@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 1
+  exam_id: 1
+  upload_id: 1
+  final: false
+  anomalous: false
+
+two:
+  user_id: 1
+  exam_id: 1
+  upload_id: 1
+  final: false
+  anomalous: false

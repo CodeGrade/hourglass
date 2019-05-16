@@ -1,0 +1,11 @@
+<div class="container">
+  <% flash.each do |key, value| %>
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="alert <%= flash_class(key) %>">
+          <%= value.html_safe %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

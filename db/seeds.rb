@@ -5,3 +5,14 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+prof = User.create(
+  username: "prof",
+  email: "prof@example.com",
+  encrypted_password: Devise::Encryptor.digest(User, "prof")
+)
+
+student = User.create(
+  username: "student",
+  email: "student@example.com",
+  encrypted_password: Devise::Encryptor.digest(User, "student")
+)

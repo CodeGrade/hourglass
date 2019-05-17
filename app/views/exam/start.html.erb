@@ -1,17 +1,8 @@
-<% @exam.info["files"]&.each do |file| %>
-  <h2>File: <%= file %></h2>
-<% end %>
-<% num = 1 %>
-<% @exam.info["questions"].each do |question| %>
-  <div id="question">
-    <h1>Question <%= num %>: <%= question["name"] %></h1>
-    <%= render "files", files: question["files"] %>
-    <p><%= question["description"]&.html_safe %></p>
-    <% partnum = 1 %>
-    <% question["parts"].each do |part| %>
-      <%= render "part", part: part, num: partnum %>
-      <% partnum+=1 %>
-    <% end %>
-  </div>
-  <% num+=1 %>
-<% end %>
+<div class="container">
+  <%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
+  <% num = 1 %>
+  <% @exam.info["questions"].each do |question| %>
+    <%= render "question", question: question, num: num %>
+    <% num+=1 %>
+  <% end %>
+</div>

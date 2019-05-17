@@ -1,6 +1,16 @@
-<% @page_title = "Welcome to Hourglass" %>
+<div id="signin">
+  <%= bootstrap_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+    <div class="form-signin text-center">
+      <h1 class="h3 mb-3 font-weight-normal">Login with your CCS username and password</h1>
 
-<h1>Welcome to Hourglass</h1>
-<p>Hourglass is a web-based exam submission tool for Computer Science courses.</p>
+      <%= f.text_field :username, class: "form-control", autofocus: true, hide_label: true, placeholder: "Username", id: "username" %>
+      <%= f.password_field :password, class: "form-control", type: "password", autocomplete: "off", hide_label: true, placeholder: "Password" %>
 
-<%= render "devise/sessions/form" %>
+      <% if devise_mapping.rememberable? -%>
+        <%= f.check_box :remember_me, id: "remember" %>
+      <% end -%>
+
+      <%= f.submit "Log in", class: "btn btn-lg btn-primary btn-block" %>
+    </div>
+  <% end %>
+</div>

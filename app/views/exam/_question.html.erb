@@ -1,0 +1,12 @@
+<div class="row question">
+  <div class="col-sm-12">
+    <h1>Question <%= num %>: <%= question["name"] %></h1>
+    <%= render "files", files: question["files"] if question["files"] %>
+    <p><%= question["description"]&.html_safe %></p>
+    <% partnum = 1 %>
+    <% question["parts"].each do |part| %>
+      <%= render "part", part: part, num: partnum %>
+      <% partnum+=1 %>
+    <% end %>
+  </div>
+</div>

@@ -21,6 +21,8 @@ gem 'devise_ldap_authenticatable'
 
 gem 'bootstrap', '~> 4.3.1'
 gem 'jquery-rails'
+gem "bootstrap_form", ">= 4.2.0"
+
 
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'

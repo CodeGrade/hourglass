@@ -1,8 +1,8 @@
+<% @page_title = "Log in" %>
 <div id="signin">
   <%= bootstrap_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
     <div class="form-signin text-center">
       <h1 class="h3 mb-3 font-weight-normal">Login with your CCS username and password</h1>
-
       <%= f.text_field :username, class: "form-control", autofocus: true, hide_label: true, placeholder: "Username", id: "username" %>
       <%= f.password_field :password, class: "form-control", type: "password", autocomplete: "off", hide_label: true, placeholder: "Password" %>
 

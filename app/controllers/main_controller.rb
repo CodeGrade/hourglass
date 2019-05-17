@@ -3,7 +3,7 @@ class MainController < ApplicationController
     if current_user
       render "dashboard"
     else
-      render "landing"
+      redirect_to new_user_session_path
     end
   end
 

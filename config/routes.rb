@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   root to: 'main#home'
   devise_for :users, :skip => [:registrations, :passwords]
-  resources :exam do
+  resources :exam, only: [:show] do
     member do
       get :start
       post :save_snapshot

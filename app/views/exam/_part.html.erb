@@ -1,0 +1,7 @@
+<h3>Part <%= num %>: <%= part["name"] %></h3>
+<h4>This part is worth <%= part["points"] %> points.</h4>
+<p><%= part["description"]&.html_safe %></p>
+<%= render "files", files: part["files"] %>
+<% part["body"].each do |item| %>
+  <%= render "bodyitem", item: item %>
+<% end %>

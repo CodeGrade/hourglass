@@ -6,8 +6,8 @@ class Exam < ApplicationRecord
 
   validates_presence_of :upload
 
-  def questions
-    return @questions if @questions
-    @questions = YAML.load(File.read(upload.file_name))
+  def info
+    return @info if @info
+    @info = YAML.load(File.read(upload.file_name))[0]
   end
 end

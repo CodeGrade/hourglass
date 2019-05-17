@@ -1,0 +1,5 @@
+<% if item.is_a? String %>
+  <p><%= item.html_safe %></p>
+<% else %>
+  <%= render "exam/questiontypes/#{item.keys[0].downcase}", item: item %>
+<% end %>

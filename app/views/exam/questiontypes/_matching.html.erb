@@ -1,2 +1,5 @@
 <!--TODO -->
-MATCHING
+<% item.each do |entry| %>
+  <%= entry.keys[0] %> <strong>matches to</strong> <%= entry[entry.keys[0]] %>
+  <br>
+<% end %>

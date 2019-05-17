@@ -3,7 +3,7 @@
   <div class="row">
     <div class="col-12">
       <h1><%= @exam.name %></h1>
-      <p><%= @exam.info["instructions"] %></p>
+      <p><%= @exam.info["instructions"]&.html_safe %></p>
     </div>
   </div>
   <%= render "files", files: @exam.info["files"] if @exam.info["files"] %>

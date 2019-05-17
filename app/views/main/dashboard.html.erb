@@ -1,6 +1,6 @@
 <% @page_title = "Home" %>
 <h1>Your Exams</h1>
-<h2><%= current_user.username %></h2>
+<h2><%= current_user.username %> - <%= link_to "log out", destroy_user_session_path, method: :delete %></h2>
 <% @exams&.each do |exam| %>
   <%= link_to exam.name, exam %>
 <% end %>

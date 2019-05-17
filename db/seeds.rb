@@ -9,14 +9,12 @@ case Rails.env
 when "development"
   prof = User.new(
     username: "professor",
-    email: "prof@example.com",
     password: "professor"
   )
   prof.save!
 
   student = User.new(
     username: "student",
-    email: "student@example.com",
     password: "student"
   )
   student.save!

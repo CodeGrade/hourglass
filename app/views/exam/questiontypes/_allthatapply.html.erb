@@ -1,2 +1,5 @@
 <!--TODO -->
-ALL THAT APPLY
+<% item.each do |option| %>
+  <input type="checkbox"><%= option.keys[0] %>
+  <br>
+<% end %>

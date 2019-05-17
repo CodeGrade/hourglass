@@ -1,2 +1,12 @@
 <!--TODO -->
-MULTIPLE CHOICE
+<!-- make these radio buttons -->
+<select>
+  <option value="empty"></option>
+  <% num = 0 %>
+  <% item["options"].each do |option| %>
+    <option value="<%= num %>">
+      <%= option.html_safe %>
+    </option>
+    <% num += 1 %>
+  <% end %>
+</select>

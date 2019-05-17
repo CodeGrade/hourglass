@@ -20,17 +20,31 @@ when "development"
   student.save!
 
   exam = Exam.new(
-    secret_key: "secret",
+    secret_key: "exam_secret",
     enabled: true,
-    name: "CS 2500 Midterm 1",
+    name: "Demo Exam",
   )
 
   upload = Upload.new(
     user: prof,
-    file_name: "exam1.yaml",
-    secret_key: "secret",
+    file_name: Rails.root.join("test", "fixtures", "files", "example.yaml"),
+    secret_key: "upload_secret",
     exam: exam
   )
   exam.save!
   upload.save!
+
+  student_reg = Registration.new(
+    user: student,
+    exam: exam,
+    role: 0
+  )
+  student_reg.save!
+
+  prof_reg = Registration.new(
+    user: prof,
+    exam: exam,
+    role: 1
+  )
+  prof_reg.save!
 end

@@ -1,0 +1,64 @@
+---
+- instructions: Instructions go here.
+  questions:
+    - name: "The first one"
+      description: "First question in the exam. This text shows at the top of each page for this question."
+      files:
+        - "q1/main.java"
+      separateSubparts: true
+      parts:
+        - name: "Part A"
+          description: "This part will test basic Java syntax knowledge. This text is shown only on the page for part A."
+          points: 16
+          body:
+            - "Answer all of the following true/false questions."
+            - TrueFalse:
+                prompt: "Java requires the use of semicolons to end statements"
+                correctAnswer: true
+            - TrueFalse:
+                prompt: "Racket requires the use of semicolons to end statements"
+                correctAnswer: false
+            - "The next one is tricky! Be careful."
+            - TrueFalse:
+                prompt: "Java does not require the use of semicolons to end statements"
+                correctAnswer: false
+        - name: "Part B"
+          points: 11
+          files:
+            - lang: "java"
+              filename: "q1/b.java" # this file will only show on part B's page
+          body:
+            - "Type your code here:"
+            - Code:
+                lang: "java"
+            - "What does the code in PartB.java do?"
+            - MultipleChoice:
+                options:
+                  - "Nothing"
+                  - "Prints 4"
+                  - "Prints 5"
+                  - "Prints 4 and then prints 5"
+                correctAnswer: 2
+    - name: "second question name"
+      description: "Welcome to question 2. This is where the fun begins."
+      parts:
+        - body:
+          - "Match items on the left to items on the right."
+          - Matching:
+              - "favorite programming language": "ISL w/lambda"
+              - "choose 5": "5"
+          points: 2
+        - name: "The second part! Name is optional."
+          points: 6
+          files: ["q2/b.rkt"]
+          body:
+            - "Select all that apply."
+            - AllThatApply:
+              - "this one applies": true
+              - "this one also applies": true
+              - "this one applies not": false
+        - points: 30
+          body:
+          - "Did you choose no?"
+          - YesNo:
+            correctAnswer: true # wrong

@@ -6,6 +6,7 @@ class CreateUploads < ActiveRecord::Migration[5.2]
       t.string :secret_key, null: false
       t.integer :exam_id, null: false
 
+      t.index :exam_id, unique: true
       t.timestamps
     end
   end

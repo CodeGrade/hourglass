@@ -1,0 +1,140 @@
+---
+start: Exams
+Exams:
+  array: Exam
+Exam:
+  object:
+    - key: "instructions"
+      value: HTML
+      optional: true
+    - key: "files"
+      value: Files
+      optional: true
+    - key: "questions"
+      value: Questions
+      minSize: 1
+Questions:
+  array: Question
+Question:
+  object:
+    - key: "name"
+      value: String
+      optional: true
+    - key: "description"
+      value: HTML
+      optional: true
+    - key: "files"
+      value: Files
+      optional: true
+    - key: "separateSubparts"
+      value: Boolean
+      optional: true
+    - key: "parts"
+      value: Parts
+Files:
+  array: File
+File:
+  one_of:
+    - String
+    - FileInfo
+FileInfo:
+  object:
+    - key: "lang"
+      value: String
+      optional: true
+    - key: "filename"
+      value: String
+Parts:
+  array: Part
+Part:
+  object:
+    - key: "name"
+      value: String
+      optional: true
+    - key: "description"
+      value: HTML
+      optional: true
+    - key: "points"
+      value: Float
+    - key: "files"
+      value: Files
+      optional: true
+    - key: "body"
+      value: BodyItems
+BodyItems:
+  array: BodyItem
+BodyItem:
+  one_of:
+    - HTML
+    - Response
+Response:
+  tagged_one_of:
+    - Code
+    - YesNo
+    - TrueFalse
+    - MultipleChoice
+    - Matching
+    - AllThatApply
+    - CodeTag
+    - Text
+Code:
+  object:
+    - key: "lang"
+      value: String
+      optional: true
+    - key: "initial"
+      value: File
+      optional: true
+YesNo:
+  object:
+    - key: "prompt"
+      value: HTML
+    - key: "correctAnswer"
+      value: Boolean
+TrueFalse:
+  object:
+    - key: "prompt"
+      value: HTML
+    - key: "correctAnswer"
+      value: Boolean
+MultipleChoice:
+  object:
+    - key: "options"
+      value: Options
+    - key: "correctAnswer"
+      value: [Integer, [0, "options"]]
+Options:
+  array: HTML
+Matching:
+  array: MatchingEntry
+MatchingEntry:
+  dictionary:
+    key: HTML
+    value: HTML
+    size: 1
+AllThatApply:
+  array: ATAOption
+ATAOption:
+  dictionary:
+    key: HTML
+    value: Boolean
+    size: 1
+CodeTag:
+  object:
+    - key: "prompt"
+      value: HTML
+    - key: "correctAnswer"
+      value: TagAnswer
+TagAnswer:
+  one_of:
+    - Lines
+    - Line
+Lines:
+  array: Line
+Line:
+  object:
+    - key: "filename"
+      value: String
+    - key: "line"
+      value: Integer
+Text:

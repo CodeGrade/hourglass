@@ -5,14 +5,34 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
-prof = User.create(
-  username: "prof",
-  email: "prof@example.com",
-  encrypted_password: Devise::Encryptor.digest(User, "prof")
-)
+case Rails.env
+when "development"
+  prof = User.new(
+    username: "professor",
+    email: "prof@example.com",
+    password: "professor"
+  )
+  prof.save!
 
-student = User.create(
-  username: "student",
-  email: "student@example.com",
-  encrypted_password: Devise::Encryptor.digest(User, "student")
-)
+  student = User.new(
+    username: "student",
+    email: "student@example.com",
+    password: "student"
+  )
+  student.save!
+
+  exam = Exam.new(
+    secret_key: "secret",
+    enabled: true,
+    name: "CS 2500 Midterm 1",
+  )
+
+  upload = Upload.new(
+    user: prof,
+    file_name: "exam1.yaml",
+    secret_key: "secret",
+    exam: exam
+  )
+  exam.save!
+  upload.save!
+end

@@ -18,7 +18,6 @@ ActiveRecord::Schema.define(version: 2019_05_16_153211) do
   create_table "exams", force: :cascade do |t|
     t.string "secret_key", null: false
     t.boolean "enabled", null: false
-    t.integer "upload_id", null: false
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -49,6 +48,7 @@ ActiveRecord::Schema.define(version: 2019_05_16_153211) do
     t.integer "exam_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["exam_id"], name: "index_uploads_on_exam_id", unique: true
   end
 
   create_table "users", force: :cascade do |t|

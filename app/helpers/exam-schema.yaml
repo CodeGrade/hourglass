@@ -99,6 +99,9 @@ TrueFalse:
       value: Boolean
 MultipleChoice:
   object:
+    - key: Prompt
+      value: HTML
+      optional: true
     - key: "options"
       value: Options
     - key: "correctAnswer"
@@ -106,6 +109,12 @@ MultipleChoice:
 Options:
   array: HTML
 Matching:
+  object:
+    - key: "prompt"
+      value: HTML
+    - key: "options"
+      value: MatchingEntries
+MatchingEntries:
   array: MatchingEntry
 MatchingEntry:
   dictionary:
@@ -113,6 +122,12 @@ MatchingEntry:
     value: HTML
     size: 1
 AllThatApply:
+  object:
+    - key: "prompt"
+      value: HTML
+    - key: "options"
+      value: ATAOptions
+ATAOptions:
   array: ATAOption
 ATAOption:
   dictionary:
@@ -138,3 +153,7 @@ Line:
     - key: "line"
       value: Integer
 Text:
+  object:
+    - key: "prompt"
+      value: HTML
+      optional: true

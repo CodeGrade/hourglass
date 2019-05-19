@@ -1,13 +1,14 @@
 <!--TODO -->
 <% files.each do |file| %>
-
-  <% if file.is_a? String then %>
-    <% @filename = file %>
-    <% @lang = "text/x-java" %>
-  <% else %>
-    <% @filename = file["filename"] %>
-    <% @lang = file["lang"] %>
-  <% end %>
-  <h2>File: <%= @filename %></h2>
-  <textarea class="codemirror-textarea" file="<%= @filename %>" lang="<%= @lang %>"></textarea>
+  <div class="card">
+    <% if file.is_a? String then %>
+      <% @filename = file %>
+      <% @lang = "text/x-java" %>
+    <% else %>
+      <% @filename = file["filename"] %>
+      <% @lang = file["lang"] %>
+    <% end %>
+    <h2>File: <%= @filename %></h2>
+    <textarea class="codemirror-textarea" file="<%= @filename %>" lang="<%= @lang %>"></textarea>
+  </div>
 <% end %>

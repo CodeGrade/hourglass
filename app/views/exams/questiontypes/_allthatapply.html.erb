@@ -1,10 +1,12 @@
 <!--TODO -->
-<% item.each do |option| %>
-  <div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-    <label class="form-check-label" for="defaultCheck1">
-      <%= option.keys[0] %>
-    </label>
-  </div>
-  <br>
+<%= render "exams/prompt", item: item %>
+<% qtitle = :need_some_unique_name #TODO %>
+<%= bootstrap_form_tag do |f| %>
+  <%= f.form_group qtitle, label: { text: "Select all that apply." } do %>
+    <% num = 0 # TODO: are these always in order? %>
+    <% item["options"].each do |option| %>
+      <%= f.check_box "#{qtitle}_#{num}", label: option.keys[0] %>
+      <% num += 1 %>
+    <% end %>
+  <% end %>
 <% end %>

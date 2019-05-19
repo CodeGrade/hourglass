@@ -1,6 +1,9 @@
 <!--TODO -->
-<select class="form-control">
-  <option value="empty"></option>
-  <option value="true">Yes</option>
-  <option value="false">No</option>
-</select>
+<%= render "exams/prompt", item: item %>
+<% qtitle = :need_some_unique_name #TODO %>
+<%= bootstrap_form_tag do |f| %>
+  <%= f.form_group qtitle, label: { text: "Select yes or no." } do %>
+    <%= f.radio_button qtitle, true, label: "Yes" %>
+    <%= f.radio_button qtitle, false, label: "No" %>
+  <% end %>
+<% end %>

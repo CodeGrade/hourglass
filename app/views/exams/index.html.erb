@@ -1,4 +1,11 @@
-<% if @exams %>
+<% if @exams.empty? %>
+  <% @page_title = "No Exam Ready" %>
+  <div class="row">
+    <div class="col-sm-12">
+      <h1>No exam ready.</h1>
+    </div>
+  </div>
+<% else %>
   <% @page_title = "My Exams" %>
   <h1>My Exams</h1>
   <ul>
@@ -6,11 +13,4 @@
       <li><%= link_to exam.name, exam %></li>
     <% end %>
   </ul>
-<% else %>
-  <% @page_title = "No Exam Ready" %>
-  <div class="row">
-    <div class="col-sm-12">
-      <h1>No exam ready.</h1>
-    </div>
-  </div>
 <% end %>

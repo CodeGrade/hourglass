@@ -8,7 +8,8 @@ class ExamsController < ApplicationController
 
   def index
     registrations = Registration.where(user: current_user)
-    @exams = registrations.map &:exam
+    @exams = registrations.map(&:exam)
+    @exams.keep_if(&:enabled?)
   end
 
   def start

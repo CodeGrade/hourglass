@@ -1,9 +1,6 @@
-<!--TODO -->
 <%= render "exams/prompt", item: item %>
-<%= @form.form_group @current, label: { text: "Select one of the following responses." } do %>
-  <% num = 0 # TODO: are these always in order? %>
-  <% item["options"].each do |option| %>
-    <%= @form.radio_button @current, num, label: option.html_safe %>
-    <% num += 1 %>
+<%= @form.form_group unique_label, label: { text: "Select one of the following responses." } do %>
+  <% item["options"].each_with_index do |option, index| %>
+    <%= @form.radio_button unique_label, index, label: option.html_safe %>
   <% end %>
 <% end %>

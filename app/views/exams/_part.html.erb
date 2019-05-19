@@ -1,15 +1,12 @@
-<% @part += 1 %>
 <div class="row part card">
   <div class="col-12">
-    <h3>Part <%= @part %>: <%= part["name"] %></h3>
+    <h3>Part <%= part_number %>: <%= part["name"] %></h3>
     <h4>This part is worth <%= part["points"] %> points.</h4>
     <p><%= part["description"]&.html_safe %></p>
     <%= render "files", files: part["files"] if part["files"] %>
-    <% @bodyitem = 0 %>
-    <% part["body"].each do |item| %>
-      <% @current = "question_#{@question}_part_#{@part}_item_#{@bodyitem}" %>
+    <% part["body"].each_with_index do |item, index| %>
       <hr>
-      <%= render "bodyitem", item: item %>
+      <%= render "bodyitem", item: item, question_number: question_number, part_number: part_number, bodyitem_number: index %>
     <% end %>
   </div>
 </div>

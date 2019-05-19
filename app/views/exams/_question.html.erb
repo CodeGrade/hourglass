@@ -1,12 +1,12 @@
+<% @question += 1 %>
 <div class="row question card">
   <div class="col-12">
-    <h1>Question <%= num %>: <%= question["name"] %></h1>
+    <h1>Question <%= @question %>: <%= question["name"] %></h1>
     <%= render "files", files: question["files"] if question["files"] %>
     <p><%= question["description"]&.html_safe %></p>
-    <% partnum = 1 %>
+    <% @part = 0 %>
     <% question["parts"].each do |part| %>
-      <%= render "part", part: part, num: partnum %>
-      <% partnum+=1 %>
+      <%= render "part", part: part %>
     <% end %>
   </div>
 </div>

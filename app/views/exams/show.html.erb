@@ -2,8 +2,7 @@
 <h1><%= @exam.name %></h1>
 <p><%= @exam.info["instructions"]&.html_safe %></p>
 <%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
-<% num = 1 %>
+<% @question = 0 %>
 <% @exam.info["questions"].each do |question| %>
-  <%= render "question", question: question, num: num %>
-  <% num+=1 %>
+  <%= render "question", question: question %>
 <% end %>

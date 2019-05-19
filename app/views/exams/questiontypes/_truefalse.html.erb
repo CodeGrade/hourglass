@@ -1,9 +1,8 @@
 <!--TODO -->
 <%= render "exams/prompt", item: item %>
-<% qtitle = :need_some_unique_name #TODO %>
 <%= bootstrap_form_tag do |f| %>
-  <%= f.form_group qtitle, label: { text: "Select true or false." } do %>
-    <%= f.radio_button qtitle, true, label: "True" %>
-    <%= f.radio_button qtitle, false, label: "False" %>
+  <%= f.form_group @current, label: { text: "Select true or false." } do %>
+    <%= f.radio_button @current, true, label: "True" %>
+    <%= f.radio_button @current, false, label: "False" %>
   <% end %>
 <% end %>

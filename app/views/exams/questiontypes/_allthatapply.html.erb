@@ -1,5 +1,10 @@
 <!--TODO -->
 <% item.each do |option| %>
-  <input type="checkbox"><%= option.keys[0] %>
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+    <label class="form-check-label" for="defaultCheck1">
+      <%= option.keys[0] %>
+    </label>
+  </div>
   <br>
 <% end %>

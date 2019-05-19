@@ -1,2 +1,8 @@
 <!--TODO -->
-<textarea class="codemirror-textarea"></textarea>
+<% if item["lang"] %>
+  <% @lang = item["lang"] %>
+<% else %>
+  <% @lang = "text/x-java" %>
+<% end %>
+
+<textarea class="codemirror-textarea" <% if item["intial"] %>file="<%= item["initial"] %>"<% end %>></textarea>

@@ -4,7 +4,7 @@
     - name: "The first one"
       description: "First question in the exam. This text shows at the top of each page for this question."
       files:
-        - "q1/main.java"
+        - "/Example.java"
       separateSubparts: true
       parts:
         - name: "Part A"
@@ -26,7 +26,7 @@
           points: 11
           files:
             - lang: "java"
-              filename: "q1/b.java" # this file will only show on part B's page
+              filename: "/Example.java" # this file will only show on part B's page
           body:
             - "Type your code here:"
             - Code:
@@ -50,7 +50,7 @@
           points: 2
         - name: "The second part! Name is optional."
           points: 6
-          files: ["q2/b.rkt"]
+          files: ["/Example.java"]
           body:
             - "Select all that apply."
             - AllThatApply:

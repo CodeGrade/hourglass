@@ -1,10 +1,6 @@
 <% @page_title = @exam.name %>
-<div class="row">
-  <div class="col-12">
-    <h1><%= @exam.name %></h1>
-    <p><%= @exam.info["instructions"]&.html_safe %></p>
-  </div>
-</div>
+<h1><%= @exam.name %></h1>
+<p><%= @exam.info["instructions"]&.html_safe %></p>
 <%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
 <% num = 1 %>
 <% @exam.info["questions"].each do |question| %>

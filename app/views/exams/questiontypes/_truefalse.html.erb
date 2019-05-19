@@ -1,8 +1,6 @@
 <!--TODO -->
 <%= render "exams/prompt", item: item %>
-<%= bootstrap_form_tag do |f| %>
-  <%= f.form_group @current, label: { text: "Select true or false." } do %>
-    <%= f.radio_button @current, true, label: "True" %>
-    <%= f.radio_button @current, false, label: "False" %>
-  <% end %>
+<%= @form.form_group @current, label: { text: "Select true or false." } do %>
+  <%= @form.radio_button @current, true, label: "True" %>
+  <%= @form.radio_button @current, false, label: "False" %>
 <% end %>

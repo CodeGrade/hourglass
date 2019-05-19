@@ -3,6 +3,11 @@
 <p><%= @exam.info["instructions"]&.html_safe %></p>
 <%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
 <% @question = 0 %>
-<% @exam.info["questions"].each do |question| %>
-  <%= render "question", question: question %>
+<%= bootstrap_form_tag do |form| %>
+  <% @form = form %>
+  <% @exam.info["questions"].each do |question| %>
+    <%= render "question", question: question %>
+  <% end %>
+
+  <%#= form.submit class: "btn btn-success" %>
 <% end %>

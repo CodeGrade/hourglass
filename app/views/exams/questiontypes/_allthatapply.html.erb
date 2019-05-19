@@ -1,11 +1,9 @@
 <!--TODO -->
 <%= render "exams/prompt", item: item %>
-<%= bootstrap_form_tag do |f| %>
-  <%= f.form_group @current, label: { text: "Select all that apply." } do %>
-    <% num = 0 # TODO: are these always in order? %>
-    <% item["options"].each do |option| %>
-      <%= f.check_box "#{@current}_#{num}", label: option.keys[0] %>
-      <% num += 1 %>
-    <% end %>
+<%= @form.form_group @current, label: { text: "Select all that apply." } do %>
+  <% num = 0 # TODO: are these always in order? %>
+  <% item["options"].each do |option| %>
+    <%= @form.check_box "#{@current}_#{num}", label: option.keys[0] %>
+    <% num += 1 %>
   <% end %>
 <% end %>

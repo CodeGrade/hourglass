@@ -1,11 +1,9 @@
 <!--TODO -->
 <%= render "exams/prompt", item: item %>
-<%= bootstrap_form_tag do |f| %>
-  <%= f.form_group @current, label: { text: "Select one of the following responses." } do %>
-    <% num = 0 # TODO: are these always in order? %>
-    <% item["options"].each do |option| %>
-      <%= f.radio_button @current, num, label: option.html_safe %>
-      <% num += 1 %>
-    <% end %>
+<%= @form.form_group @current, label: { text: "Select one of the following responses." } do %>
+  <% num = 0 # TODO: are these always in order? %>
+  <% item["options"].each do |option| %>
+    <%= @form.radio_button @current, num, label: option.html_safe %>
+    <% num += 1 %>
   <% end %>
 <% end %>

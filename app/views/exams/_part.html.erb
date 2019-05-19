@@ -7,7 +7,7 @@
     <%= render "files", files: part["files"] if part["files"] %>
     <% @bodyitem = 0 %>
     <% part["body"].each do |item| %>
-      <% @current = "#{@question}_#{@part}_#{@bodyitem}" %>
+      <% @current = "question_#{@question}_part_#{@part}_item_#{@bodyitem}" %>
       <hr>
       <%= render "bodyitem", item: item %>
     <% end %>

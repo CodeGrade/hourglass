@@ -10,6 +10,7 @@ class ExamsController < ApplicationController
     registrations = Registration.where(user: current_user)
     @exams = registrations.map(&:exam)
     @exams.keep_if(&:enabled?)
+    redirect_to @exams[0] if @exams.size == 1
   end
 
   def start

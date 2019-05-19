@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -12,7 +15,12 @@
   </head>
 
   <body>
+  <%=  render "layouts/navbar"  %>
+  <% unless flash.empty? %>
     <%= render "layouts/flash" %>
+  <% end %>
+  <div class="container mt-4">
     <%= yield %>
+  </div>
   </body>
 </html>

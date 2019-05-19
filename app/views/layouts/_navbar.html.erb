@@ -1,0 +1,14 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <%= link_to "Hourglass", root_path, class: "navbar-brand"%>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav ml-auto">
+      <% if current_user %>
+        <span class="navbar-text mr-3"><%= current_user.username %></span>
+        <%= button_to "Log Out", destroy_user_session_path, method: :delete, class: "btn btn-outline-danger mr-auto" %>
+      <% end %>
+    </ul>
+  </div>
+</nav>

@@ -8,7 +8,7 @@ Rails.application.routes.draw do
     delete "/logout" => "devise/sessions#destroy", :as => :destroy_user_session
   end
 
-  resources :exam, only: [:show] do
+  resources :exams, only: [:show, :index] do
     member do
       get :start
       post :save_snapshot

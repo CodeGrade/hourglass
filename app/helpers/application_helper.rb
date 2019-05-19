@@ -1,10 +1,9 @@
 module ApplicationHelper
-  def flash_class(level)
-    {
-      "notice" => "alert-info",
-      "success" => "alert-success",
-      "error" => "alert-danger",
-      "alert" => "alert-danger"
-    }[level]
+  def flash_class
+    { notice: 'info',
+      success: 'success',
+      error: 'danger',
+      alert: 'danger'
+    }
   end
 end

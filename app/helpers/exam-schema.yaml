@@ -32,18 +32,7 @@ Question:
     - key: "parts"
       value: Parts
 Files:
-  array: File
-File:
-  one_of:
-    - String
-    - FileInfo
-FileInfo:
-  object:
-    - key: "lang"
-      value: String
-      optional: true
-    - key: "filename"
-      value: String
+  array: String
 Parts:
   array: Part
 Part:
@@ -83,7 +72,7 @@ Code:
       value: String
       optional: true
     - key: "initial"
-      value: File
+      value: String
       optional: true
 YesNo: Boolean
 TrueFalse: Boolean

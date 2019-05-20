@@ -1,18 +1,12 @@
 <%
-  if item["lang"]
-    lang = item["lang"]
-  else
-    lang = "text/x-java"
-  end
-
-  if item["initial"]
-    contents = File.read(Rails.root.join("public", item["initial"]))
-  else
-    contents = ""
-  end
+  lang = item["lang"]
+  lang ||= "text/x-java"
 %>
 
 <p>Respond with code in the following area.</p>
 <textarea class="codemirror-textarea" data-lang="<%= lang %>" data-readonly="false" name="<%= unique_label %>">
-  <%= render html: contents %>
+  <% if item["initial"] %>
+    <% contents = File.read(Rails.root.join("public", item["initial"])) %>
+    <%= render html: contents %>
+  <% end %>
 </textarea>

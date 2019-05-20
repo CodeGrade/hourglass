@@ -18,4 +18,5 @@
 //= require bootstrap-sprockets
 //= require codemirror
 //= require codemirror/modes/clike
+//= require codemirror/modes/scheme
 //= require_tree .

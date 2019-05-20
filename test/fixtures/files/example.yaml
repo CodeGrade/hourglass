@@ -22,8 +22,7 @@
         - name: "Part B"
           points: 11
           files:
-            - lang: "text/x-java"
-              filename: "Example.java" # this file will only show on part B's page
+            - "Example.rkt" # this file will only show on part B's page
           body:
             - "Type some code in the box."
             - Code:

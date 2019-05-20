@@ -13,6 +13,4 @@
 %>
 
 <p>Respond with code in the following area.</p>
-<textarea class="codemirror-textarea" data-lang="<%= lang %>" data-readonly="false" name="<%= unique_label %>">
-  <%= render html: contents %>
-</textarea>
+<%= render "exams/codemirror", lang: lang, readonly: false, contents: contents, name: unique_label %>

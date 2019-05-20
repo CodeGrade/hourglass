@@ -8,7 +8,7 @@
           <%= prompt %>
           <br>
           <% box_label = "#{unique_label}_#{idx}" %>
-          <%= form.text_field box_label, label: "Matches:", class: "float-right col-2", maxlength: 1, type: "number", min: 1, max: num_answers %>
+          <%= form.text_field box_label, label: "Matches:", class: "float-right col-2", type: "number", min: 1, max: num_answers %>
         </li>
       <% end %>
     </ol>

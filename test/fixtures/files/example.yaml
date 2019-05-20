@@ -28,6 +28,7 @@
             - "Type some code in the box."
             - Code:
                 lang: "text/x-java"
+                initial: "/Example2.java"
             - "What does the code in PartB.java do?"
             - MultipleChoice:
                 options:
@@ -40,21 +41,24 @@
       description: "Welcome to question 2. This is where the fun begins."
       parts:
         - body:
-          - "This matching section concerns import information."
-          - Matching:
-              prompts:
-                - "favorite programming language"
-                - "choose 5"
-              values:
-                - "5"
-                - "ISL w/λ"
-              correctAnswers:
-                - 1
-                - 0
+            - "This matching section concerns import information."
+            - Matching:
+                prompts:
+                  - "favorite programming language"
+                  - "choose 5"
+                values:
+                  - "5"
+                  - "ISL w/λ"
+                correctAnswers:
+                  - 1
+                  - 0
+            - "Type some code"
+            - Code:
+                lang: "text/x-java"
           points: 2
         - name: "The second part! Name is optional."
           points: 6
-          files: ["/Example2.java"]
+          files: ["/Example.java"]
           body:
             - "Which are true about Java?"
             - AllThatApply:

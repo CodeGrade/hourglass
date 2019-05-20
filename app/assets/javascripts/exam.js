@@ -64,7 +64,7 @@ function applyMarks(cm, allMarks) {
 async function activateCode(code) {
     if ($(code).data("lang")) {
         var cm = CodeMirror.fromTextArea(code, {
-            readOnly: false, indentUnit: 2,
+            readOnly: $(code).data("readonly"), indentUnit: 2,
             mode: $(code).data("lang"),
             viewportMargin: Infinity,
             lineNumbers: true, lineWrapping: false,

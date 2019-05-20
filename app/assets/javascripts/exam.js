@@ -3,11 +3,6 @@ $(function(){
     $(".codemirror-textarea").each(activateCode);
 });
 
-async function fileLoad(file) {
-    const res = await fetch(file);
-    return res.text();
-}
-
 function extractMarks(text) {
     var lines = text.split(/\r\n?|\n/);
     if (/^\s*$/.test(lines[0])) { lines.shift(); }
@@ -59,7 +54,7 @@ function applyMarks(cm, allMarks) {
     });
 }
 
-async function activateCode(index, code) {
+function activateCode(index, code) {
     if ($(code).data("lang")) {
         var cm = CodeMirror.fromTextArea(code, {
             readOnly: $(code).data("readonly"), indentUnit: 2,
@@ -72,15 +67,14 @@ async function activateCode(index, code) {
                 'Tab': "indentAuto"
             })
         });
-        var text = "";
-        if ($(code).data("file")) {
-            text = await fileLoad($(code).data("file"));
+        if ($(code).data("contents")) {
+            const text = $(code).data("contents");
+            var markedText = extractMarks(text);
+            cm.setValue(markedText.text);
+            if (markedText.count > 0) applyMarks(cm, markedText.marks);
+            for (var i = 0; i < markedText.lines.length; i++)
+                cm.indentLine(i, "smart", true);
         }
-        var markedText = extractMarks(text);
-        cm.setValue(markedText.text);
-        if (markedText.count > 0) applyMarks(cm, markedText.marks);
-        for (var i = 0; i < markedText.lines.length; i++)
-            cm.indentLine(i, "smart", true);
         cm.setCursor(0, 0);
         cm.clearHistory();
     }

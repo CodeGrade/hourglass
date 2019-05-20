@@ -4,7 +4,7 @@
     - name: "The first one"
       description: "First question in the exam. This text shows at the top of each page for this question."
       files:
-        - "/Example.java"
+        - "Example.java"
       separateSubparts: true
       parts:
         - name: "Part A"
@@ -23,12 +23,12 @@
           points: 11
           files:
             - lang: "text/x-java"
-              filename: "/Example.java" # this file will only show on part B's page
+              filename: "Example.java" # this file will only show on part B's page
           body:
             - "Type some code in the box."
             - Code:
                 lang: "text/x-java"
-                initial: "/Example2.java"
+                initial: "Example2.java"
             - "What does the code in PartB.java do?"
             - MultipleChoice:
                 options:
@@ -58,7 +58,7 @@
           points: 2
         - name: "The second part! Name is optional."
           points: 6
-          files: ["/Example.java"]
+          files: ["Example.java"]
           body:
             - "Which are true about Java?"
             - AllThatApply:
@@ -73,7 +73,7 @@
             - "Tag your <i>favorite</i> line of code."
             - CodeTag:
                 correctAnswer:
-                  filename: "/Example.java"
+                  filename: "Example.java"
                   line: 22
             - "Explain your reasoning for taking this course."
             - Text:

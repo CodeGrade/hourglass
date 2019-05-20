@@ -9,7 +9,10 @@
       <% lang = file["lang"] %>
     <% end %>
     <h2>File: <%= filename %></h2>
-    <textarea class="codemirror-textarea" data-file="<%= filename %>" data-lang="<%= lang %>" data-readonly="true"></textarea>
+    <%
+      contents = File.read(Rails.root.join("public", filename))
+    %>
+    <textarea class="codemirror-textarea" data-lang="<%= lang %>" data-readonly="true" data-contents="<%= contents %>"></textarea>
   </div>
   <hr>
 <% end %>

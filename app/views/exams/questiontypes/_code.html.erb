@@ -1,8 +1,16 @@
-<% if item["lang"] %>
-  <% lang = item["lang"] %>
-<% else %>
-  <% lang = "text/x-java" %>
-<% end %>
+<%
+  if item["lang"]
+    lang = item["lang"]
+  else
+    lang = "text/x-java"
+  end
+
+  if item["initial"]
+    contents = File.read(Rails.root.join("public", item["initial"]))
+  else
+    contents = ""
+  end
+%>
 
 <%= form.text_area unique_label, label: "Respond with code in the following area.", class: "codemirror-textarea",
-                   data: {lang: lang, file: item["initial"], readonly: false} %>
+                   data: {lang: lang, contents: contents, readonly: false} %>

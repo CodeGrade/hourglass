@@ -1,5 +1,22 @@
 <p>Match items on the left to items on the right.</p>
-<% item["options"].each do |entry| %>
-  <%= entry.keys[0] %> <strong>matches to</strong> <%= entry[entry.keys[0]] %>
-  <br>
-<% end %>
+<div class="row no-gutters">
+  <div class="col">
+    <ol type="A">
+      <% item["prompts"].each_with_index do |prompt, idx| %>
+        <li data-index="<%= idx %>" class="clearfix">
+          <%= prompt %>
+          <br>
+          <% box_label = "#{unique_label}_#{idx}" %>
+          <%= form.text_field box_label, label: "Matches:", class: "float-right col-2", maxlength: 1 %>
+        </li>
+      <% end %>
+    </ol>
+  </div>
+  <div class="col">
+    <ol type="1">
+      <% item["values"].each_with_index do |answer, idx| %>
+        <li data-index="<%= idx %>"><%= answer %></li>
+      <% end %>
+    </ol>
+  </div>
+</div>

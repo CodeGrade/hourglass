@@ -96,12 +96,15 @@ MultipleChoice:
 Options:
   array: HTML
 Matching:
-  array: MatchingEntry
-MatchingEntry:
-  dictionary:
-    key: HTML
-    value: HTML
-    size: 1
+  object:
+    - key: "prompts"
+      value: Options
+    - key: "values"
+      value: Options
+    - key: "correctAnswers"
+      value: MatchingAnswers
+MatchingAnswers:
+  array: Integer
 AllThatApply:
   array: ATAOption
 ATAOption:

@@ -43,9 +43,15 @@
         - body:
           - "This matching section concerns import information."
           - Matching:
-              options:
-                - "favorite programming language": "ISL w/lambda"
-                - "choose 5": "5"
+              prompts:
+                - "favorite programming language"
+                - "choose 5"
+              values:
+                - "5"
+                - "ISL w/λ"
+              correctAnswers:
+                - 1
+                - 0
           points: 2
         - name: "The second part! Name is optional."
           points: 6

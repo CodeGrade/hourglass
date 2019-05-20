@@ -4,7 +4,7 @@
     <p><%= question["description"]&.html_safe %></p>
     <%= render "files", files: question["files"] if question["files"] %>
     <% question["parts"].each_with_index do |part, index| %>
-      <%= render "part", part: part, question_number: question_number, part_number: index %>
+      <%= render "part", form: form, part: part, question_number: question_number, part_number: index %>
     <% end %>
   </div>
 </div>

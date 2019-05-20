@@ -1,7 +1,7 @@
 <% if item.is_a? String %>
   <p><%= item.html_safe %></p>
 <% else %>
-  <%= render "exams/questiontypes/#{item.keys[0].downcase}", item: item[item.keys[0]],
+  <%= render "exams/questiontypes/#{item.keys[0].downcase}", form: form, item: item[item.keys[0]],
              unique_label: "question_#{question_number}_part_#{part_number}_item_#{bodyitem_number}" %>
   <hr>
 <% end %>

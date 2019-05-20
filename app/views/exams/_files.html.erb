@@ -12,7 +12,9 @@
     <%
       contents = File.read(Rails.root.join("public", filename))
     %>
-    <%= render "exams/codemirror", lang: lang, readonly: true, contents: contents %>
+    <textarea class="codemirror-textarea" data-lang="<%= lang %>" data-readonly="true">
+      <%= render html: contents %>
+    </textarea>
   </div>
   <hr>
 <% end %>

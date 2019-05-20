@@ -1,7 +1,6 @@
 
 $(function(){
-    const code = $(".codemirror-textarea").toArray();
-    code.forEach(activateCode);
+    $(".codemirror-textarea").each(activateCode);
 });
 
 async function fileLoad(file) {
@@ -60,7 +59,7 @@ function applyMarks(cm, allMarks) {
     });
 }
 
-async function activateCode(code) {
+async function activateCode(index, code) {
     if ($(code).data("lang")) {
         var cm = CodeMirror.fromTextArea(code, {
             readOnly: $(code).data("readonly"), indentUnit: 2,

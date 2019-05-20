@@ -22,13 +22,12 @@
         - name: "Part B"
           points: 11
           files:
-            - lang: "java"
+            - lang: "text/x-java"
               filename: "/Example.java" # this file will only show on part B's page
           body:
             - "Type some code in the box."
             - Code:
-                lang: "java"
-                initial: "/Example.java"
+                lang: "text/x-java"
             - "What does the code in PartB.java do?"
             - MultipleChoice:
                 options:
@@ -55,7 +54,7 @@
           points: 2
         - name: "The second part! Name is optional."
           points: 6
-          files: ["/Example.java"]
+          files: ["/Example2.java"]
           body:
             - "Which are true about Java?"
             - AllThatApply:

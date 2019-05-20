@@ -1,24 +1,90 @@
-function initCodeMirror(element) {
-    const editor = CodeMirror.fromTextArea(element, {
-        lineNumbers : true,
-        mode: 'text/x-java',
-        lineWrapping: true,
-    });
-    if (element.hasAttribute("file")) {
-        codeMirrorLoad(editor, element.getAttribute("file"));
-    }
+
+$(function(){
+    const code = $(".codemirror-textarea").toArray();
+    code.forEach(activateCode);
+});
+
+async function fileLoad(file) {
+    const res = await fetch(file);
+    return res.text();
 }
 
-function codeMirrorLoad(editor, file) {
-    fetch(file).then(res => {
-        res.text().then((str) => {
-            editor.setValue(str);
+function extractMarks(text) {
+    console.log("text", text)
+    var lines = text.split(/\r\n?|\n/);
+    if (/^\s*$/.test(lines[0])) { lines.shift(); }
+    if (/^\s*$/.test(lines[lines.length - 1])) { lines.pop(); }
+    var marks = {byLine: [], byNum: Object.create(null)};
+    var count = 0;
+    for (var lineNo = 0; lineNo < lines.length; lineNo++) {
+        marks.byLine[lineNo] = [];
+        var idx = undefined;
+        while ((idx = lines[lineNo].search(/~ro:\d+:[se]~/)) >= 0) {
+            var m = lines[lineNo].match(/~ro:(\d+):([se])~/);
+            lines[lineNo] = lines[lineNo].replace(m[0], "");
+            if (m[2] === "s") {
+                count++;
+                marks.byNum[m[1]] = {startLine: lineNo, startCol: idx, number: m[1],
+                    lockBefore: (lineNo == 0 && idx == 0)};
+                if (marks.byLine[lineNo][idx] === undefined)
+                    marks.byLine[lineNo][idx] = {open: [], close: []};
+                marks.byLine[lineNo][idx].open.push(marks.byNum[m[1]]);
+            }
+            else if (marks.byNum[m[1]] !== undefined) {
+                marks.byNum[m[1]].endLine = lineNo;
+                marks.byNum[m[1]].endCol = idx;
+                marks.byNum[m[1]].lockAfter = (lineNo == lines.length - 1) && (idx == lines[lineNo].length);
+                if (marks.byLine[lineNo][idx] === undefined)
+                    marks.byLine[lineNo][idx] = {open: [], close: []};
+                marks.byLine[lineNo][idx].close.unshift(marks.byNum[m[1]]);
+            } else {
+                console.error("No information found for mark [" + m.join(", ") + "]")
+            }
+        }
+    }
+    return {count: count, lines: lines, text: lines.join("\n"), marks: marks};
+}
+
+function applyMarks(cm, allMarks) {
+    var curCol = 0;
+    var curLine = 0;
+    var openMarks = " ";
+    allMarks.byLine.forEach(function(lineMarks) {
+        lineMarks.forEach(function(colMarks) {
+            colMarks.open.forEach(function(mark) {
+                cm.markText({line: mark.startLine, ch: mark.startCol},
+                    {line: mark.endLine, ch: mark.endCol},
+                    {inclusiveLeft: mark.lockBefore, inclusiveRight: mark.lockAfter,
+                        readOnly: true, className: "readOnly"});
+            });
         });
     });
 }
 
-$(window).on('load', function(){
-    console.log("window loaded");
-    const code = $(".codemirror-textarea").toArray();
-    code.forEach(initCodeMirror);
-});
+async function activateCode(code) {
+    if ($(code).data("lang")) {
+        var cm = CodeMirror.fromTextArea(code, {
+            readOnly: false, indentUnit: 2,
+            mode: $(code).data("lang"),
+            viewportMargin: Infinity,
+            lineNumbers: true, lineWrapping: false,
+            styleActiveLine: true,
+            extraKeys: CodeMirror.normalizeKeyMap({
+                'Enter': "newlineAndIndent",
+                'Tab': "indentAuto"
+            })
+        });
+        var text = "";
+        if ($(code).data("file")) {
+            text = await fileLoad($(code).data("file"));
+        }
+        var markedText = extractMarks(text);
+        cm.setValue(markedText.text);
+        if (markedText.count > 0) applyMarks(cm, markedText.marks);
+        for (var i = 0; i < markedText.lines.length; i++)
+            cm.indentLine(i, "smart", true);
+        cm.setCursor(0, 0);
+        cm.clearHistory();
+    }
+    $(code).addClass("cm-s-mdn-like cm-s-default");
+}

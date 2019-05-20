@@ -1,7 +1,8 @@
 <% if item["lang"] %>
-  <% @lang = item["lang"] %>
+  <% lang = item["lang"] %>
 <% else %>
-  <% @lang = "text/x-java" %>
+  <% lang = "text/x-java" %>
 <% end %>
 
-<%= form.text_area unique_label, label: "Respond with code in the following area.", class: "codemirror-textarea", file: item["initial"] %>
+<%= form.text_area unique_label, label: "Respond with code in the following area.", class: "codemirror-textarea",
+                   data: {lang: lang, file: item["initial"]} %>

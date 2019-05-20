@@ -10,7 +10,6 @@ async function fileLoad(file) {
 }
 
 function extractMarks(text) {
-    console.log("text", text)
     var lines = text.split(/\r\n?|\n/);
     if (/^\s*$/.test(lines[0])) { lines.shift(); }
     if (/^\s*$/.test(lines[lines.length - 1])) { lines.pop(); }

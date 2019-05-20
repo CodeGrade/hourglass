@@ -1,4 +1,3 @@
-<%= render "exams/prompt", item: item %>
 <p>Match items on the left to items on the right.</p>
 <% item["options"].each do |entry| %>
   <%= entry.keys[0] %> <strong>matches to</strong> <%= entry[entry.keys[0]] %>

@@ -1,5 +1,4 @@
-<%= render "exams/prompt", item: item %>
-<%= @form.form_group unique_label, label: { text: "Select all that apply." } do %>
+<%= @form.form_group unique_label, label: {text: "Select all that apply:"} do %>
   <% item["options"].each_with_index do |option, index| %>
     <%= @form.check_box "#{unique_label}_#{index}", label: option.keys[0] %>
   <% end %>

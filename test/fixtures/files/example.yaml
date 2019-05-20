@@ -12,16 +12,13 @@
           points: 16
           body:
             - "Answer all of the following true/false questions."
-            - TrueFalse:
-                prompt: "Java requires the use of semicolons to end statements"
-                correctAnswer: true
-            - TrueFalse:
-                prompt: "Racket requires the use of semicolons to end statements"
-                correctAnswer: false
+            - "Java requires the use of semicolons to end statements."
+            - TrueFalse: true
+            - "Racket requires the use of semicolons to end statements."
+            - TrueFalse: false
             - "The next one is tricky! Be careful."
-            - TrueFalse:
-                prompt: "Java does not require the use of semicolons to end statements"
-                correctAnswer: false
+            - "Java does not require the use of semicolons to end statements."
+            - TrueFalse: false
         - name: "Part B"
           points: 11
           files:
@@ -31,8 +28,9 @@
             - "Type some code in the box."
             - Code:
                 lang: "java"
+                initial: "/Example.java"
+            - "What does the code in PartB.java do?"
             - MultipleChoice:
-                prompt: "What does the code in PartB.java do?"
                 options:
                   - "Nothing"
                   - "Prints 4"
@@ -43,8 +41,8 @@
       description: "Welcome to question 2. This is where the fun begins."
       parts:
         - body:
+          - "This matching section concerns import information."
           - Matching:
-              prompt: "This matching section concerns import information."
               options:
                 - "favorite programming language": "ISL w/lambda"
                 - "choose 5": "5"
@@ -53,21 +51,20 @@
           points: 6
           files: ["/Example.java"]
           body:
+            - "Which are true about Java?"
             - AllThatApply:
-                prompt: "Which are true about Java?"
                 options:
                   - "this one applies": true
                   - "this one also applies": true
                   - "this one applies not": false
         - points: 30
           body:
-          - YesNo:
-              prompt: "Did you choose no?"
-              correctAnswer: true # wrong
-          - CodeTag:
-              prompt: "Tag your <i>favorite</i> line of code."
-              correctAnswer:
-                filename: "/Example.java"
-                line: 22
-          - Text:
-              prompt: "Explain your reasoning for taking this course."
+            - "Did you choose no?"
+            - YesNo: true # wrong
+            - "Tag your <i>favorite</i> line of code."
+            - CodeTag:
+                correctAnswer:
+                  filename: "/Example.java"
+                  line: 22
+            - "Explain your reasoning for taking this course."
+            - Text:

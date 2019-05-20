@@ -5,7 +5,6 @@
     <p><%= part["description"]&.html_safe %></p>
     <%= render "files", files: part["files"] if part["files"] %>
     <% part["body"].each_with_index do |item, index| %>
-      <hr>
       <%= render "bodyitem", item: item, question_number: question_number, part_number: part_number, bodyitem_number: index %>
     <% end %>
   </div>

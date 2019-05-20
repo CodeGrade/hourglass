@@ -17,7 +17,8 @@ function codeMirrorLoad(editor, file) {
     });
 }
 
-$(document).ready(function(){
+$(window).on('load', function(){
+    console.log("window loaded");
     const code = $(".codemirror-textarea").toArray();
     code.forEach(initCodeMirror);
 });

@@ -67,14 +67,12 @@ function activateCode(index, code) {
                 'Tab': "indentAuto"
             })
         });
-        if ($(code).data("contents")) {
-            const text = $(code).data("contents");
-            var markedText = extractMarks(text);
-            cm.setValue(markedText.text);
-            if (markedText.count > 0) applyMarks(cm, markedText.marks);
-            for (var i = 0; i < markedText.lines.length; i++)
-                cm.indentLine(i, "smart", true);
-        }
+        const text = $(code).text();
+        var markedText = extractMarks(text);
+        cm.setValue(markedText.text);
+        if (markedText.count > 0) applyMarks(cm, markedText.marks);
+        for (var i = 0; i < markedText.lines.length; i++)
+            cm.indentLine(i, "smart", true);
         cm.setCursor(0, 0);
         cm.clearHistory();
     }

@@ -12,5 +12,7 @@
   end
 %>
 
-<%= form.text_area unique_label, label: "Respond with code in the following area.", class: "codemirror-textarea",
-                   data: {lang: lang, contents: contents, readonly: false} %>
+<p>Respond with code in the following area.</p>
+<textarea class="codemirror-textarea" data-lang="<%= lang %>" data-readonly="false" name="<%= unique_label %>">
+  <%= render html: contents %>
+</textarea>

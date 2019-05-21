@@ -1,4 +1,8 @@
-<%= form.form_group unique_label, label: { text: "Select true or false." } do %>
-  <%= form.radio_button unique_label, true, label: "True" %>
-  <%= form.radio_button unique_label, false, label: "False" %>
-<% end %>
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+  <label class="btn btn-outline-primary">
+    <input type="radio" name="<%= unique_label %>" value="true" autocomplete="off">True
+  </label>
+  <label class="btn btn-outline-primary">
+    <input type="radio" name="<%= unique_label %>" value="false" autocomplete="off">False
+  </label>
+</div>

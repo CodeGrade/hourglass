@@ -1,4 +1,8 @@
-<%= form.form_group unique_label, label: { text: "Select yes or no." } do %>
-  <%= form.radio_button unique_label, true, label: "Yes" %>
-  <%= form.radio_button unique_label, false, label: "No" %>
-<% end %>
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+  <label class="btn btn-outline-primary">
+    <input type="radio" name="<%= unique_label %>" value="true" autocomplete="off">Yes
+  </label>
+  <label class="btn btn-outline-primary">
+    <input type="radio" name="<%= unique_label %>" value="false" autocomplete="off">No
+  </label>
+</div>

@@ -1,6 +1,6 @@
 <div class="row question card">
   <div class="col-12">
-    <h1>Question <%= question_number + 1 %>: <%= question["name"] %></h1>
+    <h1 id="q<%=question_number+1 %>">Question <%= question_number + 1 %>: <%= question["name"] %></h1>
     <p><%= question["description"]&.html_safe %></p>
     <%= render "files", files: question["files"] if question["files"] %>
     <% question["parts"].each_with_index do |part, index| %>

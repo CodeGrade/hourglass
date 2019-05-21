@@ -1,6 +1,6 @@
 <div class="row part card">
   <div class="col-12">
-    <h3>Part <%= part_number + 1 %>: <%= part["name"] %></h3>
+    <h3 id="q<%= question_number+1 %>p<%= part_number+1 %>">Part <%= part_number + 1 %>: <%= part["name"] %></h3>
     <h4>This part is worth <%= part["points"] %> points.</h4>
     <p><%= part["description"]&.html_safe %></p>
     <%= render "files", files: part["files"] if part["files"] %>

@@ -13,6 +13,10 @@ class ExamsController < ApplicationController
     redirect_to @exams[0] if @exams.size == 1
   end
 
+  def submit
+    debugger
+  end
+
   def start
     @exam = Exam.find(params[:id])
     render html: 'TODO'

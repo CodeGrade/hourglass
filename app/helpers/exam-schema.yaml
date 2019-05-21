@@ -70,7 +70,6 @@ Code:
   object:
     - key: "lang"
       value: String
-      optional: true
     - key: "initial"
       value: String
       optional: true

@@ -59,3 +59,38 @@ body {
 .CodeMirror .readOnly {
   background: #8d6d001a;
 }
+
+div.paginated {
+  > div.question {
+    display: none;
+    > div > div.part {
+      display: none;
+    }
+
+    &.active {
+      display: initial;
+      > div > div.part {
+        display: initial;
+      }
+    }
+
+    nav {
+      display: none;
+    }
+  }
+
+  > div.question.paginated {
+    > div > div.part {
+      display: none;
+    }
+    &.active {
+      > div > div.part.active {
+        display: initial;
+      }
+    }
+
+    nav {
+      display: initial;
+    }
+  }
+}

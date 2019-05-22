@@ -9,7 +9,7 @@
               <%= prompt %>
             </div>
             <div class="col-md-4">
-              <% box_label = "#{unique_label}_#{idx}" %>
+              <% box_label = "#{unique_label}[#{idx}]" %>
               <% num_items = item["values"].size %>
               <%= form.select box_label, 1..num_items, include_blank: true, label: "Matches:" %>
             </div>

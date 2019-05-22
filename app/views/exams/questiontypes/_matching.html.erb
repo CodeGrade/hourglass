@@ -1,14 +1,24 @@
 <p>Match items on the left to items on the right.</p>
-<% num_answers = item["values"].size %>
 <div class="row no-gutters">
   <div class="col">
     <ol type="A">
       <% item["prompts"].each_with_index do |prompt, idx| %>
         <li data-index="<%= idx %>" class="clearfix">
-          <%= prompt %>
-          <br>
-          <% box_label = "#{unique_label}_#{idx}" %>
-          <%= form.text_field box_label, label: "Matches:", class: "float-right col-2", type: "number", min: 1, max: num_answers %>
+          <div class="row">
+            <div class="col-md-8">
+              <%= prompt %>
+            </div>
+            <div class="col-md-4">
+              Matches:
+              <% box_label = "#{unique_label}_#{idx}" %>
+              <select class="form-control" name="<%= box_label %>">
+                <option></option>
+                <% item["values"].each_with_index do |_, index| %>
+                  <option value="<%= index+1 %>"><%= index+1 %></option>
+                <% end %>
+              </select>
+            </div>
+          </div>
         </li>
       <% end %>
     </ol>

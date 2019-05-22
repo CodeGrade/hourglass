@@ -11,7 +11,12 @@
             <div class="col-md-4">
               <% box_label = "#{unique_label}[#{idx}]" %>
               <% num_items = item["values"].size %>
-              <%= form.select box_label, 1..num_items, include_blank: true, label: "Matches:" %>
+              <%= form.select box_label,
+                              options_for_select(["Choose one..."] + (1..num_items).to_a,
+                                                 selected: "Choose one...",
+                                                 disabled: "Choose one..."),
+                              {label: "Matches:" },
+                              {class: "custom-select"} %>
             </div>
           </div>
         </li>

@@ -9,14 +9,9 @@
               <%= prompt %>
             </div>
             <div class="col-md-4">
-              Matches:
               <% box_label = "#{unique_label}_#{idx}" %>
-              <select class="form-control" name="<%= box_label %>">
-                <option></option>
-                <% item["values"].each_with_index do |_, index| %>
-                  <option value="<%= index+1 %>"><%= index+1 %></option>
-                <% end %>
-              </select>
+              <% num_items = item["values"].size %>
+              <%= form.select box_label, 1..num_items, include_blank: true, label: "Matches:" %>
             </div>
           </div>
         </li>

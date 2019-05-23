@@ -1,7 +1,8 @@
 <p>Respond with code in the following area.</p>
 <textarea class="codemirror-textarea" data-lang="<%= item["lang"] %>" data-readonly="false" name="<%= unique_label %>">
-  <% if item["initial"] %>
-    <% contents = File.read(Rails.root.join("public", item["initial"])) %>
+  <% file = item["initial"] %>
+  <% if file %>
+      <% contents = File.read(@exam.file(file)[:full_path]) %>
     <%= render html: contents %>
   <% end %>
 </textarea>

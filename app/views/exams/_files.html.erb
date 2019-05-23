@@ -3,7 +3,7 @@
     <% lang = mime_type(file) %>
     <h2>File: <%= file %></h2>
     <textarea class="codemirror-textarea" data-lang="<%= lang %>" data-readonly="true">
-      <% contents = File.read(Rails.root.join("public", file)) %>
+      <% contents = File.read(@exam.file(file)[:full_path]) %>
       <%= render html: contents %>
     </textarea>
   </div>

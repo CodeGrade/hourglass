@@ -26,9 +26,11 @@ when "development"
 
   upload = Upload.new(
     user: prof,
-    file_name: Rails.root.join("test", "fixtures", "files", "example.yaml"),
+    file_name: Rails.root.join("test", "fixtures", "files", "demo-exam.zip"),
     exam: exam
   )
+  upload.upload_data = FakeUpload.new(upload.file_name)
+
   exam.save!
   upload.save!
 

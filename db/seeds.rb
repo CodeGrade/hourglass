@@ -20,15 +20,13 @@ when "development"
   student.save!
 
   exam = Exam.new(
-    secret_key: "exam_secret",
     enabled: true,
-    name: "Demo Exam",
+    name: "Demo Exam"
   )
 
   upload = Upload.new(
     user: prof,
     file_name: Rails.root.join("test", "fixtures", "files", "example.yaml"),
-    secret_key: "upload_secret",
     exam: exam
   )
   exam.save!

@@ -10,7 +10,7 @@ class Exam < ApplicationRecord
   def exam_yaml
     # TODO need to validate that this file is part of the upload before allowing the upload
     #   in a `validates` in Upload
-    (upload.extracted_files.select {|f| f[:path] == "exam.yaml"})[0][:full_path]
+    upload.extracted_path.join("exam.yaml")
   end
 
   def info
@@ -29,18 +29,11 @@ class Exam < ApplicationRecord
     self.secret_key = SecureRandom.urlsafe_base64
   end
 
-  def files
-    # TODO check to make sure the directory actually exists, otherwise throw an error
-    upload_files_dir = (upload.extracted_files.select {|f| f[:path] == "files"})[0]
-    upload_files_dir[:children]
-  end
-
   def file(name)
-    found = files.select {|f| f[:path] == name}
-    if found.size != 1
-      raise "bad file '#{f}'!"
-    end
-    found[0]
+    f = upload.extracted_path.join('files', name)
+    raise "bad file '#{f}'!" unless File.exist? f
+
+    f
   end
 
   # map of base filename to its public link

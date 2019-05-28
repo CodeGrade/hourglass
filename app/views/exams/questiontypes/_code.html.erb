@@ -2,7 +2,7 @@
 <textarea class="codemirror-textarea" data-lang="<%= item["lang"] %>" data-readonly="false" name="<%= unique_label %>">
   <% file = item["initial"] %>
   <% if file %>
-      <% contents = File.read(@exam.file(file)[:full_path]) %>
+      <% contents = File.read(@exam.file(file)) %>
     <%= render html: contents %>
   <% end %>
 </textarea>

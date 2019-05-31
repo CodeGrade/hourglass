@@ -20,7 +20,9 @@ gem 'devise'
 gem 'devise_ldap_authenticatable'
 
 gem 'bootstrap', '~> 4.3.1'
+gem 'bootstrap-toggle-rails'
 gem 'jquery-rails'
+gem 'jquery-ui-rails'
 gem "bootstrap_form", ">= 4.2.0"
 
 gem 'codemirror-rails'

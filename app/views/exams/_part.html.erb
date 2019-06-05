@@ -3,8 +3,11 @@
     <h3>Part <%= part_number + 1 %>: <%= part["name"] %></h3>
     <h4>This part is worth <%= part["points"] %> points.</h4>
     <p><%= part["description"]&.html_safe %></p>
-    <% if part["files"] %>
-      <% dirs, files = @exam.get_exam_files %>
+    <%
+      part_files = "q#{question_number+1}-#{part_number+1}"
+      dirs, files = @exam.get_exam_files(part_files)
+      unless files.empty?
+    %>
       <%= render "filepicker", dirs: dirs, files: files, root: "question_#{question_number}_part_#{part_number}" %>
     <% end %>
     <% part["body"].each_with_index do |item, index| %>

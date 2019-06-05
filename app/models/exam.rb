@@ -36,16 +36,7 @@ class Exam < ApplicationRecord
     f
   end
 
-  # map of base filename to its public link
-  def files_map
-    ret = {}
-    files.each do |file|
-      ret[file[:path]] = file[:public_link]
-    end
-    ret
-  end
-
-  def get_exam_files(names=nil)
+  def get_exam_files(folder)
     @exam_files = []
     def ensure_utf8(str, mimetype)
       if ApplicationHelper.binary?(mimetype)
@@ -122,7 +113,7 @@ class Exam < ApplicationRecord
       end
     end
 
-    @exam_dirs = self.upload.extracted_files.map{|i| with_extracted(i)}.compact
+    @exam_dirs = self.upload.extracted_files(folder).map{|i| with_extracted(i)}.compact
     @exam_files.each do |sf|
       if sf[:type] == "symlink" && !sf[:broken]
         sf[:link_href] = @exam_files.find{|f| f[:link]&.ends_with?(sf[:link_to])}[:href]

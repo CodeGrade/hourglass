@@ -21,9 +21,20 @@ class Upload < ApplicationRecord
     # zip_dir/
     # +-- exam.yaml
     # +-- files/
-    # |   +-- Example.java
-    # |   +-- Example2.java
-    # |   +-- Example.rkt
+    # |   ...
+
+    # 'files' contains folders for each question/part, in the following format:
+    #    q{number}-{all|part_number}
+    #
+    # files/
+    # +-- q1-all/
+    # |   +-- src/
+    # |   |   +-- packageone/
+    # |   |   |   +-- Example.java
+    # |   |   +-- packagetwo/
+    # |   |   |   +-- Example2.java
+    # +-- q1-1/
+    # |   +-- anything.txt
 
     # storage of the upload in /private is as follows:
     #
@@ -52,7 +63,7 @@ class Upload < ApplicationRecord
     end
   end
 
-  def extracted_files
+  def extracted_files(folder)
     def rec_path(path)
       path.children.sort.collect do |child|
         if child.symlink?
@@ -78,7 +89,12 @@ class Upload < ApplicationRecord
         end
       end
     end
-    rec_path(extracted_path)
+    folder_path = files_path.join(folder)
+    if File.exist? folder_path
+      rec_path(folder_path)
+    else
+      []
+    end
   end
 
   def original_path
@@ -87,6 +103,10 @@ class Upload < ApplicationRecord
 
   def extracted_path
     upload_dir.join("extracted")
+  end
+
+  def files_path
+    extracted_path.join("files")
   end
 
   def extract_contents!(mimetype)

@@ -7,9 +7,6 @@ Exam:
     - key: "instructions"
       value: HTML
       optional: true
-    - key: "files"
-      value: Files
-      optional: true
     - key: "questions"
       value: Questions
       minSize: 1
@@ -23,16 +20,11 @@ Question:
     - key: "description"
       value: HTML
       optional: true
-    - key: "files"
-      value: Files
-      optional: true
     - key: "separateSubparts"
       value: Boolean
       optional: true
     - key: "parts"
       value: Parts
-Files:
-  array: String
 Parts:
   array: Part
 Part:
@@ -45,9 +37,6 @@ Part:
       optional: true
     - key: "points"
       value: Float
-    - key: "files"
-      value: Files
-      optional: true
     - key: "body"
       value: BodyItems
 BodyItems:
@@ -70,9 +59,6 @@ Code:
   object:
     - key: "lang"
       value: String
-    - key: "initial"
-      value: String
-      optional: true
 YesNo: Boolean
 TrueFalse: Boolean
 MultipleChoice:

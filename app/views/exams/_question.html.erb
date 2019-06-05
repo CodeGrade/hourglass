@@ -4,8 +4,11 @@
     <h1>Question <%= question_number + 1 %>: <%= question["name"] %></h1>
     <p><%= question["description"]&.html_safe %></p>
 
-    <% if question["files"] %>
-      <% dirs, files = @exam.get_exam_files %>
+    <%
+      q_files = "q#{question_number+1}-all"
+      dirs, files = @exam.get_exam_files(q_files)
+      unless files.empty?
+    %>
       <%= render "filepicker", dirs: dirs, files: files, root: "question_#{question_number}" %>
     <% end %>
 

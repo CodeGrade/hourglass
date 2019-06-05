@@ -1,8 +1,3 @@
 <p>Respond with code in the following area.</p>
 <textarea class="sourceCode" data-lang="<%= item["lang"] %>" data-readonly="false" name="<%= unique_label %>">
-  <% file = item["initial"] %>
-  <% if file %>
-      <% contents = File.read(@exam.file(file)) %>
-    <%= render html: contents %>
-  <% end %>
 </textarea>

@@ -1,32 +1,36 @@
 $.widget("hg.filePicker", {
-    options: {},
+    options: {
+        // vertical: true,
+        // editable: false
+    },
     _create: function () {
-        var thiz = this;
-        var $nav = $("<nav>");
-        thiz.anchors = [];
-        var $page = $("<ul>").addClass("pagination");
-        this.element.find(".tab-content > *").each(function (i, e) {
-            thiz.anchors[i] = "#" + $(this).attr("id");
-            var filename = $(e).find("textarea").data("name");
-            var anchor = $("<a>").addClass("page-link").attr("href", "#").text(filename);
-            var li = $("<li>").addClass("page-item");
-            li.attr('id', $(this).attr("id") + "_link");
-            $page.append(li.append(anchor));
-            anchor.click((e) => {
-                e.preventDefault();
-                thiz.activate(i);
-            })
-        });
-        $nav.append($page);
-        this.element.append($nav);
-        this.activate(0);
+        this.activateTreeView();
+        this.element.find(".file-pane").removeClass("active");
     },
 
-    activate: function (i) {
-        this.element.find(".page-item").removeClass("active");
-        this.element.find(this.anchors[i] + "_link").addClass("active");
-        this.element.find(".file-pane").removeClass("active");
-        this.element.find(this.anchors[i]).addClass("active");
-        this.element.find(".CodeMirror").each(function(i, e) {e.CodeMirror.refresh();});
+    activateTreeView: function() {
+        var thiz = this;
+        this.element.find(".files").treeview({
+            expandIcon: 'glyphicon glyphicon-chevron-down', // deliberately the same
+            collapseIcon: 'glyphicon glyphicon-chevron-down', // always expanded
+            enableLinks: true,
+            onNodeSelected: function(e, data) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (data.href !== undefined && data.href !== "#") {
+                    let id = "#" + thiz.options.root + "_" + data.href;
+                    thiz.element.find(".file-pane").removeClass("active");
+                    let foundPane = thiz.element.find(id);
+                    foundPane.addClass("active");
+                    // make sure any comments are visible
+                    foundPane.find(".CodeMirror").each(function (i, e) {
+                        e.CodeMirror.refresh();
+                    });
+                }
+            },
+            data: thiz.options.dirs
+        });
+        var filesTreeview = this.element.find(".files").treeview(true);
+        filesTreeview.expandAll({ silent: true });
     }
 });

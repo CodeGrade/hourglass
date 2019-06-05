@@ -57,13 +57,13 @@
   }
 </style>
 
-<div id="files_<%= root %>" class="filepicker">
-  <div class="col-sm-3 files-sidebar-container">
+<div id="files_<%= root %>" class="filepicker row">
+  <div class="col-md-3 files-sidebar-container">
     <div class="files-sidebar">
       <div id="files-all-files" class="files nav treeview condensed"></div>
     </div>
   </div>
-  <div class="col-sm-9 tab-content">
+  <div class="col-md-9 tab-content">
     <% files.each_with_index do |f, i| %>
       <% index = (i + 1).to_s.rjust(files.count.to_s.length, '0') %>
       <div class="file-pane tab-pane panel-tab-pane active" id="<%= root %>_file_<%= index %>">
@@ -286,6 +286,8 @@
     <%#= render 'submissions/render_pdfs.js' %>
     // $(function() { $("div[id^='pdf_']").pdfViewer(); });
     $(function() {
-        $("#files_<%= root %>").filePicker();
+        let dirs = <%= raw json_escape(JSON.pretty_generate(dirs)) %>;
+        let root = "<%= root %>";
+        $("#files_<%= root %>").filePicker({ dirs, root });
     });
 </script>

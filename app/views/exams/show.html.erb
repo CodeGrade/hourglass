@@ -4,13 +4,16 @@
 <%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
 <%= bootstrap_form_tag url: submit_exam_path do |form| %>
   <div id="questions" class="paginated">
-    <nav aria-label="question navigation">
-      <ul class="pagination">
-        <% @exam.info["questions"].each_with_index do |question, index| %>
-          <li class="page-item question-page-item" id="nav-q<%= index+1 %>"><a class="page-link" href="#" onclick="showQuestion(<%= index+1 %>)"><%= index + 1 %></a></li>
-        <% end %>
-      </ul>
-    </nav>
+    <div class="mt-4">
+      <p>Question navigation:</p>
+      <nav aria-label="question navigation" id="question-nav">
+        <ul class="pagination">
+          <% @exam.info["questions"].each_with_index do |question, index| %>
+            <li class="page-item question-page-item" id="nav-q<%= index+1 %>"><a class="page-link" href="#" onclick="showQuestion(<%= index+1 %>)"><%= index + 1 %></a></li>
+          <% end %>
+        </ul>
+      </nav>
+    </div>
     <% @exam.info["questions"].each_with_index do |question, index| %>
       <%= render "question", form: form, question: question, question_number: index %>
     <% end %>
@@ -25,7 +28,7 @@
         $(".question").toggleClass("active", false);
         $("#q" + q).toggleClass("active", true);
 
-        $("#questions > nav .question-page-item").toggleClass("active", false);
+        $(".question-page-item").removeClass("active");
         $("#nav-q" + q).toggleClass("active", true);
         $("#q" + q + ".paginated .page-item").first().toggleClass("active", true);
         showPart(q, 1);
@@ -40,10 +43,6 @@
 
         $("#q" + q + " .CodeMirror").each(function (index, cm) {
             cm.CodeMirror.refresh();
-        });
-
-        $("#q" + q + " .filepicker").each(function(i, e) {
-            $(e).filePicker("activate", 0);
         });
     }
 

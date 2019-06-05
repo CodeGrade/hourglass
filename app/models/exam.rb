@@ -88,12 +88,24 @@ class Exam < ApplicationRecord
                                    type: mimetype,
                                    href: @exam_files.count + 1,
                                })
+        deductions = nil
+        { text:
+              if deductions.to_f > 0
+                "#{item[:path]} (+#{deductions})"
+              elsif deductions
+                "#{item[:path]} (#{deductions})"
+              else
+                item[:path]
+              end,
+          href: @exam_files.count,
+        }
       elsif item[:link_to]
         @exam_files.push({
                                    link_to: item[:link_to].sub(/^.*extracted\//, ""),
                                    name: item[:path],
                                    type: "symlink",
                                    href: @exam_files.count + 1,
+                                   lineComments: {noCommentsFor: item[:path].to_s},
                                    broken: item[:broken]
                                })
         {
@@ -121,25 +133,19 @@ class Exam < ApplicationRecord
 
     def fix_hrefs(node)
       if node[:href].is_a? Integer
-        node[:href] = "#file_" + node[:href].to_s.rjust(@count, '0')
+        node[:href] = "file_" + node[:href].to_s.rjust(@count, '0')
       end
       if node[:link_href].is_a? Integer
-        node[:link_href] = "#file_" + node[:link_href].to_s.rjust(@count, '0')
+        node[:link_href] = "file_" + node[:link_href].to_s.rjust(@count, '0')
       end
       if node[:nodes]
         node[:nodes].each do |n| fix_hrefs(n) end
       end
     end
-    # sub_dirs = fix_hrefs({nodes: @exam_dirs})
-    sub_files = fix_hrefs({nodes: @exam_files})
-    # remove_instance_variable :@exam_dirs
+    exam_dirs = fix_hrefs({nodes: @exam_dirs})
+    exam_files = fix_hrefs({nodes: @exam_files})
+    remove_instance_variable :@exam_dirs
     remove_instance_variable :@exam_files
-    if names
-      real_names = names.map {|f| "files/#{f}"}
-      selected_files = sub_files.select {|f| real_names.member? f[:name]}
-      return selected_files
-    else
-      return sub_files
-    end
+    return exam_dirs, exam_files
   end
 end

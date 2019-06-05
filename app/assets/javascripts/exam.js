@@ -1,6 +1,6 @@
 
 $(function(){
-    $(".codemirror-textarea").each(activateCode);
+    $(".sourceCode").each(activateCode);
 });
 
 function extractMarks(text) {

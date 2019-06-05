@@ -7,7 +7,7 @@
     <nav aria-label="question navigation">
       <ul class="pagination">
         <% @exam.info["questions"].each_with_index do |question, index| %>
-          <li class="page-item" id="nav-q<%= index+1 %>"><a class="page-link" href="#" onclick="showQuestion(<%= index+1 %>)"><%= index + 1 %></a></li>
+          <li class="page-item question-page-item" id="nav-q<%= index+1 %>"><a class="page-link" href="#" onclick="showQuestion(<%= index+1 %>)"><%= index + 1 %></a></li>
         <% end %>
       </ul>
     </nav>
@@ -25,7 +25,7 @@
         $(".question").toggleClass("active", false);
         $("#q" + q).toggleClass("active", true);
 
-        $("#questions > nav .page-item").toggleClass("active", false);
+        $("#questions > nav .question-page-item").toggleClass("active", false);
         $("#nav-q" + q).toggleClass("active", true);
         $("#q" + q + ".paginated .page-item").first().toggleClass("active", true);
         showPart(q, 1);
@@ -35,12 +35,16 @@
         $("#q" + q + " div.part").toggleClass("active", false);
         $("#q" + q + "p" + p).toggleClass("active", true);
 
-        $(".question nav .page-item").toggleClass("active", false);
+        $(".question nav .part-page-item").toggleClass("active", false);
         $("#nav-q" + q + "p" + p).toggleClass("active", true);
 
         $("#q" + q + " .CodeMirror").each(function (index, cm) {
             cm.CodeMirror.refresh();
-        })
+        });
+
+        $("#q" + q + " .filepicker").each(function(i, e) {
+            $(e).filePicker("activate", 0);
+        });
     }
 
     $(".page-link").click(function(e) {

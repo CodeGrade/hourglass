@@ -3,11 +3,15 @@
   <div class="col-12">
     <h1>Question <%= question_number + 1 %>: <%= question["name"] %></h1>
     <p><%= question["description"]&.html_safe %></p>
-    <%= render "files", files: question["files"] if question["files"] %>
+
+    <% if question["files"] %>
+      <%= render "filepicker", files: @exam.get_exam_files(question["files"]), root: "question_#{question_number}" %>
+    <% end %>
+
     <nav aria-label="part navigation">
       <ul class="pagination">
         <% question["parts"].each_with_index do |question, index| %>
-          <li class="page-item" id="nav-q<%= question_number+1 %>p<%= index+1 %>"><a class="page-link" href="#" onclick="showPart(<%= question_number+1 %>, <%= index+1 %>)"><%= index + 1 %></a></li>
+          <li class="page-item part-page-item" id="nav-q<%= question_number+1 %>p<%= index+1 %>"><a class="page-link" href="#" onclick="showPart(<%= question_number+1 %>, <%= index+1 %>)"><%= index + 1 %></a></li>
         <% end %>
       </ul>
     </nav>

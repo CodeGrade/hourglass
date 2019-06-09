@@ -1,4 +1,6 @@
 class ExamsController < ApplicationController
+  before_action :require_current_user
+
   def show
     @exam = Exam.find(params[:id])
     unless @exam.enabled?

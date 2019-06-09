@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 2019_05_13_235656) do
   create_table "submissions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "exam_id", null: false
-    t.integer "upload_id", null: false
+    t.string "file_name", null: false
     t.boolean "final", null: false
     t.boolean "anomalous", null: false
     t.datetime "created_at", null: false

@@ -17,13 +17,12 @@ class ExamsController < ApplicationController
     debugger
   end
 
-  def start
-    @exam = Exam.find(params[:id])
-    render html: 'TODO'
-  end
-
   def save_snapshot
+    answers = params.require(:answers).permit(question: {}).to_h
     @exam = Exam.find(params[:id])
-    render html: 'TODO'
+    sub = Submission.new(user: current_user, exam: @exam, final: false, anomalous: false)
+    sub.save_answers(answers)
+    sub.save!
+    render json: {ok: true}
   end
 end

@@ -37,14 +37,14 @@ when "development"
   student_reg = Registration.new(
     user: student,
     exam: exam,
-    role: 0
+    admin: false
   )
   student_reg.save!
 
   prof_reg = Registration.new(
     user: prof,
     exam: exam,
-    role: 1
+    admin: true
   )
   prof_reg.save!
 end

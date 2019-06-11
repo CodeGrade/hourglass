@@ -287,6 +287,12 @@
     // $(function() { $("div[id^='pdf_']").pdfViewer(); });
     $(function() {
         let dirs = <%= raw json_escape(JSON.pretty_generate(dirs)) %>;
+        var node = dirs[0];
+        while ('nodes' in node) {
+            node = node.nodes[0];
+        }
+        node.state = node.state || {};
+        node.state.selected = true;
         let root = "<%= root %>";
         $("#files_<%= root %>").filePicker({ dirs, root });
     });

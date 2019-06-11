@@ -56,8 +56,9 @@ function applyMarks(cm, allMarks) {
 
 function activateCode(index, code) {
     if ($(code).data("lang")) {
+        const readOnly = $(code).data("readonly");
         var cm = CodeMirror.fromTextArea(code, {
-            readOnly: $(code).data("readonly"), indentUnit: 2,
+            readOnly: readOnly, indentUnit: 2,
             mode: $(code).data("lang"),
             viewportMargin: Infinity,
             lineNumbers: true, lineWrapping: false,
@@ -70,7 +71,7 @@ function activateCode(index, code) {
         const text = $(code).text();
         var markedText = extractMarks(text);
         cm.setValue(markedText.text);
-        if (markedText.count > 0) applyMarks(cm, markedText.marks);
+        if (markedText.count > 0 && !readOnly) applyMarks(cm, markedText.marks);
         for (var i = 0; i < markedText.lines.length; i++)
             cm.indentLine(i, "smart", true);
         cm.setCursor(0, 0);

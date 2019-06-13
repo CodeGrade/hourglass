@@ -63,7 +63,9 @@
         const formData = $("#exam-form").serialize();
         const snapshotPath = "<%= save_snapshot_exam_path(@exam) %>";
         $.post(snapshotPath, formData, function success(data, status, xhr) {
-            // success saving snapshot
+            if (!data.saved) {
+                window.location.reload();
+            }
         });
     }
 </script>

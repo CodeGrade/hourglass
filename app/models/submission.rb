@@ -4,13 +4,10 @@ class Submission < ApplicationRecord
   belongs_to :user
   belongs_to :exam
 
-  before_destroy :purge!
+  after_rollback :purge!
 
   def purge!
-    FileUtils.rm_f file_name
-    if Dir.empty? user_subs
-      FileUtils.rm_rf user_subs
-    end
+    FileUtils.rm_f filename
     if Dir.empty? exam_subs
       FileUtils.rm_rf exam_subs
     end
@@ -20,20 +17,34 @@ class Submission < ApplicationRecord
     Rails.root.join("private", "submissions", Rails.env)
   end
 
+  # [[ts, answers_hash], ...]
+  def get_answers
+    JSON.parse(File.read(filename))
+  end
+
+  def save_answers(answers)
+    unless File.exist? filename
+      FileUtils.mkdir_p exam_subs
+      write_json([])
+    end
+    json = get_answers
+    ts = DateTime.now.strftime('%s')
+    json.push [ts, answers]
+    write_json(json)
+  end
+
+  private
   def exam_subs
     Submission.base_sub_dir.join(exam.id.to_i.to_s)
   end
 
-  def user_subs
-    exam_subs.join(user.id.to_i.to_s)
+  private
+  def filename
+    exam_subs.join("user#{user.id.to_i.to_s}.json")
   end
 
-  def save_answers(answers)
-    ts = Time.now.strftime('%Y-%m-%d_%H-%M-%S')
-    rand = SecureRandom.urlsafe_base64
-    self.file_name = user_subs.join "#{ts}_#{rand}"
-    fcontents = JSON.dump(answers)
-    FileUtils.mkdir_p user_subs
-    File.write(self.file_name, fcontents)
+  private
+  def write_json(json)
+    File.write(filename, JSON.dump(json))
   end
 end

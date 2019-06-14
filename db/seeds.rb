@@ -7,15 +7,24 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 case Rails.env
 when "development"
+  admin = User.new(
+    username: "admin",
+    password: "admin",
+    role: :admin
+  )
+  admin.save!
+
   prof = User.new(
     username: "professor",
-    password: "professor"
+    password: "professor",
+    role: :professor
   )
   prof.save!
 
   student = User.new(
     username: "student",
-    password: "student"
+    password: "student",
+    role: :unprivileged
   )
   student.save!
 
@@ -37,14 +46,14 @@ when "development"
   student_reg = Registration.new(
     user: student,
     exam: exam,
-    admin: false
+    role: :student
   )
   student_reg.save!
 
   prof_reg = Registration.new(
     user: prof,
     exam: exam,
-    admin: true
+    role: :professor
   )
   prof_reg.save!
 end

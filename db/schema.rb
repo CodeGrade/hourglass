@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 2019_05_13_235656) do
   create_table "registrations", force: :cascade do |t|
     t.integer "exam_id", null: false
     t.integer "user_id", null: false
-    t.boolean "admin", default: false, null: false
+    t.integer "role", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -54,6 +54,7 @@ ActiveRecord::Schema.define(version: 2019_05_13_235656) do
     t.string "username", null: false
     t.string "encrypted_password", default: "", null: false
     t.datetime "remember_created_at"
+    t.integer "role", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["username"], name: "index_users_on_username", unique: true

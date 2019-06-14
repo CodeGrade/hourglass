@@ -4,6 +4,7 @@ class CreateUsers < ActiveRecord::Migration[5.2]
       t.string :username, null: false
       t.string :encrypted_password, null: false, default: ""
       t.datetime :remember_created_at
+      t.integer :role, null: false, default: 0
 
       t.index ["username"], name: "index_users_on_username", unique: true
       t.timestamps

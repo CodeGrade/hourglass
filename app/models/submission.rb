@@ -40,7 +40,7 @@ class Submission < ApplicationRecord
 
   private
   def filename
-    exam_subs.join("user#{user.id.to_i.to_s}.json")
+    exam_subs.join("user#{user.id.to_i}.json")
   end
 
   private

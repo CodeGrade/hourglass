@@ -63,8 +63,10 @@
         const formData = $("#exam-form").serialize();
         const snapshotPath = "<%= save_snapshot_exam_path(@exam) %>";
         $.post(snapshotPath, formData, function success(data, status, xhr) {
-            if (!data.saved) {
-                window.location.reload();
+            if (data.lockout) {
+                $("#questions").remove();
+                alert("You have been locked out of this exam. Please notify an instructor if this is unexpected.");
+                // window.location.reload();
             }
         });
     }

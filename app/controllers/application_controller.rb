@@ -11,17 +11,9 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def current_user_site_admin?
-    current_user&.admin?
-  end
-
-  def current_user_prof?
-    current_user&.professor?
-  end
-
   def require_admin(fallback_path = nil)
     fallback_path ||= root_path
-    unless current_user_site_admin?
+    unless current_user&.admin?
       redirect_back fallback_location: fallback_path, alert: "Must be an admin."
       return
     end
@@ -29,7 +21,7 @@ class ApplicationController < ActionController::Base
 
   def require_admin_or_prof(fallback_path = nil)
     fallback_path ||= root_path
-    unless current_user_site_admin? || current_user_prof?
+    unless current_user&.admin_or_prof?
       redirect_back fallback_location: fallback_path, alert: "Must be an admin or professor."
       return
     end

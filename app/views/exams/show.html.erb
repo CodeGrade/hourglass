@@ -1,5 +1,8 @@
 <% @page_title = @exam.name %>
 <h1><%= @exam.name %></h1>
+<% if current_user.admin_or_prof? %>
+  <%= link_to "View registrations", exam_registrations_path(@exam), class: "btn btn-info" %>
+<% end %>
 <p><%= @exam.info["instructions"]&.html_safe %></p>
 <%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
 <%= bootstrap_form_tag url: submit_exam_path, html: {id: "exam-form"} do |form| %>

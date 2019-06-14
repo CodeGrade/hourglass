@@ -20,11 +20,6 @@ class ExamsController < ApplicationController
   end
 
   def show
-    if @registration.admin?
-      render 'admin'
-      return
-    end
-
     @registration = Registration.find_by(user: current_user, exam: @exam)
     if @registration && @registration.final?
       render 'submit'

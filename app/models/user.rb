@@ -4,4 +4,8 @@ class User < ApplicationRecord
   has_many :exams, through: :registrations
 
   enum role: [:unprivileged, :professor, :admin]
+
+  def admin_or_prof?
+    self.admin? || self.professor?
+  end
 end

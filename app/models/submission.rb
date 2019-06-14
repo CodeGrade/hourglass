@@ -28,7 +28,7 @@ class Submission < ApplicationRecord
       write_json([])
     end
     json = get_answers
-    ts = DateTime.now.strftime('%s')
+    ts = DateTime.now.iso8601
     json.push [ts, answers]
     write_json(json)
   end

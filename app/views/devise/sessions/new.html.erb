@@ -4,7 +4,7 @@
 <p>Hourglass is a Web-based exam server for Computer Science courses.</p>
 
 <div id="signin">
-  <%= bootstrap_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+  <%= bootstrap_form_for(resource, as: resource_name, url: session_path(resource_name, next: params[:next])) do |f| %>
     <div class="form-signin text-center">
       <h1 class="h4 mb-4 font-weight-normal">Login with your Khoury username and password</h1>
       <%= f.text_field :username, class: "form-control", autofocus: true, hide_label: true, placeholder: "Username", id: "username" %>

@@ -42,23 +42,24 @@ class ExamsController < ApplicationController
     answers = params.require(:answers).permit(question: {}).to_h[:question]
     @exam = Exam.find(params[:id])
     sub = Submission.find_or_initialize_by(user: current_user, exam: @exam)
-    if sub.final?
-      return false
+    if sub.final? || sub.anomalous?
+      return true
     end
     sub.final = final
     sub.save_answers(answers)
     sub.save!
+    return false
   end
 
   def submit
-    saved = save_answers(true)
-    unless saved
+    lockout = save_answers(true)
+    if lockout
       redirect_to exams_path, alert: "You have already submitted that exam."
     end
   end
 
   def save_snapshot
-    saved = save_answers
-    render json: {saved: saved}
+    lockout = save_answers
+    render json: {lockout: lockout}
   end
 end

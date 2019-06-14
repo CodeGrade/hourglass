@@ -12,11 +12,11 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user_site_admin?
-    current_user&.role == "admin"
+    current_user&.admin?
   end
 
   def current_user_prof?
-    current_user&.role >= User::roles["professor"]
+    current_user&.professor?
   end
 
   def require_admin(fallback_path = nil)

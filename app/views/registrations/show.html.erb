@@ -1,0 +1,15 @@
+<!-- TODO -->
+<div class="row">
+  <div class="col-12">
+    <h2>Registration</h2>
+    <p><%= link_to "← back to exam registrations", exam_registrations_path(@registration.exam) %></p>
+    <p><%= link_to "← back to exam", @registration.exam %></p>
+    registration for "<%= @registration.user.username %>"
+    <p>
+      <%
+        answers = @registration.get_current_answers
+      %>
+    <p>ANSWERS: <%= answers %></p>
+    (todo)
+  </div>
+</div>

@@ -1,0 +1,26 @@
+<!-- TODO -->
+<% @page_title = "#{@exam.name} Registrations" %>
+<div class="row">
+  <div class="col-12">
+    <h2><%= @page_title %></h2>
+    <p><%= link_to "← back to exam", @exam %></p>
+    <table class="table table-hover table-sm">
+      <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">User</th>
+        <th scope="col">Final?</th>
+        <th scope="col">Anomalous?</th>
+      </tr>
+      </thead>
+      <% @registrations.each do |reg| %>
+        <tr class="<%= "table-danger" if reg.anomalous? %> <%= "table-success" if reg.final? %>">
+          <td class="align-middle"><%= link_to "View", [@exam, reg], class: "btn btn-info" %></td>
+          <td class="align-middle"><%= reg.user.username %></td>
+          <td class="align-middle"><%= reg.final? %></td>
+          <td class="align-middle"><%= reg.anomalous? %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

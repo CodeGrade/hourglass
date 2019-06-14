@@ -14,6 +14,6 @@ Rails.application.routes.draw do
       post :save_snapshot
     end
 
-    resources :submissions, only: [:show, :index]
+    resources :registrations, only: [:show, :index]
   end
 end

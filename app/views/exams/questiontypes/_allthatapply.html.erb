@@ -1,5 +1,7 @@
+
 <%= form.form_group unique_label, label: {text: "Select all that apply:"} do %>
   <% item["options"].each_with_index do |option, index| %>
-    <%= form.check_box "#{unique_label}[#{index}]", label: option.keys[0] %>
+    <% checked = answer&.dig(index.to_s) == "1" %>
+    <%= form.check_box "#{unique_label}[#{index}]", label: option.keys[0], checked: checked %>
   <% end %>
 <% end %>

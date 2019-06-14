@@ -1,8 +1,10 @@
 <div class="btn-group btn-group-toggle" data-toggle="buttons">
-  <label class="btn btn-outline-primary">
-    <input type="radio" name="<%= unique_label %>" value="true" autocomplete="off">True
+  <% is_true = answer == "true" %>
+  <% is_false = answer == "false" %>
+  <label class="btn btn-outline-primary <%= "active" if is_true %>">
+    <input type="radio" name="<%= unique_label %>" value="true" autocomplete="off" <%= "checked" if is_true %>>True
   </label>
-  <label class="btn btn-outline-primary">
-    <input type="radio" name="<%= unique_label %>" value="false" autocomplete="off">False
+  <label class="btn btn-outline-primary <%= "active" if is_false %>">
+    <input type="radio" name="<%= unique_label %>" value="false" autocomplete="off" <%= "checked" if is_false %>>False
   </label>
 </div>

@@ -20,11 +20,12 @@ class ExamsController < ApplicationController
   end
 
   def show
-    @registration = Registration.find_by(user: current_user, exam: @exam)
-    if @registration && @registration.final?
+    if @registration.final?
       render 'submit'
       return
     end
+
+    @answers = @registration.get_current_answers
   end
 
   def index

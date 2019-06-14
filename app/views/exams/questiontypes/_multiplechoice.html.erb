@@ -1,5 +1,6 @@
 <%= form.form_group unique_label, label: { text: "Select one of the following responses." } do %>
   <% item["options"].each_with_index do |option, index| %>
-    <%= form.radio_button unique_label, index, label: option.html_safe %>
+    <% checked = answer == index.to_s    # nil.to_i is 0 %>
+    <%= form.radio_button unique_label, index, label: option.html_safe, checked: checked %>
   <% end %>
 <% end %>

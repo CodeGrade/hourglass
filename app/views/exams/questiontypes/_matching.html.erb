@@ -11,9 +11,12 @@
             <div class="col-md-4">
               <% box_label = "#{unique_label}[#{idx}]" %>
               <% num_items = item["values"].size %>
+              <% ops = ["Choose one..."] + (1..num_items).to_a %>
+              <% ans_idx = (answer&.dig(idx.to_s)).to_i %>
+              <% selected = ops[ans_idx] %>
               <%= form.select box_label,
-                              options_for_select(["Choose one..."] + (1..num_items).to_a,
-                                                 selected: "Choose one...",
+                              options_for_select(ops,
+                                                 selected: selected,
                                                  disabled: "Choose one..."),
                               {label: "Matches:" },
                               {class: "custom-select"} %>
@@ -25,8 +28,8 @@
   </div>
   <div class="col">
     <ol type="1">
-      <% item["values"].each_with_index do |answer, idx| %>
-        <li data-index="<%= idx %>"><%= answer %></li>
+      <% item["values"].each_with_index do |ans, idx| %>
+        <li data-index="<%= idx %>"><%= ans %></li>
       <% end %>
     </ol>
   </div>

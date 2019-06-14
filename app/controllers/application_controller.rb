@@ -4,14 +4,20 @@ class ApplicationController < ActionController::Base
   end
   protect_from_forgery
 
-  def require_current_user
+  def check_user
     if current_user.nil?
-      redirect_to root_path(next: request.fullpath), alert: "You need to log in first."
-      return
+      redirect_to user_session_path(next: request.fullpath), alert: "You need to log in first."
+      return false
     end
+    true
+  end
+
+  def require_current_user
+    check_user
   end
 
   def require_admin(fallback_path = nil)
+    return unless check_user
     fallback_path ||= root_path
     unless current_user&.admin?
       redirect_back fallback_location: fallback_path, alert: "Must be an admin."
@@ -20,6 +26,7 @@ class ApplicationController < ActionController::Base
   end
 
   def require_admin_or_prof(fallback_path = nil)
+    return unless check_user
     fallback_path ||= root_path
     unless current_user&.admin_or_prof?
       redirect_back fallback_location: fallback_path, alert: "Must be an admin or professor."

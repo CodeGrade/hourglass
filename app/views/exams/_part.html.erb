@@ -11,7 +11,8 @@
       <%= render "filepicker", dirs: dirs, files: files, root: "question_#{question_number}_part_#{part_number}" %>
     <% end %>
     <% part["body"].each_with_index do |item, index| %>
-      <%= render "bodyitem", form: form, item: item, question_number: question_number, part_number: part_number, bodyitem_number: index %>
+      <%= render "bodyitem", form: form, item: item, question_number: question_number, part_number: part_number, 
+                             bodyitem_number: index, readonly: readonly %>
     <% end %>
   </div>
 </div>

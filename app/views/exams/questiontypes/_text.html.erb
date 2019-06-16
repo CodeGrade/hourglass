@@ -1,1 +1,12 @@
+<% if readonly %>
+<b>Answer:</b>
+<% if answer.blank? %>
+<div class="border"><i class="col">No answer given</i></div>
+<% else %>
+<div class="border">
+  <% answer %>
+</div>
+<% end %>
+<% else %>
 <%= form.text_area unique_label, label: "Text Response:", value: answer %>
+<% end %>

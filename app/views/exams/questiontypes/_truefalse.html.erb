@@ -1,3 +1,7 @@
+<% if readonly %>
+<% answers = {"true"=>"True", "false"=>"False", nil=>"<i>No answer given</i>".html_safe} %>
+<b>Answer:</b> <%= answers[answer] %>
+<% else %>
 <div class="btn-group btn-group-toggle" data-toggle="buttons">
   <% is_true = answer == "true" %>
   <% is_false = answer == "false" %>
@@ -8,3 +12,4 @@
     <input type="radio" name="<%= unique_label %>" value="false" autocomplete="off" <%= "checked" if is_false %>>False
   </label>
 </div>
+<% end %>

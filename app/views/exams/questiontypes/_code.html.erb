@@ -1,4 +1,15 @@
+<% if readonly %>
+<% if answer.blank? %>
+<b>Answer:</b>
+<div class="border"><i class="col">No answer given</i></div>
+<% else %>
+<pre class="sourceCodeDisplay border" data-lang="<%= item["lang"] %>" data-readonly="true" name="<%= unique_label %>">
+  <%= answer %>
+</pre>
+<% end %>
+<% else %>
 <p>Respond with code in the following area.</p>
 <textarea class="sourceCode" data-lang="<%= item["lang"] %>" data-readonly="false" name="<%= unique_label %>">
   <%= answer %>
 </textarea>
+<% end %>

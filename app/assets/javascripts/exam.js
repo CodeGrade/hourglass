@@ -1,6 +1,7 @@
 
 $(function(){
-    $(".sourceCode").each(activateCode);
+  $(".sourceCode").each(activateCode);
+  $(".sourceCodeDisplay").each(displayCode);
 });
 
 function extractMarks(text) {
@@ -78,4 +79,12 @@ function activateCode(index, code) {
         cm.clearHistory();
     }
     $(code).addClass("cm-s-mdn-like cm-s-default");
+}
+function displayCode(index, code) {
+  if ($(code).data("lang")) {
+    var markedText = extractMarks($(code).text());
+    CodeMirror.runMode(markedText.text, $(code).data("lang"), code);
+    if (markedText.count > 0) applyMarks(code, markedText.marks);
+    $(code).addClass("cm-s-default");
+  }
 }

@@ -1,6 +1,9 @@
 @import "bootstrap";
 @import "codemirror";
 @import "bootstrap-treeview";
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
 
 html,
 body {
@@ -50,55 +53,105 @@ body {
   padding-top: 20px;
 }
 
-.question {
-  margin: 20px;
-
-  .part {
-    margin: 20px;
-  }
-}
-
 .CodeMirror .readOnly {
   background: #8d6d001a;
 }
 
-div.paginated {
-  > div.question {
-    display: none;
+@media screen {
+    *.print-only { display: none; }
 
-    > div > div.part {
-      display: none;
+    div.paginated {
+        > div.question {
+            display: none;
+
+            > div > div.part {
+                display: none;
+            }
+
+            &.active {
+                display: initial;
+
+                > div > div.part {
+                    display: initial;
+                }
+            }
+
+            nav {
+                display: none;
+            }
+        }
+
+        > div.question.paginated {
+            > div > div.part {
+                display: none;
+            }
+
+            &.active {
+                > div > div.part.active {
+                    display: initial;
+                }
+            }
+
+            nav {
+                display: initial;
+            }
+        }
     }
-
-    &.active {
-      display: initial;
-
-      > div > div.part {
-        display: initial;
-      }
-    }
-
-    nav {
-      display: none;
-    }
-  }
-
-  > div.question.paginated {
-    > div > div.part {
-      display: none;
-    }
-
-    &.active {
-      > div > div.part.active {
-        display: initial;
-      }
-    }
-
-    nav {
-      display: initial;
-    }
-  }
 }
+
+@media print {
+    *.screen-only { display: none; }
+    
+    div.paginated {
+        > div.question {
+            display: initial;
+            margin-left: 0;
+            margin-right: 0;
+            > .col, > [class*="col-"] {
+                padding-right: 0;
+                padding-left: 0;
+            }
+            > :last-child {
+                break-after: page;
+            }
+            > div > div.part {
+                display: initial;
+                margin-left: 0;
+                margin-right: 0;
+                > .col, > [class*="col-"] {
+                    padding-right: 0;
+                    padding-left: 0;
+                }
+                > * {
+                    break-after: avoid-page;
+                }
+                .btn-group > .btn:not(.active),
+                input[type="radio"]:not(:checked),
+                input[type="radio"]:not(:checked) + label,
+                input[type="checkbox"]:not(:checked),
+                input[type="checkbox"]:not(:checked) + label {
+                    border-color: transparent;
+                    text-decoration: line-through;
+                }
+                input[type="radio"], input[type="checkbox"] {
+                    display: none;
+                }
+                input[type="radio"]:checked + label,
+                input[type="checkbox"]:checked + label {
+                    @include button-variant(map-get($theme-colors, "primary"), map-get($theme-colors, "primary"));
+                    @include button-size($btn-padding-y, $btn-padding-x, $btn-font-size, $btn-line-height, $btn-border-radius);
+                    border-width: $btn-border-width;
+
+                }
+            }
+            nav { display: none; }
+        }
+        &:last-child > :last-child {
+            break-after: avoid-page;
+        }
+    }
+}
+        
 
 .treeview.condensed {
   overflow: scroll;

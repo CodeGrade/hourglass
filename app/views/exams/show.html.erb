@@ -7,7 +7,7 @@
 <%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
 <%= bootstrap_form_tag url: submit_exam_path, html: {id: "exam-form"} do |form| %>
   <div id="questions" class="paginated">
-    <div class="mt-4">
+    <div class="mt-4 screen-only">
       <p>Question navigation:</p>
       <nav aria-label="question navigation" id="question-nav">
         <ul class="pagination">
@@ -18,12 +18,12 @@
       </nav>
     </div>
     <% @exam.info["questions"].each_with_index do |question, index| %>
-      <%= render "question", form: form, question: question, question_number: index %>
+      <%= render "question", form: form, question: question, question_number: index, readonly: @readonly %>
     <% end %>
   </div>
 
 
-  <%= form.submit class: "btn btn-success" %>
+  <%= form.submit class: "btn btn-success screen-only" %>
 <% end %>
 
 <script>

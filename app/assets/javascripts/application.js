@@ -19,6 +19,16 @@
 //= require bootstrap.treeview
 //= require bootstrap-toggle
 //= require codemirror
+//= require codemirror/addons/runmode/runmode
 //= require codemirror/modes/clike
+//= require codemirror/modes/mllike
+//= require codemirror/modes/ebnf
+//= require codemirror/modes/javascript
+//= require codemirror/modes/markdown
 //= require codemirror/modes/scheme
+//= require codemirror/modes/python
+//= require codemirror/modes/css
+//= require codemirror/modes/xml
+//= require codemirror/modes/yaml
+//= require codemirror/modes/htmlmixed
 //= require_tree .

@@ -1,7 +1,21 @@
-
+<% if readonly %>
+<% answers = item["options"].select{|n| answer&.dig(n.to_s) == "1"} %>
+<% if answers.count == 0 %>
+<b>Answer:</b> None selected
+<% else %>
+<b>Answer:</b>
+<ul>
+  <% answers.each do |ans| %>
+  <li><%= ans.keys[0] %></li>
+  <% end %>
+</ul>
+<% end %>
+<% else %>
 <%= form.form_group unique_label, label: {text: "Select all that apply:"} do %>
   <% item["options"].each_with_index do |option, index| %>
     <% checked = answer&.dig(index.to_s) == "1" %>
     <%= form.check_box "#{unique_label}[#{index}]", label: option.keys[0], checked: checked %>
   <% end %>
+  <span class="print-only">No answer</span>
+<% end %>
 <% end %>

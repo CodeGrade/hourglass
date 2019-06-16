@@ -1,5 +1,5 @@
 <% paginated = question["separateSubparts"] ? "paginated" : "" %>
-<div id="q<%= question_number + 1 %>" class="row question <%= paginated %>">
+<div id="q<%= question_number + 1 %>" class="row question no-gutters <%= paginated %>">
   <div class="col-12">
     <h1>Question <%= question_number + 1 %>: <%= question["name"] %></h1>
     <p><%= question["description"]&.html_safe %></p>
@@ -13,7 +13,7 @@
     <% end %>
 
     <% if question["separateSubparts"] %>
-      <div class="mt-4">
+      <div class="mt-4 screen-only">
         <p>Part navigation:</p>
         <nav aria-label="part navigation">
           <ul class="pagination">
@@ -25,7 +25,7 @@
       </div>
     <% end %>
     <% question["parts"].each_with_index do |part, index| %>
-      <%= render "part", form: form, part: part, question_number: question_number, part_number: index %>
+      <%= render "part", form: form, part: part, question_number: question_number, part_number: index, readonly: readonly %>
     <% end %>
   </div>
 </div>

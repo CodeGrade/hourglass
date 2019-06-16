@@ -57,13 +57,13 @@
   }
 </style>
 
-<div id="files_<%= root %>" class="filepicker row">
+<div id="files_<%= root %>" class="filepicker row screen-only">
   <div class="col-md-3 files-sidebar-container">
     <div class="files-sidebar">
       <div id="files-all-files" class="files treeview condensed"></div>
     </div>
   </div>
-  <div class="col-md-9 tab-content">
+  <div class="col-md-9 tab-content pl-0">
     <% files.each_with_index do |f, i| %>
       <% index = (i + 1).to_s.rjust(files.count.to_s.length, '0') %>
       <div class="file-pane tab-pane panel-tab-pane active" id="<%= root %>_file_<%= index %>">

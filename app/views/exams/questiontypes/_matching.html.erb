@@ -1,24 +1,35 @@
+<div class="col-12">
+  <div><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>
 <% num_items = item["values"].size %>
 <% ops = ["Choose one..."] + (1..num_items).to_a %>
 <% if readonly %>
-<div class="col">
-  <ol type="A">
-    <% item["prompts"].each_with_index do |prompt, idx| %>
-    <li class="clearfix">
-      <div>
-        <%= prompt %>
-      </div>
-      <div>
-        <b>Answer:</b>
-        <% if answer&.dig(idx.to_s) %>
-        <span class="border rounded"><%= answer.dig(idx.to_s) %></span>
-        <% else %>
-        <i>No answer given</i>
-        <% end %>
-      </div>
-    </li>
-    <% end %>
-  </ol>
+<div class="row no-gutters">
+  <div class="col">
+    <ol type="A">
+      <% item["prompts"].each_with_index do |prompt, idx| %>
+      <li class="clearfix">
+        <div>
+          <%= prompt %>
+        </div>
+        <div>
+          <b>Answer:</b>
+          <% if answer&.dig(idx.to_s) %>
+          <span class="btn btn-sm btn-outline-dark disabled">#<%= answer.dig(idx.to_s) %></span>
+          <% else %>
+          <i>No answer given</i>
+          <% end %>
+        </div>
+      </li>
+      <% end %>
+    </ol>
+  </div>
+  <div class="col">
+    <ol type="1">
+      <% item["values"].each_with_index do |ans, idx| %>
+      <li data-index="<%= idx %>"><%= ans %></li>
+      <% end %>
+    </ol>
+  </div>
 </div>
 <% else %>
 <p>Match items on the left to items on the right.</p>
@@ -56,3 +67,4 @@
   </div>
 </div>
 <% end %>
+</div>

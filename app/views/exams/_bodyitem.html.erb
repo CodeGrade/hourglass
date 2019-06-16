@@ -1,5 +1,5 @@
 <% if item.is_a? String %>
-  <p><%= item.html_safe %></p>
+  <div><%= item.html_safe %></div>
 <% else %>
   <% answer = @answers.dig(question_number.to_s, part_number.to_s, bodyitem_number.to_s) %>
   <%= render "exams/questiontypes/#{item.keys[0].downcase}", form: form, item: item[item.keys[0]],

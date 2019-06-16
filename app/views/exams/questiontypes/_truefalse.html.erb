@@ -1,6 +1,14 @@
+<div class="col-10"><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>
+<div class="col-2 text-right">
 <% if readonly %>
-<% answers = {"true"=>"True", "false"=>"False", nil=>"<i>No answer given</i>".html_safe} %>
-<b>Answer:</b> <%= answers[answer] %>
+<b>Answer:</b>
+<% if answer == "true" %>
+<span class="btn btn-sm btn-outline-dark disabled">True</span>
+<% elsif answer == "false" %>
+<span class="btn btn-sm btn-outline-dark disabled">False</span>
+<% else %>
+<i>No answer given</i>
+<% end %>
 <% else %>
 <div class="btn-group btn-group-toggle" data-toggle="buttons">
   <% is_true = answer == "true" %>
@@ -13,3 +21,4 @@
   </label>
 </div>
 <% end %>
+</div>

@@ -18,7 +18,7 @@
       </nav>
     </div>
     <% @exam.info["questions"].each_with_index do |question, index| %>
-      <%= render "question", form: form, question: question, question_number: index, readonly: @readonly %>
+      <%= render "exams/question", form: form, question: question, question_number: index, readonly: @readonly %>
     <% end %>
   </div>
 

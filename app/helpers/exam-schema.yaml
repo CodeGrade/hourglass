@@ -45,6 +45,9 @@ BodyItem:
   one_of:
     - HTML
     - Response
+HTMLs:
+  array: HTML
+  minSize: 1
 Response:
   tagged_one_of:
     - Code
@@ -57,12 +60,38 @@ Response:
     - Text
 Code:
   object:
+    - key: "prompt"
+      value: HTMLs
+      optional: true
     - key: "lang"
       value: String
-YesNo: Boolean
-TrueFalse: Boolean
+YesNo:
+  one_of:
+    - Boolean
+    - YesNoPrompt
+YesNoPrompt:
+  object:
+    - key: "prompt"
+      value: HTMLs
+      optional: true
+    - key: "correctAnswer"
+      value: Boolean
+TrueFalse:
+  one_of:
+    - Boolean
+    - TrueFalsePrompt
+TrueFalsePrompt:
+  object:
+    - key: "prompt"
+      value: HTMLs
+      optional: true
+    - key: "correctAnswer"
+      value: Boolean
 MultipleChoice:
   object:
+    - key: "prompt"
+      value: HTMLs
+      optional: true
     - key: "options"
       value: Options
     - key: "correctAnswer"
@@ -71,6 +100,9 @@ Options:
   array: HTML
 Matching:
   object:
+    - key: "prompt"
+      value: HTMLs
+      optional: true
     - key: "prompts"
       value: Options
     - key: "values"
@@ -80,6 +112,13 @@ Matching:
 MatchingAnswers:
   array: Integer
 AllThatApply:
+  object:
+    - key: "prompt"
+      value: HTMLs
+      optional: true
+    - key: "options"
+      value: ATAOptions
+ATAOptions:
   array: ATAOption
 ATAOption:
   dictionary:
@@ -88,6 +127,9 @@ ATAOption:
     size: 1
 CodeTag:
   object:
+    - key: "prompt"
+      value: HTMLs
+      optional: true
     - key: "correctAnswer"
       value: TagAnswer
 TagAnswer:
@@ -103,3 +145,11 @@ Line:
     - key: "line"
       value: Integer
 Text:
+  one_of:
+    - Nil
+    - TextPrompt
+TextPrompt:
+  object:
+    - key: "prompt"
+      value: HTMLs
+

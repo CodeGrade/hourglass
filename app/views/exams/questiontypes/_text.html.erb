@@ -1,12 +1,15 @@
+<div class="col-12">
+  <div><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>
 <% if readonly %>
 <b>Answer:</b>
 <% if answer.blank? %>
-<div class="border"><i class="col">No answer given</i></div>
+<i>No answer given</i>
 <% else %>
 <div class="border">
-  <% answer %>
+<%= answer %>
 </div>
 <% end %>
 <% else %>
-<%= form.text_area unique_label, label: "Text Response:", value: answer %>
+<%= form.text_area unique_label, label: "<i>(Free text response)</i>".html_safe, value: answer %>
 <% end %>
+</div>

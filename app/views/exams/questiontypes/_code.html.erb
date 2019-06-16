@@ -1,15 +1,17 @@
+<div class="col-12">
+  <div><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>
 <% if readonly %>
 <% if answer.blank? %>
 <b>Answer:</b>
-<div class="border"><i class="col">No answer given</i></div>
+<i>No answer given</i>
 <% else %>
 <pre class="sourceCodeDisplay border" data-lang="<%= item["lang"] %>" data-readonly="true" name="<%= unique_label %>">
-  <%= answer %>
+<%= answer %>
 </pre>
 <% end %>
 <% else %>
-<p>Respond with code in the following area.</p>
 <textarea class="sourceCode" data-lang="<%= item["lang"] %>" data-readonly="false" name="<%= unique_label %>">
-  <%= answer %>
+<%= answer %>
 </textarea>
 <% end %>
+</div>

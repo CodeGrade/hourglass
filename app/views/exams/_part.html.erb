@@ -1,18 +1,26 @@
 <div id="q<%= question_number + 1 %>p<%= part_number + 1 %>" class="row part">
   <div class="col-12">
-    <h3>Part <%= part_number + 1 %>: <%= part["name"] %></h3>
-    <h4>This part is worth <%= part["points"] %> points.</h4>
+    <h3>Part <%= part_number + 1 %>: <%= part["name"] %>
+      <small class="float-right text-muted">(<%= part["points"] %> points)</small>
+    </h3>
     <p><%= part["description"]&.html_safe %></p>
     <%
       part_files = "q#{question_number+1}-#{part_number+1}"
       dirs, files = @exam.get_exam_files(part_files)
       unless files.empty?
     %>
-      <%= render "filepicker", dirs: dirs, files: files, root: "question_#{question_number}_part_#{part_number}" %>
+    <%= render "exams/filepicker", dirs: dirs, files: files, root: "question_#{question_number}_part_#{part_number}" %>
     <% end %>
-    <% part["body"].each_with_index do |item, index| %>
-      <%= render "bodyitem", form: form, item: item, question_number: question_number, part_number: part_number, 
-                             bodyitem_number: index, readonly: readonly %>
-    <% end %>
+    <% index = 0 %>
+    <table class="table-hover col-12">
+      <tbody>
+        <% part["body"].each_with_index do |item, index| %>
+        <tr class="container"><td class="row no-gutters">
+          <%= render "exams/bodyitem", form: form, item: item, question_number: question_number, part_number: part_number, 
+              bodyitem_number: index, readonly: readonly %>
+        </td></tr>
+        <% end %>
+      </tbody>
+    </table>
   </div>
 </div>

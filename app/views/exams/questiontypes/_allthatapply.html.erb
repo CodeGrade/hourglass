@@ -1,3 +1,5 @@
+<div class="col-12">
+  <div><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>
 <% if readonly %>
 <% answers = item["options"].select{|n| answer&.dig(n.to_s) == "1"} %>
 <% if answers.count == 0 %>
@@ -11,7 +13,7 @@
 </ul>
 <% end %>
 <% else %>
-<%= form.form_group unique_label, label: {text: "Select all that apply:"} do %>
+<%= form.form_group unique_label, label: {text: "<i>(Select all that apply)</i>".html_safe } do %>
   <% item["options"].each_with_index do |option, index| %>
     <% checked = answer&.dig(index.to_s) == "1" %>
     <%= form.check_box "#{unique_label}[#{index}]", label: option.keys[0], checked: checked %>
@@ -19,3 +21,4 @@
   <span class="print-only">No answer</span>
 <% end %>
 <% end %>
+</div>

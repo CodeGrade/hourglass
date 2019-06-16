@@ -1,15 +1,18 @@
+<div class="col-12">
+  <div><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>
 <% if readonly %>
-<b>Answer:</b>
+  <p><b>Answer:</b></p>
 <%= if answer
     item["options"][answer.to_i].html_safe
     else
     "<i>No answer given</i>".html_safe
     end %>
 <% else %>
-<%= form.form_group unique_label, label: { text: "Select one of the following responses." } do %>
+<%= form.form_group unique_label, label: { text: "<i>(Select one of the following responses)</i>".html_safe }  do %>
   <% item["options"].each_with_index do |option, index| %>
     <% checked = answer == index.to_s    # nil.to_i is 0 %>
     <%= form.radio_button unique_label, index, label: option.html_safe, checked: checked %>
   <% end %>
 <% end %>
 <% end %>
+</div>

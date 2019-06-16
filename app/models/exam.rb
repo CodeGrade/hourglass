@@ -1,3 +1,4 @@
+# coding: utf-8
 class Exam < ApplicationRecord
   has_many :registrations
   has_many :users, through: :registrations
@@ -16,6 +17,22 @@ class Exam < ApplicationRecord
     return @info if @info
     versions = YAML.load(File.read(exam_yaml))
     @info = versions[0]
+    @info["questions"].each do |q|
+      q["parts"].each do |p|
+        p["body"].each do |b|
+          if b.is_a? Hash
+            if b["YesNo"] == !!b["YesNo"]
+              b["YesNo"] = {"prompt" => [], "correctAnswer" => b["YesNo"]}
+            elsif b["TrueFalse"] == !!b["TrueFalse"]
+              b["TrueFalse"] = {"prompt" => [], "correctAnswer" => b["TrueFalse"]}
+            elsif b.key? "Text" && b["Text"].nil?
+              b["Text"] = {"prompt" => []}
+            end
+          end
+        end
+      end
+    end
+    return @info
   end
 
   def generate_secret_key!

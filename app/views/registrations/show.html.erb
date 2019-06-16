@@ -5,11 +5,23 @@
     <p><%= link_to "← back to exam registrations", exam_registrations_path(@registration.exam) %></p>
     <p><%= link_to "← back to exam", @registration.exam %></p>
     registration for "<%= @registration.user.username %>"
-    <p>
-      <%
-        answers = @registration.get_current_answers
-      %>
-    <p>ANSWERS: <%= answers %></p>
     (todo)
+
+  <div id="questions">
+    <div class="mt-4 screen-only">
+      <p>Question navigation:</p>
+      <nav aria-label="question navigation" id="question-nav">
+        <ul class="pagination">
+          <% @exam.info["questions"].each_with_index do |question, index| %>
+            <li class="page-item question-page-item" id="nav-q<%= index+1 %>"><a class="page-link" href="#" onclick="showQuestion(<%= index+1 %>)"><%= index + 1 %></a></li>
+          <% end %>
+        </ul>
+      </nav>
+    </div>
+    <% @exam.info["questions"].each_with_index do |question, index| %>
+      <%= render "exams/question", form: nil, question: question, question_number: index, readonly: @readonly %>
+    <% end %>
+  </div>
+
   </div>
 </div>

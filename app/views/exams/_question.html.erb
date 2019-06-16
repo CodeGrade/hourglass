@@ -9,7 +9,7 @@
       dirs, files = @exam.get_exam_files(q_files)
       unless files.empty?
     %>
-      <%= render "filepicker", dirs: dirs, files: files, root: "question_#{question_number}" %>
+      <%= render "exams/filepicker", dirs: dirs, files: files, root: "question_#{question_number}" %>
     <% end %>
 
     <% if question["separateSubparts"] %>
@@ -25,7 +25,7 @@
       </div>
     <% end %>
     <% question["parts"].each_with_index do |part, index| %>
-      <%= render "part", form: form, part: part, question_number: question_number, part_number: index, readonly: readonly %>
+      <%= render "exams/part", form: form, part: part, question_number: question_number, part_number: index, readonly: readonly %>
     <% end %>
   </div>
 </div>

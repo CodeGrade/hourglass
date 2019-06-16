@@ -1,0 +1,72 @@
+---
+- instructions: Instructions go here.
+  questions:
+    - name: "The first one"
+      description: "First question in the exam. This text shows at the top of each page for this question."
+      separateSubparts: true
+      parts:
+        - name: "Part A"
+          description: "This part will test basic Java syntax knowledge. This text is shown only on the page for part A."
+          points: 16
+          body:
+            - "Answer all of the following true/false questions."
+            - "Java requires the use of semicolons to end statements."
+            - TrueFalse: true
+            - "Racket requires the use of semicolons to end statements."
+            - TrueFalse: false
+            - "The next one is tricky! Be careful."
+            - "Java does not require the use of semicolons to end statements."
+            - TrueFalse: false
+        - name: "Part B"
+          points: 11
+          body:
+            - "Type some code in the box."
+            - Code:
+                lang: "text/x-java"
+            - "What does the code in PartB.java do?"
+            - MultipleChoice:
+                options:
+                  - "Nothing"
+                  - "Prints 4"
+                  - "Prints 5"
+                  - "Prints 4 and then prints 5"
+                correctAnswer: 2
+    - name: "second question name"
+      description: "Welcome to question 2. This is where the fun begins."
+      parts:
+        - body:
+            - "This matching section concerns import information."
+            - Matching:
+                prompts:
+                  - "favorite programming language"
+                  - "choose 5"
+                values:
+                  - "5"
+                  - "ISL w/λ"
+                correctAnswers:
+                  - 1
+                  - 0
+            - "Type some code"
+            - Code:
+                lang: "text/x-java"
+          points: 2
+        - name: "The second part! Name is optional."
+          points: 6
+          body:
+            - "Which are true about Java?"
+            - AllThatApply:
+                options:
+                  - "this one applies": true
+                  - "this one also applies": true
+                  - "this one applies not": false
+        - points: 30
+          body:
+            - "Did you choose no?"
+            - YesNo: true # wrong
+            - "Tag your <i>favorite</i> line of code."
+            - CodeTag:
+                correctAnswer:
+                  filename: "Example.java"
+                  line: 22
+            - "Explain your reasoning for taking this course."
+            - Text:

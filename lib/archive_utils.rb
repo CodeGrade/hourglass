@@ -86,6 +86,35 @@ Gem::Package::TarReader.class_exec do
   end
 end
 class ArchiveUtils
+  ###############################
+  ## Zip file creation
+  ###############################
+  public
+  def self.create_zip(target, sources)
+    # Each item in sources will be placed in the root of the target zip
+    Zip::File.open(target, Zip::File::CREATE) do |zf|
+      sources.each do |src|
+        self.write_entry zf, src, File.basename(src)
+      end
+    end
+  end
+  private
+  def self.write_entry(zf, disk_item, zip_path)
+    if File.directory? disk_item
+      zf.mkdir zip_path
+      (Dir.entries(disk_item) - %w[. ..]).each do |entry|
+        write_entry(zf, File.join(disk_item, entry), File.join(zip_path, entry))
+      end
+    else
+      zf.add(zip_path, disk_item)
+    end
+  end
+
+
+  ################################
+  ## Safe archive extraction
+  ###############################
+  public
   def self.ARCHIVE_EXTENSIONS
     # Supported file types
     known = {

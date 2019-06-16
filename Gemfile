@@ -29,6 +29,8 @@ gem 'codemirror-rails'
 
 gem 'headless' # needed to run Racket, and xvfb-run (the shell script) merges stdout and stderr
 
+gem 'rubyzip'
+
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder

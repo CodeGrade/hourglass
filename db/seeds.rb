@@ -33,15 +33,18 @@ when "development"
     name: "Demo Exam"
   )
 
+  zipfile = Rails.root.join("test", "fixtures", "files", "demo-exam.zip")
+  ArchiveUtils.create_zip zipfile, Dir.glob(Rails.root.join("test", "fixtures", "files", "demo-exam", "**"))
   upload = Upload.new(
     user: prof,
-    file_name: Rails.root.join("test", "fixtures", "files", "demo-exam.zip"),
+    file_name: zipfile,
     exam: exam
   )
   upload.upload_data = FakeUpload.new(upload.file_name)
 
   exam.save!
   upload.save!
+  FileUtils.rm zipfile
 
   student_reg = Registration.new(
     user: student,

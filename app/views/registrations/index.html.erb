@@ -9,6 +9,7 @@
       <tr>
         <th scope="col"></th>
         <th scope="col">User</th>
+        <th scope="col">Role</th>
         <th scope="col">Final?</th>
         <th scope="col">Anomalous?</th>
       </tr>
@@ -16,6 +17,7 @@
       <% @registrations.each do |reg| %>
         <tr class="<%= "table-danger" if reg.anomalous? %> <%= "table-success" if reg.final? %>">
           <td class="align-middle"><%= link_to "View", [@exam, reg], class: "btn btn-info" %></td>
+          <td class="align-middle"><%= reg.role %></td>
           <td class="align-middle"><%= reg.user.username %></td>
           <td class="align-middle"><%= reg.final? %></td>
           <td class="align-middle"><%= reg.anomalous? %></td>

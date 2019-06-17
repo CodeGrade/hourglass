@@ -71,6 +71,7 @@ class ExamsController < ApplicationController
     @exam.enabled = exam_params[:enabled]
     upload.save!
     @exam.save!
-    redirect_to exams_path
+    Registration.create(exam: @exam, user: current_user, role: current_user.role.to_s)
+    redirect_to @exam
   end
 end

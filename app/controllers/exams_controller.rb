@@ -1,7 +1,8 @@
 class ExamsController < ApplicationController
   before_action :require_current_user
-  before_action :require_enabled, except: [:index]
-  before_action :require_registration, except: [:index]
+  before_action :require_enabled, except: [:index, :new, :create]
+  before_action :require_registration, except: [:index, :new, :create]
+  before_action :require_admin_or_prof, only: [:new, :create]
 
   def require_enabled
     @exam ||= Exam.find(params[:id])
@@ -54,5 +55,22 @@ class ExamsController < ApplicationController
   def save_snapshot
     lockout = save_answers
     render json: {lockout: lockout}
+  end
+
+  def new
+    @exam = Exam.new
+  end
+
+  def create
+    exam_params = params.require(:exam).permit(:name, :yaml, :enabled)
+    @exam = Exam.new
+    uploaded_yaml = exam_params[:yaml]
+    @exam.name = exam_params[:name]
+    upload = Upload.new(upload_data: uploaded_yaml, user: current_user, exam: @exam)
+    @exam.upload = upload
+    @exam.enabled = exam_params[:enabled]
+    upload.save!
+    @exam.save!
+    redirect_to exams_path
   end
 end

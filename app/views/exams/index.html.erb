@@ -14,3 +14,7 @@
     <% end %>
   </ul>
 <% end %>
+
+<% if current_user.admin_or_prof? %>
+  <%= link_to "New Exam", new_exam_path, class: "btn btn-success" %>
+<% end %>

@@ -24,6 +24,7 @@ gem 'bootstrap-toggle-rails'
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
 gem "bootstrap_form", ">= 4.2.0"
+gem 'octicons_helper'
 
 gem 'codemirror-rails'
 

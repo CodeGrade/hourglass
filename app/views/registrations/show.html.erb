@@ -8,12 +8,16 @@
     (todo)
 
   <div id="questions">
-    <div class="mt-4 screen-only">
+    <div class="mt-4 d-print-none">
       <p>Question navigation:</p>
-      <nav aria-label="question navigation" id="question-nav">
+      <nav aria-label="question navigation" id="question-nav" class="d-inline-block">
         <ul class="pagination">
           <% @exam.info["questions"].each_with_index do |question, index| %>
-            <li class="page-item question-page-item" id="nav-q<%= index+1 %>"><a class="page-link" href="#" onclick="showQuestion(<%= index+1 %>)"><%= index + 1 %></a></li>
+            <li class="page-item question-page-item" id="nav-q<%= index+1 %>">
+              <a href="#" class="page-link question-link" data-q="<%= index + 1 %>">
+                <%= "#{index + 1}" %>
+              </a>
+            </li>
           <% end %>
         </ul>
       </nav>

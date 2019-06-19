@@ -1,0 +1,60 @@
+<h1><%= @exam.name %></h1>
+<% if current_user.admin_or_prof? %>
+  <%= link_to "View registrations", exam_registrations_path(@exam), class: "btn btn-info" %>
+<% end %>
+<p><%= @exam.info["instructions"]&.html_safe %></p>
+<%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
+<%= bootstrap_form_tag url: submit_exam_path, html: {id: "exam-form"} do |form| %>
+  <div id="questions" class="paginated">
+    <div class="mt-4 screen-only">
+      <p>Question navigation:</p>
+      <nav aria-label="question navigation" id="question-nav">
+        <ul class="pagination">
+          <% @exam.info["questions"].each_with_index do |question, index| %>
+            <li class="page-item question-page-item" id="nav-q<%= index+1 %>"><a class="page-link" href="#" onclick="showQuestion(<%= index+1 %>)"><%= index + 1 %></a></li>
+          <% end %>
+        </ul>
+      </nav>
+    </div>
+    <% @exam.info["questions"].each_with_index do |question, index| %>
+      <%= render "exams/question", form: form, question: question, question_number: index, readonly: @readonly %>
+    <% end %>
+  </div>
+
+
+  <%= form.submit class: "btn btn-success screen-only" %>
+<% end %>
+
+<script>
+    function showQuestion(q) {
+        $(".question").toggleClass("active", false);
+        $("#q" + q).toggleClass("active", true);
+
+        $(".question-page-item").removeClass("active");
+        $("#nav-q" + q).toggleClass("active", true);
+        $("#q" + q + ".paginated .page-item").first().toggleClass("active", true);
+        showPart(q, 1);
+    }
+
+    function showPart(q, p) {
+        $("#q" + q + " div.part").toggleClass("active", false);
+        $("#q" + q + "p" + p).toggleClass("active", true);
+
+        $(".question nav .part-page-item").toggleClass("active", false);
+        $("#nav-q" + q + "p" + p).toggleClass("active", true);
+
+        $("#q" + q + " .CodeMirror").each(function (index, cm) {
+            cm.CodeMirror.refresh();
+        });
+    }
+
+    $(function() {
+        $(".page-link").click(function(e) {
+            <% #prevent "#" links from jumping to the top of the page %>
+            e.preventDefault();
+        });
+        $(".sourceCode").each(activateCode);
+        $(".sourceCodeDisplay").each(displayCode);
+        showQuestion(1);
+    });
+</script>

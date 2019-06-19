@@ -11,7 +11,11 @@
     <title><%= @page_title || default_page_title %> - Hourglass</title>
 
     <%= stylesheet_link_tag    'application', media: 'all' %>
+
     <%= javascript_include_tag 'application' %>
+    <%= javascript_tag do %>
+        <%= render 'exams/lockdown.js' %>
+    <% end %>
   </head>
 
   <body>

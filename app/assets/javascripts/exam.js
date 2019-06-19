@@ -1,9 +1,3 @@
-
-$(function(){
-  $(".sourceCode").each(activateCode);
-  $(".sourceCodeDisplay").each(displayCode);
-});
-
 function extractMarks(text) {
     var lines = text.split(/\r\n?|\n/);
     if (/^\s*$/.test(lines[0])) { lines.shift(); }

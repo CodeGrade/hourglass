@@ -58,12 +58,12 @@
 </style>
 
 <div id="files_<%= root %>" class="filepicker row d-print-none">
-  <div class="col-md-3 files-sidebar-container">
+  <div class="<%= if files.count > 1 then 'col-md-3' else 'd-none' end %> files-sidebar-container">
     <div class="files-sidebar">
       <div id="files-all-files" class="files treeview condensed"></div>
     </div>
   </div>
-  <div class="col-md-9 tab-content pl-0">
+  <div class="<%= if files.count > 1 then 'col-md-9' else 'col-md-12' end %> tab-content pl-0">
     <% files.each_with_index do |f, i| %>
       <% index = (i + 1).to_s.rjust(files.count.to_s.length, '0') %>
       <div class="file-pane tab-pane panel-tab-pane active" id="<%= root %>_file_<%= index %>">

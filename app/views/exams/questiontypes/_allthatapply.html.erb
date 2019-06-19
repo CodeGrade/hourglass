@@ -18,7 +18,7 @@
     <% checked = answer&.dig(index.to_s) == "1" %>
     <%= form.check_box "#{unique_label}[#{index}]", label: option.keys[0], checked: checked %>
   <% end %>
-  <span class="print-only">No answer</span>
+  <span class="d-none d-print-inline">No answer</span>
 <% end %>
 <% end %>
 </div>

@@ -1,4 +1,31 @@
 <h1><%= @exam.name %></h1>
+<% content_for :navbar do %>
+<nav class="navbar navbar-light bg-light fixed-top">
+  <span class="navbar-brand">Hourglass</span>
+  <div class="dropdown float-right">
+    <button class="btn btn-outline-secondary align-middle" type="button" data-toggle="dropdown"
+            style="font-size: 0;">
+      <%= octicon "book", height: 24 %>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+      <button class="dropdown-item" id="toggle-paginated" type="button">Toggle paginated display</button>
+      <div class="dropdown-divider"></div>
+      <span class="dropdown-item-text">Jump to:</span>
+      <% @exam.info["questions"].each_with_index do |q, qi| %>
+      <button class="dropdown-item question-link" type="button" data-q="<%= qi + 1 %>">
+        <%= "Question #{qi + 1}" %>
+      </button>
+      <% q["parts"].each_with_index do |p, pi| %>
+      <button class="dropdown-item ml-3 question-link" type="button"
+              data-q="<%= qi + 1 %>" data-p="<%= pi + 1 %>">
+        <%= "Question #{qi + 1}-#{pi + 1}" %>
+      </button>
+      <% end %>
+      <% end %>
+    </div>
+  </div>
+</nav>
+<% end %>
 <% if current_user.admin_or_prof? %>
   <%= link_to "View registrations", exam_registrations_path(@exam), class: "btn btn-info" %>
 <% end %>
@@ -6,12 +33,16 @@
 <%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
 <%= bootstrap_form_tag url: submit_exam_path, html: {id: "exam-form"} do |form| %>
   <div id="questions" class="paginated">
-    <div class="mt-4 screen-only">
-      <p>Question navigation:</p>
-      <nav aria-label="question navigation" id="question-nav">
+    <div class="mt-4 question-nav d-print-none">
+      <b>Jump to question:</b>
+      <nav aria-label="question navigation" id="question-nav" class="d-inline-block">
         <ul class="pagination">
           <% @exam.info["questions"].each_with_index do |question, index| %>
-            <li class="page-item question-page-item" id="nav-q<%= index+1 %>"><a class="page-link" href="#" onclick="showQuestion(<%= index+1 %>)"><%= index + 1 %></a></li>
+            <li class="page-item question-page-item" id="nav-q<%= index+1 %>">
+              <a href="#" class="page-link question-link" data-q="<%= index + 1 %>">
+                <%= "#{index + 1}" %>
+              </a>
+            </li>
           <% end %>
         </ul>
       </nav>
@@ -19,42 +50,10 @@
     <% @exam.info["questions"].each_with_index do |question, index| %>
       <%= render "exams/question", form: form, question: question, question_number: index, readonly: @readonly %>
     <% end %>
+    <div class="mt-4 d-print-none">
+      <%= form.submit class: "btn btn-success" %>
+    </div>
   </div>
-
-
-  <%= form.submit class: "btn btn-success screen-only" %>
 <% end %>
 
-<script>
-    function showQuestion(q) {
-        $(".question").toggleClass("active", false);
-        $("#q" + q).toggleClass("active", true);
-
-        $(".question-page-item").removeClass("active");
-        $("#nav-q" + q).toggleClass("active", true);
-        $("#q" + q + ".paginated .page-item").first().toggleClass("active", true);
-        showPart(q, 1);
-    }
-
-    function showPart(q, p) {
-        $("#q" + q + " div.part").toggleClass("active", false);
-        $("#q" + q + "p" + p).toggleClass("active", true);
-
-        $(".question nav .part-page-item").toggleClass("active", false);
-        $("#nav-q" + q + "p" + p).toggleClass("active", true);
-
-        $("#q" + q + " .CodeMirror").each(function (index, cm) {
-            cm.CodeMirror.refresh();
-        });
-    }
-
-    $(function() {
-        $(".page-link").click(function(e) {
-            <% #prevent "#" links from jumping to the top of the page %>
-            e.preventDefault();
-        });
-        $(".sourceCode").each(activateCode);
-        $(".sourceCodeDisplay").each(displayCode);
-        showQuestion(1);
-    });
-</script>
+<script><%= render "exams/show.js" %></script>

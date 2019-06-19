@@ -5,6 +5,7 @@
 @import "bootstrap/variables";
 @import "bootstrap/mixins";
 
+
 html,
 body {
   height: 100%;
@@ -57,9 +58,9 @@ body {
   background: #8d6d001a;
 }
 
-@media screen {
-    *.print-only { display: none; }
+div#questions:not(.paginated) .question-nav { display: none; }
 
+@media screen {
     div.paginated {
         > div.question {
             display: none;
@@ -100,8 +101,6 @@ body {
 }
 
 @media print {
-    *.screen-only { display: none; }
-    
     div.paginated {
         > div.question {
             display: initial;

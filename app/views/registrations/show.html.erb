@@ -1,25 +1,31 @@
+<!-- TODO -->
 <div class="row">
   <div class="col-12">
     <h2>Registration</h2>
     <p><%= link_to "← back to exam registrations", exam_registrations_path(@registration.exam) %></p>
     <p><%= link_to "← back to exam", @registration.exam %></p>
     registration for "<%= @registration.user.username %>"
+    (todo)
 
-    <div id="questions">
-      <div class="mt-4 screen-only">
-        <p>Question navigation:</p>
-        <nav aria-label="question navigation" id="question-nav">
-          <ul class="pagination">
-            <% @exam.info["questions"].each_with_index do |question, index| %>
-              <li class="page-item question-page-item" id="nav-q<%= index+1 %>"><a class="page-link" href="#" onclick="showQuestion(<%= index+1 %>)"><%= index + 1 %></a></li>
-            <% end %>
-          </ul>
-        </nav>
-      </div>
-      <% @exam.info["questions"].each_with_index do |question, index| %>
-        <%= render "exams/question", form: nil, question: question, question_number: index, readonly: @readonly %>
-      <% end %>
+  <div id="questions">
+    <div class="mt-4 d-print-none">
+      <p>Question navigation:</p>
+      <nav aria-label="question navigation" id="question-nav" class="d-inline-block">
+        <ul class="pagination">
+          <% @exam.info["questions"].each_with_index do |question, index| %>
+            <li class="page-item question-page-item" id="nav-q<%= index+1 %>">
+              <a href="#" class="page-link question-link" data-q="<%= index + 1 %>">
+                <%= "#{index + 1}" %>
+              </a>
+            </li>
+          <% end %>
+        </ul>
+      </nav>
     </div>
+    <% @exam.info["questions"].each_with_index do |question, index| %>
+      <%= render "exams/question", form: nil, question: question, question_number: index, readonly: @readonly %>
+    <% end %>
+  </div>
 
   </div>
 </div>

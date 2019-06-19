@@ -1,0 +1,153 @@
+<% page = "#{params[:controller]}/#{params[:action]}" %>
+<% if page == "exams/show" %>
+$(function() {
+
+    function isFullscreen() {
+        const maximized = window.outerHeight == screen.height;
+        const fullheight = window.innerHeight == window.outerHeight;
+        const fullWidth = window.innerWidth == window.outerWidth;
+        const covered = window.screenLeft == 0 && window.screenTop == 0;
+        return maximized && fullheight && fullWidth && covered;
+    }
+
+    function openFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            return elem.requestFullscreen();
+        } else if (elem.mozRequestFullScreen) { // Firefox
+            return elem.mozRequestFullScreen();
+        } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            return elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) { // IE/Edge
+            return elem.msRequestFullscreen();
+        }
+    }
+
+    var interval;
+    function startSnapshots() {
+        interval = setInterval(sendExamSnapshot, 5000);
+    }
+
+    function stopSnapshots() {
+        clearInterval(interval);
+    }
+
+    // ready to begin exam
+    function bootSequenceConfirmed() {
+        console.log('locked.');
+        $("#interstitial").html('');
+        loadExamContent().then(function() {
+            startSnapshots();
+        });
+    }
+
+    function submissionSaved() {
+        // turn off safe browsing and anomaly detection
+        stopSnapshots();
+        unloadExamContent();
+        removeListeners();
+    }
+
+
+    function loadExamContent() {
+        return $.get("<%= contents_exam_path @exam %>").then(function(contents) {
+            $("#exam-contents").html(contents);
+        });
+    }
+
+    function unloadExamContent() {
+        $("#exam-contents").html('');
+    }
+
+
+    function checkFullscreen() {
+        if (!isFullscreen()) {
+            console.log('not fullscreen.')
+            openFullscreen().then(function() {
+                console.log('fullscreen activated');
+                setTimeout(postFullscreen, 500); // fullscreen needs time to finish
+            }).catch(function (reason) {
+                console.log('could not achieve fullscreen', reason);
+                // TODO fullscreen didn't work! what now?
+            });
+        }
+    }
+
+    $("#begin-exam").on('click', checkFullscreen);
+
+    // full screen has been enabled. continue locking down
+    function postFullscreen() {
+        if (!isFullscreen()) {
+            console.log("still not fullscreen. console open?");
+            alert('Please close developer console before continuing.');
+            return;
+        }
+        console.log('locking down...');
+        installListeners();
+        bootSequenceConfirmed();
+    }
+
+    function anomalyDetected(reason, event) {
+        console.log('ANOMALY DETECTED:', reason, event);
+        removeListeners();
+        stopSnapshots();
+        unloadExamContent();
+        // TODO send anomaly back to server, lock student out of exam
+        $("#exam-contents").html(`anomaly detected. ${reason} (todo)`);
+    }
+
+    const listeners = {
+        mouseout: function (e) {
+            if (e.toElement === null && e.relatedTarget === null) {
+                anomalyDetected('mouseout', e);
+            }
+        },
+        resize: function (e) {
+            if (!isFullscreen()) {
+                anomalyDetected('left fullscreen', e);
+            }
+        },
+        blur: function(e) {
+            anomalyDetected('window blurred', e);
+        },
+    }
+
+    function installListeners() {
+        for (var event in listeners) {
+            const handler = listeners[event];
+            $(window).on(event, handler);
+        }
+    }
+
+    function removeListeners() {
+        for (var event in listeners) {
+            const handler = listeners[event];
+            $(window).off(event, handler);
+        }
+    }
+
+    function sendExamSnapshot() {
+        $(".CodeMirror").each(function(index, cm) {
+            cm.CodeMirror.save();
+        });
+        const formData = $("#exam-form").serialize();
+        console.log(formData);
+        const snapshotPath = "<%= save_snapshot_exam_path(@exam) %>";
+        const token = $('meta[name=csrf-token]').attr('content');
+        $.ajax({
+            url: snapshotPath,
+            type: 'POST',
+            headers: {
+                'X-CSRF-Token': token
+            },
+            data: formData,
+            success: function(data, status, xhr) {
+                if (data.lockout) {
+                    $("#questions").remove();
+                    alert("You have been locked out of this exam. Please notify an instructor if this is unexpected.");
+                }
+            }
+        });
+    }
+});
+<% end %>

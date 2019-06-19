@@ -25,8 +25,13 @@ class ExamsController < ApplicationController
       render 'submit'
       return
     end
+  end
 
+  def contents
+    # TODO make secret in "show" and check it before rendering
+    #   so that users cannot just visit /exams/1/contents
     @answers = @registration.get_current_answers
+    render layout: false
   end
 
   def index

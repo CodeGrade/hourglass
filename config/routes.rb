@@ -10,6 +10,7 @@ Rails.application.routes.draw do
 
   resources :exams, only: [:show, :index, :new, :create] do
     member do
+      get :contents
       post :submit
       post :save_snapshot
     end

@@ -1,0 +1,59 @@
+<h1><%= @exam.name %></h1>
+<% content_for :navbar do %>
+<nav class="navbar navbar-light bg-light fixed-top">
+  <span class="navbar-brand">Hourglass</span>
+  <div class="dropdown float-right">
+    <button class="btn btn-outline-secondary align-middle" type="button" data-toggle="dropdown"
+            style="font-size: 0;">
+      <%= octicon "book", height: 24 %>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+      <button class="dropdown-item" id="toggle-paginated" type="button">Toggle paginated display</button>
+      <div class="dropdown-divider"></div>
+      <span class="dropdown-item-text">Jump to:</span>
+      <% @exam.info["questions"].each_with_index do |q, qi| %>
+      <button class="dropdown-item question-link" type="button" data-q="<%= qi + 1 %>">
+        <%= "Question #{qi + 1}" %>
+      </button>
+      <% q["parts"].each_with_index do |p, pi| %>
+      <button class="dropdown-item ml-3 question-link" type="button"
+              data-q="<%= qi + 1 %>" data-p="<%= pi + 1 %>">
+        <%= "Question #{qi + 1}-#{pi + 1}" %>
+      </button>
+      <% end %>
+      <% end %>
+    </div>
+  </div>
+</nav>
+<% end %>
+<% if current_user.admin_or_prof? %>
+  <%= link_to "View registrations", exam_registrations_path(@exam), class: "btn btn-info" %>
+<% end %>
+<p><%= @exam.info["instructions"]&.html_safe %></p>
+<%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
+<%= bootstrap_form_tag url: submit_exam_path, html: {id: "exam-form"} do |form| %>
+  <div id="questions" class="paginated">
+    <div class="mt-4 question-nav d-print-none">
+      <b>Jump to question:</b>
+      <nav aria-label="question navigation" id="question-nav" class="d-inline-block">
+        <ul class="pagination">
+          <% @exam.info["questions"].each_with_index do |question, index| %>
+            <li class="page-item question-page-item" id="nav-q<%= index+1 %>">
+              <a href="#" class="page-link question-link" data-q="<%= index + 1 %>">
+                <%= "#{index + 1}" %>
+              </a>
+            </li>
+          <% end %>
+        </ul>
+      </nav>
+    </div>
+    <% @exam.info["questions"].each_with_index do |question, index| %>
+      <%= render "exams/question", form: form, question: question, question_number: index, readonly: @readonly %>
+    <% end %>
+    <div class="mt-4 d-print-none">
+      <%= form.submit class: "btn btn-success" %>
+    </div>
+  </div>
+<% end %>
+
+<script><%= render "exams/show.js" %></script>

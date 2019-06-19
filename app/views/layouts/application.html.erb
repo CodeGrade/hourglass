@@ -19,11 +19,7 @@
   </head>
 
   <body>
-  <% if content_for?(:navbar) %>
-    <%= yield(:navbar) %>
-  <% else %>
-    <%=  render "layouts/navbar"  %>
-  <% end %>
+  <%=  render "layouts/navbar"  %>
   <% unless flash.empty? %>
     <%= render "layouts/flash" %>
   <% end %>

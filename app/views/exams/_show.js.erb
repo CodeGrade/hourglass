@@ -1,4 +1,3 @@
-$("#toggle-paginated").click(() => $("#questions").toggleClass("paginated"));
 function showQuestion(q, shouldScroll) {
   $(".question").removeClass("active");
   $("#q" + q).addClass("active");
@@ -45,25 +44,37 @@ function doScrolling(anchor) {
 }
 
 
-$(".question-link").click(function(e) {
-  // prevent "#" links from jumping to the top of the page
-  e.preventDefault();
-  var q = $(this).data("q");
-  var p = $(this).data("p");
-  if (p !== undefined) {
-    showPart(q, p, !$(this).hasClass("page-link"));
-  } else {
-    showPart(q, 1, false);
-    showQuestion(q, !$(this).hasClass("page-link"));
-  }
-});
+$(function() {
+  const navigation = "<%= j render 'navbar' %>";
+  $("#site-nav").html(navigation);
 
-$(function () {
-  showPart(1, 1, false);
+  $(".question-link").click(function(e) {
+    // prevent "#" links from jumping to the top of the page
+    e.preventDefault();
+    var q = $(this).data("q");
+    var p = $(this).data("p");
+    if (p !== undefined) {
+      showPart(q, p, !$(this).hasClass("page-link"));
+    } else {
+      showPart(q, 1, false);
+      showQuestion(q, !$(this).hasClass("page-link"));
+    }
+  });
+
+  $(function () {
+    showPart(1, 1, false);
     $(".page-link").click(function(e) {
-        <% #prevent "#" links from jumping to the top of the page %>
+      <% #prevent "#" links from jumping to the top of the page %>
         e.preventDefault();
     });
     $(".sourceCode").each(activateCode);
     $(".sourceCodeDisplay").each(displayCode);
+  });
+
+  $("#toggle-paginated").click(function() {
+    $("#questions").toggleClass("paginated");
+    $("#questions .CodeMirror").each(function (index, cm) {
+      cm.CodeMirror.refresh();
+    });
+  });
 });

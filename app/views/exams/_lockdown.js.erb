@@ -131,7 +131,6 @@ $(function() {
             cm.CodeMirror.save();
         });
         const formData = $("#exam-form").serialize();
-        console.log(formData);
         const snapshotPath = "<%= save_snapshot_exam_path(@exam) %>";
         const token = $('meta[name=csrf-token]').attr('content');
         $.ajax({

@@ -1,0 +1,25 @@
+<nav class="navbar navbar-light bg-light fixed-top">
+  <span class="navbar-brand">Hourglass</span>
+  <div class="dropdown float-right">
+    <button class="btn btn-outline-secondary align-middle" type="button" data-toggle="dropdown"
+            style="font-size: 0;">
+      <%= octicon "book", height: 24 %>
+    </button>
+    <div class="dropdown-menu dropdown-menu-right">
+      <button class="dropdown-item" id="toggle-paginated" type="button">Toggle paginated display</button>
+      <div class="dropdown-divider"></div>
+      <span class="dropdown-item-text">Jump to:</span>
+      <% @exam.info["questions"].each_with_index do |q, qi| %>
+      <button class="dropdown-item question-link" type="button" data-q="<%= qi + 1 %>">
+        <%= "Question #{qi + 1}" %>
+      </button>
+      <% q["parts"].each_with_index do |p, pi| %>
+      <button class="dropdown-item ml-3 question-link" type="button"
+              data-q="<%= qi + 1 %>" data-p="<%= pi + 1 %>">
+        <%= "Question #{qi + 1}-#{pi + 1}" %>
+      </button>
+      <% end %>
+      <% end %>
+    </div>
+  </div>
+</nav>

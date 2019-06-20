@@ -12,7 +12,13 @@ $(function() {
         return;
     }
 
-    $("#begin-exam").on('click', checkFullscreen);
+    const beginButton = $("#begin-exam");
+    const professor = <%= current_user.admin_or_prof? %>;
+    if (professor) {
+        beginButton.on('click', bootSequenceConfirmed);
+    } else {
+        beginButton.on('click', checkFullscreen);
+    }
 
     function isFullscreen() {
         const maximized = window.outerHeight == screen.height;

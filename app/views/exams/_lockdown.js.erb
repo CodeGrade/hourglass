@@ -116,6 +116,11 @@ $(function() {
         blur: function(e) {
             anomalyDetected('window blurred', e);
         },
+        contextmenu: function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('user tried to open context menu');
+        },
     }
 
     function installListeners() {

@@ -2,6 +2,18 @@
 <% if page == "exams/show" %>
 $(function() {
 
+    // browser detection
+    // TODO: more robust browser detection, with version numbers:
+    //   https://github.com/lancedikson/bowser
+    const isChrome = navigator.userAgent.search("Chrome") >= 0;
+    const isFirefox = navigator.userAgent.search("Firefox") >= 0;
+    if (!isChrome && !isFirefox) {
+        $("#interstitial").html('Please use Chrome, Chromium, or Firefox to continue.');
+        return;
+    }
+
+    $("#begin-exam").on('click', checkFullscreen);
+
     function isFullscreen() {
         const maximized = window.outerHeight == screen.height;
         const fullheight = window.innerHeight == window.outerHeight;
@@ -63,7 +75,6 @@ $(function() {
         $("#exam-nav").replaceWith(regularNav);
     }
 
-
     function checkFullscreen() {
         if (!isFullscreen()) {
             console.log('not fullscreen.')
@@ -76,8 +87,6 @@ $(function() {
             });
         }
     }
-
-    $("#begin-exam").on('click', checkFullscreen);
 
     // full screen has been enabled. continue locking down
     function postFullscreen() {

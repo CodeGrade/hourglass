@@ -45,8 +45,9 @@ function doScrolling(anchor) {
 
 
 $(function() {
-  const navigation = "<%= j render 'navbar' %>";
-  $("#site-nav").replaceWith(navigation);
+  const regularNav = $("#site-nav");
+  const examNav = $("#exam-nav").remove();
+  regularNav.replaceWith(examNav);
 
   $(".question-link").click(function(e) {
     // prevent "#" links from jumping to the top of the page

@@ -83,7 +83,9 @@ $(function() {
     function postFullscreen() {
         if (!isFullscreen()) {
             console.log("still not fullscreen. console open?");
-            alert('Please close developer console before continuing.');
+            document.exitFullscreen().then(function(){
+                alert('Please close developer console before continuing.');
+            });
             return;
         }
         console.log('locking down...');

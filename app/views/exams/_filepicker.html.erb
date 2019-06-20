@@ -63,7 +63,7 @@
       <div id="files-all-files" class="files treeview condensed"></div>
     </div>
   </div>
-  <div class="<%= if files.count > 1 then 'col-md-9' else 'col-md-12' end %> tab-content pl-0">
+  <div class="<%= if files.count > 1 then 'col-md-9 pl-0' else 'col-md-12 p-0' end %> tab-content">
     <% files.each_with_index do |f, i| %>
       <% index = (i + 1).to_s.rjust(files.count.to_s.length, '0') %>
       <div class="file-pane tab-pane panel-tab-pane active" id="<%= root %>_file_<%= index %>">

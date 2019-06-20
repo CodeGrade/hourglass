@@ -48,15 +48,19 @@ $(function() {
         removeListeners();
     }
 
+    const regularNav = $("#site-nav");
 
     function loadExamContent() {
         return $.get("<%= contents_exam_path @exam %>").then(function(contents) {
             $("#exam-contents").html(contents);
+            const examNav = $("#exam-nav").remove();
+            $("#site-nav").replaceWith(examNav);
         });
     }
 
     function unloadExamContent() {
         $("#exam-contents").html('');
+        $("#exam-nav").replaceWith(regularNav);
     }
 
 

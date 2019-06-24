@@ -2,10 +2,16 @@ class Registration < ApplicationRecord
   belongs_to :user
   belongs_to :exam
 
+  has_many :anomalies
+
   enum role: [:student, :proctor, :professor, :admin]
 
   after_create :create_file
   after_commit :purge_file!, on: :destroy
+
+  def anomalous?
+    anomalies.size > 0
+  end
 
   def create_file
     FileUtils.mkdir_p exam_subs

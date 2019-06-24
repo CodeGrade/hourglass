@@ -3,6 +3,9 @@
   <div class="col-12">
     <h2><%= @exam.name %> Registration</h2>
     <div class="d-print-none">
+      <% if @registration.anomalous? %>
+        <p><%= link_to "Show anomalies", exam_registration_anomalies_path(@registration.exam, @registration), class: "btn btn-danger" %></p>
+      <% end %>
       <p><%= link_to "View exam registrations", exam_registrations_path(@registration.exam), class: "btn btn-info" %></p>
       <p><%= link_to "View exam", @registration.exam, class: "btn btn-info" %></p>
     </div>

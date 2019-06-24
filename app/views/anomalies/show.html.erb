@@ -1,0 +1,6 @@
+<% @page_title = "Anomaly" %>
+<h1><%= @page_title %></h1>
+<p>This anomaly was caused for the following reason:</p>
+<i><%= @anomaly.reason %></i>
+
+<%= link_to "Remove anomaly", exam_registration_anomaly_path(@exam, @registration, @anomaly), method: :delete, class: "btn btn-danger" %>

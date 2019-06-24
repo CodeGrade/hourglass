@@ -1,0 +1,12 @@
+<% @page_title = "Anomalies" %>
+<h1><%= @page_title %></h1>
+<p><%= link_to "View registration", exam_registration_path(@exam, @registration), class: "btn btn-info" %></p>
+<% if @anomalies.size == 0 %>
+  <p>No anomalies found.</p>
+<% else %>
+  <ul>
+    <% @anomalies.each do |anomaly| %>
+      <li><%= link_to anomaly.reason, exam_registration_anomaly_path(@exam, @registration, anomaly) %></li>
+    <% end %>
+  </ul>
+<% end %>

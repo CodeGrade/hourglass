@@ -67,12 +67,6 @@ class ExamsController < ApplicationController
     render json: {lockout: lockout}
   end
 
-  def anomaly_detected
-    @registration.update_attribute(:anomalous, true)
-    reason = params.require(:reason)
-    # TODO something useful with `reason`
-  end
-
   def new
     @exam = Exam.new
   end

@@ -112,7 +112,7 @@ $(function() {
     function anomalyDetected(reason, event) {
         console.log('ANOMALY DETECTED:', reason, event);
         lockOut();
-        const anomalyPath = "<%= anomaly_detected_exam_path(@exam) %>";
+        const anomalyPath = "<%= exam_registration_anomalies_path(@exam, @registration) %>";
         const token = $('meta[name=csrf-token]').attr('content');
         $.ajax({
             url: anomalyPath,
@@ -121,7 +121,12 @@ $(function() {
                 'X-CSRF-Token': token
             },
             data: {
-              reason: reason
+                anomaly: {
+                    reason: reason
+                }
+            },
+            success: function(data) {
+                console.log("anomaly created:", data.created);
             }
         });
     }

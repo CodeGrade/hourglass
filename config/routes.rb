@@ -13,9 +13,10 @@ Rails.application.routes.draw do
       get :contents
       post :submit
       post :save_snapshot
-      post :anomaly_detected
     end
 
-    resources :registrations, only: [:show, :index]
+    resources :registrations, only: [:show, :index] do
+      resources :anomalies, only: [:show, :index, :destroy, :create]
+    end
   end
 end

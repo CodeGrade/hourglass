@@ -10,10 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_13_235416) do
+ActiveRecord::Schema.define(version: 2019_06_24_202050) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "anomalies", force: :cascade do |t|
+    t.integer "registration_id", null: false
+    t.string "reason", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "exams", force: :cascade do |t|
     t.string "secret_key", null: false
@@ -28,7 +35,6 @@ ActiveRecord::Schema.define(version: 2019_05_13_235416) do
     t.integer "user_id", null: false
     t.integer "role", default: 0, null: false
     t.boolean "final", default: false, null: false
-    t.boolean "anomalous", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

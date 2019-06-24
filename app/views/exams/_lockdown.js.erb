@@ -59,13 +59,6 @@ $(function() {
         });
     }
 
-    function submissionSaved() {
-        // turn off safe browsing and anomaly detection
-        stopSnapshots();
-        unloadExamContent();
-        removeListeners();
-    }
-
     const regularNav = $("#site-nav");
 
     function loadExamContent() {
@@ -108,13 +101,29 @@ $(function() {
         bootSequenceConfirmed();
     }
 
+    function lockOut() {
+        stopSnapshots();
+        removeListeners();
+        unloadExamContent();
+      $("nav").removeClass("bg-light").addClass("bg-warning");
+      $("#exam-contents").html("You have been locked out of this exam. Please notify an instructor if this is unexpected.");
+    }
+
     function anomalyDetected(reason, event) {
         console.log('ANOMALY DETECTED:', reason, event);
-        removeListeners();
-        stopSnapshots();
-        unloadExamContent();
-        // TODO send anomaly back to server, lock student out of exam
-        $("#exam-contents").html(`anomaly detected. ${reason} (todo)`);
+        lockOut();
+        const anomalyPath = "<%= anomaly_detected_exam_path(@exam) %>";
+        const token = $('meta[name=csrf-token]').attr('content');
+        $.ajax({
+            url: anomalyPath,
+            type: 'POST',
+            headers: {
+                'X-CSRF-Token': token
+            },
+            data: {
+              reason: reason
+            }
+        });
     }
 
     const listeners = {
@@ -168,8 +177,7 @@ $(function() {
             data: formData,
             success: function(data, status, xhr) {
                 if (data.lockout) {
-                    $("#questions").remove();
-                    alert("You have been locked out of this exam. Please notify an instructor if this is unexpected.");
+                    lockOut();
                 }
             }
         });

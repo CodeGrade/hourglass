@@ -3,12 +3,12 @@ class ExamsController < ApplicationController
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create]
   before_action :require_admin_or_prof, only: [:new, :create]
+  before_action :check_anomaly, only: [:show, :contents]
 
   def require_enabled
     @exam ||= Exam.find(params[:id])
     unless @exam.enabled?
       redirect_back fallback_location: exams_path, alert: 'This exam has not been enabled yet.'
-      return
     end
   end
 
@@ -16,7 +16,12 @@ class ExamsController < ApplicationController
     @registration ||= Registration.find_by(user: current_user, exam_id: params[:id])
     if @registration.nil?
       redirect_back fallback_location: exams_path, alert: 'You are not registered for that exam.'
-      return
+    end
+  end
+
+  def check_anomaly
+    if @registration.anomalous?
+      redirect_back fallback_location: exams_path, alert: "You are locked out of that exam. Please see a proctor."
     end
   end
 
@@ -53,13 +58,19 @@ class ExamsController < ApplicationController
   def submit
     lockout = save_answers(true)
     if lockout
-      redirect_to exams_path, alert: "You have already submitted that exam."
+      redirect_to exams_path, alert: "You have already submitted this exam or you are locked out of it."
     end
   end
 
   def save_snapshot
     lockout = save_answers
     render json: {lockout: lockout}
+  end
+
+  def anomaly_detected
+    @registration.update_attribute(:anomalous, true)
+    reason = params.require(:reason)
+    # TODO something useful with `reason`
   end
 
   def new

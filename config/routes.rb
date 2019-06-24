@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       get :contents
       post :submit
       post :save_snapshot
+      post :anomaly_detected
     end
 
     resources :registrations, only: [:show, :index]

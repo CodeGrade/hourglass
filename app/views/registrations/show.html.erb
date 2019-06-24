@@ -1,29 +1,21 @@
-<!-- TODO -->
+<% @page_title = "#{@exam.name} Registration for #{@registration.user.username}" %>
 <div class="row">
   <div class="col-12">
-    <h2>Registration</h2>
-    <p><%= link_to "← back to exam registrations", exam_registrations_path(@registration.exam) %></p>
-    <p><%= link_to "← back to exam", @registration.exam %></p>
-    registration for "<%= @registration.user.username %>"
-    (todo)
+    <h2><%= @exam.name %> Registration</h2>
+    <div class="d-print-none">
+      <p><%= link_to "View exam registrations", exam_registrations_path(@registration.exam), class: "btn btn-info" %></p>
+      <p><%= link_to "View exam", @registration.exam, class: "btn btn-info" %></p>
+    </div>
+    <p>Registration for <i><%= @registration.user.username %></i>.</p>
+    <p>Updated at <i><%= @registration.updated_at %></i>.</p>
 
   <div id="questions">
-    <div class="mt-4 d-print-none">
-      <p>Question navigation:</p>
-      <nav aria-label="question navigation" id="question-nav" class="d-inline-block">
-        <ul class="pagination">
-          <% @exam.info["questions"].each_with_index do |question, index| %>
-            <li class="page-item question-page-item" id="nav-q<%= index+1 %>">
-              <a href="#" class="page-link question-link" data-q="<%= index + 1 %>">
-                <%= "#{index + 1}" %>
-              </a>
-            </li>
-          <% end %>
-        </ul>
-      </nav>
-    </div>
     <% @exam.info["questions"].each_with_index do |question, index| %>
       <%= render "exams/question", form: nil, question: question, question_number: index, readonly: @readonly %>
+    <% end %>
+    <%= javascript_tag do %>
+      $(".sourceCode").each(activateCode);
+      $(".sourceCodeDisplay").each(displayCode);
     <% end %>
   </div>
 

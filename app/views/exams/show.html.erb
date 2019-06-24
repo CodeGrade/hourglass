@@ -1,7 +1,14 @@
 <% @page_title = @exam.name %>
-<div id="interstitial">
-  <p>Click the following button to enter secure mode and begin the exam.</p>
-  <a href="#" id="begin-exam" class="btn btn-success">Begin exam</a>
-</div>
-
+<h1><%= @page_title %></h1>
+<% if current_user.admin_or_prof? %>
+  <%= link_to "View registrations", exam_registrations_path(@exam), class: "btn btn-info" %>
+  <span id="interstitial">
+    <a href="#" id="begin-exam" class="btn btn-info">View exam</a>
+  </span>
+<% else %>
+  <div id="interstitial">
+    <p>Click the following button to enter secure mode and begin the exam.</p>
+    <a href="#" id="begin-exam" class="btn btn-success">Begin exam</a>
+  </div>
+<% end %>
 <div id="exam-contents"></div>

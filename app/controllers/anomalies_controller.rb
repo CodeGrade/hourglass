@@ -5,6 +5,8 @@ class AnomaliesController < ApplicationController
   before_action :find_exam
   before_action :find_reg
 
+  before_action :my_reg, only: [:create]
+
   def find_exam
     @exam = Exam.find(params[:exam_id])
   end
@@ -19,6 +21,12 @@ class AnomaliesController < ApplicationController
 
   def show
     @anomaly = Anomaly.find(params[:id])
+  end
+
+  def my_reg
+    if @registration.user != current_user
+      render json: { created: false }
+    end
   end
 
   def create

@@ -1,24 +1,9 @@
-# README
+# Hourglass
+Web-based exam server
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+# Database setup
+Hourglass expects postgresql.
 
-Things you may want to cover:
+Databases can be created with `rails db:create` and the schema is loaded with `rails db:schema:load`.
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+To seed the database with some [defaults for development](db/seeds.rb), run `rails db:seed`.

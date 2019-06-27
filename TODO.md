@@ -11,3 +11,7 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
 - double check permissions for every controller action
 - allow site admins to view any exam without a registration
   - there's some code in the exams controller that breaks if the user does not have an active registration for the exam
+- find out if the exam network setup necessitates any changes to server
+- make logo for favicon, readme, navbar
+- grab student first and last names from LDAP?
+- add a license

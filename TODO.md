@@ -2,6 +2,8 @@
 
 See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
 
+- a better during-exam flow for seeing anomalies occur and handling them quickly
+- registration creation UI
 - the `contents` page for an exam should not be accessible by any means unless the exam is being loaded into the `show` page. (`exams_controller.rb:36`)
 - `CodeTag` responses
 - initial files for `Code` responses, like a fill-in-the-blank
@@ -23,6 +25,7 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
   - show active sessions, if one is dropped, make an anomaly
 - files for the entire exam
 - double check permissions for every controller action
+  - allow proctors to view and absolve anomalies
 - allow site admins to view any exam without a registration
   - there's some code in the exams controller that breaks if the user does not have an active registration for the exam
 - find out if the exam network setup necessitates any changes to server

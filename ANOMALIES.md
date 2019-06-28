@@ -21,4 +21,4 @@
 - The final step of the initialization must be to ping the server and request authorization to proceed with the exam, e.g. by sending some secret value (that was textually part of the inline script) back to the server and getting a confirmation code
   - Until the server receives the authorization request, the exam UI should be disabled; if the server never receives such a request, it should reject any of that student's submissions (though it should still autosave intermediate results -- I'd love to know how the student managed to trigger that!)
 - `MutationObservers` will let us check for attribute modification and page structure modification; if anything looks suspicious, flag the exam and block if from submission
-- https://arxiv.org/pdf/1905.12951.pdf might have some reference points for us to keep track of
+- [this paper](https://arxiv.org/pdf/1905.12951.pdf) might have some reference points for us to keep track of

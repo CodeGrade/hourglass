@@ -1,6 +1,10 @@
 # Hourglass
 Web-based exam server
 
+[Anomaly Detection Progress and TODOs](ANOMALIES.md)
+
+[General TODOs](TODO.md)
+
 # Database setup
 Hourglass expects postgresql.
 

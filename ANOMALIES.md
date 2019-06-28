@@ -13,3 +13,4 @@
 ## To-do
 - Chrome's "toggle device toolbar" mode (ctrl+shift+m when developer tools is open) is seen as "fullscreen" no matter what state the window is in.
   - the user could have other windows or the developer console open, but focus detection will still work if the cursor leaves the page
+- detect browser extensions

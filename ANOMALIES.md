@@ -11,6 +11,7 @@
 - if a user attempts to save a snapshot and they already have a final submission or have some anomaly, they are locked out.
 
 ## To-do
+- Exam won't start if user starts in fullscreen
 - Chrome's "toggle device toolbar" mode (ctrl+shift+m when developer tools is open) is seen as "fullscreen" no matter what state the window is in.
   - the user could have other windows or the developer console open, but focus detection will still work if the cursor leaves the page
 - detect browser extensions

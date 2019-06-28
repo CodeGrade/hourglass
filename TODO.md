@@ -2,9 +2,17 @@
 
 See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
 
+- a single checkin endpoint
+  - json blobs
+    - snapshot
+    - anomaly
+- professor iframe for viewing exam
 - a better during-exam flow for seeing anomalies occur and handling them quickly
 - registration creation UI
 - the `contents` page for an exam should not be accessible by any means unless the exam is being loaded into the `show` page. (`exams_controller.rb:36`)
+  - encrypt the data on the `contents` page
+  - client side decryption with PIN
+  - login counter, so that PIN changes
 - `CodeTag` responses
 - initial files for `Code` responses, like a fill-in-the-blank
 - validate the exam upload
@@ -34,6 +42,7 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
 - export final submissions for each student, for upload to bottlenose for grading
   - bottlenose import feature
 - download registrations (for a course) from bottlenose and upload them to hourglass (for an exam)
+  - bottlenose endpoint (course#user_data [json]) for user info locked down to professors
 - only one session per user
   - [devise - session limitable](https://github.com/devise-security/devise-security)
 - exam creator/editor so YAML doesn't have to be involved at all

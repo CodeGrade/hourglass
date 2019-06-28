@@ -5,6 +5,7 @@ $(function() {
     // browser detection
     // TODO: more robust browser detection, with version numbers:
     //   https://github.com/lancedikson/bowser
+    // disallow mobile entirely!
     const isChrome = navigator.userAgent.search("Chrome") >= 0;
     const isFirefox = navigator.userAgent.search("Firefox") >= 0;
     if (!isChrome && !isFirefox) {
@@ -12,13 +13,16 @@ $(function() {
         return;
     }
 
-    const beginButton = $("#begin-exam");
-    const professor = <%= current_user.admin_or_prof? %>;
-    if (professor) {
-        beginButton.on('click', bootSequenceConfirmed);
-    } else {
-        beginButton.on('click', checkFullscreen);
-    }
+    $("#begin-exam").on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const professor = <%= current_user.admin_or_prof? %>;
+        if (professor) {
+            bootSequenceConfirmed();
+        } else {
+            checkFullscreen();
+        }
+    });
 
     function isFullscreen() {
         const maximized = window.outerHeight == screen.height;
@@ -84,6 +88,8 @@ $(function() {
                 console.log('could not achieve fullscreen', reason);
                 // TODO fullscreen didn't work! what now?
             });
+        } else {
+            postFullscreen();
         }
     }
 
@@ -105,8 +111,7 @@ $(function() {
         stopSnapshots();
         removeListeners();
         unloadExamContent();
-      $("nav").removeClass("bg-light").addClass("bg-warning");
-      $("#exam-contents").html("You have been locked out of this exam. Please notify an instructor if this is unexpected.");
+        window.history.back();
     }
 
     function anomalyDetected(reason, event) {

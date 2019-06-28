@@ -2,7 +2,7 @@
 class Exam < ApplicationRecord
   has_many :registrations
   has_many :users, through: :registrations
-  has_one :upload
+  has_one :upload, dependent: :destroy
 
   validates_presence_of :upload
   after_initialize :generate_secret_key!

@@ -20,7 +20,10 @@ class AnomaliesController < ApplicationController
   end
 
   def show
-    @anomaly = Anomaly.find(params[:id])
+    @anomaly = Anomaly.find_by_id(params[:id])
+    if @anomaly.nil?
+      redirect_to exam_registration_anomalies_path(@exam, @registration)
+    end
   end
 
   def my_reg
@@ -39,6 +42,6 @@ class AnomaliesController < ApplicationController
   def destroy
     @anomaly = Anomaly.find(params[:id])
     @anomaly.destroy
-    redirect_to exam_registration_anomalies_path(@exam, @registration)
+    redirect_back fallback_location: exam_registration_anomalies_path(@exam, @registration)
   end
 end

@@ -8,10 +8,16 @@ class Upload < ApplicationRecord
 
   after_initialize :generate_secret_key!
   before_create :store_upload!
-  after_rollback :purge!
+  after_commit :purge!, on: :destroy
 
   def purge!
-    FileUtils.rm_rf (upload_dir.to_s)
+    FileUtils.rm_rf base_dir.to_s
+    if Dir.empty? exam_dir
+      FileUtils.rm_rf exam_dir
+    end
+    if Dir.empty? user_dir
+      FileUtils.rm_rf user_dir
+    end
   end
 
   def create_exam_structure(upload)
@@ -133,9 +139,21 @@ class Upload < ApplicationRecord
     Rails.root.join("private", "uploads", Rails.env)
   end
 
-  def upload_dir
+  def user_dir
+    Upload.base_upload_dir.join(user_id.to_s)
+  end
+
+  def exam_dir
+    user_dir.join(exam_id.to_s)
+  end
+
+  def base_dir
     pre = secret_key.slice(0, 2)
-    Upload.base_upload_dir.join(user&.id.to_i.to_s, exam&.id.to_i.to_s, pre, secret_key)
+    exam_dir.join(pre)
+  end
+
+  def upload_dir
+    base_dir.join(secret_key)
   end
 
   def generate_secret_key!

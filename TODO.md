@@ -33,6 +33,7 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
 - download registrations (for a course) from bottlenose and upload them to hourglass (for an exam)
 - only one session per user
   - [devise - session limitable](https://github.com/devise-security/devise-security)
+- exam creator/editor so YAML doesn't have to be involved at all
 - make logo for favicon, readme, navbar
 - grab student first and last names from LDAP?
 - add a license

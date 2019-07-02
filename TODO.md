@@ -14,7 +14,7 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
   - client side decryption with PIN
   - login counter, so that PIN changes
 - `CodeTag` responses
-- initial files for `Code` responses, like a fill-in-the-blank
+- [x] initial files for `Code` responses, like a fill-in-the-blank
 - validate the exam upload
   - every exam should have at least an `exam.yaml`
   - filepicker code will not work if there are only empty directories [see here](https://github.com/CodeGrade/hourglass/commit/13677552dd95aefbcf64389adfd23cff5ddac7c1#commitcomment-33899283)

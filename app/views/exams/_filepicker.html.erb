@@ -215,12 +215,19 @@
     // $(function() { $("div[id^='pdf_']").pdfViewer(); });
     $(function() {
         let dirs = <%= raw json_escape(JSON.pretty_generate(dirs)) %>;
-        var node = dirs[0];
-        while ('nodes' in node) {
-            node = node.nodes[0];
+        function markFirst(dirs) {
+          for (var i = 0; i < dirs.length; i++) {
+            if (dirs[i].nodes && markFirst(dirs[i].nodes)) { 
+              return; 
+            } else {
+              dirs[i].state = dirs[i].state || {};
+              dirs[i].state.selected = true;
+              return true;
+            }
+          }
+          return false;
         }
-        node.state = node.state || {};
-        node.state.selected = true;
+        markFirst(dirs);
         let root = "<%= root %>";
         $("#files_<%= root %>").filePicker({ dirs, root });
     });

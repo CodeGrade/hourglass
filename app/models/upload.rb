@@ -30,17 +30,23 @@ class Upload < ApplicationRecord
     # |   ...
 
     # 'files' contains folders for each question/part, in the following format:
-    #    q{number}-{all|part_number}
+    #    q{number}/{all|part_number}
+    # as well as files for the entire exam in 'all'
     #
     # files/
-    # +-- q1-all/
-    # |   +-- src/
-    # |   |   +-- packageone/
-    # |   |   |   +-- Example.java
-    # |   |   +-- packagetwo/
-    # |   |   |   +-- Example2.java
-    # +-- q1-1/
-    # |   +-- anything.txt
+    # +-- all/
+    # |   +-- anyfile.txt
+    # +-- q1/
+    # |   +-- all/
+    # |   |   +-- src/
+    # |   |   |   +-- packageone/
+    # |   |   |   |   +-- Example.java
+    # |   |   |   +-- packagetwo/
+    # |   |   |   |   +-- Example2.java
+    # |   +-- p1/
+    # |   |   +-- anything.txt
+    # |   +-- p2/
+    # |   |   +-- something-else.rkt
 
     # storage of the upload in /private is as follows:
     #

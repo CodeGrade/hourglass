@@ -3,10 +3,8 @@
   <div class="col-12">
     <h1>Question <%= question_number + 1 %>: <%= question["name"] %></h1>
     <p><%= question["description"]&.html_safe %></p>
-
     <%
-      q_files = "q#{question_number+1}-all"
-      dirs, files = @exam.get_exam_files(q_files)
+      dirs, files = @exam.get_question_files(question_number)
       unless files.empty?
     %>
       <%= render "exams/filepicker", dirs: dirs, files: files, root: "question_#{question_number}" %>

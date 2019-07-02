@@ -61,7 +61,19 @@ class Exam < ApplicationRecord
     f
   end
 
-  def get_exam_files(folder)
+  def get_exam_files
+    get_raw_files("all")
+  end
+
+  def get_question_files(qnum)
+    get_raw_files("q#{qnum+1}/all")
+  end
+
+  def get_part_files(qnum, pnum)
+    get_raw_files("q#{qnum+1}/p#{pnum+1}")
+  end
+
+  def get_raw_files(folder)
     @exam_files = []
     def ensure_utf8(str, mimetype)
       if ApplicationHelper.binary?(mimetype)

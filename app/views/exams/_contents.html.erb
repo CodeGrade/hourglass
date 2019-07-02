@@ -1,5 +1,10 @@
 <p><%= @exam.info["instructions"]&.html_safe %></p>
-<%= render "files", files: @exam.info["files"] if @exam.info["files"] %>
+
+<%  dirs, files = @exam.get_exam_files
+unless files.empty?
+%>
+  <%= render "exams/filepicker", dirs: dirs, files: files, root: "exam_files" %>
+<% end %>
 <%= bootstrap_form_tag url: @preview ? "#" : submit_exam_path, html: {id: "exam-form"} do |form| %>
   <div id="questions" class="paginated">
     <div class="mt-4 question-nav d-print-none">

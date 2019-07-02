@@ -5,8 +5,7 @@
     </h3>
     <p><%= part["description"]&.html_safe %></p>
     <%
-      part_files = "q#{question_number+1}-#{part_number+1}"
-      dirs, files = @exam.get_exam_files(part_files)
+      dirs, files = @exam.get_part_files(question_number, part_number)
       unless files.empty?
     %>
     <%= render "exams/filepicker", dirs: dirs, files: files, root: "question_#{question_number}_part_#{part_number}" %>

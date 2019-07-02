@@ -10,6 +10,9 @@ Exam:
     - key: "questions"
       value: Questions
       minSize: 1
+    - key: "reference"
+      value: FileDirs
+      optional: true
 Questions:
   array: Question
 Question:
@@ -25,6 +28,9 @@ Question:
       optional: true
     - key: "parts"
       value: Parts
+    - key: "reference"
+      value: FileDirs
+      optional: true
 Parts:
   array: Part
 Part:
@@ -39,6 +45,23 @@ Part:
       value: Float
     - key: "body"
       value: BodyItems
+    - key: "reference"
+      value: FileDirs
+      optional: true
+FileDirs:
+  array: FileDir
+FileDir:
+  one_of:
+    - File
+    - Dir
+File:
+  object:
+    - key: "file"
+      value: String
+Dir:
+  object:
+    - key: "dir"
+      value: String
 BodyItems:
   array: BodyItem
 BodyItem:
@@ -65,6 +88,9 @@ Code:
       optional: true
     - key: "lang"
       value: String
+    - key: "initial"
+      value: String
+      optional: true
 YesNo:
   one_of:
     - Boolean
@@ -132,6 +158,8 @@ CodeTag:
       optional: true
     - key: "correctAnswer"
       value: TagAnswer
+    - key: "choices"
+      value: FileDirs
 TagAnswer:
   one_of:
     - Lines

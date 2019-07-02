@@ -69,45 +69,26 @@
       <div class="file-pane tab-pane panel-tab-pane active" id="<%= root %>_file_<%= index %>">
         <% if (f[:type].starts_with?("image")) %>
           <div class="nonCMwrapper" style="position: relative; display: inline-block;">
-            <%= image_tag f[:link], id: "image_#{index}", alt: f[:name], style: "max-width: 100%; max-height: 100%;",
+            <%= image_tag "data:#{f[:mimetype]}:base64,#{f[:contents]}", id: "image_#{index}", alt: f[:path], style: "max-width: 100%; max-height: 100%;",
                           skip_pipeline: true %>
-            <a href="<%= f[:link] %>" target="_blank"
-               class="magnify-image btn btn-default" data-target="image_<%= index %>" data-container="file_<%= index %>"
-               style="position: absolute; display: block; float: right; right: 0; top: 0; font-size: 300%;">
-              <i class="glyphicon glyphicon-zoom-in"></i>
-            </a>
           </div>
         <% elsif (f[:pdf_path] || (f[:type] == "application/pdf" && f[:contents].starts_with?("%PDF"))) %>
           <div class="nonCMwrapper" style="display: inline-block; width: 100%; overflow: hidden;">
-            <%= render "submissions/pdf_viewer", index: index, url: f[:link], source: f[:pdf_path], alt: File.basename(f[:name]) %>
+            <%= render "submissions/pdf_viewer", index: index, source: f[:pdf_path], alt: File.basename(f[:path]) %>
           </div>
         <% elsif (f[:type] == "text/markdown") %>
           <ul class="nav nav-tabs">
             <li class="active"><a href="#markup_src_<%= i %>_<%= root %>" data-toggle="tab">Markdown source</a></li>
             <li id="tab_markdown_<%= i %>_<%= root %>"><a href="#markup_markdown_<%= i %>_<%= root %>" data-toggle="tab">Markdown preview<sup>β</sup> (links, scripts disabled)</a></li>
-            <li><%= link_to "Download #{File.basename(f[:name])}", f[:link] %></li>
           </ul>
           <div class="tab-content" style="height: 100%;">
             <div id="markup_src_<%= i %>_<%= root %>" class="tab-pane nested active">
-              <% if f[:contents].lines.length > @@MAX_LINES %>
-                <div class="contentTooLong">
-                  <div class="warningContent" data-source="<%= f[:link] %>">
-                    <p>Could not render <%= f[:name] %> &mdash; content was too long</p>
-                    <p><%= link_to "Download #{f[:name]}", f[:link] %></p>
-                    <%= code_textarea f[:contents],
-                                      id: "contents_#{i}_#{root}",
-                                      style: "display: none;",
-                                      data: {source: f[:link]} %>
-                  </div>
-                </div>
-              <% else %>
-                <div>
-                  <%= code_textarea f[:contents],
-                                    id: "contents_#{i}_#{root}",
-                                    class: "sourceCode",
-                                    data: {lang: "markdown", source: f[:link]} %>
-                </div>
-              <% end %>
+              <div>
+                <%= code_textarea f[:contents],
+                                  id: "contents_#{i}_#{root}",
+                                  class: "sourceCode",
+                                  data: {lang: "markdown"} %>
+              </div>
             </div>
             <div id="markup_markdown_<%= i %>_<%= root %>" class="tab-pane nested" style="position: relative;">
               <% content = Kramdown::Document.new(f[:contents], input: 'GFM', hard_wrap: false,
@@ -137,35 +118,21 @@
         <% elsif (f[:type] == "application/xml") || (f[:type] == "text/html") %>
           <% begin
                contents = render html: f[:contents]
-               type = if (f[:name].ends_with? ".svg") then "SVG"
-                      elsif (f[:name].ends_with? ".html") then "HTML"
+               type = if (f[:path].ends_with? ".svg") then "SVG"
+                      elsif (f[:path].ends_with? ".html") then "HTML"
                       else "XML" end %>
             <ul class="nav nav-tabs">
               <li class="active"><a href="#markup_src_<%= i %>_<%= root %>" data-toggle="tab"><%= type %> source</a></li>
               <li id="tab_image_<%= i %>_<%= root %>"><a href="#markup_image_<%= i %>_<%= root %>" data-toggle="tab"><%= type %> preview (scripts disabled)</a></li>
-              <li><%= link_to "Download #{File.basename(f[:name])}", f[:link] %></li>
             </ul>
             <div class="tab-content" style="height: 100%;">
               <div id="markup_src_<%= i %>_<%= root %>" class="tab-pane nested active">
-                <% if contents.lines.length > @@MAX_LINES %>
-                  <div class="contentTooLong">
-                    <div class="warningContent" data-source="<%= f[:link] %>">
-                      <p>Could not render <%= f[:name] %> &mdash; content was too long</p>
-                      <p><%= link_to "Download #{f[:name]}", f[:link] %></p>
-                      <%= code_textarea contents,
-                                        id: "contents_#{i}_#{root}",
-                                        style: "display: none;",
-                                        data: {source: f[:link], name: f[:name], readonly: true} %>
-                    </div>
-                  </div>
-                <% else %>
-                  <div>
-                    <%= code_textarea contents,
-                                      id: "contents_#{i}_#{root}",
-                                      class: "sourceCode",
-                                      data: {lang: f[:type], source: f[:link], name: f[:name], readonly: true} %>
-                  </div>
-                <% end %>
+                <div>
+                  <%= code_textarea contents,
+                                    id: "contents_#{i}_#{root}",
+                                    class: "sourceCode",
+                                    data: {lang: f[:type], name: f[:path], readonly: true} %>
+                </div>
               </div>
               <div id="markup_image_<%= i %>_<%= root %>" class="tab-pane nested" style="position: relative;">
                 <div style="position: absolute; z-index: 1; box-sizing: border-box; top: 0; bottom: 0; left: 0; right: 0;">
@@ -197,49 +164,18 @@
           <% rescue Exception => err %>
             <div class="nonCMwrapper flexV">
               <div class="warningContent">
-                <p>Could not render <%= f[:name] %></p>
-                <p><%= link_to "Download #{f[:name]}", f[:link] %></p>
+                <p>Could not render <%= f[:path] %></p>
                 <p><%= err %></p>
               </div>
             </div>
           <% end %>
-        <% elsif f[:type] == "audio/mpeg" %>
-          <div class="nonCMwrapper flexV">
-            <audio controls>
-              <source src="<%= f[:link] %>" type="audio/mpeg">
-              <div class="warningContent">
-                <p>Could not render <%= f[:name] %></p>
-                <p><%= link_to "Download #{f[:name]}", f[:link] %></p>
-              </div>
-            </audio>
-            <p><%= link_to "Download #{f[:name]}", f[:link] %></p>
-          </div>
         <% elsif f[:type] == "text/unknown" && f[:contents].ascii_only? %>
           <div class="nonCMwrapper flexV">
-            <% if f[:contents].lines.length > @@MAX_LINES %>
-              <div class="contentTooLong">
-                <div class="warningContent" data-source="<%= f[:link] %>">
-                  <p>Could not render <%= f[:name] %> &mdash; content was too long</p>
-                  <p><%= link_to "Download #{f[:name]}", f[:link] %></p>
-                  <%= code_textarea (render html: f[:contents]),
-                                    id: "contents_#{i}_#{root}",
-                                    style: "display: none;",
-                                    data: {source: f[:link], name: f[:name], readonly: true} %>
-                </div>
-              </div>
-            <% else %>
-              <div>
-                <%= code_textarea (render html: f[:contents]),
-                                  id: "contents_#{i}_#{root}",
-                                  class: "sourceCode",
-                                  data: {lang: f[:type], source: f[:link], name: f[:name], readonly: true} %>
-              </div>
-            <% end %>
-          </div>
-        <% elsif ApplicationHelper::binary?(f[:type]) %>
-          <div class="nonCMwrapper flexV">
-            <div class="warningContent" data-source="<%= f[:link] %>">
-              <p><%= link_to "Download #{f[:name]}", f[:link] %></p>
+            <div>
+              <%= code_textarea (render html: f[:contents]),
+                                id: "contents_#{i}_#{root}",
+                                class: "sourceCode",
+                                data: {lang: f[:type], name: f[:path], readonly: true} %>
             </div>
           </div>
         <% elsif f[:type] == "symlink" %>
@@ -250,28 +186,20 @@
               <%= link_to f[:link_to], f[:link_href], class: "symlink-jump", data: {root: root} %>
             <% end %>
           </div>
-        <% elsif f[:contents].lines.length > @@MAX_LINES %>
-          <div class="nonCMwrapper flexV">
-            <div class="warningContent" data-source="<%= f[:link] %>">
-              <p>Could not render <%= f[:name] %> &mdash; content was too long</p>
-              <p><%= link_to "Download #{f[:name]}", f[:link] %></p>
-            </div>
-          </div>
         <% else %>
           <% begin
-               raise "" if (f[:name].ends_with?(".class") && f[:contents].starts_with?("\xCA\xFE\xBA\xBE"))
+               raise "" if (f[:path].ends_with?(".class") && f[:contents].starts_with?("\xCA\xFE\xBA\xBE"))
                contents = render html: f[:contents] %>
             <div>
               <%= code_textarea contents,
                                 id: "contents_#{i}_#{root}",
                                 class: "sourceCode",
-                                data: {lang: f[:type], source: f[:link], name: f[:name], readonly: true}%>
+                                data: {lang: f[:type], name: f[:path], readonly: true}%>
             </div>
           <% rescue Exception => err %>
             <div class="nonCMwrapper flexV">
-              <div class="warningContent" data-source="<%= f[:link] %>">
-                <p>Could not render <%= f[:name] %></p>
-                <p><%= link_to "Download #{f[:name]}", f[:link] %></p>
+              <div class="warningContent">
+                <p>Could not render <%= f[:path] %></p>
                 <p><%= err %></p>
               </div>
             </div>

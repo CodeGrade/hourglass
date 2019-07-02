@@ -65,115 +65,111 @@ class Exam < ApplicationRecord
     get_raw_files("all")
   end
 
-  def get_question_files(qnum)
-    get_raw_files("q#{qnum+1}/all")
+  def get_referenced_files(refs)
+    @raw_files = []
+    refs&.each do |ref|
+      if ref["dir"]
+        @raw_files.push(*get_raw_files(ref["dir"]))
+      elsif ref["file"]
+        @raw_files.push(*get_raw_files(ref["file"]))
+      end
+    end
+    return clean_up(@raw_files)
   end
 
-  def get_part_files(qnum, pnum)
-    get_raw_files("q#{qnum+1}/p#{pnum+1}")
+  private
+  def with_extracted(item)
+    return nil if item.nil?
+    if item[:full_path]
+      return nil if File.basename(item[:full_path].to_s) == ".DS_Store"
+      mimetype = ApplicationHelper.mime_type(item[:full_path])
+      contents = begin
+        File.read(item[:full_path].to_s)
+      rescue Errno::EACCES => e
+        "Could not access file:\n#{e.to_s}"
+      rescue Errno::ENOENT => e
+        "Somehow, #{item[:full_path]} does not exist"
+      rescue Exception => e
+        "Error reading file:\n#{e.to_s}"
+      end
+      if mimetype.starts_with? "image/"
+        contents = Base64.encode(contents)
+      end
+      item[:text] = item[:path]
+      # pdf_path: item[:converted_path],
+      item[:contents] = ensure_utf8(contents, mimetype)
+      item[:type] = mimetype
+    elsif item[:link_to]
+      item[:type] = "symlink"
+    else
+      return nil if item[:path] == "__MACOSX"
+      item[:text] = item[:path] + "/"
+      item[:state] = {selectable: true}
+      item[:nodes] = item[:children].map{|n| with_extracted(n)}.compact
+      item.delete(:children)
+    end
+    item
   end
 
-  def get_raw_files(folder)
-    @exam_files = []
-    def ensure_utf8(str, mimetype)
-      if ApplicationHelper.binary?(mimetype)
+  private
+  def ensure_utf8(str, mimetype)
+    if ApplicationHelper.binary?(mimetype)
+      str
+    else
+      if str.is_utf8?
         str
       else
-        if str.is_utf8?
-          str
-        else
-          begin
-            if str.dup.force_encoding(Encoding::CP1252).valid_encoding?
-              str.encode(Encoding::UTF_8, Encoding::CP1252)
-            else
-              str.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '?')
-            end
-          rescue Exception => e
-            str
+        begin
+          if str.dup.force_encoding(Encoding::CP1252).valid_encoding?
+            str.encode(Encoding::UTF_8, Encoding::CP1252)
+          else
+            str.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '?')
           end
-        end
-      end
-    end
-    def with_extracted(item)
-      return nil if item.nil?
-      if item[:public_link]
-        return nil if File.basename(item[:full_path].to_s) == ".DS_Store"
-        mimetype = ApplicationHelper.mime_type(item[:full_path])
-        contents = begin
-          File.read(item[:full_path].to_s)
-        rescue Errno::EACCES => e
-          "Could not access file:\n#{e.to_s.gsub(item[:full_path].to_s, item[:public_link].to_s)}"
-        rescue Errno::ENOENT => e
-          "Somehow, #{item[:public_link]} does not exist"
         rescue Exception => e
-          "Error reading file:\n#{e.to_s.gsub(item[:full_path].to_s, item[:public_link].to_s)}"
+          str
         end
-        @exam_files.push({
-                                   link: item[:public_link],
-                                   name: item[:public_link].sub(/^.*extracted\//, ""),
-                                   pdf_path: item[:converted_path],
-                                   contents: ensure_utf8(contents, mimetype),
-                                   type: mimetype,
-                                   href: @exam_files.count + 1,
-                               })
-        deductions = nil
-        { text:
-              if deductions.to_f > 0
-                "#{item[:path]} (+#{deductions})"
-              elsif deductions
-                "#{item[:path]} (#{deductions})"
-              else
-                item[:path]
-              end,
-          href: @exam_files.count,
-        }
-      elsif item[:link_to]
-        @exam_files.push({
-                                   link_to: item[:link_to].sub(/^.*extracted\//, ""),
-                                   name: item[:path],
-                                   type: "symlink",
-                                   href: @exam_files.count + 1,
-                                   lineComments: {noCommentsFor: item[:path].to_s},
-                                   broken: item[:broken]
-                               })
-        {
-            text: item[:path] + " " + (item[:broken] ? "↯" : "⤏"),
-            href: @exam_files.count
-        }
+      end
+    end
+  end
+
+  private
+  def get_raw_files(folder)
+    self.upload.extracted_files(folder)
+  end
+
+  def clean_up(raw_files)
+    def file_list(files, arr)
+      if files[:children]
+        files[:children].each{|n| file_list(n, arr)}
       else
-        return nil if item[:path] == "__MACOSX"
-        {
-            text: item[:path] + "/",
-            state: {selectable: true},
-            nodes: item[:children].map{|i| with_extracted(i)}.compact
-        }
+        if File.basename(files[:full_path]) != ".DS_Store"
+          arr.push(files)
+        end
+      end
+      arr
+    end
+    @flat_files = raw_files.reduce([]) do |flat, raw| file_list(raw, flat) end
+    @flat_files.each do |sf|
+      if sf[:type] == "symlink" && !sf[:broken] && sf[:link_to].is_a?(String)
+        sf[:link_to] = @flat_files.find{|f| f[:full_path]&.ends_with?(sf[:link_to])}
       end
     end
 
-    @exam_dirs = self.upload.extracted_files(folder).map{|i| with_extracted(i)}.compact
-    @exam_files.each do |sf|
-      if sf[:type] == "symlink" && !sf[:broken]
-        sf[:link_href] = @exam_files.find{|f| f[:link]&.ends_with?(sf[:link_to])}[:href]
+    @count = @flat_files.count.to_s.length
+
+    @flat_files.each_with_index do |node, i|
+      node[:href] = "file_" + (i+1).to_s.rjust(@count, '0')
+    end
+    @flat_files.each do |node|
+      if node[:link_to]
+        node[:link_href] = "file_" + node[:link_to][:href].to_s.rjust(@count, '0')
       end
     end
 
-    @count = @exam_files.count.to_s.length
-
-    def fix_hrefs(node)
-      if node[:href].is_a? Integer
-        node[:href] = "file_" + node[:href].to_s.rjust(@count, '0')
-      end
-      if node[:link_href].is_a? Integer
-        node[:link_href] = "file_" + node[:link_href].to_s.rjust(@count, '0')
-      end
-      if node[:nodes]
-        node[:nodes].each do |n| fix_hrefs(n) end
-      end
+    raw_files = raw_files.map do |f|
+      with_extracted(f)
     end
-    exam_dirs = fix_hrefs({nodes: @exam_dirs})
-    exam_files = fix_hrefs({nodes: @exam_files})
-    remove_instance_variable :@exam_dirs
-    remove_instance_variable :@exam_files
-    return exam_dirs, exam_files
+
+    return raw_files.compact, @flat_files.compact
   end
 end

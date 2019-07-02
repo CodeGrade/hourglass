@@ -66,44 +66,46 @@ class Upload < ApplicationRecord
     end
   end
 
-  def self.upload_path_for(p)
-    p = p.to_s
-    if p.starts_with?(Rails.root.to_s)
-      p.gsub(Upload.base_upload_dir.to_s, "/files")
+  def relative_path(path, target)
+    target = target.to_s
+    if target.starts_with?(path.to_s)
+      target.gsub(path.to_s, "")
     else
-      p
+      target
     end
   end
 
   def extracted_files(folder)
     def rec_path(path)
-      path.children.sort.collect do |child|
-        if child.symlink?
-          {
-            path: child.basename.to_s,
-            link_to: Upload.upload_path_for(child.dirname.join(File.readlink(child))),
-            broken: (!File.exists?(File.realpath(child)) rescue true)
-          }
-        elsif child.file?
-          converted_path = Pathname.new(child.to_s.gsub(extracted_path.to_s,
-                                                        extracted_path.dirname.join("converted").to_s))
-          converted_path = converted_path.dirname.join(child.basename(child.extname).to_s + ".pdf")
-          if File.exists?(converted_path)
-            {path: child.basename.to_s,
-             full_path: child,
-             converted_path: Upload.upload_path_for(converted_path),
-             public_link: Upload.upload_path_for(child)}
-          else
-            {path: child.basename.to_s, full_path: child, public_link: Upload.upload_path_for(child)}
-          end
-        elsif child.directory?
-          {path: child.basename.to_s, children: rec_path(child)}
-        end
+      if path.symlink?
+        {
+            path: path.basename.to_s,
+            link_to: path.dirname.join(File.readlink(path)),
+            broken: (!File.exists?(File.realpath(path)) rescue true)
+        }
+      elsif path.file?
+        # converted_path = Pathname.new(path.to_s.gsub(extracted_path.to_s,
+        #                                               extracted_path.dirname.join("converted").to_s))
+        # converted_path = converted_path.dirname.join(path.basename(path.extname).to_s + ".pdf")
+        # if File.exists?(converted_path)
+        #   {path: path.basename.to_s,
+        #    full_path: path,
+        #    converted_path: Upload.upload_path_for(converted_path),
+        #    public_link: Upload.upload_path_for(path)}
+        # else
+        {path: path.basename.to_s, full_path: path}
+        # end
+      elsif path.directory?
+        {path: path.basename.to_s, children: path.children.sort.collect do |child|
+          rec_path(child)
+        end}
       end
     end
     folder_path = files_path.join(folder)
-    if File.exist? folder_path
-      rec_path(folder_path)
+    if File.directory? folder_path
+      rec_path(folder_path)[:children]
+    elsif File.exist? folder_path
+      [rec_path(folder_path)]
     else
       []
     end

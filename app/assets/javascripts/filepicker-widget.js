@@ -7,6 +7,7 @@ $.widget("hg.filePicker", {
         this.element.find(".file-pane").removeClass("active");
         var thiz = this;
         this.element.find(".files").treeview({
+            // TODO glyphicons -> octicons
             expandIcon: 'glyphicon glyphicon-chevron-down', // deliberately the same
             collapseIcon: 'glyphicon glyphicon-chevron-down', // always expanded
             enableLinks: true,

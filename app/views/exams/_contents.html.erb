@@ -1,6 +1,6 @@
 <p><%= @exam.info["instructions"]&.html_safe %></p>
 
-<%  dirs, files = @exam.get_exam_files
+<%  dirs, files = @exam.get_referenced_files(@exam.info["reference"])
 unless files.empty?
 %>
   <%= render "exams/filepicker", dirs: dirs, files: files, root: "exam_files" %>

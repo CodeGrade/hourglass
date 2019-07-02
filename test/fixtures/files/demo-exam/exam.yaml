@@ -1,13 +1,20 @@
 ---
 - instructions: Instructions go here.
+  reference:
+    - file: "test.txt"
+    - dir: "q1/all/src/packageone"
   questions:
     - name: "The first one"
       description: "First question in the exam. This text shows at the top of each page for this question."
       separateSubparts: true
+      reference:
+        - dir: "q1/all"
       parts:
         - name: "Part A"
           description: "This part will test basic Java syntax knowledge. This text is shown only on the page for part A."
           points: 16
+          reference:
+            - dir: "q1/p1"
           body:
             - "Answer all of the following true/false questions."
             - TrueFalse:
@@ -29,6 +36,7 @@
             - Code:
                 prompt:
                   - "Type some code in the box."
+                initial: "q1/all/src/packagetwo/Example2.java"
                 lang: "text/x-java"
             - "<p>This is an interlude of <b>HTML</b> content</p>"
             - MultipleChoice:

@@ -1,17 +1,17 @@
 <div class="col-12">
   <div><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>
 <% if readonly %>
-<% if answer.blank? %>
-<b>Answer:</b>
-<i>No answer given</i>
+  <% if answer&.dig('code').blank? %>
+    <b>Answer:</b>
+    <i>No answer given</i>
+  <% else %>
+    <pre class="sourceCodeDisplay border" data-lang="<%= item["lang"] %>" data-readonly="true" name="<%= unique_label %>[code]">
+    <%= answer&.dig('code') %>
+    </pre>
+  <% end %>
 <% else %>
-<pre class="sourceCodeDisplay border" data-lang="<%= item["lang"] %>" data-readonly="true" name="<%= unique_label %>">
-<%= answer %>
-</pre>
-<% end %>
-<% else %>
-<textarea class="sourceCode" data-lang="<%= item["lang"] %>" data-readonly="false" name="<%= unique_label %>">
-<%= answer %>
-</textarea>
+    <% val = answer&.dig('code') || item["initial"] %>
+    <%= code_textarea val, class: "sourceCode", data: {lang: item["lang"], readonly: false}, name: "#{unique_label}[code]" %>
+    <input hidden name="<%= unique_label %>[marks]" value="<%= answer&.dig('marks') %>" />
 <% end %>
 </div>

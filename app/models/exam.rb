@@ -34,6 +34,11 @@ class Exam < ApplicationRecord
               b["YesNo"] = {"prompt" => [], "correctAnswer" => b["YesNo"]}
             elsif b["TrueFalse"] == !!b["TrueFalse"]
               b["TrueFalse"] = {"prompt" => [], "correctAnswer" => b["TrueFalse"]}
+            elsif b["Code"]
+              if b["Code"]["initial"]
+                dirs, files = get_referenced_files([{"file" => b["Code"]["initial"]}])
+                b["Code"]["initial"] = files[0][:contents]
+              end
             elsif b.key? "Text" && b["Text"].nil?
               b["Text"] = {"prompt" => []}
             end

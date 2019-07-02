@@ -78,7 +78,11 @@ $(function() {
         $("#exam-nav").replaceWith(regularNav);
     }
 
+    <% @ignore_lockdown = false %>
     function checkFullscreen() {
+        <% if @ignore_lockdown %>
+          bootSequenceConfirmed(); return;
+        <% end %>
         if (!isFullscreen()) {
             console.log('not fullscreen.')
             openFullscreen().then(function() {
@@ -173,7 +177,13 @@ $(function() {
 
     function sendExamSnapshot() {
         $(".CodeMirror").each(function(index, cm) {
+            if (cm.CodeMirror.isReadOnly()) return;
             cm.CodeMirror.save();
+            const marksName = $(cm.CodeMirror.getTextArea()).attr('name').replace('code', 'marks');
+            const input = $(`input[name="`+marksName+`"]`);
+            const cmMarks = cm.CodeMirror.getAllMarks();
+            const json = JSON.stringify(cmMarks.map(function(m) {return m.find()}));
+            input.val(json);
         });
         const formData = $("#exam-form").serialize();
         const snapshotPath = "<%= save_snapshot_exam_path(@exam) %>";

@@ -64,11 +64,30 @@ function activateCode(index, code) {
             })
         });
         const text = $(code).text();
-        var markedText = extractMarks(text);
-        cm.setValue(markedText.text);
-        if (markedText.count > 0 && !readOnly) applyMarks(cm, markedText.marks);
-        for (var i = 0; i < markedText.lines.length; i++)
-            cm.indentLine(i, "smart", true);
+        var markedText;
+        const marksName = ($(cm.getTextArea()).attr('name') || "").replace('code', 'marks');
+        const input = $(`input[name="`+marksName+`"]`);
+        if (marksName !== "" && input.val() !== "") {
+            const lines = text.split(/\r\n?|\n/);
+            const cmMarks = JSON.parse(input.val());
+            cm.setValue(text);
+            cmMarks.forEach(function(m) {
+                debugger
+                cm.markText(m.from, m.to,
+                    {readOnly: true,
+                        inclusiveLeft: (m.from.line == 0 && m.from.ch == 0),
+                        inclusiveRight: (m.to.line == lines.length - 1 && m.to.ch == lines[lines.length - 1].length),
+                        className: "readOnly"});
+            });
+        } else {
+            markedText = extractMarks(text);
+            cm.setValue(markedText.text);
+            if (markedText.count > 0 && !readOnly) {
+                applyMarks(cm, markedText.marks);
+            }
+            for (var i = 0; i < markedText.lines.length; i++)
+                cm.indentLine(i, "smart", true);
+        }
         cm.setCursor(0, 0);
         cm.clearHistory();
     }

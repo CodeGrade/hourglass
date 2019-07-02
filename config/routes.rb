@@ -18,5 +18,9 @@ Rails.application.routes.draw do
     resources :registrations, only: [:show, :index] do
       resources :anomalies, only: [:show, :index, :destroy, :create]
     end
+
+    resources :rooms, only: [:show, :index] do
+      post :finalize
+    end
   end
 end

@@ -21,13 +21,6 @@ when "development"
   )
   prof.save!
 
-  student = User.new(
-    username: "student",
-    password: "student",
-    role: :unprivileged
-  )
-  student.save!
-
   exam = Exam.new(
     enabled: true,
     name: "Demo Exam"
@@ -46,17 +39,39 @@ when "development"
   upload.save!
   FileUtils.rm zipfile
 
-  student_reg = Registration.new(
-    user: student,
+  room_one = Room.new(
     exam: exam,
-    role: :student
+    name: "Room One"
   )
-  student_reg.save!
+  room_two = Room.new(
+    exam: exam,
+    name: "Room Two"
+  )
 
   prof_reg = Registration.new(
-    user: prof,
-    exam: exam,
-    role: :professor
+      user: prof,
+      exam: exam,
+      role: :professor,
+      room: room_one
   )
   prof_reg.save!
+
+  which_room = true
+  %w(ben rebecca matthias amit).each do |student|
+    user = User.new(
+      username: student,
+      password: student,
+      role: :unprivileged
+    )
+    user.save!
+    student_reg = Registration.new(
+      user: user,
+      exam: exam,
+      role: :student,
+      room: which_room ? room_one : room_two
+    )
+    student_reg.save!
+
+    which_room = !which_room
+  end
 end

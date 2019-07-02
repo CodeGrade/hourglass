@@ -1,0 +1,12 @@
+<% @page_title = "#{@exam.name} -- #{@room.name}" %>
+<div class="row">
+  <div class="col-12">
+    <h2><%= @page_title %></h2>
+    <% if @room.finalized? %>
+      <h3>Room finalized.</h3>
+    <% else %>
+      <%= button_to "Finalize Room", exam_room_finalize_path(@exam, @room), class: "btn btn-danger" %>
+    <% end %>
+    <%= render 'registrations/table', registrations: @room.registrations, exam: @exam %>
+  </div>
+</div>

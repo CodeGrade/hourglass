@@ -2,6 +2,7 @@
 class Exam < ApplicationRecord
   has_many :registrations
   has_many :users, through: :registrations
+  has_many :rooms
   has_one :upload, dependent: :destroy
 
   validates_presence_of :upload

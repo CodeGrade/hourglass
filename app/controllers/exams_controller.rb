@@ -3,7 +3,8 @@ class ExamsController < ApplicationController
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create]
   before_action :require_admin_or_prof, only: [:new, :create]
-  before_action :check_anomaly, only: [:show, :contents]
+  before_action :check_anomaly, only: [:show, :contents, :submit]
+  before_action :check_final, only: [:show, :contents, :submit]
 
   def require_enabled
     @exam ||= Exam.find(params[:id])
@@ -25,11 +26,13 @@ class ExamsController < ApplicationController
     end
   end
 
-  def show
+  def check_final
     if @registration.final?
-      render 'submit'
-      return
+      redirect_back fallback_location: exams_path, alert: "You have already completed that exam."
     end
+  end
+
+  def show
   end
 
   def contents
@@ -45,9 +48,10 @@ class ExamsController < ApplicationController
     @exams.keep_if(&:enabled?)
   end
 
+  # returns true if lockout should occur
   def save_answers(final = false)
     answers = params.require(:answers).permit(question: {}).to_h[:question]
-    if @registration.final? || @registration.anomalous?
+    unless @registration.allow_submission?
       return true
     end
     @registration.update_attribute(:final, final)

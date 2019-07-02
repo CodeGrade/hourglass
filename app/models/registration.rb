@@ -1,6 +1,7 @@
 class Registration < ApplicationRecord
   belongs_to :user
   belongs_to :exam
+  belongs_to :room
 
   has_many :anomalies
 
@@ -11,6 +12,10 @@ class Registration < ApplicationRecord
 
   def anomalous?
     anomalies.size > 0
+  end
+
+  def allow_submission?
+    !(self.final? || self.anomalous?)
   end
 
   def create_file

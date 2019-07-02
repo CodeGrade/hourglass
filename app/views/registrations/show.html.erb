@@ -8,6 +8,7 @@
       <% end %>
       <p><%= link_to "View exam registrations", exam_registrations_path(@registration.exam), class: "btn btn-info" %></p>
       <p><%= link_to "View exam", @registration.exam, class: "btn btn-info" %></p>
+      <p><%= link_to "View room", [@exam, @registration.room], class: "btn btn-info" %></p>
     </div>
     <p>Registration for <i><%= @registration.user.username %></i>.</p>
     <p>Updated at <i><%= @registration.updated_at %></i>.</p>

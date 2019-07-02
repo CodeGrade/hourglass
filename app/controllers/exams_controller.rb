@@ -2,7 +2,7 @@ class ExamsController < ApplicationController
   before_action :require_current_user
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create]
-  before_action :require_admin_or_prof, only: [:new, :create]
+  before_action :require_admin_or_prof, only: [:new, :create, :preview]
   before_action :check_anomaly, only: [:show, :contents, :submit]
   before_action :check_final, only: [:show, :contents, :submit]
 
@@ -39,7 +39,14 @@ class ExamsController < ApplicationController
     # TODO make secret in "show" and check it before rendering
     #   so that users cannot just visit /exams/1/contents
     @answers = @registration.get_current_answers
+    @preview = false
     render layout: false
+  end
+
+  def preview
+    @answers = {}
+    @preview = true
+    render 'contents'
   end
 
   def index

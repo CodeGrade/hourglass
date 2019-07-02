@@ -6,8 +6,8 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
   - json blobs
     - snapshot
     - anomaly
-- professor iframe for viewing exam
-- a better during-exam flow for seeing anomalies occur and handling them quickly
+- [x] professor iframe for viewing exam
+- [x] a better during-exam flow for seeing anomalies occur and handling them quickly
 - registration creation UI
 - the `contents` page for an exam should not be accessible by any means unless the exam is being loaded into the `show` page. (`exams_controller.rb:36`)
   - encrypt the data on the `contents` page

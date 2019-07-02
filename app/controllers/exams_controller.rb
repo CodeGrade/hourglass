@@ -2,7 +2,7 @@ class ExamsController < ApplicationController
   before_action :require_current_user
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create]
-  before_action :require_admin_or_prof, only: [:new, :create, :preview]
+  before_action :require_admin_or_prof, only: [:new, :create, :preview, :finalize]
   before_action :check_anomaly, only: [:show, :contents, :submit]
   before_action :check_final, only: [:show, :contents, :submit]
 
@@ -27,6 +27,7 @@ class ExamsController < ApplicationController
   end
 
   def check_final
+    return if @registration.professor?
     if @registration.final?
       redirect_back fallback_location: exams_path, alert: "You have already completed that exam."
     end
@@ -64,6 +65,12 @@ class ExamsController < ApplicationController
     @registration.update_attribute(:final, final)
     @registration.save_answers(answers)
     return false
+  end
+
+  def finalize
+    @exam = Exam.find(params[:id])
+    @exam.finalize!
+    redirect_back fallback_location: exam_path(@exam)
   end
 
   def submit

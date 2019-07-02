@@ -15,7 +15,7 @@ class RoomsController < ApplicationController
   def finalize
     @room = Room.find(params[:room_id])
     @exam = @room.exam
-    @room.registrations.update_all(final: true)
+    @room.finalize!
     redirect_back fallback_location: exam_room_path(@exam, @room)
   end
 end

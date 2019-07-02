@@ -8,6 +8,14 @@ class Exam < ApplicationRecord
   validates_presence_of :upload
   after_initialize :generate_secret_key!
 
+  def finalized?
+    registrations.all?(&:final)
+  end
+
+  def finalize!
+    rooms.map(&:finalize!)
+  end
+
   def exam_yaml
     # TODO need to validate that this file is part of the upload before allowing the upload
     #   in a `validates` in Upload

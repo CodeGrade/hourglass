@@ -1,13 +1,15 @@
 <% @page_title = @exam.name %>
 <h1><%= @page_title %></h1>
 <% if current_user.admin_or_prof? %>
-  <span id="interstitial">
-    <div class="row">
-      <iframe src="<%= preview_exam_path(@exam) %>" class="col-12 p-0" style="border: 5px solid black; height: 50em;">
-      </iframe>
-    </div>
-  </span>
+  <h2 class="collapsed" data-toggle="collapse" data-target="#preview">Preview Exam <%= octicon "chevron-down", height: "1em", width: "1em" %><%= octicon "chevron-up", height: "1em", width: "1em" %></h2>
+  <div class="row collapse" id="preview">
+    <iframe src="<%= preview_exam_path(@exam) %>" class="col-12 p-0" style="border: 5px solid black; height: 50em;">
+    </iframe>
+  </div>
   <h2 class="mt-4">Registrations</h2>
+  <% unless @exam.finalized? %>
+    <%= link_to "Finalize exam", finalize_exam_path(@exam), class: "btn btn-success", method: :post %>
+  <% end %>
   <%= render 'registrations/table', exam: @exam, registrations: @exam.registrations %>
 <% else %>
   <div id="interstitial">

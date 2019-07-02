@@ -12,4 +12,16 @@ class RegistrationsController < ApplicationController
     @exam = Exam.find(params[:exam_id])
     @registrations = @exam.registrations
   end
+
+  def clear_anomalies
+    @exam = Exam.find(params[:exam_id])
+    @registration = Registration.find(params[:registration_id])
+    @registration.anomalies.destroy_all
+    redirect_back fallback_location: exam_path(@exam)
+  end
+
+  def finalize
+    @registration = Registration.find(params[:registration_id])
+    @registration.update_attribute(:final, true)
+  end
 end

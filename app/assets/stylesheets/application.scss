@@ -190,3 +190,8 @@ div#questions:not(.paginated) .question-nav { display: none; }
   border: 1px solid black;
   border-radius: 5px;
 }
+
+h2 svg.octicon-chevron-up { display: none; }
+h2 svg.octicon-chevron-down { display: initial; }
+h2.collapsed svg.octicon-chevron-up { display: initial; }
+h2.collapsed svg.octicon-chevron-down { display: none; }

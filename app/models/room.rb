@@ -5,4 +5,8 @@ class Room < ApplicationRecord
   def finalized?
     registrations.all?(&:final)
   end
+
+  def finalize!
+    registrations.update_all(final: true)
+  end
 end

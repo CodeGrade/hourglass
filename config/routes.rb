@@ -12,12 +12,16 @@ Rails.application.routes.draw do
     member do
       get :contents
       get :preview
+      post :finalize
       post :submit
       post :save_snapshot
     end
 
     resources :registrations, only: [:show, :index] do
       resources :anomalies, only: [:show, :index, :destroy, :create]
+
+      post :clear_anomalies
+      post :finalize
     end
 
     resources :rooms, only: [:show, :index] do

@@ -159,4 +159,17 @@ module ApplicationHelper
     str = render(html: str) unless str.html_safe?
     content_tag(:textarea, str, options)
   end
+
+  def censor_full_paths(obj)
+    if obj.is_a? Hash
+      obj = obj.dup
+      obj.delete(:full_path)
+      obj.each do |k,v|
+        obj[k] = censor_full_paths(v)
+      end
+    elsif obj.is_a? Array
+      obj = obj.map {|v| censor_full_paths(v)}
+    end
+    obj
+  end
 end

@@ -1,4 +1,63 @@
 <div class="col-12">
   <div><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>
-  CodeTag (TODO)
+  <%
+    case item["choices"]
+    when "part"
+      target = item["part"]["reference"]
+      id = "question_#{question_number}_part_#{part_number}"
+    when "question"
+      target = item["question"]["reference"]
+      id = "question_#{question_number}"
+    when "all"
+      target = @exam.info["reference"]
+      id = "exam_files"
+    end
+    id = "#files_#{id}"
+  %>
+  <% if readonly %>
+    <% ans = answer&.dig('file') %>
+    <b>File:</b>
+    <% if ans.nil? %>
+      <i>No answer given</i>
+    <% elsif ans == "<none>" %>
+      <span class="btn btn-sm btn-outline-dark disabled">
+        &lt;none&gt;
+      </span>
+    <% else %>
+      <span class="btn btn-sm btn-outline-dark disabled">
+        <%= target[:files].find{|f| f[:href] == ans}[:path] %>
+      </span>
+    <% end %>
+    <% ans = answer&.dig('line') %>
+    <span class="col-1"></span>
+    <b>Line:</b>
+    <% if ans.blank? %>
+      <i>No answer given</i>
+    <% else %>
+      <span class="btn btn-sm btn-outline-dark disabled">
+        <%= ans %>
+      </span>
+    <% end %>
+
+  <% else %>
+    <p class="form-inline">
+      <b>File:</b> <select name="<%= unique_label %>[file]"
+                    class="form-control custom-select pick-file <%= if answer&.dig('file').blank? then 'unanswered' end %>">
+      <option disabled <% if answer&.dig('file').blank? %>selected<% end %> value style="display: none;"> -- select a file -- </option>
+      <option value="<none>" <% if answer&.dig('file') == "<none>" %>selected<% end %>>&lt;none&gt;</option>
+      <% target[:files].each do |file| %>
+        <option value="<%= file[:href] %>" <% if answer&.dig('file') == file[:href] %>selected<% end %>>
+          <%= file[:path] %>
+        </option>
+      <% end %>
+    </select>
+      or choose from the file picker:
+      <button class="btn btn-info" data-toggle="previewCode" data-target="<%= id %>">Choose file</button>
+      <span class="col-1"></span>
+      <b>Line number:</b> <input type="text"
+                          class="form-control numeric <%= if @answers && answer&.dig('info').blank? then 'unanswered' end %>"
+                          name="<%= unique_label %>[line]"
+                          <% if answer %>value="<%= answer['line'] %>"<% end %>>
+    </p>
+  <% end %>
 </div>

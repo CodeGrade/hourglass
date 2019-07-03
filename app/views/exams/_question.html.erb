@@ -3,11 +3,8 @@
   <div class="col-12">
     <h1>Question <%= question_number + 1 %>: <%= question["name"] %></h1>
     <p><%= question["description"]&.html_safe %></p>
-    <%
-      dirs, files = @exam.get_referenced_files(question["reference"])
-      unless files.empty?
-    %>
-      <%= render "exams/filepicker", dirs: dirs, files: files, root: "question_#{question_number}" %>
+    <% unless question.dig("reference", :files).blank? %>
+      <%= render "exams/filepicker", filedirs: question["reference"], root: "question_#{question_number}" %>
     <% end %>
 
     <% if question["separateSubparts"] %>

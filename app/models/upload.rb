@@ -29,24 +29,7 @@ class Upload < ApplicationRecord
     # +-- files/
     # |   ...
 
-    # 'files' contains folders for each question/part, in the following format:
-    #    q{number}/{all|part_number}
-    # as well as files for the entire exam in 'all'
-    #
-    # files/
-    # +-- all/
-    # |   +-- anyfile.txt
-    # +-- q1/
-    # |   +-- all/
-    # |   |   +-- src/
-    # |   |   |   +-- packageone/
-    # |   |   |   |   +-- Example.java
-    # |   |   |   +-- packagetwo/
-    # |   |   |   |   +-- Example2.java
-    # |   +-- p1/
-    # |   |   +-- anything.txt
-    # |   +-- p2/
-    # |   |   +-- something-else.rkt
+    # 'files' contains the relevant code for the exam
 
     # storage of the upload in /private is as follows:
     #
@@ -75,7 +58,7 @@ class Upload < ApplicationRecord
     end
   end
 
-  def extracted_files(folder)
+  def extracted_files(folder, strict=false)
     def rec_path(path)
       if path.symlink?
         {
@@ -106,6 +89,8 @@ class Upload < ApplicationRecord
       rec_path(folder_path)[:children]
     elsif File.exist? folder_path
       [rec_path(folder_path)]
+    elsif strict
+      throw "Folder path not found: '#{folder}'"
     else
       []
     end

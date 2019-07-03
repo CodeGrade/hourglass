@@ -26,8 +26,21 @@ class Exam < ApplicationRecord
     return @info if @info
     versions = YAML.load(File.read(exam_yaml))
     @info = versions[0]
+    if @info["reference"]
+      dirs, files = get_referenced_files(@info["reference"])
+      @info["reference"] = {dirs: dirs, files: files}
+    end
     @info["questions"].each do |q|
+      if q["reference"]
+        dirs, files = get_referenced_files(q["reference"])
+        q["reference"] = {dirs: dirs, files: files}
+      end
       q["parts"].each do |p|
+        if p["reference"]
+          dirs, files = get_referenced_files(p["reference"])
+          p["reference"] = {dirs: dirs, files: files}
+        end
+        p["question"] = q
         p["body"].each do |b|
           if b.is_a? Hash
             if b["YesNo"] == !!b["YesNo"]
@@ -41,7 +54,17 @@ class Exam < ApplicationRecord
               end
             elsif b.key? "Text" && b["Text"].nil?
               b["Text"] = {"prompt" => []}
+            elsif b["CodeTag"]
+              if b["CodeTag"]["choices"] == "part" && p["reference"].nil?
+                throw "No reference for part."
+              elsif b["CodeTag"]["choices"] == "question" && q["reference"].nil?
+                throw "No reference for question."
+              elsif b["CodeTag"]["choices"] == "all" && @info["reference"].nil?
+                throw "No reference for exam."
+              end
             end
+            b.values.first["part"] = p
+            b.values.first["question"] = q
           end
         end
       end
@@ -109,7 +132,7 @@ class Exam < ApplicationRecord
     else
       return nil if item[:path] == "__MACOSX"
       item[:text] = item[:path] + "/"
-      item[:state] = {selectable: true}
+      item[:selectable] = false
       item[:nodes] = item[:children].map{|n| with_extracted(n)}.compact
       item.delete(:children)
     end
@@ -139,7 +162,7 @@ class Exam < ApplicationRecord
 
   private
   def get_raw_files(folder)
-    self.upload.extracted_files(folder)
+    self.upload.extracted_files(folder, true)
   end
 
   def clean_up(raw_files)

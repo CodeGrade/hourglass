@@ -159,7 +159,7 @@ CodeTag:
     - key: "correctAnswer"
       value: TagAnswer
     - key: "choices"
-      value: FileDirs
+      value: [String, "all|question|part"]
 TagAnswer:
   one_of:
     - Lines

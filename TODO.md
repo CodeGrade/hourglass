@@ -13,7 +13,7 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
   - [ ] encrypt the data on the `contents` page
   - [ ] client side decryption with PIN
   - [ ] login counter, so that PIN changes
-- [ ] `CodeTag` responses
+- [x] `CodeTag` responses
 - [x] initial files for `Code` responses, like a fill-in-the-blank
 - [ ] validate the exam upload
   - [ ] every exam should have at least an `exam.yaml`

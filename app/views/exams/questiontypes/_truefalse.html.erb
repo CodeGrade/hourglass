@@ -13,10 +13,10 @@
 <div class="btn-group btn-group-toggle" data-toggle="buttons">
   <% is_true = answer == "true" %>
   <% is_false = answer == "false" %>
-  <label class="btn btn-outline-primary <%= "active" if is_true %>">
+  <label class="btn btn-outline-primary <%= "active" if is_true %>" style="cursor:pointer;">
     <input type="radio" name="<%= unique_label %>" value="true" autocomplete="off" <%= "checked" if is_true %>>True
   </label>
-  <label class="btn btn-outline-primary <%= "active" if is_false %>">
+  <label class="btn btn-outline-primary <%= "active" if is_false %>" style="cursor:pointer;">
     <input type="radio" name="<%= unique_label %>" value="false" autocomplete="off" <%= "checked" if is_false %>>False
   </label>
 </div>

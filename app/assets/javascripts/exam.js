@@ -72,7 +72,6 @@ function activateCode(index, code) {
             const cmMarks = JSON.parse(input.val());
             cm.setValue(text);
             cmMarks.forEach(function(m) {
-                debugger
                 cm.markText(m.from, m.to,
                     {readOnly: true,
                         inclusiveLeft: (m.from.line == 0 && m.from.ch == 0),

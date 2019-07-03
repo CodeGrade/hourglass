@@ -4,11 +4,8 @@
       <small class="float-right text-muted">(<%= part["points"] %> points)</small>
     </h3>
     <p><%= part["description"]&.html_safe %></p>
-    <%
-      dirs, files = @exam.get_referenced_files(part["reference"])
-      unless files.empty?
-    %>
-    <%= render "exams/filepicker", dirs: dirs, files: files, root: "question_#{question_number}_part_#{part_number}" %>
+    <% unless part.dig("reference", :files).blank? %>
+      <%= render "exams/filepicker", filedirs: part["reference"], root: "question_#{question_number}_part_#{part_number}" %>
     <% end %>
     <% index = 0 %>
     <table class="table-hover col-12">

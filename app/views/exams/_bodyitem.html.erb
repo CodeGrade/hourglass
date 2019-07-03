@@ -4,5 +4,6 @@
   <% answer = @answers.dig(question_number.to_s, part_number.to_s, bodyitem_number.to_s) %>
   <%= render "exams/questiontypes/#{item.keys[0].downcase}", form: form, item: item[item.keys[0]],
              unique_label: "answers[question[#{question_number}][#{part_number}][#{bodyitem_number}]]",
+             question_number: question_number, part_number: part_number, bodyitem_number: bodyitem_number,
              answer: answer, readonly: readonly %>
 <% end %>

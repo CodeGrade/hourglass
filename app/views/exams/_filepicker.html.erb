@@ -58,14 +58,14 @@
 </style>
 
 <div id="files_<%= root %>" class="filepicker row d-print-none">
-  <div class="<%= if files.count > 1 then 'col-md-3' else 'd-none' end %> files-sidebar-container">
+  <div class="<%= if filedirs[:files].count > 1 then 'col-md-3' else 'd-none' end %> files-sidebar-container">
     <div class="files-sidebar">
       <div id="files-all-files" class="files treeview condensed"></div>
     </div>
   </div>
-  <div class="<%= if files.count > 1 then 'col-md-9 pl-0' else 'col-md-12 p-0' end %> tab-content">
-    <% files.each_with_index do |f, i| %>
-      <% index = (i + 1).to_s.rjust(files.count.to_s.length, '0') %>
+  <div class="<%= if filedirs[:files].count > 1 then 'col-md-9 pl-0' else 'col-md-12 p-0' end %> tab-content">
+    <% filedirs[:files].each_with_index do |f, i| %>
+      <% index = (i + 1).to_s.rjust(filedirs[:files].count.to_s.length, '0') %>
       <div class="file-pane tab-pane panel-tab-pane active" id="<%= root %>_file_<%= index %>">
         <% if (f[:type].starts_with?("image")) %>
           <div class="nonCMwrapper" style="position: relative; display: inline-block;">
@@ -214,11 +214,11 @@
     <%#= render 'submissions/render_pdfs.js' %>
     // $(function() { $("div[id^='pdf_']").pdfViewer(); });
     $(function() {
-        let dirs = <%= raw json_escape(JSON.pretty_generate(dirs)) %>;
+        let dirs = <%= raw json_escape(JSON.pretty_generate(censor_full_paths(filedirs[:dirs]))) %>;
         function markFirst(dirs) {
           for (var i = 0; i < dirs.length; i++) {
             if (dirs[i].nodes && markFirst(dirs[i].nodes)) { 
-              return; 
+              return true;
             } else {
               dirs[i].state = dirs[i].state || {};
               dirs[i].state.selected = true;

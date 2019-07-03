@@ -1,9 +1,6 @@
 <p><%= @exam.info["instructions"]&.html_safe %></p>
-
-<%  dirs, files = @exam.get_referenced_files(@exam.info["reference"])
-unless files.empty?
-%>
-  <%= render "exams/filepicker", dirs: dirs, files: files, root: "exam_files" %>
+<% unless @exam.info.dig("reference", :files).blank? %>
+  <%= render "exams/filepicker", filedirs: @exam.info["reference"], root: "exam_files" %>
 <% end %>
 <%= bootstrap_form_tag url: @preview ? "#" : submit_exam_path, html: {id: "exam-form"} do |form| %>
   <div id="questions" class="paginated">
@@ -31,6 +28,28 @@ unless files.empty?
     <% end %>
   </div>
 <% end %>
+
+<div class="modal fade p-0" tabindex="-1" role="dialog" id="fileModal">
+  <div class="modal-dialog modal-dialog-centered col-12" style="max-width: none;" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <div class="modal-title">
+          <h2>Files</h2>
+          <span>Choose a file or press escape to leave your current choice unchanged.</span>
+        </div>
+        <button type="button" class="close" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="fileModalBody">
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-secondary">Cancel</button>
+        <button type="button" class="btn btn-primary" id="selectFileBtn">Select file</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <%= render "navbar" %>
 <script><%= render "exams/show.js" %></script>

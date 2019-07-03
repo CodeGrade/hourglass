@@ -42,8 +42,8 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
   - [ ] bottlenose import feature
 - [ ] download registrations (for a course) from bottlenose and upload them to hourglass (for an exam)
   - [ ] bottlenose endpoint (course#user_data [json]) for user info locked down to professors
-- [ ] only one session per user
-  - [ ] [devise - session limitable](https://github.com/devise-security/devise-security)
+- [x] only one session per user
+  - [x] [devise - session limitable](https://github.com/devise-security/devise-security)
 - [ ] exam creator/editor so YAML doesn't have to be involved at all
 - [ ] make logo for favicon, readme, navbar
 - [ ] grab student first and last names from LDAP?

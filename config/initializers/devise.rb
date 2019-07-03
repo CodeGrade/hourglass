@@ -316,4 +316,5 @@ Devise.setup do |config|
       manager.default_strategies(scope: :user).unshift :debug_login
     end
   end
+  Devise.add_module :session_limitable, model: 'devise/models/session_limitable'
 end

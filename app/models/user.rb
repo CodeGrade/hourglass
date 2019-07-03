@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  devise :ldap_authenticatable, :database_authenticatable, :rememberable
+  devise :ldap_authenticatable, :database_authenticatable, :rememberable, :session_limitable
   has_many :registrations
   has_many :exams, through: :registrations
 

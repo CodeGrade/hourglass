@@ -1,10 +1,25 @@
 class ExamsController < ApplicationController
-  before_action :require_current_user
+  before_action :require_current_user, except: [:save_snapshot]
+  prepend_before_action :catch_require_current_user, only: [:save_snapshot]
   before_action :require_enabled, except: [:index, :new, :create]
-  before_action :require_registration, except: [:index, :new, :create]
+  before_action :require_registration, except: [:index, :new, :create, :save_snapshot]
   before_action :require_admin_or_prof, only: [:new, :create, :preview, :finalize]
   before_action :check_anomaly, only: [:show, :contents, :submit]
   before_action :check_final, only: [:show, :contents, :submit]
+
+  def catch_require_current_user
+    begin
+      require_current_user
+      @registration ||= Registration.find_by(user: current_user, exam_id: params[:id])
+    rescue DoubleLoginException => e
+      registration ||= Registration.find_by(user_id: e.user.id, exam_id: params[:id])
+      if registration
+        Anomaly.create(registration: registration, reason: e.message)
+      end
+      render json: {lockout: true, reason: e.message}
+      return false
+    end
+  end
 
   def require_enabled
     @exam ||= Exam.find(params[:id])
@@ -22,7 +37,7 @@ class ExamsController < ApplicationController
 
   def check_anomaly
     if @registration.anomalous?
-      redirect_back fallback_location: exams_path, alert: "You are locked out of that exam. Please see a proctor."
+      redirect_to exams_path, alert: "You are locked out of that exam. Please see a proctor."
     end
   end
 

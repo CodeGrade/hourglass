@@ -62,6 +62,7 @@ ActiveRecord::Schema.define(version: 2019_07_02_145705) do
     t.string "encrypted_password", default: "", null: false
     t.datetime "remember_created_at"
     t.integer "role", default: 0, null: false
+    t.string "unique_session_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["username"], name: "index_users_on_username", unique: true

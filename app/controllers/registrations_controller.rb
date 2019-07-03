@@ -23,5 +23,7 @@ class RegistrationsController < ApplicationController
   def finalize
     @registration = Registration.find(params[:registration_id])
     @registration.update_attribute(:final, true)
+    @exam = Exam.find(params[:exam_id])
+    redirect_back fallback_location: exam_path(@exam)
   end
 end

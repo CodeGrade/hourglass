@@ -6,7 +6,7 @@
         <th scope="col"></th>
         <th scope="col">User</th>
         <th scope="col">Role</th>
-        <th scope="col">Anomalous?</th>
+        <th scope="col">Actions</th>
         <th scope="col">Room</th>
       </tr>
       </thead>
@@ -32,12 +32,16 @@
           <td class="align-middle">
               <span>
                 <%= reg.anomalies.map(&:reason).to_sentence %>
-                <% if reg.anomalous? && !reg.final? %>
-                  <br>
-                  <span class="col-12">
-                    <%= link_to "Clear", exam_registration_clear_anomalies_path(@exam, reg), class: "col-4 btn btn-success", method: :post %>
-                    <%= link_to "Finalize", exam_registration_finalize_path(@exam, reg), class: "col-4 btn btn-danger", method: :post %>
-                  </span>
+                <% if !reg.final? %>
+                  <% if reg.anomalous? %>
+                    <br>
+                    <span class="col-12">
+                      <%= link_to "Clear", exam_registration_clear_anomalies_path(@exam, reg), class: "col-4 btn btn-success", method: :post, data: {confirm: "Are you sure you want to allow this student to continue?"} %>
+                      <%= link_to "Finalize", exam_registration_finalize_path(@exam, reg), class: "col-4 btn btn-danger", method: :post, data: {confirm: "Are you sure you want to finalize this student's submission?"} %>
+                    </span>
+                  <% else %>
+                      <%= link_to "Finalize", exam_registration_finalize_path(@exam, reg), class: "col-8 btn btn-outline-secondary", method: :post, data: {confirm: "Are you sure you want to finalize this student's submission?"} %>
+                  <% end %>
                 <% end %>
               </span>
           </td>

@@ -8,7 +8,7 @@
   </div>
   <h2 class="mt-4">Registrations</h2>
   <% unless @exam.finalized? %>
-    <%= link_to "Finalize exam", finalize_exam_path(@exam), class: "btn btn-success", method: :post %>
+    <%= link_to "Finalize exam", finalize_exam_path(@exam), class: "btn btn-success", method: :post, data: {confirm: "Are you sure you want to finalize all submissions for this exam?"} %>
   <% end %>
   <%= render 'registrations/table', exam: @exam, registrations: @exam.registrations %>
 <% else %>

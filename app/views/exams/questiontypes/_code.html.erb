@@ -5,9 +5,7 @@
     <b>Answer:</b>
     <i>No answer given</i>
   <% else %>
-    <pre class="sourceCodeDisplay border" data-lang="<%= item["lang"] %>" data-readonly="true" name="<%= unique_label %>[code]">
-    <%= answer&.dig('code') %>
-    </pre>
+      <%= content_tag(:pre, answer&.dig('code'), class: "sourceCodeDisplay border", data: {lang: item["lang"], readonly: true}, name: "#{unique_label}[code]") %>
   <% end %>
 <% else %>
     <% val = answer&.dig('code') || item["initial"] %>

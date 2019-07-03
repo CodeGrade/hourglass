@@ -8,30 +8,29 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
     - anomaly
 - [x] professor iframe for viewing exam
 - [x] a better during-exam flow for seeing anomalies occur and handling them quickly
-- registration creation UI
-- the `contents` page for an exam should not be accessible by any means unless the exam is being loaded into the `show` page. (`exams_controller.rb:36`)
-  - encrypt the data on the `contents` page
-  - client side decryption with PIN
-  - login counter, so that PIN changes
-- `CodeTag` responses
+- [ ] registration creation UI
+- [ ] the `contents` page for an exam should not be accessible by any means unless the exam is being loaded into the `show` page. (`exams_controller.rb:36`)
+  - [ ] encrypt the data on the `contents` page
+  - [ ] client side decryption with PIN
+  - [ ] login counter, so that PIN changes
+- [ ] `CodeTag` responses
 - [x] initial files for `Code` responses, like a fill-in-the-blank
-- validate the exam upload
-  - every exam should have at least an `exam.yaml`
+- [ ] validate the exam upload
+  - [ ] every exam should have at least an `exam.yaml`
   - [x] filepicker code will not work if there are only empty directories [see here](https://github.com/CodeGrade/hourglass/commit/13677552dd95aefbcf64389adfd23cff5ddac7c1#commitcomment-33899283)
-  - can get rid of `Upload` - exams should be able to handle their own files like `Registration`s do.
-    - a bunch of code in `Upload` is taken from Bottlenose and is likely unnecessary.
-- actually use SchemaChecker on uploaded exams' `exam.yaml`
-- 6-digit PINs for students to check-in to exams based on exam salt and username
-- notion of exam rooms
-  - professor chooses the room they are in
-  - "finalize exam for this room"
-    - all submissions in *this* room are marked final, locking students out
-- a way to sign students out if they finish early
-  - a secret on the 'submitted' page
-  - or just check their registration and make sure it is final
+  - [ ] can get rid of `Upload` - exams should be able to handle their own files like `Registration`s do.
+    - [ ] a bunch of code in `Upload` is taken from Bottlenose and is likely unnecessary.
+- [ ] actually use SchemaChecker on uploaded exams' `exam.yaml`
+- [ ] 6-digit PINs for students to check-in to exams based on exam salt and username
+- [ ] notion of exam rooms
+  - [ ] professor chooses the room they are in
+  - [x] "finalize exam for this room"
+    - [x] all submissions in *this* room are marked final, locking students out
+- [x] a way to sign students out if they finish early
+  - [x] finalize button for any submission that isnt final
 - a way to check if students disconnect from the internet
   - show active sessions, if one is dropped, make an anomaly
-- files for the entire exam
+- [x] files for the entire exam
 - double check permissions for every controller action
   - allow proctors to view and absolve anomalies
 - allow site admins to view any exam without a registration

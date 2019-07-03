@@ -2,10 +2,10 @@
 
 See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
 
-- a single checkin endpoint
-  - json blobs
-    - snapshot
-    - anomaly
+- [ ] a single checkin endpoint
+  - [ ] json blobs
+    - [ ] snapshot
+    - [ ] anomaly
 - [x] professor iframe for viewing exam
 - [x] a better during-exam flow for seeing anomalies occur and handling them quickly
 - [ ] registration creation UI
@@ -28,23 +28,23 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
     - [x] all submissions in *this* room are marked final, locking students out
 - [x] a way to sign students out if they finish early
   - [x] finalize button for any submission that isnt final
-- a way to check if students disconnect from the internet
-  - show active sessions, if one is dropped, make an anomaly
+- [ ] a way to check if students disconnect from the internet
+  - [ ] show active sessions, if one is dropped, make an anomaly
 - [x] files for the entire exam
-- double check permissions for every controller action
-  - allow proctors to view and absolve anomalies
-- allow site admins to view any exam without a registration
-  - there's some code in the exams controller that breaks if the user does not have an active registration for the exam
-- find out if the exam network setup necessitates any changes to server
-- "scratch space" for user taking exam
-- export all final submissions as PDFs for manual grading
-- export final submissions for each student, for upload to bottlenose for grading
-  - bottlenose import feature
-- download registrations (for a course) from bottlenose and upload them to hourglass (for an exam)
-  - bottlenose endpoint (course#user_data [json]) for user info locked down to professors
-- only one session per user
-  - [devise - session limitable](https://github.com/devise-security/devise-security)
-- exam creator/editor so YAML doesn't have to be involved at all
-- make logo for favicon, readme, navbar
-- grab student first and last names from LDAP?
-- add a license
+- [ ] double check permissions for every controller action
+  - [ ] allow proctors to view and absolve anomalies
+- [ ] allow site admins to view any exam without a registration
+  - [ ] there's some code in the exams controller that breaks if the user does not have an active registration for the exam
+- [ ] find out if the exam network setup necessitates any changes to server
+- [ ] "scratch space" for user taking exam
+- [ ] export all final submissions as PDFs for manual grading
+- [ ] export final submissions for each student, for upload to bottlenose for grading
+  - [ ] bottlenose import feature
+- [ ] download registrations (for a course) from bottlenose and upload them to hourglass (for an exam)
+  - [ ] bottlenose endpoint (course#user_data [json]) for user info locked down to professors
+- [ ] only one session per user
+  - [ ] [devise - session limitable](https://github.com/devise-security/devise-security)
+- [ ] exam creator/editor so YAML doesn't have to be involved at all
+- [ ] make logo for favicon, readme, navbar
+- [ ] grab student first and last names from LDAP?
+- [ ] add a license

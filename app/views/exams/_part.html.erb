@@ -11,7 +11,7 @@
     <table class="table-hover col-12">
       <tbody>
         <% part["body"].each_with_index do |item, index| %>
-        <tr class="container"><td class="row no-gutters">
+        <tr class="container <% if item.is_a? String %>no-hover<% end %>"><td class="row no-gutters">
           <%= render "exams/bodyitem", form: form, item: item, question_number: question_number, part_number: part_number, 
               bodyitem_number: index, readonly: readonly %>
         </td></tr>

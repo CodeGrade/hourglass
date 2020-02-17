@@ -17,6 +17,7 @@ gem 'webpacker', '~> 4.0'
 gem 'devise'
 gem 'devise_ldap_authenticatable'
 
+gem "bootstrap_form", ">= 4.2.0"
 gem 'octicons_helper'
 
 gem 'headless' # needed to run Racket, and xvfb-run (the shell script) merges stdout and stderr

@@ -29,3 +29,8 @@
 # Ignore uploaded files and submissions.
 /private/uploads
 /private/submissions
+
+# nix ignores
+/.nix-gems/
+/postgres/
+/postgres_data/

@@ -1,6 +1,6 @@
 with import <nixpkgs> {};
 let
-  ruby = ruby_2_4;
+  ruby = ruby_2_6;
   psql_setup_file = writeText "setup.sql" ''
     DO
     $do$

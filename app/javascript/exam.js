@@ -1,3 +1,5 @@
+import CodeMirror from 'codemirror';
+
 function extractMarks(text) {
     var lines = text.split(/\r\n?|\n/);
     if (/^\s*$/.test(lines[0])) { lines.shift(); }
@@ -49,7 +51,7 @@ function applyMarks(cm, allMarks) {
     });
 }
 
-function activateCode(index, code) {
+export function activateCode(index, code) {
     if ($(code).data("lang")) {
         const readOnly = $(code).data("readonly");
         var cm = CodeMirror.fromTextArea(code, {
@@ -92,7 +94,7 @@ function activateCode(index, code) {
     }
     $(code).addClass("cm-s-mdn-like cm-s-default");
 }
-function displayCode(index, code) {
+export function displayCode(index, code) {
   if ($(code).data("lang")) {
     var markedText = extractMarks($(code).text());
     CodeMirror.runMode(markedText.text, $(code).data("lang"), code);

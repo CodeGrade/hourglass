@@ -49,6 +49,7 @@ in mkShell {
     curl.dev
     pcre
     nodejs
+    yarn
     start_postgres
     stop_postgres
   ];

@@ -17,11 +17,11 @@ require("../filepicker-widget.js")
 import {activateCode, displayCode} from "../exam.js";
 import './bootstrap.js';
 import './bootstrap.scss';
+import './codemirror.js';
 
 global.activateCode = activateCode; // TODO remove
 global.displayCode = displayCode; // TODO remove
 
-import 'bootstrap/dist/js/bootstrap.bundle'
 // Uncomment to copy all static images under ../images to the output folder and reference
 // them with the image_pack_tag helper in views (e.g <%= image_pack_tag 'rails.png' %>)
 // or the `imagePath` JavaScript helper below.
@@ -29,24 +29,7 @@ import 'bootstrap/dist/js/bootstrap.bundle'
 // const images = require.context('../images', true)
 // const imagePath = (name) => images(name, true)
 
-//   = require rails-ujs
-//   = require activestorage
-//   = require jquery3
-//   = require jquery-ui/widget
-//   = require popper
-//   = require bootstrap-sprockets
-//   = require bootstrap.treeview
 //   = require bootstrap-toggle
-//   = require codemirror
 //   = require codemirror/addons/runmode/runmode
-//   = require codemirror/modes/clike
-//   = require codemirror/modes/mllike
-//   = require codemirror/modes/ebnf
-//   = require codemirror/modes/javascript
-//   = require codemirror/modes/markdown
-//   = require codemirror/modes/scheme
-//   = require codemirror/modes/python
-//   = require codemirror/modes/css
-//   = require codemirror/modes/xml
-//   = require codemirror/modes/yaml
-//   = require codemirror/modes/htmlmixed
+
+

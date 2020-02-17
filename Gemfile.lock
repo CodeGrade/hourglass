@@ -69,9 +69,6 @@ GEM
       debug_inspector (>= 0.0.1)
     bootsnap (1.4.5)
       msgpack (~> 1.0)
-    bootstrap_form (4.3.0)
-      actionpack (>= 5.0)
-      activemodel (>= 5.0)
     builder (3.2.4)
     capybara (3.31.0)
       addressable
@@ -249,7 +246,6 @@ DEPENDENCIES
   better_errors
   binding_of_caller
   bootsnap (>= 1.4.2)
-  bootstrap_form (>= 4.2.0)
   capybara (>= 2.15)
   capybara-webkit
   devise

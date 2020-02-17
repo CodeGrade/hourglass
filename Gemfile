@@ -23,8 +23,6 @@ gem 'jquery-ui-rails'
 gem "bootstrap_form", ">= 4.2.0"
 gem 'octicons_helper'
 
-gem 'codemirror-rails'
-
 gem 'headless' # needed to run Racket, and xvfb-run (the shell script) merges stdout and stderr
 
 gem 'rubyzip'

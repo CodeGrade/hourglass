@@ -92,7 +92,6 @@ GEM
       capybara (>= 2.3, < 4.0)
       json
     childprocess (3.0.0)
-    codemirror-rails (0.3.1)
     coderay (1.1.2)
     coffee-rails (4.2.2)
       coffee-script (>= 2.2.0)
@@ -277,7 +276,6 @@ DEPENDENCIES
   bootstrap_form (>= 4.2.0)
   capybara (>= 2.15)
   capybara-webkit
-  codemirror-rails
   coffee-rails (~> 4.2)
   devise
   devise_ldap_authenticatable

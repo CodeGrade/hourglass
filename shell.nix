@@ -57,5 +57,6 @@ in mkShell {
   shellHook = ''
     ${postgres_setup}
     ${gem_setup}
+    export PATH="$PWD/node_modules/.bin/:$PATH"
   '';
 }

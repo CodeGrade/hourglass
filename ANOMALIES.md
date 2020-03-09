@@ -9,12 +9,11 @@
 - `blur` event detects when the window loses focus from the user, triggers an anomaly
 - `contextmenu` is sent when the user right-clicks in the window, and this is disabled with `preventDefault` and `stopPropagation`. no anomaly is recorded
 - if a user attempts to save a snapshot and they already have a final submission or have some anomaly, they are locked out.
-
-## To-do
-- [ ] 20 second gap in snapshots
-- [x] Chrome's "toggle device toolbar" mode (ctrl+shift+m when developer tools is open) is seen as "fullscreen" no matter what state the window is in.
+- Chrome's "toggle device toolbar" mode (ctrl+shift+m when developer tools is open) is seen as "fullscreen" no matter what state the window is in.
   - the user could have other windows or the developer console open, but focus detection will still work if the cursor leaves the page
   - this is fixed by disallowing mobile useragents
+
+## To-do
 - detect browser extensions
 - use [`Object.freeze`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze) to prevent tampering
 - We should work to implement subresource integrity checks (i.e. `<script integrity="..." ...>` [link](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)) as well

@@ -78,12 +78,13 @@ $(function() {
         $("#exam-nav").replaceWith(regularNav);
     }
 
-    <% @ignore_lockdown = false %>
+    <% @ignore_lockdown = @exam.policy_permits? "ignore-lockdown" %>
     function checkFullscreen() {
         <% if @ignore_lockdown %>
           bootSequenceConfirmed(); return;
         <% end %>
-        if (!isFullscreen()) {
+        const tolerateWindowed = <%= @exam.policy_permits? "tolerate-windowed" %>;
+        if (!isFullscreen() && !tolerateWindowed) {
             console.log('not fullscreen.')
             openFullscreen().then(function() {
                 console.log('fullscreen activated');

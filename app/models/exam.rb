@@ -23,11 +23,22 @@ class Exam < ApplicationRecord
     upload.extracted_path.join("exam.yaml")
   end
 
+  def policy_permits?(policy)
+    policies.include? policy
+  end
+
+  def policies
+    properties["policies"]
+  end
+
+  def properties
+    return @properties if @properties
+    @properties = YAML.load(File.read(exam_yaml))
+  end
+
   def info
     return @info if @info
-
-    versions = YAML.load(File.read(exam_yaml))
-    @info = versions[0]
+    @info = properties["versions"][0]
     if @info["reference"]
       dirs, files = get_referenced_files(@info["reference"])
       @info["reference"] = { dirs: dirs, files: files }

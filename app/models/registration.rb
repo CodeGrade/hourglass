@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Registration < ApplicationRecord
   belongs_to :user
   belongs_to :exam
@@ -5,17 +7,17 @@ class Registration < ApplicationRecord
 
   has_many :anomalies
 
-  enum role: [:student, :proctor, :professor, :admin]
+  enum role: { student: 0, proctor: 1, professor: 2, admin: 3 }
 
   after_create :create_file
   after_commit :purge_file!, on: :destroy
 
   def anomalous?
-    anomalies.size > 0
+    !anomalies.empty?
   end
 
   def allow_submission?
-    !(self.final? || self.anomalous?)
+    !(final? || anomalous?)
   end
 
   def create_file
@@ -27,17 +29,15 @@ class Registration < ApplicationRecord
 
   def purge_file!
     FileUtils.rm_f filename
-    if Dir.empty? exam_subs
-      FileUtils.rm_rf exam_subs
-    end
+    FileUtils.rm_rf exam_subs if Dir.empty? exam_subs
   end
 
   def self.base_sub_dir
-    Rails.root.join("private", "submissions", Rails.env)
+    Rails.root.join('private', 'submissions', Rails.env)
   end
 
   def get_all_answers
-    JSON.parse("{" + File.read(filename) + "}")
+    JSON.parse('{' + File.read(filename) + '}')
   end
 
   def get_current_answers

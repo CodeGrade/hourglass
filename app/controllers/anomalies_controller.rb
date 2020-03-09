@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AnomaliesController < ApplicationController
   before_action :require_current_user
   before_action :require_admin_or_prof, except: [:create]
@@ -20,16 +22,14 @@ class AnomaliesController < ApplicationController
   end
 
   def show
-    @anomaly = Anomaly.find_by_id(params[:id])
+    @anomaly = Anomaly.find_by(id: params[:id])
     if @anomaly.nil?
       redirect_to exam_registration_anomalies_path(@exam, @registration)
     end
   end
 
   def my_reg
-    if @registration.user != current_user
-      render json: { created: false }
-    end
+    render json: { created: false } if @registration.user != current_user
   end
 
   def create

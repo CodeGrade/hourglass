@@ -1,24 +1,24 @@
+# frozen_string_literal: true
+
 class ExamsController < ApplicationController
   before_action :require_current_user, except: [:save_snapshot]
   prepend_before_action :catch_require_current_user, only: [:save_snapshot]
-  before_action :require_enabled, except: [:index, :new, :create]
-  before_action :require_registration, except: [:index, :new, :create, :save_snapshot]
-  before_action :require_admin_or_prof, only: [:new, :create, :preview, :finalize]
-  before_action :check_anomaly, only: [:show, :contents, :submit]
-  before_action :check_final, only: [:show, :contents, :submit]
+  before_action :require_enabled, except: %i[index new create]
+  before_action :require_registration, except: %i[index new create save_snapshot]
+  before_action :require_admin_or_prof, only: %i[new create preview finalize]
+  before_action :check_anomaly, only: %i[show contents submit]
+  before_action :check_final, only: %i[show contents submit]
 
   def catch_require_current_user
-    begin
-      require_current_user
-      @registration ||= Registration.find_by(user: current_user, exam_id: params[:id])
-    rescue DoubleLoginException => e
-      registration ||= Registration.find_by(user_id: e.user.id, exam_id: params[:id])
-      if registration
-        Anomaly.create(registration: registration, reason: e.message)
-      end
-      render json: { lockout: true, reason: e.message }
-      return false
+    require_current_user
+    @registration ||= Registration.find_by(user: current_user, exam_id: params[:id])
+  rescue DoubleLoginException => e
+    registration ||= Registration.find_by(user_id: e.user.id, exam_id: params[:id])
+    if registration
+      Anomaly.create(registration: registration, reason: e.message)
     end
+    render json: { lockout: true, reason: e.message }
+    false
   end
 
   def require_enabled
@@ -37,7 +37,7 @@ class ExamsController < ApplicationController
 
   def check_anomaly
     if @registration.anomalous?
-      redirect_to exams_path, alert: "You are locked out of that exam. Please see a proctor."
+      redirect_to exams_path, alert: 'You are locked out of that exam. Please see a proctor.'
     end
   end
 
@@ -45,15 +45,14 @@ class ExamsController < ApplicationController
     return if @registration.professor?
 
     if @registration.final?
-      redirect_back fallback_location: exams_path, alert: "You have already completed that exam."
+      redirect_back fallback_location: exams_path, alert: 'You have already completed that exam.'
     end
   end
 
-  def show
-  end
+  def show; end
 
   def contents
-    # TODO make secret in "show" and check it before rendering
+    # TODO: make secret in "show" and check it before rendering
     #   so that users cannot just visit /exams/1/contents
     @answers = @registration.get_current_answers
     @preview = false
@@ -75,13 +74,11 @@ class ExamsController < ApplicationController
   # returns true if lockout should occur
   def save_answers(final = false)
     answers = params.require(:answers).permit(question: {}).to_h[:question]
-    unless @registration.allow_submission?
-      return true
-    end
+    return true unless @registration.allow_submission?
 
     @registration.update_attribute(:final, final)
     @registration.save_answers(answers)
-    return false
+    false
   end
 
   def finalize
@@ -93,7 +90,7 @@ class ExamsController < ApplicationController
   def submit
     lockout = save_answers(true)
     if lockout
-      redirect_to exams_path, alert: "You have already submitted this exam or you are locked out of it."
+      redirect_to exams_path, alert: 'You have already submitted this exam or you are locked out of it.'
     end
   end
 

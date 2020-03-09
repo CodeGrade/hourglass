@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
@@ -17,7 +19,7 @@ gem 'webpacker', '~> 4.0'
 gem 'devise'
 gem 'devise_ldap_authenticatable'
 
-gem "bootstrap_form", ">= 4.2.0"
+gem 'bootstrap_form', '>= 4.2.0'
 gem 'octicons_helper'
 
 gem 'headless' # needed to run Racket, and xvfb-run (the shell script) merges stdout and stderr
@@ -41,20 +43,20 @@ gem 'jbuilder', '~> 2.7'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 group :development, :test do
+  gem 'minitest-reporters'
   gem 'pry'
   gem 'pry-rails'
-  gem 'minitest-reporters'
 end
 
 group :development do
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
-  gem 'web-console', '>= 3.3.0'
+  gem 'better_errors'
+  gem 'binding_of_caller'
   gem 'listen', '>= 3.0.5', '< 3.2'
+  gem 'rubocop-rails'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
-  gem "better_errors"
-  gem "binding_of_caller"
-  gem 'rubocop-rails'
+  gem 'web-console', '>= 3.3.0'
 end
 
 group :test do
@@ -65,4 +67,4 @@ group :test do
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]

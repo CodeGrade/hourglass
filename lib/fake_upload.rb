@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FakeUpload
   def initialize(path, content = nil)
     @path = path
@@ -24,6 +26,5 @@ class FakeUpload
     @size || File.size(@path)
   end
 
-  def rewind
-  end
+  def rewind; end
 end

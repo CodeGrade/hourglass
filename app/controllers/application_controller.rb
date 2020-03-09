@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
@@ -5,8 +7,8 @@ class ApplicationController < ActionController::Base
     redirect_back fallback_location: root_path, alert: "There was an error logging in. Please contact a professor or site admin, and provide them the following information:<br>#{exception}"
   end
 
-  rescue_from DoubleLoginException do |e|
-    redirect_to root_path, alert: "You are currently logged into another session."
+  rescue_from DoubleLoginException do |_e|
+    redirect_to root_path, alert: 'You are currently logged into another session.'
   end
 
   def after_sign_in_path_for(resource)
@@ -15,7 +17,7 @@ class ApplicationController < ActionController::Base
 
   def require_current_user
     if current_user.nil?
-      redirect_to new_user_session_path(next: request.fullpath), alert: "You need to log in first."
+      redirect_to new_user_session_path(next: request.fullpath), alert: 'You need to log in first.'
       return false
     end
     true
@@ -25,8 +27,8 @@ class ApplicationController < ActionController::Base
     return unless require_current_user
 
     unless current_user&.admin?
-      redirect_to root_path, alert: "Must be an admin."
-      return
+      redirect_to root_path, alert: 'Must be an admin.'
+      nil
     end
   end
 
@@ -34,8 +36,8 @@ class ApplicationController < ActionController::Base
     return unless require_current_user
 
     unless current_user&.admin_or_prof?
-      redirect_to root_path, alert: "Must be an admin or professor."
-      return
+      redirect_to root_path, alert: 'Must be an admin or professor.'
+      nil
     end
   end
 end

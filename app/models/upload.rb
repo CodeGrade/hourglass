@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'find'
 
 class Upload < ApplicationRecord
@@ -12,12 +14,8 @@ class Upload < ApplicationRecord
 
   def purge!
     FileUtils.rm_rf base_dir.to_s
-    if Dir.empty? exam_dir
-      FileUtils.rm_rf exam_dir
-    end
-    if Dir.empty? user_dir
-      FileUtils.rm_rf user_dir
-    end
+    FileUtils.rm_rf exam_dir if Dir.empty? exam_dir
+    FileUtils.rm_rf user_dir if Dir.empty? user_dir
   end
 
   def create_exam_structure(upload)
@@ -43,7 +41,7 @@ class Upload < ApplicationRecord
     #         +-- Example.rkt/
     #         |   ... extracted embedded contents
     upload_dir.mkpath
-    upload_dir.join("original").mkpath
+    upload_dir.join('original').mkpath
     File.open(original_path, 'wb') do |file|
       file.write(upload.read)
     end
@@ -52,7 +50,7 @@ class Upload < ApplicationRecord
   def relative_path(path, target)
     target = target.to_s
     if target.starts_with?(path.to_s)
-      target.gsub(path.to_s, "")
+      target.gsub(path.to_s, '')
     else
       target
     end
@@ -64,7 +62,11 @@ class Upload < ApplicationRecord
         {
           path: path.basename.to_s,
           link_to: path.dirname.join(File.readlink(path)),
-          broken: (!File.exists?(File.realpath(path)) rescue true)
+          broken: (begin
+                     !File.exist?(File.realpath(path))
+                   rescue StandardError
+                     true
+                   end)
         }
       elsif path.file?
         # converted_path = Pathname.new(path.to_s.gsub(extracted_path.to_s,
@@ -97,15 +99,15 @@ class Upload < ApplicationRecord
   end
 
   def original_path
-    upload_dir.join("original", file_name)
+    upload_dir.join('original', file_name)
   end
 
   def extracted_path
-    upload_dir.join("extracted")
+    upload_dir.join('extracted')
   end
 
   def files_path
-    extracted_path.join("files")
+    extracted_path.join('files')
   end
 
   def extract_contents!(mimetype)
@@ -132,7 +134,7 @@ class Upload < ApplicationRecord
   end
 
   def self.base_upload_dir
-    Rails.root.join("private", "uploads", Rails.env)
+    Rails.root.join('private', 'uploads', Rails.env)
   end
 
   def user_dir
@@ -156,13 +158,13 @@ class Upload < ApplicationRecord
     return unless new_record?
 
     unless secret_key.nil?
-      raise Exception.new("Can't generate a second secret key for an upload.")
+      raise Exception, "Can't generate a second secret key for an upload."
     end
 
     self.secret_key = SecureRandom.urlsafe_base64
 
     if Dir.exist?(upload_dir)
-      raise Exception.new("Duplicate secret key (2). That's unpossible!")
+      raise Exception, "Duplicate secret key (2). That's unpossible!"
     end
   end
 
@@ -176,18 +178,18 @@ class Upload < ApplicationRecord
     self.file_name = @upload.original_filename
 
     if Dir.exist?(upload_dir)
-      raise Exception.new("Duplicate secret key (1). That's unpossible!")
+      raise Exception, "Duplicate secret key (1). That's unpossible!"
     end
 
     create_exam_structure(@upload)
 
-    if @upload.is_a? ActionDispatch::Http::UploadedFile
-      upload_path = @upload.path
-    elsif @upload.is_a? String
-      upload_path = @upload
-    else
-      upload_path = original_path
-    end
+    upload_path = if @upload.is_a? ActionDispatch::Http::UploadedFile
+                    @upload.path
+                  elsif @upload.is_a? String
+                    @upload
+                  else
+                    original_path
+                  end
     effective_mime = @upload.content_type
 
     extract_contents!(effective_mime)

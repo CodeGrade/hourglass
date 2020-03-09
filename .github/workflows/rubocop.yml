@@ -9,5 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Rubocop checks
-      uses: gimenete/rubocop-action@1.0
+    - name: Rubocop
+      uses: andrewmcodes/rubocop-linter-action@v3.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

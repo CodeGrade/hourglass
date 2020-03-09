@@ -47,20 +47,24 @@ class Registration < ApplicationRecord
   def save_answers(answers)
     json = get_current_answers
     return if json == answers
+
     append_json(answers)
   end
 
   private
+
   def exam_subs
     Registration.base_sub_dir.join(exam.id.to_i.to_s)
   end
 
   private
+
   def filename
     exam_subs.join("user#{user.id.to_i}.json")
   end
 
   private
+
   def append_json(json)
     ts = DateTime.now.iso8601
     open(filename, 'a') do |f|

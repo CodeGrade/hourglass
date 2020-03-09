@@ -3,8 +3,7 @@ module ApplicationHelper
     { notice: 'info',
       success: 'success',
       error: 'danger',
-      alert: 'danger'
-    }
+      alert: 'danger' }
   end
 
   def self.mime_type(full_path)
@@ -164,11 +163,11 @@ module ApplicationHelper
     if obj.is_a? Hash
       obj = obj.dup
       obj.delete(:full_path)
-      obj.each do |k,v|
+      obj.each do |k, v|
         obj[k] = censor_full_paths(v)
       end
     elsif obj.is_a? Array
-      obj = obj.map {|v| censor_full_paths(v)}
+      obj = obj.map { |v| censor_full_paths(v) }
     end
     obj
   end

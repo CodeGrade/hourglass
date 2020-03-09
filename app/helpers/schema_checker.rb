@@ -6,13 +6,15 @@ class SchemaChecker
   def check(yaml)
     @path = []
     @commit = nil
-    @checker["start"][:check].call(yaml, []).map!{|s| s.gsub(/^: /, "")}
+    @checker["start"][:check].call(yaml, []).map! { |s| s.gsub(/^: /, "") }
   end
+
   def convert(yaml)
     @path = []
     @commit = nil
     @checker["start"][:convert].call(yaml)
   end
+
   def initialize(schema)
     schema =
       case schema
@@ -30,90 +32,94 @@ class SchemaChecker
 
     @checker = {}
     @checker["Nil"] = {
-      check: lambda {|val, parent, refinement=nil|
+      check: lambda { |val, parent, refinement = nil|
         if val.nil?
           []
         else
           ["#{make_path}: Expected nil but got #{elide(val, 2)}"]
         end
       },
-      convert: lambda {|val| val}
+      convert: lambda { |val| val }
     }
     @checker["String"] = {
-      check: lambda {|val, parent, refinement=nil|
-        if val.is_a? String
-          if refinement.is_a? String
-            refinement = Regexp.new(refinement)
-            if refinement.match? val
-              []
-            else
-              ["#{make_path}: Expected a string matching #{refinement.inspect}, but got #{elide(val, 2)}"]
-            end
-          else
-            []
-          end
-        else
-          ["#{make_path}: Expected a string, but got #{elide(val, 2)}"]
-        end},
-      convert: lambda {|val| val}
+      check: lambda { |val, parent, refinement = nil|
+               if val.is_a? String
+                 if refinement.is_a? String
+                   refinement = Regexp.new(refinement)
+                   if refinement.match? val
+                     []
+                   else
+                     ["#{make_path}: Expected a string matching #{refinement.inspect}, but got #{elide(val, 2)}"]
+                   end
+                 else
+                   []
+                 end
+               else
+                 ["#{make_path}: Expected a string, but got #{elide(val, 2)}"]
+               end
+             },
+      convert: lambda { |val| val }
     }
     @checker["HTML"] = @checker["String"] # NOTE: This is temporary, and doesn't actually do any HTML validation
     @checker["Boolean"] = {
-      check: lambda {|val, parent, refinement=nil|
-        if (val == true || val == false)
-          []
-        else
-          ["#{make_path}: Expected a boolean, but got #{elide(val, 2)}"]
-        end},
-      convert: lambda {|val| val}
+      check: lambda { |val, parent, refinement = nil|
+               if (val == true || val == false)
+                 []
+               else
+                 ["#{make_path}: Expected a boolean, but got #{elide(val, 2)}"]
+               end
+             },
+      convert: lambda { |val| val }
     }
     @checker["Integer"] = {
-      check: lambda {|val, parent, refinement=nil|
-        val_clean = (Integer(val) rescue false)
-        if val_clean
-          if (refinement.is_a? Array) && (refinement.size == 2)
-            lo = get_number(parent, refinement[0])
-            hi = get_number(parent, refinement[1])
-            if hi && lo
-              if lo <= val_clean && val_clean < hi
-                []
-              else
-                ["#{make_path}: Expected an integer in the range [#{lo}, #{hi - 1}], but got #{elide(val, 2)}"]
-              end
-            else
-              []
-            end
-          else
-            []
-          end
-        else
-          ["#{make_path}: Expected an integer, but got #{elide(val, 2)}"]
-        end},
-      convert: lambda {|val| Integer(val) }
+      check: lambda { |val, parent, refinement = nil|
+               val_clean = (Integer(val) rescue false)
+               if val_clean
+                 if (refinement.is_a? Array) && (refinement.size == 2)
+                   lo = get_number(parent, refinement[0])
+                   hi = get_number(parent, refinement[1])
+                   if hi && lo
+                     if lo <= val_clean && val_clean < hi
+                       []
+                     else
+                       ["#{make_path}: Expected an integer in the range [#{lo}, #{hi - 1}], but got #{elide(val, 2)}"]
+                     end
+                   else
+                     []
+                   end
+                 else
+                   []
+                 end
+               else
+                 ["#{make_path}: Expected an integer, but got #{elide(val, 2)}"]
+               end
+             },
+      convert: lambda { |val| Integer(val) }
     }
     @checker["Float"] = {
-      check: lambda {|val, parent, refinement=nil|
-        val_clean = (Float(val) rescue false)
-        if val_clean
-          if refinement.is_a? Array
-            lo = get_number(parent, refinement[0])
-            hi = get_number(parent, refinement[1])
-            if lo && hi
-              if lo <= val_clean && val_clean <= hi
-                []
-              else
-                ["#{make_path}: Expected a float in the range [#{lo}, #{hi}], but got #{elide(val, 2)}"]
-              end
-            else
-              []
-            end
-          else
-            []
-          end
-        else
-          ["#{make_path}: Expected a float, but got #{elide(val, 2)}"]
-        end},
-      convert: lambda {|val| Float(val) }
+      check: lambda { |val, parent, refinement = nil|
+               val_clean = (Float(val) rescue false)
+               if val_clean
+                 if refinement.is_a? Array
+                   lo = get_number(parent, refinement[0])
+                   hi = get_number(parent, refinement[1])
+                   if lo && hi
+                     if lo <= val_clean && val_clean <= hi
+                       []
+                     else
+                       ["#{make_path}: Expected a float in the range [#{lo}, #{hi}], but got #{elide(val, 2)}"]
+                     end
+                   else
+                     []
+                   end
+                 else
+                   []
+                 end
+               else
+                 ["#{make_path}: Expected a float, but got #{elide(val, 2)}"]
+               end
+             },
+      convert: lambda { |val| Float(val) }
     }
     start = schema.delete "start"
     schema.each do |name, type|
@@ -123,7 +129,6 @@ class SchemaChecker
   end
 
   protected
-
 
   def get_number(parent, refinement)
     if (refinement.is_a? Numeric)
@@ -168,9 +173,9 @@ class SchemaChecker
     new_path.compact.join(" > ")
   end
 
-  def options(arr, joiner="or")
+  def options(arr, joiner = "or")
     if arr.size > 1
-      arr[0...-1].map{|i| "`#{i}`"}.join(', ') + " #{joiner} `#{arr[-1]}`"
+      arr[0...-1].map { |i| "`#{i}`" }.join(', ') + " #{joiner} `#{arr[-1]}`"
     else
       "`#{arr[0]}`"
     end
@@ -189,6 +194,7 @@ class SchemaChecker
       @checker[type[0]][:check].call(val, parent, type[1])
     end
   end
+
   def do_convert(type, val)
     if type.is_a? String
       @checker[type][:convert].call(val)
@@ -196,12 +202,13 @@ class SchemaChecker
       @checker[type[0]][:convert].call(val)
     end
   end
+
   def produce(type, typename)
     if (type.is_a? String) && @checker[type]
       @checker[type]
     elsif type["array"]
       {
-        check: lambda {|val, parent, refinement=nil|
+        check: lambda { |val, parent, refinement = nil|
           errors = []
           if !val.is_a? Array
             errors << "#{make_path}: Expected an array of #{type["array"].pluralize}, but got #{elide(val, 2)}"
@@ -223,7 +230,7 @@ class SchemaChecker
           end
           errors
         },
-        convert: lambda{|val|
+        convert: lambda { |val|
           val.map do |v|
             do_convert(type["array"], v)
           end
@@ -231,7 +238,7 @@ class SchemaChecker
       }
     elsif type["dictionary"]
       {
-        check: lambda {|val, parent, refinement=nil|
+        check: lambda { |val, parent, refinement = nil|
           errors = []
           if !val.is_a? Hash
             errors << "#{make_path}: Expected a dictionary, but got #{elide(val, 2)}"
@@ -256,7 +263,7 @@ class SchemaChecker
           end
           errors
         },
-        convert: lambda {|val|
+        convert: lambda { |val|
           val.map do |k, v|
             [do_convert(type["dictionary"]["key"], k),
              do_convert(type["dictionary"]["value"], v)]
@@ -265,7 +272,7 @@ class SchemaChecker
       }
     elsif type["labeled_value"]
       {
-        check: lambda {|val, parent, refinement=nil|
+        check: lambda { |val, parent, refinement = nil|
           errors = []
           if (!val.is_a? Hash) || val.size != 1
             errors << "#{make_path}: Expected a #{typename}, but got #{elide(val, 2)}"
@@ -279,7 +286,7 @@ class SchemaChecker
           end
           errors
         },
-        convert: lambda {|val|
+        convert: lambda { |val|
           val.map do |k, v|
             [k, do_convert(type["labeled_value"]["value"], v)]
           end.to_h
@@ -287,15 +294,15 @@ class SchemaChecker
       }
     elsif type["object"]
       {
-        check: lambda {|val, parent, refinement=nil|
+        check: lambda { |val, parent, refinement = nil|
           errors = []
           checkers = type["object"].map do |field|
-            [field["key"], {count: 0, commit: field["commit"], optional: field["optional"], value: field["value"]}]
+            [field["key"], { count: 0, commit: field["commit"], optional: field["optional"], value: field["value"] }]
           end.to_h
           if !val.is_a? Hash
             errors << "#{make_path}: Expected an object, but got #{elide(val, 2)}"
           else
-            named = 
+            named =
               if val["name"]
                 [:named, val["name"]]
               else
@@ -314,7 +321,7 @@ class SchemaChecker
                   errors << "#{make_path}: Got an unexpected field #{k} in #{elide(val, 2)}.  Valid fields are #{options(checkers.keys)}"
                 end
               end
-              required = checkers.select{|k, v| !v[:optional] && v[:count] == 0}
+              required = checkers.select { |k, v| !v[:optional] && v[:count] == 0 }
               if !required.empty?
                 errors << "#{make_path}: Missing required #{'field'.pluralize(required.size)} #{options(required.keys, 'and')}"
               end
@@ -322,7 +329,7 @@ class SchemaChecker
             errors
           end
         },
-        convert: lambda {|val|
+        convert: lambda { |val|
           converters = type["object"].map do |field|
             [field["key"], field["value"]]
           end.to_h
@@ -333,7 +340,7 @@ class SchemaChecker
       }
     elsif type["one_of"]
       {
-        check: lambda {|val, parent, refinement=nil|
+        check: lambda { |val, parent, refinement = nil|
           commit = @commit
           @commit = nil
           errors = []
@@ -356,7 +363,7 @@ class SchemaChecker
           @commit = commit
           errors
         },
-        convert: lambda {|val|
+        convert: lambda { |val|
           type["one_of"].each do |typ|
             if do_check(typ, val, "").empty?
               return do_convert(typ, val)
@@ -366,7 +373,7 @@ class SchemaChecker
       }
     elsif type["tagged_one_of"]
       {
-        check: lambda {|val, parent, refinement=nil|
+        check: lambda { |val, parent, refinement = nil|
           key_str = options(type["tagged_one_of"])
           if !val.is_a? Hash
             ["#{make_path}: Expected an object tagged as #{key_str}"]
@@ -378,7 +385,7 @@ class SchemaChecker
             do_check(val.first[0], val.first[1], parent)
           end
         },
-        convert: lambda {|val|
+        convert: lambda { |val|
           [[val.first[0], do_convert(val.first[0], val.first[1])]].to_h
         }
       }
@@ -398,7 +405,7 @@ class SchemaChecker
       if depth <= 0
         "[...]"
       else
-        "[#{val.map{|v| elide(v, depth - 1)}.join(", ")}]"
+        "[#{val.map { |v| elide(v, depth - 1) }.join(", ")}]"
       end
     else
       val.inspect

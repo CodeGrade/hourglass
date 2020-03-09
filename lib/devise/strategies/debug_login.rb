@@ -12,6 +12,7 @@ module Devise
           fail("Did not recognize username/password")
         end
       end
+
       def valid?
         params[:user] && params[:user][:username] && params[:user][:password]
       end

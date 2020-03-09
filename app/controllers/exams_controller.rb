@@ -16,7 +16,7 @@ class ExamsController < ApplicationController
       if registration
         Anomaly.create(registration: registration, reason: e.message)
       end
-      render json: {lockout: true, reason: e.message}
+      render json: { lockout: true, reason: e.message }
       return false
     end
   end
@@ -43,6 +43,7 @@ class ExamsController < ApplicationController
 
   def check_final
     return if @registration.professor?
+
     if @registration.final?
       redirect_back fallback_location: exams_path, alert: "You have already completed that exam."
     end
@@ -77,6 +78,7 @@ class ExamsController < ApplicationController
     unless @registration.allow_submission?
       return true
     end
+
     @registration.update_attribute(:final, final)
     @registration.save_answers(answers)
     return false
@@ -97,7 +99,7 @@ class ExamsController < ApplicationController
 
   def save_snapshot
     lockout = save_answers
-    render json: {lockout: lockout}
+    render json: { lockout: lockout }
   end
 
   def new

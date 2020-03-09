@@ -58,13 +58,13 @@ class Upload < ApplicationRecord
     end
   end
 
-  def extracted_files(folder, strict=false)
+  def extracted_files(folder, strict = false)
     def rec_path(path)
       if path.symlink?
         {
-            path: path.basename.to_s,
-            link_to: path.dirname.join(File.readlink(path)),
-            broken: (!File.exists?(File.realpath(path)) rescue true)
+          path: path.basename.to_s,
+          link_to: path.dirname.join(File.readlink(path)),
+          broken: (!File.exists?(File.realpath(path)) rescue true)
         }
       elsif path.file?
         # converted_path = Pathname.new(path.to_s.gsub(extracted_path.to_s,
@@ -76,12 +76,12 @@ class Upload < ApplicationRecord
         #    converted_path: Upload.upload_path_for(converted_path),
         #    public_link: Upload.upload_path_for(path)}
         # else
-        {path: path.basename.to_s, full_path: path}
+        { path: path.basename.to_s, full_path: path }
         # end
       elsif path.directory?
-        {path: path.basename.to_s, children: path.children.sort.collect do |child|
+        { path: path.basename.to_s, children: path.children.sort.collect do |child|
           rec_path(child)
-        end}
+        end }
       end
     end
     folder_path = files_path.join(folder)
@@ -118,11 +118,14 @@ class Upload < ApplicationRecord
     extracted_path.mkpath
     ArchiveUtils.extract(original_path.to_s, mimetype, extracted_path.to_s, force_readable: force_readable)
     return unless postprocess
+
     found_any = false
     Find.find(extracted_path) do |f|
       next unless File.file? f
+
       found_any = true
       next if File.extname(f).empty?
+
       Postprocessor.process(extracted_path, f)
     end
     Postprocessor.no_files_found(extracted_path) unless found_any
@@ -168,6 +171,7 @@ class Upload < ApplicationRecord
   end
 
   private
+
   def store_upload!
     self.file_name = @upload.original_filename
 

@@ -1,4 +1,5 @@
 # coding: utf-8
+
 class Exam < ApplicationRecord
   has_many :registrations
   has_many :users, through: :registrations
@@ -24,36 +25,37 @@ class Exam < ApplicationRecord
 
   def info
     return @info if @info
+
     versions = YAML.load(File.read(exam_yaml))
     @info = versions[0]
     if @info["reference"]
       dirs, files = get_referenced_files(@info["reference"])
-      @info["reference"] = {dirs: dirs, files: files}
+      @info["reference"] = { dirs: dirs, files: files }
     end
     @info["questions"].each do |q|
       if q["reference"]
         dirs, files = get_referenced_files(q["reference"])
-        q["reference"] = {dirs: dirs, files: files}
+        q["reference"] = { dirs: dirs, files: files }
       end
       q["parts"].each do |p|
         if p["reference"]
           dirs, files = get_referenced_files(p["reference"])
-          p["reference"] = {dirs: dirs, files: files}
+          p["reference"] = { dirs: dirs, files: files }
         end
         p["question"] = q
         p["body"].each do |b|
           if b.is_a? Hash
             if b["YesNo"] == !!b["YesNo"]
-              b["YesNo"] = {"prompt" => [], "correctAnswer" => b["YesNo"]}
+              b["YesNo"] = { "prompt" => [], "correctAnswer" => b["YesNo"] }
             elsif b["TrueFalse"] == !!b["TrueFalse"]
-              b["TrueFalse"] = {"prompt" => [], "correctAnswer" => b["TrueFalse"]}
+              b["TrueFalse"] = { "prompt" => [], "correctAnswer" => b["TrueFalse"] }
             elsif b["Code"]
               if b["Code"]["initial"]
-                dirs, files = get_referenced_files([{"file" => b["Code"]["initial"]}])
+                dirs, files = get_referenced_files([{ "file" => b["Code"]["initial"] }])
                 b["Code"]["initial"] = files[0][:contents]
               end
             elsif b.key? "Text" && b["Text"].nil?
-              b["Text"] = {"prompt" => []}
+              b["Text"] = { "prompt" => [] }
             elsif b["CodeTag"]
               if b["CodeTag"]["choices"] == "part" && p["reference"].nil?
                 throw "No reference for part."
@@ -106,19 +108,22 @@ class Exam < ApplicationRecord
   end
 
   private
+
   def with_extracted(item)
     return nil if item.nil?
+
     if item[:full_path]
       return nil if File.basename(item[:full_path].to_s) == ".DS_Store"
+
       mimetype = ApplicationHelper.mime_type(item[:full_path])
       contents = begin
         File.read(item[:full_path].to_s)
-      rescue Errno::EACCES => e
-        "Could not access file:\n#{e.to_s}"
-      rescue Errno::ENOENT => e
-        "Somehow, #{item[:full_path]} does not exist"
-      rescue Exception => e
-        "Error reading file:\n#{e.to_s}"
+                 rescue Errno::EACCES => e
+                   "Could not access file:\n#{e.to_s}"
+                 rescue Errno::ENOENT => e
+                   "Somehow, #{item[:full_path]} does not exist"
+                 rescue Exception => e
+                   "Error reading file:\n#{e.to_s}"
       end
       if mimetype.starts_with? "image/"
         contents = Base64.encode(contents)
@@ -131,15 +136,17 @@ class Exam < ApplicationRecord
       item[:type] = "symlink"
     else
       return nil if item[:path] == "__MACOSX"
+
       item[:text] = item[:path] + "/"
       item[:selectable] = false
-      item[:nodes] = item[:children].map{|n| with_extracted(n)}.compact
+      item[:nodes] = item[:children].map { |n| with_extracted(n) }.compact
       item.delete(:children)
     end
     item
   end
 
   private
+
   def ensure_utf8(str, mimetype)
     if ApplicationHelper.binary?(mimetype)
       str
@@ -161,6 +168,7 @@ class Exam < ApplicationRecord
   end
 
   private
+
   def get_raw_files(folder)
     self.upload.extracted_files(folder, true)
   end
@@ -168,7 +176,7 @@ class Exam < ApplicationRecord
   def clean_up(raw_files)
     def file_list(files, arr)
       if files[:children]
-        files[:children].each{|n| file_list(n, arr)}
+        files[:children].each { |n| file_list(n, arr) }
       else
         if File.basename(files[:full_path]) != ".DS_Store"
           arr.push(files)
@@ -179,14 +187,14 @@ class Exam < ApplicationRecord
     @flat_files = raw_files.reduce([]) do |flat, raw| file_list(raw, flat) end
     @flat_files.each do |sf|
       if sf[:type] == "symlink" && !sf[:broken] && sf[:link_to].is_a?(String)
-        sf[:link_to] = @flat_files.find{|f| f[:full_path]&.ends_with?(sf[:link_to])}
+        sf[:link_to] = @flat_files.find { |f| f[:full_path]&.ends_with?(sf[:link_to]) }
       end
     end
 
     @count = @flat_files.count.to_s.length
 
     @flat_files.each_with_index do |node, i|
-      node[:href] = "file_" + (i+1).to_s.rjust(@count, '0')
+      node[:href] = "file_" + (i + 1).to_s.rjust(@count, '0')
     end
     @flat_files.each do |node|
       if node[:link_to]

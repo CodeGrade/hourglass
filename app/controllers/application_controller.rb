@@ -23,6 +23,7 @@ class ApplicationController < ActionController::Base
 
   def require_admin
     return unless require_current_user
+
     unless current_user&.admin?
       redirect_to root_path, alert: "Must be an admin."
       return
@@ -31,6 +32,7 @@ class ApplicationController < ActionController::Base
 
   def require_admin_or_prof
     return unless require_current_user
+
     unless current_user&.admin_or_prof?
       redirect_to root_path, alert: "Must be an admin or professor."
       return

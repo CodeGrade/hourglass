@@ -49,10 +49,10 @@ when "development"
   )
 
   prof_reg = Registration.new(
-      user: prof,
-      exam: exam,
-      role: :professor,
-      room: room_one
+    user: prof,
+    exam: exam,
+    role: :professor,
+    room: room_one
   )
   prof_reg.save!
 

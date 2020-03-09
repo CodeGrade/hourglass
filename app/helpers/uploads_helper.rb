@@ -6,8 +6,11 @@ require 'headless'
 module UploadsHelper
   class Postprocessor
     private
+
     PROCS = {}
+
     public
+
     def self.create_handler(name, &block)
       name = name.to_s
       # slight shenanigans to access the private :define_method and :remove_method methods
@@ -16,6 +19,7 @@ module UploadsHelper
       PROCS[name] = PROCS.class.instance_method(:temp_method).bind(PROCS)
       PROCS.class.send(:remove_method, :temp_method)
     end
+
     def self.alias_handler(new_name, old_name)
       new_name = new_name.to_s
       old_name = old_name.to_s
@@ -35,6 +39,7 @@ module UploadsHelper
 
     create_handler :rtf do |extracted_path, f|
       return false unless (File.read(f, 6) == "{\\rtf1" rescue false)
+
       # Creates the path .../converted/directory/where/file/is/
       # and excludes the filename from the directory structure,
       # since only one output file is created
@@ -51,20 +56,21 @@ module UploadsHelper
         return true
       else
         FileUtils.rm "#{output_path}/#{File.basename(f, '.*')}.pdf", force: true
-        Audit.log <<ERROR
-================================
-Problem processing #{f}:
-Status: #{status}
-Error: #{err}
-Output: #{output}
-================================
-ERROR
+        Audit.log <<~ERROR
+          ================================
+          Problem processing #{f}:
+          Status: #{status}
+          Error: #{err}
+          Output: #{output}
+          ================================
+        ERROR
         return false
       end
     end
 
     create_handler :doc do |extracted_path, f|
       return false unless (File.read(f, 8) == "\xD0\xCF\x11\xE0\xA1\xB1\x1A\xE1" rescue false)
+
       # Creates the path .../converted/directory/where/file/is/
       # and excludes the filename from the directory structure,
       # since only one output file is created
@@ -81,20 +87,21 @@ ERROR
         return true
       else
         FileUtils.rm "#{output_path}/#{File.basename(f, '.*')}.pdf", force: true
-        Audit.log <<ERROR
-================================
-Problem processing #{f}:
-Status: #{status}
-Error: #{err}
-Output: #{output}
-================================
-ERROR
+        Audit.log <<~ERROR
+          ================================
+          Problem processing #{f}:
+          Status: #{status}
+          Error: #{err}
+          Output: #{output}
+          ================================
+        ERROR
         return false
       end
     end
 
     create_handler :docx do |extracted_path, f|
       return false unless (File.read(f, 4) == "\x50\x4B\x03\x04" rescue false)
+
       # Creates the path .../converted/directory/where/file/is/
       # and excludes the filename from the directory structure,
       # since only one output file is created
@@ -111,14 +118,14 @@ ERROR
         return true
       else
         FileUtils.rm "#{output_path}/#{File.basename(f, '.*')}.pdf", force: true
-        Audit.log <<ERROR
-================================
-Problem processing #{f}:
-Status: #{status}
-Error: #{err}
-Output: #{output}
-================================
-ERROR
+        Audit.log <<~ERROR
+          ================================
+          Problem processing #{f}:
+          Status: #{status}
+          Error: #{err}
+          Output: #{output}
+          ================================
+        ERROR
         return false
       end
     end
@@ -132,12 +139,13 @@ ERROR
       Pathname.new(output_path).mkpath
       Headless.ly(display: output_path.hash % Headless::MAX_DISPLAY_NUMBER, autopick: true) do
         output, err, status, timed_out = ApplicationHelper.capture3(
-                               {"XDG_RUNTIME_DIR" => nil},
-                               "racket", Rails.root.join("lib/assets/render-racket.rkt").to_s,
-                               "-e", output_path,
-                               "-o", f + "ext",
-                               f,
-                               timeout: 30)
+          { "XDG_RUNTIME_DIR" => nil },
+          "racket", Rails.root.join("lib/assets/render-racket.rkt").to_s,
+          "-e", output_path,
+          "-o", f + "ext",
+          f,
+          timeout: 30
+        )
         if status.success? && !timed_out
           contents = File.read(f + "ext")
           File.open(f, "w") do |f|
@@ -148,14 +156,14 @@ ERROR
           return true
         else
           FileUtils.rm (f + "ext"), force: true
-          Audit.log <<ERROR
-================================
-Problem processing #{f}:
-Status: #{status}
-Error: #{err}
-Output: #{output}
-================================
-ERROR
+          Audit.log <<~ERROR
+            ================================
+            Problem processing #{f}:
+            Status: #{status}
+            Error: #{err}
+            Output: #{output}
+            ================================
+          ERROR
           return false
         end
       end

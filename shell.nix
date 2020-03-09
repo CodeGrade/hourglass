@@ -1,6 +1,6 @@
 with import <nixpkgs> {};
 let
-  ruby = ruby_2_4;
+  ruby = ruby_2_6;
   psql_setup_file = writeText "setup.sql" ''
     DO
     $do$
@@ -16,7 +16,7 @@ let
     export GEM_HOME=$PWD/.nix-gems
     export GEM_PATH=$GEM_HOME
     export PATH=$GEM_HOME/bin:$PATH
-    gem install bundler
+    gem install --conservative bundler
   '';
   postgres_setup = ''
     export PGDATA=$PWD/postgres_data
@@ -43,12 +43,14 @@ let
 in mkShell {
   name = "hourglass";
   buildInputs = [
+    nodePackages.bower # needed for bootstrap-treeview
     ruby.devEnv
     postgresql
     qt4
     curl.dev
     pcre
     nodejs
+    yarn
     start_postgres
     stop_postgres
   ];
@@ -56,5 +58,6 @@ in mkShell {
   shellHook = ''
     ${postgres_setup}
     ${gem_setup}
+    export PATH="$PWD/node_modules/.bin/:$PATH"
   '';
 }

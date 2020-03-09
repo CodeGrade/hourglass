@@ -48,3 +48,4 @@ See [ANOMALIES.md](ANOMALIES.md) for anomaly checking TODOs.
 - [ ] make logo for favicon, readme, navbar
 - [ ] grab student first and last names from LDAP?
 - [ ] add a license
+- [ ] pressing Ctrl-R from within exam

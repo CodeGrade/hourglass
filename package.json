@@ -16,7 +16,8 @@
     "popper.js": "^1.16.1",
     "prop-types": "^15.7.2",
     "react": "^16.13.0",
-    "react-dom": "^16.13.0"
+    "react-dom": "^16.13.0",
+    "react_ujs": "^2.6.1"
   },
   "devDependencies": {
     "webpack-dev-server": "^3.10.3"

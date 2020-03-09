@@ -7,18 +7,19 @@
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
 
-require("@rails/ujs").start()
-require("@rails/activestorage").start()
-require("channels")
-require("codemirror")
-require("jquery")
-require("jquery-ui")
-require("../filepicker-widget.js")
-import {activateCode, displayCode} from "../exam.js";
+require("@rails/ujs").start();
+require("@rails/activestorage").start();
+require("channels");
+
+require('codemirror');
+require('jquery');
+require('jquery-ui');
+require('../filepicker-widget.js');
 import './bootstrap.js';
 import './bootstrap.scss';
 import './codemirror.js';
 
+import { activateCode, displayCode } from "../exam.js";
 global.activateCode = activateCode; // TODO remove
 global.displayCode = displayCode; // TODO remove
 

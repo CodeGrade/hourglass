@@ -1,7 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 
 import TreeView from "@material-ui/lab/TreeView";
+
 import TreeItem from "@material-ui/lab/TreeItem";
+
+import { Controlled as CodeMirror } from "react-codemirror2";
 
 function reduceFilesDirs(files, f) {
   return files.reduce((acc, file) => {
@@ -43,7 +46,14 @@ function FileContents(props) {
   const { files, selectedFileID } = props;
   const m = idToFileMap(files);
   const contents = m[selectedFileID] || "Select a file to view.";
-  return <textarea value={contents} readOnly />;
+  return (
+    <CodeMirror
+      value={contents}
+      options={{
+        lineNumbers: true
+      }}
+    />
+  );
 }
 
 function FileTree(props) {

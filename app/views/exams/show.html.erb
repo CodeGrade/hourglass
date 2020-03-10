@@ -18,3 +18,9 @@
   </div>
 <% end %>
 <div id="exam-contents"></div>
+
+
+<%= react_component('ExamTaker', {
+    info: @exam.info,
+    files: @exam.get_exam_files
+}) %>

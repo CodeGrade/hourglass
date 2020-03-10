@@ -181,6 +181,7 @@ class Upload < ApplicationRecord
 
     create_exam_structure(@upload)
 
+    # TODO bring back archiveutils checking
     if @upload.is_a? ActionDispatch::Http::UploadedFile
       upload_path = @upload.path
     elsif @upload.is_a? String

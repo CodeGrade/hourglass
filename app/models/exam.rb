@@ -39,32 +39,15 @@ class Exam < ApplicationRecord
   def info
     return @info if @info
     @info = properties["versions"][0]
-    if @info["reference"]
-      dirs, files = get_referenced_files(@info["reference"])
-      @info["reference"] = { dirs: dirs, files: files }
-    end
+    answer_count = 0
     @info["questions"].each do |q|
-      if q["reference"]
-        dirs, files = get_referenced_files(q["reference"])
-        q["reference"] = { dirs: dirs, files: files }
-      end
       q["parts"].each do |p|
-        if p["reference"]
-          dirs, files = get_referenced_files(p["reference"])
-          p["reference"] = { dirs: dirs, files: files }
-        end
-        p["question"] = q
         p["body"].each do |b|
           if b.is_a? Hash
             if b["YesNo"] == !!b["YesNo"]
               b["YesNo"] = { "prompt" => [], "correctAnswer" => b["YesNo"] }
             elsif b["TrueFalse"] == !!b["TrueFalse"]
               b["TrueFalse"] = { "prompt" => [], "correctAnswer" => b["TrueFalse"] }
-            elsif b["Code"]
-              if b["Code"]["initial"]
-                dirs, files = get_referenced_files([{ "file" => b["Code"]["initial"] }])
-                b["Code"]["initial"] = files[0][:contents]
-              end
             elsif b.key? "Text" && b["Text"].nil?
               b["Text"] = { "prompt" => [] }
             elsif b["CodeTag"]
@@ -76,8 +59,8 @@ class Exam < ApplicationRecord
                 throw "No reference for exam."
               end
             end
-            b.values.first["part"] = p
-            b.values.first["question"] = q
+            b['id'] = answer_count
+            answer_count += 1
           end
         end
       end
@@ -103,19 +86,7 @@ class Exam < ApplicationRecord
   end
 
   def get_exam_files
-    get_raw_files("all")
-  end
-
-  def get_referenced_files(refs)
-    @raw_files = []
-    refs&.each do |ref|
-      if ref["dir"]
-        @raw_files.push(*get_raw_files(ref["dir"]))
-      elsif ref["file"]
-        @raw_files.push(*get_raw_files(ref["file"]))
-      end
-    end
-    return clean_up(@raw_files)
+    clean_up(get_raw_files(""))
   end
 
   private
@@ -153,6 +124,7 @@ class Exam < ApplicationRecord
       item[:nodes] = item[:children].map { |n| with_extracted(n) }.compact
       item.delete(:children)
     end
+    item.delete(:full_path)
     item
   end
 
@@ -184,39 +156,55 @@ class Exam < ApplicationRecord
     self.upload.extracted_files(folder, true)
   end
 
+  def assign_ids(files)
+    @count = 0
+    def help(f)
+      f["id"] = @count
+      @count += 1
+      if f[:nodes]
+        f[:nodes].each { |n| help(n) }
+      end
+    end
+    files.map { |n| help(n) }
+  end
+
   def clean_up(raw_files)
-    def file_list(files, arr)
-      if files[:children]
-        files[:children].each { |n| file_list(n, arr) }
-      else
-        if File.basename(files[:full_path]) != ".DS_Store"
-          arr.push(files)
-        end
-      end
-      arr
-    end
-    @flat_files = raw_files.reduce([]) do |flat, raw| file_list(raw, flat) end
-    @flat_files.each do |sf|
-      if sf[:type] == "symlink" && !sf[:broken] && sf[:link_to].is_a?(String)
-        sf[:link_to] = @flat_files.find { |f| f[:full_path]&.ends_with?(sf[:link_to]) }
-      end
-    end
-
-    @count = @flat_files.count.to_s.length
-
-    @flat_files.each_with_index do |node, i|
-      node[:href] = "file_" + (i + 1).to_s.rjust(@count, '0')
-    end
-    @flat_files.each do |node|
-      if node[:link_to]
-        node[:link_href] = "file_" + node[:link_to][:href].to_s.rjust(@count, '0')
-      end
-    end
+    # def file_list(files, arr)
+    #   if files[:children]
+    #     files[:children].each { |n| file_list(n, arr) }
+    #   else
+    #     if File.basename(files[:full_path]) != ".DS_Store"
+    #       arr.push(files)
+    #     end
+    #   end
+    #   arr
+    # end
+    # @flat_files = raw_files.reduce([]) do |flat, raw| file_list(raw, flat) end
+    # @flat_files.each do |sf|
+    #   if sf[:type] == "symlink" && !sf[:broken] && sf[:link_to].is_a?(String)
+    #     sf[:link_to] = @flat_files.find { |f| f[:full_path]&.ends_with?(sf[:link_to]) }
+    #   end
+    # end
+    #
+    # @count = @flat_files.count.to_s.length
+    #
+    # @flat_files.each_with_index do |node, i|
+    #   node[:href] = "file_" + (i + 1).to_s.rjust(@count, '0')
+    # end
+    # @flat_files.each do |node|
+    #   if node[:link_to]
+    #     node[:link_href] = "file_" + node[:link_to][:href].to_s.rjust(@count, '0')
+    #   end
+    # end
 
     raw_files = raw_files.map do |f|
       with_extracted(f)
     end
 
-    return raw_files.compact, @flat_files.compact
+    raw_files = raw_files.compact
+    assign_ids(raw_files)
+
+    raw_files
   end
+
 end

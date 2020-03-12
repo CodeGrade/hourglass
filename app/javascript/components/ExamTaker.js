@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
+import Code from "./questions/Code";
+import { Editor } from "./ExamCodeBox";
+import { useExamState } from "./examstate";
 
 import TreeView from "@material-ui/lab/TreeView";
 
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import TreeItem from "@material-ui/lab/TreeItem";
-
-import { Controlled as CodeMirror } from "react-codemirror2";
 
 function reduceFilesDirs(files, f) {
   return files.reduce((acc, file) => {
@@ -48,14 +49,7 @@ function FileContents(props) {
   const { files, selectedFileID } = props;
   const m = idToFileMap(files);
   const contents = m[selectedFileID] || "Select a file to view.";
-  return (
-    <CodeMirror
-      value={contents}
-      options={{
-        lineNumbers: true
-      }}
-    />
-  );
+  return <Editor value={contents} readOnly />;
 }
 
 function FileTree(props) {
@@ -75,12 +69,27 @@ function FileTree(props) {
 
 function ExamTaker(props) {
   const { files } = props;
+  const [examStateByPath, dispatch] = useExamState();
   const [selectedID, setSelectedID] = useState(-1);
 
   return (
     <div>
       <FileTree files={files} onChangeFile={setSelectedID} />
       <FileContents files={files} selectedFileID={selectedID} />
+      <Code
+        defaultValue={"function a() {}"}
+        language={"javascript"}
+        onChange={(a, b, v) =>
+          dispatch({
+            type: "updateAnswer",
+            qnum: 0,
+            pnum: 0,
+            bnum: 0,
+            val: v
+          })
+        }
+        value={examStateByPath(0, 0, 0)}
+      />
     </div>
   );
 }

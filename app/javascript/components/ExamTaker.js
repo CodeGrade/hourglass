@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 
 import TreeView from "@material-ui/lab/TreeView";
 
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import TreeItem from "@material-ui/lab/TreeItem";
 
 import { Controlled as CodeMirror } from "react-codemirror2";
@@ -26,7 +28,7 @@ function Files(props) {
         const nodeId = String(id);
         return (
           <TreeItem label={text} key={nodeId} nodeId={nodeId}>
-            <Files files={nodes || []} />
+            {nodes ? <Files files={nodes} /> : null}
           </TreeItem>
         );
       })}
@@ -60,7 +62,12 @@ function FileTree(props) {
   const { files, onChangeFile } = props;
   const ids = reduceFilesDirs(files, f => String(f.id));
   return (
-    <TreeView expanded={ids} onNodeSelect={(e, [id]) => onChangeFile(id)}>
+    <TreeView
+      expanded={ids}
+      onNodeSelect={(e, [id]) => onChangeFile(id)}
+      defaultCollapseIcon={<ExpandMoreIcon />}
+      defaultExpandIcon={<ChevronRightIcon />}
+    >
       <Files files={files} />
     </TreeView>
   );

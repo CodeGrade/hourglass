@@ -1,8 +1,18 @@
 ---
-start: Exams
-Exams:
-  array: Exam
+start: Exam
 Exam:
+  object:
+    - key: "policies"
+      value: Policies
+      optional: true
+    - key: "versions"
+      value: Versions
+      minSize: 1
+Policies:
+  array: String
+Versions:
+  array: Version
+Version:
   object:
     - key: "instructions"
       value: HTML

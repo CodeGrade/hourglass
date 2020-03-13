@@ -21,6 +21,6 @@
 
 
 <%= react_component('ExamTaker', {
-    info: @exam.info,
+    info: @exam.info(false),
     files: @exam.get_exam_files
 }) %>

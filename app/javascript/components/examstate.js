@@ -35,7 +35,22 @@ const getAtPath = state => (qnum, pnum, bnum) => {
   return state?.[qnum]?.[pnum]?.[bnum];
 };
 
-export function useExamState() {
+//function initState(files, { questions }) {
+//  const ret = {};
+//  questions.forEach((q, qnum) => {
+//    ret[qnum] = {};
+//    q.parts.forEach((p, pnum) => {
+//      ret[qnum][pnum] = {};
+//      p.body.forEach((b, bnum) => {
+//        //if (b) is an object... else ....
+//        ret[qnum][pnum][bnum] = {};
+//      });
+//    });
+//  })
+//  return ret;
+//}
+
+export function useExamState(files, info) {
   const [examState, dispatch] = useReducer(reducer, {});
   return [getAtPath(examState), dispatch];
 }

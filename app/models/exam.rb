@@ -36,36 +36,113 @@ class Exam < ApplicationRecord
     @properties = YAML.load(File.read(exam_yaml))
   end
 
-  def info
-    return @info if @info
-    @info = properties["versions"][0]
+  def info(include_answers = true)
+    ret = properties["versions"][0]
     answer_count = 0
-    @info["questions"].each do |q|
+    ret["questions"].each do |q|
       q["parts"].each do |p|
-        p["body"].each do |b|
-          if b.is_a? Hash
-            if b["YesNo"] == !!b["YesNo"]
-              b["YesNo"] = { "prompt" => [], "correctAnswer" => b["YesNo"] }
-            elsif b["TrueFalse"] == !!b["TrueFalse"]
-              b["TrueFalse"] = { "prompt" => [], "correctAnswer" => b["TrueFalse"] }
-            elsif b.key? "Text" && b["Text"].nil?
-              b["Text"] = { "prompt" => [] }
-            elsif b["CodeTag"]
+        p["body"].each_with_index do |b, bnum|
+          if b.is_a? String
+            p["body"][bnum] = {
+              "type" => "HTML",
+              "value" => b
+            }
+          elsif b.is_a? Hash
+            if b.key? "AllThatApply"
+              p["body"][bnum] = {
+                "type" => "AllThatApply",
+                "prompt" => b["AllThatApply"]["prompt"]
+              }
+              if include_answers
+                p["body"][bnum]["options"] = b["AllThatApply"]["options"]
+              else
+                p["body"][bnum]["options"] = b["AllThatApply"]["options"].map(&:keys).flatten
+              end
+            elsif b.key? "Code"
+              p["body"][bnum] = {
+                "type" => "Code",
+                "prompt" => b["Code"]["prompt"],
+                "lang" => b["Code"]["lang"],
+                "initial" => b["Code"]["initial"]
+              }
+            elsif b.key? "CodeTag"
               if b["CodeTag"]["choices"] == "part" && p["reference"].nil?
                 throw "No reference for part."
               elsif b["CodeTag"]["choices"] == "question" && q["reference"].nil?
                 throw "No reference for question."
-              elsif b["CodeTag"]["choices"] == "all" && @info["reference"].nil?
+              elsif b["CodeTag"]["choices"] == "all" && ret["reference"].nil?
                 throw "No reference for exam."
               end
+              p["body"][bnum] = {
+                "type" => "CodeTag",
+                "choices" => b["CodeTag"]["choices"],
+              }
+              p["body"][bnum]["correctAnswer"] = b["CodeTag"]["correctAnswer"] if include_answers
+            elsif b.key? "Matching"
+              p["body"][bnum] = {
+                "type" => "Matching",
+                "prompt" => b["Matching"]["prompt"],
+                "values" => b["Matching"]["values"]
+              }
+              p["body"][bnum]["correctAnswers"] = b["Matching"]["correctAnswers"] if include_answers
+            elsif b.key? "MultipleChoice"
+              p["body"][bnum] = {
+                "type" => "MultipleChoice",
+                "prompt" => b["MultipleChoice"]["prompt"],
+                "options" => b["MultipleChoice"]["options"]
+              }
+              p["body"][bnum]["correctAnswer"] = b["MultipleChoice"]["correctAnswer"] if include_answers
+            elsif b.key? "Text"
+              if b["Text"].nil?
+                p["body"][bnum] = {
+                  "type" => "Text",
+                  "prompt" => []
+                }
+              else
+                p["body"][bnum] = {
+                  "type" => "Text",
+                  "prompt" => b["Text"]["prompt"]
+                }
+              end
+            elsif b.key? "TrueFalse"
+              p["body"][bnum] = {
+                "type" => "TrueFalse"
+              }
+              if b["TrueFalse"] == !!b["TrueFalse"]
+                p["body"][bnum]["prompt"] = []
+                p["body"][bnum]["correctAnswer"] = b["TrueFalse"] if include_answers
+              else
+                p["body"][bnum]["prompt"] = b["TrueFalse"]["prompt"]
+                p["body"][bnum]["correctAnswer"] = b["TrueFalse"]["correctAnswer"] if include_answers
+              end
+            elsif b.key? "YesNo"
+              p["body"][bnum] = {
+                "type" => "YesNo"
+              }
+              if b["YesNo"] == !!b["YesNo"]
+                p["body"][bnum]["prompt"] = []
+                p["body"][bnum]["correctAnswer"] = b["YesNo"] if include_answers
+              else
+                p["body"][bnum]["prompt"] = b["YesNo"]["prompt"]
+                p["body"][bnum]["correctAnswer"] = b["YesNo"]["correctAnswer"] if include_answers
+              end
+            else
+              throw "Bad question type."
             end
             b['id'] = answer_count
             answer_count += 1
+          else
+            throw "Bad body item."
           end
         end
       end
     end
-    return @info
+    return ret
+  end
+
+  def info_no_answers
+    ret = info.deep_dup
+
   end
 
   def generate_secret_key!

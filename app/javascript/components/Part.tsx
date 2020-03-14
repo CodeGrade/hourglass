@@ -4,7 +4,9 @@ import { AllThatApply } from "./questions/AllThatApply"
 import { TrueFalse } from "./questions/TrueFalse"
 import { YesNo } from "./questions/YesNo"
 import { HTML } from "./questions/HTML"
+import { MultipleChoice } from "./questions/MultipleChoice"
 import { Table } from 'react-bootstrap';
+import { isUndefined } from "util";
 
 export interface Part {
   name?: string;
@@ -42,10 +44,13 @@ export function Part(props: PartProps) {
               case "TrueFalse":
                 bodyItem = <TrueFalse {...(b as TrueFalse)} qnum={qnum} pnum={pnum} bnum={i}/>;
                 break;
-                case "YesNo":
-                  bodyItem = <YesNo {...(b as YesNo)} qnum={qnum} pnum={pnum} bnum={i}/>;
-                  break;
-                default:
+              case "YesNo":
+                bodyItem = <YesNo {...(b as YesNo)} qnum={qnum} pnum={pnum} bnum={i}/>;
+                break;
+              case "MultipleChoice":
+                bodyItem = <MultipleChoice {...(b as MultipleChoice)} qnum={qnum} pnum={pnum} bnum={i}/>;
+                break;
+              default:
                 bodyItem = <p key={i}>Something more complicated.</p>;
                 break;
             }

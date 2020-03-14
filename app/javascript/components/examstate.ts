@@ -71,7 +71,7 @@ const getAtPath = (state) => (...path) => {
 };
 
 export function useExamState(files, info) {
-  const [examState, dispatch] = useReducer(reducer, {1: {2: {0: false}}});
+  const [examState, dispatch] = useReducer(reducer, {});
   return [getAtPath(examState), dispatch];
 }
 

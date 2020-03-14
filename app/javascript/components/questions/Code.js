@@ -7,7 +7,7 @@ function Code(props) {
   let theRest = null;
   if (readOnly) {
     if (/\S/.test(defaultValue)) {
-      theRest = <Renderer value={defaultValue} language={language} />;
+      theRest = <Renderer className="border" value={defaultValue} language={language} />;
     } else {
       theRest = <i>No answer given.</i>;
     }
@@ -34,7 +34,7 @@ function Code(props) {
   <div><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>
 <% if readonly %>
   <% if answer&.dig('code').blank? %>
-    <b>Answer:</b>
+    <b>Answer: </b>
     <i>No answer given</i>
   <% else %>
       <%= content_tag(:pre, answer&.dig('code'), class: "sourceCodeDisplay border", data: {lang: item["lang"], readonly: true}, name: "#{unique_label}[code]") %>

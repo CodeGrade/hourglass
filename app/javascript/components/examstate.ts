@@ -1,4 +1,14 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useContext } from "react";
+
+export interface BodyItem {
+  type: string;
+}
+
+export interface BodyItemProps {
+  qnum: number;
+  pnum: number;
+  bnum: number;
+}
 
 /*
 state:
@@ -19,19 +29,19 @@ action:
 }
 */
 
-interface Action {
+export interface Action {
   type: string,
   path: Array<number | string>,
   val: any
 }
 
-function reducer(state, action : Action) {
+function reducer(state, action: Action) {
   switch (action.type) {
     case "updateAnswer":
       const ret = { ...state };
       let cur = ret;
       for (let i = 0; i < action.path.length - 1; i++) {
-        cur[action.path[i]] = { ... cur[action.path[i]] };
+        cur[action.path[i]] = { ...cur[action.path[i]] };
         cur = cur[action.path[i]];
       }
       cur[action.path[action.path.length - 1]] = action.val;
@@ -54,3 +64,9 @@ export function useExamState(files, info) {
   const [examState, dispatch] = useReducer(reducer, {});
   return [getAtPath(examState), dispatch];
 }
+
+export const ExamContext = React.createContext({
+  dispatch: undefined,
+  examStateByPath: undefined,
+});
+export const useExamContext = () => useContext(ExamContext);

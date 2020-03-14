@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { useExamState, BodyItem, BodyItemProps, ExamContext, FileDir } from "./examstate";
+import { Code } from "./questions/Code";
 import { AllThatApply } from "./questions/AllThatApply"
 import { TrueFalse } from "./questions/TrueFalse"
 import { YesNo } from "./questions/YesNo"
@@ -38,16 +39,19 @@ export function Part(props: PartProps) {
                 className = "no-hover";
                 bodyItem = <HTML value={(b as HTML).value}/>;
                 break;
+              case 'Code':
+                bodyItem = <Code {...(b as Code)} qnum={qnum} pnum={pnum} bnum={i} />;
+                break;
               case 'AllThatApply':
                 bodyItem = <AllThatApply {...(b as AllThatApply)} qnum={qnum} pnum={pnum} bnum={i}/>;
                 break;
-              case "TrueFalse":
+              case 'TrueFalse':
                 bodyItem = <TrueFalse {...(b as TrueFalse)} qnum={qnum} pnum={pnum} bnum={i}/>;
                 break;
-              case "YesNo":
+              case 'YesNo':
                 bodyItem = <YesNo {...(b as YesNo)} qnum={qnum} pnum={pnum} bnum={i}/>;
                 break;
-              case "MultipleChoice":
+              case 'MultipleChoice':
                 bodyItem = <MultipleChoice {...(b as MultipleChoice)} qnum={qnum} pnum={pnum} bnum={i}/>;
                 break;
               default:

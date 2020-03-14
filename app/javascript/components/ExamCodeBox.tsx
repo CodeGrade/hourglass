@@ -10,9 +10,10 @@ import "codemirror/theme/mdn-like";
 
 import Highlighter from "react-codemirror-runmode";
 
-interface EditorProps extends IControlledCodeMirror {
-  readOnly: boolean;
-  marksDependencies: Array<any>;
+export interface EditorProps extends IControlledCodeMirror {
+  readOnly?: boolean;
+  language?: string;
+  marksDependencies?: Array<any>;
 }
 
 function extractMarks(text) {

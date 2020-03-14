@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
-import Code from "./questions/Code";
 import { Editor } from "./ExamCodeBox";
 import { useExamState, BodyItem, BodyItemProps, ExamContext, FileDir } from "./examstate";
 import { Question } from "./Question"
@@ -84,12 +83,6 @@ function idToFileMap(files) {
 
 // interface HTMLProps extends  {
 
-// }
-
-// interface CodeProps extends AnswerItem<string> {
-//   starterContents?: string;
-//   language: string;
-//   prompt: string;
 // }
 
 

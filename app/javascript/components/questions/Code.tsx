@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { Editor, Renderer } from "../ExamCodeBox";
+import { useExamContext, BodyItem, BodyItemProps } from "../examstate";
 
-function Code(props) {
+
+export interface CodeProps extends BodyItemProps {
+  starterContents?: string;
+  language: string;
+  prompt: string;
+}
+
+export function Code(props) {
   const { readOnly, prompt, defaultValue, language, onChange, value } = props;
 
   let theRest = null;
@@ -47,5 +55,3 @@ function Code(props) {
 </div>
 */
 }
-
-export default Code;

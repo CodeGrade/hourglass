@@ -26,7 +26,7 @@ export function Question(props: QuestionProps) {
           <ul className="pagination">
             {parts.map((p, i) => {
               return (
-                <li className="page-item part-page-item" id={`nav-q${qnum + 1}p${i + 1}`}>
+                <li key={i} className="page-item part-page-item" id={`nav-q${qnum + 1}p${i + 1}`}>
                   <a href="#" className="page-link question-link">
                     {qnum + 1}-{i + 1}
                   </a>

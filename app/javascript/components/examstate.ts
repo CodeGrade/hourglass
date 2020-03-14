@@ -10,6 +10,16 @@ export interface BodyItemProps {
   bnum: number;
 }
 
+export interface FileDir { }
+
+export interface File extends FileDir {
+  file: string; // Full path
+}
+
+export interface Dir extends FileDir {
+  dir: string; // Full path
+}
+
 /*
 state:
 {
@@ -61,7 +71,7 @@ const getAtPath = (state) => (...path) => {
 };
 
 export function useExamState(files, info) {
-  const [examState, dispatch] = useReducer(reducer, {});
+  const [examState, dispatch] = useReducer(reducer, {1: {2: {0: false}}});
   return [getAtPath(examState), dispatch];
 }
 

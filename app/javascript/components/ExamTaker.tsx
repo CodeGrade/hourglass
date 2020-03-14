@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import Code from "./questions/Code";
 import { Editor } from "./ExamCodeBox";
-import { AllThatApply } from "./questions/AllThatApply"
-import { useExamState, BodyItem, BodyItemProps, ExamContext } from "./examstate";
+import { useExamState, BodyItem, BodyItemProps, ExamContext, FileDir } from "./examstate";
+import { Question } from "./Question"
 import { Form } from 'react-bootstrap';
 
 import TreeView from "@material-ui/lab/TreeView";
@@ -10,6 +10,7 @@ import TreeView from "@material-ui/lab/TreeView";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import TreeItem from "@material-ui/lab/TreeItem";
+import { HTML } from "./questions/HTML";
 
 function reduceFilesDirs(files, f) {
   return files.reduce((acc, file) => {
@@ -80,13 +81,6 @@ function idToFileMap(files) {
 //  );
 //}
 
-interface HTML extends BodyItem {
-  value: string;
-}
-
-interface HTMLProps {
-  value: string;
-}
 
 // interface HTMLProps extends  {
 
@@ -98,81 +92,9 @@ interface HTMLProps {
 //   prompt: string;
 // }
 
-function HTML(props: HTMLProps) {
-  return (
-    <div dangerouslySetInnerHTML={{ __html: props.value }}></div>
-  )
-}
-
-interface Part {
-  name?: string;
-  description: string;
-  points: number;
-  reference?: Array<FileDir>;
-  body: Array<BodyItem>;
-}
-
-interface PartProps extends Part {
-  qnum: number;
-  pnum: number;
-}
-
-interface FileDir { }
-
-interface File extends FileDir {
-  file: string; // Full path
-}
-
-interface Dir extends FileDir {
-  dir: string; // Full path
-}
-
-interface Question {
-  name?: string;
-  description: string;
-  separateSubparts: boolean;
-  parts: Array<Part>;
-  reference?: Array<FileDir>;
-}
-
-interface QuestionProps extends Question {
-  qnum: number;
-}
 
 
 
-
-function Part(props: PartProps) {
-  const { qnum, pnum, body } = props;
-  return (
-    <div>
-      <h2>Part {pnum + 1}</h2>
-      {body.map((b, i) => {
-        switch (b.type) {
-          case 'HTML':
-            return <HTML value={(b as HTML).value} key={i} />
-          case 'AllThatApply':
-            return <AllThatApply {...(b as AllThatApply)} qnum={qnum} pnum={pnum} bnum={i} key={i} />
-          default:
-            return <p key={i}>Something more complicated.</p>
-
-        }
-      })}
-    </div>
-  )
-}
-
-function Question(props: QuestionProps) {
-  const { qnum, parts } = props;
-  return (
-    <div>
-      <h1>Question {qnum + 1}</h1>
-      {parts.map((p, i) => (
-        <Part {...p} pnum={i} qnum={qnum} key={i} />
-      ))}
-    </div>
-  );
-}
 
 interface Exam {
   questions: Array<Question>;
@@ -187,10 +109,8 @@ interface ExamTakerProps {
 
 function ExamTaker(props: ExamTakerProps) {
   const { files, info } = props;
-  const { questions } = info;
+  const { questions, instructions } = info;
   const [examStateByPath, dispatch] = useExamState(files, info);
-  console.log('esbp', examStateByPath);
-  console.log('dispatch', dispatch);
 
   /* For each bodyitem
    * If it is a string: render a <textitem/>
@@ -201,6 +121,8 @@ function ExamTaker(props: ExamTakerProps) {
 
   return (
     <ExamContext.Provider value={{ dispatch, examStateByPath }}>
+      <div><HTML value={instructions} /></div>
+      {/* TODO: show files */}
       <div>
         {questions.map((q, i) => (
           <Question {...q} qnum={i} key={i} />

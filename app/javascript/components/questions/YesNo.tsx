@@ -4,13 +4,15 @@ import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 
 export interface YesNoProps {
   yesno: YesNo;
+  yes?: string;
+  no?: string;
   qnum: number;
   pnum: number;
   bnum: number;
 }
 
 export function YesNo(props: YesNoProps) {
-  const { yesno, qnum, pnum, bnum } = props;
+  const { yesno, qnum, pnum, bnum, yes, no } = props;
   const { prompt } = yesno;
   const { dispatch, getAtPath } = useExamContext();
   const value = getAtPath(qnum, pnum, bnum);
@@ -39,8 +41,8 @@ export function YesNo(props: YesNoProps) {
   const body =
     <React.Fragment>
       <ToggleButtonGroup type="radio" name={`tf-${qnum}-${pnum}-${bnum}`} value={value} onChange={handler}>
-        <ToggleButton variant="outline-primary" value={true}>Yes</ToggleButton>
-        <ToggleButton variant="outline-primary" value={false}>No</ToggleButton>
+        <ToggleButton variant="outline-primary" value={true}>{yes || "Yes"}</ToggleButton>
+        <ToggleButton variant="outline-primary" value={false}>{no || "No"}</ToggleButton>
       </ToggleButtonGroup>
     </React.Fragment>;
   return (

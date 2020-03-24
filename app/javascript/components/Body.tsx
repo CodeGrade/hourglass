@@ -3,6 +3,7 @@ import { HTML } from "./questions/HTML"
 import { Code } from "./questions/Code";
 import { YesNo } from "./questions/YesNo";
 import { CodeTag } from "./questions/CodeTag";
+import { MultipleChoice } from "./questions/MultipleChoice";
 import { AllThatApply } from "./questions/AllThatApply";
 
 export interface BodyProps {
@@ -23,15 +24,13 @@ export function Body(props: BodyProps) {
       return <AllThatApply ata={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'CodeTag':
       return <CodeTag codetag={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
-    // case 'TrueFalse':
-    //   bodyItem = <TrueFalse {...(b as TrueFalse)} qnum={qnum} pnum={pnum} bnum={i}/>;
-    //   break;
+    case 'TrueFalse':
+      return <YesNo yesno={body} qnum={qnum} pnum={pnum} bnum={bnum} yes="True" no="False "/>;
     case 'YesNo':
       return <YesNo yesno={body} qnum={qnum} pnum={pnum} bnum={bnum}/>;
-    // case 'MultipleChoice':
-    //   bodyItem = <MultipleChoice {...(b as MultipleChoice)} qnum={qnum} pnum={pnum} bnum={i}/>;
-    //   break;
+     case 'MultipleChoice':
+      return <MultipleChoice mc={body} qnum={qnum} pnum={pnum} bnum={bnum}/>;
     default:
-      return <p>TODO: {body.type}</p>;
+      return <p>TODO: {(body as any).type}</p>
   }
 }

@@ -14,12 +14,7 @@ interface AllThatApply {
 }
 
 interface YesNo {
-  type: "YesNo";
-  prompt: Array<string>;
-}
-
-interface TrueFalse {
-  type: "TrueFalse";
+  type: "YesNo" | "TrueFalse";
   prompt: Array<string>;
 }
 
@@ -29,11 +24,14 @@ interface CodeTag {
 }
 
 interface MultipleChoice {
+  type: "MultipleChoice";
   prompt: Array<string>; // (html)
   options: Array<string>; // (html)
 }
 
-type BodyItem = HTML | AllThatApply | Code | YesNo | TrueFalse | CodeTag;// | Matching | MultipleChoice | Text | TrueFalse;
+type BodyItem = HTML | AllThatApply | Code | YesNo | CodeTag | MultipleChoice;
+// TODO: implement below types
+// | Matching | Text | TrueFalse;
 
 type HTML = {
   type: "HTML";

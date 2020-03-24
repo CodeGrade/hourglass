@@ -3,6 +3,7 @@ import { HTML } from "./questions/HTML"
 import { Code } from "./questions/Code";
 import { YesNo } from "./questions/YesNo";
 import { CodeTag } from "./questions/CodeTag";
+import { Text } from "./questions/Text";
 import { MultipleChoice } from "./questions/MultipleChoice";
 import { AllThatApply } from "./questions/AllThatApply";
 
@@ -28,8 +29,10 @@ export function Body(props: BodyProps) {
       return <YesNo yesno={body} qnum={qnum} pnum={pnum} bnum={bnum} yes="True" no="False "/>;
     case 'YesNo':
       return <YesNo yesno={body} qnum={qnum} pnum={pnum} bnum={bnum}/>;
-     case 'MultipleChoice':
+    case 'MultipleChoice':
       return <MultipleChoice mc={body} qnum={qnum} pnum={pnum} bnum={bnum}/>;
+    case 'Text':
+      return <Text text={body} qnum={qnum} pnum={pnum} bnum={bnum}/>;
     default:
       return <p>TODO: {(body as any).type}</p>
   }

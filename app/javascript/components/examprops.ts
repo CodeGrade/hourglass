@@ -29,9 +29,14 @@ interface MultipleChoice {
   options: Array<string>; // (html)
 }
 
-type BodyItem = HTML | AllThatApply | Code | YesNo | CodeTag | MultipleChoice;
+interface Text {
+  type: "Text";
+  prompt: Array<string>; // (html)
+}
+
+type BodyItem = HTML | AllThatApply | Code | YesNo | CodeTag | MultipleChoice | Text;
 // TODO: implement below types
-// | Matching | Text | TrueFalse;
+// | Matching | TrueFalse;
 
 type HTML = {
   type: "HTML";

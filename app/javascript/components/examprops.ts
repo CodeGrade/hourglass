@@ -13,7 +13,12 @@ interface AllThatApply {
   prompt: Array<string>;
 }
 
-type BodyItem = HTML | AllThatApply | Code; //| CodeTag | Matching | MultipleChoice | Text | TrueFalse | YesNo;
+interface YesNo {
+  type: "YesNo";
+  prompt: Array<string>;
+}
+
+type BodyItem = HTML | AllThatApply | Code | YesNo; //| CodeTag | Matching | MultipleChoice | Text | TrueFalse;
 
 type HTML = {
   type: "HTML";

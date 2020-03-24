@@ -1,6 +1,7 @@
 import React from 'react';
 import { HTML } from "./questions/HTML"
 import { Code } from "./questions/Code";
+import { YesNo } from "./questions/YesNo";
 import { AllThatApply } from "./questions/AllThatApply";
 
 export interface BodyProps {
@@ -22,9 +23,8 @@ export function Body(props: BodyProps) {
     // case 'TrueFalse':
     //   bodyItem = <TrueFalse {...(b as TrueFalse)} qnum={qnum} pnum={pnum} bnum={i}/>;
     //   break;
-    // case 'YesNo':
-    //   bodyItem = <YesNo {...(b as YesNo)} qnum={qnum} pnum={pnum} bnum={i}/>;
-    //   break;
+     case 'YesNo':
+       return <YesNo yesno={body} qnum={qnum} pnum={pnum} bnum={bnum}/>;
     // case 'MultipleChoice':
     //   bodyItem = <MultipleChoice {...(b as MultipleChoice)} qnum={qnum} pnum={pnum} bnum={i}/>;
     //   break;

@@ -1,25 +1,5 @@
 import React, { useReducer, useContext } from "react";
 
-export interface BodyItem {
-  type: string;
-}
-
-export interface BodyItemProps {
-  qnum: number;
-  pnum: number;
-  bnum: number;
-}
-
-export interface FileDir { }
-
-export interface File extends FileDir {
-  file: string; // Full path
-}
-
-export interface Dir extends FileDir {
-  dir: string; // Full path
-}
-
 /*
 state:
 {
@@ -30,22 +10,26 @@ state:
         }
     }
 }
-
-action:
-{
-    type: "updateAnswer",
-    path: [0, 1, 3],
-    val: "new value",
-}
 */
 
-export interface Action {
-  type: string,
-  path: Array<number | string>,
-  val: any
+interface ExamState {
+  [qnum: number]: {
+    [pnum: number]: {
+      [bnum: number]: any;
+    }
+  }
 }
 
-function reducer(state, action: Action) {
+type StatePath = Array<number | string>;
+
+interface UpdateAnswerAction {
+  type: "updateAnswer",
+  path: StatePath;
+  val: any
+}
+type Action = UpdateAnswerAction;
+
+function reducer(state: ExamState, action: Action) {
   switch (action.type) {
     case "updateAnswer":
       const ret = { ...state };
@@ -62,7 +46,7 @@ function reducer(state, action: Action) {
   }
 }
 
-const getAtPath = (state) => (...path) => {
+const getAtPath = (state: ExamState) => (...path: StatePath) => {
   let ret = state;
   for (const elem of path) {
     ret = ret?.[elem];
@@ -70,13 +54,40 @@ const getAtPath = (state) => (...path) => {
   return ret;
 };
 
-export function useExamState(files, info) {
-  const [examState, dispatch] = useReducer(reducer, {});
-  return [getAtPath(examState), dispatch];
+function initState(files: Files, info: Exam): ExamState {
+  const ret = {};
+  info.questions.forEach((q, qi) => {
+    ret[qi] = {};
+    q.parts.forEach((p, pi) => {
+      ret[qi][pi] = {};
+      p.body.forEach((b, bi) => {
+        switch (b.type) {
+          case 'Code':
+            ret[qi][pi][bi] = b.initial; // TODO: get contents
+            break;
+          default:
+            break;
+        }
+      });
+    })
+  });
+  return ret;
 }
 
-export const ExamContext = React.createContext({
-  dispatch: undefined,
-  examStateByPath: undefined,
-});
-export const useExamContext = () => useContext(ExamContext);
+interface ExamContext {
+  getAtPath: (...path: StatePath) => any;
+  dispatch: (action: Action) => void;
+}
+
+export function useExamState(files: Files, info: Exam): ExamContext {
+  const [examState, dispatch] = useReducer(reducer, initState(files, info));
+  return {
+    getAtPath: getAtPath(examState),
+    dispatch,
+  };
+}
+
+const ctx = React.createContext<Partial<ExamContext>>({});
+ctx.displayName = "ExamContext";
+export const useExamContext = () => useContext(ctx);
+export const ExamContextProvider = ctx.Provider;

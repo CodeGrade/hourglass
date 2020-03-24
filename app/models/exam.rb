@@ -28,7 +28,7 @@ class Exam < ApplicationRecord
   end
 
   def policies
-    properties["policies"]
+    properties['policies']
   end
 
   def properties
@@ -37,112 +37,108 @@ class Exam < ApplicationRecord
   end
 
   def info(include_answers = true)
-    ret = properties["versions"][0]
+    ret = properties['versions'][0].deep_dup
     answer_count = 0
-    ret["questions"].each do |q|
-      q["parts"].each do |p|
-        p["body"].each_with_index do |b, bnum|
+    ret['questions'].each do |q|
+      q['parts'].each do |p|
+        p['body'].each_with_index do |b, bnum|
           if b.is_a? String
-            p["body"][bnum] = {
-              "type" => "HTML",
-              "value" => b
+            p['body'][bnum] = {
+              'type' => 'HTML',
+              'value' => b
             }
           elsif b.is_a? Hash
-            if b.key? "AllThatApply"
-              p["body"][bnum] = {
-                "type" => "AllThatApply",
-                "prompt" => b["AllThatApply"]["prompt"]
+            if b.key? 'AllThatApply'
+              p['body'][bnum] = {
+                'type' => 'AllThatApply',
+                'prompt' => b['AllThatApply']['prompt']
               }
               if include_answers
-                p["body"][bnum]["options"] = b["AllThatApply"]["options"]
+                p['body'][bnum]['options'] = b['AllThatApply']['options']
               else
-                p["body"][bnum]["options"] = b["AllThatApply"]["options"].map(&:keys).flatten
+                p['body'][bnum]['options'] = b['AllThatApply']['options'].map(&:keys).flatten
               end
-            elsif b.key? "Code"
-              p["body"][bnum] = {
-                "type" => "Code",
-                "prompt" => b["Code"]["prompt"],
-                "lang" => b["Code"]["lang"],
-                "initial" => b["Code"]["initial"]
+            elsif b.key? 'Code'
+              p['body'][bnum] = {
+                'type' => 'Code',
+                'prompt' => b['Code']['prompt'],
+                'lang' => b['Code']['lang'],
+                'initial' => b['Code']['initial']
               }
-            elsif b.key? "CodeTag"
-              if b["CodeTag"]["choices"] == "part" && p["reference"].nil?
-                throw "No reference for part."
-              elsif b["CodeTag"]["choices"] == "question" && q["reference"].nil?
-                throw "No reference for question."
-              elsif b["CodeTag"]["choices"] == "all" && ret["reference"].nil?
-                throw "No reference for exam."
+            elsif b.key? 'CodeTag'
+              if b['CodeTag']['choices'] == 'part' && p['reference'].nil?
+                throw 'No reference for part.'
+              elsif b['CodeTag']['choices'] == 'question' && q['reference'].nil?
+                throw 'No reference for question.'
+              elsif b['CodeTag']['choices'] == 'all' && ret['reference'].nil?
+                throw 'No reference for exam.'
               end
-              p["body"][bnum] = {
-                "type" => "CodeTag",
-                "choices" => b["CodeTag"]["choices"],
+              p['body'][bnum] = {
+                'type' => 'CodeTag',
+                'choices' => b['CodeTag']['choices'],
               }
-              p["body"][bnum]["correctAnswer"] = b["CodeTag"]["correctAnswer"] if include_answers
-            elsif b.key? "Matching"
-              p["body"][bnum] = {
-                "type" => "Matching",
-                "prompt" => b["Matching"]["prompt"],
-                "values" => b["Matching"]["values"]
+              p['body'][bnum]['correctAnswer'] = b['CodeTag']['correctAnswer'] if include_answers
+            elsif b.key? 'Matching'
+              p['body'][bnum] = {
+                'type' => 'Matching',
+                'prompt' => b['Matching']['prompt'],
+                'values' => b['Matching']['values']
               }
-              p["body"][bnum]["correctAnswers"] = b["Matching"]["correctAnswers"] if include_answers
-            elsif b.key? "MultipleChoice"
-              p["body"][bnum] = {
-                "type" => "MultipleChoice",
-                "prompt" => b["MultipleChoice"]["prompt"],
-                "options" => b["MultipleChoice"]["options"]
+              p['body'][bnum]['correctAnswers'] = b['Matching']['correctAnswers'] if include_answers
+            elsif b.key? 'MultipleChoice'
+              p['body'][bnum] = {
+                'type' => 'MultipleChoice',
+                'prompt' => b['MultipleChoice']['prompt'],
+                'options' => b['MultipleChoice']['options']
               }
-              p["body"][bnum]["correctAnswer"] = b["MultipleChoice"]["correctAnswer"] if include_answers
-            elsif b.key? "Text"
-              if b["Text"].nil?
-                p["body"][bnum] = {
-                  "type" => "Text",
-                  "prompt" => []
+              p['body'][bnum]['correctAnswer'] = b['MultipleChoice']['correctAnswer'] if include_answers
+            elsif b.key? 'Text'
+              if b['Text'].nil?
+                p['body'][bnum] = {
+                  'type' => 'Text',
+                  'prompt' => []
                 }
               else
-                p["body"][bnum] = {
-                  "type" => "Text",
-                  "prompt" => b["Text"]["prompt"]
+                p['body'][bnum] = {
+                  'type' => 'Text',
+                  'prompt' => b['Text']['prompt']
                 }
               end
-            elsif b.key? "TrueFalse"
-              p["body"][bnum] = {
-                "type" => "TrueFalse"
+            elsif b.key? 'TrueFalse'
+              p['body'][bnum] = {
+                'type' => 'TrueFalse'
               }
-              if b["TrueFalse"] == !!b["TrueFalse"]
-                p["body"][bnum]["prompt"] = []
-                p["body"][bnum]["correctAnswer"] = b["TrueFalse"] if include_answers
+              if b['TrueFalse'] == !!b['TrueFalse']
+                p['body'][bnum]['prompt'] = []
+                p['body'][bnum]['correctAnswer'] = b['TrueFalse'] if include_answers
               else
-                p["body"][bnum]["prompt"] = b["TrueFalse"]["prompt"]
-                p["body"][bnum]["correctAnswer"] = b["TrueFalse"]["correctAnswer"] if include_answers
+                p['body'][bnum]['prompt'] = b['TrueFalse']['prompt']
+                p['body'][bnum]['correctAnswer'] = b['TrueFalse']['correctAnswer'] if include_answers
               end
-            elsif b.key? "YesNo"
-              p["body"][bnum] = {
-                "type" => "YesNo"
+            elsif b.key? 'YesNo'
+              p['body'][bnum] = {
+                'type' => 'YesNo'
               }
-              if b["YesNo"] == !!b["YesNo"]
-                p["body"][bnum]["prompt"] = []
-                p["body"][bnum]["correctAnswer"] = b["YesNo"] if include_answers
+              if b['YesNo'] == !!b['YesNo']
+                p['body'][bnum]['prompt'] = []
+                p['body'][bnum]['correctAnswer'] = b['YesNo'] if include_answers
               else
-                p["body"][bnum]["prompt"] = b["YesNo"]["prompt"]
-                p["body"][bnum]["correctAnswer"] = b["YesNo"]["correctAnswer"] if include_answers
+                p['body'][bnum]['prompt'] = b['YesNo']['prompt']
+                p['body'][bnum]['correctAnswer'] = b['YesNo']['correctAnswer'] if include_answers
               end
             else
-              throw "Bad question type."
+              p b
+              throw 'Bad question type.'
             end
             b['id'] = answer_count
             answer_count += 1
           else
-            throw "Bad body item."
+            throw 'Bad body item.'
           end
         end
       end
     end
-    return ret
-  end
-
-  def info_no_answers
-    ret = info.deep_dup
-
+    ret
   end
 
   def generate_secret_key!

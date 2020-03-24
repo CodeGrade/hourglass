@@ -11,7 +11,8 @@
         }
     },
     "rules": {
-        "semi": "error"
+        "semi": "error",
+        "indent": ["error", 2]
     },
     "extends": "eslint:recommended"
 }

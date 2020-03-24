@@ -1,38 +1,47 @@
 import React, { useState } from "react";
 import { Editor, Renderer } from "../ExamCodeBox";
-import { useExamContext, BodyItem, BodyItemProps } from "../examstate";
+import { useExamContext } from "../examstate";
+import { HTML } from "./HTML";
 
-
-export interface CodeProps extends BodyItemProps {
-  starterContents?: string;
-  language: string;
-  prompt: string;
+interface CodeProps {
+  code: Code;
+  qnum: number;
+  pnum: number;
+  bnum: number;
 }
 
-export function Code(props) {
-  const { readOnly, prompt, defaultValue, language, onChange, value } = props;
-
-  let theRest = null;
-  if (readOnly) {
-    if (/\S/.test(defaultValue)) {
-      theRest = <Renderer className="border" value={defaultValue} language={language} />;
-    } else {
-      theRest = <i>No answer given.</i>;
-    }
-  } else {
-    theRest = (
-      <Editor
-        value={value || defaultValue}
-        language={language}
-        onBeforeChange={onChange}
-      />
-    );
-  }
+export function Code(props: CodeProps) {
+  const { code, qnum, pnum, bnum } = props;
+  const { prompt, lang } = code;
+  const { dispatch, getAtPath } = useExamContext();
+  const value = getAtPath(qnum, pnum, bnum);
+  //let theRest = null;
+  //if (readOnly) {
+  //  if (/\S/.test(initial)) {
+  //    theRest = <Renderer className="border" value={initial} language={lang} />;
+  //  } else {
+  //    theRest = <i>No answer given.</i>;
+  //  }
+  //} else {
+  const onChange = (cm, state, newVal) => dispatch({
+    type: "updateAnswer",
+    path: [qnum, pnum, bnum],
+    val: newVal,
+  });
+  const editor = (
+    <Editor
+      value={value}
+      language={lang}
+      onBeforeChange={onChange}
+    />
+  );
 
   return (
     <div>
-      <div>{prompt}</div>
-      {theRest}
+      <div>
+        {prompt.map((p, i) => <HTML key={i} value={p}/>)}
+      </div>
+      {editor}
     </div>
   );
   /*

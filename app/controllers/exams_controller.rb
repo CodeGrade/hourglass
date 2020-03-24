@@ -57,13 +57,17 @@ class ExamsController < ApplicationController
     #   so that users cannot just visit /exams/1/contents
     @answers = @registration.get_current_answers
     @preview = false
-    render layout: false
+
+    # render layout: false
+    render json: {TODO: "this"}
   end
 
   def preview
     @answers = {}
     @preview = true
-    render 'contents'
+
+    # render 'contents'
+    render json: {TODO: "this"}
   end
 
   def index

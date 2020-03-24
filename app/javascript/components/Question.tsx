@@ -1,22 +1,15 @@
 import React from "react";
-import { FileDir } from "./examstate";
 import { Part } from "./Part"
 import { HTML } from "./questions/HTML";
 
-export interface Question {
-  name?: string;
-  description: string;
-  separateSubparts: boolean;
-  parts: Array<Part>;
-  reference?: Array<FileDir>;
-}
-
-export interface QuestionProps extends Question {
+export interface QuestionProps {
+  question: Question;
   qnum: number;
 }
 
 export function Question(props: QuestionProps) {
-  const { name, description, separateSubparts, qnum, parts } = props;
+  const { question, qnum } = props;
+  const { name, description, separateSubparts, parts } = question;
   let jumpToPart = null;
   if (separateSubparts) {
     jumpToPart =
@@ -43,7 +36,7 @@ export function Question(props: QuestionProps) {
       {/* TODO: show files */}
       {jumpToPart}
       {parts.map((p, i) => (
-        <Part {...p} pnum={i} qnum={qnum} key={i} />
+        <Part part={p} pnum={i} qnum={qnum} key={i} />
       ))}
     </div>
   );

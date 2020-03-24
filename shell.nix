@@ -45,6 +45,7 @@ in mkShell {
   buildInputs = [
     nodePackages.bower # needed for bootstrap-treeview
     ruby.devEnv
+    bundler
     postgresql
     qt4
     curl.dev

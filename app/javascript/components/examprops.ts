@@ -34,9 +34,13 @@ interface Text {
   prompt: Array<string>; // (html)
 }
 
-type BodyItem = HTML | AllThatApply | Code | YesNo | CodeTag | MultipleChoice | Text;
-// TODO: implement below types
-// | Matching | TrueFalse;
+interface Matching {
+  type: "Matching";
+  prompt: Array<string>; // (html)
+  values: Array<string>;
+}
+
+type BodyItem = HTML | AllThatApply | Code | YesNo | CodeTag | MultipleChoice | Text | Matching;
 
 type HTML = {
   type: "HTML";

@@ -1,14 +1,7 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
-import { useExamState } from "./examstate";
-import { Code } from "./questions/Code";
-import { AllThatApply } from "./questions/AllThatApply"
-import { TrueFalse } from "./questions/TrueFalse"
-import { YesNo } from "./questions/YesNo"
-import { HTML } from "./questions/HTML"
-import { MultipleChoice } from "./questions/MultipleChoice"
+import React from "react";
 import { Table } from 'react-bootstrap';
-import { isUndefined } from "util";
 import { Body } from "./Body";
+import { HTML } from "./questions/HTML";
 
 interface PartProps {
   part: Part;

@@ -2,6 +2,7 @@ import React from 'react';
 import { HTML } from "./questions/HTML"
 import { Code } from "./questions/Code";
 import { YesNo } from "./questions/YesNo";
+import { CodeTag } from "./questions/CodeTag";
 import { AllThatApply } from "./questions/AllThatApply";
 
 export interface BodyProps {
@@ -20,15 +21,17 @@ export function Body(props: BodyProps) {
       return <Code code={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'AllThatApply':
       return <AllThatApply ata={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    case 'CodeTag':
+      return <CodeTag codetag={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'TrueFalse':
     //   bodyItem = <TrueFalse {...(b as TrueFalse)} qnum={qnum} pnum={pnum} bnum={i}/>;
     //   break;
-     case 'YesNo':
-       return <YesNo yesno={body} qnum={qnum} pnum={pnum} bnum={bnum}/>;
+    case 'YesNo':
+      return <YesNo yesno={body} qnum={qnum} pnum={pnum} bnum={bnum}/>;
     // case 'MultipleChoice':
     //   bodyItem = <MultipleChoice {...(b as MultipleChoice)} qnum={qnum} pnum={pnum} bnum={i}/>;
     //   break;
     default:
-      return <p>Something more complicated.</p>;
+      return <p>TODO: {body.type}</p>;
   }
 }

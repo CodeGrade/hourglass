@@ -18,7 +18,22 @@ interface YesNo {
   prompt: Array<string>;
 }
 
-type BodyItem = HTML | AllThatApply | Code | YesNo; //| CodeTag | Matching | MultipleChoice | Text | TrueFalse;
+interface TrueFalse {
+  type: "TrueFalse";
+  prompt: Array<string>;
+}
+
+interface CodeTag {
+  type: "CodeTag";
+  choices: "all" | "part" | "question";
+}
+
+interface MultipleChoice {
+  prompt: Array<string>; // (html)
+  options: Array<string>; // (html)
+}
+
+type BodyItem = HTML | AllThatApply | Code | YesNo | TrueFalse | CodeTag;// | Matching | MultipleChoice | Text | TrueFalse;
 
 type HTML = {
   type: "HTML";

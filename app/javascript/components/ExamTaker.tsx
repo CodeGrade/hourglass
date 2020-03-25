@@ -16,7 +16,7 @@ function ExamTaker(props: ExamTakerProps) {
   return (
     <ExamContextProvider value={{ dispatch, getAtPath }}>
       <div><HTML value={instructions} /></div>
-      {/* TODO: show files */}
+      {/* TODO: don't show *every* file, use _references_ for this, q, and p */}
       <FileViewer files={files} />
       <div>
         {questions.map((q, i) => (

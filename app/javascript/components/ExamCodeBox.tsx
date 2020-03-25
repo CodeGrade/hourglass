@@ -1,20 +1,10 @@
-import React, { useEffect, useState } from "react";
 import CM from "codemirror";
-import {
-  Controlled as CodeMirror,
-  IControlledCodeMirror
-} from "react-codemirror2";
 import "codemirror/addon/runmode/runmode";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/theme/mdn-like";
-
-import Highlighter from "react-codemirror-runmode";
-
-export interface EditorProps extends IControlledCodeMirror {
-  readOnly?: boolean;
-  language?: string;
-  marksDependencies?: Array<any>;
-}
+import React from "react";
+import Highlighter from 'react-codemirror-runmode';
+import { Controlled as CodeMirror, IControlledCodeMirror } from "react-codemirror2";
 
 function extractMarks(text) {
   var lines = text.split(/\r\n?|\n/);
@@ -69,6 +59,12 @@ function applyMarks(cm, allMarks) {
       });
     });
   });
+}
+
+export interface EditorProps extends IControlledCodeMirror {
+  readOnly?: boolean;
+  language?: string;
+  marksDependencies?: Array<any>;
 }
 
 export const Editor = ({ options, readOnly, marksDependencies, value, ...props }: EditorProps) => {

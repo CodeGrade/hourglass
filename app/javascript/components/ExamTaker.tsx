@@ -1,7 +1,7 @@
-import TreeItem from "@material-ui/lab/TreeItem";
 import React from "react";
 import { useExamState, ExamContextProvider } from "./examstate";
 import { Question } from "./Question";
+import { FileViewer } from "./FileViewer";
 import { HTML } from "./questions/HTML";
 
 interface ExamTakerProps {
@@ -17,6 +17,7 @@ function ExamTaker(props: ExamTakerProps) {
     <ExamContextProvider value={{ dispatch, getAtPath }}>
       <div><HTML value={instructions} /></div>
       {/* TODO: show files */}
+      <FileViewer files={files} />
       <div>
         {questions.map((q, i) => (
           <Question question={q} qnum={i} key={i} />

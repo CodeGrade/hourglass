@@ -72,17 +72,26 @@ interface Exam {
 type FileRef = SingleFileRef | DirRef;
 
 interface SingleFileRef {
+  type: "file";
+
   // The full path of the file.
-  file: string;
+  path: string;
 }
 
 interface DirRef {
+  type: "dir";
+
   // The full path of the directory.
-  file: string;
+  path: string;
 }
 
 // A tree of files, used in displaying treeview references.
 interface ExamSingleFile {
+  filedir: "file";
+
+  // Label for the file.
+  text: string;
+
   // Sequential ID of this file.
   id: number;
 
@@ -90,15 +99,17 @@ interface ExamSingleFile {
   contents: string;
 
   // The CodeMirror type for this file.
-  type: string;
+  lang: string;
 }
 
 interface ExamDir {
+  filedir: "dir";
+
+  // Label for the directory.
+  text: string;
+
   // Sequential ID of this directory.
   id: number;
-
-  // The name of this directory.
-  text: string;
 
   // Files within this directory.
   nodes: Array<ExamFile>;

@@ -39,8 +39,26 @@ class Exam < ApplicationRecord
   def info(include_answers = true)
     ret = properties['versions'][0].deep_dup
     answer_count = 0
+    ret['reference']&.each_with_index do |r, i|
+      ret['reference'][i] = {
+        'type' => r.keys.first,
+        'path' => r.values.first
+      }
+    end
     ret['questions'].each do |q|
+      q['reference']&.each_with_index do |r, i|
+        q['reference'][i] = {
+          'type' => r.keys.first,
+          'path' => r.values.first
+        }
+      end
       q['parts'].each do |p|
+        p['reference']&.each_with_index do |r, i|
+          p['reference'][i] = {
+            'type' => r.keys.first,
+            'path' => r.values.first
+          }
+        end
         p['body'].each_with_index do |b, bnum|
           if b.is_a? String
             p['body'][bnum] = {
@@ -187,11 +205,12 @@ class Exam < ApplicationRecord
       # pdf_path: item[:converted_path],
       item[:contents] = ensure_utf8(contents, mimetype)
       item[:type] = mimetype
+      item[:filedir] = "file"
     elsif item[:link_to]
       item[:type] = "symlink"
     else
       return nil if item[:path] == "__MACOSX"
-
+      item[:filedir] = "dir"
       item[:text] = item[:path] + "/"
       item[:selectable] = false
       item[:nodes] = item[:children].map { |n| with_extracted(n) }.compact

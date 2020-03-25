@@ -64,10 +64,9 @@ function applyMarks(cm, allMarks) {
 export interface EditorProps extends IControlledCodeMirror {
   readOnly?: boolean;
   language?: string;
-  marksDependencies?: Array<any>;
 }
 
-export const Editor = ({ options, readOnly, marksDependencies, value, ...props }: EditorProps) => {
+export const Editor = ({ options, readOnly, value, ...props }: Partial<EditorProps>) => {
   const myOptions = {
     theme: "mdn-like",
     indentUnit: 2,
@@ -82,7 +81,7 @@ export const Editor = ({ options, readOnly, marksDependencies, value, ...props }
     readOnly,
     ...options
   };
-  return <CodeMirror value={value} {...props} options={myOptions} />;
+  return <CodeMirror onBeforeChange={()=>{}} value={value} {...props} options={myOptions} />;
 };
 
 export const Renderer = ({ value, ...props }) => (

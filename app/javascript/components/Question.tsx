@@ -1,6 +1,7 @@
 import React from "react";
 import { Part } from "./Part"
 import { HTML } from "./questions/HTML";
+import { FileViewer } from './FileViewer';
 
 export interface QuestionProps {
   question: Question;
@@ -9,7 +10,7 @@ export interface QuestionProps {
 
 export function Question(props: QuestionProps) {
   const { question, qnum } = props;
-  const { name, description, separateSubparts, parts } = question;
+  const { name, reference, description, separateSubparts, parts } = question;
   let jumpToPart = null;
   if (separateSubparts) {
     jumpToPart =
@@ -30,10 +31,11 @@ export function Question(props: QuestionProps) {
       </div>
   }
   return (
-    <div className={`row question no-gutters ${separateSubparts ? "paginated" : ""}`}>
+    <div className={`question no-gutters ${separateSubparts ? "paginated" : ""}`}>
       <h1>Question {qnum + 1}: {name}</h1>
-      <div><HTML value={description} /></div>
+      <HTML value={description} />
       {/* TODO: show files */}
+      <FileViewer references={reference}/>
       {jumpToPart}
       {parts.map((p, i) => (
         <Part part={p} pnum={i} qnum={qnum} key={i} />

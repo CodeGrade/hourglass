@@ -40,9 +40,10 @@ class Exam < ApplicationRecord
     ret = properties['versions'][0].deep_dup
     answer_count = 0
     ret['reference']&.each_with_index do |r, i|
+      path = r.values.first
       ret['reference'][i] = {
         'type' => r.keys.first,
-        'path' => r.values.first
+        'path' => path
       }
     end
     ret['questions'].each do |q|
@@ -145,7 +146,6 @@ class Exam < ApplicationRecord
                 p['body'][bnum]['correctAnswer'] = b['YesNo']['correctAnswer'] if include_answers
               end
             else
-              p b
               throw 'Bad question type.'
             end
             b['id'] = answer_count
@@ -206,6 +206,7 @@ class Exam < ApplicationRecord
       item[:contents] = ensure_utf8(contents, mimetype)
       item[:type] = mimetype
       item[:filedir] = "file"
+      item.delete(:full_path)
     elsif item[:link_to]
       item[:type] = "symlink"
     else
@@ -216,11 +217,8 @@ class Exam < ApplicationRecord
       item[:nodes] = item[:children].map { |n| with_extracted(n) }.compact
       item.delete(:children)
     end
-    item.delete(:full_path)
     item
   end
-
-  private
 
   def ensure_utf8(str, mimetype)
     if ApplicationHelper.binary?(mimetype)
@@ -242,59 +240,16 @@ class Exam < ApplicationRecord
     end
   end
 
-  private
-
   def get_raw_files(folder)
     self.upload.extracted_files(folder, true)
   end
 
-  def assign_ids(files)
-    @count = 0
-    def help(f)
-      f["id"] = @count
-      @count += 1
-      if f[:nodes]
-        f[:nodes].each { |n| help(n) }
-      end
-    end
-    files.map { |n| help(n) }
-  end
-
   def clean_up(raw_files)
-    # def file_list(files, arr)
-    #   if files[:children]
-    #     files[:children].each { |n| file_list(n, arr) }
-    #   else
-    #     if File.basename(files[:full_path]) != ".DS_Store"
-    #       arr.push(files)
-    #     end
-    #   end
-    #   arr
-    # end
-    # @flat_files = raw_files.reduce([]) do |flat, raw| file_list(raw, flat) end
-    # @flat_files.each do |sf|
-    #   if sf[:type] == "symlink" && !sf[:broken] && sf[:link_to].is_a?(String)
-    #     sf[:link_to] = @flat_files.find { |f| f[:full_path]&.ends_with?(sf[:link_to]) }
-    #   end
-    # end
-    #
-    # @count = @flat_files.count.to_s.length
-    #
-    # @flat_files.each_with_index do |node, i|
-    #   node[:href] = "file_" + (i + 1).to_s.rjust(@count, '0')
-    # end
-    # @flat_files.each do |node|
-    #   if node[:link_to]
-    #     node[:link_href] = "file_" + node[:link_to][:href].to_s.rjust(@count, '0')
-    #   end
-    # end
-
     raw_files = raw_files.map do |f|
       with_extracted(f)
     end
 
     raw_files = raw_files.compact
-    assign_ids(raw_files)
 
     raw_files
   end

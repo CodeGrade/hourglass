@@ -77,9 +77,10 @@ function initState(files: Files, info: Exam): ExamState {
 interface ExamContext {
   getAtPath: (...path: StatePath) => any;
   dispatch: (action: Action) => void;
+  files: Files;
 }
 
-export function useExamState(files: Files, info: Exam): ExamContext {
+export function useExamState(files: Files, info: Exam) {
   const [examState, dispatch] = useReducer(reducer, initState(files, info));
   return {
     getAtPath: getAtPath(examState),

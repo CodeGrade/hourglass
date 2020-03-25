@@ -2,6 +2,7 @@ import React from "react";
 import { Table } from 'react-bootstrap';
 import { Body } from "./Body";
 import { HTML } from "./questions/HTML";
+import { FileViewer } from './FileViewer';
 
 interface PartProps {
   part: Part;
@@ -11,12 +12,12 @@ interface PartProps {
 
 export function Part(props: PartProps) {
   const { part, qnum, pnum } = props;
-  const { name, description, points, body } = part;
+  const { name, reference, description, points, body } = part;
   return (
-    <div className="row part">
+    <div className="part">
       <h3>Part {pnum + 1}: {name} <small className="float-right text-muted">({points} points)</small></h3>
       <div><HTML value={description} /></div>
-      {/* TODO: show files */}
+      <FileViewer references={reference}/>
       <Table hover borderless>
         <tbody>
           {body.map((b, i) => {

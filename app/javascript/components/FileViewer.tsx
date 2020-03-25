@@ -3,19 +3,8 @@ import { Editor } from './ExamCodeBox';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-
-function reduceFilesDirs(files, f) {
-  return files.reduce((acc, file) => {
-    const thisFile = f(file);
-    if ("nodes" in file) {
-      const rest = reduceFilesDirs(file.nodes, f);
-      return acc.concat(thisFile).concat(rest);
-    } else {
-      return acc.concat(thisFile);
-    }
-  }, []);
-}
-
+import { useExamContext } from './examstate';
+import { Row, Col } from 'react-bootstrap';
 
 interface FilesProps {
   files: Array<ExamFile>;
@@ -26,7 +15,7 @@ function Files(props: FilesProps) {
   return (
     <React.Fragment>
     {files.map((f) => {
-      const nodeId = String(f.id);
+      const nodeId = f.rel_path;
       switch (f.filedir) {
         case 'dir':
           return (
@@ -46,54 +35,93 @@ function Files(props: FilesProps) {
   );
 }
 
-function idToFileMap(files: Array<File>): { [id: string]: string } {
-  const m = {};
-  reduceFilesDirs(files, f => {
-    m[f.id] = f.contents;
-  });
-  return m;
+interface FileContentsProps {
+  files: Files;
+  fmap: FileMap;
+  selectedFile: string;
 }
 
-function FileContents(props) {
-  const { files, selectedFileID } = props;
-  const m = idToFileMap(files);
-  const contents = m[selectedFileID] || "Select a file to view.";
-  return (
-    <Editor readOnly onBeforeChange={()=>{}} value={contents} marksDependencies={[selectedFileID]} />
-  );
+function FileContents(props: FileContentsProps) {
+  const { files, selectedFile, fmap } = props;
+  const f = fmap[selectedFile];
+  if (f?.filedir == 'file') {
+    return (
+      <Editor readOnly value={f.contents} />
+    );
+  } else {
+    return (
+      <p>Select a file...</p>
+    );
+  }
 }
 
 interface FileTreeProps {
   files: Files;
-  onChangeFile: (id: number) => void;
+  onChangeFile: (id: string) => void;
+  fmap: FileMap;
 }
 
 function FileTree(props: FileTreeProps) {
-  const { files, onChangeFile } = props;
-  const ids = reduceFilesDirs(files, f => String(f.id));
+  const { files, onChangeFile, fmap } = props;
+  const allIds = Object.keys(fmap);
   return (
     <TreeView
-      expanded={ids}
-      onNodeSelect={(e, [id]) => onChangeFile(id)}
+      onNodeSelect={(e, id) => onChangeFile(id)}
       defaultCollapseIcon={<ExpandMoreIcon />}
       defaultExpandIcon={<ChevronRightIcon />}
+      expanded={allIds}
     >
       <Files files={files} />
     </TreeView>
   );
 }
 
+// Map from file path to file.
+interface FileMap {
+  [path: string]: ExamFile;
+}
+
+function getFilesForRefs(map: FileMap, refs: FileRef[]): Files {
+  return refs ? refs.map(r => map[r.path]).filter(a => a) : [];
+}
+
+function createMap(files: Files): FileMap {
+  const ret = {};
+  for (const file of files) {
+    switch (file.filedir) {
+      case 'dir':
+        ret[file.rel_path] = file;
+        const children = createMap(file.nodes);
+        Object.assign(ret, children);
+        break;
+      case 'file':
+        ret[file.rel_path] = file;
+        break;
+      default:
+        throw new Error("invalid file");
+    }
+  }
+  return ret;
+}
+
 interface FileViewerProps {
-  files: Files;
+  references: FileRef[];
 }
 
 export function FileViewer(props: FileViewerProps) {
-  const { files } = props;
-  const [selectedID, setSelectedID] = useState(-1);
+  const { references } = props;
+  const { files } = useExamContext();
+  const [selectedID, setSelectedID] = useState("");
+  const fileMap = createMap(files);
+  const filteredFiles = getFilesForRefs(fileMap, references);
   return (
-    <div>
-      <FileTree files={files} onChangeFile={setSelectedID} />
-      <FileContents files={files} selectedFileID={selectedID} />
-    </div>
+    <Row>
+      <Col sm={6}>
+        <FileTree fmap={fileMap} files={filteredFiles} onChangeFile={setSelectedID} />
+      </Col>
+      <Col sm={6}>
+        <FileContents fmap={fileMap} files={filteredFiles} selectedFile={selectedID} />
+      </Col>
+    </Row>
   );
 }

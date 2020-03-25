@@ -92,6 +92,11 @@ interface ExamSingleFile {
   // Label for the file.
   text: string;
 
+  // Path name of this file (no trailing slash)
+  path: string;
+
+  rel_path: string;
+
   // Sequential ID of this file.
   id: number;
 
@@ -105,8 +110,13 @@ interface ExamSingleFile {
 interface ExamDir {
   filedir: "dir";
 
-  // Label for the directory.
+  // Label for the directory (with trailing slash)
   text: string;
+
+  // Path name of this directory (no trailing slash)
+  path: string;
+
+  rel_path: string;
 
   // Sequential ID of this directory.
   id: number;

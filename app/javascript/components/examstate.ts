@@ -1,4 +1,5 @@
-import React, { useReducer, useContext } from "react";
+import React, { useContext, useReducer } from "react";
+import { FileMap } from './files';
 
 /*
 state:
@@ -54,19 +55,18 @@ const getAtPath = (state: ExamState) => (...path: StatePath) => {
   return ret;
 };
 
-function initState(files: Files, info: Exam): ExamState {
+function initState(files: Files, info: Exam, fmap: FileMap): ExamState {
   const ret = {};
   info.questions.forEach((q, qi) => {
     ret[qi] = {};
     q.parts.forEach((p, pi) => {
       ret[qi][pi] = {};
       p.body.forEach((b, bi) => {
-        switch (b.type) {
-          case 'Code':
-            ret[qi][pi][bi] = b.initial; // TODO: get contents
-            break;
-          default:
-            break;
+        if (b.type == 'Code') {
+          const f = fmap[b.initial];
+          if (f?.filedir == 'file') {
+            ret[qi][pi][bi] = f.contents;
+          }
         }
       });
     })
@@ -78,10 +78,11 @@ interface ExamContext {
   getAtPath: (...path: StatePath) => any;
   dispatch: (action: Action) => void;
   files: Files;
+  fmap: FileMap;
 }
 
-export function useExamState(files: Files, info: Exam) {
-  const [examState, dispatch] = useReducer(reducer, initState(files, info));
+export function useExamState(files: Files, info: Exam, fmap: FileMap) {
+  const [examState, dispatch] = useReducer(reducer, initState(files, info, fmap));
   return {
     getAtPath: getAtPath(examState),
     dispatch,

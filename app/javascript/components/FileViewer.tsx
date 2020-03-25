@@ -5,6 +5,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { useExamContext } from './examstate';
 import { Row, Col } from 'react-bootstrap';
+import { FileMap, getFilesForRefs } from './files';
 
 interface FilesProps {
   files: Array<ExamFile>;
@@ -37,12 +38,12 @@ function Files(props: FilesProps) {
 
 interface FileContentsProps {
   files: Files;
-  fmap: FileMap;
   selectedFile: string;
 }
 
 function FileContents(props: FileContentsProps) {
-  const { files, selectedFile, fmap } = props;
+  const { files, selectedFile } = props;
+  const { fmap } = useExamContext();
   const f = fmap[selectedFile];
   if (f?.filedir == 'file') {
     return (
@@ -58,11 +59,11 @@ function FileContents(props: FileContentsProps) {
 interface FileTreeProps {
   files: Files;
   onChangeFile: (id: string) => void;
-  fmap: FileMap;
 }
 
 function FileTree(props: FileTreeProps) {
-  const { files, onChangeFile, fmap } = props;
+  const { files, onChangeFile } = props;
+  const { fmap } = useExamContext();
   const allIds = Object.keys(fmap);
   return (
     <TreeView
@@ -76,51 +77,22 @@ function FileTree(props: FileTreeProps) {
   );
 }
 
-// Map from file path to file.
-interface FileMap {
-  [path: string]: ExamFile;
-}
-
-function getFilesForRefs(map: FileMap, refs: FileRef[]): Files {
-  return refs ? refs.map(r => map[r.path]).filter(a => a) : [];
-}
-
-function createMap(files: Files): FileMap {
-  const ret = {};
-  for (const file of files) {
-    switch (file.filedir) {
-      case 'dir':
-        ret[file.rel_path] = file;
-        const children = createMap(file.nodes);
-        Object.assign(ret, children);
-        break;
-      case 'file':
-        ret[file.rel_path] = file;
-        break;
-      default:
-        throw new Error("invalid file");
-    }
-  }
-  return ret;
-}
-
 interface FileViewerProps {
   references: FileRef[];
 }
 
 export function FileViewer(props: FileViewerProps) {
   const { references } = props;
-  const { files } = useExamContext();
+  const { files, fmap } = useExamContext();
   const [selectedID, setSelectedID] = useState("");
-  const fileMap = createMap(files);
-  const filteredFiles = getFilesForRefs(fileMap, references);
+  const filteredFiles = getFilesForRefs(fmap, references);
   return (
     <Row>
       <Col sm={6}>
-        <FileTree fmap={fileMap} files={filteredFiles} onChangeFile={setSelectedID} />
+        <FileTree files={filteredFiles} onChangeFile={setSelectedID} />
       </Col>
       <Col sm={6}>
-        <FileContents fmap={fileMap} files={filteredFiles} selectedFile={selectedID} />
+        <FileContents files={filteredFiles} selectedFile={selectedID} />
       </Col>
     </Row>
   );

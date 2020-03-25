@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Editor, Renderer } from "../ExamCodeBox";
+import React from "react";
+import { Editor } from "../ExamCodeBox";
 import { useExamContext } from "../examstate";
 import { HTML } from "./HTML";
 

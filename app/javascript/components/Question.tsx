@@ -34,8 +34,7 @@ export function Question(props: QuestionProps) {
     <div className={`question no-gutters ${separateSubparts ? "paginated" : ""}`}>
       <h1>Question {qnum + 1}: {name}</h1>
       <HTML value={description} />
-      {/* TODO: show files */}
-      <FileViewer references={reference}/>
+      {reference && <FileViewer references={reference}/>}
       {jumpToPart}
       {parts.map((p, i) => (
         <Part part={p} pnum={i} qnum={qnum} key={i} />

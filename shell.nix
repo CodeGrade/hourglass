@@ -43,6 +43,7 @@ let
 in mkShell {
   name = "hourglass";
   buildInputs = [
+    solargraph
     nodePackages.bower # needed for bootstrap-treeview
     ruby.devEnv
     bundler

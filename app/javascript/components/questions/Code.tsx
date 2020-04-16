@@ -1,6 +1,7 @@
 import React from "react";
 import { Editor } from "../ExamCodeBox";
 import { useExamContext } from "../examstate";
+import { Container, Row, Col } from 'react-bootstrap';
 import { HTML } from "./HTML";
 
 interface CodeProps {
@@ -37,12 +38,16 @@ export function Code(props: CodeProps) {
   );
 
   return (
-    <div>
-      <div>
-        {prompt.map((p, i) => <HTML key={i} value={p}/>)}
-      </div>
-      {editor}
-    </div>
+    <Container>
+      <Row>
+        <Col sm={12}>
+          {prompt.map((p, i) => <HTML key={i} value={p}/>)}
+        </Col>
+        <Col sm={12}>
+          {editor}
+        </Col>
+      </Row>
+    </Container>
   );
   /*
   return (

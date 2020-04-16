@@ -100,7 +100,7 @@ class Exam < ApplicationRecord
             elsif b.key? 'Matching'
               p['body'][bnum] = {
                 'type' => 'Matching',
-                'prompt' => b['Matching']['prompt'],
+                'prompts' => b['Matching']['prompts'],
                 'values' => b['Matching']['values']
               }
               p['body'][bnum]['correctAnswers'] = b['Matching']['correctAnswers'] if include_answers

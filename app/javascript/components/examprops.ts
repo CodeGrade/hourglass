@@ -36,7 +36,9 @@ interface Text {
 
 interface Matching {
   type: "Matching";
-  prompt: Array<string>; // (html)
+  promptLabel?: string; // (html)
+  prompts: Array<string>; // (html)
+  valuesLabel?: string;
   values: Array<string>;
 }
 
@@ -104,7 +106,7 @@ interface ExamSingleFile {
   contents: string;
 
   // The CodeMirror type for this file.
-  lang: string;
+  type: string;
 }
 
 interface ExamDir {

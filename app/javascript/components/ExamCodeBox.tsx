@@ -63,17 +63,19 @@ function applyMarks(cm, allMarks) {
 
 export interface EditorProps extends IControlledCodeMirror {
   readOnly?: boolean;
+  lineNumbers?: boolean;
   language?: string;
 }
 
-export const Editor = ({ options, readOnly, value, ...props }: Partial<EditorProps>) => {
+export const Editor = ({ options, readOnly, lineNumbers, language, value, ...props }: Partial<EditorProps>) => {
   const myOptions = {
     theme: "mdn-like",
     indentUnit: 2,
     viewportMargin: Infinity,
-    lineNumbers: true,
+    lineNumbers: (lineNumbers ?? true),
     lineWrapping: false,
     styleActiveLine: true,
+    mode: language,
     extraKeys: CM.normalizeKeyMap({
       Enter: "newlineAndIndent",
       Tab: "indentAuto"

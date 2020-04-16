@@ -47,11 +47,11 @@ function FileContents(props: FileContentsProps) {
   const f = fmap[selectedFile];
   if (f?.filedir == 'file') {
     return (
-      <Editor readOnly value={f.contents} />
+      <Editor readOnly language={f.type} value={f.contents} />
     );
   } else {
     return (
-      <p>Select a file...</p>
+      <Editor readOnly lineNumbers={false} value={"Select a file..."  } />
     );
   }
 }
@@ -88,10 +88,10 @@ export function FileViewer(props: FileViewerProps) {
   const filteredFiles = getFilesForRefs(fmap, references);
   return (
     <Row>
-      <Col sm={6}>
+      <Col sm={3}>
         <FileTree files={filteredFiles} onChangeFile={setSelectedID} />
       </Col>
-      <Col sm={6}>
+      <Col sm={9}>
         <FileContents files={filteredFiles} selectedFile={selectedID} />
       </Col>
     </Row>

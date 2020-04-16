@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Container, Row, Col, Form } from 'react-bootstrap';
 interface TextProps {
   text: Text;
   qnum: number;
@@ -11,6 +11,12 @@ export function Text(props: TextProps) {
   const { text, qnum, pnum, bnum } = props;
   const { prompt } = text;
   return (
-    <p>TODO: Text</p>
+    <Container>
+      <Row>
+        <Col sm={12}>
+          <Form.Control as="textarea" rows="3" placeholder="Enter your answer here"/>
+        </Col>
+      </Row>
+    </Container>
   );
 }

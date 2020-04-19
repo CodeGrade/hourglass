@@ -50,7 +50,7 @@ export function Matching(props: MatchingProps) {
                           <em>None</em>
                         </MenuItem> */}
                         {(values.map((v, j) => {
-                          return <MenuItem value={j + 1}>{j + 1}</MenuItem>;
+                          return <MenuItem key={`${qnum}-${pnum}-${bnum}-${i}-${j}`} value={j + 1}>{j + 1}</MenuItem>;
                         }))}
                       </Select>
                     </FormControl>

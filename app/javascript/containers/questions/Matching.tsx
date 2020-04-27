@@ -1,4 +1,4 @@
 import { Matching } from '../../components/questions/Matching';
-import { connectWithPath } from './connectors';
+import { connectWithPathIndexed } from './connectors';
 
-export default connectWithPath(Matching);
+export default connectWithPathIndexed(Matching);

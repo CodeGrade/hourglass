@@ -1,18 +1,16 @@
 import React from 'react';
 import { Container, Row, Col, Table } from 'react-bootstrap';
 import { Select, FormControl, InputLabel, MenuItem } from '@material-ui/core';
-import { Matching } from '../../types';
+import { Matching, MatchingState } from '../../types';
 
 interface MatchingProps {
   info: Matching;
-  qnum: number;
-  pnum: number;
-  bnum: number;
+  onChange: (index: number, newVal: boolean) => void;
+  value: MatchingState;
 }
 
-// TODO: move state to redux
 export function Matching(props: MatchingProps) {
-  const { info, qnum, pnum, bnum } = props;
+  const { info, value, onChange } = props;
   const { promptLabel, prompts, valuesLabel, values } = info;
   return (
     <Container>
@@ -30,29 +28,34 @@ export function Matching(props: MatchingProps) {
             </thead>
             <tbody>
               {prompts.map((p, i) => {
-                const [answerI, setAnswerI] = React.useState('');
-
+                const valueI = value?.[i] ?? -1;
                 const handleChange = (event) => {
-                  setAnswerI(event.target.value);
+                  const val = event.target.value;
+                  onChange(i, val);
                 };              
-                return <tr key={`${qnum}-${pnum}-${bnum}-prompt-${i}`}>
+                return <tr key={i}>
                   <td>{String.fromCharCode(65 + i)}.</td>
                   <td>{p}</td>
                   <td>
                     <FormControl variant="outlined">
-                      <InputLabel id={`${qnum}-${pnum}-${bnum}-answer-${i}`}>Match</InputLabel>
+                      <InputLabel>Match</InputLabel>
                       <Select
                         margin="dense"
-                        labelId={`${qnum}-${pnum}-${bnum}-answer-${i}`}
-                        value={answerI}
+                        value={valueI}
                         onChange={handleChange}
                         label="Match"
                       >
-                        {/* <MenuItem value="">
+                        <MenuItem value={-1}>
                           <em>None</em>
-                        </MenuItem> */}
+                        </MenuItem>
                         {(values.map((v, j) => {
-                          return <MenuItem key={`${qnum}-${pnum}-${bnum}-${i}-${j}`} value={j + 1}>{j + 1}</MenuItem>;
+                          return (
+                            <MenuItem
+                              key={j}
+                              value={j + 1}>
+                              {j + 1}
+                            </MenuItem>
+                          );
                         }))}
                       </Select>
                     </FormControl>
@@ -74,10 +77,12 @@ export function Matching(props: MatchingProps) {
             </thead>
             <tbody>
               {values.map((v, i) => {
-                return <tr key={`${qnum}-${pnum}-${bnum}-value-${i}`}>
-                  <td>{i + 1}.</td>
-                  <td>{v}</td>
-                </tr>
+                return (
+                  <tr key={i}>
+                    <td>{i + 1}.</td>
+                    <td>{v}</td>
+                  </tr>
+                );
               })}
             </tbody>
           </Table>

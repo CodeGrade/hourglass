@@ -52,7 +52,7 @@ export interface MultipleChoice {
 }
 
 export interface MultipleChoiceState {
-  // TODO
+  [index: number]: number;
 }
 
 export interface Text {

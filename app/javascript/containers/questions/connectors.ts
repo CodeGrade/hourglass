@@ -22,3 +22,24 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 };
 
 export const connectWithPath = connect(mapStateToProps, mapDispatchToProps);
+
+const mapStateToPropsIndexed = (state, ownProps) => {
+  const { qnum, pnum, bnum } = ownProps;
+  return {
+    value: getAtPath(state, qnum, pnum, bnum),
+  }
+};
+
+const mapDispatchToPropsIndexed = (dispatch, ownProps) => {
+  const { qnum, pnum, bnum } = ownProps;
+  return {
+    onChange: (index, newState) => dispatch(
+      updateAnswer(
+        [qnum, pnum, bnum, index],
+        newState,
+      )
+    ),
+  }
+};
+
+export const connectWithPathIndexed = connect(mapStateToPropsIndexed, mapDispatchToPropsIndexed);

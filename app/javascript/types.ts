@@ -51,9 +51,7 @@ export interface MultipleChoice {
   options: Array<string>; // (html)
 }
 
-export interface MultipleChoiceState {
-  [index: number]: number;
-}
+export type MultipleChoiceState = number;
 
 export interface Text {
   type: "Text";

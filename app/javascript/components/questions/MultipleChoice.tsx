@@ -31,28 +31,24 @@ export function MultipleChoice(props: MultipleChoiceProps) {
     const val = event.target.value;
     onChange(val);
   }
-  const body =
-    <React.Fragment>
-      <i>(Select one of the following responses)</i>
-      <Form.Group>
-      {options.map((o, i) => {
-        return (
-          <Form.Check
-            type="radio"
-            value={i}
-            label={o}
-            onChange={handler}
-            checked={value == i}
-            key={i}
-          />
-        );
-      })}
-      </Form.Group>
-    </React.Fragment>;
   return (
     <div>
       <div>{prompt}</div>
-      {body}
+      <i>(Select one of the following responses)</i>
+      <Form.Group>
+        {options.map((option, idx) => {
+          return (
+            <Form.Check
+              type="radio"
+              value={idx}
+              label={option}
+              onChange={handler}
+              checked={value == idx}
+              key={idx}
+            />
+          );
+        })}
+      </Form.Group>
     </div>
   )
 }

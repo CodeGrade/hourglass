@@ -1,19 +1,10 @@
-import { ExamState } from '../types';
-import { Action } from '../actions';
+import { combineReducers } from 'redux';
+import { answers } from './answers.ts';
+import { snapshot } from './snapshot.ts';
 
-export function mainReducer(state: ExamState, action: Action): ExamState {
-  switch (action.type) {
-    case "UPDATE_ANSWER":
-      const ret = { ...state };
-      let cur = ret;
-      for (let i = 0; i < action.path.length - 1; i++) {
-        cur[action.path[i]] = { ...cur[action.path[i]] };
-        cur = cur[action.path[i]];
-      }
-      cur[action.path[action.path.length - 1]] = action.val;
-      return ret;
-    default:
-      console.log("Got a different action type: " + action.type);
-      return state;
-  }
-}
+const rootReducer = combineReducers({
+  answers,
+  snapshot,
+});
+
+export default rootReducer;

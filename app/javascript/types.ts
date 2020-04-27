@@ -1,4 +1,4 @@
-export interface ExamState {
+export interface AnswersState {
   [qnum: number]: {
     [pnum: number]: {
       [bnum: number]: AnswerState;

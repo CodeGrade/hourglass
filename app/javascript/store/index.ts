@@ -1,10 +1,10 @@
 import { createStore } from 'redux';
-import { mainReducer } from '../reducers';
-import { AnswerState, StatePath, Exam, Files, FileMap, ExamState } from '../types';
+import rootReducer from '../reducers';
+import { AnswerState, StatePath, Exam, Files, FileMap, AnswersState } from '../types';
 import { devToolsEnhancer } from 'redux-devtools-extension';
 import { createMap } from '../files';
 
-export const getAtPath = (state: ExamState, ...path: StatePath): AnswerState => {
+export const getAtPath = (state: AnswersState, ...path: StatePath): AnswerState => {
   let ret = state;
   for (const elem of path) {
     ret = ret?.[elem];
@@ -12,7 +12,7 @@ export const getAtPath = (state: ExamState, ...path: StatePath): AnswerState => 
   return ret;
 };
 
-function initState(info: Exam, fmap: FileMap): ExamState {
+function initState(info: Exam, fmap: FileMap): AnswersState {
   const ret = {};
   info.questions.forEach((q, qi) => {
     ret[qi] = {};
@@ -34,5 +34,5 @@ function initState(info: Exam, fmap: FileMap): ExamState {
 export function examStore(files: Files, info: Exam) {
   const fmap = createMap(files);
   const initialState = initState(info, fmap);
-  return createStore(mainReducer, initialState, devToolsEnhancer({}));
+  return createStore(rootReducer, { answers: initialState }, devToolsEnhancer({}));
 }

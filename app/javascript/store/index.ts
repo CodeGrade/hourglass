@@ -1,7 +1,9 @@
-import { createStore } from 'redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import ReduxThunk from 'redux-thunk';
+import { createStore, applyMiddleware } from 'redux';
+
 import rootReducer from '../reducers';
 import { AnswerState, StatePath, Exam, Files, FileMap, AnswersState } from '../types';
-import { devToolsEnhancer } from 'redux-devtools-extension';
 import { createMap } from '../files';
 
 export const getAtPath = (state: AnswersState, ...path: StatePath): AnswerState => {
@@ -34,5 +36,7 @@ function initState(info: Exam, fmap: FileMap): AnswersState {
 export function examStore(files: Files, info: Exam) {
   const fmap = createMap(files);
   const initialState = initState(info, fmap);
-  return createStore(rootReducer, { answers: initialState }, devToolsEnhancer({}));
+  return createStore(rootReducer, { answers: initialState }, composeWithDevTools(
+    applyMiddleware(ReduxThunk)
+  ));
 }

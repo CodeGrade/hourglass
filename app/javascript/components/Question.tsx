@@ -1,7 +1,7 @@
 import React from "react";
 import { Part } from "./Part"
 import { HTML } from "./questions/HTML";
-// import { FileViewer } from './FileViewer';
+import { FileViewer } from './FileViewer';
 import { Question } from '../types';
 
 export interface QuestionProps {
@@ -35,7 +35,7 @@ export function Question(props: QuestionProps) {
     <div className={`question no-gutters ${separateSubparts ? "paginated" : ""}`}>
       <h1>Question {qnum + 1}: {name}</h1>
       <HTML value={description} />
-      {/*reference && <FileViewer references={reference}/>*/}
+      {reference && <FileViewer references={reference}/>}
       {jumpToPart}
       {parts.map((p, i) => (
         <Part part={p} pnum={i} qnum={qnum} key={i} />

@@ -2,7 +2,7 @@ import React from "react";
 import { Table } from 'react-bootstrap';
 import { Body } from "./Body";
 import { HTML } from "./questions/HTML";
-// import { FileViewer } from './FileViewer';
+import { FileViewer } from './FileViewer';
 import { Part } from '../types';
 
 interface PartProps {
@@ -18,7 +18,7 @@ export function Part(props: PartProps) {
     <div className="part">
       <h3>Part {pnum + 1}: {name} <small className="float-right text-muted">({points} points)</small></h3>
       <div><HTML value={description} /></div>
-      {/*reference && <FileViewer references={reference}/>*/}
+      {reference && <FileViewer references={reference}/>}
       <Table hover borderless>
         <tbody>
           {body.map((b, i) => {

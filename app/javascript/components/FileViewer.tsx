@@ -5,6 +5,8 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { Row, Col } from 'react-bootstrap';
 import { FileRef, ExamFile, Files } from '../types';
+import { useExamContext } from '../context';
+import { getFilesForRefs } from '../files';
 
 interface FilesProps {
   files: Array<ExamFile>;
@@ -42,8 +44,7 @@ interface FileContentsProps {
 
 function FileContents(props: FileContentsProps) {
   const { files, selectedFile } = props;
-  //const { fmap } = useExamContext();
-  const fmap = {};
+  const { fmap } = useExamContext();
   const f = fmap[selectedFile];
   if (f?.filedir == 'file') {
     return (
@@ -63,8 +64,7 @@ interface FileTreeProps {
 
 function FileTree(props: FileTreeProps) {
   const { files, onChangeFile } = props;
-  // const { fmap } = useExamContext();
-  const fmap = {};
+  const { fmap } = useExamContext();
   const allIds = Object.keys(fmap);
   return (
     <TreeView
@@ -84,10 +84,9 @@ interface FileViewerProps {
 
 export function FileViewer(props: FileViewerProps) {
   const { references } = props;
-  // const { files, fmap } = useExamContext();
+  const { files, fmap } = useExamContext();
   const [selectedID, setSelectedID] = useState("");
-  // const filteredFiles = getFilesForRefs(fmap, references);
-  const filteredFiles = [];
+  const filteredFiles = getFilesForRefs(fmap, references);
   return (
     <Row>
       <Col sm={3}>

@@ -1,19 +1,17 @@
 import React from "react";
-import { useExamContext } from "../examstate";
 import { Form } from 'react-bootstrap';
 
-export interface AllThatApplyProps {
-  ata: AllThatApply;
-  qnum: number;
-  pnum: number;
-  bnum: number;
+import { AllThatApply, AllThatApplyState } from '../../types';
+
+interface AllThatApplyProps {
+  info: AllThatApply;
+  value: AllThatApplyState;
+  onChange: (index: number, newState: boolean) => void;
 }
 
 export function AllThatApply(props: AllThatApplyProps) {
-  const { ata, qnum, pnum, bnum } = props;
-  const { options, prompt } = ata;
-  const { dispatch, getAtPath } = useExamContext();
-  const value = getAtPath(qnum, pnum, bnum);
+  const { onChange, info, value } = props;
+  const { options, prompt } = info;
   // if (readOnly) {
   //   if (!value?.some((ans) => !!ans)) {
   //     theRest = (<React.Fragment>
@@ -34,11 +32,7 @@ export function AllThatApply(props: AllThatApplyProps) {
   // } else {
   const handler = index => event => {
     const val = event.target.checked;
-    dispatch({
-      type: 'updateAnswer',
-      path: [qnum, pnum, bnum, index],
-      val,
-    })
+    onChange(index, val);
   }
   const body =
     <React.Fragment>
@@ -47,7 +41,12 @@ export function AllThatApply(props: AllThatApplyProps) {
         const val = !!value?.[i];
         return (
           <Form.Group key={i}>
-            <Form.Check type="checkbox" label={o} id={`ata-${qnum}-${pnum}-${bnum}-${i}`} checked={val} onChange={handler(i)} />
+            <Form.Check
+              type="checkbox"
+              label={o}
+              checked={val}
+              onChange={handler(i)}
+            />
           </Form.Group>
         );
       })}

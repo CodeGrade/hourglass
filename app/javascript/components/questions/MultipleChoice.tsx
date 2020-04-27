@@ -1,19 +1,16 @@
 import React from "react";
-import { useExamContext } from "../examstate";
 import { Form } from 'react-bootstrap';
+import { MultipleChoice, MultipleChoiceState } from '../../types';
 
-export interface MultipleChoiceProps {
-  mc: MultipleChoice;
-  qnum: number;
-  pnum: number;
-  bnum: number;
+interface MultipleChoiceProps {
+  info: MultipleChoice;
+  value: MultipleChoiceState,
+  onChange: (newVal: number) => void;
 }
 
 export function MultipleChoice(props: MultipleChoiceProps) {
-  const { mc, qnum, pnum, bnum } = props;
-  const { options, prompt } = mc;
-  const { dispatch, getAtPath } = useExamContext();
-  const value = getAtPath(qnum, pnum, bnum);
+  const { info, value, onChange } = props;
+  const { options, prompt } = info;
   //if (readOnly) {
   //  if (value === undefined) {
   //    theRest = (<React.Fragment>
@@ -32,19 +29,23 @@ export function MultipleChoice(props: MultipleChoiceProps) {
   //} else {
   const handler = event => {
     const val = event.target.value;
-    dispatch({
-      type: 'updateAnswer',
-      path: [qnum, pnum, bnum],
-      val,
-    })
+    onChange(val);
   }
   const body =
     <React.Fragment>
       <i>(Select one of the following responses)</i>
       <Form.Group>
       {options.map((o, i) => {
-        return <Form.Check type="radio" value={i} label={o} id={`mc-${qnum}-${pnum}-${bnum}-${i}`}
-                            onChange={handler} checked={value == i} key={i} />;
+        return (
+          <Form.Check
+            type="radio"
+            value={i}
+            label={o}
+            onChange={handler}
+            checked={value == i}
+            key={i}
+          />
+        );
       })}
       </Form.Group>
     </React.Fragment>;

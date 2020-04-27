@@ -1,17 +1,19 @@
 import React from 'react';
 import { Container, Row, Col, Table } from 'react-bootstrap';
 import { Select, FormControl, InputLabel, MenuItem } from '@material-ui/core';
+import { Matching } from '../../types';
 
 interface MatchingProps {
-  matching: Matching;
+  info: Matching;
   qnum: number;
   pnum: number;
   bnum: number;
 }
 
+// TODO: move state to redux
 export function Matching(props: MatchingProps) {
-  const { matching, qnum, pnum, bnum } = props;
-  const { promptLabel, prompts, valuesLabel, values } = matching;
+  const { info, qnum, pnum, bnum } = props;
+  const { promptLabel, prompts, valuesLabel, values } = info;
   return (
     <Container>
       <Row>

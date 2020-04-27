@@ -1,21 +1,18 @@
 import React from "react";
 import { Editor } from "../ExamCodeBox";
-import { useExamContext } from "../examstate";
 import { Container, Row, Col } from 'react-bootstrap';
 import { HTML } from "./HTML";
+import { Code, CodeState } from '../../types';
 
 interface CodeProps {
-  code: Code;
-  qnum: number;
-  pnum: number;
-  bnum: number;
+  info: Code;
+  value: CodeState;
+  onChange: (newVal: CodeState) => void;
 }
 
 export function Code(props: CodeProps) {
-  const { code, qnum, pnum, bnum } = props;
-  const { prompt, lang } = code;
-  const { dispatch, getAtPath } = useExamContext();
-  const value = getAtPath(qnum, pnum, bnum);
+  const { info, value, onChange } = props;
+  const { prompt, lang } = info;
   //let theRest = null;
   //if (readOnly) {
   //  if (/\S/.test(initial)) {
@@ -24,16 +21,11 @@ export function Code(props: CodeProps) {
   //    theRest = <i>No answer given.</i>;
   //  }
   //} else {
-  const onChange = (cm, state, newVal) => dispatch({
-    type: "updateAnswer",
-    path: [qnum, pnum, bnum],
-    val: newVal,
-  });
   const editor = (
     <Editor
       value={value}
       language={lang}
-      onBeforeChange={onChange}
+      onBeforeChange={(_cm, _state, newVal) => onChange(newVal)}
     />
   );
 

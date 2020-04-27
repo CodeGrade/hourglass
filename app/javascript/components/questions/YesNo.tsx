@@ -1,21 +1,21 @@
 import React from "react";
-import { useExamContext } from "../examstate";
 import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import { YesNo } from '../../types';
 
 export interface YesNoProps {
-  yesno: YesNo;
-  yes?: string;
-  no?: string;
+  info: YesNo;
+  yesLabel?: string;
+  noLabel?: string;
+  value: boolean;
+  onChange: (newValue: boolean) => void;
   qnum: number;
   pnum: number;
   bnum: number;
 }
 
-export function YesNo(props: YesNoProps) {
-  const { yesno, qnum, pnum, bnum, yes, no } = props;
-  const { prompt } = yesno;
-  const { dispatch, getAtPath } = useExamContext();
-  const value = getAtPath(qnum, pnum, bnum);
+export function YesNoInput(props: YesNoProps) {
+  const { qnum, pnum, bnum, info, yesLabel, noLabel, value, onChange } = props;
+  const { prompt } = info;
   // if (readOnly) {
   //   if (value === undefined) {
   //     theRest = (<React.Fragment>
@@ -31,24 +31,17 @@ export function YesNo(props: YesNoProps) {
   //     </React.Fragment>)
   //   }
   // } else {
-  const handler = val => {
-    dispatch({
-      type: 'updateAnswer',
-      path: [qnum, pnum, bnum],
-      val,
-    })
-  }
-  const body =
-    <React.Fragment>
-      <ToggleButtonGroup type="radio" name={`tf-${qnum}-${pnum}-${bnum}`} value={value} onChange={handler}>
-        <ToggleButton variant="outline-primary" value={true}>{yes || "Yes"}</ToggleButton>
-        <ToggleButton variant="outline-primary" value={false}>{no || "No"}</ToggleButton>
-      </ToggleButtonGroup>
-    </React.Fragment>;
   return (
     <div>
       <div>{prompt}</div>
-      {body}
+      <ToggleButtonGroup
+        name={`tf-${qnum}-${pnum}-${bnum}`}
+        type="radio"
+        value={value}
+        onChange={onChange}>
+        <ToggleButton variant="outline-primary" value={true}>{yesLabel || "Yes"}</ToggleButton>
+        <ToggleButton variant="outline-primary" value={false}>{noLabel || "No"}</ToggleButton>
+      </ToggleButtonGroup>
     </div>
   )
 }

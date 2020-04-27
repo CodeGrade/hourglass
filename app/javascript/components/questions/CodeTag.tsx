@@ -1,15 +1,13 @@
 import React from 'react';
+import { CodeTag } from '../../types';
 
 interface CodeTagProps {
-  codetag: CodeTag;
-  qnum: number;
-  pnum: number;
-  bnum: number;
+  info: CodeTag;
 }
 
 export function CodeTag(props: CodeTagProps) {
-  const { codetag } = props;
-  const { choices } = codetag;
+  const { info } = props;
+  const { choices } = info;
   return (
     <p>
       TODO: CodeTag with choices from <i>{choices}</i>.

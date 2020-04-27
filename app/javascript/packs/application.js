@@ -14,7 +14,6 @@ require("channels");
 require('codemirror');
 require('jquery');
 require('jquery-ui');
-require('../filepicker-widget.js');
 import './bootstrap.js';
 import './bootstrap.scss';
 import './codemirror.js';

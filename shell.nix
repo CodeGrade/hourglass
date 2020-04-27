@@ -55,11 +55,12 @@ in mkShell {
     yarn
     start_postgres
     stop_postgres
+    nodePackages.typescript
+    nodePackages.typescript-language-server
   ];
 
   shellHook = ''
     ${postgres_setup}
     ${gem_setup}
-    export PATH="$PWD/node_modules/.bin/:$PATH"
   '';
 }

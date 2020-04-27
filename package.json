@@ -32,7 +32,6 @@
   "devDependencies": {
     "eslint": "^6.8.0",
     "eslint_d": "^8.1.1",
-    "typescript-language-server": "^0.4.0",
     "webpack-dev-server": "^3.10.3"
   }
 }

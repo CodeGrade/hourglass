@@ -1,5 +1,5 @@
 class ExamsController < ApplicationController
-  before_action :require_current_user, except: [:save_snapshot]
+  before_action :require_current_user, except: [:save_snapshot, :get_snapshot]
   prepend_before_action :catch_require_current_user, only: [:save_snapshot]
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create, :save_snapshot]
@@ -104,6 +104,15 @@ class ExamsController < ApplicationController
   def save_snapshot
     lockout = save_answers
     render json: { lockout: lockout }
+  end
+
+  def get_snapshot
+    unless @registration.visible_to? current_user
+      render json: { message: "There is no submission for that user." }
+      return
+    end
+    answers = @registration.get_current_answers
+    render json: { answers: answers }
   end
 
   def new

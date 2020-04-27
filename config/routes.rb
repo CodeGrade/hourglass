@@ -14,6 +14,8 @@ Rails.application.routes.draw do
       get :preview
       post :finalize
       post :submit
+
+      get :get_snapshot
       post :save_snapshot
     end
 

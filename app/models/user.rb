@@ -3,6 +3,7 @@ class User < ApplicationRecord
   has_many :registrations
   has_many :exams, through: :registrations
 
+  # professors can create exams
   enum role: [:unprivileged, :professor, :admin]
 
   def admin_or_prof?

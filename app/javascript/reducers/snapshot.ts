@@ -1,11 +1,5 @@
-import { AnswersState } from '../types';
+import { SnapshotState } from '../types';
 import { SnapshotAction } from '../actions';
-
-export interface SnapshotState {
-  isLoading: boolean;
-  success: boolean;
-  message: string;
-}
 
 export function snapshot(state: SnapshotState = null, action: SnapshotAction): SnapshotState {
   switch (action.type) {

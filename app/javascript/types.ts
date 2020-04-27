@@ -1,3 +1,14 @@
+export interface ExamState {
+  answers: AnswersState;
+  snapshot: SnapshotState;
+}
+
+export interface SnapshotState {
+  isLoading: boolean;
+  success: boolean;
+  message: string;
+}
+
 export interface AnswersState {
   [qnum: number]: {
     [pnum: number]: {

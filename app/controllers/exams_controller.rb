@@ -78,7 +78,7 @@ class ExamsController < ApplicationController
 
   # returns true if lockout should occur
   def save_answers(final = false)
-    answers = params.require(:answers).permit(question: {}).to_h[:question]
+    answers = params.permit(:id, exam: {}, answers: {}).to_h[:answers]
     unless @registration.allow_submission?
       return true
     end

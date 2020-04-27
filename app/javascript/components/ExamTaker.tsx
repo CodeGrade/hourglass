@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { examStore } from '../store';
 import { ExamInfo } from '../types';
 import { Question } from './Question';
@@ -8,6 +8,7 @@ import { Container } from 'react-bootstrap';
 import { Provider } from 'react-redux';
 import { ExamContextProvider } from '../context';
 import { createMap } from '../files';
+import SnapshotInfo from '../containers/SnapshotInfo';
 
 interface ExamTakerProps {
   exam: ExamInfo;
@@ -23,6 +24,7 @@ function ExamTaker(props: ExamTakerProps) {
     <Container>
       <ExamContextProvider value={{ files, fmap }}>
         <Provider store={store}>
+          <SnapshotInfo />
           <div><HTML value={instructions} /></div>
           {reference && <FileViewer references={reference} />}
           <div>

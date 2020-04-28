@@ -10,8 +10,15 @@ jobs:
     services:
       postgres:
         image: postgres:11
+        env:
+          POSTGRES_USER: hourglass
+          POSTGRES_PASSWORD: hourglass
         ports: ["5432:5432"]
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
     - uses: actions/checkout@v2
     - run: |
@@ -33,8 +40,7 @@ jobs:
       run: yarn install --frozen-lockfile
     - name: Run tests
       env:
-        PGHOST: localhost
-        PGUSER: postgres
+        DATABASE_URL: postgres://hourglass:hourglass@localhost:5432/hourglass
         RAILS_ENV: test
       run: |
         bundle exec rails db:setup

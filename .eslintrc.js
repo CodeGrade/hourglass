@@ -27,7 +27,7 @@ module.exports = {
   settings: {
     "import/resolver": {
       webpack: {
-        "config": "config/webpack/development.js",
+        config: 'config/webpack/development.js',
       },
     },
     react: {
@@ -35,5 +35,15 @@ module.exports = {
     },
   },
   rules: {
+   "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        js: "never",
+        jsx: "never",
+        ts: "never",
+        tsx: "never",
+      },
+   ],
   },
 };

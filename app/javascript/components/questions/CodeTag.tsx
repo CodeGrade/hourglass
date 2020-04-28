@@ -11,9 +11,7 @@ export function CodeTag(props: CodeTagProps) {
   return (
     <p>
       TODO: CodeTag with choices from
-      {' '}
       <i>{choices}</i>
-      .
     </p>
   );
 }

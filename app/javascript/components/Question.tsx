@@ -26,7 +26,7 @@ export function Question(props: QuestionProps) {
                 <a href="#" className="page-link question-link">
                   {qnum + 1}
                   -
-{i + 1}
+                  {i + 1}
                 </a>
               </li>
             ))}
@@ -37,12 +37,7 @@ export function Question(props: QuestionProps) {
   }
   return (
     <div className={`question no-gutters ${separateSubparts ? 'paginated' : ''}`}>
-      <h1>
-        Question
-        {qnum + 1}
-        :
-        {name}
-      </h1>
+      <h1>{`Question ${qnum + 1}: ${name}`}</h1>
       <HTML value={description} />
       {reference && <FileViewer references={reference} />}
       {jumpToPart}

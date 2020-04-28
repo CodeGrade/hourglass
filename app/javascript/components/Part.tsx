@@ -16,19 +16,14 @@ export function Part(props: PartProps) {
   const {
     name, reference, description, points, body,
   } = part;
+  const title = `Part ${pnum + 1}: ${name}`;
+  const subtitle = `(${points} points)`;
   return (
     <div className="part">
       <h3>
-        Part
-        {pnum + 1}
-        :
-        {name}
-        {' '}
+        {title}
         <small className="float-right text-muted">
-          (
-          {points}
-          {' '}
-          points)
+          {subtitle}
         </small>
       </h3>
       <div><HTML value={description} /></div>

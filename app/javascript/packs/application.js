@@ -7,18 +7,20 @@
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
 
-require("@rails/ujs").start();
-require("@rails/activestorage").start();
-require("channels");
-
-require('codemirror');
-require('jquery');
-require('jquery-ui');
 import './bootstrap.js';
 import './bootstrap.scss';
 import './codemirror.js';
 
-import { activateCode, displayCode } from "../exam.js";
+import { activateCode, displayCode } from '../exam.js';
+
+require('@rails/ujs').start();
+require('@rails/activestorage').start();
+require('channels');
+
+require('codemirror');
+require('jquery');
+require('jquery-ui');
+
 global.activateCode = activateCode; // TODO remove
 global.displayCode = displayCode; // TODO remove
 
@@ -29,6 +31,7 @@ global.displayCode = displayCode; // TODO remove
 // const images = require.context('../images', true)
 // const imagePath = (name) => images(name, true)
 // Support component names relative to this directory:
-var componentRequireContext = require.context("components", true);
-var ReactRailsUJS = require("react_ujs");
+const componentRequireContext = require.context('components', true);
+const ReactRailsUJS = require('react_ujs');
+
 ReactRailsUJS.useContext(componentRequireContext);

@@ -20,19 +20,15 @@ function SnapshotInfo(props) {
   }, [save]);
   if (isLoading) {
     return (<button className="btn btn-info" type="button" disabled>
-      <div className={"spinner-border align-middle"} style={{width: size, height: size}} role={"status"}>
-        <span className={"sr-only"}>Loading...</span>
-      </div>
+      <span className={"spinner-border align-middle"} title="Saving answers..." style={{width: size, height: size}} role={"status"} />
     </button>);
   } else if (success) {
     return (<button className="btn btn-success" type="button" disabled>
-      <MdCloudDone size={size} role="status" />
-      <span className={"sr-only"}>Answers saved to server</span>
+      <MdCloudDone size={size} role="status" title="Answers saved to server"/>
     </button>);
   } else {
     return (<button className="btn btn-danger" type="button" disabled role={"status"}>
-      <MdError title={message} size={size} />
-      <span className={"sr-only"}>Error saving answers to server</span>
+      <MdError title={"Error saving answers to server: " + message} size={size} />
     </button>);
   }
 }

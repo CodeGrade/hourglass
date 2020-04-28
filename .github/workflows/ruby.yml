@@ -9,10 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - run: |
+        apt-get update
+        apt-get install -y build-essential
     - name: Set up Ruby 2.6
       uses: actions/setup-ruby@v1
       with:
-        ruby-version: 2.6.x
+        ruby-version: 2.6.6
     - name: Build and test with Rake
       run: |
         gem install bundler

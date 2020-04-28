@@ -24,6 +24,16 @@ module.exports = {
     'react',
     '@typescript-eslint',
   ],
+  settings: {
+    "import/resolver": {
+      webpack: {
+        "config": "config/webpack/development.js",
+      },
+    },
+    react: {
+      version: 'detect',
+    },
+  },
   rules: {
   },
 };

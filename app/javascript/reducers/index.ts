@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
-import { answers } from './answers.ts';
-import { snapshot } from './snapshot.ts';
+import { answers } from './answers';
+import { snapshot } from './snapshot';
 
 const rootReducer = combineReducers({
   answers,

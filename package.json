@@ -2,6 +2,7 @@
   "name": "hourglass",
   "private": true,
   "dependencies": {
+    "@babel/core": "^7.0.0",
     "@babel/preset-react": "^7.8.3",
     "@material-ui/core": "^4.9.5",
     "@material-ui/icons": "^4.9.1",
@@ -30,7 +31,8 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "ts-loader": "^6.2.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "webpack": "^4.0.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.30.0",

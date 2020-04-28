@@ -23,7 +23,7 @@ let
     export PGHOST=$PWD/postgres
     export LOG_PATH=$PWD/postgres/LOG
     export PGDATABASE=postgres
-    export DATABASE_URL="postgresql:///postgres?host=$PGHOST"
+    export DATABASE_URL="postgresql:///hourglass?host=$PGHOST"
     export DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true
     if [ ! -d $PGHOST ]; then
       mkdir -p $PGHOST

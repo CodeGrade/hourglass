@@ -5,15 +5,16 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-    postgres:
-      image: postgres:11
-      env:
-        POSTGRES_USER: hourglass
-        POSTGRES_DB: hourglass_test
-        POSTGRES_PASSWORD: ""
-      ports: ["5432:5432"]
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: hourglass
+          POSTGRES_DB: hourglass_test
+          POSTGRES_PASSWORD: ""
+        ports: ["5432:5432"]
     steps:
     - uses: actions/checkout@v2
     - run: |

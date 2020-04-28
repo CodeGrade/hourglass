@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { YesNo } from '../../types';
 
@@ -14,7 +14,9 @@ export interface YesNoProps {
 }
 
 export function YesNoInput(props: YesNoProps) {
-  const { qnum, pnum, bnum, info, yesLabel, noLabel, value, onChange } = props;
+  const {
+    qnum, pnum, bnum, info, yesLabel, noLabel, value, onChange,
+  } = props;
   const { prompt } = info;
   // if (readOnly) {
   //   if (value === undefined) {
@@ -38,10 +40,11 @@ export function YesNoInput(props: YesNoProps) {
         name={`tf-${qnum}-${pnum}-${bnum}`}
         type="radio"
         value={value}
-        onChange={onChange}>
-        <ToggleButton variant="outline-primary" value={true}>{yesLabel || "Yes"}</ToggleButton>
-        <ToggleButton variant="outline-primary" value={false}>{noLabel || "No"}</ToggleButton>
+        onChange={onChange}
+      >
+        <ToggleButton variant="outline-primary" value>{yesLabel || 'Yes'}</ToggleButton>
+        <ToggleButton variant="outline-primary" value={false}>{noLabel || 'No'}</ToggleButton>
       </ToggleButtonGroup>
     </div>
-  )
+  );
 }

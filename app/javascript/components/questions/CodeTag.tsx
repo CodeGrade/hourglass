@@ -10,7 +10,10 @@ export function CodeTag(props: CodeTagProps) {
   const { choices } = info;
   return (
     <p>
-      TODO: CodeTag with choices from <i>{choices}</i>.
+      TODO: CodeTag with choices from
+      {' '}
+      <i>{choices}</i>
+      .
     </p>
   );
 }

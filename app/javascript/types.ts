@@ -20,7 +20,7 @@ export interface AnswersState {
 export type StatePath = Array<number | string>;
 
 export interface Code {
-  type: "Code";
+  type: 'Code';
   prompt: Array<string>;
   lang: string;
 
@@ -31,7 +31,7 @@ export interface Code {
 export type CodeState = string;
 
 export interface AllThatApply {
-  type: "AllThatApply";
+  type: 'AllThatApply';
   options: Array<string>;
   prompt: Array<string>;
 }
@@ -41,15 +41,15 @@ export interface AllThatApplyState {
 }
 
 export interface YesNo {
-  type: "YesNo" | "TrueFalse";
+  type: 'YesNo' | 'TrueFalse';
   prompt: Array<string>;
 }
 
 export type YesNoState = boolean;
 
 export interface CodeTag {
-  type: "CodeTag";
-  choices: "all" | "part" | "question";
+  type: 'CodeTag';
+  choices: 'all' | 'part' | 'question';
 }
 
 export interface CodeTagState {
@@ -57,7 +57,7 @@ export interface CodeTagState {
 }
 
 export interface MultipleChoice {
-  type: "MultipleChoice";
+  type: 'MultipleChoice';
   prompt: Array<string>; // (html)
   options: Array<string>; // (html)
 }
@@ -65,14 +65,14 @@ export interface MultipleChoice {
 export type MultipleChoiceState = number;
 
 export interface Text {
-  type: "Text";
+  type: 'Text';
   prompt: Array<string>; // (html)
 }
 
 export type TextState = string;
 
 export interface Matching {
-  type: "Matching";
+  type: 'Matching';
   promptLabel?: string; // (html)
   prompts: Array<string>; // (html)
   valuesLabel?: string;
@@ -88,7 +88,7 @@ export type BodyItem = HTML | AllThatApply | Code | YesNo | CodeTag | MultipleCh
 export type AnswerState = AllThatApplyState | CodeState | YesNoState | CodeTagState | MultipleChoiceState | TextState | MatchingState;
 
 type HTML = {
-  type: "HTML";
+  type: 'HTML';
   value: string;
 };
 
@@ -117,14 +117,14 @@ export interface Exam {
 export type FileRef = SingleFileRef | DirRef;
 
 export interface SingleFileRef {
-  type: "file";
+  type: 'file';
 
   // The full path of the file.
   path: string;
 }
 
 export interface DirRef {
-  type: "dir";
+  type: 'dir';
 
   // The full path of the directory.
   path: string;
@@ -132,7 +132,7 @@ export interface DirRef {
 
 // A tree of files, used in displaying treeview references.
 export interface ExamSingleFile {
-  filedir: "file";
+  filedir: 'file';
 
   // Label for the file.
   text: string;
@@ -153,7 +153,7 @@ export interface ExamSingleFile {
 }
 
 export interface ExamDir {
-  filedir: "dir";
+  filedir: 'dir';
 
   // Label for the directory (with trailing slash)
   text: string;
@@ -188,4 +188,3 @@ export interface ExamInfo {
   // Questions and their references.
   info: Exam;
 }
-

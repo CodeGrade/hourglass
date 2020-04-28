@@ -26,15 +26,15 @@ interface SnapshotLoadResult {
 }
 
 export function loadSnapshot() {
-  return dispatch => {
+  return (dispatch) => {
     dispatch(snapshotLoading());
     fetch(`${document.URL}/get_snapshot`)
       .then((result) => result.json() as Promise<SnapshotLoadResult>)
-      .then(result => {
+      .then((result) => {
         const { answers } = result;
         dispatch(loadSnapshotAction(answers));
         dispatch(snapshotSuccess());
-      }).catch(err => {
+      }).catch((err) => {
         dispatch(snapshotFailure(String(err)));
       });
   };
@@ -63,11 +63,11 @@ export function saveSnapshot() {
       credentials: 'same-origin',
     })
       .then((result) => result.json() as Promise<SnapshotSaveResult>)
-      .then(result => {
+      .then((result) => {
         const { lockout } = result;
         console.log('lockout: ', lockout);
         dispatch(snapshotSuccess());
-      }).catch(err => {
+      }).catch((err) => {
         dispatch(snapshotFailure(String(err)));
       });
   };

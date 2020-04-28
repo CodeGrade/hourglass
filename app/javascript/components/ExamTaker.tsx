@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
+import { Container } from 'react-bootstrap';
+import { Provider } from 'react-redux';
 import { examStore } from '../store';
 import { ExamInfo } from '../types';
 import { Question } from './Question';
 import { FileViewer } from './FileViewer';
 import { HTML } from './questions/HTML';
-import { Container } from 'react-bootstrap';
-import { Provider } from 'react-redux';
 import { ExamContextProvider } from '../context';
 import { createMap } from '../files';
 import SnapshotInfo from '../containers/SnapshotInfo';

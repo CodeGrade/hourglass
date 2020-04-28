@@ -48,6 +48,6 @@
     "webpack-dev-server": "^3.10.3"
   },
   "scripts": {
-    "lint": "eslint app/javascript/"
+    "lint": "eslint 'app/javascript/**/*'"
   }
 }

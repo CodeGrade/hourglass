@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Editor } from './ExamCodeBox';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { Row, Col } from 'react-bootstrap';
+import { Editor } from './ExamCodeBox';
 import { FileRef, ExamFile, Files } from '../types';
 import { useExamContext } from '../context';
 import { getFilesForRefs } from '../files';
@@ -15,25 +15,25 @@ interface FilesProps {
 function Files(props: FilesProps) {
   const { files } = props;
   return (
-    <React.Fragment>
-    {files.map((f) => {
-      const nodeId = f.rel_path;
-      switch (f.filedir) {
-        case 'dir':
-          return (
-            <TreeItem label={f.text} key={nodeId} nodeId={nodeId}>
-              <Files files={f.nodes} />
-            </TreeItem>
-          );
-        case 'file':
-          return (
-            <TreeItem label={f.text} key={nodeId} nodeId={nodeId} />
-          );
-        default:
-          throw new Error("Invalid file type");
-      }
-    })}
-    </React.Fragment>
+    <>
+      {files.map((f) => {
+        const nodeId = f.rel_path;
+        switch (f.filedir) {
+          case 'dir':
+            return (
+              <TreeItem label={f.text} key={nodeId} nodeId={nodeId}>
+                <Files files={f.nodes} />
+              </TreeItem>
+            );
+          case 'file':
+            return (
+              <TreeItem label={f.text} key={nodeId} nodeId={nodeId} />
+            );
+          default:
+            throw new Error('Invalid file type');
+        }
+      })}
+    </>
   );
 }
 
@@ -50,11 +50,10 @@ function FileContents(props: FileContentsProps) {
     return (
       <Editor readOnly language={f.type} value={f.contents} />
     );
-  } else {
-    return (
-      <Editor readOnly lineNumbers={false} value={"Select a file..."  } />
-    );
   }
+  return (
+    <Editor readOnly lineNumbers={false} value="Select a file..." />
+  );
 }
 
 interface FileTreeProps {
@@ -85,7 +84,7 @@ interface FileViewerProps {
 export function FileViewer(props: FileViewerProps) {
   const { references } = props;
   const { files, fmap } = useExamContext();
-  const [selectedID, setSelectedID] = useState("");
+  const [selectedID, setSelectedID] = useState('');
   const filteredFiles = getFilesForRefs(fmap, references);
   return (
     <Row>

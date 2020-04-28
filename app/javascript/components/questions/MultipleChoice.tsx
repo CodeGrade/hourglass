@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import { Form } from 'react-bootstrap';
 import { MultipleChoice, MultipleChoiceState } from '../../types';
 
@@ -11,7 +11,7 @@ interface MultipleChoiceProps {
 export function MultipleChoice(props: MultipleChoiceProps) {
   const { info, value, onChange } = props;
   const { options, prompt } = info;
-  //if (readOnly) {
+  // if (readOnly) {
   //  if (value === undefined) {
   //    theRest = (<React.Fragment>
   //      <b>Answer: </b>
@@ -26,29 +26,27 @@ export function MultipleChoice(props: MultipleChoiceProps) {
 
   //    </React.Fragment>)
   //  }
-  //} else {
-  const handler = event => {
+  // } else {
+  const handler = (event) => {
     const val = event.target.value;
     onChange(val);
-  }
+  };
   return (
     <div>
       <div>{prompt}</div>
       <i>(Select one of the following responses)</i>
       <Form.Group>
-        {options.map((option, idx) => {
-          return (
-            <Form.Check
-              type="radio"
-              value={idx}
-              label={option}
-              onChange={handler}
-              checked={value == idx}
-              key={idx}
-            />
-          );
-        })}
+        {options.map((option, idx) => (
+          <Form.Check
+            type="radio"
+            value={idx}
+            label={option}
+            onChange={handler}
+            checked={value == idx}
+            key={idx}
+          />
+        ))}
       </Form.Group>
     </div>
-  )
+  );
 }

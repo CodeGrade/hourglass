@@ -1,7 +1,7 @@
-import React from "react";
-import { Editor } from "../ExamCodeBox";
+import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { HTML } from "./HTML";
+import { Editor } from '../ExamCodeBox';
+import { HTML } from './HTML';
 import { Code, CodeState } from '../../types';
 
 interface CodeProps {
@@ -13,14 +13,14 @@ interface CodeProps {
 export function Code(props: CodeProps) {
   const { info, value, onChange } = props;
   const { prompt, lang } = info;
-  //let theRest = null;
-  //if (readOnly) {
+  // let theRest = null;
+  // if (readOnly) {
   //  if (/\S/.test(initial)) {
   //    theRest = <Renderer className="border" value={initial} language={lang} />;
   //  } else {
   //    theRest = <i>No answer given.</i>;
   //  }
-  //} else {
+  // } else {
   const editor = (
     <Editor
       value={value}
@@ -33,7 +33,7 @@ export function Code(props: CodeProps) {
     <Container>
       <Row>
         <Col sm={12}>
-          {prompt.map((p, i) => <HTML key={i} value={p}/>)}
+          {prompt.map((p, i) => <HTML key={i} value={p} />)}
         </Col>
         <Col sm={12}>
           {editor}

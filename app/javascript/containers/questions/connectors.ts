@@ -6,7 +6,7 @@ const mapStateToProps = (state, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
   return {
     value: getAtPath(state, qnum, pnum, bnum),
-  }
+  };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
@@ -16,9 +16,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       updateAnswer(
         [qnum, pnum, bnum],
         newState,
-      )
+      ),
     ),
-  }
+  };
 };
 
 export const connectWithPath = connect(mapStateToProps, mapDispatchToProps);
@@ -27,7 +27,7 @@ const mapStateToPropsIndexed = (state, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
   return {
     value: getAtPath(state, qnum, pnum, bnum),
-  }
+  };
 };
 
 const mapDispatchToPropsIndexed = (dispatch, ownProps) => {
@@ -37,9 +37,9 @@ const mapDispatchToPropsIndexed = (dispatch, ownProps) => {
       updateAnswer(
         [qnum, pnum, bnum, index],
         newState,
-      )
+      ),
     ),
-  }
+  };
 };
 
 export const connectWithPathIndexed = connect(mapStateToPropsIndexed, mapDispatchToPropsIndexed);

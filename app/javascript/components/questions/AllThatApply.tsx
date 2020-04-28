@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import { Form } from 'react-bootstrap';
 
 import { AllThatApply, AllThatApplyState } from '../../types';
@@ -30,12 +30,12 @@ export function AllThatApply(props: AllThatApplyProps) {
   //     </React.Fragment>)
   //   }
   // } else {
-  const handler = index => event => {
+  const handler = (index) => (event) => {
     const val = event.target.checked;
     onChange(index, val);
-  }
-  const body =
-    <React.Fragment>
+  };
+  const body = (
+    <>
       <i>(Select all that apply)</i>
       {options.map((o, i) => {
         const val = !!value?.[i];
@@ -50,11 +50,12 @@ export function AllThatApply(props: AllThatApplyProps) {
           </Form.Group>
         );
       })}
-    </React.Fragment>;
+    </>
+  );
   return (
     <div>
       <div>{prompt}</div>
       {body}
     </div>
-  )
+  );
 }

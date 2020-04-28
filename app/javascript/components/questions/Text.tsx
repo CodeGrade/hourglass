@@ -1,7 +1,9 @@
 import React from 'react';
-import { Container, Row, Col, Form } from 'react-bootstrap';
+import {
+  Container, Row, Col, Form,
+} from 'react-bootstrap';
 import { Text, TextState } from '../../types';
-import { HTML } from "./HTML";
+import { HTML } from './HTML';
 
 interface TextProps {
   info: Text;
@@ -16,7 +18,7 @@ export function Text(props: TextProps) {
     <Container>
       <Row>
         <Col sm={12}>
-          {prompt.map((p, i) => <HTML key={i} value={p}/>)}
+          {prompt.map((p, i) => <HTML key={i} value={p} />)}
         </Col>
         <Col sm={12}>
           <Form.Control
@@ -24,7 +26,7 @@ export function Text(props: TextProps) {
             rows="3"
             placeholder="Enter your answer here"
             value={value}
-            onChange={e => {
+            onChange={(e) => {
               const elem = e.target as HTMLTextAreaElement;
               onChange(elem.value);
             }}

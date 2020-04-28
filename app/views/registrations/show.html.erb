@@ -13,15 +13,11 @@
     <p>Registration for <i><%= @registration.user.username %></i>.</p>
     <p>Updated at <i><%= @registration.updated_at %></i>.</p>
 
-  <div id="questions">
-    <% @exam.info["questions"].each_with_index do |question, index| %>
-      <%= render "exams/question", form: nil, question: question, question_number: index, readonly: @readonly %>
-    <% end %>
-    <%= javascript_tag do %>
-      $(".sourceCode").each(activateCode);
-      $(".sourceCodeDisplay").each(displayCode);
-    <% end %>
-  </div>
-
+    <% # TODO move this to react ExamViewer %>
+    <div id="questions">
+      <% @exam.info["questions"].each_with_index do |question, index| %>
+        <%= render "exams/question", form: nil, question: question, question_number: index, readonly: @readonly %>
+      <% end %>
+    </div>
   </div>
 </div>

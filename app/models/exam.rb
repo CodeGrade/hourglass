@@ -85,16 +85,23 @@ class Exam < ApplicationRecord
                 'initial' => b['Code']['initial']
               }
             elsif b.key? 'CodeTag'
-              if b['CodeTag']['choices'] == 'part' && p['reference'].nil?
-                throw 'No reference for part.'
-              elsif b['CodeTag']['choices'] == 'question' && q['reference'].nil?
-                throw 'No reference for question.'
-              elsif b['CodeTag']['choices'] == 'all' && ret['reference'].nil?
-                throw 'No reference for exam.'
-              end
+              referent =
+                if b['CodeTag']['choices'] == 'part'
+                  throw 'No reference for part.' if p['reference'].nil?
+                  p
+                elsif b['CodeTag']['choices'] == 'question'
+                  throw 'No reference for question.' if q['reference'].nil?
+                  q
+                elsif b['CodeTag']['choices'] == 'all'
+                  throw 'No reference for exam.' if ret['reference'].nil?
+                  ret
+                else
+                  throw "CodeTag reference is invalid."
+                end
               p['body'][bnum] = {
                 'type' => 'CodeTag',
-                'choices' => b['CodeTag']['choices'],
+                'choices' => referent['reference'],
+                'prompt' => b['CodeTag']['prompt'],
               }
               p['body'][bnum]['correctAnswer'] = b['CodeTag']['correctAnswer'] if include_answers
             elsif b.key? 'Matching'

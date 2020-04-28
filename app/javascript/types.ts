@@ -1,3 +1,5 @@
+import CodeMirror from 'codemirror';
+
 export interface ExamState {
   answers: AnswersState;
   snapshot: SnapshotState;
@@ -49,11 +51,15 @@ export type YesNoState = boolean;
 
 export interface CodeTag {
   type: 'CodeTag';
-  choices: 'all' | 'part' | 'question';
+  prompt: Array<string>;
+  choices: Array<FileRef>;
 }
 
+export type CMMarks = CodeMirror.TextMarker[];
+
 export interface CodeTagState {
-  // TODO
+  selectedFile?: string;
+  marks?: CMMarks;
 }
 
 export interface MultipleChoice {

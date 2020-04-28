@@ -29,7 +29,11 @@ function ExamTaker(props: ExamTakerProps) {
           {reference && <FileViewer references={reference} />}
           <div>
             {questions.map((q, i) => (
-              <Question question={q} qnum={i} key={i} />
+              <Question
+                question={q}
+                qnum={i}
+                key={i}
+              />
             ))}
           </div>
         </Provider>

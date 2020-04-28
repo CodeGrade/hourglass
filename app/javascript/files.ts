@@ -1,4 +1,4 @@
-import { FileMap, Files, FileRef } from './types';
+import { ExamFile, FileMap, Files, FileRef } from './types';
 
 export function createMap(files: Files): FileMap {
   const ret = {};
@@ -17,6 +17,21 @@ export function createMap(files: Files): FileMap {
     }
   }
   return ret;
+}
+
+export function firstFile(files: Files): ExamFile {
+  for (const file of files) {
+    switch (file.filedir) {
+      case 'file':
+        return file;
+      case 'dir':
+        const firstChild = firstFile(file.nodes);
+        if (firstChild) {
+          return firstChild;
+        }
+    }
+  }
+  return undefined;
 }
 
 export function getFilesForRefs(map: FileMap, refs: FileRef[]): Files {

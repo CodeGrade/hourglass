@@ -42,7 +42,12 @@ export function Question(props: QuestionProps) {
       {reference && <FileViewer references={reference} />}
       {jumpToPart}
       {parts.map((p, i) => (
-        <Part part={p} pnum={i} qnum={qnum} key={i} />
+        <Part
+          part={p}
+          pnum={i}
+          qnum={qnum}
+          key={i}
+        />
       ))}
     </div>
   );

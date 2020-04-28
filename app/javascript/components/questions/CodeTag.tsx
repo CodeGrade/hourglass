@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FileRef, CodeTag, CodeTagState } from '../../types';
 import { Row, Col, Modal, Button } from 'react-bootstrap';
-import { FileViewer } from '../FileViewer';
+import { ControlledFileViewer } from '../FileViewer';
 import { HTML } from './HTML';
 
 interface FileModalProps {
@@ -15,7 +15,6 @@ interface FileModalProps {
 function FileModal(props) {
   const { show, onClose, onSave, references, startValue } = props;
   const [selected, setSelected] = useState(startValue);
-  const { selectedFile, marks } = selected;
   return (
     <Modal
       show={show}
@@ -28,12 +27,11 @@ function FileModal(props) {
       </Modal.Header>
       <Modal.Body>
         wait
-        {/*<FileViewer
-          controlled
+        <ControlledFileViewer
           references={references}
-          selection={selectedFile}
+          selection={selected}
           onSelectionChange={setSelected}
-        />*/}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onClose}>
@@ -66,6 +64,14 @@ export function CodeTag(props: CodeTagProps) {
          </Col>
        </Row>
       }
+      <p>
+        <b>Selected file:</b>
+        <span>{value?.selectedFile || "none"}</span>
+      </p>
+      <p>
+        <b>Selected marks:</b>
+        <span>{JSON.stringify(value?.marks || [])}</span>
+      </p>
       <Button
         onClick={() => setShowModal(true)}
       >
@@ -74,12 +80,12 @@ export function CodeTag(props: CodeTagProps) {
       <FileModal
         references={choices}
         show={showModal}
-        onClose={()=>setShowModal(false)}
-        onSave={(selectedMarks)=> {
+        onClose={() => setShowModal(false)}
+        onSave={(newState) => {
           setShowModal(false);
-          onChange(selectedMarks);
+          onChange(newState);
         }}
-        startValue={value ?? {}}
+        startValue={value}
       />
     </div>
   );

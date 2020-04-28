@@ -120,3 +120,39 @@ interface ControlledFileViewerProps {
   selection?: CodeTagState;
   onSelectionChange: (newSelection: CodeTagState) => void;
 }
+
+export function ControlledFileViewer(props: ControlledFileViewerProps) {
+  let { references, selection, onSelectionChange } = props;
+  const { fmap } = useExamContext();
+  const filteredFiles = getFilesForRefs(fmap, references);
+  const first = firstFile(filteredFiles);
+  const firstID = first?.rel_path;
+  if (!selection) {
+    selection = {
+      selectedFile: firstID,
+      marks: [],
+    };
+  }
+  const { selectedFile, marks } = selection;
+  return (
+    <Row>
+      <Col sm={3}>
+        <FileTree
+          files={filteredFiles}
+          selectedFile={selectedFile}
+          onChangeFile={(file) => onSelectionChange({
+            selectedFile: file,
+            marks,
+          })}
+        />
+      </Col>
+      <Col sm={9}>
+        <FileContents
+          selectedFile={selectedFile}
+        />
+      </Col>
+    </Row>
+  );
+}
+
+/*TODO: ongutterclick*/

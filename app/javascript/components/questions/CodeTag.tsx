@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FileRef, CodeTag, CodeTagState } from '../../types';
 import { Row, Col, Modal, Button } from 'react-bootstrap';
 import { ControlledFileViewer } from '../FileViewer';
@@ -26,12 +26,32 @@ function FileModal(props) {
         <Modal.Title>Choose a line</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        wait
         <ControlledFileViewer
           references={references}
           selection={selected}
-          onSelectionChange={setSelected}
+          onChangeFile={(newFile) => {
+            setSelected(old => ({
+              ...old,
+              selectedFile: newFile,
+            }));
+          }}
+          onChangeLine={(newLine) => {
+            setSelected(old => ({
+              ...old,
+              lineNumber: newLine,
+            }));
+          }}
         />
+        <div>
+          <p>
+            <b>Selected file:</b>
+            <span>{selected?.selectedFile || "none"}</span>
+          </p>
+          <p>
+            <b>Selected line number:</b>
+            <span>{selected?.lineNumber || "none"}</span>
+          </p>
+        </div>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onClose}>
@@ -69,8 +89,8 @@ export function CodeTag(props: CodeTagProps) {
         <span>{value?.selectedFile || "none"}</span>
       </p>
       <p>
-        <b>Selected marks:</b>
-        <span>{JSON.stringify(value?.marks || [])}</span>
+        <b>Selected line number:</b>
+        <span>{value?.lineNumber || "none"}</span>
       </p>
       <Button
         onClick={() => setShowModal(true)}

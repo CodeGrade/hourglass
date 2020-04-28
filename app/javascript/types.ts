@@ -1,5 +1,3 @@
-import CodeMirror from 'codemirror';
-
 export interface ExamState {
   answers: AnswersState;
   snapshot: SnapshotState;
@@ -55,11 +53,9 @@ export interface CodeTag {
   choices: Array<FileRef>;
 }
 
-export type CMMarks = CodeMirror.TextMarker[];
-
 export interface CodeTagState {
   selectedFile?: string;
-  marks?: CMMarks;
+  lineNumber: number;
 }
 
 export interface MultipleChoice {

@@ -4,7 +4,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { Row, Col } from 'react-bootstrap';
 import { Editor } from './ExamCodeBox';
-import { CodeTagState, CMMarks, FileRef, ExamFile, Files } from '../types';
+import { CodeTagState, FileRef, ExamFile, Files } from '../types';
 import { useExamContext } from '../context';
 import { firstFile, getFilesForRefs } from '../files';
 
@@ -39,11 +39,11 @@ function Files(props: FilesProps) {
 
 interface FileContentsProps {
   selectedFile: string;
-  onMark?: (marks: CMMarks) => void;
+  onGutterClick?: (lineNum: number) => void;
 }
 
 function FileContents(props: FileContentsProps) {
-  const { selectedFile } = props;
+  const { selectedFile, onGutterClick } = props;
   const { fmap } = useExamContext();
   const f = fmap[selectedFile];
   if (f?.filedir == 'file') {
@@ -52,11 +52,16 @@ function FileContents(props: FileContentsProps) {
         readOnly
         language={f.type}
         value={f.contents}
+        onGutterClick={(_ed, lineNum) => {
+          if (onGutterClick) {
+            onGutterClick(lineNum + 1);
+          }
+        }}
       />
     );
   }
-  return ( // TODO: error boundaries
-    <p>Error rendering files.</p>
+  return (
+    <p>Choose a file.</p>
   );
 }
 
@@ -118,41 +123,32 @@ export function FileViewer(props: FileViewerProps) {
 interface ControlledFileViewerProps {
   references: FileRef[];
   selection?: CodeTagState;
-  onSelectionChange: (newSelection: CodeTagState) => void;
+  onChangeLine: (lineNumber: number) => void;
+  onChangeFile: (file: string) => void;
 }
 
 export function ControlledFileViewer(props: ControlledFileViewerProps) {
-  let { references, selection, onSelectionChange } = props;
+  const { references, onChangeFile, onChangeLine } = props;
   const { fmap } = useExamContext();
   const filteredFiles = getFilesForRefs(fmap, references);
   const first = firstFile(filteredFiles);
   const firstID = first?.rel_path;
-  if (!selection) {
-    selection = {
-      selectedFile: firstID,
-      marks: [],
-    };
-  }
-  const { selectedFile, marks } = selection;
+  let { selection } = props;
   return (
     <Row>
       <Col sm={3}>
         <FileTree
           files={filteredFiles}
-          selectedFile={selectedFile}
-          onChangeFile={(file) => onSelectionChange({
-            selectedFile: file,
-            marks,
-          })}
+          selectedFile={selection?.selectedFile}
+          onChangeFile={onChangeFile}
         />
       </Col>
       <Col sm={9}>
         <FileContents
-          selectedFile={selectedFile}
+          selectedFile={selection?.selectedFile}
+          onGutterClick={onChangeLine}
         />
       </Col>
     </Row>
   );
 }
-
-/*TODO: ongutterclick*/

@@ -30,19 +30,21 @@ export function Code(props: CodeProps) {
   );
 
   return (
-    <Container>
+    <>
       <Row>
-        <Col sm={12}>
+        <Col>
           {prompt.map((p, i) => <HTML key={i} value={p} />)}
         </Col>
-        <Col sm={12}>
+      </Row>
+      <Row>
+        <Col>
           {editor}
         </Col>
       </Row>
-    </Container>
+    </>
   );
   /*
-  return (
+     return (
 
 <div class="col-12">
   <div><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>

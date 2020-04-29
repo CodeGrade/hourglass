@@ -80,6 +80,10 @@ function FileContents(props: FileContentsProps) {
         onCursor={(ed, pos) => {
           if (ed.hasFocus()) handleLineClick(pos.line);
         }}
+        onFocus={(ed, event) => {
+          const { line } = ed.getCursor();
+          handleLineClick(line);
+        }}
       />
     );
   }

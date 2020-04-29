@@ -28,6 +28,7 @@ export interface EditorProps {
   cursor?: IControlledCodeMirror["cursor"];
   onCursor?: IControlledCodeMirror["onCursor"];
   onBeforeChange?: IControlledCodeMirror["onBeforeChange"];
+  onFocus?: IControlledCodeMirror["onFocus"];
   refreshProps?: any[];
 }
 
@@ -37,6 +38,7 @@ export const Editor = (props: EditorProps) => {
     cursor, onCursor,
     onGutterClick,
     onBeforeChange,
+    onFocus,
     refreshProps: rp,
   } = props;
   const refreshProps = rp ?? [];
@@ -82,6 +84,10 @@ export const Editor = (props: EditorProps) => {
       onCursor={(...args) => {
         // this callback always needs to be defined
         if (onCursor) onCursor(...args);
+      }}
+      onFocus={(...args) => {
+        // this callback always needs to be defined
+        if (onFocus) onFocus(...args);
       }}
       value={value}
       options={myOptions}

@@ -74,14 +74,14 @@ function FileModal(props) {
           references={references}
           selection={selected}
           onChangeFile={(newFile) => {
-            setSelected(old => ({
-              ...old,
+            setSelected({
               selectedFile: newFile,
-            }));
+              lineNumber: undefined,
+            });
           }}
           onChangeLine={(newLine) => {
             setSelected(old => ({
-              ...old,
+              selectedFile: old.selectedFile,
               lineNumber: newLine,
             }));
           }}

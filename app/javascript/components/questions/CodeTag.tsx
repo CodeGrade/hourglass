@@ -122,7 +122,7 @@ export function CodeTag(props: CodeTagProps) {
   const { choices, prompt } = info;
   const [showModal, setShowModal] = useState(false);
   return (
-    <Row className="w-100">
+    <Row>
       <Col>
         {prompt &&
          <Row>

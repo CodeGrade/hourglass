@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table } from 'react-bootstrap';
+import { Table, Col } from 'react-bootstrap';
 import { Body } from './Body';
 import { HTML } from './questions/HTML';
 import { FileViewer } from './FileViewer';
@@ -33,8 +33,10 @@ export function Part(props: PartProps) {
         <tbody>
           {body.map((b, i) => (
             <tr key={i}>
-              <td className="row no-gutters">
-                <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
+              <td className="row w-100 no-gutters">
+                <Col>
+                  <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
+                </Col>
               </td>
             </tr>
           ))}

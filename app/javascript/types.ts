@@ -82,7 +82,7 @@ export interface Matching {
 }
 
 export interface MatchingState {
-  // TODO
+  [index: number]: number;
 }
 
 export type BodyItem = HTML | AllThatApply | Code | YesNo | CodeTag | MultipleChoice | Text | Matching;

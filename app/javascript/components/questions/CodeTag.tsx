@@ -12,7 +12,7 @@ function CodeTagVal(props: CodeTagValProps) {
   const { value } = props;
   return (
     <div>
-      <p>
+      <span className="mr-2">
         <b className="mr-2">File:</b>
         {value?.selectedFile
         ? (
@@ -22,8 +22,8 @@ function CodeTagVal(props: CodeTagValProps) {
         )
         : <i>Unanswered</i>
         }
-      </p>
-      <p>
+      </span>
+      <span>
         <b className="mr-2">Line:</b>
         {value?.lineNumber
         ? (
@@ -33,7 +33,7 @@ function CodeTagVal(props: CodeTagValProps) {
         )
         : <i>Unanswered</i>
         }
-      </p>
+      </span>
     </div>
   );
 }
@@ -131,22 +131,30 @@ export function CodeTag(props: CodeTagProps) {
            </Col>
          </Row>
         }
-        <CodeTagVal value={value} />
-        <Button
-          onClick={() => setShowModal(true)}
-        >
-          Choose line
-        </Button>
-        <FileModal
-          references={choices}
-          show={showModal}
-          onClose={() => setShowModal(false)}
-          onSave={(newState) => {
-            setShowModal(false);
-            onChange(newState);
-          }}
-          startValue={value}
-        />
+        <Row className="mt-2">
+          <Col>
+            <CodeTagVal value={value} />
+          </Col>
+        </Row>
+        <Row className="mt-2">
+          <Col>
+            <Button
+              onClick={() => setShowModal(true)}
+            >
+              Choose line
+            </Button>
+            <FileModal
+              references={choices}
+              show={showModal}
+              onClose={() => setShowModal(false)}
+              onSave={(newState) => {
+                setShowModal(false);
+                onChange(newState);
+              }}
+              startValue={value}
+            />
+          </Col>
+        </Row>
       </Col>
     </Row>
   );

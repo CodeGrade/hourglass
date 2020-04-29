@@ -16,7 +16,8 @@ export function Part(props: PartProps) {
   const {
     name, reference, description, points, body,
   } = part;
-  const title = `Part ${pnum + 1}: ${name}`;
+  let title = `Part ${pnum + 1}`;
+  if (name) title += `: ${name}`;
   const subtitle = `(${points} points)`;
   return (
     <div className="part">

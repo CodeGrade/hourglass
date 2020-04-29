@@ -85,7 +85,7 @@ export const Editor = ({
       Enter: 'newlineAndIndent',
       Tab: 'indentAuto',
     }),
-    readOnly : readOnly ? 'nocursor' : false,
+    readOnly,
     ...options,
   };
   return (

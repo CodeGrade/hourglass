@@ -59,6 +59,7 @@ function FileContents(props: FileContentsProps) {
       onGutterClick(num + 1);
     }
   }
+  // TODO: don't blink the cursor
   if (f?.filedir == 'file') {
     return (
       <Editor

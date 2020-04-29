@@ -4,6 +4,40 @@ import { Row, Col, Modal, Button } from 'react-bootstrap';
 import { ControlledFileViewer } from '../FileViewer';
 import { HTML } from './HTML';
 
+interface CodeTagValProps {
+  value: CodeTagState;
+}
+
+function CodeTagVal(props: CodeTagValProps) {
+  const { value } = props;
+  return (
+    <div>
+      <p>
+        <b className="mr-2">File:</b>
+        {value?.selectedFile
+        ? (
+          <Button disabled size="sm" variant="outline-dark">
+            {value.selectedFile}
+          </Button>
+        )
+        : <i>Unanswered</i>
+        }
+      </p>
+      <p>
+        <b className="mr-2">Line:</b>
+        {value?.lineNumber
+        ? (
+          <Button disabled size="sm" variant="outline-dark">
+            {value.lineNumber}
+          </Button>
+        )
+        : <i>Unanswered</i>
+        }
+      </p>
+    </div>
+  );
+}
+
 interface FileModalProps {
   references: Array<FileRef>;
   show: boolean;
@@ -57,18 +91,11 @@ function FileModal(props) {
             }));
           }}
         />
-        <div>
-          <p>
-            <b>Selected file:</b>
-            <span>{selected?.selectedFile || "none"}</span>
-          </p>
-          <p>
-            <b>Selected line number:</b>
-            <span>{selected?.lineNumber || "none"}</span>
-          </p>
-        </div>
       </Modal.Body>
       <Modal.Footer>
+        <div className="mr-auto">
+          <CodeTagVal value={selected} />
+        </div>
         <Button variant="secondary" onClick={onClose}>
           Close
         </Button>
@@ -95,37 +122,32 @@ export function CodeTag(props: CodeTagProps) {
   const { choices, prompt } = info;
   const [showModal, setShowModal] = useState(false);
   return (
-    <div>
-      {prompt &&
-       <Row>
-         <Col sm={12}>
-           {prompt.map((p, i) => <HTML key={i} value={p} />)}
-         </Col>
-       </Row>
-      }
-      <p>
-        <b>Selected file:</b>
-        <span>{value?.selectedFile || "none"}</span>
-      </p>
-      <p>
-        <b>Selected line number:</b>
-        <span>{value?.lineNumber || "none"}</span>
-      </p>
-      <Button
-        onClick={() => setShowModal(true)}
-      >
-        Choose line
-      </Button>
-      <FileModal
-        references={choices}
-        show={showModal}
-        onClose={() => setShowModal(false)}
-        onSave={(newState) => {
-          setShowModal(false);
-          onChange(newState);
-        }}
-        startValue={value}
-      />
-    </div>
+    <Row className="w-100">
+      <Col>
+        {prompt &&
+         <Row>
+           <Col sm={12}>
+             {prompt.map((p, i) => <HTML key={i} value={p} />)}
+           </Col>
+         </Row>
+        }
+        <CodeTagVal value={value} />
+        <Button
+          onClick={() => setShowModal(true)}
+        >
+          Choose line
+        </Button>
+        <FileModal
+          references={choices}
+          show={showModal}
+          onClose={() => setShowModal(false)}
+          onSave={(newState) => {
+            setShowModal(false);
+            onChange(newState);
+          }}
+          startValue={value}
+        />
+      </Col>
+    </Row>
   );
 }

@@ -25,9 +25,10 @@ export interface Code {
   type: 'Code';
   prompt: Array<string>;
   lang: string;
+  initial: string;
 }
 
-interface MarkDescription {
+export interface MarkDescription {
   from: CodeMirror.Position;
   to: CodeMirror.Position;
   options: CodeMirror.TextMarkerOptions
@@ -157,6 +158,9 @@ export interface ExamSingleFile {
 
   // The contents of the file.
   contents: string;
+
+  // CodeMirror marks to apply
+  marks: MarkDescription[];
 
   // The CodeMirror type for this file.
   type: string;

@@ -2,7 +2,8 @@ import React from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Editor } from '../ExamCodeBox';
 import { HTML } from './HTML';
-import { Code, CodeState } from '../../types';
+import { MarkDescription, Code, CodeState } from '../../types';
+import { useExamContext } from '../../context';
 
 interface CodeProps {
   info: Code;
@@ -12,8 +13,15 @@ interface CodeProps {
 
 export function Code(props: CodeProps) {
   const { info, value, onChange } = props;
-  const { prompt, lang } = info;
-  const { text, marks } = value ?? { text: '', marks: [] };
+  const { prompt, lang, initial } = info;
+  const { fmap } = useExamContext();
+  const f = fmap[initial];
+  if (f?.filedir === 'dir') {
+    throw new Error("Code initial cannot be a directory.");
+  }
+  const initText = f?.contents ?? '';
+  const initMarks = f?.marks ?? [];
+  const text = value?.text ?? initText;
   // let theRest = null;
   // if (readOnly) {
   //    theRest = <Renderer className="border" value={initial} language={lang} />;
@@ -21,14 +29,20 @@ export function Code(props: CodeProps) {
   const editor = (
     <Editor
       value={text}
+      initialMarks={initMarks}
       language={lang}
       onBeforeChange={(cm, _state, newVal) => {
-        const marks = cm.getAllMarks();
-        const descriptions = marks.map(m => {
+        const marks: any = cm.getAllMarks();
+        const descriptions: MarkDescription[] = marks.map(m => {
+          const { readOnly, inclusiveLeft, inclusiveRight } = m;
           const found = m.find();
           return {
             ...found,
-            options: m.getOptions(false),
+            options: {
+              readOnly,
+              inclusiveLeft,
+              inclusiveRight,
+            }
           };
         });
         onChange({

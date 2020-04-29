@@ -66,6 +66,7 @@ function FileContents(props: FileContentsProps) {
         readOnly
         language={f.type}
         value={f.contents}
+        initialMarks={f.marks}
         onGutterClick={(_ed, lineNum) => {
           handleLineClick(lineNum);
           _ed.setCursor(lineNum);

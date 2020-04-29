@@ -166,25 +166,8 @@ class Exam < ApplicationRecord
     ret
   end
 
-  def initial_state
-    ret = {}
-    info['questions'].each_with_index do |q, qnum|
-      q['parts'].each_with_index do |p, pnum|
-        p['body'].each_with_index do |b, bnum|
-          if b['type'] == 'Code' && b['initial']
-            ret[qnum] = {} unless ret[qnum]
-            ret[qnum][pnum] = {} unless ret[qnum][pnum]
-            ret[qnum][pnum][bnum] = process_marks file(b['initial'])
-          end
-        end
-      end
-    end
-    ret
-  end
-
-  def process_marks(fname)
-    f = File.read(fname)
-    lines = f.lines.map &:chomp
+  def process_marks(contents)
+    lines = contents.lines.map &:chomp
     lines.shift if lines[0].blank?
     lines.pop if lines[-1].blank?
     marks = {
@@ -207,7 +190,7 @@ class Exam < ApplicationRecord
               ch: idx,
             },
             options: {
-              lockBefore: (lineNum == 0 && idx == 0),
+              inclusiveLeft: (lineNum == 0 && idx == 0),
             },
           }
           if marks[:byLine][lineNum][idx].nil?
@@ -224,7 +207,7 @@ class Exam < ApplicationRecord
           }
           lastLine = lineNum == lines.length - 1
           endOfLine = idx == lines[lineNum].length
-          marks[:byNum][match[1]][:options][:lockAfter] = lastLine && endOfLine
+          marks[:byNum][match[1]][:options][:inclusiveRight] = lastLine && endOfLine
           if marks[:byLine][lineNum][idx].nil?
             marks[:byLine][lineNum][idx] = {
               open: [],
@@ -286,10 +269,14 @@ class Exam < ApplicationRecord
       end
       if mimetype.starts_with? "image/"
         contents = Base64.encode(contents)
+        item[:contents] = ensure_utf8(contents, mimetype)
+      else
+        processed = process_marks(ensure_utf8(contents, mimetype))
+        item[:contents] = processed[:text]
+        item[:marks] = processed[:marks]
       end
       item[:text] = item[:path]
       # pdf_path: item[:converted_path],
-      item[:contents] = ensure_utf8(contents, mimetype)
       item[:type] = mimetype
       item[:filedir] = "file"
       item.delete(:full_path)

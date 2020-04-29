@@ -29,8 +29,9 @@ class Registration < ApplicationRecord
 
   def create_file
     FileUtils.mkdir_p exam_subs
+    init = exam.initial_state.to_json
     open(filename, 'w') do |f|
-      f.puts '"initial": {}'
+      f.puts "\"initial\": #{init}"
     end
   end
 

@@ -1,3 +1,5 @@
+import CM from 'codemirror';
+
 export interface ExamState {
   answers: AnswersState;
   snapshot: SnapshotState;
@@ -23,12 +25,18 @@ export interface Code {
   type: 'Code';
   prompt: Array<string>;
   lang: string;
-
-  // Full path to initial file.
-  initial?: string;
 }
 
-export type CodeState = string;
+interface MarkDescription {
+  from: CodeMirror.Position;
+  to: CodeMirror.Position;
+  options: CodeMirror.TextMarkerOptions
+}
+
+export type CodeState = {
+  text: string;
+  marks: MarkDescription[];
+};
 
 export interface AllThatApply {
   type: 'AllThatApply';

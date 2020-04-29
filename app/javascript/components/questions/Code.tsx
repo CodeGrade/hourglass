@@ -13,19 +13,29 @@ interface CodeProps {
 export function Code(props: CodeProps) {
   const { info, value, onChange } = props;
   const { prompt, lang } = info;
+  const { text, marks } = value ?? { text: '', marks: [] };
   // let theRest = null;
   // if (readOnly) {
-  //  if (/\S/.test(initial)) {
   //    theRest = <Renderer className="border" value={initial} language={lang} />;
-  //  } else {
-  //    theRest = <i>No answer given.</i>;
-  //  }
   // } else {
   const editor = (
     <Editor
-      value={value}
+      value={text}
       language={lang}
-      onBeforeChange={(_cm, _state, newVal) => onChange(newVal)}
+      onBeforeChange={(cm, _state, newVal) => {
+        const marks = cm.getAllMarks();
+        const descriptions = marks.map(m => {
+          const found = m.find();
+          return {
+            ...found,
+            options: m.getOptions(false),
+          };
+        });
+        onChange({
+          text: newVal,
+          marks: descriptions,
+        });
+      }}
     />
   );
 

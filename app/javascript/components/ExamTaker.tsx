@@ -19,7 +19,7 @@ function ExamTaker(props: ExamTakerProps) {
   const { files, info } = exam;
   const fmap = createMap(files);
   const { questions, instructions, reference } = info;
-  const store = examStore(files, info);
+  const store = examStore();
   return (
     <Container>
       <ExamContextProvider value={{ files, fmap }}>

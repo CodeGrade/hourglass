@@ -16,29 +16,8 @@ export const getAtPath = (state, ...path: StatePath): AnswerState => {
   return ret;
 };
 
-function initState(info: Exam, fmap: FileMap): AnswersState {
-  const ret = {};
-  info.questions.forEach((q, qi) => {
-    ret[qi] = {};
-    q.parts.forEach((p, pi) => {
-      ret[qi][pi] = {};
-      p.body.forEach((b, bi) => {
-        if (b.type == 'Code') {
-          const f = fmap[b.initial];
-          if (f?.filedir == 'file') {
-            ret[qi][pi][bi] = f.contents;
-          }
-        }
-      });
-    });
-  });
-  return ret;
-}
-
-export function examStore(files: Files, info: Exam) {
-  const fmap = createMap(files);
-  const initialState = initState(info, fmap);
-  return createStore(rootReducer, { answers: initialState }, composeWithDevTools(
+export function examStore() {
+  return createStore(rootReducer, composeWithDevTools(
     applyMiddleware(ReduxThunk),
   ));
 }

@@ -1,10 +1,11 @@
 import CM from 'codemirror';
 import 'codemirror/addon/runmode/runmode';
+import 'codemirror/addon/selection/active-line';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/theme/mdn-like';
 import React from 'react';
 import Highlighter from 'react-codemirror-runmode';
-import { Controlled as CodeMirror, IControlledCodeMirror } from 'react-codemirror2';
+import { Controlled as ControlledCodeMirror, IControlledCodeMirror } from 'react-codemirror2';
 
 function extractMarks(text) {
   const lines = text.split(/\r\n?|\n/);
@@ -79,16 +80,22 @@ export const Editor = ({
     viewportMargin: Infinity,
     lineNumbers: (lineNumbers ?? true),
     lineWrapping: false,
-    styleActiveLine: true,
     mode: language,
     extraKeys: CM.normalizeKeyMap({
       Enter: 'newlineAndIndent',
       Tab: 'indentAuto',
     }),
-    readOnly,
+    readOnly : readOnly ? 'nocursor' : false,
     ...options,
   };
-  return <CodeMirror onBeforeChange={() => {}} value={value} {...props} options={myOptions} />;
+  return (
+    <ControlledCodeMirror
+      onBeforeChange={() => {}}
+      value={value}
+      {...props}
+      options={myOptions}
+    />
+  );
 };
 
 export const Renderer = ({ value, ...props }) => (

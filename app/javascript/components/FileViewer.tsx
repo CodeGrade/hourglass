@@ -39,13 +39,26 @@ function Files(props: FilesProps) {
 
 interface FileContentsProps {
   selectedFile: string;
+  selectedLine?: number;
   onGutterClick?: (lineNum: number) => void;
 }
 
 function FileContents(props: FileContentsProps) {
-  const { selectedFile, onGutterClick } = props;
+  const { selectedFile, selectedLine, onGutterClick } = props;
   const { fmap } = useExamContext();
   const f = fmap[selectedFile];
+  let cursor;
+  if (selectedLine) {
+    cursor = {
+      line: selectedLine - 1,
+      ch: 0,
+    };
+  }
+  const handleLineClick = (num) => {
+    if (onGutterClick) {
+      onGutterClick(num + 1);
+    }
+  }
   if (f?.filedir == 'file') {
     return (
       <Editor
@@ -53,9 +66,15 @@ function FileContents(props: FileContentsProps) {
         language={f.type}
         value={f.contents}
         onGutterClick={(_ed, lineNum) => {
-          if (onGutterClick) {
-            onGutterClick(lineNum + 1);
-          }
+          handleLineClick(lineNum);
+          _ed.setCursor(lineNum);
+        }}
+        options={{
+          styleActiveLine: !!selectedLine,
+        }}
+        cursor={cursor}
+        onCursor={(_ed, pos) => {
+          handleLineClick(pos.line);
         }}
       />
     );
@@ -145,6 +164,7 @@ export function ControlledFileViewer(props: ControlledFileViewerProps) {
       <Col sm={9}>
         <FileContents
           selectedFile={selection?.selectedFile}
+          selectedLine={selection?.lineNumber}
           onGutterClick={onChangeLine}
         />
       </Col>

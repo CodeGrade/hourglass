@@ -20,10 +20,19 @@ function FileModal(props) {
     // Reset my starting state when outer state changes.
     setSelected(startValue);
   }, [startValue]);
+  const refreshCodeMirror = () => {
+    setTimeout(() => {
+      // flip the state back and forth to refresh CodeMirror
+      const old = selected;
+      setSelected({});
+      setSelected(old);
+    });
+  }
   return (
     <Modal
       show={show}
       onHide={onClose}
+      onEntering={refreshCodeMirror}
       dialogClassName="w-100 mw-100 m-2"
       centered
     >

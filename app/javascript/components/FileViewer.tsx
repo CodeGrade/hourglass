@@ -128,18 +128,17 @@ interface ControlledFileViewerProps {
 }
 
 export function ControlledFileViewer(props: ControlledFileViewerProps) {
-  const { references, onChangeFile, onChangeLine } = props;
+  const { references, selection, onChangeFile, onChangeLine } = props;
   const { fmap } = useExamContext();
   const filteredFiles = getFilesForRefs(fmap, references);
   const first = firstFile(filteredFiles);
   const firstID = first?.rel_path;
-  let { selection } = props;
   return (
     <Row>
       <Col sm={3}>
         <FileTree
           files={filteredFiles}
-          selectedFile={selection?.selectedFile}
+          selectedFile={selection?.selectedFile ?? ""}
           onChangeFile={onChangeFile}
         />
       </Col>

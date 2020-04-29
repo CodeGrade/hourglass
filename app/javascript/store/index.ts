@@ -8,7 +8,7 @@ import {
 } from '../types';
 import { createMap } from '../files';
 
-export const getAtPath = (state: ExamState, ...path: StatePath): AnswerState => {
+export const getAtPath = (state, ...path: StatePath): AnswerState => {
   let ret = state.answers;
   for (const elem of path) {
     ret = ret?.[elem];

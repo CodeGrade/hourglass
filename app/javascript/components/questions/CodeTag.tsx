@@ -14,7 +14,12 @@ interface FileModalProps {
 
 function FileModal(props) {
   const { show, onClose, onSave, references, startValue } = props;
+  // Modal has its own state so the user can manipulate it before saving.
   const [selected, setSelected] = useState(startValue);
+  useEffect(() => {
+    // Reset my starting state when outer state changes.
+    setSelected(startValue);
+  }, [startValue]);
   return (
     <Modal
       show={show}

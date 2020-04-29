@@ -9,8 +9,8 @@ import { Matching, MatchingState } from '../../types';
 
 interface MatchingProps {
   info: Matching;
-  onChange: (index: number, newVal: boolean) => void;
   value: MatchingState;
+  onChange: (index: number, newVal: number) => void;
 }
 
 export function Matching(props: MatchingProps) {

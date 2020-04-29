@@ -41,10 +41,11 @@ interface FileContentsProps {
   selectedFile: string;
   selectedLine?: number;
   onGutterClick?: (lineNum: number) => void;
+  refreshProps?: any[];
 }
 
 function FileContents(props: FileContentsProps) {
-  const { selectedFile, selectedLine, onGutterClick } = props;
+  const { selectedFile, selectedLine, onGutterClick, refreshProps } = props;
   const { fmap } = useExamContext();
   const f = fmap[selectedFile];
   let cursor;
@@ -64,6 +65,7 @@ function FileContents(props: FileContentsProps) {
     return (
       <Editor
         readOnly
+        refreshProps={refreshProps}
         language={f.type}
         value={f.contents}
         initialMarks={f.marks}
@@ -146,10 +148,11 @@ interface ControlledFileViewerProps {
   selection?: CodeTagState;
   onChangeLine: (lineNumber: number) => void;
   onChangeFile: (file: string) => void;
+  refreshProps?: any[];
 }
 
 export function ControlledFileViewer(props: ControlledFileViewerProps) {
-  const { references, selection, onChangeFile, onChangeLine } = props;
+  const { references, selection, onChangeFile, onChangeLine, refreshProps } = props;
   const { fmap } = useExamContext();
   const filteredFiles = getFilesForRefs(fmap, references);
   const first = firstFile(filteredFiles);
@@ -168,6 +171,7 @@ export function ControlledFileViewer(props: ControlledFileViewerProps) {
           selectedFile={selection?.selectedFile}
           selectedLine={selection?.lineNumber}
           onGutterClick={onChangeLine}
+          refreshProps={refreshProps}
         />
       </Col>
     </Row>

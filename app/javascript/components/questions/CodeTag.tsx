@@ -50,18 +50,12 @@ function FileModal(props) {
   const { show, onClose, onSave, references, startValue } = props;
   // Modal has its own state so the user can manipulate it before saving.
   const [selected, setSelected] = useState(startValue);
+  const [refresher, setRefresher] = useState(false);
+  const refreshCodeMirror = () => setRefresher(b => !b);
   useEffect(() => {
     // Reset my starting state when outer state changes.
     setSelected(startValue);
   }, [startValue]);
-  const refreshCodeMirror = () => {
-    setTimeout(() => {
-      // flip the state back and forth to refresh CodeMirror
-      const old = selected;
-      setSelected({});
-      setSelected(old);
-    });
-  }
   const saveEnabled = selected?.selectedFile && selected?.lineNumber;
   return (
     <Modal
@@ -76,6 +70,7 @@ function FileModal(props) {
       </Modal.Header>
       <Modal.Body>
         <ControlledFileViewer
+          refreshProps={[refresher]}
           references={references}
           selection={selected}
           onChangeFile={(newFile) => {

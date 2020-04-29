@@ -8,14 +8,14 @@ import Highlighter from 'react-codemirror-runmode';
 import { Controlled as ControlledCodeMirror, IControlledCodeMirror } from 'react-codemirror2';
 import { MarkDescription } from '../types';
 
-function applyMarks(cm: CM.Editor, marks: MarkDescription[]) {
-  marks.forEach((mark) => {
+function applyMarks(cm: CM.Editor, marks: MarkDescription[]): CM.TextMarker[] {
+  return marks.map((mark) =>
     cm.markText(mark.from, mark.to, {
       ...mark.options,
       readOnly: true,
       className: 'readOnly',
-    });
-  });
+    })
+  );
 }
 
 export interface EditorProps {
@@ -28,6 +28,7 @@ export interface EditorProps {
   cursor?: IControlledCodeMirror["cursor"];
   onCursor?: IControlledCodeMirror["onCursor"];
   onBeforeChange?: IControlledCodeMirror["onBeforeChange"];
+  refreshProps?: any[];
 }
 
 export const Editor = (props: EditorProps) => {
@@ -36,8 +37,26 @@ export const Editor = (props: EditorProps) => {
     cursor, onCursor,
     onGutterClick,
     onBeforeChange,
+    refreshProps: rp,
   } = props;
+  const refreshProps = rp ?? [];
   const [instance, setInstance] = useState(undefined);
+
+  // save current marks to clear them if we change files
+  const [appliedMarks, setAppliedMarks] = useState([]);
+  // EFFECT: clear and reset marks if instance or file changes
+  useEffect(() => {
+    if (instance && initialMarks) {
+      appliedMarks.forEach(m => m.clear());
+      setAppliedMarks(applyMarks(instance, initialMarks));
+    }
+  }, [instance, initialMarks]);
+  // EFFECT: refresh the instance if any item in refreshProps changes
+  useEffect(() => {
+    if (instance) {
+      instance.refresh();
+    }
+  }, refreshProps);
   const myOptions = {
     theme: 'mdn-like',
     indentUnit: 2,
@@ -61,6 +80,7 @@ export const Editor = (props: EditorProps) => {
       onGutterClick={onGutterClick}
       cursor={cursor}
       onCursor={(...args) => {
+        // this callback always needs to be defined
         if (onCursor) onCursor(...args);
       }}
       value={value}

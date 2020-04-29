@@ -28,6 +28,7 @@ function FileModal(props) {
       setSelected(old);
     });
   }
+  const saveEnabled = selected?.selectedFile && selected?.lineNumber;
   return (
     <Modal
       show={show}
@@ -71,7 +72,11 @@ function FileModal(props) {
         <Button variant="secondary" onClick={onClose}>
           Close
         </Button>
-        <Button variant="primary" onClick={() => onSave(selected)}>
+        <Button
+          variant="primary"
+          onClick={() => onSave(selected)}
+          disabled={!saveEnabled}
+        >
           Save Changes
         </Button>
       </Modal.Footer>

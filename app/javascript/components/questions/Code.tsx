@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Editor } from '../ExamCodeBox';
 import { HTML } from './HTML';
@@ -9,46 +9,41 @@ interface CodeProps {
   info: Code;
   value: CodeState;
   onChange: (newVal: CodeState) => void;
+  disabled: boolean;
 }
 
 export function Code(props: CodeProps) {
-  const { info, value, onChange } = props;
+  const {
+    info,
+    value: state,
+    onChange,
+    disabled,
+  } = props;
   const { prompt, lang, initial } = info;
   const { fmap } = useExamContext();
   const f = fmap[initial];
   if (f?.filedir === 'dir') {
     throw new Error("Code initial cannot be a directory.");
   }
-  const initText = f?.contents ?? '';
-  const initMarks = f?.marks ?? [];
-  const text = value?.text ?? initText;
-  // let theRest = null;
-  // if (readOnly) {
-  //    theRest = <Renderer className="border" value={initial} language={lang} />;
-  // } else {
+  if (disabled) { // TODO show a disabled editor using disabled prop below
+    return (
+      <p>Disabled</p>
+    );
+  }
+  const text = state?.text ?? f?.contents ?? '';
+  const marks = state?.marks ?? f?.marks ?? [];
   const editor = (
     <Editor
       value={text}
-      initialMarks={initMarks}
+      markDescriptions={marks}
+      valueUpdate={[disabled]}
+      disabled={disabled}
       language={lang}
-      onBeforeChange={(cm, _state, newVal) => {
-        const marks: any = cm.getAllMarks();
-        const descriptions: MarkDescription[] = marks.map(m => {
-          const { readOnly, inclusiveLeft, inclusiveRight } = m;
-          const found = m.find();
-          return {
-            ...found,
-            options: {
-              readOnly,
-              inclusiveLeft,
-              inclusiveRight,
-            }
-          };
-        });
+      onChange={(text, marks) => {
         onChange({
-          text: newVal,
-          marks: descriptions,
-        });
+          text,
+          marks,
+        })
       }}
     />
   );

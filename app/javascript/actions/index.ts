@@ -1,7 +1,7 @@
 import { AnswersState, StatePath, AnswerState } from '../types';
 
 export type Action = UpdateAnswerAction | LoadSnapshotAction;
-export type SnapshotAction = SnapshotLoading | SnapshotSuccess | SnapshotFailure;
+export type SnapshotAction = SnapshotFetching | SnapshotSaving | SnapshotSuccess | SnapshotFailure;
 
 export interface UpdateAnswerAction {
   type: 'UPDATE_ANSWER';
@@ -25,9 +25,9 @@ interface SnapshotLoadResult {
   answers: AnswersState;
 }
 
-export function loadSnapshot() {
+export function fetchSnapshot() {
   return (dispatch) => {
-    dispatch(snapshotLoading());
+    dispatch(snapshotFetching());
     fetch(`${document.URL}/get_snapshot`)
       .then((result) => result.json() as Promise<SnapshotLoadResult>)
       .then((result) => {
@@ -52,7 +52,7 @@ function getCSRFToken(): string {
 export function saveSnapshot() {
   return (dispatch, getState) => {
     const { answers } = getState();
-    dispatch(snapshotLoading());
+    dispatch(snapshotSaving());
     fetch(`${document.URL}/save_snapshot`, {
       method: 'POST',
       headers: {
@@ -73,13 +73,23 @@ export function saveSnapshot() {
   };
 }
 
-export interface SnapshotLoading {
-  type: 'SNAPSHOT_LOADING';
+export interface SnapshotFetching {
+  type: 'SNAPSHOT_FETCHING';
 }
 
-export function snapshotLoading(): SnapshotLoading {
+export function snapshotFetching(): SnapshotFetching {
   return {
-    type: 'SNAPSHOT_LOADING',
+    type: 'SNAPSHOT_FETCHING',
+  };
+}
+
+export interface SnapshotSaving {
+  type: 'SNAPSHOT_SAVING',
+}
+
+export function snapshotSaving(): SnapshotSaving {
+  return {
+    type: 'SNAPSHOT_SAVING',
   };
 }
 

@@ -5,9 +5,22 @@ export interface ExamState {
   snapshot: SnapshotState;
 }
 
+export enum SnapshotStatus {
+  LOADING = "LOADING",
+  SUCCESS = "SUCCESS",
+  FAILURE = "FAILURE",
+}
+
 export interface SnapshotState {
-  isLoading: boolean;
-  success: boolean;
+  // whether to disable the controls, because:
+  //   - the first snapshot has not been loaded yet, or
+  //   - the last snapshot failed
+  disableControls: boolean;
+
+  // status of network requests
+  status: SnapshotStatus;
+
+  // message to display with FAILURE status
   message: string;
 }
 

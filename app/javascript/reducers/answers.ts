@@ -1,10 +1,12 @@
 import { AnswersState } from '../types';
 import { Action } from '../actions';
 
-export function answers(state: AnswersState = null, action: Action): AnswersState {
+export function answers(state: AnswersState = {}, action: Action): AnswersState {
   switch (action.type) {
     case 'UPDATE_ANSWER':
-      const ret = { ...state };
+      const ret = {
+        ...state,
+      };
       let cur = ret;
       for (let i = 0; i < action.path.length - 1; i++) {
         cur[action.path[i]] = { ...cur[action.path[i]] };

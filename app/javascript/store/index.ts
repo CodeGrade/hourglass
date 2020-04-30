@@ -17,7 +17,17 @@ export const getAtPath = (state, ...path: StatePath): AnswerState => {
 };
 
 export function examStore() {
-  return createStore(rootReducer, composeWithDevTools(
+  const composeEnhancers = composeWithDevTools({
+    actionCreators: {
+      reset: () => ({
+        type: 'LOAD_SNAPSHOT',
+        answers: {},
+      }),
+    },
+    trace: true,
+    traceLimit: 25,
+  });
+  return createStore(rootReducer, composeEnhancers(
     applyMiddleware(ReduxThunk),
   ));
 }

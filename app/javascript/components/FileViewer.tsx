@@ -45,7 +45,13 @@ interface FileContentsProps {
 }
 
 function FileContents(props: FileContentsProps) {
-  const { selectedFile, selectedLine, onChangeLine, refreshProps } = props;
+  const {
+    selectedFile,
+    selectedLine,
+    onChangeLine,
+    refreshProps: rp,
+  } = props;
+  const refreshProps = rp ?? [];
   const { fmap } = useExamContext();
   const f = fmap[selectedFile];
   let cursor;
@@ -65,10 +71,11 @@ function FileContents(props: FileContentsProps) {
     return (
       <Editor
         readOnly
-        refreshProps={refreshProps}
+        refreshProps={[...refreshProps, f]}
         language={f.type}
         value={f.contents}
-        initialMarks={f.marks}
+        markDescriptions={f.marks}
+        valueUpdate={[...refreshProps, f]}
         onGutterClick={(_ed, lineNum) => {
           handleLineClick(lineNum);
           _ed.setCursor(lineNum);

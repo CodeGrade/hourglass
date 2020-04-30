@@ -25,28 +25,8 @@ export function Code(props: CodeProps) {
   if (f?.filedir === 'dir') {
     throw new Error("Code initial cannot be a directory.");
   }
-  if (disabled) { // TODO show a disabled editor using disabled prop below
-    return (
-      <p>Disabled</p>
-    );
-  }
   const text = state?.text ?? f?.contents ?? '';
   const marks = state?.marks ?? f?.marks ?? [];
-  const editor = (
-    <Editor
-      value={text}
-      markDescriptions={marks}
-      valueUpdate={[disabled]}
-      disabled={disabled}
-      language={lang}
-      onChange={(text, marks) => {
-        onChange({
-          text,
-          marks,
-        })
-      }}
-    />
-  );
 
   return (
     <>
@@ -57,7 +37,19 @@ export function Code(props: CodeProps) {
       </Row>
       <Row>
         <Col>
-          {editor}
+          <Editor
+            disabled={disabled}
+            value={text}
+            markDescriptions={marks}
+            valueUpdate={[disabled]}
+            language={lang}
+            onChange={(text, marks) => {
+              onChange({
+                text,
+                marks,
+              })
+            }}
+          />
         </Col>
       </Row>
     </>

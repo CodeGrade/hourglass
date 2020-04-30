@@ -2,6 +2,7 @@ import { connect } from 'react-redux';
 import { getAtPath } from '../../store';
 import { updateAnswer } from '../../actions';
 import { ExamState } from '../../types';
+import withDisabled from '../../components/Disabled';
 
 const mapStateToProps = (state: ExamState, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
@@ -24,7 +25,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   };
 };
 
-export const connectWithPath = connect(mapStateToProps, mapDispatchToProps);
+export const connectWithPath = (Component) =>
+  connect(mapStateToProps, mapDispatchToProps)(withDisabled(Component));
 
 const mapDispatchToPropsIndexed = (dispatch, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
@@ -38,4 +40,5 @@ const mapDispatchToPropsIndexed = (dispatch, ownProps) => {
   };
 };
 
-export const connectWithPathIndexed = connect(mapStateToProps, mapDispatchToPropsIndexed);
+export const connectWithPathIndexed = (Component) =>
+  connect(mapStateToProps, mapDispatchToPropsIndexed)(withDisabled(Component));

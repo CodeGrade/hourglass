@@ -56,15 +56,18 @@ export const Editor = (props: EditorProps) => {
     value,
     markDescriptions,
     valueUpdate,
-    options, readOnly, language,
-    cursor, onCursor,
+    options,
+    readOnly = false,
+    language = "",
+    cursor,
+    onCursor,
     onGutterClick,
     onChange,
     onBeforeChange,
     onFocus,
-    refreshProps: rp,
+    refreshProps = [],
+    disabled = false,
   } = props;
-  const refreshProps = rp ?? [];
 
   // keep track of codemirror instance
   const [instance, setInstance] = useState(undefined);
@@ -109,7 +112,7 @@ export const Editor = (props: EditorProps) => {
       Enter: 'newlineAndIndent',
       Tab: 'indentAuto',
     }),
-    readOnly,
+    readOnly: readOnly || disabled,
     cursorBlinkRate: readOnly ? -1 : 500,
     ...options,
   };

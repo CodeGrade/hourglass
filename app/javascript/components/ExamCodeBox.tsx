@@ -101,6 +101,8 @@ export const Editor = (props: EditorProps) => {
     }
   }, refreshProps);
 
+  const disableCursor = disabled ? 'nocursor' : false;
+
   const myOptions = {
     theme: 'mdn-like',
     indentUnit: 2,
@@ -112,7 +114,7 @@ export const Editor = (props: EditorProps) => {
       Enter: 'newlineAndIndent',
       Tab: 'indentAuto',
     }),
-    readOnly: readOnly || disabled,
+    readOnly: readOnly || disableCursor,
     cursorBlinkRate: readOnly ? -1 : 500,
     ...options,
   };

@@ -9,10 +9,16 @@ interface TextProps {
   info: TextInfo;
   value: TextState;
   onChange: (newVal: TextState) => void;
+  disabled: boolean;
 }
 
 export function Text(props: TextProps) {
-  const { info, value, onChange } = props;
+  const {
+    info,
+    value,
+    onChange,
+    disabled,
+  } = props;
   const { prompt } = info;
   return (
     <>
@@ -24,8 +30,9 @@ export function Text(props: TextProps) {
       <Row>
         <Col>
           <Form.Control
+            disabled={disabled}
             as="textarea"
-            rows="3"
+            rows={3}
             placeholder="Enter your answer here."
             value={value}
             onChange={(e) => {

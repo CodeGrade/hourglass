@@ -72,26 +72,26 @@ export const Editor = (props: EditorProps) => {
   // keep track of codemirror instance
   const [instance, setInstance] = useState(undefined);
 
-  // save applied marks to clear them if we change files
+  // doSave applied marks to clear them if we change files
   const [appliedMarks, setAppliedMarks] = useState([]);
 
   // whether to enable saving state to redux
-  const [doSave, setDoSave] = useState(false);
-
-  const reset = () => {
-    if (instance) {
-      setDoSave(false);
-      appliedMarks.forEach(m => m.clear());
-      instance.setValue(value);
-      setAppliedMarks(applyMarks(instance, markDescriptions));
-      setDoSave(true);
-    }
-  }
+  // this boolean is purposefully local to this specific render:
+  // using setState would result in one render with the old value and then
+  // one with the new value.
+  // This way, the effect runs and properly sets doSave in onChange.
+  let doSave = true;
 
   // EFFECT: reset marks and value initially,
   // or if valueUpdate changes
   useEffect(() => {
-    reset();
+    if (instance) {
+      doSave = false;
+      appliedMarks.forEach(m => m.clear());
+      instance.setValue(value);
+      setAppliedMarks(applyMarks(instance, markDescriptions));
+      doSave = true;
+    }
   }, [instance, ...valueUpdate]);
 
   // EFFECT: refresh the instance if any item in refreshProps changes

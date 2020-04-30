@@ -11,10 +11,16 @@ interface MatchingProps {
   info: MatchingInfo;
   value: MatchingState;
   onChange: (index: number, newVal: number) => void;
+  disabled: boolean;
 }
 
 export function Matching(props: MatchingProps) {
-  const { info, value, onChange } = props;
+  const {
+    info,
+    value,
+    onChange,
+    disabled,
+  } = props;
   const {
     promptLabel, prompts, valuesLabel, values,
   } = info;
@@ -49,6 +55,7 @@ export function Matching(props: MatchingProps) {
                     <FormControl variant="outlined">
                       <InputLabel>Match</InputLabel>
                       <Select
+                        disabled={disabled}
                         margin="dense"
                         value={valueI}
                         onChange={handleChange}

@@ -6,10 +6,16 @@ interface MultipleChoiceProps {
   info: MultipleChoiceInfo;
   value: MultipleChoiceState,
   onChange: (newVal: number) => void;
+  disabled: boolean;
 }
 
 export function MultipleChoice(props: MultipleChoiceProps) {
-  const { info, value, onChange } = props;
+  const {
+    info,
+    value,
+    onChange,
+    disabled,
+  } = props;
   const { options, prompt } = info;
   // if (readOnly) {
   //  if (value === undefined) {
@@ -38,6 +44,7 @@ export function MultipleChoice(props: MultipleChoiceProps) {
       <Form.Group>
         {options.map((option, idx) => (
           <Form.Check
+            disabled={disabled}
             type="radio"
             value={idx}
             label={option}

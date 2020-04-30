@@ -4,6 +4,7 @@ import { FileMap, Files } from './types';
 interface ExamCtxt {
   files: Files;
   fmap: FileMap;
+  id: number;
 }
 
 const ExamContext = createContext<Partial<ExamCtxt>>({});

@@ -209,6 +209,9 @@ export interface FileMap {
 
 // An exam object.
 export interface ExamInfo {
+  // The exam ID.
+  id: number;
+
   // File tree.
   files: Files;
 

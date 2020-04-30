@@ -2,6 +2,7 @@
 
 <%= react_component('ExamTaker', {
   exam: {
+    id: @exam.id,
     info: @exam.info(false),
     files: @exam.get_exam_files
   }

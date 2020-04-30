@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
 import { SnapshotStatus } from '../types';
 import { MdCloudDone, MdError } from 'react-icons/md';
+import { useExamContext } from '../context';
 
 const TIMEOUT = 10000;
 
 interface SnapshotInfoProps {
   status: SnapshotStatus;
   message: string;
-  fetch: () => void;
-  save: () => void;
+  fetch: (id: number) => void;
+  save: (id: number) => void;
   size?: string;
 }
 
@@ -20,11 +21,12 @@ export default function SnapshotInfo(props: SnapshotInfoProps) {
     message,
     size = '1.5em',
   } = props;
+  const { id } = useExamContext();
   useEffect(() => {
-    fetch();
+    fetch(id);
   }, [fetch]);
   useEffect(() => {
-    const timer = setInterval(save, TIMEOUT);
+    const timer = setInterval(() => save(id), TIMEOUT);
     return () => {
       clearInterval(timer);
     };

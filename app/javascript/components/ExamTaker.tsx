@@ -16,13 +16,17 @@ interface ExamTakerProps {
 
 function ExamTaker(props: ExamTakerProps) {
   const { exam } = props;
-  const { files, info } = exam;
+  const {
+    files,
+    info,
+    id,
+  } = exam;
   const fmap = createMap(files);
   const { questions, instructions, reference } = info;
   const store = examStore();
   return (
     <Container>
-      <ExamContextProvider value={{ files, fmap }}>
+      <ExamContextProvider value={{ id, files, fmap }}>
         <Provider store={store}>
           <SnapshotInfo />
           <div><HTML value={instructions} /></div>

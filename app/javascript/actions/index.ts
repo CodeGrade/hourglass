@@ -25,11 +25,11 @@ interface SnapshotLoadResult {
   answers: AnswersState;
 }
 
-export function fetchSnapshot() {
+export function fetchSnapshot(examID) {
   return (dispatch) => {
     dispatch(snapshotFetching());
     // TODO jsroute
-    fetch('/exams/1/get_snapshot')
+    fetch(`/exams/${examID}/get_snapshot`)
       .then((result) => result.json() as Promise<SnapshotLoadResult>)
       .then((result) => {
         const { answers } = result;
@@ -50,12 +50,12 @@ function getCSRFToken(): string {
   return elem.content;
 }
 
-export function saveSnapshot() {
+export function saveSnapshot(examID) {
   return (dispatch, getState) => {
     const { answers } = getState();
     dispatch(snapshotSaving());
     // TODO jsroute
-    fetch('/exams/1/save_snapshot', {
+    fetch(`/exams/${examID}/save_snapshot`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

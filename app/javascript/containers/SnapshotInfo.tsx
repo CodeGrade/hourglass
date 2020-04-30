@@ -14,11 +14,11 @@ function mapStateToProps(state: ExamState) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    fetch: () => dispatch(
-      fetchSnapshot(),
+    fetch: (id) => dispatch(
+      fetchSnapshot(id),
     ),
-    save: () => dispatch(
-      saveSnapshot(),
+    save: (id) => dispatch(
+      saveSnapshot(id),
     ),
   };
 }

@@ -78,7 +78,6 @@ export const Editor = (props: EditorProps) => {
   const reset = () => {
     if (instance) {
       setDoSave(false);
-      console.log('set initial marks and val');
       appliedMarks.forEach(m => m.clear());
       instance.setValue(value);
       setAppliedMarks(applyMarks(instance, markDescriptions));
@@ -95,7 +94,6 @@ export const Editor = (props: EditorProps) => {
   // EFFECT: refresh the instance if any item in refreshProps changes
   useEffect(() => {
     if (instance) {
-      console.log('refreshing');
       instance.refresh();
     }
   }, refreshProps);
@@ -119,7 +117,6 @@ export const Editor = (props: EditorProps) => {
       onChange={(cm, _state, newVal) => {
         if (onChange && doSave) {
           const appliedDescs = marksToDescs(cm.getAllMarks());
-          console.log('appliedDescs');
           onChange(newVal, appliedDescs);
         }
       }}

@@ -28,7 +28,8 @@ interface SnapshotLoadResult {
 export function fetchSnapshot() {
   return (dispatch) => {
     dispatch(snapshotFetching());
-    fetch(`${document.URL}/get_snapshot`)
+    // TODO jsroute
+    fetch('/exams/1/get_snapshot')
       .then((result) => result.json() as Promise<SnapshotLoadResult>)
       .then((result) => {
         const { answers } = result;
@@ -53,7 +54,8 @@ export function saveSnapshot() {
   return (dispatch, getState) => {
     const { answers } = getState();
     dispatch(snapshotSaving());
-    fetch(`${document.URL}/save_snapshot`, {
+    // TODO jsroute
+    fetch('/exams/1/save_snapshot', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

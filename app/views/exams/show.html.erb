@@ -18,10 +18,3 @@
   </div>
 <% end %>
 <div id="exam-contents"></div>
-
-<%= react_component('ExamTaker', {
-    exam: {
-      info: @exam.info(false),
-      files: @exam.get_exam_files
-    }
-}) %>

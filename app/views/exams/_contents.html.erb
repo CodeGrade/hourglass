@@ -1,55 +1,8 @@
-<p><%= @exam.info["instructions"]&.html_safe %></p>
-<% unless @exam.info.dig("reference", :files).blank? %>
-  <%= render "exams/filepicker", filedirs: @exam.info["reference"], root: "exam_files" %>
-<% end %>
-<%= bootstrap_form_tag url: @preview ? "#" : submit_exam_path, html: {id: "exam-form"} do |form| %>
-  <div id="questions" class="paginated">
-    <div class="mt-4 question-nav d-print-none">
-      <b>Jump to question:</b>
-      <nav aria-label="question navigation" id="question-nav" class="d-inline-block">
-        <ul class="pagination">
-          <% @exam.info["questions"].each_with_index do |question, index| %>
-            <li class="page-item question-page-item" id="nav-q<%= index+1 %>">
-              <a href="#" class="page-link question-link" data-q="<%= index + 1 %>">
-                <%= "#{index + 1}" %>
-              </a>
-            </li>
-          <% end %>
-        </ul>
-      </nav>
-    </div>
-    <% @exam.info["questions"].each_with_index do |question, index| %>
-      <%= render "exams/question", form: form, question: question, question_number: index, readonly: @readonly %>
-    <% end %>
-    <% unless @preview %>
-      <div class="mt-4 d-print-none">
-        <%= form.submit class: "btn btn-success" %>
-      </div>
-    <% end %>
-  </div>
-<% end %>
-
-<div class="modal fade p-0" tabindex="-1" role="dialog" id="fileModal">
-  <div class="modal-dialog modal-dialog-centered col-12" style="max-width: none;" role="document">
-    <div class="modal-content">
-      <div class="modal-header bg-light">
-        <div class="modal-title">
-          <h2>Files</h2>
-          <span>Choose a file or press escape to leave your current choice unchanged.</span>
-        </div>
-        <button type="button" class="close" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body" id="fileModalBody">
-      </div>
-      <div class="modal-footer bg-light">
-        <button type="button" class="btn btn-secondary">Cancel</button>
-        <button type="button" class="btn btn-primary" id="selectFileBtn">Select file</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <%= render "navbar" %>
-<script><%= render "exams/show.js" %></script>
+
+<%= react_component('ExamTaker', {
+  exam: {
+    info: @exam.info(false),
+    files: @exam.get_exam_files
+  }
+}) %>

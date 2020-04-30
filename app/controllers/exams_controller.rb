@@ -55,19 +55,10 @@ class ExamsController < ApplicationController
   def contents
     # TODO make secret in "show" and check it before rendering
     #   so that users cannot just visit /exams/1/contents
-    @answers = @registration.get_current_answers
-    @preview = false
-
-    # render layout: false
-    render json: {TODO: "this"}
   end
 
   def preview
-    @answers = {}
-    @preview = true
-
-    # render 'contents'
-    render json: {TODO: "this"}
+    render 'contents'
   end
 
   def index

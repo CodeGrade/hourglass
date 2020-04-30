@@ -1,9 +1,9 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
-import { MultipleChoice, MultipleChoiceState } from '../../types';
+import { MultipleChoiceInfo, MultipleChoiceState } from '../../types';
 
 interface MultipleChoiceProps {
-  info: MultipleChoice;
+  info: MultipleChoiceInfo;
   value: MultipleChoiceState,
   onChange: (newVal: number) => void;
 }

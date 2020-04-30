@@ -1,9 +1,9 @@
 import React from 'react';
 import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
-import { YesNo } from '../../types';
+import { YesNoInfo } from '../../types';
 
 export interface YesNoProps {
-  info: YesNo;
+  info: YesNoInfo;
   yesLabel?: string;
   noLabel?: string;
   value: boolean;

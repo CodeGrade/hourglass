@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FileRef, CodeTag, CodeTagState } from '../../types';
+import { FileRef, CodeTagInfo, CodeTagState } from '../../types';
 import { Row, Col, Modal, Button } from 'react-bootstrap';
 import { ControlledFileViewer } from '../FileViewer';
 import { HTML } from './HTML';
@@ -107,7 +107,7 @@ function FileModal(props) {
 }
 
 interface CodeTagProps {
-  info: CodeTag;
+  info: CodeTagInfo;
   value: CodeTagState;
   onChange: (newVal: CodeTagState) => void;
 }

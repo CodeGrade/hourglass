@@ -5,10 +5,10 @@ import {
 import {
   Select, FormControl, InputLabel, MenuItem,
 } from '@material-ui/core';
-import { Matching, MatchingState } from '../../types';
+import { MatchingInfo, MatchingState } from '../../types';
 
 interface MatchingProps {
-  info: Matching;
+  info: MatchingInfo;
   value: MatchingState;
   onChange: (index: number, newVal: number) => void;
 }

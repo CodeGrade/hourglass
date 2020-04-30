@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Editor } from '../ExamCodeBox';
 import { HTML } from './HTML';
-import { MarkDescription, Code, CodeState } from '../../types';
+import { MarkDescription, CodeInfo, CodeState } from '../../types';
 import { useExamContext } from '../../context';
 
 interface CodeProps {
-  info: Code;
+  info: CodeInfo;
   value: CodeState;
   onChange: (newVal: CodeState) => void;
   disabled: boolean;

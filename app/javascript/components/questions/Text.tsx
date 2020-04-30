@@ -2,11 +2,11 @@ import React from 'react';
 import {
   Container, Row, Col, Form,
 } from 'react-bootstrap';
-import { Text, TextState } from '../../types';
+import { TextInfo, TextState } from '../../types';
 import { HTML } from './HTML';
 
 interface TextProps {
-  info: Text;
+  info: TextInfo;
   value: TextState;
   onChange: (newVal: TextState) => void;
 }

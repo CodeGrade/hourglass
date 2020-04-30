@@ -1,10 +1,10 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 
-import { AllThatApply, AllThatApplyState } from '../../types';
+import { AllThatApplyInfo, AllThatApplyState } from '../../types';
 
 interface AllThatApplyProps {
-  info: AllThatApply;
+  info: AllThatApplyInfo;
   value: AllThatApplyState;
   onChange: (index: number, newState: boolean) => void;
 }

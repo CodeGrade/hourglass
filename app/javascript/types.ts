@@ -34,7 +34,7 @@ export interface AnswersState {
 
 export type StatePath = Array<number | string>;
 
-export interface Code {
+export interface CodeInfo {
   type: 'Code';
   prompt: Array<string>;
   lang: string;
@@ -52,7 +52,7 @@ export type CodeState = {
   marks: MarkDescription[];
 };
 
-export interface AllThatApply {
+export interface AllThatApplyInfo {
   type: 'AllThatApply';
   options: Array<string>;
   prompt: Array<string>;
@@ -62,14 +62,14 @@ export interface AllThatApplyState {
   [index: number]: boolean;
 }
 
-export interface YesNo {
+export interface YesNoInfo {
   type: 'YesNo' | 'TrueFalse';
   prompt: Array<string>;
 }
 
 export type YesNoState = boolean;
 
-export interface CodeTag {
+export interface CodeTagInfo {
   type: 'CodeTag';
   prompt: Array<string>;
   choices: Array<FileRef>;
@@ -80,7 +80,7 @@ export interface CodeTagState {
   lineNumber: number;
 }
 
-export interface MultipleChoice {
+export interface MultipleChoiceInfo {
   type: 'MultipleChoice';
   prompt: Array<string>; // (html)
   options: Array<string>; // (html)
@@ -88,14 +88,14 @@ export interface MultipleChoice {
 
 export type MultipleChoiceState = number;
 
-export interface Text {
+export interface TextInfo {
   type: 'Text';
   prompt: Array<string>; // (html)
 }
 
 export type TextState = string;
 
-export interface Matching {
+export interface MatchingInfo {
   type: 'Matching';
   promptLabel?: string; // (html)
   prompts: Array<string>; // (html)
@@ -107,7 +107,7 @@ export interface MatchingState {
   [index: number]: number;
 }
 
-export type BodyItem = HTML | AllThatApply | Code | YesNo | CodeTag | MultipleChoice | Text | Matching;
+export type BodyItem = HTML | AllThatApplyInfo | CodeInfo | YesNoInfo | CodeTagInfo | MultipleChoiceInfo | TextInfo | MatchingInfo;
 
 export type AnswerState = AllThatApplyState | CodeState | YesNoState | CodeTagState | MultipleChoiceState | TextState | MatchingState;
 

@@ -1,35 +1,20 @@
 import React, { FunctionComponent } from 'react';
 import { Spinner } from 'react-bootstrap';
+import './Disabled.css';
 
 export default (Child) => {
   const WithDisabled = (props) => {
+    const disabledClass = props.disabled ? '' : 'd-none';
     return (
       <div>
         <div
-          style={{
-            display: props.disabled ? 'block' : 'none',
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            zIndex: 1000,
-          }}
+          className={`spinnerOuter w-100 h-100 position-absolute ${disabledClass}`}
         >
           <div
-            className="bg-danger"
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              opacity: 0.6,
-            }}
+            className="bg-danger w-100 h-100 position-absolute spinnerOverlay"
           />
           <div
-            style={{
-              position: 'absolute',
-              transform: 'translate(-50%,-50%)',
-              top: '50%',
-              left: '50%',
-            }}
+            className="spinnerInner position-absolute"
           >
             <Spinner animation="border" role="status">
               <span className="sr-only">Loading...</span>

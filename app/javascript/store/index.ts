@@ -18,12 +18,6 @@ export const getAtPath = (state, ...path: StatePath): AnswerState => {
 
 export function examStore() {
   const composeEnhancers = composeWithDevTools({
-    actionCreators: {
-      reset: () => ({
-        type: 'LOAD_SNAPSHOT',
-        answers: {},
-      }),
-    },
     trace: true,
     traceLimit: 25,
   });

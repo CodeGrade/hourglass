@@ -1,16 +1,21 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
-
 import { AllThatApplyInfo, AllThatApplyState } from '../../types';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;
   value: AllThatApplyState;
   onChange: (index: number, newState: boolean) => void;
+  disabled: boolean;
 }
 
 export function AllThatApply(props: AllThatApplyProps) {
-  const { onChange, info, value } = props;
+  const {
+    onChange,
+    info,
+    value,
+    disabled,
+  } = props;
   const { options, prompt } = info;
   // if (readOnly) {
   //   if (!value?.some((ans) => !!ans)) {
@@ -42,6 +47,7 @@ export function AllThatApply(props: AllThatApplyProps) {
         return (
           <Form.Group key={i}>
             <Form.Check
+              disabled={disabled}
               type="checkbox"
               label={o}
               checked={val}

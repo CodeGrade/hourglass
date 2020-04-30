@@ -8,6 +8,7 @@ export interface YesNoProps {
   noLabel?: string;
   value: boolean;
   onChange: (newValue: boolean) => void;
+  disabled: boolean;
   qnum: number;
   pnum: number;
   bnum: number;
@@ -15,7 +16,15 @@ export interface YesNoProps {
 
 export function YesNoInput(props: YesNoProps) {
   const {
-    qnum, pnum, bnum, info, yesLabel, noLabel, value, onChange,
+    qnum,
+    pnum,
+    bnum,
+    info,
+    yesLabel = 'Yes',
+    noLabel = 'No',
+    value,
+    onChange,
+    disabled,
   } = props;
   const { prompt } = info;
   // if (readOnly) {
@@ -42,8 +51,18 @@ export function YesNoInput(props: YesNoProps) {
         value={value}
         onChange={onChange}
       >
-        <ToggleButton variant="outline-primary" value>{yesLabel || 'Yes'}</ToggleButton>
-        <ToggleButton variant="outline-primary" value={false}>{noLabel || 'No'}</ToggleButton>
+        <ToggleButton
+          disabled={disabled}
+          variant={value ? "primary" : "outline-primary"}
+          value={true}>
+          {yesLabel}
+        </ToggleButton>
+        <ToggleButton
+          disabled={disabled}
+          variant={(value === false) ? "primary" : "outline-primary"}
+          value={false}>
+          {noLabel}
+        </ToggleButton>
       </ToggleButtonGroup>
     </div>
   );

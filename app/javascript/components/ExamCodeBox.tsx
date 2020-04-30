@@ -110,6 +110,7 @@ export const Editor = (props: EditorProps) => {
       Tab: 'indentAuto',
     }),
     readOnly,
+    cursorBlinkRate: readOnly ? -1 : 500,
     ...options,
   };
   return (

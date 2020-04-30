@@ -3,6 +3,7 @@ import { FileRef, CodeTagInfo, CodeTagState } from '../../types';
 import { Row, Col, Modal, Button } from 'react-bootstrap';
 import { ControlledFileViewer } from '../FileViewer';
 import { HTML } from './HTML';
+import { TooltipButton } from '../TooltipButton';
 
 interface CodeTagValProps {
   value: CodeTagState;
@@ -44,10 +45,18 @@ interface FileModalProps {
   onClose: () => void;
   onSave: (newState: CodeTagState) => void;
   startValue: CodeTagState;
+  disabled: boolean;
 }
 
 function FileModal(props) {
-  const { show, onClose, onSave, references, startValue } = props;
+  const {
+    show,
+    onClose,
+    onSave,
+    references,
+    startValue,
+    disabled,
+  } = props;
   // Modal has its own state so the user can manipulate it before saving.
   const [selected, setSelected] = useState(startValue);
   const [refresher, setRefresher] = useState(false);
@@ -57,6 +66,11 @@ function FileModal(props) {
     setSelected(startValue);
   }, [startValue]);
   const saveEnabled = selected?.selectedFile && selected?.lineNumber;
+  const saveButtonDisabled = disabled || !saveEnabled;
+  const disabledMessage =
+    disabled
+    ? 'Lost connection to server...'
+    : 'Please choose a file and line to save.';
   return (
     <Modal
       show={show}
@@ -94,13 +108,14 @@ function FileModal(props) {
         <Button variant="secondary" onClick={onClose}>
           Close
         </Button>
-        <Button
+        <TooltipButton
+          disabled={saveButtonDisabled}
+          disabledMessage={disabledMessage}
           variant="primary"
           onClick={() => onSave(selected)}
-          disabled={!saveEnabled}
         >
           Save Changes
-        </Button>
+        </TooltipButton>
       </Modal.Footer>
     </Modal>
   );
@@ -110,10 +125,16 @@ interface CodeTagProps {
   info: CodeTagInfo;
   value: CodeTagState;
   onChange: (newVal: CodeTagState) => void;
+  disabled: boolean;
 }
 
 export function CodeTag(props: CodeTagProps) {
-  const { info, value, onChange } = props;
+  const {
+    info,
+    value,
+    onChange,
+    disabled,
+  } = props;
   const { choices, prompt } = info;
   const [showModal, setShowModal] = useState(false);
   return (
@@ -134,11 +155,13 @@ export function CodeTag(props: CodeTagProps) {
         <Row className="mt-2">
           <Col>
             <Button
+              disabled={disabled}
               onClick={() => setShowModal(true)}
             >
               Choose line
             </Button>
             <FileModal
+              disabled={disabled}
               references={choices}
               show={showModal}
               onClose={() => setShowModal(false)}

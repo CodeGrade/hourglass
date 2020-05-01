@@ -2,7 +2,7 @@ import { AnswersState, StatePath, AnswerState } from '@hourglass/types';
 import Routes from '@hourglass/routes';
 
 export type Action = UpdateAnswerAction | LoadSnapshotAction;
-export type SnapshotAction = SnapshotFetching | SnapshotSaving | SnapshotSuccess | SnapshotFailure;
+export type SnapshotAction = SnapshotDisable | SnapshotFetching | SnapshotSaving | SnapshotSuccess | SnapshotFailure;
 
 export interface UpdateAnswerAction {
   type: 'UPDATE_ANSWER';
@@ -37,7 +37,9 @@ export function fetchSnapshot(examID) {
         dispatch(loadSnapshotAction(answers));
         dispatch(snapshotSuccess());
       }).catch((err) => {
-        dispatch(snapshotFailure(String(err)));
+        console.error('Snapshot fetch failure', err);
+        const error = 'Error fetching snapshot from server.';
+        dispatch(snapshotFailure(error));
       });
   };
 }
@@ -71,8 +73,20 @@ export function saveSnapshot(examID) {
         console.log('lockout: ', lockout);
         dispatch(snapshotSuccess());
       }).catch((err) => {
-        dispatch(snapshotFailure(String(err)));
+        console.error('Snapshot save failure', err);
+        const error = 'Error saving snapshot to server.';
+        dispatch(snapshotFailure(error));
       });
+  };
+}
+
+export interface SnapshotDisable {
+  type: 'SNAPSHOT_DISABLE';
+}
+
+export function snapshotDisable(): SnapshotDisable {
+  return {
+    type: 'SNAPSHOT_DISABLE',
   };
 }
 

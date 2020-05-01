@@ -10,17 +10,17 @@ interface SnapshotInfoProps {
   message: string;
   fetch: (id: number) => void;
   save: (id: number) => void;
-  size?: string;
+  disableSnapshots: () => void;
 }
 
-export default function SnapshotInfo(props: SnapshotInfoProps) {
+export function DoSnapshot(props: SnapshotInfoProps) {
   const {
     fetch,
     save,
     status,
     message,
-    size = '1.5em',
   } = props;
+  const size = '1.5em';
   const { id } = useExamContext();
   useEffect(() => {
     fetch(id);
@@ -32,6 +32,7 @@ export default function SnapshotInfo(props: SnapshotInfoProps) {
     };
   }, [save]);
   switch (status) {
+    case SnapshotStatus.BEFORE:
     case SnapshotStatus.LOADING:
       return (
         <button className="btn btn-info" type="button" disabled>
@@ -51,4 +52,16 @@ export default function SnapshotInfo(props: SnapshotInfoProps) {
         </button>
       );
   }
+}
+
+export function NoSnapshot(props: SnapshotInfoProps) {
+  const {
+    disableSnapshots,
+  } = props;
+  useEffect(() => {
+    disableSnapshots();
+  }, []);
+  return (
+    <p>Snapshots disabled.</p>
+  );
 }

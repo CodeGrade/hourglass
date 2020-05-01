@@ -55,10 +55,11 @@ class ExamsController < ApplicationController
   def contents
     # TODO make secret in "show" and check it before rendering
     #   so that users cannot just visit /exams/1/contents
+    render "contents", locals: { preview: false }
   end
 
   def preview
-    render 'contents'
+    render 'contents', locals: { preview: true }
   end
 
   def index

@@ -4,17 +4,23 @@ export interface ExamState {
 }
 
 export enum SnapshotStatus {
+  // Initial state. no snapshots have been taken yet.
+  BEFORE = "BEFORE",
+
+  // The exam is in preview mode and snapshots are disabled.
+  DISABLED = "DISABLED",
+
+  // A snapshot is being fetched from the server.
   LOADING = "LOADING",
+
+  // The last snapshot was successfully fetched.
   SUCCESS = "SUCCESS",
+
+  // The last snapshot fetch was not successful.
   FAILURE = "FAILURE",
 }
 
 export interface SnapshotState {
-  // whether to disable the controls, because:
-  //   - the first snapshot has not been loaded yet, or
-  //   - the last snapshot failed
-  disableControls: boolean;
-
   // status of network requests
   status: SnapshotStatus;
 

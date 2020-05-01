@@ -1,6 +1,9 @@
 import { connect } from 'react-redux';
-import { fetchSnapshot, saveSnapshot } from '@hourglass/actions';
-import SnapshotInfo from '@hourglass/components/SnapshotInfo';
+import { snapshotDisable, fetchSnapshot, saveSnapshot } from '@hourglass/actions';
+import {
+  DoSnapshot as DoSnap,
+  NoSnapshot as NoSnap,
+} from '@hourglass/components/SnapshotInfo';
 import { ExamState } from '@hourglass/types';
 
 function mapStateToProps(state: ExamState) {
@@ -20,7 +23,9 @@ function mapDispatchToProps(dispatch) {
     save: (id) => dispatch(
       saveSnapshot(id),
     ),
+    disableSnapshots: () => dispatch(snapshotDisable()),
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SnapshotInfo);
+export const DoSnapshot = connect(mapStateToProps, mapDispatchToProps)(DoSnap);
+export const NoSnapshot = connect(mapStateToProps, mapDispatchToProps)(NoSnap);

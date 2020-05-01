@@ -1,15 +1,19 @@
 import { connect } from 'react-redux';
-import { getAtPath } from '../../store';
-import { updateAnswer } from '../../actions';
-import { ExamState } from '../../types';
-import withDisabled from '../../components/Disabled';
+import { getAtPath } from '@hourglass/store';
+import { updateAnswer } from '@hourglass/actions';
+import { ExamState, SnapshotStatus } from '@hourglass/types';
+import withLocked from '@hourglass/components/Locked';
 
 const mapStateToProps = (state: ExamState, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
   const { snapshot } = state;
+  const { status, message } = snapshot;
+  const locked = status == SnapshotStatus.FAILURE;
   return {
     value: getAtPath(state, qnum, pnum, bnum),
-    disabled: snapshot.disableControls,
+    disabled: status == SnapshotStatus.DISABLED || locked,
+    locked,
+    lockedMsg: message,
   };
 };
 
@@ -26,7 +30,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
 };
 
 export const connectWithPath = (Component) =>
-  connect(mapStateToProps, mapDispatchToProps)(withDisabled(Component));
+  connect(mapStateToProps, mapDispatchToProps)(withLocked(Component));
 
 const mapDispatchToPropsIndexed = (dispatch, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
@@ -41,4 +45,4 @@ const mapDispatchToPropsIndexed = (dispatch, ownProps) => {
 };
 
 export const connectWithPathIndexed = (Component) =>
-  connect(mapStateToProps, mapDispatchToPropsIndexed)(withDisabled(Component));
+  connect(mapStateToProps, mapDispatchToPropsIndexed)(withLocked(Component));

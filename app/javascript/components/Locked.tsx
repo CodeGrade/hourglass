@@ -1,14 +1,16 @@
 import React, { FunctionComponent } from 'react';
 import { Spinner } from 'react-bootstrap';
-import './Disabled.css';
+import './Locked.css';
 
 export default (Child) => {
-  const WithDisabled = (props) => {
-    const disabledClass = props.disabled ? '' : 'd-none';
+  const WithLocked: React.FC<{
+    locked: boolean;
+  }> = (props) => {
+    const lockedClass = props.locked ? '' : 'd-none';
     return (
       <div>
         <div
-          className={`spinnerOuter w-100 h-100 position-absolute ${disabledClass}`}
+          className={`spinnerOuter w-100 h-100 position-absolute ${lockedClass}`}
         >
           <div
             className="bg-danger w-100 h-100 position-absolute spinnerOverlay"
@@ -25,6 +27,6 @@ export default (Child) => {
       </div>
     );
   }
-  WithDisabled.displayName = 'WithDisabled';
-  return WithDisabled;
+  WithLocked.displayName = 'WithLocked';
+  return WithLocked;
 }

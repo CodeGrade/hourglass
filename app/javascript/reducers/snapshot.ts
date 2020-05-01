@@ -1,22 +1,14 @@
-import { SnapshotState, SnapshotStatus } from '@hourglass/types';
-import { SnapshotAction } from '@hourglass/actions';
+import {
+  ExamTakerAction,
+  SnapshotState,
+  SnapshotStatus,
+} from '@hourglass/types';
 
-export function snapshot(state: SnapshotState = {
-  status: SnapshotStatus.BEFORE,
-  message: 'Waiting for first snapshot.',
-}, action: SnapshotAction): SnapshotState {
+export default function snapshot(state: SnapshotState = {
+  status: SnapshotStatus.DISABLED,
+  message: '',
+}, action: ExamTakerAction): SnapshotState {
   switch (action.type) {
-    case 'SNAPSHOT_DISABLE':
-      return {
-        ...state,
-        status: SnapshotStatus.DISABLED,
-        message: 'Exam in preview mode.',
-      };
-    case 'SNAPSHOT_FETCHING':
-      return {
-        ...state,
-        status: SnapshotStatus.LOADING,
-      };
     case 'SNAPSHOT_SAVING':
       return {
         ...state,

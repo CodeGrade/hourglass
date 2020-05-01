@@ -1,57 +1,74 @@
-import { AnswersState, StatePath, AnswerState } from '@hourglass/types';
-import Routes from '@hourglass/routes';
+import {
+  ExamTakerState,
+  SnapshotFailure,
+  SnapshotSuccess,
+  SnapshotSaveResult,
+  SnapshotSaving,
+  AnswersState,
+  StatePath,
+  AnswerState,
+  UpdateAnswerAction,
+  ContentsState,
+  StartExamAction,
+} from '@hourglass/types';
 import { getCSRFToken } from '@hourglass/helpers';
+import Routes from '@hourglass/routes';
+import { lock } from '@hourglass/lockdown';
 
-export type Action = UpdateAnswerAction | LoadSnapshotAction;
-export type SnapshotAction = SnapshotDisable | SnapshotFetching | SnapshotSaving | SnapshotSuccess | SnapshotFailure;
-
-export interface UpdateAnswerAction {
-  type: 'UPDATE_ANSWER';
-  path: StatePath;
-  val: AnswerState;
-}
-
-export interface LoadSnapshotAction {
-  type: 'LOAD_SNAPSHOT';
-  answers: AnswersState;
-}
-
-function loadSnapshotAction(answers: AnswersState) {
+export function startExam(contents: ContentsState): StartExamAction {
   return {
-    type: 'LOAD_SNAPSHOT',
-    answers,
+    type: 'START_EXAM',
+    contents,
   };
 }
 
-interface SnapshotLoadResult {
-  answers: AnswersState;
-}
-
-export function fetchSnapshot(examID) {
+export function fetchContents(examID: number) {
   return (dispatch) => {
-    dispatch(snapshotFetching());
-    const url = Routes.get_snapshot_exam_path(examID);
+    const url = Routes.start_exam_path(examID);
     fetch(url)
-      .then((result) => result.json() as Promise<SnapshotLoadResult>)
+      .then((result) => result.json() as Promise<ContentsState>)
       .then((result) => {
-        const { answers } = result;
-        dispatch(loadSnapshotAction(answers));
-        dispatch(snapshotSuccess());
+        lock();
+        dispatch(startExam(result));
       }).catch((err) => {
-        console.error('Snapshot fetch failure', err);
-        const error = 'Error fetching snapshot from server.';
-        dispatch(snapshotFailure(error));
+        // TODO: store a message to tell the user what went wrong
+        console.error('Error starting exam', err);
       });
   };
 }
 
-interface SnapshotSaveResult {
-  lockout: boolean;
+export function updateAnswer(path: StatePath, val: AnswerState): UpdateAnswerAction {
+  return {
+    type: 'UPDATE_ANSWER',
+    path,
+    val,
+  };
+}
+
+function snapshotFailure(message): SnapshotFailure {
+  return {
+    type: 'SNAPSHOT_FAILURE',
+    message,
+  };
+}
+
+
+function snapshotSuccess(): SnapshotSuccess {
+  return {
+    type: 'SNAPSHOT_SUCCESS',
+  };
+}
+
+function snapshotSaving(): SnapshotSaving {
+  return {
+    type: 'SNAPSHOT_SAVING',
+  };
 }
 
 export function saveSnapshot(examID) {
   return (dispatch, getState) => {
-    const { answers } = getState();
+    const { contents }: ExamTakerState = getState();
+    const { answers } = contents;
     dispatch(snapshotSaving());
     const url = Routes.save_snapshot_exam_path(examID);
     fetch(url, {
@@ -73,65 +90,5 @@ export function saveSnapshot(examID) {
         const error = 'Error saving snapshot to server.';
         dispatch(snapshotFailure(error));
       });
-  };
-}
-
-export interface SnapshotDisable {
-  type: 'SNAPSHOT_DISABLE';
-}
-
-export function snapshotDisable(): SnapshotDisable {
-  return {
-    type: 'SNAPSHOT_DISABLE',
-  };
-}
-
-export interface SnapshotFetching {
-  type: 'SNAPSHOT_FETCHING';
-}
-
-export function snapshotFetching(): SnapshotFetching {
-  return {
-    type: 'SNAPSHOT_FETCHING',
-  };
-}
-
-export interface SnapshotSaving {
-  type: 'SNAPSHOT_SAVING',
-}
-
-export function snapshotSaving(): SnapshotSaving {
-  return {
-    type: 'SNAPSHOT_SAVING',
-  };
-}
-
-export interface SnapshotSuccess {
-  type: 'SNAPSHOT_SUCCESS';
-}
-
-function snapshotSuccess() {
-  return {
-    type: 'SNAPSHOT_SUCCESS',
-  };
-}
-
-export interface SnapshotFailure {
-  type: 'SNAPSHOT_FAILURE';
-  message: string;
-}
-
-function snapshotFailure(message) {
-  return {
-    type: 'SNAPSHOT_FAILURE',
-    message,
-  };
-}
-
-export function updateAnswer(path: StatePath, val: AnswerState): UpdateAnswerAction {
-  return {
-    type: 'UPDATE_ANSWER',
-    path,
-    val,
   };
 }

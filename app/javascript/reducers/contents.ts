@@ -1,11 +1,14 @@
 import { AnswersState } from '@hourglass/types';
-import { Action } from '@hourglass/actions';
+import {
+  ContentsState,
+  ExamTakerAction,
+} from '@hourglass/types';
 
-export function answers(state: AnswersState = {}, action: Action): AnswersState {
+export default (state: ContentsState, action: ExamTakerAction): ContentsState => {
   switch (action.type) {
     case 'UPDATE_ANSWER':
       const ret = {
-        ...state,
+        ...state.answers,
       };
       let cur = ret;
       for (let i = 0; i < action.path.length - 1; i++) {
@@ -13,9 +16,10 @@ export function answers(state: AnswersState = {}, action: Action): AnswersState 
         cur = cur[action.path[i]];
       }
       cur[action.path[action.path.length - 1]] = action.val;
-      return ret;
-    case 'LOAD_SNAPSHOT':
-      return action.answers;
+      return {
+        ...state,
+        answers: ret,
+      };
     default:
       return state;
   }

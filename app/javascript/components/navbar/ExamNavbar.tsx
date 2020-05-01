@@ -8,35 +8,39 @@ import MenuBookIcon from '@material-ui/icons/MenuBook';
 import { getCSRFToken, logOut } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import { User } from '@hourglass/types';
-import { DoSnapshot, NoSnapshot } from '@hourglass/containers/SnapshotInfo';
+import SnapshotInfo from '@hourglass/containers/SnapshotInfo';
 
-interface NavbarProps {
+interface ExamNavbarProps {
   user?: User;
   preview: boolean;
+  locked: boolean;
 }
 
-export const ExamNavbar: React.FC<NavbarProps> = (props) => {
+export const ExamNavbar: React.FC<ExamNavbarProps> = (props) => {
   const {
     preview,
+    locked,
   } = props;
-  const snapshots = preview ? <NoSnapshot /> : <DoSnapshot />;
+  const doSnapshots = locked && !preview;
+  const title = 'Hourglass' + (locked ? ' (locked)' : '');
+  const bg = locked ? 'dark' : 'light';
   return (
     <Navbar
-      bg="dark"
-      variant="dark"
+      bg={bg}
+      variant={bg}
       expand="lg"
       fixed="top"
     >
       <Navbar.Brand>
-        Hourglass (locked)
+        {title}
       </Navbar.Brand>
       <span className="ml-auto">
         <span className="mr-2">
-          {snapshots}
+          <SnapshotInfo />
         </span>
         <Dropdown className="d-inline">
           <Dropdown.Toggle
-            className="text-white"
+            className={locked && "text-white"}
             id="toggle-exam-contents"
             variant="outline-secondary"
           >

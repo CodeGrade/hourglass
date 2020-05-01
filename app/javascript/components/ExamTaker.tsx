@@ -1,61 +1,125 @@
-import React, { useEffect } from 'react';
-import { Container } from 'react-bootstrap';
-import { Provider } from 'react-redux';
-import { examStore } from '@hourglass/store';
-import { ExamInfo, User } from '@hourglass/types';
-import { Question } from './Question';
-import { FileViewer } from './FileViewer';
-import { HTML } from './questions/HTML';
+import React, { useState, useEffect } from 'react';
+import {
+  Container,
+  Button,
+} from 'react-bootstrap';
+import { connect, Provider } from 'react-redux';
+import store from '@hourglass/store';
+import { fetchContents } from '@hourglass/actions';
+import { ExamTakerState, ExamInfo, User } from '@hourglass/types';
 import { ExamContextProvider } from '@hourglass/context';
 import { createMap } from '@hourglass/files';
-import { ExamNavbar } from '@hourglass/components/navbar';
+import {
+  ExamNavbar,
+  RegularNavbar,
+} from '@hourglass/components/navbar';
+import ExamShowContents from '@hourglass/containers/ExamShowContents';
+
+interface PreStartProps {
+  onClick: () => void;
+}
+
+const PreStart: React.FC<PreStartProps> = (props) => {
+  const {
+    onClick,
+  } = props;
+  return (
+    <div>
+      <p>Click the following button to enter secure mode and begin the exam.</p>
+      <Button
+        variant="success"
+        onClick={onClick}
+      >
+        Begin Exam
+      </Button>
+    </div>
+  );
+}
+
+const mapPreStartDispatch = (dispatch, ownProps) => {
+  const { examID } = ownProps;
+  return {
+    onClick: () => {
+      dispatch(fetchContents(examID));
+    },
+  };
+}
+
+const PreStartContainer = connect(null, mapPreStartDispatch)(PreStart);
 
 interface ExamTakerProps {
-  // Whether the exam is in "preview" mode.
-  preview: boolean;
-
-  user: User;
-
+  loaded: boolean;
   exam: ExamInfo;
+  preview: boolean;
+  user: User;
 }
 
 function ExamTaker(props: ExamTakerProps) {
+  const {
+    loaded,
+    exam,
+    preview,
+    user,
+  } = props;
+  if (loaded) {
+    return (
+      <div>
+        <ExamNavbar
+          user={user}
+          preview={preview}
+          locked={loaded}
+        />
+        <ExamShowContents exam={exam} />
+      </div>
+    );
+  }
+  return (
+    <div>
+      <RegularNavbar user={user} />
+      <h1>{exam.name}</h1>
+      <PreStartContainer
+        examID={exam.id}
+      />
+    </div>
+  );
+}
+
+function examTakerStateToProps(state: ExamTakerState) {
+  return {
+    loaded: state.loaded,
+  };
+}
+
+const ExamTakerContainer = connect(examTakerStateToProps)(ExamTaker);
+
+interface ShowExamProps {
+  // Whether the exam should load in "preview" mode.
+  preview: boolean;
+
+  // The current logged-in user.
+  user: User;
+
+  // Information about the exam.
+  exam: ExamInfo;
+}
+
+function ShowExam(props: ShowExamProps) {
   const {
     exam,
     preview,
     user,
   } = props;
-  const {
-    files,
-    info,
-    id,
-  } = exam;
-  const fmap = createMap(files);
-  const { questions, instructions, reference } = info;
-  const store = examStore();
   return (
     <Container>
-      <ExamContextProvider value={{ id, files, fmap }}>
-        <Provider store={store}>
-          <ExamNavbar
-            user={user}
-            preview={preview}
-          />
-          <div><HTML value={instructions} /></div>
-          {reference && <FileViewer references={reference} />}
-          <div>
-            {questions.map((q, i) => (
-              <Question
-                question={q}
-                qnum={i}
-                key={i}
-              />
-            ))}
-          </div>
-        </Provider>
-      </ExamContextProvider>
+      <Provider store={store}>
+        <ExamTakerContainer
+          exam={exam}
+          preview={preview}
+          user={user}
+        />
+      </Provider>
     </Container>
   );
 }
 
-export default ExamTaker;
+export default ShowExam;

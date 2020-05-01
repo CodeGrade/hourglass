@@ -1,10 +1,35 @@
 import { combineReducers } from 'redux';
-import { answers } from './answers';
-import { snapshot } from './snapshot';
+import {
+  SnapshotStatus,
+  ExamTakerState,
+  ExamTakerAction,
+} from '@hourglass/types';
+import contentsReducer from './contents';
+import snapshotReducer from './snapshot';
 
-const rootReducer = combineReducers({
-  answers,
-  snapshot,
-});
-
-export default rootReducer;
+export default (state: ExamTakerState = {
+  loaded: false,
+  snapshot: undefined,
+  contents: undefined,
+}, action: ExamTakerAction): ExamTakerState => {
+  switch (action.type) {
+    case 'START_EXAM':
+      return {
+        ...state,
+        loaded: true,
+        contents: action.contents,
+        snapshot: {
+          status: SnapshotStatus.SUCCESS,
+          message: '',
+        },
+      };
+    default:
+      return {
+        ...state,
+        contents: (state.loaded
+          ? contentsReducer(state.contents, action)
+          : undefined),
+        snapshot: snapshotReducer(state.snapshot, action),
+      };
+  }
+}

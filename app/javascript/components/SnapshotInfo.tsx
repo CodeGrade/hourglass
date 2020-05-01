@@ -1,38 +1,21 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { SnapshotStatus } from '@hourglass/types';
 import { MdCloudDone, MdCloudOff, MdError } from 'react-icons/md';
 import { useExamContext } from '@hourglass/context';
 
-const TIMEOUT = 10000;
-
 interface SnapshotInfoProps {
   status: SnapshotStatus;
   message: string;
-  fetch: (id: number) => void;
-  save: (id: number) => void;
-  disableSnapshots: () => void;
 }
 
-export function DoSnapshot(props: SnapshotInfoProps) {
+const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
   const {
-    fetch,
-    save,
     status,
     message,
   } = props;
   const size = '1.5em';
   const { id } = useExamContext();
-  useEffect(() => {
-    fetch(id);
-  }, [fetch]);
-  useEffect(() => {
-    const timer = setInterval(() => save(id), TIMEOUT);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [save]);
   switch (status) {
-    case SnapshotStatus.BEFORE:
     case SnapshotStatus.LOADING:
       return (
         <button className="btn btn-info" type="button" disabled>
@@ -51,21 +34,15 @@ export function DoSnapshot(props: SnapshotInfoProps) {
           <MdError title={message} size={size} />
         </button>
       );
+    case SnapshotStatus.DISABLED:
+      return (
+        <button className="btn btn-secondary" type="button" disabled role="status">
+          <MdCloudOff title={message} size={size} />
+        </button>
+      );
+    default:
+      throw new Error("CASE NOT HANDLED");
   }
 }
 
-export function NoSnapshot(props: SnapshotInfoProps) {
-  const {
-    message,
-    disableSnapshots,
-  } = props;
-  const size = '1.5em';
-  useEffect(() => {
-    disableSnapshots();
-  }, []);
-  return (
-    <button className="btn btn-secondary" type="button" disabled role="status">
-      <MdCloudOff title={message} size={size} />
-    </button>
-  );
-}
+export default SnapshotInfo;

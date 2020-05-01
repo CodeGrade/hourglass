@@ -9,11 +9,11 @@ import { getCSRFToken, logOut } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import { User } from '@hourglass/types';
 
-interface NavbarProps {
+interface RegularNavbarProps {
   user?: User;
 }
 
-export const RegularNavbar: React.FC<NavbarProps> = (props) => {
+export const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
   const {
     user,
   } = props;

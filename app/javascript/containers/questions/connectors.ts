@@ -1,17 +1,32 @@
 import { connect } from 'react-redux';
-import { getAtPath } from '@hourglass/store';
 import { updateAnswer } from '@hourglass/actions';
-import { ExamState, SnapshotStatus } from '@hourglass/types';
+import {
+  ExamTakerState,
+  AnswerState,
+  StatePath,
+  SnapshotStatus,
+} from '@hourglass/types';
 import withLocked from '@hourglass/components/Locked';
 
-const mapStateToProps = (state: ExamState, ownProps) => {
+const getAtPath = (state, ...path: StatePath): AnswerState => {
+  let ret = state.contents.answers;
+  for (const elem of path) {
+    ret = ret?.[elem];
+  }
+  return ret;
+};
+
+const mapStateToProps = (state: ExamTakerState, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
   const { snapshot } = state;
   const { status, message } = snapshot;
-  const locked = status == SnapshotStatus.FAILURE;
+  const locked = status === SnapshotStatus.FAILURE;
+  const disabled =
+    status === SnapshotStatus.DISABLED ||
+    status === SnapshotStatus.FAILURE;
   return {
     value: getAtPath(state, qnum, pnum, bnum),
-    disabled: status == SnapshotStatus.DISABLED || locked,
+    disabled,
     locked,
     lockedMsg: message,
   };

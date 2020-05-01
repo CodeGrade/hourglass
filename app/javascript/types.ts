@@ -1,16 +1,69 @@
+export interface ExamInfo {
+  // The exam ID.
+  id: number;
+
+  // The name of the exam.
+  name: string;
+}
+
+export type ExamTakerAction = StartExamAction | ContentsAction | SnapshotAction;
+
+export interface ContentsState {
+  // Exam information.
+  exam: ExamState,
+
+  // The student's current answers.
+  answers: AnswersState;
+}
+
+export interface StartExamAction {
+  type: 'START_EXAM',
+  contents: ContentsState;
+}
+
+export type ContentsAction = UpdateAnswerAction;
+
+export interface UpdateAnswerAction {
+  type: 'UPDATE_ANSWER';
+  path: StatePath;
+  val: AnswerState;
+}
+
+export interface SnapshotSaving {
+  type: 'SNAPSHOT_SAVING',
+}
+
+export interface SnapshotSuccess {
+  type: 'SNAPSHOT_SUCCESS';
+}
+
+export interface SnapshotFailure {
+  type: 'SNAPSHOT_FAILURE';
+  message: string;
+}
+
+export interface SnapshotSaveResult {
+  lockout: boolean;
+}
+
+export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure;
+
+export interface ExamTakerState {
+  // Whether the exam contents are loaded into the 'contents' field.
+  loaded: boolean;
+
+  // The contents of the exam, and latest student answers.
+  contents?: ContentsState;
+
+  // The current state of saving snapshots.
+  snapshot: SnapshotState;
+}
+
 export interface User {
   username: string;
 }
 
-export interface ExamState {
-  answers: AnswersState;
-  snapshot: SnapshotState;
-}
-
 export enum SnapshotStatus {
-  // Initial state. no snapshots have been taken yet.
-  BEFORE = "BEFORE",
-
   // The exam is in preview mode and snapshots are disabled.
   DISABLED = "DISABLED",
 
@@ -140,6 +193,14 @@ export interface Question {
   reference?: Array<FileRef>;
 }
 
+export interface ExamState {
+  // File tree.
+  files: Files;
+
+  // Questions and their references.
+  info: Exam;
+}
+
 export interface Exam {
   questions: Array<Question>;
   reference?: Array<FileRef>;
@@ -213,16 +274,4 @@ export type Files = Array<ExamFile>;
 // Map from file path to file.
 export interface FileMap {
   [path: string]: ExamFile;
-}
-
-// An exam object.
-export interface ExamInfo {
-  // The exam ID.
-  id: number;
-
-  // File tree.
-  files: Files;
-
-  // Questions and their references.
-  info: Exam;
 }

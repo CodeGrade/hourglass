@@ -1,5 +1,5 @@
 class ExamsController < ApplicationController
-  before_action :require_current_user, except: [:save_snapshot, :get_snapshot]
+  before_action :require_current_user, except: [:save_snapshot, :start]
   prepend_before_action :catch_require_current_user, only: [:save_snapshot]
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create, :save_snapshot]
@@ -52,14 +52,26 @@ class ExamsController < ApplicationController
   def show
   end
 
-  def contents
-    # TODO make secret in "show" and check it before rendering
-    #   so that users cannot just visit /exams/1/contents
-    render "contents", locals: { preview: false }
+  def start
+    # TODO make secret in "show" and check it here with a POST before rendering
+    #   so that users cannot just visit /exams/1/contents in the browser easily
+    unless @registration.visible_to? current_user
+      render json: { message: "There is no submission for that user." }
+      return
+    end
+    answers = @registration.get_current_answers
+    render(
+      json: {
+        exam: {
+          info: @exam.info(false),
+          files: @exam.get_exam_files,
+        },
+        answers: answers,
+      }
+    )
   end
 
   def preview
-    render 'contents', locals: { preview: true }
   end
 
   def index
@@ -96,15 +108,6 @@ class ExamsController < ApplicationController
   def save_snapshot
     lockout = save_answers
     render json: { lockout: lockout }
-  end
-
-  def get_snapshot
-    unless @registration.visible_to? current_user
-      render json: { message: "There is no submission for that user." }
-      return
-    end
-    answers = @registration.get_current_answers
-    render json: { answers: answers }
   end
 
   def new

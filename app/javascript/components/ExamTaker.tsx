@@ -8,7 +8,6 @@ import { FileViewer } from './FileViewer';
 import { HTML } from './questions/HTML';
 import { ExamContextProvider } from '@hourglass/context';
 import { createMap } from '@hourglass/files';
-import { DoSnapshot, NoSnapshot } from '@hourglass/containers/SnapshotInfo';
 import { ExamNavbar } from '@hourglass/components/navbar';
 
 interface ExamTakerProps {
@@ -34,15 +33,14 @@ function ExamTaker(props: ExamTakerProps) {
   const fmap = createMap(files);
   const { questions, instructions, reference } = info;
   const store = examStore();
-  const snapshots = preview ? <NoSnapshot /> : <DoSnapshot />;
   return (
     <Container>
-      <ExamNavbar
-        user={user}
-      />
       <ExamContextProvider value={{ id, files, fmap }}>
         <Provider store={store}>
-          {snapshots}
+          <ExamNavbar
+            user={user}
+            preview={preview}
+          />
           <div><HTML value={instructions} /></div>
           {reference && <FileViewer references={reference} />}
           <div>

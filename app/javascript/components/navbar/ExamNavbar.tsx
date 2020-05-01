@@ -8,12 +8,18 @@ import MenuBookIcon from '@material-ui/icons/MenuBook';
 import { getCSRFToken, logOut } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import { User } from '@hourglass/types';
+import { DoSnapshot, NoSnapshot } from '@hourglass/containers/SnapshotInfo';
 
 interface NavbarProps {
   user?: User;
+  preview: boolean;
 }
 
 export const ExamNavbar: React.FC<NavbarProps> = (props) => {
+  const {
+    preview,
+  } = props;
+  const snapshots = preview ? <NoSnapshot /> : <DoSnapshot />;
   return (
     <Navbar
       bg="dark"
@@ -24,18 +30,23 @@ export const ExamNavbar: React.FC<NavbarProps> = (props) => {
       <Navbar.Brand>
         Hourglass (locked)
       </Navbar.Brand>
-      <Dropdown className="ml-auto">
-        <Dropdown.Toggle
-          className="text-white"
-          id="toggle-exam-contents"
-          variant="outline-secondary"
-        >
-          <MenuBookIcon />
-        </Dropdown.Toggle>
-        <Dropdown.Menu alignRight>
-          <Dropdown.Item>TODO</Dropdown.Item>
-        </Dropdown.Menu>
-      </Dropdown>
+      <span className="ml-auto">
+        <span className="mr-2">
+          {snapshots}
+        </span>
+        <Dropdown className="d-inline">
+          <Dropdown.Toggle
+            className="text-white"
+            id="toggle-exam-contents"
+            variant="outline-secondary"
+          >
+            <MenuBookIcon />
+          </Dropdown.Toggle>
+          <Dropdown.Menu alignRight>
+            <Dropdown.Item>TODO</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </span>
     </Navbar>
   );
 }

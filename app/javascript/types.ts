@@ -1,5 +1,3 @@
-import CM from 'codemirror';
-
 export interface ExamState {
   answers: AnswersState;
   snapshot: SnapshotState;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
-import { AllThatApplyInfo, AllThatApplyState } from '../../types';
+import { AllThatApplyInfo, AllThatApplyState } from '@hourglass/types';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;

@@ -1,13 +1,13 @@
 import React from 'react';
 import { HTML } from './questions/HTML';
-import Code from '../containers/questions/Code';
-import YesNoInput from '../containers/questions/YesNo';
-import CodeTag from '../containers/questions/CodeTag';
-import Text from '../containers/questions/Text';
-import Matching from '../containers/questions/Matching';
-import MultipleChoice from '../containers/questions/MultipleChoice';
-import AllThatApply from '../containers/questions/AllThatApply';
-import { BodyItem } from '../types';
+import Code from '@hourglass/containers/questions/Code';
+import YesNoInput from '@hourglass/containers/questions/YesNo';
+import CodeTag from '@hourglass/containers/questions/CodeTag';
+import Text from '@hourglass/containers/questions/Text';
+import Matching from '@hourglass/containers/questions/Matching';
+import MultipleChoice from '@hourglass/containers/questions/MultipleChoice';
+import AllThatApply from '@hourglass/containers/questions/AllThatApply';
+import { BodyItem } from '@hourglass/types';
 
 export interface BodyProps {
   body: BodyItem;

@@ -1,4 +1,4 @@
-import { CodeTag } from '../../components/questions/CodeTag';
+import { CodeTag } from '@hourglass/components/questions/CodeTag';
 import { connectWithPath } from './connectors';
 
 export default connectWithPath(CodeTag);

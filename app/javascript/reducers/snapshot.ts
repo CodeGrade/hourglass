@@ -1,5 +1,5 @@
-import { SnapshotState, SnapshotStatus } from '../types';
-import { SnapshotAction } from '../actions';
+import { SnapshotState, SnapshotStatus } from '@hourglass/types';
+import { SnapshotAction } from '@hourglass/actions';
 
 export function snapshot(state: SnapshotState = {
   disableControls: true,

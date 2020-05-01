@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { SnapshotStatus } from '../types';
+import { SnapshotStatus } from '@hourglass/types';
 import { MdCloudDone, MdError } from 'react-icons/md';
-import { useExamContext } from '../context';
+import { useExamContext } from '@hourglass/context';
 
 const TIMEOUT = 10000;
 

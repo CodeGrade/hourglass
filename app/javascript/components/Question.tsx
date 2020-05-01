@@ -2,7 +2,7 @@ import React from 'react';
 import { Part } from './Part';
 import { HTML } from './questions/HTML';
 import { FileViewer } from './FileViewer';
-import { Question } from '../types';
+import { Question } from '@hourglass/types';
 
 export interface QuestionProps {
   question: Question;

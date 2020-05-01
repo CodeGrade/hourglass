@@ -4,9 +4,9 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { Row, Col } from 'react-bootstrap';
 import { Editor } from './ExamCodeBox';
-import { CodeTagState, FileRef, ExamFile, Files } from '../types';
-import { useExamContext } from '../context';
-import { firstFile, getFilesForRefs } from '../files';
+import { CodeTagState, FileRef, ExamFile, Files } from '@hourglass/types';
+import { useExamContext } from '@hourglass/context';
+import { firstFile, getFilesForRefs } from '@hourglass/files';
 
 interface FilesProps {
   files: Array<ExamFile>;

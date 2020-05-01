@@ -1,5 +1,5 @@
-import { AnswersState } from '../types';
-import { Action } from '../actions';
+import { AnswersState } from '@hourglass/types';
+import { Action } from '@hourglass/actions';
 
 export function answers(state: AnswersState = {}, action: Action): AnswersState {
   switch (action.type) {

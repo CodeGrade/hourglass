@@ -3,7 +3,7 @@ import { Table, Col } from 'react-bootstrap';
 import { Body } from './Body';
 import { HTML } from './questions/HTML';
 import { FileViewer } from './FileViewer';
-import { Part } from '../types';
+import { Part } from '@hourglass/types';
 
 interface PartProps {
   part: Part;

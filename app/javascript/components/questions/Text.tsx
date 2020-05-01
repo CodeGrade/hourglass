@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Container, Row, Col, Form,
 } from 'react-bootstrap';
-import { TextInfo, TextState } from '../../types';
+import { TextInfo, TextState } from '@hourglass/types';
 import { HTML } from './HTML';
 
 interface TextProps {

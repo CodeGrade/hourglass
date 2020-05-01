@@ -1,6 +1,6 @@
 import React from 'react';
 import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
-import { YesNoInfo } from '../../types';
+import { YesNoInfo } from '@hourglass/types';
 
 export interface YesNoProps {
   info: YesNoInfo;

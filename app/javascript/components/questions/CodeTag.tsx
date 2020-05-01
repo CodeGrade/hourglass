@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { FileRef, CodeTagInfo, CodeTagState } from '../../types';
+import { FileRef, CodeTagInfo, CodeTagState } from '@hourglass/types';
 import { Row, Col, Modal, Button } from 'react-bootstrap';
-import { ControlledFileViewer } from '../FileViewer';
+import { ControlledFileViewer } from '@hourglass/components/FileViewer';
 import { HTML } from './HTML';
-import { TooltipButton } from '../TooltipButton';
+import { TooltipButton } from '@hourglass/components/TooltipButton';
 
 interface CodeTagValProps {
   value: CodeTagState;

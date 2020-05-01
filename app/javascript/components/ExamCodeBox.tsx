@@ -6,7 +6,7 @@ import 'codemirror/theme/mdn-like';
 import React, { useEffect, useState } from 'react';
 import Highlighter from 'react-codemirror-runmode';
 import { UnControlled as UnControlledCodeMirror, IUnControlledCodeMirror } from 'react-codemirror2';
-import { MarkDescription } from '../types';
+import { MarkDescription } from '@hourglass/types';
 
 function applyMarks(cm: CM.Editor, marks: MarkDescription[]): CM.TextMarker[] {
   return marks.map((mark) =>

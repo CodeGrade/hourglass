@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import { Editor } from '../ExamCodeBox';
 import { HTML } from './HTML';
-import { MarkDescription, CodeInfo, CodeState } from '../../types';
-import { useExamContext } from '../../context';
+import { MarkDescription, CodeInfo, CodeState } from '@hourglass/types';
+import { useExamContext } from '@hourglass/context';
 
 interface CodeProps {
   info: CodeInfo;

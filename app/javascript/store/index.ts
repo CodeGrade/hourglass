@@ -2,11 +2,11 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
 import { createStore, applyMiddleware } from 'redux';
 
-import rootReducer from '../reducers';
+import rootReducer from '@hourglass/reducers';
 import {
   AnswerState, StatePath, Exam, ExamState, Files, FileMap, AnswersState,
 } from '../types';
-import { createMap } from '../files';
+import { createMap } from '@hourglass/files';
 
 export const getAtPath = (state, ...path: StatePath): AnswerState => {
   let ret = state.answers;

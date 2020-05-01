@@ -5,7 +5,7 @@ import {
 import {
   Select, FormControl, InputLabel, MenuItem,
 } from '@material-ui/core';
-import { MatchingInfo, MatchingState } from '../../types';
+import { MatchingInfo, MatchingState } from '@hourglass/types';
 
 interface MatchingProps {
   info: MatchingInfo;

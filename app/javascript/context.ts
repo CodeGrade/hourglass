@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react';
-import { FileMap, Files } from './types';
+import { FileMap, Files } from '@hourglass/types';
 
 interface ExamCtxt {
   files: Files;

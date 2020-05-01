@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
-import { MultipleChoiceInfo, MultipleChoiceState } from '../../types';
+import { MultipleChoiceInfo, MultipleChoiceState } from '@hourglass/types';
 
 interface MultipleChoiceProps {
   info: MultipleChoiceInfo;

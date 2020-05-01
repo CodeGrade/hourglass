@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
-import { fetchSnapshot, saveSnapshot } from '../actions';
-import SnapshotInfo from '../components/SnapshotInfo';
-import { ExamState } from '../types';
+import { fetchSnapshot, saveSnapshot } from '@hourglass/actions';
+import SnapshotInfo from '@hourglass/components/SnapshotInfo';
+import { ExamState } from '@hourglass/types';
 
 function mapStateToProps(state: ExamState) {
   const { snapshot } = state;

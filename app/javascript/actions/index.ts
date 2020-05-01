@@ -1,5 +1,5 @@
-import { AnswersState, StatePath, AnswerState } from '../types';
-import Routes from '../routes';
+import { AnswersState, StatePath, AnswerState } from '@hourglass/types';
+import Routes from '@hourglass/routes';
 
 export type Action = UpdateAnswerAction | LoadSnapshotAction;
 export type SnapshotAction = SnapshotFetching | SnapshotSaving | SnapshotSuccess | SnapshotFailure;

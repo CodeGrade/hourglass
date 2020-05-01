@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { Provider } from 'react-redux';
-import { examStore } from '../store';
-import { ExamInfo } from '../types';
+import { examStore } from '@hourglass/store';
+import { ExamInfo } from '@hourglass/types';
 import { Question } from './Question';
 import { FileViewer } from './FileViewer';
 import { HTML } from './questions/HTML';
-import { ExamContextProvider } from '../context';
-import { createMap } from '../files';
-import SnapshotInfo from '../containers/SnapshotInfo';
+import { ExamContextProvider } from '@hourglass/context';
+import { createMap } from '@hourglass/files';
+import SnapshotInfo from '@hourglass/containers/SnapshotInfo';
 
 interface ExamTakerProps {
   exam: ExamInfo;

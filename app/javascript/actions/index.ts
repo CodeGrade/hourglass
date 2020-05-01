@@ -1,5 +1,6 @@
 import { AnswersState, StatePath, AnswerState } from '@hourglass/types';
 import Routes from '@hourglass/routes';
+import { getCSRFToken } from '@hourglass/helpers';
 
 export type Action = UpdateAnswerAction | LoadSnapshotAction;
 export type SnapshotAction = SnapshotDisable | SnapshotFetching | SnapshotSaving | SnapshotSuccess | SnapshotFailure;
@@ -46,11 +47,6 @@ export function fetchSnapshot(examID) {
 
 interface SnapshotSaveResult {
   lockout: boolean;
-}
-
-function getCSRFToken(): string {
-  const elem: HTMLMetaElement = document.querySelector('[name=csrf-token]');
-  return elem.content;
 }
 
 export function saveSnapshot(examID) {

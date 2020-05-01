@@ -1,3 +1,7 @@
+export interface User {
+  username: string;
+}
+
 export interface ExamState {
   answers: AnswersState;
   snapshot: SnapshotState;

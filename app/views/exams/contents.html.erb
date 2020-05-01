@@ -1,6 +1,5 @@
-<%= render "navbar" %>
-
 <%= react_component('ExamTaker', {
+  user: current_user,
   preview: preview,
   exam: {
     id: @exam.id,

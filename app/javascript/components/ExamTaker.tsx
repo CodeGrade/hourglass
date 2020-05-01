@@ -2,17 +2,20 @@ import React, { useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import { Provider } from 'react-redux';
 import { examStore } from '@hourglass/store';
-import { ExamInfo } from '@hourglass/types';
+import { ExamInfo, User } from '@hourglass/types';
 import { Question } from './Question';
 import { FileViewer } from './FileViewer';
 import { HTML } from './questions/HTML';
 import { ExamContextProvider } from '@hourglass/context';
 import { createMap } from '@hourglass/files';
 import { DoSnapshot, NoSnapshot } from '@hourglass/containers/SnapshotInfo';
+import { ExamNavbar } from '@hourglass/components/navbar';
 
 interface ExamTakerProps {
   // Whether the exam is in "preview" mode.
   preview: boolean;
+
+  user: User;
 
   exam: ExamInfo;
 }
@@ -21,6 +24,7 @@ function ExamTaker(props: ExamTakerProps) {
   const {
     exam,
     preview,
+    user,
   } = props;
   const {
     files,
@@ -33,6 +37,9 @@ function ExamTaker(props: ExamTakerProps) {
   const snapshots = preview ? <NoSnapshot /> : <DoSnapshot />;
   return (
     <Container>
+      <ExamNavbar
+        user={user}
+      />
       <ExamContextProvider value={{ id, files, fmap }}>
         <Provider store={store}>
           {snapshots}

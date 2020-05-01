@@ -1,4 +1,5 @@
 import { AnswersState, StatePath, AnswerState } from '../types';
+import Routes from '../routes';
 
 export type Action = UpdateAnswerAction | LoadSnapshotAction;
 export type SnapshotAction = SnapshotFetching | SnapshotSaving | SnapshotSuccess | SnapshotFailure;
@@ -28,8 +29,8 @@ interface SnapshotLoadResult {
 export function fetchSnapshot(examID) {
   return (dispatch) => {
     dispatch(snapshotFetching());
-    // TODO jsroute
-    fetch(`/exams/${examID}/get_snapshot`)
+    const url = Routes.get_snapshot_exam_path(examID);
+    fetch(url)
       .then((result) => result.json() as Promise<SnapshotLoadResult>)
       .then((result) => {
         const { answers } = result;
@@ -54,8 +55,8 @@ export function saveSnapshot(examID) {
   return (dispatch, getState) => {
     const { answers } = getState();
     dispatch(snapshotSaving());
-    // TODO jsroute
-    fetch(`/exams/${examID}/save_snapshot`, {
+    const url = Routes.save_snapshot_exam_path(examID);
+    fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { SnapshotStatus } from '@hourglass/types';
-import { MdCloudDone, MdError } from 'react-icons/md';
+import { MdCloudDone, MdCloudOff, MdError } from 'react-icons/md';
 import { useExamContext } from '@hourglass/context';
 
 const TIMEOUT = 10000;
@@ -48,7 +48,7 @@ export function DoSnapshot(props: SnapshotInfoProps) {
     case SnapshotStatus.FAILURE:
       return (
         <button className="btn btn-danger" type="button" disabled role="status">
-          <MdError title={`Error saving answers to server: ${message}`} size={size} />
+          <MdError title={message} size={size} />
         </button>
       );
   }
@@ -56,12 +56,16 @@ export function DoSnapshot(props: SnapshotInfoProps) {
 
 export function NoSnapshot(props: SnapshotInfoProps) {
   const {
+    message,
     disableSnapshots,
   } = props;
+  const size = '1.5em';
   useEffect(() => {
     disableSnapshots();
   }, []);
   return (
-    <p>Snapshots disabled.</p>
+    <button className="btn btn-secondary" type="button" disabled role="status">
+      <MdCloudOff title={message} size={size} />
+    </button>
   );
 }

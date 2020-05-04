@@ -47,6 +47,30 @@ export function viewPrevQuestion() {
   };
 }
 
+interface SubmitResponse {
+  lockout: boolean;
+}
+
+export function submitExam(examID: number) {
+  return (dispatch, getState) => {
+    const state: ExamTakerState = getState();
+    const { answers } = state.contents;
+    dispatch(saveSnapshot(examID));
+    const url = Routes.submit_exam_path(examID);
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': getCSRFToken(),
+      },
+      credentials: 'same-origin',
+    })
+      .then(result => result.json() as Promise<SubmitResponse>)
+      .then(result => {
+        window.location = Routes.exam_path(examID);
+      });
+  }
+}
 
 export function startExam(contents: ContentsState, preview: boolean): StartExamAction {
   return {
@@ -101,8 +125,8 @@ function snapshotSaving(): SnapshotSaving {
 
 export function saveSnapshot(examID) {
   return (dispatch, getState) => {
-    const { contents }: ExamTakerState = getState();
-    const { answers } = contents;
+    const state: ExamTakerState = getState();
+    const { answers } = state.contents;
     dispatch(snapshotSaving());
     const url = Routes.save_snapshot_exam_path(examID);
     fetch(url, {

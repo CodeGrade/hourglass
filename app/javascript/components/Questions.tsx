@@ -2,6 +2,8 @@ import React from 'react';
 import { Question } from '@hourglass/types';
 import ShowQuestion from '@hourglass/components/ShowQuestion';
 import Pagination from '@hourglass/components/Pagination';
+import SubmitButton from '@hourglass/containers/SubmitButton';
+import { useExamContext } from '@hourglass/context';
 
 interface QuestionsProps {
   questions: Question[];
@@ -15,6 +17,7 @@ const Questions: React.FC<QuestionsProps> = (props) => {
     paginated,
     selectedQuestion,
   } = props;
+  const { id } = useExamContext();
   const body = questions.map((q, i) => (
     <ShowQuestion
       question={q}
@@ -27,7 +30,7 @@ const Questions: React.FC<QuestionsProps> = (props) => {
       paginated={paginated}
       body={body}
       max={questions.length}
-      endItem={<p>TODO SUBMIT BUTTON</p>}
+      endItem={<SubmitButton examID={id} />}
     />
   );
 }

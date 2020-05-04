@@ -4,8 +4,8 @@ class ExamsController < ApplicationController
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create, :save_snapshot]
   before_action :require_admin_or_prof, only: [:new, :create, :preview, :finalize]
-  before_action :check_anomaly, only: [:show, :contents, :submit]
-  before_action :check_final, only: [:show, :contents, :submit]
+  before_action :check_anomaly, only: [:start, :submit]
+  before_action :check_final, only: [:start, :submit]
 
   def catch_require_current_user
     begin
@@ -45,11 +45,12 @@ class ExamsController < ApplicationController
     return if @registration.professor?
 
     if @registration.final?
-      redirect_back fallback_location: exams_path, alert: "You have already completed that exam."
+      redirect_to exams_path, alert: "You have already completed that exam."
     end
   end
 
   def show
+    @final = @registration.final?
   end
 
   def start
@@ -72,6 +73,7 @@ class ExamsController < ApplicationController
   end
 
   def preview
+    @final = false
   end
 
   def index
@@ -100,9 +102,7 @@ class ExamsController < ApplicationController
 
   def submit
     lockout = save_answers(true)
-    if lockout
-      redirect_to exams_path, alert: "You have already submitted this exam or you are locked out of it."
-    end
+    render json: { lockout: lockout }
   end
 
   def save_snapshot

@@ -40,14 +40,10 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
     );
   }
   return (
-    <div>
-      <RegularNavbar user={user} />
-      <h1>{exam.name}</h1>
-      <PreStart
-        examID={exam.id}
-        preview={preview}
-      />
-    </div>
+    <PreStart
+      examID={exam.id}
+      preview={preview}
+    />
   );
 }
 export default ExamTaker;

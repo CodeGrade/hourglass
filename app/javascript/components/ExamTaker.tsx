@@ -1,54 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
-  Container,
-  Button,
-} from 'react-bootstrap';
-import { connect, Provider } from 'react-redux';
-import store from '@hourglass/store';
-import { fetchContents } from '@hourglass/actions';
-import { ExamTakerState, ExamInfo, User } from '@hourglass/types';
-import { ExamContextProvider } from '@hourglass/context';
-import { createMap } from '@hourglass/files';
+  ExamInfo,
+  User,
+} from '@hourglass/types';
 import {
   ExamNavbar,
   RegularNavbar,
 } from '@hourglass/components/navbar';
 import ExamShowContents from '@hourglass/containers/ExamShowContents';
-
-interface PreStartProps {
-  onClick: () => void;
-}
-
-const PreStart: React.FC<PreStartProps> = (props) => {
-  const {
-    onClick,
-  } = props;
-  return (
-    <div>
-      <p>Click the following button to enter secure mode and begin the exam.</p>
-      <Button
-        variant="success"
-        onClick={onClick}
-      >
-        Begin Exam
-      </Button>
-    </div>
-  );
-}
-
-const mapPreStartDispatch = (dispatch, ownProps) => {
-  const {
-    examID,
-    preview,
-  } = ownProps;
-  return {
-    onClick: () => {
-      dispatch(fetchContents(examID, preview));
-    },
-  };
-}
-
-const PreStartContainer = connect(null, mapPreStartDispatch)(PreStart);
+import PreStart from '@hourglass/containers/PreStart';
 
 interface ExamTakerProps {
   loaded: boolean;
@@ -57,7 +17,7 @@ interface ExamTakerProps {
   user: User;
 }
 
-function ExamTaker(props: ExamTakerProps) {
+const ExamTaker: React.FC<ExamTakerProps> = (props) => {
   const {
     loaded,
     exam,
@@ -83,50 +43,11 @@ function ExamTaker(props: ExamTakerProps) {
     <div>
       <RegularNavbar user={user} />
       <h1>{exam.name}</h1>
-      <PreStartContainer
+      <PreStart
         examID={exam.id}
         preview={preview}
       />
     </div>
   );
 }
-
-function examTakerStateToProps(state: ExamTakerState) {
-  return {
-    loaded: state.loaded,
-  };
-}
-
-const ExamTakerContainer = connect(examTakerStateToProps)(ExamTaker);
-
-interface ShowExamProps {
-  // Whether the exam should load in "preview" mode.
-  preview: boolean;
-
-  // The current logged-in user.
-  user: User;
-
-  // Information about the exam.
-  exam: ExamInfo;
-}
-
-function ShowExam(props: ShowExamProps) {
-  const {
-    exam,
-    preview,
-    user,
-  } = props;
-  return (
-    <Container>
-      <Provider store={store}>
-        <ExamTakerContainer
-          exam={exam}
-          preview={preview}
-          user={user}
-        />
-      </Provider>
-    </Container>
-  );
-}
-
-export default ShowExam;
+export default ExamTaker;

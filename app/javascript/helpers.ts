@@ -1,3 +1,4 @@
+import { RefObject } from 'react';
 import Routes from '@hourglass/routes';
 
 export function getCSRFToken(): string {
@@ -18,5 +19,13 @@ export function logOut() {
     window.location = Routes.root_path();
   }).catch((err) => {
     console.error('Error logging out', err);
+  });
+}
+
+export function scrollToRef(ref: RefObject<HTMLElement>) {
+  window.scrollTo({
+    left: 0,
+    top: ref.current.offsetTop,
+    behavior: 'smooth',
   });
 }

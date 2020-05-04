@@ -37,6 +37,7 @@ export interface TogglePaginationAction {
 export interface ViewQuestionAction {
   type: 'VIEW_QUESTION';
   question: number;
+  part: number;
 }
 
 export interface StartExamAction {

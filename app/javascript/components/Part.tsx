@@ -20,7 +20,7 @@ export function Part(props: PartProps) {
   if (name) title += `: ${name}`;
   const subtitle = `(${points} points)`;
   return (
-    <div className="part">
+    <div id={`question-${qnum}-part-${pnum}`} className="part">
       <h3>
         {title}
         <small className="float-right text-muted">

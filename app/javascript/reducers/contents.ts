@@ -35,7 +35,7 @@ export default (state: ContentsState, action: ExamTakerAction): ContentsState =>
           ...state.pagination,
           selected: {
             question: action.question,
-            part: 0,
+            part: action.part,
           },
         },
       };

@@ -5,7 +5,7 @@ import {
 } from '@hourglass/types';
 import {
   togglePagination,
-  viewQuestion
+  viewQuestion,
 } from '@hourglass/actions';
 
 function mapStateToProps(state: ExamTakerState) {
@@ -20,9 +20,9 @@ function mapDispatchToProps(dispatch) {
     togglePagination: () => {
       dispatch(togglePagination());
     },
-    changeQuestion: (question: number) => {
-      dispatch(viewQuestion(question));
-    }
+    changeQuestion: (question: number, part?: number) => {
+      dispatch(viewQuestion(question, part));
+    },
   };
 }
 

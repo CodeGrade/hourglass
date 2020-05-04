@@ -23,10 +23,11 @@ export function togglePagination(): TogglePaginationAction {
   };
 }
 
-export function viewQuestion(question: number): ViewQuestionAction {
+export function viewQuestion(question: number, part?: number): ViewQuestionAction {
   return {
     type: 'VIEW_QUESTION',
     question,
+    part: part ?? 0,
   };
 }
 

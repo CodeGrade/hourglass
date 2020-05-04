@@ -23,12 +23,24 @@ export function logOut() {
 }
 
 export function scrollToQuestion(qnum: number) {
-  const qElem = document.getElementById(`question-${qnum}`);
-  const nav = document.querySelectorAll('.navbar')[0] as HTMLDivElement;
-  const navHeight = nav?.offsetHeight ?? 0;
-  window.scrollTo({
-    left: 0,
-    top: qElem.offsetTop - navHeight,
-    behavior: 'smooth',
+  scrollToElem(`question-${qnum}`);
+}
+
+export function scrollToPart(qnum: number, pnum: number) {
+  scrollToElem(`question-${qnum}-part-${pnum}`);
+}
+
+function scrollToElem(id: string) {
+  setTimeout(() => {
+    const elem = document.getElementById(id);
+    console.log('elem', elem);
+    const nav = document.querySelectorAll('.navbar')[0] as HTMLDivElement;
+    const navHeight = nav?.offsetHeight ?? 0;
+    const elemTop = elem.getBoundingClientRect().top + window.pageYOffset;
+    window.scrollTo({
+      left: 0,
+      top: elemTop - navHeight,
+      behavior: 'smooth',
+    });
   });
 }

@@ -5,12 +5,15 @@ import {
   PaginationState,
   Question,
 } from '@hourglass/types';
-import { scrollToQuestion } from '@hourglass/helpers';
+import {
+  scrollToQuestion,
+  scrollToPart,
+} from '@hourglass/helpers';
 
 interface PaginationDropdownProps {
   pagination: PaginationState;
   togglePagination: () => void;
-  changeQuestion: (idx: number) => void;
+  changeQuestion: (qnum: number, pnum?: number) => void;
   questions: Question[];
 }
 
@@ -42,27 +45,45 @@ const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {
           Toggle paginated display
         </Dropdown.Item>
         <Dropdown.Divider />
-        {questions.map((q, i) => {
-          const selectedQuestion = i === selected.question;
-          const active = paginated && selectedQuestion;
+        {questions.map((q, qi) => {
+          const selectedQuestion = qi === selected.question;
           return (
-            <Dropdown.Item
-              key={i}
-              className="pl-3"
-              active={active}
-              onClick={() => {
-                if (paginated) {
-                  changeQuestion(i);
-                } else {
-                  scrollToQuestion(i);
-                }
-              }}
+            <div
+              key={`q-${qi}`}
             >
-              Question {i+1}
-            </Dropdown.Item>
+              <Dropdown.Item
+                className="pl-3"
+                onClick={() => {
+                  if (paginated) {
+                    changeQuestion(qi);
+                  }
+                  scrollToQuestion(qi);
+                }}
+              >
+                Question {qi+1}
+              </Dropdown.Item>
+              {q.parts.map((p, pi) => {
+                const selectedPart = pi === selected.part;
+                const active = paginated && selectedQuestion && selectedPart;
+                return (
+                  <Dropdown.Item
+                    key={`q-${qi}-p-${pi}`}
+                    className="pl-5"
+                    active={active}
+                    onClick={() => {
+                      if (paginated) {
+                        changeQuestion(qi, pi);
+                      }
+                      scrollToPart(qi, pi);
+                    }}
+                  >
+                    Part {pi+1}
+                  </Dropdown.Item>
+                );
+              })}
+            </div>
           );
         })}
-        <Dropdown.Item className="pl-5">TODO Part</Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
   );

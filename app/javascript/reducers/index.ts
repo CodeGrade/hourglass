@@ -23,6 +23,7 @@ export default (state: ExamTakerState = {
             paginated: false,
             selected: {
               question: 0,
+              part: 0,
             },
           }
         },

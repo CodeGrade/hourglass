@@ -1,3 +1,5 @@
+import { RefObject } from 'react';
+
 export interface ExamInfo {
   // The exam ID.
   id: number;
@@ -10,19 +12,49 @@ export type ExamTakerAction = StartExamAction | ContentsAction | SnapshotAction;
 
 export interface ContentsState {
   // Exam information.
-  exam: ExamState,
+  exam: ExamState;
 
   // The student's current answers.
   answers: AnswersState;
+
+  // Pagination information.
+  pagination: PaginationState;
+}
+
+export interface PaginationState {
+  paginated: boolean;
+
+  selected: {
+    question: number;
+    part?: number;
+  }
+
+  refs: {
+    [qnum: number]: {
+      ref: RefObject<HTMLElement>;
+      [pnum: number]: {
+        ref: RefObject<HTMLElement>;
+      }
+    }
+  }
+}
+
+export interface TogglePaginationAction {
+  type: 'TOGGLE_PAGINATION';
+}
+
+export interface ViewQuestionAction {
+  type: 'VIEW_QUESTION';
+  question: number;
 }
 
 export interface StartExamAction {
-  type: 'START_EXAM',
+  type: 'START_EXAM';
   contents: ContentsState;
   preview: boolean;
 }
 
-export type ContentsAction = UpdateAnswerAction;
+export type ContentsAction = UpdateAnswerAction | TogglePaginationAction | ViewQuestionAction;
 
 export interface UpdateAnswerAction {
   type: 'UPDATE_ANSWER';
@@ -31,7 +63,7 @@ export interface UpdateAnswerAction {
 }
 
 export interface SnapshotSaving {
-  type: 'SNAPSHOT_SAVING',
+  type: 'SNAPSHOT_SAVING';
 }
 
 export interface SnapshotSuccess {
@@ -66,16 +98,16 @@ export interface User {
 
 export enum SnapshotStatus {
   // The exam is in preview mode and snapshots are disabled.
-  DISABLED = "DISABLED",
+  DISABLED = 'DISABLED',
 
   // A snapshot is being fetched from the server.
-  LOADING = "LOADING",
+  LOADING = 'LOADING',
 
   // The last snapshot was successfully fetched.
-  SUCCESS = "SUCCESS",
+  SUCCESS = 'SUCCESS',
 
   // The last snapshot fetch was not successful.
-  FAILURE = "FAILURE",
+  FAILURE = 'FAILURE',
 }
 
 export interface SnapshotState {

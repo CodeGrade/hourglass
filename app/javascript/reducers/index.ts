@@ -1,4 +1,3 @@
-import { combineReducers } from 'redux';
 import {
   SnapshotStatus,
   ExamTakerState,
@@ -17,7 +16,17 @@ export default (state: ExamTakerState = {
       return {
         ...state,
         loaded: true,
-        contents: action.contents,
+        contents: {
+          exam: action.contents.exam,
+          answers: action.contents.answers,
+          pagination: {
+            paginated: false,
+            selected: {
+              question: 0,
+            },
+            refs: {},
+          }
+        },
         snapshot: {
           status: action.preview ? SnapshotStatus.DISABLED : SnapshotStatus.SUCCESS,
           message: '',

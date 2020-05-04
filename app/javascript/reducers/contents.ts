@@ -20,6 +20,25 @@ export default (state: ContentsState, action: ExamTakerAction): ContentsState =>
         ...state,
         answers: ret,
       };
+    case 'TOGGLE_PAGINATION':
+      return {
+        ...state,
+        pagination: {
+          ...state.pagination,
+          paginated: !state.pagination.paginated,
+        },
+      };
+    case 'VIEW_QUESTION':
+      return {
+        ...state,
+        pagination: {
+          ...state.pagination,
+          selected: {
+            question: action.question,
+            part: 0,
+          },
+        },
+      };
     default:
       return state;
   }

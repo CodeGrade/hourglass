@@ -4,12 +4,12 @@ import { HTML } from './questions/HTML';
 import { FileViewer } from './FileViewer';
 import { Question } from '@hourglass/types';
 
-export interface QuestionProps {
+interface ShowQuestionProps {
   question: Question;
   qnum: number;
 }
 
-export function Question(props: QuestionProps) {
+const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const { question, qnum } = props;
   const {
     name, reference, description, separateSubparts, parts,
@@ -52,3 +52,4 @@ export function Question(props: QuestionProps) {
     </div>
   );
 }
+export default ShowQuestion;

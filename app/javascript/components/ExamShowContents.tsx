@@ -8,6 +8,7 @@ import { FileViewer } from './FileViewer';
 import { Question } from './Question';
 import { createMap } from '@hourglass/files';
 import { ExamContextProvider } from '@hourglass/context';
+import Questions from '@hourglass/containers/Questions';
 
 interface ExamShowContentsProps {
   exam: ExamInfo;
@@ -50,13 +51,7 @@ export default function ExamShowContents(props: ExamShowContentsProps) {
         <HTML value={instructions} />
         {reference && <FileViewer references={reference} />}
         <div>
-          {questions.map((q, i) => (
-            <Question
-              question={q}
-              qnum={i}
-              key={i}
-            />
-          ))}
+          <Questions questions={questions} />
         </div>
       </div>
     </ExamContextProvider>

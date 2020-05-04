@@ -15,21 +15,22 @@ import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import { lock } from '@hourglass/lockdown';
 
-export function startExam(contents: ContentsState): StartExamAction {
+export function startExam(contents: ContentsState, preview: boolean): StartExamAction {
   return {
     type: 'START_EXAM',
+    preview,
     contents,
   };
 }
 
-export function fetchContents(examID: number) {
+export function fetchContents(examID: number, preview: boolean) {
   return (dispatch) => {
     const url = Routes.start_exam_path(examID);
     fetch(url)
       .then((result) => result.json() as Promise<ContentsState>)
       .then((result) => {
         lock();
-        dispatch(startExam(result));
+        dispatch(startExam(result, preview));
       }).catch((err) => {
         // TODO: store a message to tell the user what went wrong
         console.error('Error starting exam', err);

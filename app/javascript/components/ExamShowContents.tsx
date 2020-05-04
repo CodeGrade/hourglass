@@ -13,6 +13,7 @@ interface ExamShowContentsProps {
   exam: ExamInfo;
   examState: ExamState;
   save: () => void;
+  preview: boolean;
 }
 
 const INTERVAL = 10000;
@@ -22,6 +23,7 @@ export default function ExamShowContents(props: ExamShowContentsProps) {
     examState,
     exam,
     save,
+    preview,
   } = props;
   const { id } = exam;
   const {
@@ -29,11 +31,13 @@ export default function ExamShowContents(props: ExamShowContentsProps) {
     files,
   } = examState;
   useEffect(() => {
-    const timer = setInterval(() => save(), INTERVAL);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [save]);
+    if (!preview) {
+      const timer = setInterval(() => save(), INTERVAL);
+      return () => {
+        clearInterval(timer);
+      };
+    }
+  }, [save, preview]);
   const {
     questions,
     instructions,

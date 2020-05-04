@@ -19,6 +19,7 @@ export interface ContentsState {
 export interface StartExamAction {
   type: 'START_EXAM',
   contents: ContentsState;
+  preview: boolean;
 }
 
 export type ContentsAction = UpdateAnswerAction;

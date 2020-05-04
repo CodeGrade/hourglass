@@ -19,7 +19,7 @@ export default (state: ExamTakerState = {
         loaded: true,
         contents: action.contents,
         snapshot: {
-          status: SnapshotStatus.SUCCESS,
+          status: action.preview ? SnapshotStatus.DISABLED : SnapshotStatus.SUCCESS,
           message: '',
         },
       };

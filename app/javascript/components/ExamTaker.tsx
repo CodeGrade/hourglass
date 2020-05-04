@@ -37,10 +37,13 @@ const PreStart: React.FC<PreStartProps> = (props) => {
 }
 
 const mapPreStartDispatch = (dispatch, ownProps) => {
-  const { examID } = ownProps;
+  const {
+    examID,
+    preview,
+  } = ownProps;
   return {
     onClick: () => {
-      dispatch(fetchContents(examID));
+      dispatch(fetchContents(examID, preview));
     },
   };
 }
@@ -69,7 +72,10 @@ function ExamTaker(props: ExamTakerProps) {
           preview={preview}
           locked={loaded}
         />
-        <ExamShowContents exam={exam} />
+        <ExamShowContents
+          exam={exam}
+          preview={preview}
+        />
       </div>
     );
   }
@@ -79,6 +85,7 @@ function ExamTaker(props: ExamTakerProps) {
       <h1>{exam.name}</h1>
       <PreStartContainer
         examID={exam.id}
+        preview={preview}
       />
     </div>
   );

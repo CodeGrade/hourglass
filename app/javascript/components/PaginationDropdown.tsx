@@ -5,6 +5,7 @@ import {
   PaginationState,
   Question,
 } from '@hourglass/types';
+import { scrollToQuestion } from '@hourglass/helpers';
 
 interface PaginationDropdownProps {
   pagination: PaginationState;
@@ -49,7 +50,13 @@ const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {
               key={i}
               className="pl-3"
               active={active}
-              onClick={() => changeQuestion(i)}
+              onClick={() => {
+                if (paginated) {
+                  changeQuestion(i);
+                } else {
+                  scrollToQuestion(i);
+                }
+              }}
             >
               Question {i+1}
             </Dropdown.Item>

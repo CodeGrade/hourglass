@@ -10,9 +10,16 @@ interface ShowQuestionProps {
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
-  const { question, qnum } = props;
   const {
-    name, reference, description, separateSubparts, parts,
+    question,
+    qnum,
+  } = props;
+  const {
+    name,
+    reference,
+    description,
+    separateSubparts,
+    parts,
   } = question;
   let jumpToPart = null;
   if (separateSubparts) {
@@ -36,7 +43,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     );
   }
   return (
-    <div className={`question no-gutters ${separateSubparts ? 'paginated' : ''}`}>
+    <div id={`question-${qnum}`} className={`question no-gutters ${separateSubparts ? 'paginated' : ''}`}>
       <h1>{`Question ${qnum + 1}: ${name}`}</h1>
       <HTML value={description} />
       {reference && <FileViewer references={reference} />}

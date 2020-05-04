@@ -28,15 +28,6 @@ export interface PaginationState {
     question: number;
     part?: number;
   }
-
-  refs: {
-    [qnum: number]: {
-      ref: RefObject<HTMLElement>;
-      [pnum: number]: {
-        ref: RefObject<HTMLElement>;
-      }
-    }
-  }
 }
 
 export interface TogglePaginationAction {

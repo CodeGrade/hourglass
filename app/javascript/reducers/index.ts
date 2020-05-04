@@ -24,7 +24,6 @@ export default (state: ExamTakerState = {
             selected: {
               question: 0,
             },
-            refs: {},
           }
         },
         snapshot: {

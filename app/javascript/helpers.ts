@@ -22,10 +22,13 @@ export function logOut() {
   });
 }
 
-export function scrollToRef(ref: RefObject<HTMLElement>) {
+export function scrollToQuestion(qnum: number) {
+  const qElem = document.getElementById(`question-${qnum}`);
+  const nav = document.querySelectorAll('.navbar')[0] as HTMLDivElement;
+  const navHeight = nav?.offsetHeight ?? 0;
   window.scrollTo({
     left: 0,
-    top: ref.current.offsetTop,
+    top: qElem.offsetTop - navHeight,
     behavior: 'smooth',
   });
 }

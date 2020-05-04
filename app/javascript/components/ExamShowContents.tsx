@@ -5,7 +5,6 @@ import {
 } from '@hourglass/types';
 import { HTML } from './questions/HTML';
 import { FileViewer } from './FileViewer';
-import { Question } from './Question';
 import { createMap } from '@hourglass/files';
 import { ExamContextProvider } from '@hourglass/context';
 import Questions from '@hourglass/containers/Questions';

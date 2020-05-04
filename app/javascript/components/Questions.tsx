@@ -26,6 +26,8 @@ const Questions: React.FC<QuestionsProps> = (props) => {
       current={selectedQuestion}
       paginated={paginated}
       body={body}
+      max={questions.length}
+      endItem={<p>TODO SUBMIT BUTTON</p>}
     />
   );
 }

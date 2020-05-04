@@ -1,33 +1,51 @@
 import React from 'react';
 import { Carousel } from 'react-bootstrap';
+import PaginationArrows from '@hourglass/containers/PaginationArrows';
 
 interface PaginationProps {
   paginated: boolean;
   current: number;
+  max: number;
   body: JSX.Element[];
+  endItem: JSX.Element;
 }
 
 const Pagination: React.FC<PaginationProps> = (props) => {
   const {
     paginated,
     current,
+    max,
     body,
+    endItem,
   } = props;
+  const onFirstPage = current === 0;
+  const onLastPage = current === max - 1;
+  const showEnd = (!paginated) || onLastPage;
   return (
-    <div
-      className={paginated ? 'carousel' : undefined}
-    >
-      {body.map((b, i) => {
-        const active = current === i ? 'active' : '';
-        return (
-          <div
-            key={i}
-            className={paginated ? `carousel-item ${active}` : ''}
-          >
-            {b}
-          </div>
-        );
-      })}
+    <div>
+      <div
+        className={paginated ? 'carousel' : undefined}
+      >
+        {body.map((b, i) => {
+          const active = current === i;
+          const activeClass = active ? 'active' : '';
+          return (
+            <div
+              key={i}
+              className={paginated ? `carousel-item ${activeClass}` : ''}
+            >
+              {b}
+              {paginated && (
+                <PaginationArrows
+                  showNext={!onLastPage}
+                  showBack={!onFirstPage}
+                />
+              )}
+              {showEnd && endItem}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -31,6 +31,23 @@ export function viewQuestion(question: number, part?: number): ViewQuestionActio
   };
 }
 
+export function viewNextQuestion() {
+  return (dispatch, getState) => {
+    const state: ExamTakerState = getState();
+    const qnum = state.contents.pagination.selected.question;
+    dispatch(viewQuestion(qnum+1, 0))
+  };
+}
+
+export function viewPrevQuestion() {
+  return (dispatch, getState) => {
+    const state: ExamTakerState = getState();
+    const qnum = state.contents.pagination.selected.question;
+    dispatch(viewQuestion(qnum-1, 0))
+  };
+}
+
+
 export function startExam(contents: ContentsState, preview: boolean): StartExamAction {
   return {
     type: 'START_EXAM',

@@ -1,2 +1,2 @@
 export { RegularNavbar } from './RegularNavbar';
-export { ExamNavbar } from './ExamNavbar';
+export { default as ExamNavbar } from './ExamNavbar';

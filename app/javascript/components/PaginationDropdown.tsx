@@ -69,7 +69,7 @@ const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {
                 const active = paginated && selectedQuestion && selectedPart;
                 return (
                   <Dropdown.Item
-                    key={`q-${qi}-p-${pi}`}
+                    key={pi}
                     className="pl-5"
                     active={active}
                     onClick={(): void => {

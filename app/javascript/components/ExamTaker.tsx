@@ -22,10 +22,7 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
   } = useExamInfoContext();
   const body = ready ? (
     <>
-      <ExamNavbar
-        user={user}
-        preview={preview}
-      />
+      <ExamNavbar />
       <ExamShowContents
         exam={exam}
         preview={preview}

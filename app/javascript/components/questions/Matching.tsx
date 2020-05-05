@@ -14,7 +14,7 @@ interface MatchingProps {
   disabled: boolean;
 }
 
-export function Matching(props: MatchingProps) {
+const Matching: React.FC<MatchingProps> = (props) => {
   const {
     info,
     value,
@@ -106,4 +106,6 @@ export function Matching(props: MatchingProps) {
       </Col>
     </Row>
   );
-}
+};
+
+export default Matching;

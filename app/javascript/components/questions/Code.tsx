@@ -2,8 +2,8 @@ import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { CodeInfo, CodeState } from '@hourglass/types';
 import { useExamContext } from '@hourglass/context';
-import { Editor } from '../ExamCodeBox';
 import HTML from '@hourglass/components/HTML';
+import { Editor } from '../ExamCodeBox';
 
 interface CodeProps {
   info: CodeInfo;

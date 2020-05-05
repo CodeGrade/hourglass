@@ -1,15 +1,16 @@
 import { connect } from 'react-redux';
 import { submitExam } from '@hourglass/actions';
-import {
-  ExamTakerState,
-} from '@hourglass/types';
 import SubmitButton from '@hourglass/components/SubmitButton';
+import { MDTP } from '@hourglass/types';
 
-function mapDispatchToProps(dispatch, ownProps) {
-  const { examID } = ownProps;
-  return {
-    submit: () => dispatch(submitExam(examID)),
-  };
+interface OwnProps {
+  examID: number;
 }
+
+const mapDispatchToProps: MDTP<{
+  submit: () => void;
+}, OwnProps> = (dispatch, ownProps) => ({
+  submit: (): void => dispatch(submitExam(ownProps.examID)),
+});
 
 export default connect(null, mapDispatchToProps)(SubmitButton);

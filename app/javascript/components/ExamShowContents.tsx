@@ -5,7 +5,7 @@ import {
 import { createMap } from '@hourglass/files';
 import { ExamContextProvider } from '@hourglass/context';
 import Questions from '@hourglass/containers/Questions';
-import { useAnomalyListeners } from '@hourglass/lockdown/anomaly';
+import useAnomalyListeners from '@hourglass/lockdown/anomaly';
 import HTML from '@hourglass/components/HTML';
 import { FileViewer } from './FileViewer';
 

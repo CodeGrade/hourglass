@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { connect } from 'react-redux';
 import { updateAnswer } from '@hourglass/actions';
 import {
@@ -8,12 +10,12 @@ import {
 } from '@hourglass/types';
 import withLocked from '@hourglass/components/Locked';
 
-const getAtPath = (state, ...path: StatePath): AnswerState => {
+const getAtPath = (state: ExamTakerState, ...path: StatePath): AnswerState => {
   let ret = state.contents.data.answers;
-  for (const elem of path) {
-    ret = ret?.[elem];
-  }
-  return ret;
+  path.forEach((item) => {
+    ret = ret?.[item];
+  });
+  return ret as AnswerState;
 };
 
 const mapStateToProps = (state: ExamTakerState, ownProps) => {

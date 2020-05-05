@@ -1,9 +1,7 @@
 import {
-  AnswersState,
   ContentsState,
   ExamTakerAction,
 } from '@hourglass/types';
-
 
 export default (state: ContentsState = {
   data: undefined,
@@ -22,12 +20,12 @@ export default (state: ContentsState = {
         ...state,
         data: action.contents,
       };
-    case 'UPDATE_ANSWER':
+    case 'UPDATE_ANSWER': {
       const ret = {
         ...state.data.answers,
       };
       let cur = ret;
-      for (let i = 0; i < action.path.length - 1; i++) {
+      for (let i = 0; i < action.path.length - 1; i += 1) {
         cur[action.path[i]] = { ...cur[action.path[i]] };
         cur = cur[action.path[i]];
       }
@@ -39,6 +37,7 @@ export default (state: ContentsState = {
           answers: ret,
         },
       };
+    }
     case 'TOGGLE_PAGINATION':
       return {
         ...state,

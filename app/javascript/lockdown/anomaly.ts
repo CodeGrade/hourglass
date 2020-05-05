@@ -5,14 +5,19 @@ import { useExamInfoContext } from '@hourglass/context';
 import { AnomalyDetected } from '@hourglass/types';
 import { installListeners, removeListeners } from './listeners';
 
-function lockOut() {
+function lockOut(): void {
   // TODO: redirect with flash
   const url = Routes.exams_path();
   window.location = url;
 }
 
-const anomalyDetectedForExam = (examID: number, registrationID: number) => (reason: string, event: any) => {
-  console.error('ANOMALY DETECTED:', reason, event);
+/**
+ * Return a function that can be used to signal anomalies.
+ * @param examID the ID of the current exam
+ * @param registrationID the ID of the current registration
+ */
+const anom = (examID: number, registrationID: number) => (reason: string): void => {
+  // TODO use event argument?
   const anomalyPath = Routes.exam_registration_anomalies_path(examID, registrationID);
   fetch(anomalyPath, {
     method: 'POST',
@@ -28,27 +33,27 @@ const anomalyDetectedForExam = (examID: number, registrationID: number) => (reas
     }),
   })
     .then((data) => data.json())
-    .then((data) => lockOut())
+    .then(() => lockOut())
     .catch(() => lockOut());
 };
 
 /**
  * React hook to install anomaly listeners.
  */
-export function useAnomalyListeners(preview: boolean) {
+export default function useAnomalyListeners(preview: boolean): void {
   const {
     exam,
     registration,
   } = useExamInfoContext();
   const [lst, setLst] = useState([]);
-  const anomalyDetected: AnomalyDetected = anomalyDetectedForExam(exam.id, registration.id);
+  const anomalyDetected: AnomalyDetected = anom(exam.id, registration.id);
   useEffect(() => {
     if (!preview) {
       setLst(installListeners(anomalyDetected));
-      return () => {
-        removeListeners(lst);
-        setLst([]);
-      };
     }
+    return (): void => {
+      removeListeners(lst);
+      setLst([]);
+    };
   }, [preview]);
 }

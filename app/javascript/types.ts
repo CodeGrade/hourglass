@@ -1,6 +1,5 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
-import { MapStateToProps, MapDispatchToProps } from 'react-redux';
-import {Dispatch} from 'redux';
+import { MapStateToProps } from 'react-redux';
 
 export interface ExamInfo {
   // The exam ID.

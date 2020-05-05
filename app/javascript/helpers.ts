@@ -1,4 +1,3 @@
-import { RefObject } from 'react';
 import Routes from '@hourglass/routes';
 
 export function getCSRFToken(): string {
@@ -6,7 +5,7 @@ export function getCSRFToken(): string {
   return elem.content;
 }
 
-export function logOut() {
+export function logOut(): void {
   const url = Routes.destroy_user_session_path();
   fetch(url, {
     method: 'DELETE',
@@ -17,20 +16,12 @@ export function logOut() {
     credentials: 'same-origin',
   }).then(() => {
     window.location = Routes.root_path();
-  }).catch((err) => {
+  }).catch(() => {
     // TODO
   });
 }
 
-export function scrollToQuestion(qnum: number) {
-  scrollToElem(`question-${qnum}`);
-}
-
-export function scrollToPart(qnum: number, pnum: number) {
-  scrollToElem(`question-${qnum}-part-${pnum}`);
-}
-
-function scrollToElem(id: string) {
+function scrollToElem(id: string): void {
   setTimeout(() => {
     const elem = document.getElementById(id);
     const nav = document.querySelectorAll('.navbar')[0] as HTMLDivElement;
@@ -42,4 +33,12 @@ function scrollToElem(id: string) {
       behavior: 'smooth',
     });
   });
+}
+
+export function scrollToQuestion(qnum: number): void {
+  scrollToElem(`question-${qnum}`);
+}
+
+export function scrollToPart(qnum: number, pnum: number): void {
+  scrollToElem(`question-${qnum}-part-${pnum}`);
 }

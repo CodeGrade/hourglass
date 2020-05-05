@@ -12,10 +12,10 @@ interface ExamContext {
   fmap: FileMap;
 }
 
-const EC = createContext<Partial<ExamContext>>({});
+const EC = createContext<ExamContext>({} as ExamContext);
 
 export const ExamContextProvider = EC.Provider;
-export const useExamContext = () => useContext(EC);
+export const useExamContext = (): ExamContext => useContext(EC);
 
 interface ExamInfoContext {
   exam: ExamInfo;
@@ -24,7 +24,7 @@ interface ExamInfoContext {
   preview: boolean;
 }
 
-const EIC = createContext<Partial<ExamInfoContext>>({});
+const EIC = createContext<ExamInfoContext>({} as ExamInfoContext);
 
 export const ExamInfoContextProvider = EIC.Provider;
-export const useExamInfoContext = () => useContext(EIC);
+export const useExamInfoContext = (): ExamInfoContext => useContext(EIC);

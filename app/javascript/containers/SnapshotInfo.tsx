@@ -1,14 +1,13 @@
 import { connect } from 'react-redux';
-import { ExamTakerState } from '@hourglass/types';
+import { ExamTakerState, MSTP, SnapshotStatus } from '@hourglass/types';
 import SnapshotInfo from '@hourglass/components/SnapshotInfo';
 
-function mapStateToProps(state: ExamTakerState) {
-  const { snapshot } = state;
-  const { message, status } = snapshot;
-  return {
-    status,
-    message,
-  };
-}
+const mapStateToProps: MSTP<{
+  status: SnapshotStatus;
+  message: string;
+}> = (state: ExamTakerState) => ({
+  status: state.snapshot.status,
+  message: state.snapshot.message,
+});
 
 export default connect(mapStateToProps)(SnapshotInfo);

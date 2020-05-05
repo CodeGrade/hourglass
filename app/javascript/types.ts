@@ -171,7 +171,7 @@ export type StatePath = Array<number | string>;
 
 export interface CodeInfo {
   type: 'Code';
-  prompt: Array<string>;
+  prompt: string[];
   lang: string;
   initial: string;
 }
@@ -189,8 +189,8 @@ export type CodeState = {
 
 export interface AllThatApplyInfo {
   type: 'AllThatApply';
-  options: Array<string>;
-  prompt: Array<string>;
+  options: string[];
+  prompt: string[];
 }
 
 export interface AllThatApplyState {
@@ -199,15 +199,15 @@ export interface AllThatApplyState {
 
 export interface YesNoInfo {
   type: 'YesNo' | 'TrueFalse';
-  prompt: Array<string>;
+  prompt: string[];
 }
 
 export type YesNoState = boolean;
 
 export interface CodeTagInfo {
   type: 'CodeTag';
-  prompt: Array<string>;
-  choices: Array<FileRef>;
+  prompt: string[];
+  choices: FileRef[];
 }
 
 export interface CodeTagState {
@@ -217,15 +217,15 @@ export interface CodeTagState {
 
 export interface MultipleChoiceInfo {
   type: 'MultipleChoice';
-  prompt: Array<string>; // (html)
-  options: Array<string>; // (html)
+  prompt: string[]; // (html)
+  options: string[]; // (html)
 }
 
 export type MultipleChoiceState = number;
 
 export interface TextInfo {
   type: 'Text';
-  prompt: Array<string>; // (html)
+  prompt: string[]; // (html)
 }
 
 export type TextState = string;
@@ -233,9 +233,9 @@ export type TextState = string;
 export interface MatchingInfo {
   type: 'Matching';
   promptLabel?: string; // (html)
-  prompts: Array<string>; // (html)
+  prompts: string[]; // (html)
   valuesLabel?: string;
-  values: Array<string>;
+  values: string[];
 }
 
 export interface MatchingState {
@@ -259,16 +259,16 @@ export interface PartInfo {
   name?: string;
   description: string;
   points: number;
-  reference?: Array<FileRef>;
-  body: Array<BodyItem>;
+  reference?: FileRef[];
+  body: BodyItem[];
 }
 
 export interface QuestionInfo {
   name?: string;
   description: string;
   separateSubparts: boolean;
-  parts: Array<PartInfo>;
-  reference?: Array<FileRef>;
+  parts: PartInfo[];
+  reference?: FileRef[];
 }
 
 export interface ExamState {
@@ -280,8 +280,8 @@ export interface ExamState {
 }
 
 export interface Exam {
-  questions: Array<QuestionInfo>;
-  reference?: Array<FileRef>;
+  questions: QuestionInfo[];
+  reference?: FileRef[];
   instructions: string;
 }
 
@@ -341,7 +341,7 @@ export interface ExamDir {
   id: number;
 
   // Files within this directory.
-  nodes: Array<ExamFile>;
+  nodes: ExamFile[];
 }
 
 // Exam files can be single files or directories.

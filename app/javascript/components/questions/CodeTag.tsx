@@ -40,7 +40,7 @@ function CodeTagVal(props: CodeTagValProps) {
 }
 
 interface FileModalProps {
-  references: Array<FileRef>;
+  references: FileRef[];
   show: boolean;
   onClose: () => void;
   onSave: (newState: CodeTagState) => void;

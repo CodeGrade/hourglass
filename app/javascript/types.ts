@@ -1,5 +1,3 @@
-import { RefObject } from 'react';
-
 export interface ExamInfo {
   // The exam ID.
   id: number;
@@ -12,7 +10,8 @@ export interface RegistrationInfo {
   id: number;
 }
 
-export type ExamTakerAction = LockedDownAction | LockdownFailedAction | LoadExamAction | ContentsAction | SnapshotAction;
+export type ExamTakerAction =
+  LockedDownAction | LockdownFailedAction | LoadExamAction | ContentsAction | SnapshotAction;
 
 export type StartExamResponse = AnomalousReponse | ContentsData;
 
@@ -45,7 +44,7 @@ export interface PaginationState {
   selected: {
     question: number;
     part?: number;
-  }
+  };
 }
 
 export interface TogglePaginationAction {
@@ -160,8 +159,8 @@ export interface AnswersState {
   [qnum: number]: {
     [pnum: number]: {
       [bnum: number]: AnswerState;
-    }
-  }
+    };
+  };
 }
 
 export type StatePath = Array<number | string>;
@@ -176,7 +175,7 @@ export interface CodeInfo {
 export interface MarkDescription {
   from: CodeMirror.Position;
   to: CodeMirror.Position;
-  options: CodeMirror.TextMarkerOptions
+  options: CodeMirror.TextMarkerOptions;
 }
 
 export type CodeState = {
@@ -239,9 +238,13 @@ export interface MatchingState {
   [index: number]: number;
 }
 
-export type BodyItem = HTML | AllThatApplyInfo | CodeInfo | YesNoInfo | CodeTagInfo | MultipleChoiceInfo | TextInfo | MatchingInfo;
+export type BodyItem =
+  HTML | AllThatApplyInfo | CodeInfo | YesNoInfo |
+  CodeTagInfo | MultipleChoiceInfo | TextInfo | MatchingInfo;
 
-export type AnswerState = AllThatApplyState | CodeState | YesNoState | CodeTagState | MultipleChoiceState | TextState | MatchingState;
+export type AnswerState =
+  AllThatApplyState | CodeState | YesNoState |
+  CodeTagState | MultipleChoiceState | TextState | MatchingState;
 
 type HTML = {
   type: 'HTML';
@@ -347,9 +350,9 @@ export interface FileMap {
   [path: string]: ExamFile;
 }
 
-export type AnomalyDetected = (reason: string, event: any) => void;
+export type AnomalyDetected = (reason: string, event: Event) => void;
 
 export interface AnomalyListener {
   event: string;
-  handler: (e: any) => void;
+  handler: (e: Event) => void;
 }

@@ -43,10 +43,10 @@ interface FileContentsProps {
   selectedFile: string;
   selectedLine?: number;
   onChangeLine?: (lineNum: number) => void;
-  refreshProps?: any[];
+  refreshProps?: React.DependencyList;
 }
 
-function FileContents(props: FileContentsProps) {
+const FileContents: React.FC<FileContentsProps> = (props) => {
   const {
     selectedFile,
     selectedLine,
@@ -56,19 +56,19 @@ function FileContents(props: FileContentsProps) {
   const refreshProps = rp ?? [];
   const { fmap } = useExamContext();
   const f = fmap[selectedFile];
-  let cursor;
+  let cursor: CodeMirror.Position;
   if (selectedLine) {
     cursor = {
       line: selectedLine - 1,
       ch: 0,
     };
   }
-  const handleLineClick = (num) => {
+  const handleLineClick = (num: number): void => {
     if (onChangeLine) {
       onChangeLine(num + 1);
     }
   };
-  if (f?.filedir == 'file') {
+  if (f?.filedir === 'file') {
     return (
       <Editor
         readOnly
@@ -77,7 +77,7 @@ function FileContents(props: FileContentsProps) {
         value={f.contents}
         markDescriptions={f.marks}
         valueUpdate={[...refreshProps, f]}
-        onGutterClick={(_ed, lineNum) => {
+        onGutterClick={(_ed, lineNum): void => {
           handleLineClick(lineNum);
           _ed.setCursor(lineNum);
         }}
@@ -85,10 +85,10 @@ function FileContents(props: FileContentsProps) {
           styleActiveLine: !!selectedLine,
         }}
         cursor={cursor}
-        onCursor={(ed, pos) => {
+        onCursor={(ed, pos): void => {
           if (ed.hasFocus()) handleLineClick(pos.line);
         }}
-        onFocus={(ed, event) => {
+        onFocus={(ed): void => {
           const { line } = ed.getCursor();
           handleLineClick(line);
         }}
@@ -98,7 +98,7 @@ function FileContents(props: FileContentsProps) {
   return (
     <p>Choose a file.</p>
   );
-}
+};
 
 interface FileTreeProps {
   files: ExamFile[];
@@ -106,15 +106,15 @@ interface FileTreeProps {
   onChangeFile: (id: string) => void;
 }
 
-function FileTree(props: FileTreeProps) {
+const FileTree: React.FC<FileTreeProps> = (props) => {
   const { files, onChangeFile, selectedFile } = props;
   const { fmap } = useExamContext();
   const allIds = Object.keys(fmap);
   return (
     <TreeView
       selected={selectedFile}
-      onNodeSelect={(e, id) => {
-        const dir = fmap[id].filedir == 'dir';
+      onNodeSelect={(e, id): void => {
+        const dir = fmap[id].filedir === 'dir';
         if (!dir) onChangeFile(id);
       }}
       defaultCollapseIcon={<ExpandMoreIcon />}
@@ -124,13 +124,13 @@ function FileTree(props: FileTreeProps) {
       <Files files={files} />
     </TreeView>
   );
-}
+};
 
 interface FileViewerProps {
   references: FileRef[];
 }
 
-export function FileViewer(props: FileViewerProps) {
+export const FileViewer: React.FC<FileViewerProps> = (props) => {
   const { references } = props;
   const { fmap } = useExamContext();
   const filteredFiles = getFilesForRefs(fmap, references);
@@ -153,24 +153,23 @@ export function FileViewer(props: FileViewerProps) {
       </Col>
     </Row>
   );
-}
+};
+
 
 interface ControlledFileViewerProps {
   references: FileRef[];
   selection?: CodeTagState;
   onChangeLine: (lineNumber: number) => void;
   onChangeFile: (file: string) => void;
-  refreshProps?: any[];
+  refreshProps?: React.DependencyList;
 }
 
-export function ControlledFileViewer(props: ControlledFileViewerProps) {
+export const ControlledFileViewer: React.FC<ControlledFileViewerProps> = (props) => {
   const {
     references, selection, onChangeFile, onChangeLine, refreshProps,
   } = props;
   const { fmap } = useExamContext();
   const filteredFiles = getFilesForRefs(fmap, references);
-  const first = firstFile(filteredFiles);
-  const firstID = first?.rel_path;
   return (
     <Row>
       <Col sm={3}>
@@ -190,4 +189,4 @@ export function ControlledFileViewer(props: ControlledFileViewerProps) {
       </Col>
     </Row>
   );
-}
+};

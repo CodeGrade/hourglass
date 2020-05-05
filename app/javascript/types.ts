@@ -14,7 +14,15 @@ export interface RegistrationInfo {
 
 export type ExamTakerAction = LockedDownAction | LockdownFailedAction | LoadExamAction | ContentsAction | SnapshotAction;
 
+export type StartExamResponse = AnomalousReponse | ContentsData;
+
+export interface AnomalousReponse {
+  type: 'ANOMALOUS';
+}
+
 export interface ContentsData {
+  type: 'CONTENTS';
+
   // Exam information.
   exam: ExamState;
 
@@ -337,4 +345,11 @@ export type Files = Array<ExamFile>;
 // Map from file path to file.
 export interface FileMap {
   [path: string]: ExamFile;
+}
+
+export type AnomalyDetected = (reason: string, event: any) => void;
+
+export interface AnomalyListener {
+  event: string;
+  handler: (e: any) => void;
 }

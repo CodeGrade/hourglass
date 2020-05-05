@@ -19,10 +19,7 @@ export default (state: ContentsState = {
     case 'LOAD_EXAM':
       return {
         ...state,
-        data: {
-          exam: action.contents.exam,
-          answers: action.contents.answers,
-        },
+        data: action.contents,
       }
     case 'UPDATE_ANSWER':
       const ret = {

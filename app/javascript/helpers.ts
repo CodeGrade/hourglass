@@ -18,7 +18,7 @@ export function logOut() {
   }).then(() => {
     window.location = Routes.root_path();
   }).catch((err) => {
-    console.error('Error logging out', err);
+    // TODO
   });
 }
 
@@ -33,7 +33,6 @@ export function scrollToPart(qnum: number, pnum: number) {
 function scrollToElem(id: string) {
   setTimeout(() => {
     const elem = document.getElementById(id);
-    console.log('elem', elem);
     const nav = document.querySelectorAll('.navbar')[0] as HTMLDivElement;
     const navHeight = nav?.offsetHeight ?? 0;
     const elemTop = elem.getBoundingClientRect().top + window.pageYOffset;

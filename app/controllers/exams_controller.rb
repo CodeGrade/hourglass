@@ -37,7 +37,11 @@ class ExamsController < ApplicationController
 
   def check_anomaly
     if @registration.anomalous?
-      redirect_to exams_path, alert: "You are locked out of that exam. Please see a proctor."
+      render(
+        json: {
+          type: 'ANOMALOUS'
+        }
+      )
     end
   end
 
@@ -63,6 +67,7 @@ class ExamsController < ApplicationController
     answers = @registration.get_current_answers
     render(
       json: {
+        type: 'CONTENTS',
         exam: {
           info: @exam.info(false),
           files: @exam.get_exam_files,

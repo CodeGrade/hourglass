@@ -9,7 +9,7 @@ import {
 import withLocked from '@hourglass/components/Locked';
 
 const getAtPath = (state, ...path: StatePath): AnswerState => {
-  let ret = state.contents.answers;
+  let ret = state.contents.data.answers;
   for (const elem of path) {
     ret = ret?.[elem];
   }

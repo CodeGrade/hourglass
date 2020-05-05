@@ -12,6 +12,7 @@ import {
   StatePath,
   AnswerState,
   UpdateAnswerAction,
+  StartExamResponse,
   ContentsData,
   LoadExamAction,
   RegistrationInfo,
@@ -19,7 +20,7 @@ import {
 } from '@hourglass/types';
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
-import { lock } from '@hourglass/lockdown';
+import { lock } from '@hourglass/lockdown/lock';
 
 export function togglePagination(): TogglePaginationAction {
   return {
@@ -52,12 +53,11 @@ export function viewPrevQuestion() {
 }
 
 export function doTryLockdown(
-  preview: boolean,
   exam: ExamInfo,
-  registration: RegistrationInfo,
+  preview: boolean,
 ) {
   return (dispatch) => {
-    lock(exam, registration).then(() => {
+    lock().then(() => {
       dispatch(lockedDown());
       dispatch(doLoad(exam.id, preview));
     }).catch((err) => {
@@ -107,8 +107,8 @@ export function submitExam(examID: number) {
 export function loadExam(contents: ContentsData, preview: boolean): LoadExamAction {
   return {
     type: 'LOAD_EXAM',
-    preview,
     contents,
+    preview,
   };
 }
 
@@ -116,12 +116,16 @@ export function doLoad(examID: number, preview: boolean) {
   return (dispatch) => {
     const url = Routes.start_exam_path(examID);
     fetch(url)
-      .then((result) => result.json() as Promise<ContentsData>)
+      .then((result) => result.json() as Promise<StartExamResponse>)
       .then((result) => {
-        dispatch(loadExam(result, preview));
+        if (result.type === 'ANOMALOUS') {
+          dispatch(lockdownFailed("You have been locked out. Please see an instructor."));
+        } else {
+          dispatch(loadExam(result, preview));
+        }
       }).catch((err) => {
         // TODO: store a message to tell the user what went wrong
-        console.error('Error starting exam', err);
+        dispatch(lockdownFailed(`Error starting exam: ${err.message}`));
       });
   };
 }
@@ -173,6 +177,7 @@ export function saveSnapshot(examID) {
       .then((result) => {
         const { lockout } = result;
         console.log('lockout: ', lockout);
+        // TODO act on lockout
         dispatch(snapshotSuccess());
       }).catch((err) => {
         console.error('Snapshot save failure', err);

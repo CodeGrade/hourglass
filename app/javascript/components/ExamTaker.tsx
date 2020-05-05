@@ -42,9 +42,8 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
         user={user}
       />
       <PreStart
-        exam={exam}
-        registration={registration}
         preview={preview}
+        exam={exam}
       />
     </>
   );

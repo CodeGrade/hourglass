@@ -10,12 +10,10 @@ import { doTryLockdown } from '@hourglass/actions';
 const mapDispatchToProps = (dispatch, ownProps) => {
   const {
     exam,
-    registration,
-    preview,
   } = ownProps;
   return {
     onClick: () => {
-      dispatch(doTryLockdown(preview, exam, registration));
+      dispatch(doTryLockdown(exam, ownProps.preview));
     },
   };
 }

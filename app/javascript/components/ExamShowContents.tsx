@@ -8,6 +8,7 @@ import { FileViewer } from './FileViewer';
 import { createMap } from '@hourglass/files';
 import { ExamContextProvider } from '@hourglass/context';
 import Questions from '@hourglass/containers/Questions';
+import { useAnomalyListeners } from '@hourglass/lockdown/anomaly';
 
 interface ExamShowContentsProps {
   exam: ExamInfo;
@@ -38,6 +39,7 @@ export default function ExamShowContents(props: ExamShowContentsProps) {
       };
     }
   }, [save, preview]);
+  useAnomalyListeners(preview);
   const {
     questions,
     instructions,

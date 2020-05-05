@@ -29,6 +29,8 @@ const Pagination: React.FC<PaginationProps> = (props) => {
           const active = current === i;
           const activeClass = active ? 'active' : '';
           return (
+            // Page indices are STATIC.
+            // eslint-disable-next-line react/no-array-index-key
             <div key={i} className={paginated ? `carousel-item ${activeClass}` : ''}>
               {b}
               {paginated && (

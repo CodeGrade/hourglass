@@ -28,6 +28,8 @@ const Questions: React.FC<QuestionsProps> = (props) => {
     >
       {questions.map((q, i) => (
         <ShowQuestion
+          // Question numbers are STATIC.
+          // eslint-disable-next-line react/no-array-index-key
           key={i}
           question={q}
           qnum={i}

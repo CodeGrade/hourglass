@@ -31,6 +31,8 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           part={p}
           pnum={i}
           qnum={qnum}
+          // Part numbers are STATIC.
+          // eslint-disable-next-line react/no-array-index-key
           key={i}
         />
       ))}

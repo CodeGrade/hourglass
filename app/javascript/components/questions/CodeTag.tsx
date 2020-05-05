@@ -143,7 +143,14 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
          && (
          <Row>
            <Col sm={12}>
-             {prompt.map((p, i) => <HTML key={i} value={p} />)}
+             {prompt.map((p, i) => (
+               <HTML
+                 // Prompt indices are STATIC.
+                 // eslint-disable-next-line react/no-array-index-key
+                 key={i}
+                 value={p}
+               />
+             ))}
            </Col>
          </Row>
          )}

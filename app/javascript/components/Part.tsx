@@ -32,6 +32,8 @@ const Part: React.FC<PartProps> = (props) => {
       <Table hover borderless>
         <tbody>
           {body.map((b, i) => (
+            // Body numbers are STATIC.
+            // eslint-disable-next-line react/no-array-index-key
             <tr key={i}>
               <td className="row w-100 no-gutters">
                 <Col>

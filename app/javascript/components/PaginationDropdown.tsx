@@ -49,6 +49,8 @@ const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {
           const selectedQuestion = qi === selected.question;
           return (
             <div
+              // Question numbers are STATIC.
+              // eslint-disable-next-line react/no-array-index-key
               key={qi}
             >
               <Dropdown.Item
@@ -64,11 +66,13 @@ const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {
                 {' '}
                 {qi + 1}
               </Dropdown.Item>
-              {q.parts.map((p, pi) => {
+              {q.parts.map((_p, pi) => {
                 const selectedPart = pi === selected.part;
                 const active = paginated && selectedQuestion && selectedPart;
                 return (
                   <Dropdown.Item
+                    // Part numbers are STATIC.
+                    // eslint-disable-next-line react/no-array-index-key
                     key={pi}
                     className="pl-5"
                     active={active}

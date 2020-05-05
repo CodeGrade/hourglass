@@ -1,6 +1,5 @@
 import {
   LockedDownAction,
-  LockdownFailedAction,
   TogglePaginationAction,
   ViewQuestionAction,
   ExamTakerState,
@@ -8,15 +7,15 @@ import {
   SnapshotSuccess,
   SnapshotSaveResult,
   SnapshotSaving,
-  AnswersState,
   StatePath,
   AnswerState,
   UpdateAnswerAction,
   StartExamResponse,
   ContentsData,
   LoadExamAction,
-  RegistrationInfo,
   ExamInfo,
+  LockdownFailedAction,
+  Thunk,
 } from '@hourglass/types';
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
@@ -36,33 +35,19 @@ export function viewQuestion(question: number, part?: number): ViewQuestionActio
   };
 }
 
-export function viewNextQuestion() {
-  return (dispatch, getState) => {
-    const state: ExamTakerState = getState();
+export function viewNextQuestion(): Thunk {
+  return (dispatch, getState): void => {
+    const state = getState();
     const qnum = state.contents.pagination.selected.question;
     dispatch(viewQuestion(qnum + 1, 0));
   };
 }
 
-export function viewPrevQuestion() {
-  return (dispatch, getState) => {
-    const state: ExamTakerState = getState();
+export function viewPrevQuestion(): Thunk {
+  return (dispatch, getState): void => {
+    const state = getState();
     const qnum = state.contents.pagination.selected.question;
     dispatch(viewQuestion(qnum - 1, 0));
-  };
-}
-
-export function doTryLockdown(
-  exam: ExamInfo,
-  preview: boolean,
-) {
-  return (dispatch) => {
-    lock().then(() => {
-      dispatch(lockedDown());
-      dispatch(doLoad(exam.id, preview));
-    }).catch((err) => {
-      dispatch(lockdownFailed(err.message));
-    });
   };
 }
 
@@ -72,35 +57,10 @@ export function lockedDown(): LockedDownAction {
   };
 }
 
-export function lockdownFailed(message: string) {
+export function lockdownFailed(message: string): LockdownFailedAction {
   return {
     type: 'LOCKDOWN_FAILED',
     message,
-  };
-}
-
-interface SubmitResponse {
-  lockout: boolean;
-}
-
-export function submitExam(examID: number) {
-  return (dispatch, getState) => {
-    const state: ExamTakerState = getState();
-    const { answers } = state.contents.data;
-    dispatch(saveSnapshot(examID));
-    const url = Routes.submit_exam_path(examID);
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': getCSRFToken(),
-      },
-      credentials: 'same-origin',
-    })
-      .then((result) => result.json() as Promise<SubmitResponse>)
-      .then((result) => {
-        window.location = Routes.exam_path(examID);
-      });
   };
 }
 
@@ -112,8 +72,17 @@ export function loadExam(contents: ContentsData, preview: boolean): LoadExamActi
   };
 }
 
-export function doLoad(examID: number, preview: boolean) {
-  return (dispatch) => {
+export function updateAnswer(path: StatePath, val: AnswerState): UpdateAnswerAction {
+  return {
+    type: 'UPDATE_ANSWER',
+    path,
+    val,
+  };
+}
+
+
+export function doLoad(examID: number, preview: boolean): Thunk {
+  return (dispatch): void => {
     const url = Routes.start_exam_path(examID);
     fetch(url)
       .then((result) => result.json() as Promise<StartExamResponse>)
@@ -130,15 +99,25 @@ export function doLoad(examID: number, preview: boolean) {
   };
 }
 
-export function updateAnswer(path: StatePath, val: AnswerState): UpdateAnswerAction {
-  return {
-    type: 'UPDATE_ANSWER',
-    path,
-    val,
+export function doTryLockdown(
+  exam: ExamInfo,
+  preview: boolean,
+): Thunk {
+  return (dispatch): void => {
+    lock().then(() => {
+      dispatch(lockedDown());
+      dispatch(doLoad(exam.id, preview));
+    }).catch((err) => {
+      dispatch(lockdownFailed(err.message));
+    });
   };
 }
 
-function snapshotFailure(message): SnapshotFailure {
+interface SubmitResponse {
+  lockout: boolean;
+}
+
+function snapshotFailure(message: string): SnapshotFailure {
   return {
     type: 'SNAPSHOT_FAILURE',
     message,
@@ -158,8 +137,8 @@ function snapshotSaving(): SnapshotSaving {
   };
 }
 
-export function saveSnapshot(examID) {
-  return (dispatch, getState) => {
+export function saveSnapshot(examID: number): Thunk {
+  return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
     const { answers } = state.contents.data;
     dispatch(snapshotSaving());
@@ -176,13 +155,36 @@ export function saveSnapshot(examID) {
       .then((result) => result.json() as Promise<SnapshotSaveResult>)
       .then((result) => {
         const { lockout } = result;
-        console.log('lockout: ', lockout);
-        // TODO act on lockout
-        dispatch(snapshotSuccess());
+        if (lockout) {
+          const error = 'Locked out of exam.';
+          dispatch(snapshotFailure(error));
+          window.location = Routes.exams_path();
+        } else {
+          dispatch(snapshotSuccess());
+        }
       }).catch((err) => {
-        console.error('Snapshot save failure', err);
-        const error = 'Error saving snapshot to server.';
+        const error = `Error saving snapshot to server: ${err.message}`;
         dispatch(snapshotFailure(error));
       });
+  };
+}
+
+export function submitExam(examID: number): Thunk {
+  return (dispatch): void => {
+    dispatch(saveSnapshot(examID));
+    const url = Routes.submit_exam_path(examID);
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': getCSRFToken(),
+      },
+      credentials: 'same-origin',
+    })
+      .then((result) => result.json() as Promise<SubmitResponse>)
+      .then(() => {
+        window.location = Routes.exam_path(examID);
+      });
+    // TODO: catch
   };
 }

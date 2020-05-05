@@ -1,3 +1,5 @@
+import { ThunkAction } from "redux-thunk";
+
 export interface ExamInfo {
   // The exam ID.
   id: number;
@@ -12,6 +14,8 @@ export interface RegistrationInfo {
 
 export type ExamTakerAction =
   LockedDownAction | LockdownFailedAction | LoadExamAction | ContentsAction | SnapshotAction;
+
+export type Thunk = ThunkAction<void, ExamTakerState, unknown, ExamTakerAction>;
 
 export type StartExamResponse = AnomalousReponse | ContentsData;
 

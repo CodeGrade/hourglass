@@ -49,6 +49,7 @@ module.exports = {
     ],
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["error"],
-    "react/jsx-filename-extension": ["error", { "extensions": [".jsx", ".tsx"] }]
+    "react/jsx-filename-extension": ["error", { "extensions": [".jsx", ".tsx"] }],
+    "react/prop-types": "off",
   },
 };

@@ -16,7 +16,7 @@ export interface BodyProps {
   bnum: number;
 }
 
-export function Body(props: BodyProps) {
+const Body: React.FC<BodyProps> = (props) => {
   const {
     body, qnum, pnum, bnum,
   } = props;
@@ -42,4 +42,6 @@ export function Body(props: BodyProps) {
     default:
       throw new Error('invalid question type');
   }
-}
+};
+
+export default Body;

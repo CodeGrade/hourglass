@@ -1,12 +1,12 @@
 import React from 'react';
-import { Question } from '@hourglass/types';
+import { QuestionInfo } from '@hourglass/types';
 import ShowQuestion from '@hourglass/components/ShowQuestion';
 import Pagination from '@hourglass/components/Pagination';
 import SubmitButton from '@hourglass/containers/SubmitButton';
 import { useExamInfoContext } from '@hourglass/context';
 
 interface QuestionsProps {
-  questions: Question[];
+  questions: QuestionInfo[];
   paginated: boolean;
   selectedQuestion: number;
 }

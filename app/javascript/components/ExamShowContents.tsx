@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import {
   ExamState,
-  ExamInfo,
 } from '@hourglass/types';
 import { createMap } from '@hourglass/files';
 import { ExamContextProvider } from '@hourglass/context';
@@ -11,7 +10,6 @@ import { FileViewer } from './FileViewer';
 import { HTML } from './questions/HTML';
 
 interface ExamShowContentsProps {
-  exam: ExamInfo;
   examState: ExamState;
   save: () => void;
   preview: boolean;
@@ -19,25 +17,24 @@ interface ExamShowContentsProps {
 
 const INTERVAL = 10000;
 
-export default function ExamShowContents(props: ExamShowContentsProps) {
+const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const {
     examState,
-    exam,
     save,
     preview,
   } = props;
-  const { id } = exam;
   const {
     info,
     files,
   } = examState;
   useEffect(() => {
+    let timer: number;
     if (!preview) {
-      const timer = setInterval(() => save(), INTERVAL);
-      return () => {
-        clearInterval(timer);
-      };
+      timer = window.setInterval(() => save(), INTERVAL);
     }
+    return (): void => {
+      if (timer) clearInterval(timer);
+    };
   }, [save, preview]);
   useAnomalyListeners(preview);
   const {
@@ -57,4 +54,6 @@ export default function ExamShowContents(props: ExamShowContentsProps) {
       </div>
     </ExamContextProvider>
   );
-}
+};
+
+export default ExamShowContents;

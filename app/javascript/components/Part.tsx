@@ -1,17 +1,17 @@
 import React from 'react';
 import { Table, Col } from 'react-bootstrap';
-import { Part } from '@hourglass/types';
-import { Body } from './Body';
+import { PartInfo } from '@hourglass/types';
+import Body from './Body';
 import { HTML } from './questions/HTML';
 import { FileViewer } from './FileViewer';
 
 interface PartProps {
-  part: Part;
+  part: PartInfo;
   qnum: number;
   pnum: number;
 }
 
-export function Part(props: PartProps) {
+const Part: React.FC<PartProps> = (props) => {
   const { part, qnum, pnum } = props;
   const {
     name, reference, description, points, body,
@@ -44,4 +44,6 @@ export function Part(props: PartProps) {
       </Table>
     </div>
   );
-}
+};
+
+export default Part;

@@ -3,7 +3,7 @@ import { Dropdown } from 'react-bootstrap';
 import MenuBookIcon from '@material-ui/icons/MenuBook';
 import {
   PaginationState,
-  Question,
+  QuestionInfo,
 } from '@hourglass/types';
 import {
   scrollToQuestion,
@@ -14,7 +14,7 @@ interface PaginationDropdownProps {
   pagination: PaginationState;
   togglePagination: () => void;
   changeQuestion: (qnum: number, pnum?: number) => void;
-  questions: Question[];
+  questions: QuestionInfo[];
 }
 
 const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {

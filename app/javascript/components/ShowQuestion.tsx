@@ -1,11 +1,11 @@
 import React from 'react';
-import { Question } from '@hourglass/types';
-import { Part } from './Part';
+import { QuestionInfo } from '@hourglass/types';
+import Part from './Part';
 import { HTML } from './questions/HTML';
 import { FileViewer } from './FileViewer';
 
 interface ShowQuestionProps {
-  question: Question;
+  question: QuestionInfo;
   qnum: number;
 }
 

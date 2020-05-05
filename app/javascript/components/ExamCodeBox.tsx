@@ -16,7 +16,16 @@ function applyMarks(cm: CM.Editor, marks: MarkDescription[]): CM.TextMarker[] {
   }));
 }
 
-function marksToDescs(marks: any): MarkDescription[] {
+// TODO: upstream these properties to DefinitelyTyped
+declare module 'codemirror' {
+  export interface TextMarker {
+    readOnly: boolean;
+    inclusiveLeft: boolean;
+    inclusiveRight: boolean;
+  }
+}
+
+function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
   return marks.map((m) => {
     const { readOnly, inclusiveLeft, inclusiveRight } = m;
     const found = m.find();
@@ -33,7 +42,7 @@ function marksToDescs(marks: any): MarkDescription[] {
 
 export interface EditorProps {
   value: string;
-  valueUpdate: any[];
+  valueUpdate: React.DependencyList;
   markDescriptions: MarkDescription[];
   readOnly?: boolean;
   language?: string;
@@ -41,14 +50,13 @@ export interface EditorProps {
   onGutterClick?: IUnControlledCodeMirror['onGutterClick'];
   cursor?: IUnControlledCodeMirror['cursor'];
   onCursor?: IUnControlledCodeMirror['onCursor'];
-  onBeforeChange?: IUnControlledCodeMirror['onBeforeChange'];
   onChange?: (text: string, marks: MarkDescription[]) => void;
   onFocus?: IUnControlledCodeMirror['onFocus'];
-  refreshProps?: any[];
+  refreshProps?: React.DependencyList;
   disabled?: boolean;
 }
 
-export const Editor = (props: EditorProps) => {
+export const Editor: React.FC<EditorProps> = (props) => {
   const {
     value,
     markDescriptions,
@@ -60,7 +68,6 @@ export const Editor = (props: EditorProps) => {
     onCursor,
     onGutterClick,
     onChange,
-    onBeforeChange,
     onFocus,
     refreshProps = [],
     disabled = false,
@@ -117,7 +124,7 @@ export const Editor = (props: EditorProps) => {
   };
   return (
     <UnControlledCodeMirror
-      onChange={(cm, _state, newVal) => {
+      onChange={(cm, _state, newVal): void => {
         if (onChange && doSave) {
           const appliedDescs = marksToDescs(cm.getAllMarks());
           onChange(newVal, appliedDescs);

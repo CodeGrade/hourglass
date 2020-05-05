@@ -1,4 +1,4 @@
-import { ThunkAction } from "redux-thunk";
+import { ThunkAction } from 'redux-thunk';
 
 export interface ExamInfo {
   // The exam ID.
@@ -255,7 +255,7 @@ type HTML = {
   value: string;
 };
 
-export interface Part {
+export interface PartInfo {
   name?: string;
   description: string;
   points: number;
@@ -263,11 +263,11 @@ export interface Part {
   body: Array<BodyItem>;
 }
 
-export interface Question {
+export interface QuestionInfo {
   name?: string;
   description: string;
   separateSubparts: boolean;
-  parts: Array<Part>;
+  parts: Array<PartInfo>;
   reference?: Array<FileRef>;
 }
 
@@ -280,7 +280,7 @@ export interface ExamState {
 }
 
 export interface Exam {
-  questions: Array<Question>;
+  questions: Array<QuestionInfo>;
   reference?: Array<FileRef>;
   instructions: string;
 }

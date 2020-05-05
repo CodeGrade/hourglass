@@ -70,12 +70,12 @@ class Upload < ApplicationRecord
         {
           path: path.basename.to_s,
           full_path: path,
-          rel_path: path.relative_path_from(files_path),
+          relPath: path.relative_path_from(files_path),
         }
       elsif path.directory?
         {
           path: path.basename.to_s,
-          rel_path: path.relative_path_from(files_path),
+          relPath: path.relative_path_from(files_path),
           children: path.children.sort.collect do |child|
             rec_path(child)
           end,

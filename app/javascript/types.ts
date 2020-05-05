@@ -311,7 +311,7 @@ export interface ExamSingleFile {
   // Path name of this file (no trailing slash)
   path: string;
 
-  rel_path: string;
+  relPath: string;
 
   // Sequential ID of this file.
   id: number;
@@ -335,7 +335,7 @@ export interface ExamDir {
   // Path name of this directory (no trailing slash)
   path: string;
 
-  rel_path: string;
+  relPath: string;
 
   // Sequential ID of this directory.
   id: number;

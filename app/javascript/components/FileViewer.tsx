@@ -19,7 +19,7 @@ const Files: React.FC<FilesProps> = (props) => {
   return (
     <>
       {files.map((f) => {
-        const nodeId = f.rel_path;
+        const nodeId = f.relPath;
         switch (f.filedir) {
           case 'dir':
             return (
@@ -135,7 +135,7 @@ export const FileViewer: React.FC<FileViewerProps> = (props) => {
   const { fmap } = useExamContext();
   const filteredFiles = getFilesForRefs(fmap, references);
   const first = firstFile(filteredFiles);
-  const firstID = first?.rel_path;
+  const firstID = first?.relPath;
   const [selectedID, setSelectedID] = useState(firstID);
   return (
     <Row>

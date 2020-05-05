@@ -7,12 +7,12 @@ export function createMap(files: ExamFile[]): FileMap {
   for (const file of files) {
     switch (file.filedir) {
       case 'dir':
-        ret[file.rel_path] = file;
+        ret[file.relPath] = file;
         const children = createMap(file.nodes);
         Object.assign(ret, children);
         break;
       case 'file':
-        ret[file.rel_path] = file;
+        ret[file.relPath] = file;
         break;
       default:
         throw new Error('invalid file');

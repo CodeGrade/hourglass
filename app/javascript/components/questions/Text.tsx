@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  Container, Row, Col, Form,
+  Row, Col, Form,
 } from 'react-bootstrap';
 import { TextInfo, TextState } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
@@ -12,7 +12,7 @@ interface TextProps {
   disabled: boolean;
 }
 
-export function Text(props: TextProps) {
+const Text: React.FC<TextProps> = (props) => {
   const {
     info,
     value,
@@ -24,7 +24,14 @@ export function Text(props: TextProps) {
     <>
       <Row>
         <Col>
-          {prompt.map((p, i) => <HTML key={i} value={p} />)}
+          {prompt.map((p, i) => (
+            <HTML
+              // Prompt indices are STATIC.
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
+              value={p}
+            />
+          ))}
         </Col>
       </Row>
       <Row>
@@ -35,7 +42,7 @@ export function Text(props: TextProps) {
             rows={3}
             placeholder="Enter your answer here."
             value={value}
-            onChange={(e) => {
+            onChange={(e): void => {
               const elem = e.target as HTMLTextAreaElement;
               onChange(elem.value);
             }}
@@ -44,4 +51,6 @@ export function Text(props: TextProps) {
       </Row>
     </>
   );
-}
+};
+
+export default Text;

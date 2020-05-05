@@ -38,11 +38,13 @@ const Matching: React.FC<MatchingProps> = (props) => {
           <tbody>
             {prompts.map((p, i) => {
               const valueI = value?.[i] ?? -1;
-              const handleChange = (event) => {
+              const handleChange = (event: React.ChangeEvent<{ value: number }>): void => {
                 const val = event.target.value;
                 onChange(i, val);
               };
               return (
+                // Prompt indices are STATIC.
+                // eslint-disable-next-line react/no-array-index-key
                 <tr key={i}>
                   <td>
                     {String.fromCharCode(65 + i)}
@@ -62,8 +64,10 @@ const Matching: React.FC<MatchingProps> = (props) => {
                         <MenuItem value={-1}>
                           <em>None</em>
                         </MenuItem>
-                        {(values.map((v, j) => (
+                        {(values.map((_v, j) => (
                           <MenuItem
+                            // Question choices are STATIC.
+                            // eslint-disable-next-line react/no-array-index-key
                             key={j}
                             value={j + 1}
                           >
@@ -90,6 +94,8 @@ const Matching: React.FC<MatchingProps> = (props) => {
           </thead>
           <tbody>
             {values.map((v, i) => (
+              // Question choices are STATIC.
+              // eslint-disable-next-line react/no-array-index-key
               <tr key={i}>
                 <td>
                   {i + 1}

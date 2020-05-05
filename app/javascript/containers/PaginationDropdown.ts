@@ -1,29 +1,31 @@
 import { connect } from 'react-redux';
 import PaginationDropdown from '@hourglass/components/PaginationDropdown';
 import {
-  ExamTakerState,
+  MSTP, PaginationState, QuestionInfo, MDTP,
 } from '@hourglass/types';
 import {
   togglePagination,
   viewQuestion,
 } from '@hourglass/actions';
 
-function mapStateToProps(state: ExamTakerState) {
-  return {
-    pagination: state.contents.pagination,
-    questions: state.contents.data.exam.info.questions,
-  };
-}
+const mapStateToProps: MSTP<{
+  pagination: PaginationState;
+  questions: QuestionInfo[];
+}> = (state) => ({
+  pagination: state.contents.pagination,
+  questions: state.contents.data.exam.info.questions,
+});
 
-function mapDispatchToProps(dispatch) {
-  return {
-    togglePagination: () => {
-      dispatch(togglePagination());
-    },
-    changeQuestion: (question: number, part?: number) => {
-      dispatch(viewQuestion(question, part));
-    },
-  };
-}
+const mapDispatchToProps: MDTP<{
+  togglePagination: () => void;
+  changeQuestion: (q: number, part?: number) => void;
+}> = (dispatch) => ({
+  togglePagination: (): void => {
+    dispatch(togglePagination());
+  },
+  changeQuestion: (question: number, part?: number): void => {
+    dispatch(viewQuestion(question, part));
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(PaginationDropdown);

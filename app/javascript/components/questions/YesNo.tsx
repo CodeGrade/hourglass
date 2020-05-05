@@ -9,16 +9,10 @@ export interface YesNoProps {
   value: boolean;
   onChange: (newValue: boolean) => void;
   disabled: boolean;
-  qnum: number;
-  pnum: number;
-  bnum: number;
 }
 
-export function YesNoInput(props: YesNoProps) {
+const YesNo: React.FC<YesNoProps> = (props) => {
   const {
-    qnum,
-    pnum,
-    bnum,
     info,
     yesLabel = 'Yes',
     noLabel = 'No',
@@ -46,7 +40,7 @@ export function YesNoInput(props: YesNoProps) {
     <div>
       <div>{prompt}</div>
       <ToggleButtonGroup
-        name={`tf-${qnum}-${pnum}-${bnum}`}
+        name="tbg"
         type="radio"
         value={value}
         onChange={onChange}
@@ -68,4 +62,6 @@ export function YesNoInput(props: YesNoProps) {
       </ToggleButtonGroup>
     </div>
   );
-}
+};
+
+export default YesNo;

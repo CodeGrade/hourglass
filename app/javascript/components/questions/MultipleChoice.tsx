@@ -9,7 +9,7 @@ interface MultipleChoiceProps {
   disabled: boolean;
 }
 
-export function MultipleChoice(props: MultipleChoiceProps) {
+const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
   const {
     info,
     value,
@@ -33,9 +33,9 @@ export function MultipleChoice(props: MultipleChoiceProps) {
   //    </React.Fragment>)
   //  }
   // } else {
-  const handler = (event) => {
+  const handler = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.value;
-    onChange(val);
+    onChange(Number(val));
   };
   return (
     <div>
@@ -49,11 +49,15 @@ export function MultipleChoice(props: MultipleChoiceProps) {
             value={idx}
             label={option}
             onChange={handler}
-            checked={value == idx}
+            checked={value === idx}
+            // Response indices are STATIC.
+            // eslint-disable-next-line react/no-array-index-key
             key={idx}
           />
         ))}
       </Form.Group>
     </div>
   );
-}
+};
+
+export default MultipleChoice;

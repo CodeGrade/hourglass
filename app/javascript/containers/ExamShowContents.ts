@@ -2,21 +2,26 @@ import ExamShowContents from '@hourglass/components/ExamShowContents';
 import { connect } from 'react-redux';
 import { saveSnapshot } from '@hourglass/actions';
 import {
-  ExamTakerState,
+  ExamState,
+  MSTP,
+  MDTP,
+  ExamInfo,
 } from '@hourglass/types';
 
-function mapStateToProps(state: ExamTakerState) {
-  return {
-    examState: state.contents.data.exam,
-  };
+interface OwnProps {
+  exam: ExamInfo;
 }
 
-function mapDispatchToProps(dispatch, ownProps) {
-  return {
-    save: (examID) => {
-      dispatch(saveSnapshot(ownProps.exam.id));
-    },
-  };
-}
+const mapStateToProps: MSTP<{examState: ExamState}, OwnProps> = (state) => ({
+  examState: state.contents.data.exam,
+});
+
+const mapDispatchToProps: MDTP<{
+  save: () => void;
+}, OwnProps> = (dispatch, ownProps) => ({
+  save: (): void => {
+    dispatch(saveSnapshot(ownProps.exam.id));
+  },
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExamShowContents);

@@ -1,4 +1,6 @@
-import { ThunkAction } from 'redux-thunk';
+import { ThunkAction, ThunkDispatch } from 'redux-thunk';
+import { MapStateToProps, MapDispatchToProps } from 'react-redux';
+import {Dispatch} from 'redux';
 
 export interface ExamInfo {
   // The exam ID.
@@ -16,6 +18,13 @@ export type ExamTakerAction =
   LockedDownAction | LockdownFailedAction | LoadExamAction | ContentsAction | SnapshotAction;
 
 export type Thunk = ThunkAction<void, ExamTakerState, unknown, ExamTakerAction>;
+export type ExamTakerDispatch = ThunkDispatch<ExamTakerState, unknown, ExamTakerAction>;
+
+export type MSTP<TStateProps, TOwnProps = {}> =
+  MapStateToProps<TStateProps, TOwnProps, ExamTakerState>;
+
+export type MDTP<TDispatchProps, TOwnProps = {}> =
+  (dispatch: ExamTakerDispatch, ownProps: TOwnProps) => TDispatchProps;
 
 export type StartExamResponse = AnomalousReponse | ContentsData;
 

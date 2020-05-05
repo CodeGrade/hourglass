@@ -3,22 +3,29 @@ import PreStart from '@hourglass/components/PreStart';
 import {
   LockdownStatus,
   ExamTakerState,
+  MDTP,
+  ExamInfo,
+  MSTP,
 } from '@hourglass/types';
 import { doTryLockdown } from '@hourglass/actions';
 
+interface OwnProps {
+  exam: ExamInfo;
+  preview: boolean;
+}
 
-const mapDispatchToProps = (dispatch, ownProps) => {
-  const {
-    exam,
-  } = ownProps;
-  return {
-    onClick: () => {
-      dispatch(doTryLockdown(exam, ownProps.preview));
-    },
-  };
-};
+const mapDispatchToProps: MDTP<{
+  onClick: () => void;
+}, OwnProps> = (dispatch, ownProps) => ({
+  onClick: (): void => {
+    dispatch(doTryLockdown(ownProps.exam, ownProps.preview));
+  },
+});
 
-const mapStateToProps = (state: ExamTakerState) => ({
+const mapStateToProps: MSTP<{
+  isError: boolean;
+  errorMsg: string;
+}, OwnProps> = (state: ExamTakerState) => ({
   isError: state.lockdown.status === LockdownStatus.FAILED,
   errorMsg: state.lockdown.message,
 });

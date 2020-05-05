@@ -37,7 +37,7 @@ module.exports = {
     },
   },
   rules: {
-   "import/extensions": [
+    "import/extensions": [
       "error",
       "ignorePackages",
       {
@@ -46,8 +46,9 @@ module.exports = {
         ts: "never",
         tsx: "never",
       },
-   ],
-  "no-unused-vars": "off",
-  "@typescript-eslint/no-unused-vars": ["error"]
+    ],
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": ["error"],
+    "react/jsx-filename-extension": ["error", { "extensions": [".jsx", ".tsx"] }]
   },
 };

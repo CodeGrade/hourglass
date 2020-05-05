@@ -3,19 +3,19 @@ import { isFullscreen } from './helpers';
 
 const listeners: {
   event: string;
-  handler: (anomalyDetected: AnomalyDetected) => (e: any) => void;
+  handler: (anomalyDetected: AnomalyDetected) => (e: Event) => void;
 }[] = [
   {
     event: 'mouseout',
-    handler: (detected) => (e) => {
-      if (e.toElement === null && e.relatedTarget === null) {
+    handler: (detected) => (e: MouseEvent): void => {
+      if (e.target === null || e.relatedTarget === null) {
         detected('mouseout', e);
       }
     },
   },
   {
     event: 'resize',
-    handler: (detected) => (e) => {
+    handler: (detected) => (e: FocusEvent): void => {
       if (!isFullscreen()) {
         detected('left fullscreen', e);
       }
@@ -23,13 +23,13 @@ const listeners: {
   },
   {
     event: 'blur',
-    handler: (detected) => (e) => {
+    handler: (detected) => (e: FocusEvent): void => {
       detected('window blurred', e);
     },
   },
   {
     event: 'contextmenu',
-    handler: (detected) => (e) => {
+    handler: (detected) => (e: Event): void => {
       e.preventDefault();
       e.stopPropagation();
       detected('tried context menu', e);
@@ -46,10 +46,10 @@ export function installListeners(detected: AnomalyDetected): AnomalyListener[] {
       handler: f,
     };
   });
-  return [];
+  return handlers;
 }
 
-export function removeListeners(lst: AnomalyListener[]) {
+export function removeListeners(lst: AnomalyListener[]): void {
   lst.forEach(({ event, handler }) => {
     window.removeEventListener(event, handler);
   });

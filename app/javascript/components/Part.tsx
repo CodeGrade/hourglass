@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Col } from 'react-bootstrap';
 import { PartInfo } from '@hourglass/types';
 import Body from './Body';
-import { HTML } from './questions/HTML';
+import HTML from '@hourglass/components/HTML';
 import { FileViewer } from './FileViewer';
 
 interface PartProps {

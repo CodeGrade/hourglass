@@ -3,7 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import { CodeInfo, CodeState } from '@hourglass/types';
 import { useExamContext } from '@hourglass/context';
 import { Editor } from '../ExamCodeBox';
-import { HTML } from './HTML';
+import HTML from '@hourglass/components/HTML';
 
 interface CodeProps {
   info: CodeInfo;

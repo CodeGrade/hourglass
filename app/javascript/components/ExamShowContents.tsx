@@ -7,7 +7,7 @@ import { ExamContextProvider } from '@hourglass/context';
 import Questions from '@hourglass/containers/Questions';
 import { useAnomalyListeners } from '@hourglass/lockdown/anomaly';
 import { FileViewer } from './FileViewer';
-import { HTML } from './questions/HTML';
+import HTML from '@hourglass/components/HTML';
 
 interface ExamShowContentsProps {
   examState: ExamState;

@@ -5,7 +5,7 @@ import {
 } from 'react-bootstrap';
 import { ControlledFileViewer } from '@hourglass/components/FileViewer';
 import TooltipButton from '@hourglass/components/TooltipButton';
-import { HTML } from './HTML';
+import HTML from '@hourglass/components/HTML';
 
 interface CodeTagValProps {
   value: CodeTagState;

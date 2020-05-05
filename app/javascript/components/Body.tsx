@@ -7,7 +7,7 @@ import Matching from '@hourglass/containers/questions/Matching';
 import MultipleChoice from '@hourglass/containers/questions/MultipleChoice';
 import AllThatApply from '@hourglass/containers/questions/AllThatApply';
 import { BodyItem } from '@hourglass/types';
-import { HTML } from './questions/HTML';
+import HTML from '@hourglass/components/HTML';
 
 export interface BodyProps {
   body: BodyItem;

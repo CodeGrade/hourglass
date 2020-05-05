@@ -3,7 +3,7 @@ import {
   Container, Row, Col, Form,
 } from 'react-bootstrap';
 import { TextInfo, TextState } from '@hourglass/types';
-import { HTML } from './HTML';
+import HTML from '@hourglass/components/HTML';
 
 interface TextProps {
   info: TextInfo;

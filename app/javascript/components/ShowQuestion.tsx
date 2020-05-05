@@ -1,7 +1,7 @@
 import React from 'react';
 import { QuestionInfo } from '@hourglass/types';
 import Part from './Part';
-import { HTML } from './questions/HTML';
+import HTML from '@hourglass/components/HTML';
 import { FileViewer } from './FileViewer';
 
 interface ShowQuestionProps {

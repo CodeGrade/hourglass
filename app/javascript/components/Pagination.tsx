@@ -5,8 +5,8 @@ interface PaginationProps {
   paginated: boolean;
   current: number;
   max: number;
-  body: JSX.Element[];
   endItem: JSX.Element;
+  children: React.ReactChild[];
 }
 
 const Pagination: React.FC<PaginationProps> = (props) => {
@@ -14,7 +14,7 @@ const Pagination: React.FC<PaginationProps> = (props) => {
     paginated,
     current,
     max,
-    body,
+    children,
     endItem,
   } = props;
   const onFirstPage = current === 0;
@@ -25,14 +25,11 @@ const Pagination: React.FC<PaginationProps> = (props) => {
       <div
         className={paginated ? 'carousel' : undefined}
       >
-        {body.map((b, i) => {
+        {children.map((b, i) => {
           const active = current === i;
           const activeClass = active ? 'active' : '';
           return (
-            <div
-              key={i}
-              className={paginated ? `carousel-item ${activeClass}` : ''}
-            >
+            <div key={i} className={paginated ? `carousel-item ${activeClass}` : ''}>
               {b}
               {paginated && (
                 <PaginationArrows

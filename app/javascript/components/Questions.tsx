@@ -19,20 +19,21 @@ const Questions: React.FC<QuestionsProps> = (props) => {
   } = props;
   const { exam, preview } = useExamInfoContext();
   const { id } = exam;
-  const body = questions.map((q, i) => (
-    <ShowQuestion
-      question={q}
-      qnum={i}
-    />
-  ));
   return (
     <Pagination
       current={selectedQuestion}
       paginated={paginated}
-      body={body}
       max={questions.length}
       endItem={!preview && <SubmitButton examID={id} />}
-    />
+    >
+      {questions.map((q, i) => (
+        <ShowQuestion
+          key={i}
+          question={q}
+          qnum={i}
+        />
+      ))}
+    </Pagination>
   );
 };
 export default Questions;

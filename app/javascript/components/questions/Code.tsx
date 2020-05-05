@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Row, Col } from 'react-bootstrap';
-import { MarkDescription, CodeInfo, CodeState } from '@hourglass/types';
+import React from 'react';
+import { Row, Col } from 'react-bootstrap';
+import { CodeInfo, CodeState } from '@hourglass/types';
 import { useExamContext } from '@hourglass/context';
 import { Editor } from '../ExamCodeBox';
 import { HTML } from './HTML';
@@ -12,7 +12,7 @@ interface CodeProps {
   disabled: boolean;
 }
 
-export function Code(props: CodeProps) {
+const Code: React.FC<CodeProps> = (props) => {
   const {
     info,
     value: state,
@@ -43,10 +43,10 @@ export function Code(props: CodeProps) {
             markDescriptions={marks}
             valueUpdate={[disabled]}
             language={lang}
-            onChange={(text, marks) => {
+            onChange={(newText, newMarks): void => {
               onChange({
-                text,
-                marks,
+                text: newText,
+                marks: newMarks,
               });
             }}
           />
@@ -54,23 +54,5 @@ export function Code(props: CodeProps) {
       </Row>
     </>
   );
-  /*
-     return (
-
-<div class="col-12">
-  <div><% item["prompt"]&.each do |p| %><%= p.html_safe %><% end %></div>
-<% if readonly %>
-  <% if answer&.dig('code').blank? %>
-    <b>Answer: </b>
-    <i>No answer given</i>
-  <% else %>
-      <%= content_tag(:pre, answer&.dig('code'), class: "sourceCodeDisplay border", data: {lang: item["lang"], readonly: true}, name: "#{unique_label}[code]") %>
-  <% end %>
-<% else %>
-    <% val = answer&.dig('code') || item["initial"] %>
-    <%= code_textarea val, class: "sourceCode", data: {lang: item["lang"], readonly: false}, name: "#{unique_label}[code]" %>
-    <input hidden name="<%= unique_label %>[marks]" value="<%= answer&.dig('marks') %>" />
-<% end %>
-</div>
-*/
-}
+};
+export default Code;

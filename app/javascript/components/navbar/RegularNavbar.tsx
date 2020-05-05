@@ -1,11 +1,10 @@
 import React from 'react';
 import {
   Navbar,
-  Nav,
   Form,
   Button,
 } from 'react-bootstrap';
-import { getCSRFToken, logOut } from '@hourglass/helpers';
+import { logOut } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import { User } from '@hourglass/types';
 import LockdownInfo from '@hourglass/containers/LockdownInfo';
@@ -14,7 +13,7 @@ interface RegularNavbarProps {
   user?: User;
 }
 
-export const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
+const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
   const {
     user,
   } = props;
@@ -55,3 +54,5 @@ export const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
     </Navbar>
   );
 };
+
+export default RegularNavbar;

@@ -1,8 +1,9 @@
-import { AnswersState } from '@hourglass/types';
 import {
+  AnswersState,
   ContentsState,
   ExamTakerAction,
 } from '@hourglass/types';
+
 
 export default (state: ContentsState = {
   data: undefined,
@@ -20,7 +21,7 @@ export default (state: ContentsState = {
       return {
         ...state,
         data: action.contents,
-      }
+      };
     case 'UPDATE_ANSWER':
       const ret = {
         ...state.data.answers,
@@ -60,4 +61,4 @@ export default (state: ContentsState = {
     default:
       return state;
   }
-}
+};

@@ -33,5 +33,5 @@ const Questions: React.FC<QuestionsProps> = (props) => {
       endItem={<SubmitButton examID={id} />}
     />
   );
-}
+};
 export default Questions;

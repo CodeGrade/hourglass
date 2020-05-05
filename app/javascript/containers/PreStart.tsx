@@ -16,13 +16,11 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       dispatch(doTryLockdown(exam, ownProps.preview));
     },
   };
-}
+};
 
-const mapStateToProps = (state: ExamTakerState) => {
-  return {
-    isError: state.lockdown.status === LockdownStatus.FAILED,
-    errorMsg: state.lockdown.message,
-  };
-}
+const mapStateToProps = (state: ExamTakerState) => ({
+  isError: state.lockdown.status === LockdownStatus.FAILED,
+  errorMsg: state.lockdown.message,
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreStart);

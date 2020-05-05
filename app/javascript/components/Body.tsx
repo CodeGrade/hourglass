@@ -1,5 +1,4 @@
 import React from 'react';
-import { HTML } from './questions/HTML';
 import Code from '@hourglass/containers/questions/Code';
 import YesNoInput from '@hourglass/containers/questions/YesNo';
 import CodeTag from '@hourglass/containers/questions/CodeTag';
@@ -8,6 +7,7 @@ import Matching from '@hourglass/containers/questions/Matching';
 import MultipleChoice from '@hourglass/containers/questions/MultipleChoice';
 import AllThatApply from '@hourglass/containers/questions/AllThatApply';
 import { BodyItem } from '@hourglass/types';
+import { HTML } from './questions/HTML';
 
 export interface BodyProps {
   body: BodyItem;

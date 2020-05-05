@@ -41,8 +41,8 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
         </button>
       );
     default:
-      throw new Error("CASE NOT HANDLED");
+      throw new Error('CASE NOT HANDLED');
   }
-}
+};
 
 export default SnapshotInfo;

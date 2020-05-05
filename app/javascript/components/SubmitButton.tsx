@@ -22,6 +22,6 @@ const SubmitButton: React.FC<SubmitButtonProps> = (props) => {
       </Button>
     </div>
   );
-}
+};
 
 export default SubmitButton;

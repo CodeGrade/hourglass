@@ -43,7 +43,10 @@ function ShowExam(props: ShowExamProps) {
   } = props;
   return (
     <Container>
-      <ExamInfoContextProvider value={{ exam, registration, user, preview }}>
+      <ExamInfoContextProvider value={{
+        exam, registration, user, preview,
+      }}
+      >
         <Provider store={store}>
           <Row>
             <Col>

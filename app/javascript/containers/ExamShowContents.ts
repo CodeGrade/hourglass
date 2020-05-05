@@ -15,7 +15,7 @@ function mapDispatchToProps(dispatch, ownProps) {
   return {
     save: (examID) => {
       dispatch(saveSnapshot(ownProps.exam.id));
-    }
+    },
   };
 }
 

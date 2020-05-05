@@ -1,9 +1,9 @@
 import React from 'react';
 import { Table, Col } from 'react-bootstrap';
+import { Part } from '@hourglass/types';
 import { Body } from './Body';
 import { HTML } from './questions/HTML';
 import { FileViewer } from './FileViewer';
-import { Part } from '@hourglass/types';
 
 interface PartProps {
   part: Part;

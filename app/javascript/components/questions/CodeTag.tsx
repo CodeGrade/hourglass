@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { FileRef, CodeTagInfo, CodeTagState } from '@hourglass/types';
-import { Row, Col, Modal, Button } from 'react-bootstrap';
+import {
+  Row, Col, Modal, Button,
+} from 'react-bootstrap';
 import { ControlledFileViewer } from '@hourglass/components/FileViewer';
-import { HTML } from './HTML';
 import { TooltipButton } from '@hourglass/components/TooltipButton';
+import { HTML } from './HTML';
 
 interface CodeTagValProps {
   value: CodeTagState;
@@ -16,24 +18,22 @@ function CodeTagVal(props: CodeTagValProps) {
       <span className="mr-2">
         <b className="mr-2">File:</b>
         {value?.selectedFile
-        ? (
-          <Button disabled size="sm" variant="outline-dark">
-            {value.selectedFile}
-          </Button>
+          ? (
+            <Button disabled size="sm" variant="outline-dark">
+              {value.selectedFile}
+            </Button>
         )
-        : <i>Unanswered</i>
-        }
+          : <i>Unanswered</i>}
       </span>
       <span>
         <b className="mr-2">Line:</b>
         {value?.lineNumber
-        ? (
-          <Button disabled size="sm" variant="outline-dark">
-            {value.lineNumber}
-          </Button>
+          ? (
+            <Button disabled size="sm" variant="outline-dark">
+              {value.lineNumber}
+            </Button>
         )
-        : <i>Unanswered</i>
-        }
+          : <i>Unanswered</i>}
       </span>
     </div>
   );
@@ -60,15 +60,14 @@ function FileModal(props) {
   // Modal has its own state so the user can manipulate it before saving.
   const [selected, setSelected] = useState(startValue);
   const [refresher, setRefresher] = useState(false);
-  const refreshCodeMirror = () => setRefresher(b => !b);
+  const refreshCodeMirror = () => setRefresher((b) => !b);
   useEffect(() => {
     // Reset my starting state when outer state changes.
     setSelected(startValue);
   }, [startValue]);
   const saveEnabled = selected?.selectedFile && selected?.lineNumber;
   const saveButtonDisabled = disabled || !saveEnabled;
-  const disabledMessage =
-    disabled
+  const disabledMessage = disabled
     ? 'Lost connection to server...'
     : 'Please choose a file and line to save.';
   return (
@@ -94,7 +93,7 @@ function FileModal(props) {
             });
           }}
           onChangeLine={(newLine) => {
-            setSelected(old => ({
+            setSelected((old) => ({
               selectedFile: old.selectedFile,
               lineNumber: newLine,
             }));
@@ -140,13 +139,14 @@ export function CodeTag(props: CodeTagProps) {
   return (
     <Row>
       <Col>
-        {prompt &&
+        {prompt
+         && (
          <Row>
            <Col sm={12}>
              {prompt.map((p, i) => <HTML key={i} value={p} />)}
            </Col>
          </Row>
-        }
+         )}
         <Row className="mt-2">
           <Col>
             <CodeTagVal value={value} />

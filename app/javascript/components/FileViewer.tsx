@@ -3,10 +3,12 @@ import { TreeView, TreeItem } from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { Row, Col } from 'react-bootstrap';
-import { Editor } from './ExamCodeBox';
-import { CodeTagState, FileRef, ExamFile, Files } from '@hourglass/types';
+import {
+  CodeTagState, FileRef, ExamFile, Files,
+} from '@hourglass/types';
 import { useExamContext } from '@hourglass/context';
 import { firstFile, getFilesForRefs } from '@hourglass/files';
+import { Editor } from './ExamCodeBox';
 
 interface FilesProps {
   files: Array<ExamFile>;
@@ -65,7 +67,7 @@ function FileContents(props: FileContentsProps) {
     if (onChangeLine) {
       onChangeLine(num + 1);
     }
-  }
+  };
   if (f?.filedir == 'file') {
     return (
       <Editor
@@ -162,7 +164,9 @@ interface ControlledFileViewerProps {
 }
 
 export function ControlledFileViewer(props: ControlledFileViewerProps) {
-  const { references, selection, onChangeFile, onChangeLine, refreshProps } = props;
+  const {
+    references, selection, onChangeFile, onChangeLine, refreshProps,
+  } = props;
   const { fmap } = useExamContext();
   const filteredFiles = getFilesForRefs(fmap, references);
   const first = firstFile(filteredFiles);
@@ -172,7 +176,7 @@ export function ControlledFileViewer(props: ControlledFileViewerProps) {
       <Col sm={3}>
         <FileTree
           files={filteredFiles}
-          selectedFile={selection?.selectedFile ?? ""}
+          selectedFile={selection?.selectedFile ?? ''}
           onChangeFile={onChangeFile}
         />
       </Col>

@@ -1,12 +1,14 @@
 import React from 'react';
-import { Button, ButtonProps, Tooltip, OverlayTrigger } from 'react-bootstrap';
+import {
+  Button, ButtonProps, Tooltip, OverlayTrigger,
+} from 'react-bootstrap';
 import './TooltipButton.css';
 
 interface TooltipButtonProps {
   disabled: boolean;
   disabledMessage: string;
   onClick: () => void;
-  variant?: ButtonProps["variant"];
+  variant?: ButtonProps['variant'];
 }
 
 export const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
@@ -24,23 +26,23 @@ export const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
       {disabledMessage}
     </Tooltip>
   );
-  const noTooltip = () => <span/>;
+  const noTooltip = () => <span />;
   return (
     <OverlayTrigger
       overlay={disabled ? tooltip : noTooltip}
     >
       <div
-        className={`d-inline-block ${disabled && "cursor-not-allowed"}`}
+        className={`d-inline-block ${disabled && 'cursor-not-allowed'}`}
       >
         <Button
           variant="primary"
           onClick={onClick}
           disabled={disabled}
-          className={disabled && "pointer-events-none"}
+          className={disabled && 'pointer-events-none'}
         >
           {children}
         </Button>
       </div>
     </OverlayTrigger>
   );
-}
+};

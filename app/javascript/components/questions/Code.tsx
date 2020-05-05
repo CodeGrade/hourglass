@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
-import { Editor } from '../ExamCodeBox';
-import { HTML } from './HTML';
 import { MarkDescription, CodeInfo, CodeState } from '@hourglass/types';
 import { useExamContext } from '@hourglass/context';
+import { Editor } from '../ExamCodeBox';
+import { HTML } from './HTML';
 
 interface CodeProps {
   info: CodeInfo;
@@ -23,7 +23,7 @@ export function Code(props: CodeProps) {
   const { fmap } = useExamContext();
   const f = fmap[initial];
   if (f?.filedir === 'dir') {
-    throw new Error("Code initial cannot be a directory.");
+    throw new Error('Code initial cannot be a directory.');
   }
   const text = state?.text ?? f?.contents ?? '';
   const marks = state?.marks ?? f?.marks ?? [];
@@ -47,7 +47,7 @@ export function Code(props: CodeProps) {
               onChange({
                 text,
                 marks,
-              })
+              });
             }}
           />
         </Col>

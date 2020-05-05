@@ -60,7 +60,9 @@ const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {
                   scrollToQuestion(qi);
                 }}
               >
-                Question {qi+1}
+                Question
+                {' '}
+                {qi + 1}
               </Dropdown.Item>
               {q.parts.map((p, pi) => {
                 const selectedPart = pi === selected.part;
@@ -77,7 +79,9 @@ const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {
                       scrollToPart(qi, pi);
                     }}
                   >
-                    Part {pi+1}
+                    Part
+                    {' '}
+                    {pi + 1}
                   </Dropdown.Item>
                 );
               })}
@@ -87,5 +91,5 @@ const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {
       </Dropdown.Menu>
     </Dropdown>
   );
-}
+};
 export default PaginationDropdown;

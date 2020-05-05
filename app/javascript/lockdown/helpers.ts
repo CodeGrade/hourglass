@@ -10,11 +10,11 @@ export async function openFullscreen() {
   const elem = document.documentElement as any;
   if (elem.requestFullscreen) {
     return elem.requestFullscreen();
-  } else if (elem.mozRequestFullScreen) { // Firefox
+  } if (elem.mozRequestFullScreen) { // Firefox
     return elem.mozRequestFullScreen();
-  } else if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
+  } if (elem.webkitRequestFullscreen) { // Chrome, Safari and Opera
     return elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) { // IE/Edge
+  } if (elem.msRequestFullscreen) { // IE/Edge
     return elem.msRequestFullscreen();
   }
 }

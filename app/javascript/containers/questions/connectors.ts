@@ -21,9 +21,8 @@ const mapStateToProps = (state: ExamTakerState, ownProps) => {
   const { snapshot } = state;
   const { status, message } = snapshot;
   const locked = status === SnapshotStatus.FAILURE;
-  const disabled =
-    status === SnapshotStatus.DISABLED ||
-    status === SnapshotStatus.FAILURE;
+  const disabled = status === SnapshotStatus.DISABLED
+    || status === SnapshotStatus.FAILURE;
   return {
     value: getAtPath(state, qnum, pnum, bnum),
     disabled,
@@ -44,8 +43,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
   };
 };
 
-export const connectWithPath = (Component) =>
-  connect(mapStateToProps, mapDispatchToProps)(withLocked(Component));
+export const connectWithPath = (Component) => connect(mapStateToProps, mapDispatchToProps)(withLocked(Component));
 
 const mapDispatchToPropsIndexed = (dispatch, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
@@ -59,5 +57,4 @@ const mapDispatchToPropsIndexed = (dispatch, ownProps) => {
   };
 };
 
-export const connectWithPathIndexed = (Component) =>
-  connect(mapStateToProps, mapDispatchToPropsIndexed)(withLocked(Component));
+export const connectWithPathIndexed = (Component) => connect(mapStateToProps, mapDispatchToPropsIndexed)(withLocked(Component));

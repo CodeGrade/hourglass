@@ -13,7 +13,7 @@ function mapDispatchToProps(dispatch) {
     onNext: () => {
       dispatch(viewNextQuestion());
     },
-  }
+  };
 }
 
 export default connect(null, mapDispatchToProps)(PaginationArrows);

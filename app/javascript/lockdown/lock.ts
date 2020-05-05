@@ -23,12 +23,12 @@ export async function lock() {
     try {
       await openFullscreen();
     } catch (e) {
-      throw new Error("Error starting fullscreen mode.");
+      throw new Error('Error starting fullscreen mode.');
     }
   }
 
   if (!isFullscreen()) {
     await document.exitFullscreen();
-    throw new Error("Developer console open.");
+    throw new Error('Developer console open.');
   }
 }

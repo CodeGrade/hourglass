@@ -1,8 +1,8 @@
 import React from 'react';
+import { Question } from '@hourglass/types';
 import { Part } from './Part';
 import { HTML } from './questions/HTML';
 import { FileViewer } from './FileViewer';
-import { Question } from '@hourglass/types';
 
 interface ShowQuestionProps {
   question: Question;
@@ -36,5 +36,5 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
       ))}
     </div>
   );
-}
+};
 export default ShowQuestion;

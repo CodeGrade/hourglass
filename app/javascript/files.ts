@@ -1,4 +1,6 @@
-import { ExamFile, FileMap, Files, FileRef } from '@hourglass/types';
+import {
+  ExamFile, FileMap, Files, FileRef,
+} from '@hourglass/types';
 
 export function createMap(files: Files): FileMap {
   const ret = {};

@@ -34,18 +34,19 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
         >
           <MdLockOpen title={message} size={size} />
         </Button>
-    );
+      );
     case 'LOCKED':
       return (
         <Button
           variant="success"
-          disabled>
+          disabled
+        >
           <MdLock size={size} title="Session locked" />
         </Button>
       );
     default:
-      throw new Error("UNHANDLED CASE");
+      throw new Error('UNHANDLED CASE');
   }
-}
+};
 
 export default LockdownInfo;

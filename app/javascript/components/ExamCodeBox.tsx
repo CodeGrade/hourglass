@@ -9,17 +9,15 @@ import { UnControlled as UnControlledCodeMirror, IUnControlledCodeMirror } from 
 import { MarkDescription } from '@hourglass/types';
 
 function applyMarks(cm: CM.Editor, marks: MarkDescription[]): CM.TextMarker[] {
-  return marks.map((mark) =>
-    cm.markText(mark.from, mark.to, {
-      ...mark.options,
-      readOnly: true,
-      className: 'readOnly',
-    })
-  );
+  return marks.map((mark) => cm.markText(mark.from, mark.to, {
+    ...mark.options,
+    readOnly: true,
+    className: 'readOnly',
+  }));
 }
 
 function marksToDescs(marks: any): MarkDescription[] {
-  return marks.map(m => {
+  return marks.map((m) => {
     const { readOnly, inclusiveLeft, inclusiveRight } = m;
     const found = m.find();
     return {
@@ -28,10 +26,9 @@ function marksToDescs(marks: any): MarkDescription[] {
         readOnly,
         inclusiveLeft,
         inclusiveRight,
-      }
+      },
     };
   });
-
 }
 
 export interface EditorProps {
@@ -41,12 +38,12 @@ export interface EditorProps {
   readOnly?: boolean;
   language?: string;
   options?: {};
-  onGutterClick?: IUnControlledCodeMirror["onGutterClick"];
-  cursor?: IUnControlledCodeMirror["cursor"];
-  onCursor?: IUnControlledCodeMirror["onCursor"];
-  onBeforeChange?: IUnControlledCodeMirror["onBeforeChange"];
+  onGutterClick?: IUnControlledCodeMirror['onGutterClick'];
+  cursor?: IUnControlledCodeMirror['cursor'];
+  onCursor?: IUnControlledCodeMirror['onCursor'];
+  onBeforeChange?: IUnControlledCodeMirror['onBeforeChange'];
   onChange?: (text: string, marks: MarkDescription[]) => void;
-  onFocus?: IUnControlledCodeMirror["onFocus"];
+  onFocus?: IUnControlledCodeMirror['onFocus'];
   refreshProps?: any[];
   disabled?: boolean;
 }
@@ -58,7 +55,7 @@ export const Editor = (props: EditorProps) => {
     valueUpdate,
     options,
     readOnly = false,
-    language = "",
+    language = '',
     cursor,
     onCursor,
     onGutterClick,
@@ -87,7 +84,7 @@ export const Editor = (props: EditorProps) => {
   useEffect(() => {
     if (instance) {
       doSave = false;
-      appliedMarks.forEach(m => m.clear());
+      appliedMarks.forEach((m) => m.clear());
       instance.setValue(value);
       setAppliedMarks(applyMarks(instance, markDescriptions));
       doSave = true;
@@ -147,5 +144,3 @@ export const Editor = (props: EditorProps) => {
 export const Renderer = ({ value, ...props }) => (
   <Highlighter value={value} codeMirror={CM} theme="mdn-like" {...props} />
 );
-
-      //value={initialValue}

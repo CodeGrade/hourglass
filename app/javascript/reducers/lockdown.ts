@@ -24,4 +24,4 @@ export default (state: LockdownState = {
     default:
       return state;
   }
-}
+};

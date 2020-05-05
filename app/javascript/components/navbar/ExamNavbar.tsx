@@ -43,4 +43,4 @@ export const ExamNavbar: React.FC<ExamNavbarProps> = (props) => {
       </span>
     </Navbar>
   );
-}
+};

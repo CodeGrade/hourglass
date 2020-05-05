@@ -26,7 +26,7 @@ export default (Child) => {
         <Child {...props} />
       </div>
     );
-  }
+  };
   WithLocked.displayName = 'WithLocked';
   return WithLocked;
-}
+};

@@ -54,4 +54,4 @@ export const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
       </Navbar.Collapse>
     </Navbar>
   );
-}
+};

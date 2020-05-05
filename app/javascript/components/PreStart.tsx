@@ -32,5 +32,5 @@ const PreStart: React.FC<PreStartProps> = (props) => {
       </div>
     </div>
   );
-}
+};
 export default PreStart;

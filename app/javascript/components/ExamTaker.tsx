@@ -52,5 +52,5 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
       {body}
     </div>
   );
-}
+};
 export default ExamTaker;

@@ -53,14 +53,16 @@ export function YesNoInput(props: YesNoProps) {
       >
         <ToggleButton
           disabled={disabled}
-          variant={value ? "primary" : "outline-primary"}
-          value={true}>
+          variant={value ? 'primary' : 'outline-primary'}
+          value
+        >
           {yesLabel}
         </ToggleButton>
         <ToggleButton
           disabled={disabled}
-          variant={(value === false) ? "primary" : "outline-primary"}
-          value={false}>
+          variant={(value === false) ? 'primary' : 'outline-primary'}
+          value={false}
+        >
           {noLabel}
         </ToggleButton>
       </ToggleButtonGroup>

@@ -22,18 +22,20 @@ const PaginationArrows: React.FC<PaginationArrowsProps> = (props) => {
         disabled={!showBack}
         onClick={onBack}
       >
-        <MdArrowBack /> Previous
+        <MdArrowBack />
+        <span>Previous</span>
       </Button>
       <Button
         disabled={!showNext}
         className="ml-2"
         onClick={onNext}
       >
-        Next <MdArrowForward />
+        <span>Next</span>
+        <MdArrowForward />
       </Button>
     </div>
   );
-}
-PaginationArrows.displayName = "PaginationArrows";
+};
+PaginationArrows.displayName = 'PaginationArrows';
 
 export default PaginationArrows;

@@ -40,7 +40,7 @@ export function viewNextQuestion() {
   return (dispatch, getState) => {
     const state: ExamTakerState = getState();
     const qnum = state.contents.pagination.selected.question;
-    dispatch(viewQuestion(qnum+1, 0))
+    dispatch(viewQuestion(qnum + 1, 0));
   };
 }
 
@@ -48,7 +48,7 @@ export function viewPrevQuestion() {
   return (dispatch, getState) => {
     const state: ExamTakerState = getState();
     const qnum = state.contents.pagination.selected.question;
-    dispatch(viewQuestion(qnum-1, 0))
+    dispatch(viewQuestion(qnum - 1, 0));
   };
 }
 
@@ -62,7 +62,7 @@ export function doTryLockdown(
       dispatch(doLoad(exam.id, preview));
     }).catch((err) => {
       dispatch(lockdownFailed(err.message));
-    })
+    });
   };
 }
 
@@ -97,11 +97,11 @@ export function submitExam(examID: number) {
       },
       credentials: 'same-origin',
     })
-      .then(result => result.json() as Promise<SubmitResponse>)
-      .then(result => {
+      .then((result) => result.json() as Promise<SubmitResponse>)
+      .then((result) => {
         window.location = Routes.exam_path(examID);
       });
-  }
+  };
 }
 
 export function loadExam(contents: ContentsData, preview: boolean): LoadExamAction {
@@ -119,7 +119,7 @@ export function doLoad(examID: number, preview: boolean) {
       .then((result) => result.json() as Promise<StartExamResponse>)
       .then((result) => {
         if (result.type === 'ANOMALOUS') {
-          dispatch(lockdownFailed("You have been locked out. Please see an instructor."));
+          dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
         } else {
           dispatch(loadExam(result, preview));
         }

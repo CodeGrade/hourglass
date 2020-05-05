@@ -3,12 +3,12 @@ import {
   ExamState,
   ExamInfo,
 } from '@hourglass/types';
-import { HTML } from './questions/HTML';
-import { FileViewer } from './FileViewer';
 import { createMap } from '@hourglass/files';
 import { ExamContextProvider } from '@hourglass/context';
 import Questions from '@hourglass/containers/Questions';
 import { useAnomalyListeners } from '@hourglass/lockdown/anomaly';
+import { FileViewer } from './FileViewer';
+import { HTML } from './questions/HTML';
 
 interface ExamShowContentsProps {
   exam: ExamInfo;

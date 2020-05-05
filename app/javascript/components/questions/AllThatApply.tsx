@@ -9,7 +9,7 @@ interface AllThatApplyProps {
   disabled: boolean;
 }
 
-export function AllThatApply(props: AllThatApplyProps) {
+const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
   const {
     onChange,
     info,
@@ -35,7 +35,7 @@ export function AllThatApply(props: AllThatApplyProps) {
   //     </React.Fragment>)
   //   }
   // } else {
-  const handler = (index) => (event) => {
+  const handler = (index: number) => (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
     onChange(index, val);
   };
@@ -45,7 +45,7 @@ export function AllThatApply(props: AllThatApplyProps) {
       {options.map((o, i) => {
         const val = !!value?.[i];
         return (
-          <Form.Group key={i}>
+          <Form.Group key={o}>
             <Form.Check
               disabled={disabled}
               type="checkbox"
@@ -64,4 +64,6 @@ export function AllThatApply(props: AllThatApplyProps) {
       {body}
     </div>
   );
-}
+};
+
+export default AllThatApply;

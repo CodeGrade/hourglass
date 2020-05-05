@@ -1,7 +1,6 @@
 import React from 'react';
 import { SnapshotStatus } from '@hourglass/types';
 import { MdCloudDone, MdCloudOff, MdError } from 'react-icons/md';
-import { useExamInfoContext } from '@hourglass/context';
 
 interface SnapshotInfoProps {
   status: SnapshotStatus;
@@ -14,7 +13,6 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
     message,
   } = props;
   const size = '1.5em';
-  const { id } = useExamInfoContext().exam;
   switch (status) {
     case SnapshotStatus.LOADING:
       return (
@@ -30,14 +28,14 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
       );
     case SnapshotStatus.FAILURE:
       return (
-        <button className="btn btn-danger" type="button" disabled role="status">
+        <button className="btn btn-danger" type="button" disabled>
           <MdError title={message} size={size} />
         </button>
       );
     case SnapshotStatus.DISABLED:
       return (
-        <button className="btn btn-secondary" type="button" disabled role="status">
-          <MdCloudOff title={message} size={size} />
+        <button className="btn btn-secondary" type="button" disabled>
+          <MdCloudOff title="Snapshots disabled." size={size} />
         </button>
       );
     default:

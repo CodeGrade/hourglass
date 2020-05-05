@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { MdLock, MdLockOpen } from 'react-icons/md';
-import { useExamInfoContext } from '@hourglass/context';
 import { LockdownStatus } from '@hourglass/types';
 
 interface LockdownInfoProps {
@@ -15,7 +14,6 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
     message,
   } = props;
   const size = '1.5em';
-  const { id } = useExamInfoContext().exam;
   switch (status) {
     case 'BEFORE':
       return (
@@ -23,7 +21,7 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
           variant="secondary"
           disabled
         >
-          <MdLockOpen title={message} size={size} />
+          <MdLockOpen title="Waiting for session lock." size={size} />
         </Button>
       );
     case 'FAILED':
@@ -41,7 +39,7 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
           variant="success"
           disabled
         >
-          <MdLock size={size} title="Session locked" />
+          <MdLock size={size} title="Session locked." />
         </Button>
       );
     default:

@@ -104,7 +104,7 @@ export function doTryLockdown(
   preview: boolean,
 ): Thunk {
   return (dispatch): void => {
-    lock().then(() => {
+    lock(preview).then(() => {
       dispatch(lockedDown());
       dispatch(doLoad(exam.id, preview));
     }).catch((err) => {

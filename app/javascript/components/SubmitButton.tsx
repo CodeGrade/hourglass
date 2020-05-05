@@ -13,7 +13,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = (props) => {
     <div className="my-2">
       <Button
         variant="success"
-        onClick={() => {
+        onClick={(): void => {
           // TODO check if student is sure
           submit();
         }}

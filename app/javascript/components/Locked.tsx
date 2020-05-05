@@ -1,12 +1,16 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import { Spinner } from 'react-bootstrap';
 import './Locked.css';
 
-export default (Child) => {
-  const WithLocked: React.FC<{
-    locked: boolean;
-  }> = (props) => {
-    const lockedClass = props.locked ? '' : 'd-none';
+interface LockedProps {
+  locked: boolean;
+}
+
+const Locked = <P extends {}>(Child: React.ComponentType<P>): React.FC<P & LockedProps> => {
+  const WithLocked: React.FC<P & LockedProps> = (props) => {
+    const { locked } = props;
+    const lockedClass = locked ? '' : 'd-none';
+    const ChildWithProps = React.createElement(Child, props, null);
     return (
       <div>
         <div
@@ -23,10 +27,11 @@ export default (Child) => {
             </Spinner>
           </div>
         </div>
-        <Child {...props} />
+        {ChildWithProps}
       </div>
     );
   };
-  WithLocked.displayName = 'WithLocked';
   return WithLocked;
 };
+
+export default Locked;

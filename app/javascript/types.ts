@@ -273,7 +273,7 @@ export interface QuestionInfo {
 
 export interface ExamState {
   // File tree.
-  files: Files;
+  files: ExamFile[];
 
   // Questions and their references.
   info: Exam;
@@ -346,8 +346,6 @@ export interface ExamDir {
 
 // Exam files can be single files or directories.
 export type ExamFile = ExamSingleFile | ExamDir;
-
-export type Files = Array<ExamFile>;
 
 // Map from file path to file.
 export interface FileMap {

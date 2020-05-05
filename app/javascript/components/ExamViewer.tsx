@@ -1,7 +1,9 @@
 import React from 'react';
 
-export default () => (
+const ExamViewer: React.FC<{}> = () => (
   <div>
     <i>Exam submitted at (TODO)</i>
   </div>
 );
+
+export default ExamViewer;

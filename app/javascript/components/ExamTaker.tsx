@@ -1,9 +1,5 @@
 import React from 'react';
 import {
-  ExamInfo,
-  User,
-} from '@hourglass/types';
-import {
   ExamNavbar,
   RegularNavbar,
 } from '@hourglass/components/navbar';
@@ -21,7 +17,6 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
   } = props;
   const {
     exam,
-    registration,
     preview,
     user,
   } = useExamInfoContext();

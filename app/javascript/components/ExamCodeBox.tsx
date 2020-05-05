@@ -4,7 +4,6 @@ import 'codemirror/addon/selection/active-line';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/theme/mdn-like';
 import React, { useEffect, useState } from 'react';
-import Highlighter from 'react-codemirror-runmode';
 import { UnControlled as UnControlledCodeMirror, IUnControlledCodeMirror } from 'react-codemirror2';
 import { MarkDescription } from '@hourglass/types';
 
@@ -132,22 +131,23 @@ export const Editor: React.FC<EditorProps> = (props) => {
       }}
       onGutterClick={onGutterClick}
       cursor={cursor}
-      onCursor={(...args) => {
+      onCursor={(...args): void => {
         // this callback always needs to be defined
         if (onCursor) onCursor(...args);
       }}
-      onFocus={(...args) => {
+      onFocus={(...args): void => {
         // this callback always needs to be defined
         if (onFocus) onFocus(...args);
       }}
       options={myOptions}
-      editorDidMount={(editor) => {
+      editorDidMount={(editor): void => {
         setInstance(editor);
       }}
     />
   );
 };
 
-export const Renderer = ({ value, ...props }) => (
-  <Highlighter value={value} codeMirror={CM} theme="mdn-like" {...props} />
-);
+// TODO: in separate file, for ExamViewer
+// export const Renderer = ({ value, ...props }) => (
+//   <Highlighter value={value} codeMirror={CM} theme="mdn-like" {...props} />
+// );

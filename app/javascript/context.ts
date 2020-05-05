@@ -1,14 +1,14 @@
 import { createContext, useContext } from 'react';
 import {
   FileMap,
-  Files,
+  ExamFile,
   ExamInfo,
   RegistrationInfo,
   User,
 } from '@hourglass/types';
 
 interface ExamContext {
-  files: Files;
+  files: ExamFile[];
   fmap: FileMap;
 }
 

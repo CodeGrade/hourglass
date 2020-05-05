@@ -1,8 +1,8 @@
 import {
-  ExamFile, FileMap, Files, FileRef,
+  ExamFile, FileMap, FileRef,
 } from '@hourglass/types';
 
-export function createMap(files: Files): FileMap {
+export function createMap(files: ExamFile[]): FileMap {
   const ret = {};
   for (const file of files) {
     switch (file.filedir) {
@@ -21,7 +21,7 @@ export function createMap(files: Files): FileMap {
   return ret;
 }
 
-export function firstFile(files: Files): ExamFile {
+export function firstFile(files: ExamFile[]): ExamFile {
   for (const file of files) {
     switch (file.filedir) {
       case 'file':
@@ -36,6 +36,6 @@ export function firstFile(files: Files): ExamFile {
   return undefined;
 }
 
-export function getFilesForRefs(map: FileMap, refs: FileRef[]): Files {
+export function getFilesForRefs(map: FileMap, refs: FileRef[]): ExamFile[] {
   return refs ? refs.map((r) => map[r.path]).filter((a) => a) : [];
 }

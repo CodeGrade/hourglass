@@ -4,17 +4,17 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { Row, Col } from 'react-bootstrap';
 import {
-  CodeTagState, FileRef, ExamFile, Files,
+  CodeTagState, FileRef, ExamFile,
 } from '@hourglass/types';
 import { useExamContext } from '@hourglass/context';
 import { firstFile, getFilesForRefs } from '@hourglass/files';
 import { Editor } from './ExamCodeBox';
 
 interface FilesProps {
-  files: Array<ExamFile>;
+  files: ExamFile[];
 }
 
-function Files(props: FilesProps) {
+const Files: React.FC<FilesProps> = (props) => {
   const { files } = props;
   return (
     <>
@@ -37,7 +37,7 @@ function Files(props: FilesProps) {
       })}
     </>
   );
-}
+};
 
 interface FileContentsProps {
   selectedFile: string;
@@ -101,7 +101,7 @@ function FileContents(props: FileContentsProps) {
 }
 
 interface FileTreeProps {
-  files: Files;
+  files: ExamFile[];
   selectedFile: string;
   onChangeFile: (id: string) => void;
 }

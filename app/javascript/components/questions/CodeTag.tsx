@@ -4,14 +4,14 @@ import {
   Row, Col, Modal, Button,
 } from 'react-bootstrap';
 import { ControlledFileViewer } from '@hourglass/components/FileViewer';
-import { TooltipButton } from '@hourglass/components/TooltipButton';
+import TooltipButton from '@hourglass/components/TooltipButton';
 import { HTML } from './HTML';
 
 interface CodeTagValProps {
   value: CodeTagState;
 }
 
-function CodeTagVal(props: CodeTagValProps) {
+const CodeTagVal: React.FC<CodeTagValProps> = (props) => {
   const { value } = props;
   return (
     <div>
@@ -37,7 +37,7 @@ function CodeTagVal(props: CodeTagValProps) {
       </span>
     </div>
   );
-}
+};
 
 interface FileModalProps {
   references: FileRef[];
@@ -48,7 +48,7 @@ interface FileModalProps {
   disabled: boolean;
 }
 
-function FileModal(props) {
+const FileModal: React.FC<FileModalProps> = (props) => {
   const {
     show,
     onClose,
@@ -60,7 +60,7 @@ function FileModal(props) {
   // Modal has its own state so the user can manipulate it before saving.
   const [selected, setSelected] = useState(startValue);
   const [refresher, setRefresher] = useState(false);
-  const refreshCodeMirror = () => setRefresher((b) => !b);
+  const refreshCodeMirror = (): void => setRefresher((b) => !b);
   useEffect(() => {
     // Reset my starting state when outer state changes.
     setSelected(startValue);
@@ -86,13 +86,13 @@ function FileModal(props) {
           refreshProps={[refresher]}
           references={references}
           selection={selected}
-          onChangeFile={(newFile) => {
+          onChangeFile={(newFile): void => {
             setSelected({
               selectedFile: newFile,
               lineNumber: undefined,
             });
           }}
-          onChangeLine={(newLine) => {
+          onChangeLine={(newLine): void => {
             setSelected((old) => ({
               selectedFile: old.selectedFile,
               lineNumber: newLine,
@@ -111,14 +111,14 @@ function FileModal(props) {
           disabled={saveButtonDisabled}
           disabledMessage={disabledMessage}
           variant="primary"
-          onClick={() => onSave(selected)}
+          onClick={(): void => onSave(selected)}
         >
           Save Changes
         </TooltipButton>
       </Modal.Footer>
     </Modal>
   );
-}
+};
 
 interface CodeTagProps {
   info: CodeTagInfo;
@@ -127,7 +127,7 @@ interface CodeTagProps {
   disabled: boolean;
 }
 
-export function CodeTag(props: CodeTagProps) {
+const CodeTag: React.FC<CodeTagProps> = (props) => {
   const {
     info,
     value,
@@ -156,7 +156,7 @@ export function CodeTag(props: CodeTagProps) {
           <Col>
             <Button
               disabled={disabled}
-              onClick={() => setShowModal(true)}
+              onClick={(): void => setShowModal(true)}
             >
               Choose line
             </Button>
@@ -164,8 +164,8 @@ export function CodeTag(props: CodeTagProps) {
               disabled={disabled}
               references={choices}
               show={showModal}
-              onClose={() => setShowModal(false)}
-              onSave={(newState) => {
+              onClose={(): void => setShowModal(false)}
+              onSave={(newState): void => {
                 setShowModal(false);
                 onChange(newState);
               }}
@@ -176,4 +176,6 @@ export function CodeTag(props: CodeTagProps) {
       </Col>
     </Row>
   );
-}
+};
+
+export default CodeTag;

@@ -11,7 +11,7 @@ interface TooltipButtonProps {
   variant?: ButtonProps['variant'];
 }
 
-export const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
+const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
   const {
     disabled,
     disabledMessage,
@@ -26,7 +26,7 @@ export const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
       {disabledMessage}
     </Tooltip>
   );
-  const noTooltip = () => <span />;
+  const noTooltip = <span />;
   return (
     <OverlayTrigger
       overlay={disabled ? tooltip : noTooltip}
@@ -46,3 +46,5 @@ export const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
     </OverlayTrigger>
   );
 };
+
+export default TooltipButton;

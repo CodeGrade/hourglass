@@ -49,11 +49,11 @@ const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {
           const selectedQuestion = qi === selected.question;
           return (
             <div
-              key={`q-${qi}`}
+              key={qi}
             >
               <Dropdown.Item
                 className="pl-3"
-                onClick={() => {
+                onClick={(): void => {
                   if (paginated) {
                     changeQuestion(qi);
                   }
@@ -72,7 +72,7 @@ const PaginationDropdown: React.FC<PaginationDropdownProps> = (props) => {
                     key={`q-${qi}-p-${pi}`}
                     className="pl-5"
                     active={active}
-                    onClick={() => {
+                    onClick={(): void => {
                       if (paginated) {
                         changeQuestion(qi, pi);
                       }

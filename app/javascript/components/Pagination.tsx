@@ -1,5 +1,4 @@
 import React from 'react';
-import { Carousel } from 'react-bootstrap';
 import PaginationArrows from '@hourglass/containers/PaginationArrows';
 
 interface PaginationProps {

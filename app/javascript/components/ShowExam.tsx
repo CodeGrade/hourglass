@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Row,
   Col,
   Container,
-  Button,
 } from 'react-bootstrap';
 import { Provider } from 'react-redux';
 import store from '@hourglass/store';
@@ -33,7 +32,7 @@ interface ShowExamProps {
   final: boolean;
 }
 
-function ShowExam(props: ShowExamProps) {
+const ShowExam: React.FC<ShowExamProps> = (props) => {
   const {
     exam,
     preview,
@@ -58,6 +57,6 @@ function ShowExam(props: ShowExamProps) {
       </ExamInfoContextProvider>
     </Container>
   );
-}
+};
 
 export default ShowExam;

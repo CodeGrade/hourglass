@@ -20,7 +20,7 @@ import {
 } from '@hourglass/types';
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
-import { lock } from '@hourglass/lockdown/lock';
+import lock from '@hourglass/lockdown/lock';
 
 export function togglePagination(): TogglePaginationAction {
   return {

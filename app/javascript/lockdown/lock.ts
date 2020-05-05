@@ -4,7 +4,7 @@ import { isFullscreen, openFullscreen } from './helpers';
  * Lock down the client browser.
  * @throws Error if lockdown fails
  */
-export async function lock() {
+export default async function lock(): Promise<void> {
   // TODO take param for security settings to apply
   // - ignore-lockdown
   // - tolerate-windowed
@@ -23,12 +23,11 @@ export async function lock() {
     try {
       await openFullscreen();
     } catch (e) {
-      throw new Error('Error starting fullscreen mode.');
+      throw new Error('Error entering fullscreen. Please manually fullscreen the window with F11.');
     }
   }
 
   if (!isFullscreen()) {
-    await document.exitFullscreen();
-    throw new Error('Developer console open.');
+    throw new Error('Try again in fullscreen.');
   }
 }

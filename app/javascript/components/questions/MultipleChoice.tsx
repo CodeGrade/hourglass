@@ -4,7 +4,7 @@ import { MultipleChoiceInfo, MultipleChoiceState } from '@hourglass/types';
 
 interface MultipleChoiceProps {
   info: MultipleChoiceInfo;
-  value: MultipleChoiceState,
+  value: MultipleChoiceState;
   onChange: (newVal: number) => void;
   disabled: boolean;
 }

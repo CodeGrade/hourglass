@@ -6,6 +6,8 @@ module.exports = {
   },
   extends: [
     'plugin:react/recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
     'airbnb',
   ],
   globals: {
@@ -45,5 +47,7 @@ module.exports = {
         tsx: "never",
       },
    ],
+  "no-unused-vars": "off",
+  "@typescript-eslint/no-unused-vars": ["error"]
   },
 };

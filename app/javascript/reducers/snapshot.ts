@@ -9,6 +9,12 @@ export default function snapshot(state: SnapshotState = {
   message: '',
 }, action: ExamTakerAction): SnapshotState {
   switch (action.type) {
+      case 'LOAD_EXAM':
+      return {
+        ...state,
+        status: action.preview ? SnapshotStatus.DISABLED : SnapshotStatus.SUCCESS,
+        message: '',
+      };
     case 'SNAPSHOT_SAVING':
       return {
         ...state,

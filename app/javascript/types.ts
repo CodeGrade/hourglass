@@ -8,14 +8,24 @@ export interface ExamInfo {
   name: string;
 }
 
-export type ExamTakerAction = StartExamAction | ContentsAction | SnapshotAction;
+export interface RegistrationInfo {
+  id: number;
+}
 
-export interface ContentsState {
+export type ExamTakerAction = LockedDownAction | LockdownFailedAction | LoadExamAction | ContentsAction | SnapshotAction;
+
+export interface ContentsData {
   // Exam information.
   exam: ExamState;
 
   // The student's current answers.
   answers: AnswersState;
+}
+
+export interface ContentsState {
+  loaded: boolean;
+
+  data?: ContentsData;
 
   // Pagination information.
   pagination: PaginationState;
@@ -40,9 +50,18 @@ export interface ViewQuestionAction {
   part: number;
 }
 
-export interface StartExamAction {
-  type: 'START_EXAM';
-  contents: ContentsState;
+export interface LockedDownAction {
+  type: 'LOCKED_DOWN';
+}
+
+export interface LockdownFailedAction {
+  type: 'LOCKDOWN_FAILED';
+  message: string;
+}
+
+export interface LoadExamAction {
+  type: 'LOAD_EXAM';
+  contents: ContentsData;
   preview: boolean;
 }
 
@@ -73,12 +92,31 @@ export interface SnapshotSaveResult {
 
 export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure;
 
+export enum LockdownStatus {
+  // Lockdown hasn't been requested yet.
+  BEFORE = 'BEFORE',
+
+  // Lockdown request failed.
+  FAILED = 'FAILED',
+
+  // Lockdown succeeded.
+  LOCKED = 'LOCKED',
+}
+
+export interface LockdownState {
+  // Last lockdown event.
+  status: LockdownStatus;
+
+  // Error message to display.
+  message: string;
+}
+
 export interface ExamTakerState {
-  // Whether the exam contents are loaded into the 'contents' field.
-  loaded: boolean;
+  // The current state of lockdown.
+  lockdown: LockdownState;
 
   // The contents of the exam, and latest student answers.
-  contents?: ContentsState;
+  contents: ContentsState;
 
   // The current state of saving snapshots.
   snapshot: SnapshotState;

@@ -7,9 +7,14 @@ import {
 } from 'react-bootstrap';
 import { Provider } from 'react-redux';
 import store from '@hourglass/store';
-import { ExamInfo, User } from '@hourglass/types';
+import {
+  ExamInfo,
+  User,
+  RegistrationInfo,
+} from '@hourglass/types';
 import ExamTaker from '@hourglass/containers/ExamTaker';
 import ExamViewer from '@hourglass/components/ExamViewer';
+import { ExamInfoContextProvider } from '@hourglass/context';
 
 interface ShowExamProps {
   // Whether the exam should load in "preview" mode.
@@ -21,6 +26,9 @@ interface ShowExamProps {
   // Information about the exam.
   exam: ExamInfo;
 
+  // Information about the registration.
+  registration: RegistrationInfo;
+
   // Whether the exam is complete.
   final: boolean;
 }
@@ -31,27 +39,20 @@ function ShowExam(props: ShowExamProps) {
     preview,
     user,
     final,
+    registration,
   } = props;
   return (
     <Container>
-      <Provider store={store}>
-        <Row>
-          <Col>
-            <h1>{exam.name}</h1>
-            {final
-            ? (
-              <ExamViewer />
-            )
-            : (
-              <ExamTaker
-                exam={exam}
-                preview={preview}
-                user={user}
-              />
-            )}
-          </Col>
-        </Row>
-      </Provider>
+      <ExamInfoContextProvider value={{ exam, registration, user, preview }}>
+        <Provider store={store}>
+          <Row>
+            <Col>
+              <h1>{exam.name}</h1>
+              {final ? <ExamViewer /> : <ExamTaker />}
+            </Col>
+          </Row>
+        </Provider>
+      </ExamInfoContextProvider>
     </Container>
   );
 }

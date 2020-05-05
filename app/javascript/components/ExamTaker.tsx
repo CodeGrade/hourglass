@@ -7,43 +7,51 @@ import {
   ExamNavbar,
   RegularNavbar,
 } from '@hourglass/components/navbar';
+import { useExamInfoContext } from '@hourglass/context';
 import ExamShowContents from '@hourglass/containers/ExamShowContents';
 import PreStart from '@hourglass/containers/PreStart';
 
 interface ExamTakerProps {
-  loaded: boolean;
-  exam: ExamInfo;
-  preview: boolean;
-  user: User;
+  ready: boolean;
 }
 
 const ExamTaker: React.FC<ExamTakerProps> = (props) => {
   const {
-    loaded,
+    ready,
+  } = props;
+  const {
     exam,
+    registration,
     preview,
     user,
-  } = props;
-  if (loaded) {
-    return (
-      <div>
-        <ExamNavbar
-          user={user}
-          preview={preview}
-          locked={loaded}
-        />
-        <ExamShowContents
-          exam={exam}
-          preview={preview}
-        />
-      </div>
-    );
-  }
+  } = useExamInfoContext();
+  const body = ready ? (
+    <>
+      <ExamNavbar
+        user={user}
+        preview={preview}
+      />
+      <ExamShowContents
+        exam={exam}
+        preview={preview}
+      />
+    </>
+  ) : (
+    <>
+      <RegularNavbar
+        user={user}
+      />
+      <PreStart
+        exam={exam}
+        registration={registration}
+        preview={preview}
+      />
+    </>
+  );
   return (
-    <PreStart
-      examID={exam.id}
-      preview={preview}
-    />
+    <div>
+      {body}
+    </div>
   );
 }
 export default ExamTaker;

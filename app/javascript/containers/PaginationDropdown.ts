@@ -11,7 +11,7 @@ import {
 function mapStateToProps(state: ExamTakerState) {
   return {
     pagination: state.contents.pagination,
-    questions: state.contents.exam.info.questions,
+    questions: state.contents.data.exam.info.questions,
   };
 }
 

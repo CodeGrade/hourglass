@@ -7,7 +7,7 @@ import {
 
 function mapStateToProps(state: ExamTakerState) {
   return {
-    examState: state.contents.exam,
+    examState: state.contents.data.exam,
   };
 }
 

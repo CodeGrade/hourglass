@@ -1,7 +1,7 @@
 import React from 'react';
 import { SnapshotStatus } from '@hourglass/types';
 import { MdCloudDone, MdCloudOff, MdError } from 'react-icons/md';
-import { useExamContext } from '@hourglass/context';
+import { useExamInfoContext } from '@hourglass/context';
 
 interface SnapshotInfoProps {
   status: SnapshotStatus;
@@ -14,7 +14,7 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
     message,
   } = props;
   const size = '1.5em';
-  const { id } = useExamContext();
+  const { id } = useExamInfoContext().exam;
   switch (status) {
     case SnapshotStatus.LOADING:
       return (

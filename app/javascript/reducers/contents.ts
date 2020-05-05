@@ -4,11 +4,29 @@ import {
   ExamTakerAction,
 } from '@hourglass/types';
 
-export default (state: ContentsState, action: ExamTakerAction): ContentsState => {
+export default (state: ContentsState = {
+  data: undefined,
+  loaded: false,
+  pagination: {
+    paginated: false,
+    selected: {
+      question: 0,
+      part: 0,
+    },
+  },
+}, action: ExamTakerAction): ContentsState => {
   switch (action.type) {
+    case 'LOAD_EXAM':
+      return {
+        ...state,
+        data: {
+          exam: action.contents.exam,
+          answers: action.contents.answers,
+        },
+      }
     case 'UPDATE_ANSWER':
       const ret = {
-        ...state.answers,
+        ...state.data.answers,
       };
       let cur = ret;
       for (let i = 0; i < action.path.length - 1; i++) {
@@ -18,7 +36,10 @@ export default (state: ContentsState, action: ExamTakerAction): ContentsState =>
       cur[action.path[action.path.length - 1]] = action.val;
       return {
         ...state,
-        answers: ret,
+        data: {
+          ...state.data,
+          answers: ret,
+        },
       };
     case 'TOGGLE_PAGINATION':
       return {

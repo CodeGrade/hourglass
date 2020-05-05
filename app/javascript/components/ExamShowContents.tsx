@@ -45,7 +45,7 @@ export default function ExamShowContents(props: ExamShowContentsProps) {
   } = info;
   const fmap = createMap(files);
   return (
-    <ExamContextProvider value={{ id, files, fmap }}>
+    <ExamContextProvider value={{ files, fmap }}>
       <div>
         <HTML value={instructions} />
         {reference && <FileViewer references={reference} />}

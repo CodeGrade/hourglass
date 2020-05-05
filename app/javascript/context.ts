@@ -1,13 +1,30 @@
 import { createContext, useContext } from 'react';
-import { FileMap, Files } from '@hourglass/types';
+import {
+  FileMap,
+  Files,
+  ExamInfo,
+  RegistrationInfo,
+  User,
+} from '@hourglass/types';
 
-interface ExamCtxt {
+interface ExamContext {
   files: Files;
   fmap: FileMap;
-  id: number;
 }
 
-const ExamContext = createContext<Partial<ExamCtxt>>({});
+const EC = createContext<Partial<ExamContext>>({});
 
-export const ExamContextProvider = ExamContext.Provider;
-export const useExamContext = () => useContext(ExamContext);
+export const ExamContextProvider = EC.Provider;
+export const useExamContext = () => useContext(EC);
+
+interface ExamInfoContext {
+  exam: ExamInfo;
+  registration: RegistrationInfo;
+  user: User;
+  preview: boolean;
+}
+
+const EIC = createContext<Partial<ExamInfoContext>>({});
+
+export const ExamInfoContextProvider = EIC.Provider;
+export const useExamInfoContext = () => useContext(EIC);

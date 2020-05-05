@@ -1,10 +1,13 @@
 import { connect } from 'react-redux';
-import { ExamTakerState } from '@hourglass/types';
+import {
+  ExamTakerState,
+  LockdownStatus,
+} from '@hourglass/types';
 import ExamTaker from '@hourglass/components/ExamTaker';
 
 function examTakerStateToProps(state: ExamTakerState) {
   return {
-    loaded: state.loaded,
+    ready: state.lockdown.status === LockdownStatus.LOCKED && !!state.contents.data,
   };
 }
 

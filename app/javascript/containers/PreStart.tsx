@@ -1,17 +1,30 @@
 import { connect } from 'react-redux';
 import PreStart from '@hourglass/components/PreStart';
-import { fetchContents } from '@hourglass/actions';
+import {
+  LockdownStatus,
+  ExamTakerState,
+} from '@hourglass/types';
+import { doTryLockdown } from '@hourglass/actions';
+
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   const {
-    examID,
+    exam,
+    registration,
     preview,
   } = ownProps;
   return {
     onClick: () => {
-      dispatch(fetchContents(examID, preview));
+      dispatch(doTryLockdown(preview, exam, registration));
     },
   };
 }
 
-export default connect(null, mapDispatchToProps)(PreStart);
+const mapStateToProps = (state: ExamTakerState) => {
+  return {
+    isError: state.lockdown.status === LockdownStatus.FAILED,
+    errorMsg: state.lockdown.message,
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PreStart);

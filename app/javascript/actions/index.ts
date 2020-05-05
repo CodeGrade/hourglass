@@ -1,4 +1,6 @@
 import {
+  LockedDownAction,
+  LockdownFailedAction,
   TogglePaginationAction,
   ViewQuestionAction,
   ExamTakerState,
@@ -10,8 +12,10 @@ import {
   StatePath,
   AnswerState,
   UpdateAnswerAction,
-  ContentsState,
-  StartExamAction,
+  ContentsData,
+  LoadExamAction,
+  RegistrationInfo,
+  ExamInfo,
 } from '@hourglass/types';
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
@@ -47,6 +51,34 @@ export function viewPrevQuestion() {
   };
 }
 
+export function doTryLockdown(
+  preview: boolean,
+  exam: ExamInfo,
+  registration: RegistrationInfo,
+) {
+  return (dispatch) => {
+    lock(exam, registration).then(() => {
+      dispatch(lockedDown());
+      dispatch(doLoad(exam.id, preview));
+    }).catch((err) => {
+      dispatch(lockdownFailed(err.message));
+    })
+  };
+}
+
+export function lockedDown(): LockedDownAction {
+  return {
+    type: 'LOCKED_DOWN',
+  };
+}
+
+export function lockdownFailed(message: string) {
+  return {
+    type: 'LOCKDOWN_FAILED',
+    message,
+  };
+}
+
 interface SubmitResponse {
   lockout: boolean;
 }
@@ -54,7 +86,7 @@ interface SubmitResponse {
 export function submitExam(examID: number) {
   return (dispatch, getState) => {
     const state: ExamTakerState = getState();
-    const { answers } = state.contents;
+    const { answers } = state.contents.data;
     dispatch(saveSnapshot(examID));
     const url = Routes.submit_exam_path(examID);
     fetch(url, {
@@ -72,22 +104,21 @@ export function submitExam(examID: number) {
   }
 }
 
-export function startExam(contents: ContentsState, preview: boolean): StartExamAction {
+export function loadExam(contents: ContentsData, preview: boolean): LoadExamAction {
   return {
-    type: 'START_EXAM',
+    type: 'LOAD_EXAM',
     preview,
     contents,
   };
 }
 
-export function fetchContents(examID: number, preview: boolean) {
+export function doLoad(examID: number, preview: boolean) {
   return (dispatch) => {
     const url = Routes.start_exam_path(examID);
     fetch(url)
-      .then((result) => result.json() as Promise<ContentsState>)
+      .then((result) => result.json() as Promise<ContentsData>)
       .then((result) => {
-        lock();
-        dispatch(startExam(result, preview));
+        dispatch(loadExam(result, preview));
       }).catch((err) => {
         // TODO: store a message to tell the user what went wrong
         console.error('Error starting exam', err);
@@ -126,7 +157,7 @@ function snapshotSaving(): SnapshotSaving {
 export function saveSnapshot(examID) {
   return (dispatch, getState) => {
     const state: ExamTakerState = getState();
-    const { answers } = state.contents;
+    const { answers } = state.contents.data;
     dispatch(snapshotSaving());
     const url = Routes.save_snapshot_exam_path(examID);
     fetch(url, {

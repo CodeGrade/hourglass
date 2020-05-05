@@ -8,6 +8,7 @@ import {
 import { getCSRFToken, logOut } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import { User } from '@hourglass/types';
+import LockdownInfo from '@hourglass/containers/LockdownInfo';
 
 interface RegularNavbarProps {
   user?: User;
@@ -28,6 +29,9 @@ export const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
       >
         Hourglass
       </Navbar.Brand>
+      <span className="ml-2">
+        <LockdownInfo />
+      </span>
       <Navbar.Toggle />
       <Navbar.Collapse className="justify-content-end">
         {user && (

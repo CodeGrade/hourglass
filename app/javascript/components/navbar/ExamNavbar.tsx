@@ -10,31 +10,31 @@ import {
 } from '@hourglass/types';
 import SnapshotInfo from '@hourglass/containers/SnapshotInfo';
 import PaginationDropdown from '@hourglass/containers/PaginationDropdown';
+import LockdownInfo from '@hourglass/containers/LockdownInfo';
 
 interface ExamNavbarProps {
   user?: User;
   preview: boolean;
-  locked: boolean;
 }
 
 export const ExamNavbar: React.FC<ExamNavbarProps> = (props) => {
   const {
     preview,
-    locked,
   } = props;
-  const doSnapshots = locked && !preview;
-  const title = 'Hourglass' + (locked ? ' (locked)' : '');
-  const bg = locked ? 'dark' : 'light';
+  const doSnapshots = !preview;
   return (
     <Navbar
-      bg={bg}
-      variant={bg}
+      bg="dark"
+      variant="dark"
       expand="lg"
       fixed="top"
     >
       <Navbar.Brand>
-        {title}
+        Hourglass
       </Navbar.Brand>
+      <span className="ml-2">
+        <LockdownInfo />
+      </span>
       <span className="ml-auto">
         <span className="mr-2">
           <SnapshotInfo />

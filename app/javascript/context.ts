@@ -21,7 +21,6 @@ interface ExamInfoContext {
   exam: ExamInfo;
   registration: RegistrationInfo;
   user: User;
-  preview: boolean;
 }
 
 const EIC = createContext<ExamInfoContext>({} as ExamInfoContext);

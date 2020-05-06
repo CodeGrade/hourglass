@@ -2,11 +2,9 @@ import { isCovered, isFullscreen, openFullscreen } from './helpers';
 
 /**
  * Lock down the client browser.
- * @param preview whether the exam is in preview mode
  * @throws Error if lockdown fails
  */
-export default async function lock(preview: boolean): Promise<void> {
-  if (preview) return;
+export default async function lock(): Promise<void> {
   // TODO take param for security settings to apply
   // - ignore-lockdown
   // - tolerate-windowed

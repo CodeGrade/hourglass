@@ -3,9 +3,8 @@
   <h1><%= @page_title %></h1>
   <h2 class="collapsed" data-toggle="collapse" data-target="#preview">Preview Exam <%= octicon "chevron-down", height: "1em", width: "1em" %><%= octicon "chevron-up", height: "1em", width: "1em" %></h2>
   <div class="row collapse" id="preview">
+    TODO
     <% # TODO instead of below, use React ExamViewer with correct answers %>
-    <iframe src="<%= preview_exam_path(@exam) %>" class="col-12 p-0" style="border: 5px solid black; height: 50em;">
-    </iframe>
   </div>
   <h2 class="mt-4">Registrations</h2>
   <% unless @exam.finalized? %>
@@ -13,5 +12,15 @@
   <% end %>
   <%= render 'registrations/table', exam: @exam, registrations: @exam.registrations %>
 <% else %>
-  <%= render "contents", preview: false %>
+  <%= react_component('ShowExam', {
+    user: current_user,
+    final: @final,
+    registration: {
+      id: @registration.id,
+    },
+    exam: {
+      id: @exam.id,
+      name: @exam.name,
+    }
+  }) %>
 <% end %>

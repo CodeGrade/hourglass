@@ -12,7 +12,6 @@ import { FileViewer } from './FileViewer';
 interface ExamShowContentsProps {
   examState: ExamState;
   save: () => void;
-  preview: boolean;
 }
 
 const INTERVAL = 10000;
@@ -21,22 +20,18 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const {
     examState,
     save,
-    preview,
   } = props;
   const {
     info,
     files,
   } = examState;
   useEffect(() => {
-    let timer: number;
-    if (!preview) {
-      timer = window.setInterval(() => save(), INTERVAL);
-    }
+    const timer: number = window.setInterval(() => save(), INTERVAL);
     return (): void => {
-      if (timer) clearInterval(timer);
+      clearInterval(timer);
     };
-  }, [save, preview]);
-  useAnomalyListeners(preview);
+  }, [save]);
+  useAnomalyListeners();
   const {
     questions,
     instructions,

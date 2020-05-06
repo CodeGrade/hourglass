@@ -64,11 +64,10 @@ export function lockdownFailed(message: string): LockdownFailedAction {
   };
 }
 
-export function loadExam(contents: ContentsData, preview: boolean): LoadExamAction {
+export function loadExam(contents: ContentsData): LoadExamAction {
   return {
     type: 'LOAD_EXAM',
     contents,
-    preview,
   };
 }
 
@@ -81,7 +80,7 @@ export function updateAnswer(path: StatePath, val: AnswerState): UpdateAnswerAct
 }
 
 
-export function doLoad(examID: number, preview: boolean): Thunk {
+export function doLoad(examID: number): Thunk {
   return (dispatch): void => {
     const url = Routes.start_exam_path(examID);
     fetch(url)
@@ -90,7 +89,7 @@ export function doLoad(examID: number, preview: boolean): Thunk {
         if (result.type === 'ANOMALOUS') {
           dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
         } else {
-          dispatch(loadExam(result, preview));
+          dispatch(loadExam(result));
         }
       }).catch((err) => {
         // TODO: store a message to tell the user what went wrong
@@ -101,12 +100,11 @@ export function doLoad(examID: number, preview: boolean): Thunk {
 
 export function doTryLockdown(
   exam: ExamInfo,
-  preview: boolean,
 ): Thunk {
   return (dispatch): void => {
-    lock(preview).then(() => {
+    lock().then(() => {
       dispatch(lockedDown());
-      dispatch(doLoad(exam.id, preview));
+      dispatch(doLoad(exam.id));
     }).catch((err) => {
       dispatch(lockdownFailed(err.message));
     });

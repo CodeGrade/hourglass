@@ -40,7 +40,7 @@ const anom = (examID: number, registrationID: number) => (reason: string): void 
 /**
  * React hook to install anomaly listeners.
  */
-export default function useAnomalyListeners(preview: boolean): void {
+export default function useAnomalyListeners(): void {
   const {
     exam,
     registration,
@@ -48,12 +48,10 @@ export default function useAnomalyListeners(preview: boolean): void {
   const [lst, setLst] = useState([]);
   const anomalyDetected: AnomalyDetected = anom(exam.id, registration.id);
   useEffect(() => {
-    if (!preview) {
-      setLst(installListeners(anomalyDetected));
-    }
+    setLst(installListeners(anomalyDetected));
     return (): void => {
       removeListeners(lst);
       setLst([]);
     };
-  }, [preview]);
+  }, []);
 }

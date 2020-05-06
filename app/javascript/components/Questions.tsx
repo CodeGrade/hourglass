@@ -17,14 +17,14 @@ const Questions: React.FC<QuestionsProps> = (props) => {
     paginated,
     selectedQuestion,
   } = props;
-  const { exam, preview } = useExamInfoContext();
+  const { exam } = useExamInfoContext();
   const { id } = exam;
   return (
     <Pagination
       current={selectedQuestion}
       paginated={paginated}
       max={questions.length}
-      endItem={!preview && <SubmitButton examID={id} />}
+      endItem={<SubmitButton examID={id} />}
     >
       {questions.map((q, i) => (
         <ShowQuestion

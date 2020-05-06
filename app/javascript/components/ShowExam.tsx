@@ -12,13 +12,10 @@ import {
   RegistrationInfo,
 } from '@hourglass/types';
 import ExamTaker from '@hourglass/containers/ExamTaker';
-import ExamViewer from '@hourglass/components/ExamViewer';
+import ExamSubmitted from '@hourglass/components/ExamSubmitted';
 import { ExamInfoContextProvider } from '@hourglass/context';
 
 interface ShowExamProps {
-  // Whether the exam should load in "preview" mode.
-  preview: boolean;
-
   // The current logged-in user.
   user: User;
 
@@ -35,7 +32,6 @@ interface ShowExamProps {
 const ShowExam: React.FC<ShowExamProps> = (props) => {
   const {
     exam,
-    preview,
     user,
     final,
     registration,
@@ -43,14 +39,14 @@ const ShowExam: React.FC<ShowExamProps> = (props) => {
   return (
     <Container>
       <ExamInfoContextProvider value={{
-        exam, registration, user, preview,
+        exam, registration, user,
       }}
       >
         <Provider store={store}>
           <Row>
             <Col>
               <h1>{exam.name}</h1>
-              {final ? <ExamViewer /> : <ExamTaker />}
+              {final ? <ExamSubmitted /> : <ExamTaker />}
             </Col>
           </Row>
         </Provider>

@@ -5,15 +5,14 @@ import {
 } from '@hourglass/types';
 
 export default function snapshot(state: SnapshotState = {
-  status: SnapshotStatus.DISABLED,
+  status: SnapshotStatus.LOADING,
   message: '',
 }, action: ExamTakerAction): SnapshotState {
   switch (action.type) {
     case 'LOAD_EXAM':
       return {
         ...state,
-        status: action.preview ? SnapshotStatus.DISABLED : SnapshotStatus.SUCCESS,
-        message: '',
+        status: SnapshotStatus.SUCCESS,
       };
     case 'SNAPSHOT_SAVING':
       return {

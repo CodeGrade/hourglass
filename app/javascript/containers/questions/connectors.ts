@@ -23,11 +23,9 @@ const mapStateToProps = (state: ExamTakerState, ownProps) => {
   const { snapshot } = state;
   const { status, message } = snapshot;
   const locked = status === SnapshotStatus.FAILURE;
-  const disabled = status === SnapshotStatus.DISABLED
-    || status === SnapshotStatus.FAILURE;
   return {
     value: getAtPath(state, qnum, pnum, bnum),
-    disabled,
+    disabled: locked,
     locked,
     lockedMsg: message,
   };

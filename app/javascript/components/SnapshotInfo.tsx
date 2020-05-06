@@ -1,6 +1,6 @@
 import React from 'react';
 import { SnapshotStatus } from '@hourglass/types';
-import { MdCloudDone, MdCloudOff, MdError } from 'react-icons/md';
+import { MdCloudDone, MdError } from 'react-icons/md';
 import TooltipButton from '@hourglass/components/TooltipButton';
 
 interface SnapshotInfoProps {
@@ -43,16 +43,6 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
           disabledMessage={`Failed saving snapshot: ${message}.`}
         >
           <MdError size={size} />
-        </TooltipButton>
-      );
-    case SnapshotStatus.DISABLED:
-      return (
-        <TooltipButton
-          variant="secondary"
-          disabled
-          disabledMessage="Snapshots disabled."
-        >
-          <MdCloudOff title="Snapshots disabled." size={size} />
         </TooltipButton>
       );
     default:

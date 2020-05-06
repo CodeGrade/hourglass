@@ -3,7 +3,7 @@ class ExamsController < ApplicationController
   prepend_before_action :catch_require_current_user, only: [:save_snapshot]
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create, :save_snapshot]
-  before_action :require_admin_or_prof, only: [:new, :create, :preview, :finalize]
+  before_action :require_admin_or_prof, only: [:new, :create, :finalize]
   before_action :check_anomaly, only: [:start, :submit]
   before_action :check_final, only: [:start, :submit]
 
@@ -75,10 +75,6 @@ class ExamsController < ApplicationController
         answers: answers,
       }
     )
-  end
-
-  def preview
-    @final = false
   end
 
   def index

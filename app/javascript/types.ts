@@ -81,7 +81,6 @@ export interface LockdownFailedAction {
 export interface LoadExamAction {
   type: 'LOAD_EXAM';
   contents: ContentsData;
-  preview: boolean;
 }
 
 export type ContentsAction = UpdateAnswerAction | TogglePaginationAction | ViewQuestionAction;
@@ -146,9 +145,6 @@ export interface User {
 }
 
 export enum SnapshotStatus {
-  // The exam is in preview mode and snapshots are disabled.
-  DISABLED = 'DISABLED',
-
   // A snapshot is being fetched from the server.
   LOADING = 'LOADING',
 

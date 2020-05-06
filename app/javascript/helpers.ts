@@ -42,3 +42,11 @@ export function scrollToQuestion(qnum: number): void {
 export function scrollToPart(qnum: number, pnum: number): void {
   scrollToElem(`question-${qnum}-part-${pnum}`);
 }
+
+/**
+ * Returns a promise that sleeps for the specified duration before resolving.
+ * @param milis duration in miliseconds
+ */
+export function sleep(milis: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, milis));
+}

@@ -1,4 +1,4 @@
-import { isFullscreen, openFullscreen } from './helpers';
+import { isCovered, isFullscreen, openFullscreen } from './helpers';
 
 /**
  * Lock down the client browser.
@@ -29,7 +29,11 @@ export default async function lock(preview: boolean): Promise<void> {
     }
   }
 
+  if (!isCovered()) {
+    throw new Error('On second monitor...');
+  }
+
   if (!isFullscreen()) {
-    throw new Error('Try again in fullscreen.');
+    throw new Error('Close the developer console to continue.');
   }
 }

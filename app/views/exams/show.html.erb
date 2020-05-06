@@ -3,8 +3,12 @@
   <h1><%= @page_title %></h1>
   <h2 class="collapsed" data-toggle="collapse" data-target="#preview">Preview Exam <%= octicon "chevron-down", height: "1em", width: "1em" %><%= octicon "chevron-up", height: "1em", width: "1em" %></h2>
   <div class="row collapse" id="preview">
-    TODO
-    <% # TODO instead of below, use React ExamViewer with correct answers %>
+    <%= react_component('ExamViewer', {
+      exam: {
+        id: @exam.id,
+        name: @exam.name,
+      }
+    }) %>
   </div>
   <h2 class="mt-4">Registrations</h2>
   <% unless @exam.finalized? %>

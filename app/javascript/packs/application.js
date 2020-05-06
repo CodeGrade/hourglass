@@ -1,4 +1,5 @@
-/* eslint no-console:0 */
+/* eslint-disable */
+
 // This file is automatically compiled by Webpack, along with any other files
 // present in this directory. You're encouraged to place your actual application logic in
 // a relevant structure within app/javascript and only use these pack files to reference
@@ -7,21 +8,16 @@
 // To reference this file, add <%= javascript_pack_tag 'application' %> to the appropriate
 // layout file, like app/views/layouts/application.html.erb
 
-require("@rails/ujs").start();
-require("@rails/activestorage").start();
-require("channels");
+import './bootstrap';
+import './bootstrap.scss';
+import './codemirror';
+
+require('@rails/ujs').start();
+require('@rails/activestorage').start();
+require('channels');
 
 require('codemirror');
 require('jquery');
-require('jquery-ui');
-require('../filepicker-widget.js');
-import './bootstrap.js';
-import './bootstrap.scss';
-import './codemirror.js';
-
-import { activateCode, displayCode } from "../exam.js";
-global.activateCode = activateCode; // TODO remove
-global.displayCode = displayCode; // TODO remove
 
 // Uncomment to copy all static images under ../images to the output folder and reference
 // them with the image_pack_tag helper in views (e.g <%= image_pack_tag 'rails.png' %>)
@@ -30,6 +26,7 @@ global.displayCode = displayCode; // TODO remove
 // const images = require.context('../images', true)
 // const imagePath = (name) => images(name, true)
 // Support component names relative to this directory:
-var componentRequireContext = require.context("components", true);
-var ReactRailsUJS = require("react_ujs");
+const componentRequireContext = require.context('components', true);
+const ReactRailsUJS = require('react_ujs');
+
 ReactRailsUJS.useContext(componentRequireContext);

@@ -5,10 +5,19 @@ class Registration < ApplicationRecord
 
   has_many :anomalies
 
-  enum role: [:student, :proctor, :professor, :admin]
+  # student takes exams
+  # grader just grades
+  # proctor can fix anomalies and finalize exams
+  enum role: [:student, :grader, :proctor, :professor]
 
   after_create :create_file
   after_commit :purge_file!, on: :destroy
+
+  def visible_to?(user)
+    reg = Registration.find_by(user: user, exam: exam)
+    return true if Registration::roles[reg.role] > Registration::roles[:grader]
+    return self.user == user
+  end
 
   def anomalous?
     anomalies.size > 0

@@ -4,8 +4,23 @@
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: {}
-# column: value
-#
-two: {}
-# column: value
+benReg:
+  exam: examOne
+  user: ben
+  room: examOneRoomOne
+  role: <%= Registration::roles[:professor] %>
+  final: false
+
+amitReg:
+  exam: examTwo
+  user: amit
+  room: examTwoRoomOne
+  role: <%= Registration::roles[:professor] %>
+  final: false
+
+kyleReg:
+  exam: examOne
+  user: kyle
+  room: examOneRoomOne
+  role: <%= Registration::roles[:proctor] %>
+  final: false

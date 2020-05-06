@@ -28,7 +28,7 @@ class Exam < ApplicationRecord
   end
 
   def policies
-    properties["policies"]
+    properties['policies']
   end
 
   def properties
@@ -36,53 +36,196 @@ class Exam < ApplicationRecord
     @properties = YAML.load(File.read(exam_yaml))
   end
 
-  def info
-    return @info if @info
-    @info = properties["versions"][0]
-    if @info["reference"]
-      dirs, files = get_referenced_files(@info["reference"])
-      @info["reference"] = { dirs: dirs, files: files }
+  def info(include_answers = true)
+    ret = properties['versions'][0].deep_dup
+    answer_count = 0
+    ret['reference']&.each_with_index do |r, i|
+      path = r.values.first
+      ret['reference'][i] = {
+        'type' => r.keys.first,
+        'path' => path
+      }
     end
-    @info["questions"].each do |q|
-      if q["reference"]
-        dirs, files = get_referenced_files(q["reference"])
-        q["reference"] = { dirs: dirs, files: files }
+    ret['questions'].each do |q|
+      q['reference']&.each_with_index do |r, i|
+        q['reference'][i] = {
+          'type' => r.keys.first,
+          'path' => r.values.first
+        }
       end
-      q["parts"].each do |p|
-        if p["reference"]
-          dirs, files = get_referenced_files(p["reference"])
-          p["reference"] = { dirs: dirs, files: files }
+      q['parts'].each do |p|
+        p['reference']&.each_with_index do |r, i|
+          p['reference'][i] = {
+            'type' => r.keys.first,
+            'path' => r.values.first
+          }
         end
-        p["question"] = q
-        p["body"].each do |b|
-          if b.is_a? Hash
-            if b["YesNo"] == !!b["YesNo"]
-              b["YesNo"] = { "prompt" => [], "correctAnswer" => b["YesNo"] }
-            elsif b["TrueFalse"] == !!b["TrueFalse"]
-              b["TrueFalse"] = { "prompt" => [], "correctAnswer" => b["TrueFalse"] }
-            elsif b["Code"]
-              if b["Code"]["initial"]
-                dirs, files = get_referenced_files([{ "file" => b["Code"]["initial"] }])
-                b["Code"]["initial"] = files[0][:contents]
+        p['body'].each_with_index do |b, bnum|
+          if b.is_a? String
+            p['body'][bnum] = {
+              'type' => 'HTML',
+              'value' => b
+            }
+          elsif b.is_a? Hash
+            if b.key? 'AllThatApply'
+              p['body'][bnum] = {
+                'type' => 'AllThatApply',
+                'prompt' => b['AllThatApply']['prompt']
+              }
+              if include_answers
+                p['body'][bnum]['options'] = b['AllThatApply']['options']
+              else
+                p['body'][bnum]['options'] = b['AllThatApply']['options'].map(&:keys).flatten
               end
-            elsif b.key? "Text" && b["Text"].nil?
-              b["Text"] = { "prompt" => [] }
-            elsif b["CodeTag"]
-              if b["CodeTag"]["choices"] == "part" && p["reference"].nil?
-                throw "No reference for part."
-              elsif b["CodeTag"]["choices"] == "question" && q["reference"].nil?
-                throw "No reference for question."
-              elsif b["CodeTag"]["choices"] == "all" && @info["reference"].nil?
-                throw "No reference for exam."
+            elsif b.key? 'Code'
+              p['body'][bnum] = {
+                'type' => 'Code',
+                'prompt' => b['Code']['prompt'],
+                'lang' => b['Code']['lang'],
+                'initial' => b['Code']['initial'],
+              }
+            elsif b.key? 'CodeTag'
+              referent =
+                if b['CodeTag']['choices'] == 'part'
+                  throw 'No reference for part.' if p['reference'].nil?
+                  p
+                elsif b['CodeTag']['choices'] == 'question'
+                  throw 'No reference for question.' if q['reference'].nil?
+                  q
+                elsif b['CodeTag']['choices'] == 'all'
+                  throw 'No reference for exam.' if ret['reference'].nil?
+                  ret
+                else
+                  throw "CodeTag reference is invalid."
+                end
+              p['body'][bnum] = {
+                'type' => 'CodeTag',
+                'choices' => referent['reference'],
+                'prompt' => b['CodeTag']['prompt'],
+              }
+              p['body'][bnum]['correctAnswer'] = b['CodeTag']['correctAnswer'] if include_answers
+            elsif b.key? 'Matching'
+              p['body'][bnum] = {
+                'type' => 'Matching',
+                'prompts' => b['Matching']['prompts'],
+                'values' => b['Matching']['values']
+              }
+              p['body'][bnum]['correctAnswers'] = b['Matching']['correctAnswers'] if include_answers
+            elsif b.key? 'MultipleChoice'
+              p['body'][bnum] = {
+                'type' => 'MultipleChoice',
+                'prompt' => b['MultipleChoice']['prompt'],
+                'options' => b['MultipleChoice']['options']
+              }
+              p['body'][bnum]['correctAnswer'] = b['MultipleChoice']['correctAnswer'] if include_answers
+            elsif b.key? 'Text'
+              if b['Text'].nil?
+                p['body'][bnum] = {
+                  'type' => 'Text',
+                  'prompt' => []
+                }
+              else
+                p['body'][bnum] = {
+                  'type' => 'Text',
+                  'prompt' => b['Text']['prompt']
+                }
               end
+            elsif b.key? 'TrueFalse'
+              p['body'][bnum] = {
+                'type' => 'TrueFalse'
+              }
+              if b['TrueFalse'] == !!b['TrueFalse']
+                p['body'][bnum]['prompt'] = []
+                p['body'][bnum]['correctAnswer'] = b['TrueFalse'] if include_answers
+              else
+                p['body'][bnum]['prompt'] = b['TrueFalse']['prompt']
+                p['body'][bnum]['correctAnswer'] = b['TrueFalse']['correctAnswer'] if include_answers
+              end
+            elsif b.key? 'YesNo'
+              p['body'][bnum] = {
+                'type' => 'YesNo'
+              }
+              if b['YesNo'] == !!b['YesNo']
+                p['body'][bnum]['prompt'] = []
+                p['body'][bnum]['correctAnswer'] = b['YesNo'] if include_answers
+              else
+                p['body'][bnum]['prompt'] = b['YesNo']['prompt']
+                p['body'][bnum]['correctAnswer'] = b['YesNo']['correctAnswer'] if include_answers
+              end
+            else
+              throw 'Bad question type.'
             end
-            b.values.first["part"] = p
-            b.values.first["question"] = q
+            b['id'] = answer_count
+            answer_count += 1
+          else
+            throw 'Bad body item.'
           end
         end
       end
     end
-    return @info
+    ret
+  end
+
+  def process_marks(contents)
+    lines = contents.lines.map &:chomp
+    lines.shift if lines[0].blank?
+    lines.pop if lines[-1].blank?
+    marks = {
+      byLine: [],
+      byNum: {},
+    }
+    count = 0
+    (0...lines.length).each do |lineNum|
+      marks[:byLine][lineNum] = []
+      reTag = /~ro:(\d+):([se])~/
+      match = reTag.match(lines[lineNum])
+      while match do
+        idx = match.begin(0)
+        lines[lineNum].sub!(match[0], "")
+        if match[2] == 's'
+          count += 1
+          marks[:byNum][match[1]] = {
+            from: {
+              line: lineNum,
+              ch: idx,
+            },
+            options: {
+              inclusiveLeft: (lineNum == 0 && idx == 0),
+            },
+          }
+          if marks[:byLine][lineNum][idx].nil?
+            marks[:byLine][lineNum][idx] = {
+              open: [],
+              close: [],
+            }
+          end
+          marks[:byLine][lineNum][idx][:open].push(marks[:byNum][match[1]])
+        elsif !marks[:byNum][match[1]].nil?
+          marks[:byNum][match[1]][:to] = {
+            line: lineNum,
+            ch: idx,
+          }
+          lastLine = lineNum == lines.length - 1
+          endOfLine = idx == lines[lineNum].length
+          marks[:byNum][match[1]][:options][:inclusiveRight] = lastLine && endOfLine
+          if marks[:byLine][lineNum][idx].nil?
+            marks[:byLine][lineNum][idx] = {
+              open: [],
+              close: [],
+            }
+          end
+          marks[:byLine][lineNum][idx][:close].unshift(marks[:byNum][match[1]])
+        else
+          m = match.to_a.join(', ')
+          throw "No information found for mark [#{m}]"
+        end
+        match = reTag.match(lines[lineNum], idx)
+      end
+    end
+    {
+      text: lines.join("\n"),
+      marks: marks[:byNum].values,
+    }
   end
 
   def generate_secret_key!
@@ -103,19 +246,7 @@ class Exam < ApplicationRecord
   end
 
   def get_exam_files
-    get_raw_files("all")
-  end
-
-  def get_referenced_files(refs)
-    @raw_files = []
-    refs&.each do |ref|
-      if ref["dir"]
-        @raw_files.push(*get_raw_files(ref["dir"]))
-      elsif ref["file"]
-        @raw_files.push(*get_raw_files(ref["file"]))
-      end
-    end
-    return clean_up(@raw_files)
+    clean_up(get_raw_files(""))
   end
 
   private
@@ -138,16 +269,22 @@ class Exam < ApplicationRecord
       end
       if mimetype.starts_with? "image/"
         contents = Base64.encode(contents)
+        item[:contents] = ensure_utf8(contents, mimetype)
+      else
+        processed = process_marks(ensure_utf8(contents, mimetype))
+        item[:contents] = processed[:text]
+        item[:marks] = processed[:marks]
       end
       item[:text] = item[:path]
       # pdf_path: item[:converted_path],
-      item[:contents] = ensure_utf8(contents, mimetype)
       item[:type] = mimetype
+      item[:filedir] = "file"
+      item.delete(:full_path)
     elsif item[:link_to]
       item[:type] = "symlink"
     else
       return nil if item[:path] == "__MACOSX"
-
+      item[:filedir] = "dir"
       item[:text] = item[:path] + "/"
       item[:selectable] = false
       item[:nodes] = item[:children].map { |n| with_extracted(n) }.compact
@@ -155,8 +292,6 @@ class Exam < ApplicationRecord
     end
     item
   end
-
-  private
 
   def ensure_utf8(str, mimetype)
     if ApplicationHelper.binary?(mimetype)
@@ -178,45 +313,18 @@ class Exam < ApplicationRecord
     end
   end
 
-  private
-
   def get_raw_files(folder)
     self.upload.extracted_files(folder, true)
   end
 
   def clean_up(raw_files)
-    def file_list(files, arr)
-      if files[:children]
-        files[:children].each { |n| file_list(n, arr) }
-      else
-        if File.basename(files[:full_path]) != ".DS_Store"
-          arr.push(files)
-        end
-      end
-      arr
-    end
-    @flat_files = raw_files.reduce([]) do |flat, raw| file_list(raw, flat) end
-    @flat_files.each do |sf|
-      if sf[:type] == "symlink" && !sf[:broken] && sf[:link_to].is_a?(String)
-        sf[:link_to] = @flat_files.find { |f| f[:full_path]&.ends_with?(sf[:link_to]) }
-      end
-    end
-
-    @count = @flat_files.count.to_s.length
-
-    @flat_files.each_with_index do |node, i|
-      node[:href] = "file_" + (i + 1).to_s.rjust(@count, '0')
-    end
-    @flat_files.each do |node|
-      if node[:link_to]
-        node[:link_href] = "file_" + node[:link_to][:href].to_s.rjust(@count, '0')
-      end
-    end
-
     raw_files = raw_files.map do |f|
       with_extracted(f)
     end
 
-    return raw_files.compact, @flat_files.compact
+    raw_files = raw_files.compact
+
+    raw_files
   end
+
 end

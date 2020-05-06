@@ -1,4 +1,7 @@
 const { environment } = require('@rails/webpacker');
+const erb = require('./loaders/erb')
+const typescript =  require('./loaders/typescript')
+const path = require('path')
 
 const webpack = require('webpack');
 environment.plugins.prepend('Provide',
@@ -11,9 +14,11 @@ environment.plugins.prepend('Provide',
 
 const aliasConfig = {
   'jquery': 'jquery/src/jquery',
-  'jquery-ui': 'jquery-ui-dist/jquery-ui.js',
+  '@hourglass': path.resolve(__dirname, '..', '..', 'app/javascript'),
 };
 
 environment.config.set('resolve.alias', aliasConfig);
 
+environment.loaders.prepend('typescript', typescript)
+environment.loaders.prepend('erb', erb)
 module.exports = environment;

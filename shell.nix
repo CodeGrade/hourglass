@@ -23,7 +23,7 @@ let
     export PGHOST=$PWD/postgres
     export LOG_PATH=$PWD/postgres/LOG
     export PGDATABASE=postgres
-    export DATABASE_URL="postgresql:///postgres?host=$PGHOST"
+    export DATABASE_URL="postgresql:///hourglass?host=$PGHOST"
     export DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true
     if [ ! -d $PGHOST ]; then
       mkdir -p $PGHOST
@@ -43,8 +43,9 @@ let
 in mkShell {
   name = "hourglass";
   buildInputs = [
-    nodePackages.bower # needed for bootstrap-treeview
+    solargraph
     ruby.devEnv
+    bundler
     postgresql
     qt4
     curl.dev
@@ -53,11 +54,12 @@ in mkShell {
     yarn
     start_postgres
     stop_postgres
+    nodePackages.typescript
+    nodePackages.eslint_d
   ];
 
   shellHook = ''
     ${postgres_setup}
     ${gem_setup}
-    export PATH="$PWD/node_modules/.bin/:$PATH"
   '';
 }

@@ -1,13 +1,13 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  user_id: 1
+  user: ben
   file_name: MyString
-  secret_key: MyString
-  exam_id: 1
+  secret_key: "0dc33c2a-f74c-4197-b970-c6acfea9526c"
+  exam: examOne
 
 two:
-  user_id: 1
+  user: amit
   file_name: MyString
-  secret_key: MyString
-  exam_id: 1
+  secret_key: "dbb68b83-1a8b-4bb8-9878-369f475a11c8"
+  exam: examTwo

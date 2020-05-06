@@ -1,11 +1,11 @@
 class ExamsController < ApplicationController
-  before_action :require_current_user, except: [:save_snapshot]
+  before_action :require_current_user, except: [:save_snapshot, :start]
   prepend_before_action :catch_require_current_user, only: [:save_snapshot]
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create, :save_snapshot]
   before_action :require_admin_or_prof, only: [:new, :create, :preview, :finalize]
-  before_action :check_anomaly, only: [:show, :contents, :submit]
-  before_action :check_final, only: [:show, :contents, :submit]
+  before_action :check_anomaly, only: [:start, :submit]
+  before_action :check_final, only: [:start, :submit]
 
   def catch_require_current_user
     begin
@@ -37,7 +37,11 @@ class ExamsController < ApplicationController
 
   def check_anomaly
     if @registration.anomalous?
-      redirect_to exams_path, alert: "You are locked out of that exam. Please see a proctor."
+      render(
+        json: {
+          type: 'ANOMALOUS'
+        }
+      )
     end
   end
 
@@ -45,25 +49,36 @@ class ExamsController < ApplicationController
     return if @registration.professor?
 
     if @registration.final?
-      redirect_back fallback_location: exams_path, alert: "You have already completed that exam."
+      redirect_to exams_path, alert: "You have already completed that exam."
     end
   end
 
   def show
+    @final = @registration.final?
   end
 
-  def contents
-    # TODO make secret in "show" and check it before rendering
-    #   so that users cannot just visit /exams/1/contents
-    @answers = @registration.get_current_answers
-    @preview = false
-    render layout: false
+  def start
+    # TODO make secret in "show" and check it here with a POST before rendering
+    #   so that users cannot just visit /exams/1/contents in the browser easily
+    unless @registration.visible_to? current_user
+      render json: { message: "There is no submission for that user." }
+      return
+    end
+    answers = @registration.get_current_answers
+    render(
+      json: {
+        type: 'CONTENTS',
+        exam: {
+          info: @exam.info(false),
+          files: @exam.get_exam_files,
+        },
+        answers: answers,
+      }
+    )
   end
 
   def preview
-    @answers = {}
-    @preview = true
-    render 'contents'
+    @final = false
   end
 
   def index
@@ -74,7 +89,7 @@ class ExamsController < ApplicationController
 
   # returns true if lockout should occur
   def save_answers(final = false)
-    answers = params.require(:answers).permit(question: {}).to_h[:question]
+    answers = params.permit(:id, exam: {}, answers: {}).to_h[:answers]
     unless @registration.allow_submission?
       return true
     end
@@ -92,9 +107,7 @@ class ExamsController < ApplicationController
 
   def submit
     lockout = save_answers(true)
-    if lockout
-      redirect_to exams_path, alert: "You have already submitted this exam or you are locked out of it."
-    end
+    render json: { lockout: lockout }
   end
 
   def save_snapshot

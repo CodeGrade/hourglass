@@ -1,6 +1,3 @@
-import "bootstrap-treeview/src/css/bootstrap-treeview.css";
-//import "bootstrap-treeview/src/js/bootstrap-treeview.js"; // TODO use this and remove vendored version below (seems npm version is behind)
-require("../bootstrap.treeview.js");
 import 'bootstrap/js/dist/alert';
 import 'bootstrap/js/dist/button';
 import 'bootstrap/js/dist/carousel';

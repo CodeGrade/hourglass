@@ -1,0 +1,47 @@
+name: Rails Tests
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11
+        env:
+          POSTGRES_USER: hourglass
+          POSTGRES_PASSWORD: hourglass
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 60s
+          --health-retries 5
+    steps:
+    - uses: actions/checkout@v2
+    - run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential qt5-default qt5-qmake libqt5webkit5-dev
+    - name: Set up Ruby 2.6
+      uses: actions/setup-ruby@v1
+      with:
+        ruby-version: 2.6.6
+    - name: Install ruby bundle
+      run: |
+        gem install bundler
+        bundle install --jobs 4 --retry 3
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10
+    - name: Install yarn packages
+      run: yarn install --frozen-lockfile
+    - name: Run tests
+      env:
+        DATABASE_URL: postgres://hourglass:hourglass@localhost:5432/hourglass
+        RAILS_ENV: test
+      run: |
+        bundle exec rails db:setup
+        bundle exec rails test

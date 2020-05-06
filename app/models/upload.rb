@@ -64,24 +64,22 @@ class Upload < ApplicationRecord
         {
           path: path.basename.to_s,
           link_to: path.dirname.join(File.readlink(path)),
-          broken: (!File.exists?(File.realpath(path)) rescue true)
+          broken: (!File.exist?(File.realpath(path)) rescue true),
         }
       elsif path.file?
-        # converted_path = Pathname.new(path.to_s.gsub(extracted_path.to_s,
-        #                                               extracted_path.dirname.join("converted").to_s))
-        # converted_path = converted_path.dirname.join(path.basename(path.extname).to_s + ".pdf")
-        # if File.exists?(converted_path)
-        #   {path: path.basename.to_s,
-        #    full_path: path,
-        #    converted_path: Upload.upload_path_for(converted_path),
-        #    public_link: Upload.upload_path_for(path)}
-        # else
-        { path: path.basename.to_s, full_path: path }
-        # end
+        {
+          path: path.basename.to_s,
+          full_path: path,
+          relPath: path.relative_path_from(files_path),
+        }
       elsif path.directory?
-        { path: path.basename.to_s, children: path.children.sort.collect do |child|
-          rec_path(child)
-        end }
+        {
+          path: path.basename.to_s,
+          relPath: path.relative_path_from(files_path),
+          children: path.children.sort.collect do |child|
+            rec_path(child)
+          end,
+        }
       end
     end
     folder_path = files_path.join(folder)
@@ -181,6 +179,7 @@ class Upload < ApplicationRecord
 
     create_exam_structure(@upload)
 
+    # TODO bring back archiveutils checking
     if @upload.is_a? ActionDispatch::Http::UploadedFile
       upload_path = @upload.path
     elsif @upload.is_a? String

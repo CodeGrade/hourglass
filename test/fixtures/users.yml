@@ -1,7 +1,11 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+ben:
+  username: "ben"
+  role: <%= User::roles[:admin] %>
 
-one:
-  username: MyString
+amit:
+  username: "amit"
+  role: <%= User::roles[:professor] %>
 
-two:
-  username: MyString
+kyle:
+  username: "kyle"
+  role: <%= User::roles[:unprivileged] %>

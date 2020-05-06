@@ -1,13 +1,9 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  secret_key: MyString
+examOne:
+  secret_key: "94ae378e-53f3-4022-94cf-cbe6fe0c6a03"
   enabled: false
-  upload_id: 1
-  name: MyString
+  name: "Exam One"
 
-two:
-  secret_key: MyString
+examTwo:
+  secret_key: "f772d1aa-4def-4af5-b650-d353519f3dad"
   enabled: false
-  upload_id: 1
-  name: MyString
+  name: "Exam Two"

@@ -1,0 +1,8 @@
+// Tell webpack to watch routes.rb for changes
+/* rails-erb-loader-dependencies ../config/routes.rb */
+
+const routes = {};
+(function() {
+  <%= JsRoutes.generate(namespace: "Namespace") %>
+}).call(routes);
+export default routes.Namespace;

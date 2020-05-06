@@ -16,7 +16,7 @@ const ExamNavbar: React.FC<{}> = () => (
     <Navbar.Brand>
       Hourglass
     </Navbar.Brand>
-    <span className="ml-2">
+    <span className="ml-2 mr-auto">
       <LockdownInfo />
     </span>
     <span className="ml-auto">

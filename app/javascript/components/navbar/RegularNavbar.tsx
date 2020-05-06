@@ -28,7 +28,7 @@ const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
       >
         Hourglass
       </Navbar.Brand>
-      <span className="ml-2">
+      <span className="ml-2 mr-auto">
         <LockdownInfo />
       </span>
       <Navbar.Toggle />

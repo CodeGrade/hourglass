@@ -1,6 +1,7 @@
 ---
 policies:
   - ignore-lockdown
+  - tolerate-windowed
 versions:
   - instructions: Instructions go here.
     reference:

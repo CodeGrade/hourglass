@@ -16,7 +16,8 @@ export interface RailsRegistration {
 }
 
 export type ExamTakerAction =
-  LockedDownAction | LockdownFailedAction | LoadExamAction | ContentsAction | SnapshotAction;
+     LockedDownAction | LockdownFailedAction | LockdownIgnoredAction
+   | LoadExamAction | ContentsAction | SnapshotAction;
 
 export type Thunk = ThunkAction<void, ExamTakerState, unknown, ExamTakerAction>;
 export type ExamTakerDispatch = ThunkDispatch<ExamTakerState, unknown, ExamTakerAction>;
@@ -73,6 +74,10 @@ export interface ViewQuestionAction {
   part: number;
 }
 
+export interface LockdownIgnoredAction {
+  type: 'LOCKDOWN_IGNORED';
+}
+
 export interface LockedDownAction {
   type: 'LOCKED_DOWN';
 }
@@ -123,6 +128,9 @@ export enum LockdownStatus {
 
   // Lockdown succeeded.
   LOCKED = 'LOCKED',
+
+  // Lockdown ignored
+  IGNORED = 'IGNORED',
 }
 
 export interface LockdownState {
@@ -360,4 +368,13 @@ export interface AnomalyListener {
   handler: (e: Event) => void;
 }
 
+/**
+ * Security policies:
+ * - `'ignore-lockdown'`: don't install anomaly handlers
+ * - `'tolerate-windowed'`: allow the browser to not be fullscreen
+ */
 export type Policy = 'ignore-lockdown' | 'tolerate-windowed';
+
+export function policyPermits(policy: Policy[], query: Policy): boolean {
+  return policy.find((p) => p === query) !== undefined;
+}

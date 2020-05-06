@@ -1,5 +1,6 @@
 import {
   LockedDownAction,
+  LockdownIgnoredAction,
   TogglePaginationAction,
   ViewQuestionAction,
   ExamTakerState,
@@ -16,6 +17,7 @@ import {
   RailsExam,
   LockdownFailedAction,
   Thunk,
+  policyPermits,
 } from '@hourglass/types';
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
@@ -54,6 +56,12 @@ export function viewPrevQuestion(): Thunk {
 export function lockedDown(): LockedDownAction {
   return {
     type: 'LOCKED_DOWN',
+  };
+}
+
+export function lockdownIgnored(): LockdownIgnoredAction {
+  return {
+    type: 'LOCKDOWN_IGNORED',
   };
 }
 
@@ -103,7 +111,11 @@ export function doTryLockdown(
 ): Thunk {
   return (dispatch): void => {
     lock(exam.policies).then(() => {
-      dispatch(lockedDown());
+      if (policyPermits(exam.policies, 'ignore-lockdown')) {
+        dispatch(lockdownIgnored());
+      } else {
+        dispatch(lockedDown());
+      }
       dispatch(doLoad(exam.id));
     }).catch((err) => {
       dispatch(lockdownFailed(err.message));

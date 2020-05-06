@@ -45,6 +45,16 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
           <MdLock size={size} />
         </TooltipButton>
       );
+    case 'IGNORED':
+      return (
+        <TooltipButton
+          variant="warning"
+          disabledMessage="Session lock ignored"
+          disabled
+        >
+          <MdLockOpen size={size} />
+        </TooltipButton>
+      );
     default:
       throw new Error('UNHANDLED CASE');
   }

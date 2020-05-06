@@ -9,6 +9,12 @@ export default (state: LockdownState = {
   message: '',
 }, action: ExamTakerAction): LockdownState => {
   switch (action.type) {
+    case 'LOCKDOWN_IGNORED':
+      return {
+        ...state,
+        status: LockdownStatus.IGNORED,
+        message: '',
+      };
     case 'LOCKED_DOWN':
       return {
         ...state,

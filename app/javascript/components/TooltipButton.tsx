@@ -36,7 +36,7 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
       placement={placement}
     >
       <div
-        className={`d-inline-block ${disabled && 'cursor-not-allowed'}`}
+        className={`d-inline-block ${disabled && 'cursor-help'}`}
       >
         <Button
           variant={variant}

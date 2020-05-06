@@ -52,11 +52,13 @@
     "eslint-plugin-react-hooks": "^2.5.1",
     "sass-loader": "^8.0.2",
     "style-loader": "^1.2.1",
+    "tplant": "^2.3.3",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
   },
   "scripts": {
     "lint": "eslint 'app/javascript' --ext 'js,ts,jsx,tsx'",
-    "dev": "./bin/webpack-dev-server"
+    "dev": "./bin/webpack-dev-server",
+    "uml": "tplant -C --input app/javascript/types.ts --output types.svg"
   }
 }

@@ -2,17 +2,23 @@ import React from 'react';
 import { Table, Col } from 'react-bootstrap';
 import { PartInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
-import Body from './Body';
+import { BodyProps } from './Body';
 import { FileViewer } from './FileViewer';
 
 interface PartProps {
   part: PartInfo;
   qnum: number;
   pnum: number;
+  BodyRenderer: React.ComponentType<BodyProps>;
 }
 
 const Part: React.FC<PartProps> = (props) => {
-  const { part, qnum, pnum } = props;
+  const {
+    part,
+    qnum,
+    pnum,
+    BodyRenderer,
+  } = props;
   const {
     name, reference, description, points, body,
   } = part;
@@ -37,7 +43,7 @@ const Part: React.FC<PartProps> = (props) => {
             <tr key={i}>
               <td className="row w-100 no-gutters">
                 <Col>
-                  <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
+                  <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
                 </Col>
               </td>
             </tr>

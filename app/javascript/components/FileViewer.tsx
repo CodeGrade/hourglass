@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -6,7 +6,7 @@ import { Row, Col } from 'react-bootstrap';
 import {
   CodeTagState, FileRef, ExamFile,
 } from '@hourglass/types';
-import { useExamContext } from '@hourglass/context';
+import { ExamContext } from '@hourglass/context';
 import { firstFile, getFilesForRefs } from '@hourglass/files';
 import { Editor } from './ExamCodeBox';
 
@@ -54,7 +54,7 @@ const FileContents: React.FC<FileContentsProps> = (props) => {
     refreshProps: rp,
   } = props;
   const refreshProps = rp ?? [];
-  const { fmap } = useExamContext();
+  const { fmap } = useContext(ExamContext);
   const f = fmap[selectedFile];
   let cursor: CodeMirror.Position;
   if (selectedLine) {
@@ -108,7 +108,7 @@ interface FileTreeProps {
 
 const FileTree: React.FC<FileTreeProps> = (props) => {
   const { files, onChangeFile, selectedFile } = props;
-  const { fmap } = useExamContext();
+  const { fmap } = useContext(ExamContext);
   const allIds = Object.keys(fmap);
   return (
     <TreeView
@@ -132,7 +132,7 @@ interface FileViewerProps {
 
 export const FileViewer: React.FC<FileViewerProps> = (props) => {
   const { references } = props;
-  const { fmap } = useExamContext();
+  const { fmap } = useContext(ExamContext);
   const filteredFiles = getFilesForRefs(fmap, references);
   const first = firstFile(filteredFiles);
   const firstID = first?.relPath;
@@ -168,7 +168,7 @@ export const ControlledFileViewer: React.FC<ControlledFileViewerProps> = (props)
   const {
     references, selection, onChangeFile, onChangeLine, refreshProps,
   } = props;
-  const { fmap } = useExamContext();
+  const { fmap } = useContext(ExamContext);
   const filteredFiles = getFilesForRefs(fmap, references);
   return (
     <Row>

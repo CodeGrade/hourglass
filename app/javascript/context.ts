@@ -1,29 +1,27 @@
-import { createContext, useContext } from 'react';
+import { createContext } from 'react';
 import {
   FileMap,
   ExamFile,
   RailsExam,
   RailsRegistration,
   RailsUser,
+  AnswersState,
 } from '@hourglass/types';
 
 interface ExamContext {
   files: ExamFile[];
   fmap: FileMap;
 }
+export const ExamContext = createContext<ExamContext>({} as ExamContext);
 
-const EC = createContext<ExamContext>({} as ExamContext);
-
-export const ExamContextProvider = EC.Provider;
-export const useExamContext = (): ExamContext => useContext(EC);
-
-interface ExamInfoContext {
-  railsExam: RailsExam;
-  railsRegistration: RailsRegistration;
-  railsUser: RailsUser;
+interface RailsContext {
+  railsExam?: RailsExam;
+  railsRegistration?: RailsRegistration;
+  railsUser?: RailsUser;
 }
+export const RailsContext = createContext<RailsContext>({} as RailsContext);
 
-const EIC = createContext<ExamInfoContext>({} as ExamInfoContext);
-
-export const ExamInfoContextProvider = EIC.Provider;
-export const useExamInfoContext = (): ExamInfoContext => useContext(EIC);
+interface ExamViewerContext {
+  answers: AnswersState;
+}
+export const ExamViewerContext = createContext({} as ExamViewerContext);

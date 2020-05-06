@@ -19,7 +19,12 @@
         name: @exam.name
       },
       contents: {
-        exam: @exam.info[:contents],
+        exam: {
+          questions: @exam.info[:contents][:questions],
+          reference: @exam.info[:contents][:reference],
+          instructions: @exam.info[:contents][:instructions],
+          files: @exam.get_exam_files
+        },
         answers: @registration.get_current_answers
       }
     }) %>

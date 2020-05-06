@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { QuestionInfo } from '@hourglass/types';
 import ShowQuestion from '@hourglass/components/ShowQuestion';
 import Pagination from '@hourglass/components/Pagination';
 import SubmitButton from '@hourglass/containers/SubmitButton';
-import { useExamInfoContext } from '@hourglass/context';
+import { RailsContext } from '@hourglass/context';
+import Body from '@hourglass/components/Body';
 
 interface QuestionsProps {
   questions: QuestionInfo[];
@@ -17,7 +18,7 @@ const Questions: React.FC<QuestionsProps> = (props) => {
     paginated,
     selectedQuestion,
   } = props;
-  const { railsExam } = useExamInfoContext();
+  const { railsExam } = useContext(RailsContext);
   const { id } = railsExam;
   return (
     <Pagination
@@ -33,6 +34,7 @@ const Questions: React.FC<QuestionsProps> = (props) => {
           key={i}
           question={q}
           qnum={i}
+          BodyRenderer={Body}
         />
       ))}
     </Pagination>

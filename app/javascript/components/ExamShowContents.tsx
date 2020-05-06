@@ -3,7 +3,7 @@ import {
   Exam,
 } from '@hourglass/types';
 import { createMap } from '@hourglass/files';
-import { ExamContextProvider } from '@hourglass/context';
+import { ExamContext } from '@hourglass/context';
 import Questions from '@hourglass/containers/Questions';
 import useAnomalyListeners from '@hourglass/lockdown/anomaly';
 import HTML from '@hourglass/components/HTML';
@@ -36,15 +36,17 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   } = exam;
   const fmap = createMap(files);
   return (
-    <ExamContextProvider value={{ files, fmap }}>
+    <ExamContext.Provider value={{ files, fmap }}>
       <div>
         <HTML value={instructions} />
         {reference && <FileViewer references={reference} />}
         <div>
-          <Questions questions={questions} />
+          <Questions
+            questions={questions}
+          />
         </div>
       </div>
-    </ExamContextProvider>
+    </ExamContext.Provider>
   );
 };
 

@@ -13,7 +13,7 @@ import {
 } from '@hourglass/types';
 import ExamTaker from '@hourglass/containers/ExamTaker';
 import ExamSubmitted from '@hourglass/components/ExamSubmitted';
-import { ExamInfoContextProvider } from '@hourglass/context';
+import { RailsContext } from '@hourglass/context';
 
 interface ShowExamProps {
   // The current logged-in user.
@@ -38,7 +38,7 @@ const ShowExam: React.FC<ShowExamProps> = (props) => {
   } = props;
   return (
     <Container>
-      <ExamInfoContextProvider value={{
+      <RailsContext.Provider value={{
         railsExam, railsRegistration, railsUser,
       }}
       >
@@ -50,7 +50,7 @@ const ShowExam: React.FC<ShowExamProps> = (props) => {
             </Col>
           </Row>
         </Provider>
-      </ExamInfoContextProvider>
+      </RailsContext.Provider>
     </Container>
   );
 };

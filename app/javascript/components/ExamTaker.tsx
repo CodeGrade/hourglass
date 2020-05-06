@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   ExamNavbar,
   RegularNavbar,
 } from '@hourglass/components/navbar';
-import { useExamInfoContext } from '@hourglass/context';
+import { RailsContext } from '@hourglass/context';
 import ExamShowContents from '@hourglass/containers/ExamShowContents';
 import PreStart from '@hourglass/containers/PreStart';
 
@@ -18,7 +18,7 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
   const {
     railsExam,
     railsUser,
-  } = useExamInfoContext();
+  } = useContext(RailsContext);
   const body = ready ? (
     <>
       <ExamNavbar />

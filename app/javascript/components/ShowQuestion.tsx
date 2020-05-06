@@ -1,18 +1,21 @@
 import React from 'react';
 import { QuestionInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
+import { BodyProps } from '@hourglass/components/Body';
 import Part from './Part';
 import { FileViewer } from './FileViewer';
 
 interface ShowQuestionProps {
   question: QuestionInfo;
   qnum: number;
+  BodyRenderer: React.ComponentType<BodyProps>;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const {
     question,
     qnum,
+    BodyRenderer,
   } = props;
   const {
     name,
@@ -34,6 +37,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           // Part numbers are STATIC.
           // eslint-disable-next-line react/no-array-index-key
           key={i}
+          BodyRenderer={BodyRenderer}
         />
       ))}
     </div>

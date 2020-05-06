@@ -1,14 +1,14 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { CodeInfo, CodeState } from '@hourglass/types';
-import { useExamContext } from '@hourglass/context';
+import { ExamContext } from '@hourglass/context';
 import HTML from '@hourglass/components/HTML';
 import { Editor } from '../ExamCodeBox';
 
 interface CodeProps {
   info: CodeInfo;
   value: CodeState;
-  onChange: (newVal: CodeState) => void;
+  onChange?: (newVal: CodeState) => void;
   disabled: boolean;
 }
 
@@ -20,7 +20,7 @@ const Code: React.FC<CodeProps> = (props) => {
     disabled,
   } = props;
   const { prompt, lang, initial } = info;
-  const { fmap } = useExamContext();
+  const { fmap } = useContext(ExamContext);
   const f = fmap[initial];
   if (f?.filedir === 'dir') {
     throw new Error('Code initial cannot be a directory.');
@@ -51,10 +51,12 @@ const Code: React.FC<CodeProps> = (props) => {
             valueUpdate={[disabled]}
             language={lang}
             onChange={(newText, newMarks): void => {
-              onChange({
-                text: newText,
-                marks: newMarks,
-              });
+              if (onChange) {
+                onChange({
+                  text: newText,
+                  marks: newMarks,
+                });
+              }
             }}
           />
         </Col>

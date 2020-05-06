@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Routes from '@hourglass/routes';
 import { getCSRFToken } from '@hourglass/helpers';
-import { useExamInfoContext } from '@hourglass/context';
+import { RailsContext } from '@hourglass/context';
 import { AnomalyDetected } from '@hourglass/types';
 import { installListeners, removeListeners } from './listeners';
 
@@ -44,7 +44,7 @@ export default function useAnomalyListeners(): void {
   const {
     railsExam,
     railsRegistration,
-  } = useExamInfoContext();
+  } = useContext(RailsContext);
   const [lst, setLst] = useState([]);
   const anomalyDetected: AnomalyDetected = anom(railsExam.id, railsRegistration.id);
   useEffect(() => {

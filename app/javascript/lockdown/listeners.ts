@@ -1,4 +1,4 @@
-import { AnomalyDetected, AnomalyListener } from '@hourglass/types';
+import { Policy, AnomalyDetected, AnomalyListener } from '@hourglass/types';
 import { isFullscreen } from './helpers';
 
 const listeners: {
@@ -37,7 +37,9 @@ const listeners: {
   },
 ];
 
-export function installListeners(detected: AnomalyDetected): AnomalyListener[] {
+export function installListeners(policies: Policy[], detected: AnomalyDetected): AnomalyListener[] {
+  if (policies.find((p) => p === 'ignore-lockdown')) return [];
+
   const handlers = listeners.map(({ event, handler }) => {
     const f = handler(detected);
     window.addEventListener(event, f);

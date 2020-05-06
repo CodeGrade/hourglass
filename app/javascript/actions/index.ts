@@ -102,7 +102,7 @@ export function doTryLockdown(
   exam: RailsExam,
 ): Thunk {
   return (dispatch): void => {
-    lock().then(() => {
+    lock(exam.policies).then(() => {
       dispatch(lockedDown());
       dispatch(doLoad(exam.id));
     }).catch((err) => {

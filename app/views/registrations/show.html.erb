@@ -16,7 +16,8 @@
     <%= react_component('ExamViewer', {
       railsExam: {
         id: @exam.id,
-        name: @exam.name
+        name: @exam.name,
+        policies: @exam.policies
       },
       contents: {
         exam: {

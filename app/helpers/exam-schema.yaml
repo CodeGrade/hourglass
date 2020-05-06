@@ -9,7 +9,8 @@ Exam:
       value: Versions
       minSize: 1
 Policies:
-  array: String
+  array: Policy
+Policy: [String, "ignore-lockdown|tolerate-windowed"]
 Versions:
   array: Version
 Version:

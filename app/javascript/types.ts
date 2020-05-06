@@ -7,6 +7,8 @@ export interface RailsExam {
 
   // The name of the exam.
   name: string;
+
+  policies: Policy[];
 }
 
 export interface RailsRegistration {
@@ -357,3 +359,5 @@ export interface AnomalyListener {
   event: string;
   handler: (e: Event) => void;
 }
+
+export type Policy = 'ignore-lockdown' | 'tolerate-windowed';

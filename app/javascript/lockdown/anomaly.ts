@@ -45,10 +45,13 @@ export default function useAnomalyListeners(): void {
     railsExam,
     railsRegistration,
   } = useContext(RailsContext);
+  const {
+    policies,
+  } = railsExam;
   const [lst, setLst] = useState([]);
   const anomalyDetected: AnomalyDetected = anom(railsExam.id, railsRegistration.id);
   useEffect(() => {
-    setLst(installListeners(anomalyDetected));
+    setLst(installListeners(policies, anomalyDetected));
     return (): void => {
       removeListeners(lst);
       setLst([]);

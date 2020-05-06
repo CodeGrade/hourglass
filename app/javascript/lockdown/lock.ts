@@ -1,10 +1,12 @@
+import { Policy } from '@hourglass/types';
 import { isCovered, isFullscreen, openFullscreen } from './helpers';
 
 /**
  * Lock down the client browser.
  * @throws Error if lockdown fails
  */
-export default async function lock(): Promise<void> {
+export default async function lock(policies: Policy[]): Promise<void> {
+  if (policies.find((p) => p === 'ignore-lockdown')) return;
   // TODO take param for security settings to apply
   // - ignore-lockdown
   // - tolerate-windowed
@@ -18,6 +20,8 @@ export default async function lock(): Promise<void> {
   if (!isChrome && !isFirefox) {
     throw new Error('Please use Chrome, Chromium, or Firefox to continue.');
   }
+
+  if (policies.find((p) => p === 'tolerate-windowed')) return;
 
   if (!isFullscreen()) {
     try {

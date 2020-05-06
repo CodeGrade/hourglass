@@ -42,11 +42,11 @@ const anom = (examID: number, registrationID: number) => (reason: string): void 
  */
 export default function useAnomalyListeners(): void {
   const {
-    exam,
-    registration,
+    railsExam,
+    railsRegistration,
   } = useExamInfoContext();
   const [lst, setLst] = useState([]);
-  const anomalyDetected: AnomalyDetected = anom(exam.id, registration.id);
+  const anomalyDetected: AnomalyDetected = anom(railsExam.id, railsRegistration.id);
   useEffect(() => {
     setLst(installListeners(anomalyDetected));
     return (): void => {

@@ -10,14 +10,14 @@ import {
 import { doTryLockdown } from '@hourglass/actions';
 
 interface OwnProps {
-  exam: RailsExam;
+  railsExam: RailsExam;
 }
 
 const mapDispatchToProps: MDTP<{
   onClick: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   onClick: (): void => {
-    dispatch(doTryLockdown(ownProps.exam));
+    dispatch(doTryLockdown(ownProps.railsExam));
   },
 });
 

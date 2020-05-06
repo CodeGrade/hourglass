@@ -9,7 +9,7 @@ import store from '@hourglass/store';
 import {
   RailsExam,
   RailsUser,
-  RegistrationInfo,
+  RailsRegistration,
 } from '@hourglass/types';
 import ExamTaker from '@hourglass/containers/ExamTaker';
 import ExamSubmitted from '@hourglass/components/ExamSubmitted';
@@ -17,13 +17,13 @@ import { ExamInfoContextProvider } from '@hourglass/context';
 
 interface ShowExamProps {
   // The current logged-in user.
-  user: RailsUser;
+  railsUser: RailsUser;
 
   // Information about the exam.
-  exam: RailsExam;
+  railsExam: RailsExam;
 
   // Information about the registration.
-  registration: RegistrationInfo;
+  railsRegistration: RailsRegistration;
 
   // Whether the exam is complete.
   final: boolean;
@@ -31,21 +31,21 @@ interface ShowExamProps {
 
 const ShowExam: React.FC<ShowExamProps> = (props) => {
   const {
-    exam,
-    user,
+    railsExam,
+    railsUser,
     final,
-    registration,
+    railsRegistration,
   } = props;
   return (
     <Container>
       <ExamInfoContextProvider value={{
-        exam, registration, user,
+        railsExam, railsRegistration, railsUser,
       }}
       >
         <Provider store={store}>
           <Row>
             <Col>
-              <h1>{exam.name}</h1>
+              <h1>{railsExam.name}</h1>
               {final ? <ExamSubmitted /> : <ExamTaker />}
             </Col>
           </Row>

@@ -9,7 +9,7 @@ export interface RailsExam {
   name: string;
 }
 
-export interface RegistrationInfo {
+export interface RailsRegistration {
   id: number;
 }
 

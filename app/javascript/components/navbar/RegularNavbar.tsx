@@ -10,12 +10,12 @@ import { RailsUser } from '@hourglass/types';
 import LockdownInfo from '@hourglass/containers/LockdownInfo';
 
 interface RegularNavbarProps {
-  user?: RailsUser;
+  railsUser?: RailsUser;
 }
 
 const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
   const {
-    user,
+    railsUser,
   } = props;
   return (
     <Navbar
@@ -33,12 +33,12 @@ const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
       </span>
       <Navbar.Toggle />
       <Navbar.Collapse className="justify-content-end">
-        {user && (
+        {railsUser && (
           <>
             <Navbar.Text
               className="mr-2"
             >
-              {user.username}
+              {railsUser.username}
             </Navbar.Text>
             <Form inline>
               <Button

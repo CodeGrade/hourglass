@@ -10,7 +10,7 @@ import HTML from '@hourglass/components/HTML';
 import { FileViewer } from './FileViewer';
 
 interface ExamShowContentsProps {
-  examState: Exam;
+  exam: Exam;
   save: () => void;
 }
 
@@ -18,13 +18,13 @@ const INTERVAL = 10000;
 
 const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const {
-    examState,
+    exam,
     save,
   } = props;
   const {
     contents,
     files,
-  } = examState;
+  } = exam;
   useEffect(() => {
     const timer: number = window.setInterval(() => save(), INTERVAL);
     return (): void => {

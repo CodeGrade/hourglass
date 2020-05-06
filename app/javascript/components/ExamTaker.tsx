@@ -16,23 +16,23 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
     ready,
   } = props;
   const {
-    exam,
-    user,
+    railsExam,
+    railsUser,
   } = useExamInfoContext();
   const body = ready ? (
     <>
       <ExamNavbar />
       <ExamShowContents
-        exam={exam}
+        railsExam={railsExam}
       />
     </>
   ) : (
     <>
       <RegularNavbar
-        user={user}
+        railsUser={railsUser}
       />
       <PreStart
-        exam={exam}
+        railsExam={railsExam}
       />
     </>
   );

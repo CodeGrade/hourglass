@@ -3,7 +3,7 @@ import {
   FileMap,
   ExamFile,
   RailsExam,
-  RegistrationInfo,
+  RailsRegistration,
   RailsUser,
 } from '@hourglass/types';
 
@@ -18,9 +18,9 @@ export const ExamContextProvider = EC.Provider;
 export const useExamContext = (): ExamContext => useContext(EC);
 
 interface ExamInfoContext {
-  exam: RailsExam;
-  registration: RegistrationInfo;
-  user: RailsUser;
+  railsExam: RailsExam;
+  railsRegistration: RailsRegistration;
+  railsUser: RailsUser;
 }
 
 const EIC = createContext<ExamInfoContext>({} as ExamInfoContext);

@@ -9,18 +9,18 @@ import {
 } from '@hourglass/types';
 
 interface OwnProps {
-  exam: RailsExam;
+  railsExam: RailsExam;
 }
 
-const mapStateToProps: MSTP<{examState: Exam}, OwnProps> = (state) => ({
-  examState: state.contents.data.exam,
+const mapStateToProps: MSTP<{exam: Exam}, OwnProps> = (state) => ({
+  exam: state.contents.data.exam,
 });
 
 const mapDispatchToProps: MDTP<{
   save: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   save: (): void => {
-    dispatch(saveSnapshot(ownProps.exam.id));
+    dispatch(saveSnapshot(ownProps.railsExam.id));
   },
 });
 

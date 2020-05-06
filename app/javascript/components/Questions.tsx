@@ -17,8 +17,8 @@ const Questions: React.FC<QuestionsProps> = (props) => {
     paginated,
     selectedQuestion,
   } = props;
-  const { exam } = useExamInfoContext();
-  const { id } = exam;
+  const { railsExam } = useExamInfoContext();
+  const { id } = railsExam;
   return (
     <Pagination
       current={selectedQuestion}

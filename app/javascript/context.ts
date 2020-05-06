@@ -2,9 +2,9 @@ import { createContext, useContext } from 'react';
 import {
   FileMap,
   ExamFile,
-  ExamInfo,
+  RailsExam,
   RegistrationInfo,
-  User,
+  RailsUser,
 } from '@hourglass/types';
 
 interface ExamContext {
@@ -18,9 +18,9 @@ export const ExamContextProvider = EC.Provider;
 export const useExamContext = (): ExamContext => useContext(EC);
 
 interface ExamInfoContext {
-  exam: ExamInfo;
+  exam: RailsExam;
   registration: RegistrationInfo;
-  user: User;
+  user: RailsUser;
 }
 
 const EIC = createContext<ExamInfoContext>({} as ExamInfoContext);

@@ -1,7 +1,7 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
 
-export interface ExamInfo {
+export interface RailsExam {
   // The exam ID.
   id: number;
 
@@ -35,7 +35,7 @@ export interface ContentsData {
   type: 'CONTENTS';
 
   // Exam information.
-  exam: ExamState;
+  exam: Exam;
 
   // The student's current answers.
   answers: AnswersState;
@@ -140,7 +140,7 @@ export interface ExamTakerState {
   snapshot: SnapshotState;
 }
 
-export interface User {
+export interface RailsUser {
   username: string;
 }
 
@@ -275,15 +275,15 @@ export interface QuestionInfo {
   reference?: FileRef[];
 }
 
-export interface ExamState {
+export interface Exam {
   // File tree.
   files: ExamFile[];
 
   // Questions and their references.
-  info: Exam;
+  contents: ExamContents;
 }
 
-export interface Exam {
+export interface ExamContents {
   questions: QuestionInfo[];
   reference?: FileRef[];
   instructions: string;

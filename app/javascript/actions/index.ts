@@ -13,7 +13,7 @@ import {
   StartExamResponse,
   ContentsData,
   LoadExamAction,
-  ExamInfo,
+  RailsExam,
   LockdownFailedAction,
   Thunk,
 } from '@hourglass/types';
@@ -99,7 +99,7 @@ export function doLoad(examID: number): Thunk {
 }
 
 export function doTryLockdown(
-  exam: ExamInfo,
+  exam: RailsExam,
 ): Thunk {
   return (dispatch): void => {
     lock().then(() => {

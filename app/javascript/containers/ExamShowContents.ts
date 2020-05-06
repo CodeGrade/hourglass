@@ -2,17 +2,17 @@ import ExamShowContents from '@hourglass/components/ExamShowContents';
 import { connect } from 'react-redux';
 import { saveSnapshot } from '@hourglass/actions';
 import {
-  ExamState,
+  Exam,
   MSTP,
   MDTP,
-  ExamInfo,
+  RailsExam,
 } from '@hourglass/types';
 
 interface OwnProps {
-  exam: ExamInfo;
+  exam: RailsExam;
 }
 
-const mapStateToProps: MSTP<{examState: ExamState}, OwnProps> = (state) => ({
+const mapStateToProps: MSTP<{examState: Exam}, OwnProps> = (state) => ({
   examState: state.contents.data.exam,
 });
 

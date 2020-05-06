@@ -6,11 +6,11 @@ import {
 } from 'react-bootstrap';
 import { logOut } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
-import { User } from '@hourglass/types';
+import { RailsUser } from '@hourglass/types';
 import LockdownInfo from '@hourglass/containers/LockdownInfo';
 
 interface RegularNavbarProps {
-  user?: User;
+  user?: RailsUser;
 }
 
 const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {

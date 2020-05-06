@@ -1,11 +1,11 @@
 import React from 'react';
-import { ExamInfo, Exam, AnswersState } from '@hourglass/types';
+import { RailsExam, ExamContents, AnswersState } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 
 interface ExamViewerProps {
-  info: ExamInfo;
+  info: RailsExam;
   contents: {
-    exam: Exam;
+    exam: ExamContents;
     answers: AnswersState;
   };
 }

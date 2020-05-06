@@ -4,13 +4,13 @@ import {
   LockdownStatus,
   ExamTakerState,
   MDTP,
-  ExamInfo,
+  RailsExam,
   MSTP,
 } from '@hourglass/types';
 import { doTryLockdown } from '@hourglass/actions';
 
 interface OwnProps {
-  exam: ExamInfo;
+  exam: RailsExam;
 }
 
 const mapDispatchToProps: MDTP<{

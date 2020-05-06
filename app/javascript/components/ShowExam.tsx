@@ -7,8 +7,8 @@ import {
 import { Provider } from 'react-redux';
 import store from '@hourglass/store';
 import {
-  ExamInfo,
-  User,
+  RailsExam,
+  RailsUser,
   RegistrationInfo,
 } from '@hourglass/types';
 import ExamTaker from '@hourglass/containers/ExamTaker';
@@ -17,10 +17,10 @@ import { ExamInfoContextProvider } from '@hourglass/context';
 
 interface ShowExamProps {
   // The current logged-in user.
-  user: User;
+  user: RailsUser;
 
   // Information about the exam.
-  exam: ExamInfo;
+  exam: RailsExam;
 
   // Information about the registration.
   registration: RegistrationInfo;

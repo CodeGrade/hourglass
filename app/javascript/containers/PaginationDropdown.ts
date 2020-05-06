@@ -13,7 +13,7 @@ const mapStateToProps: MSTP<{
   questions: QuestionInfo[];
 }> = (state) => ({
   pagination: state.contents.pagination,
-  questions: state.contents.data.exam.info.questions,
+  questions: state.contents.data.exam.contents.questions,
 });
 
 const mapDispatchToProps: MDTP<{

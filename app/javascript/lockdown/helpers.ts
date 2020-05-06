@@ -12,6 +12,6 @@ export function isFullscreen(): boolean {
 }
 
 export async function openFullscreen(): Promise<void> {
-  document.documentElement.requestFullscreen();
+  await document.documentElement.requestFullscreen();
   return sleep(200);
 }

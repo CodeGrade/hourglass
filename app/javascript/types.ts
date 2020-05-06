@@ -35,7 +35,7 @@ export interface ContentsData {
   type: 'CONTENTS';
 
   // Exam information.
-  exam: Exam;
+  exam: DeleteMe;
 
   // The student's current answers.
   answers: AnswersState;
@@ -275,15 +275,15 @@ export interface QuestionInfo {
   reference?: FileRef[];
 }
 
-export interface Exam {
+export interface DeleteMe {
   // File tree.
   files: ExamFile[];
 
   // Questions and their references.
-  contents: ExamContents;
+  contents: Exam;
 }
 
-export interface ExamContents {
+export interface Exam {
   questions: QuestionInfo[];
   reference?: FileRef[];
   instructions: string;

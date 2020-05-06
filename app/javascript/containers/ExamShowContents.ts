@@ -2,7 +2,7 @@ import ExamShowContents from '@hourglass/components/ExamShowContents';
 import { connect } from 'react-redux';
 import { saveSnapshot } from '@hourglass/actions';
 import {
-  Exam,
+  DeleteMe,
   MSTP,
   MDTP,
   RailsExam,
@@ -12,7 +12,7 @@ interface OwnProps {
   railsExam: RailsExam;
 }
 
-const mapStateToProps: MSTP<{exam: Exam}, OwnProps> = (state) => ({
+const mapStateToProps: MSTP<{exam: DeleteMe}, OwnProps> = (state) => ({
   exam: state.contents.data.exam,
 });
 

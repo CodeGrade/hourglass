@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import {
-  Exam,
+  DeleteMe,
 } from '@hourglass/types';
 import { createMap } from '@hourglass/files';
 import { ExamContextProvider } from '@hourglass/context';
@@ -10,7 +10,7 @@ import HTML from '@hourglass/components/HTML';
 import { FileViewer } from './FileViewer';
 
 interface ExamShowContentsProps {
-  exam: Exam;
+  exam: DeleteMe;
   save: () => void;
 }
 

@@ -36,132 +36,168 @@ class Exam < ApplicationRecord
     @properties = YAML.load(File.read(exam_yaml))
   end
 
+  def map_reference(r)
+    {
+      type: r.keys.first,
+      path: r.values.first
+    }
+  end
   def info()
-    ret = properties['versions'][0].deep_dup
-    answers = {}
-    ret['reference']&.each_with_index do |r, i|
-      path = r.values.first
-      ret['reference'][i] = {
-        'type' => r.keys.first,
-        'path' => path
-      }
-    end
-    ret['questions'].each_with_index do |q, qnum|
-      answers[qnum] = {}
-      q['reference']&.each_with_index do |r, i|
-        q['reference'][i] = {
-          'type' => r.keys.first,
-          'path' => r.values.first
-        }
-      end
-      q['parts'].each_with_index do |p, pnum|
-        answers[qnum][pnum] = {}
-        p['reference']&.each_with_index do |r, i|
-          p['reference'][i] = {
-            'type' => r.keys.first,
-            'path' => r.values.first
-          }
-        end
-        p['body'].each_with_index do |b, bnum|
+    exam_info = properties['versions'][0]
+
+    answers = exam_info['questions'].map do |q|
+      q['parts'].map do |p|
+        p['body'].map do |b|
           if b.is_a? String
-            p['body'][bnum] = {
-              'type' => 'HTML',
-              'value' => b
-            }
+            nil
           elsif b.is_a? Hash
             if b.key? 'AllThatApply'
-              p['body'][bnum] = {
-                'type' => 'AllThatApply',
-                'prompt' => b['AllThatApply']['prompt']
-              }
-              answers[qnum][pnum][bnum] = b['AllThatApply']['options'].map(&:values).flatten
-              p['body'][bnum]['options'] = b['AllThatApply']['options'].map(&:keys).flatten
+              b['AllThatApply']['options'].map(&:values).flatten
             elsif b.key? 'Code'
-              p['body'][bnum] = {
-                'type' => 'Code',
-                'prompt' => b['Code']['prompt'],
-                'lang' => b['Code']['lang'],
-                'initial' => b['Code']['initial'],
-              }
+              nil
             elsif b.key? 'CodeTag'
-              referent =
-                if b['CodeTag']['choices'] == 'part'
-                  throw 'No reference for part.' if p['reference'].nil?
-                  p
-                elsif b['CodeTag']['choices'] == 'question'
-                  throw 'No reference for question.' if q['reference'].nil?
-                  q
-                elsif b['CodeTag']['choices'] == 'all'
-                  throw 'No reference for exam.' if ret['reference'].nil?
-                  ret
-                else
-                  throw "CodeTag reference is invalid."
-                end
-              p['body'][bnum] = {
-                'type' => 'CodeTag',
-                'choices' => referent['reference'],
-                'prompt' => b['CodeTag']['prompt'],
-              }
-              answers[qnum][pnum][bnum] = b['CodeTag']['correctAnswer']
+              b['CodeTag']['correctAnswer']
             elsif b.key? 'Matching'
-              p['body'][bnum] = {
-                'type' => 'Matching',
-                'prompts' => b['Matching']['prompts'],
-                'values' => b['Matching']['values']
-              }
-              answers[qnum][pnum][bnum] = b['Matching']['correctAnswers']
+              b['Matching']['correctAnswers']
             elsif b.key? 'MultipleChoice'
-              p['body'][bnum] = {
-                'type' => 'MultipleChoice',
-                'prompt' => b['MultipleChoice']['prompt'],
-                'options' => b['MultipleChoice']['options']
-              }
-              answers[qnum][pnum][bnum] = b['MultipleChoice']['correctAnswer']
+              b['MultipleChoice']['correctAnswer']
             elsif b.key? 'Text'
-              if b['Text'].nil?
-                p['body'][bnum] = {
-                  'type' => 'Text',
-                  'prompt' => []
-                }
-              else
-                p['body'][bnum] = {
-                  'type' => 'Text',
-                  'prompt' => b['Text']['prompt']
-                }
-              end
+              nil
             elsif b.key? 'TrueFalse'
-              p['body'][bnum] = {
-                'type' => 'TrueFalse'
-              }
-              if b['TrueFalse'] == !!b['TrueFalse']
-                p['body'][bnum]['prompt'] = []
-                answers[qnum][pnum][bnum] = b['TrueFalse']
+              if b['TrueFalse'] == !! b['YesNo']
+                b['TrueFalse']
               else
-                p['body'][bnum]['prompt'] = b['TrueFalse']['prompt']
-                answers[qnum][pnum][bnum] = b['TrueFalse']['correctAnswer']
+                b['TrueFalse']['correctAnswer']
               end
             elsif b.key? 'YesNo'
-              p['body'][bnum] = {
-                'type' => 'YesNo'
-              }
-              if b['YesNo'] == !!b['YesNo']
-                p['body'][bnum]['prompt'] = []
-                answers[qnum][pnum][bnum] = b['YesNo']
+              if b['YesNo'] == !! b['YesNo']
+                b['YesNo']
               else
-                p['body'][bnum]['prompt'] = b['YesNo']['prompt']
-                answers[qnum][pnum][bnum] = b['YesNo']['correctAnswer']
+                b['YesNo']['correctAnswer']
               end
             else
-              throw 'Bad question type.'
+              throw 'Bad body item'
             end
-          else
-            throw 'Bad body item.'
           end
         end
       end
     end
+
+    e_reference = exam_info['reference']&.map{|r| map_reference r}
+    questions = exam_info['questions'].map do |q|
+      q_reference = q['reference']&.map{|r| map_reference r}
+      {
+        name: q['name'],
+        separateSubparts: q['separateSubparts'],
+        description: q['description'],                
+        reference: q_reference,
+        parts: q['parts'].map do |p|
+          p_reference = p['reference']&.map{|r| map_reference r}
+          {
+            name: p['name'],
+            description: p['description'],
+            points: p['points'],
+            reference: p_reference,
+            body: p['body'].map do |b|
+              if b.is_a? String
+                {
+                  type: 'HTML',
+                  value: b
+                }
+              elsif b.is_a? Hash
+                if b.key? 'AllThatApply'
+                  {
+                    type: 'AllThatApply',
+                    prompt: b['AllThatApply']['prompt'],
+                    options: b['AllThatApply']['options'].map(&:keys).flatten
+                  }
+                elsif b.key? 'Code'
+                  {
+                    type: 'Code',
+                    prompt: b['Code']['prompt'],
+                    lang: b['Code']['lang'],
+                    initial: b['Code']['initial'],
+                  }
+                elsif b.key? 'CodeTag'
+                  referent =
+                    if b['CodeTag']['choices'] == 'part'
+                      throw 'No reference for part.' if p_reference.nil?
+                      p_reference
+                    elsif b['CodeTag']['choices'] == 'question'
+                      throw 'No reference for question.' if q_reference.nil?
+                      q_reference
+                    elsif b['CodeTag']['choices'] == 'all'
+                      throw 'No reference for exam.' if e_reference.nil?
+                      e_reference
+                    else
+                      throw "CodeTag reference is invalid."
+                    end
+                  {
+                    type: 'CodeTag',
+                    choices: referent,
+                    prompt: b['CodeTag']['prompt'],
+                  }
+                elsif b.key? 'Matching'
+                  {
+                    type: 'Matching',
+                    prompts: b['Matching']['prompts'],
+                    values: b['Matching']['values']
+                  }
+                elsif b.key? 'MultipleChoice'
+                  {
+                    type: 'MultipleChoice',
+                    prompt: b['MultipleChoice']['prompt'],
+                    options: b['MultipleChoice']['options']
+                  }
+                elsif b.key? 'Text'
+                  if b['Text'].nil?
+                    {
+                      type: 'Text',
+                      prompt: []
+                    }
+                  else
+                    {
+                      type: 'Text',
+                      prompt: b['Text']['prompt']
+                    }
+                  end
+                elsif b.key? 'TrueFalse'
+                  {
+                    type: 'TrueFalse',
+                    prompt:
+                      if b['TrueFalse'] == !!b['TrueFalse']
+                        []
+                      else
+                        b['TrueFalse']['prompt']
+                      end
+                  }
+                elsif b.key? 'YesNo'
+                  {
+                    type: 'YesNo',
+                    prompt:
+                      if b['YesNo'] == !!b['YesNo']
+                        []
+                      else
+                        b['YesNo']['prompt']
+                      end
+                  }
+                else
+                  throw 'Bad question type.'
+                end
+              else
+                throw 'Bad body item.'
+              end
+            end
+          }
+        end
+      }
+    end
     {
-      contents: ret,
+      contents: {
+        questions: questions,
+        reference: e_reference,
+        instructions: exam_info['instructions']
+      },
       answers: answers
     }
   end

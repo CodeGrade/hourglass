@@ -36,9 +36,9 @@ class Exam < ApplicationRecord
     @properties = YAML.load(File.read(exam_yaml))
   end
 
-  def info(include_answers = true)
+  def info()
     ret = properties['versions'][0].deep_dup
-    answer_count = 0
+    answers = {}
     ret['reference']&.each_with_index do |r, i|
       path = r.values.first
       ret['reference'][i] = {
@@ -46,14 +46,16 @@ class Exam < ApplicationRecord
         'path' => path
       }
     end
-    ret['questions'].each do |q|
+    ret['questions'].each_with_index do |q, qnum|
+      answers[qnum] = {}
       q['reference']&.each_with_index do |r, i|
         q['reference'][i] = {
           'type' => r.keys.first,
           'path' => r.values.first
         }
       end
-      q['parts'].each do |p|
+      q['parts'].each_with_index do |p, pnum|
+        answers[qnum][pnum] = {}
         p['reference']&.each_with_index do |r, i|
           p['reference'][i] = {
             'type' => r.keys.first,
@@ -72,11 +74,8 @@ class Exam < ApplicationRecord
                 'type' => 'AllThatApply',
                 'prompt' => b['AllThatApply']['prompt']
               }
-              if include_answers
-                p['body'][bnum]['options'] = b['AllThatApply']['options']
-              else
-                p['body'][bnum]['options'] = b['AllThatApply']['options'].map(&:keys).flatten
-              end
+              answers[qnum][pnum][bnum] = b['AllThatApply']['options'].map(&:values).flatten
+              p['body'][bnum]['options'] = b['AllThatApply']['options'].map(&:keys).flatten
             elsif b.key? 'Code'
               p['body'][bnum] = {
                 'type' => 'Code',
@@ -103,21 +102,21 @@ class Exam < ApplicationRecord
                 'choices' => referent['reference'],
                 'prompt' => b['CodeTag']['prompt'],
               }
-              p['body'][bnum]['correctAnswer'] = b['CodeTag']['correctAnswer'] if include_answers
+              answers[qnum][pnum][bnum] = b['CodeTag']['correctAnswer']
             elsif b.key? 'Matching'
               p['body'][bnum] = {
                 'type' => 'Matching',
                 'prompts' => b['Matching']['prompts'],
                 'values' => b['Matching']['values']
               }
-              p['body'][bnum]['correctAnswers'] = b['Matching']['correctAnswers'] if include_answers
+              answers[qnum][pnum][bnum] = b['Matching']['correctAnswers']
             elsif b.key? 'MultipleChoice'
               p['body'][bnum] = {
                 'type' => 'MultipleChoice',
                 'prompt' => b['MultipleChoice']['prompt'],
                 'options' => b['MultipleChoice']['options']
               }
-              p['body'][bnum]['correctAnswer'] = b['MultipleChoice']['correctAnswer'] if include_answers
+              answers[qnum][pnum][bnum] = b['MultipleChoice']['correctAnswer']
             elsif b.key? 'Text'
               if b['Text'].nil?
                 p['body'][bnum] = {
@@ -136,10 +135,10 @@ class Exam < ApplicationRecord
               }
               if b['TrueFalse'] == !!b['TrueFalse']
                 p['body'][bnum]['prompt'] = []
-                p['body'][bnum]['correctAnswer'] = b['TrueFalse'] if include_answers
+                answers[qnum][pnum][bnum] = b['TrueFalse']
               else
                 p['body'][bnum]['prompt'] = b['TrueFalse']['prompt']
-                p['body'][bnum]['correctAnswer'] = b['TrueFalse']['correctAnswer'] if include_answers
+                answers[qnum][pnum][bnum] = b['TrueFalse']['correctAnswer']
               end
             elsif b.key? 'YesNo'
               p['body'][bnum] = {
@@ -147,23 +146,24 @@ class Exam < ApplicationRecord
               }
               if b['YesNo'] == !!b['YesNo']
                 p['body'][bnum]['prompt'] = []
-                p['body'][bnum]['correctAnswer'] = b['YesNo'] if include_answers
+                answers[qnum][pnum][bnum] = b['YesNo']
               else
                 p['body'][bnum]['prompt'] = b['YesNo']['prompt']
-                p['body'][bnum]['correctAnswer'] = b['YesNo']['correctAnswer'] if include_answers
+                answers[qnum][pnum][bnum] = b['YesNo']['correctAnswer']
               end
             else
               throw 'Bad question type.'
             end
-            b['id'] = answer_count
-            answer_count += 1
           else
             throw 'Bad body item.'
           end
         end
       end
     end
-    ret
+    {
+      content: ret,
+      answers: answers
+    }
   end
 
   def process_marks(contents)

@@ -69,10 +69,10 @@ class ExamsController < ApplicationController
       json: {
         type: 'CONTENTS',
         exam: {
-          info: @exam.info(false),
-          files: @exam.get_exam_files,
+          info: @exam.info[:content],
+          files: @exam.get_exam_files
         },
-        answers: answers,
+        answers: answers
       }
     )
   end

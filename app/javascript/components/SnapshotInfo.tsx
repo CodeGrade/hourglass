@@ -40,7 +40,7 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
         <TooltipButton
           variant="danger"
           disabled
-          disabledMessage="Failed saving snapshot."
+          disabledMessage={`Failed saving snapshot: ${message}.`}
         >
           <MdError size={size} />
         </TooltipButton>

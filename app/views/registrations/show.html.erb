@@ -15,12 +15,14 @@
 
     <%= react_component('ExamViewer', {
       exam: {
-        id: @exam.id,
-        name: @exam.name,
         info: {
-          contents: @exam.info[:contents],
-          answers: @registration.get_current_answers
+          id: @exam.id,
+          name: @exam.name
         },
+        contents: {
+          exam: @exam.info[:contents],
+          answers: @registration.get_current_answers
+        }
       }
     }) %>
   </div>

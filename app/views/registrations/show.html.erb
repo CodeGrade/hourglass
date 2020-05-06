@@ -14,15 +14,13 @@
     <p>Updated at <i><%= @registration.updated_at %></i>.</p>
 
     <%= react_component('ExamViewer', {
-      exam: {
-        info: {
-          id: @exam.id,
-          name: @exam.name
-        },
-        contents: {
-          exam: @exam.info[:contents],
-          answers: @registration.get_current_answers
-        }
+      railsExam: {
+        id: @exam.id,
+        name: @exam.name
+      },
+      contents: {
+        exam: @exam.info[:contents],
+        answers: @registration.get_current_answers
       }
     }) %>
   </div>

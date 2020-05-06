@@ -25,17 +25,19 @@ export type MSTP<TStateProps, TOwnProps = {}> =
 export type MDTP<TDispatchProps, TOwnProps = {}> =
   (dispatch: ExamTakerDispatch, ownProps: TOwnProps) => TDispatchProps;
 
-export type StartExamResponse = AnomalousReponse | ContentsData;
+export type StartExamResponse = AnomalousReponse | ContentsResponse;
 
 export interface AnomalousReponse {
   type: 'ANOMALOUS';
 }
 
-export interface ContentsData {
+export interface ContentsResponse extends ContentsData {
   type: 'CONTENTS';
+}
 
+export interface ContentsData {
   // Exam information.
-  exam: DeleteMe;
+  exam: Exam;
 
   // The student's current answers.
   answers: AnswersState;
@@ -273,11 +275,6 @@ export interface QuestionInfo {
   separateSubparts: boolean;
   parts: PartInfo[];
   reference?: FileRef[];
-}
-
-export interface DeleteMe {
-  // Questions and their references.
-  contents: Exam;
 }
 
 export interface Exam {

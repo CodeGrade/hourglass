@@ -1,13 +1,10 @@
 import React from 'react';
-import { RailsExam, Exam, AnswersState } from '@hourglass/types';
+import { RailsExam, ContentsData } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 
 interface ExamViewerProps {
-  info: RailsExam;
-  contents: {
-    exam: Exam;
-    answers: AnswersState;
-  };
+  railsExam: RailsExam;
+  contents: ContentsData;
 }
 
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {

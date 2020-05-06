@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import {
-  DeleteMe,
+  Exam,
 } from '@hourglass/types';
 import { createMap } from '@hourglass/files';
 import { ExamContextProvider } from '@hourglass/context';
@@ -10,7 +10,7 @@ import HTML from '@hourglass/components/HTML';
 import { FileViewer } from './FileViewer';
 
 interface ExamShowContentsProps {
-  exam: DeleteMe;
+  exam: Exam;
   save: () => void;
 }
 
@@ -21,9 +21,6 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     exam,
     save,
   } = props;
-  const {
-    contents,
-  } = exam;
   useEffect(() => {
     const timer: number = window.setInterval(() => save(), INTERVAL);
     return (): void => {
@@ -36,7 +33,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     instructions,
     reference,
     files,
-  } = contents;
+  } = exam;
   const fmap = createMap(files);
   return (
     <ExamContextProvider value={{ files, fmap }}>

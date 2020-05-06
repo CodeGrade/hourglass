@@ -69,7 +69,9 @@ class ExamsController < ApplicationController
       json: {
         type: 'CONTENTS',
         exam: {
-          info: @exam.info[:contents],
+          questions: @exam.info[:contents]['questions'],
+          reference: @exam.info[:contents]['reference'],
+          instructions: @exam.info[:contents]['instructions'],
           files: @exam.get_exam_files
         },
         answers: answers

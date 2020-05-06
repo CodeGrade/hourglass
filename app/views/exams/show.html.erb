@@ -4,7 +4,7 @@
   <h2 class="collapsed" data-toggle="collapse" data-target="#preview">Preview Exam <%= octicon "chevron-down", height: "1em", width: "1em" %><%= octicon "chevron-up", height: "1em", width: "1em" %></h2>
   <div class="row collapse" id="preview">
     <%= react_component('ExamViewer', {
-      info: {
+      railsExam: {
         id: @exam.id,
         name: @exam.name,
       },
@@ -21,14 +21,16 @@
   <%= render 'registrations/table', exam: @exam, registrations: @exam.registrations %>
 <% else %>
   <%= react_component('ShowExam', {
-    user: current_user,
-    final: @final,
-    registration: {
-      id: @registration.id,
+    railsUser: {
+      username: current_user.username
     },
-    exam: {
+    railsExam: {
       id: @exam.id,
       name: @exam.name,
-    }
+    },
+    railsRegistration: {
+      id: @registration.id,
+    },
+    final: @final
   }) %>
 <% end %>

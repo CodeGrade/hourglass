@@ -1,13 +1,14 @@
 import React from 'react';
 import {
-  Button, ButtonProps, Tooltip, OverlayTrigger,
+  Button, ButtonProps, Tooltip, OverlayTrigger, OverlayTriggerProps,
 } from 'react-bootstrap';
 import './TooltipButton.css';
 
 interface TooltipButtonProps {
   disabled: boolean;
   disabledMessage: string;
-  onClick: () => void;
+  placement?: OverlayTriggerProps['placement'];
+  onClick?: () => void;
   variant?: ButtonProps['variant'];
 }
 
@@ -16,6 +17,8 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
     disabled,
     disabledMessage,
     onClick,
+    variant = 'primary',
+    placement = 'bottom',
     children,
   } = props;
   // TODO: id below for a11y
@@ -30,12 +33,13 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
   return (
     <OverlayTrigger
       overlay={disabled ? tooltip : noTooltip}
+      placement={placement}
     >
       <div
         className={`d-inline-block ${disabled && 'cursor-not-allowed'}`}
       >
         <Button
-          variant="primary"
+          variant={variant}
           onClick={onClick}
           disabled={disabled}
           className={disabled && 'pointer-events-none'}

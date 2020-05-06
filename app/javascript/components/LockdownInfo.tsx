@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
 import { MdLock, MdLockOpen } from 'react-icons/md';
 import { LockdownStatus } from '@hourglass/types';
+import TooltipButton from '@hourglass/components/TooltipButton';
 
 interface LockdownInfoProps {
   status: LockdownStatus;
@@ -17,30 +17,33 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
   switch (status) {
     case 'BEFORE':
       return (
-        <Button
+        <TooltipButton
           variant="secondary"
+          disabledMessage="Waiting for session lock."
           disabled
         >
-          <MdLockOpen title="Waiting for session lock." size={size} />
-        </Button>
+          <MdLockOpen size={size} />
+        </TooltipButton>
       );
     case 'FAILED':
       return (
-        <Button
+        <TooltipButton
           variant="danger"
+          disabledMessage={message}
           disabled
         >
-          <MdLockOpen title={message} size={size} />
-        </Button>
+          <MdLockOpen size={size} />
+        </TooltipButton>
       );
     case 'LOCKED':
       return (
-        <Button
+        <TooltipButton
           variant="success"
+          disabledMessage="Session locked."
           disabled
         >
-          <MdLock size={size} title="Session locked." />
-        </Button>
+          <MdLock size={size} />
+        </TooltipButton>
       );
     default:
       throw new Error('UNHANDLED CASE');

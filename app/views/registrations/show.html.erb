@@ -13,6 +13,15 @@
     <p>Registration for <i><%= @registration.user.username %></i>.</p>
     <p>Updated at <i><%= @registration.updated_at %></i>.</p>
 
-    <% # TODO add React ExamViewer %>
+    <%= react_component('ExamViewer', {
+      exam: {
+        id: @exam.id,
+        name: @exam.name,
+        info: {
+          contents: @exam.info[:contents],
+          answers: @registration.get_current_answers
+        },
+      }
+    }) %>
   </div>
 </div>

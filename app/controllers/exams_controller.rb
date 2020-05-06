@@ -59,7 +59,7 @@ class ExamsController < ApplicationController
 
   def start
     # TODO make secret in "show" and check it here with a POST before rendering
-    #   so that users cannot just visit /exams/1/contents in the browser easily
+    #   so that users cannot just visit /exams/1/start in the browser easily
     unless @registration.visible_to? current_user
       render json: { message: "There is no submission for that user." }
       return
@@ -69,7 +69,7 @@ class ExamsController < ApplicationController
       json: {
         type: 'CONTENTS',
         exam: {
-          info: @exam.info[:content],
+          info: @exam.info[:contents],
           files: @exam.get_exam_files
         },
         answers: answers

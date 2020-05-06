@@ -1,7 +1,12 @@
 import React from 'react';
+import { Row, Col } from 'react-bootstrap';
 
 const ExamViewer: React.FC<{}> = () => (
-  <p>TODO: ExamViewer</p>
+  <Row>
+    <Col>
+      <p>TODO: ExamViewer</p>
+    </Col>
+  </Row>
 );
 
 export default ExamViewer;

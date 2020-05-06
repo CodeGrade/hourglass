@@ -161,7 +161,7 @@ class Exam < ApplicationRecord
       end
     end
     {
-      content: ret,
+      contents: ret,
       answers: answers
     }
   end

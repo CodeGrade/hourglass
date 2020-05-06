@@ -276,9 +276,6 @@ export interface QuestionInfo {
 }
 
 export interface DeleteMe {
-  // File tree.
-  files: ExamFile[];
-
   // Questions and their references.
   contents: Exam;
 }
@@ -287,6 +284,7 @@ export interface Exam {
   questions: QuestionInfo[];
   reference?: FileRef[];
   instructions: string;
+  files: ExamFile[];
 }
 
 export type FileRef = SingleFileRef | DirRef;

@@ -23,7 +23,6 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   } = props;
   const {
     contents,
-    files,
   } = exam;
   useEffect(() => {
     const timer: number = window.setInterval(() => save(), INTERVAL);
@@ -36,6 +35,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     questions,
     instructions,
     reference,
+    files,
   } = contents;
   const fmap = createMap(files);
   return (

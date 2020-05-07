@@ -172,12 +172,6 @@ CodeTag:
     - key: "choices"
       value: [String, "all|question|part"]
 TagAnswer:
-  one_of:
-    - Lines
-    - Line
-Lines:
-  array: Line
-Line:
   object:
     - key: "filename"
       value: String

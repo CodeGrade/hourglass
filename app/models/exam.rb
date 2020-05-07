@@ -56,7 +56,10 @@ class Exam < ApplicationRecord
             elsif b.key? 'Code'
               nil
             elsif b.key? 'CodeTag'
-              b['CodeTag']['correctAnswer']
+              {
+                selectedFile: b['CodeTag']['correctAnswer']['filename'],
+                lineNumber: b['CodeTag']['correctAnswer']['line']
+              }
             elsif b.key? 'Matching'
               b['Matching']['correctAnswers']
             elsif b.key? 'MultipleChoice'

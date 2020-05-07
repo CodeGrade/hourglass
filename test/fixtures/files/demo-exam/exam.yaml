@@ -37,20 +37,20 @@ versions:
               - CodeTag:
                   prompt: ["Tag line one of a file."]
                   correctAnswer:
-                    - filename: "foo"
-                      line: 1
+                    filename: "q1/p1/anything.txt"
+                    line: 1
                   choices: "part"
               - CodeTag:
                   prompt: ["Tag line two of a file."]
                   correctAnswer:
-                    - filename: "foo"
-                      line: 2
+                    filename: "q1/all/src/packagetwo/Example2.java"
+                    line: 7
                   choices: "question"
               - CodeTag:
                   prompt: ["Tag line three of a file."]
                   correctAnswer:
-                    - filename: "foo"
-                      line: 3
+                    filename: "q1/all/src/packageone/Example.java"
+                    line: 5
                   choices: "all"
           - name: "Part B"
             points: 11

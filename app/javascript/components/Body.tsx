@@ -29,8 +29,6 @@ const Body: React.FC<BodyProps> = (props) => {
       return <AllThatApply info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'CodeTag':
       return <CodeTag info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
-    case 'TrueFalse':
-      return <YesNoInput info={body} qnum={qnum} pnum={pnum} bnum={bnum} yesLabel="True" noLabel="False" />;
     case 'YesNo':
       return <YesNoInput info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'MultipleChoice':

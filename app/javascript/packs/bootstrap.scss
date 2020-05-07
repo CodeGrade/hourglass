@@ -9,6 +9,10 @@ body {
   height: 100%;
 }
 
+.navbar + .container {
+  padding-top: 80px;
+}
+
 .table-hover tbody tr.no-hover:hover {
   background-color: inherit;
 }

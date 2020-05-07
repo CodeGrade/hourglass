@@ -21,16 +21,16 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
     railsUser,
   } = useContext(RailsContext);
   const body = ready ? (
-    <Row>
-      <Col className="bg-dark text-white" xs="auto">
-        <ExamNavbar />
-      </Col>
-      <Col xs>
-        <ExamShowContents
-          railsExam={railsExam}
-        />
-      </Col>
-    </Row>
+    <>
+      <ExamNavbar />
+      <Row>
+        <Col>
+          <ExamShowContents
+            railsExam={railsExam}
+          />
+        </Col>
+      </Row>
+    </>
   ) : (
     <>
       <RegularNavbar

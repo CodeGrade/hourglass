@@ -23,22 +23,8 @@
       <%= render "layouts/flash" %>
     <% end %>
     <% if content_for?(:wide_content) %>
-      <div class="container-fluid">
-        <% if content_for?(:wide_content_before) %>
-          <!-- Before wide content -->
-          <div class="container">
-            <%= yield(:wide_content_before) %>
-          </div>
-        <% end %>
-        <!-- Wide content -->
-        <%= yield(:wide_content) %>
-        <% if content_for?(:wide_content_after) %>
-          <!-- After wide content -->
-          <div class="container">
-            <%= yield(:wide_content_after) %>
-          </div>
-        <% end %>
-      </div>
+      <!-- Wide content -->
+      <%= yield(:wide_content) %>
     <% else %>
       <div class="container mt-f">
         <%= content_for?(:content) ? yield(:content) : yield %>

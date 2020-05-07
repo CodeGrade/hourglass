@@ -7,6 +7,9 @@ interface AllThatApplyProps {
   value: AllThatApplyState;
   onChange: (index: number, newState: boolean) => void;
   disabled: boolean;
+  qnum: number;
+  pnum: number;
+  bnum: number;
 }
 
 const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
@@ -15,6 +18,9 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
     info,
     value,
     disabled,
+    qnum,
+    pnum,
+    bnum,
   } = props;
   const { options, prompt } = info;
 
@@ -34,6 +40,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
               type="checkbox"
               label={o}
               checked={val}
+              id={`ata-${qnum}-${pnum}-${bnum}-${i}`}
               onChange={handler(i)}
             />
           </Form.Group>

@@ -73,7 +73,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
   } = props;
 
   // keep track of codemirror instance
-  const [instance, setInstance] = useState(undefined);
+  const [instance, setInstance] = useState<CM.Editor>(undefined);
 
   // doSave applied marks to clear them if we change files
   const [appliedMarks, setAppliedMarks] = useState([]);
@@ -103,6 +103,13 @@ export const Editor: React.FC<EditorProps> = (props) => {
       instance.refresh();
     }
   }, refreshProps);
+
+  // Force reset cursor when prop changes.
+  useEffect(() => {
+    if (instance && cursor) {
+      setTimeout(() => instance.setCursor(cursor));
+    }
+  }, [instance, cursor?.line]);
 
   const disableCursor = disabled ? 'nocursor' : false;
 

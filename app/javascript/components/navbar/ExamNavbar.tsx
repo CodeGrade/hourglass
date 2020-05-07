@@ -40,40 +40,38 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
   );
 };
 
-const NavAccordion: React.FC<{}> = () => {
-  return (
-    <Accordion>
-      <NavAccordionItem
-        icon={<MenuBookIcon />}
-        label="Jump to"
-        eventKey="jump"
-      >
-        TODO
-      </NavAccordionItem>
-      <NavAccordionItem
-        icon={<MdFeedback />}
-        label="Professor Messages"
-        eventKey="profmsg"
-      >
-        TODO
-      </NavAccordionItem>
-      <NavAccordionItem
-        icon={<MdNoteAdd />}
-        label="Scratch space"
-        eventKey="scratch"
-      >
-        TODO
-      </NavAccordionItem>
-      <NavAccordionItem
-        icon={<MdLiveHelp />}
-        label="Ask a question"
-        eventKey="askq"
-      >
-        TODO
-      </NavAccordionItem>
-    </Accordion>
-  );
-};
+const NavAccordion: React.FC<{}> = () => (
+  <Accordion>
+    <NavAccordionItem
+      icon={<MenuBookIcon />}
+      label="Jump to"
+      eventKey="jump"
+    >
+      TODO
+    </NavAccordionItem>
+    <NavAccordionItem
+      icon={<MdFeedback />}
+      label="Professor Messages"
+      eventKey="profmsg"
+    >
+      TODO
+    </NavAccordionItem>
+    <NavAccordionItem
+      icon={<MdNoteAdd />}
+      label="Scratch space"
+      eventKey="scratch"
+    >
+      TODO
+    </NavAccordionItem>
+    <NavAccordionItem
+      icon={<MdLiveHelp />}
+      label="Ask a question"
+      eventKey="askq"
+    >
+      TODO
+    </NavAccordionItem>
+  </Accordion>
+);
 
 const ExamNavbar: React.FC<{}> = () => (
   <div className="bg-dark text-white float-left position-sticky p-3 vh-100 t-0">

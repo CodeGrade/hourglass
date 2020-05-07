@@ -1,4 +1,3 @@
-import 'codemirror/lib/codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/mllike/mllike';

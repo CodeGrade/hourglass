@@ -15,7 +15,10 @@
   </head>
 
   <body>
-  <%=  render "layouts/navbar"  %>
+    <% if @keepnavbar %>
+      <% # TODO remove this (and the partial once erb views are gone) %>
+      <%= render "layouts/navbar"  %>
+    <% end %>
   <% unless flash.empty? %>
     <%= render "layouts/flash" %>
   <% end %>

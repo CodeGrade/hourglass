@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button } from 'react-bootstrap';
+import { RailsContext } from '@hourglass/context';
 
 interface PreStartProps {
   onClick: () => void;
@@ -13,8 +14,10 @@ const PreStart: React.FC<PreStartProps> = (props) => {
     isError,
     errorMsg,
   } = props;
+  const { railsExam } = useContext(RailsContext);
   return (
     <div>
+      <h1>{railsExam.name}</h1>
       <p>Click the following button to enter secure mode and begin the exam.</p>
       <Button
         variant="success"

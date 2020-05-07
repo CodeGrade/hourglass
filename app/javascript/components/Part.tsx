@@ -1,9 +1,10 @@
 import React from 'react';
-import { Table, Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import { PartInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 import { BodyProps } from './Body';
 import { FileViewer } from './FileViewer';
+import './Part.css';
 
 interface PartProps {
   part: PartInfo;
@@ -40,14 +41,8 @@ const Part: React.FC<PartProps> = (props) => {
           {body.map((b, i) => (
             // Body numbers are STATIC.
             // eslint-disable-next-line react/no-array-index-key
-            <div key={i}>
-              <div className="w-100 no-gutters">
-                <Row>
-                  <Col>
-                    <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
-                  </Col>
-                </Row>
-              </div>
+            <div className="p-2 bodyitem" key={i}>
+              <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
             </div>
           ))}
         </div>

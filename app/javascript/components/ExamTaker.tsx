@@ -3,7 +3,7 @@ import {
   ExamNavbar,
   RegularNavbar,
 } from '@hourglass/components/navbar';
-import { Row, Col } from 'react-bootstrap';
+import { Row, Col, Container } from 'react-bootstrap';
 import { RailsContext } from '@hourglass/context';
 import ExamShowContents from '@hourglass/containers/ExamShowContents';
 import PreStart from '@hourglass/containers/PreStart';
@@ -36,9 +36,11 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
       <RegularNavbar
         railsUser={railsUser}
       />
-      <PreStart
-        railsExam={railsExam}
-      />
+      <Container>
+        <PreStart
+          railsExam={railsExam}
+        />
+      </Container>
     </>
   );
   return (

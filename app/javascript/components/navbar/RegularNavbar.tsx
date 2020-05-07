@@ -21,7 +21,7 @@ const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
     <Navbar
       bg="light"
       expand="lg"
-      fixed="top"
+      className="static-top"
     >
       <Navbar.Brand
         href={Routes.root_path()}

@@ -7,7 +7,10 @@
 html,
 body {
   height: 100%;
-  padding-top: 40px;
+}
+
+.container-fluid {
+  padding: 0;
 }
 
 .table-hover tbody tr.no-hover:hover {

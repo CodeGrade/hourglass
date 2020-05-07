@@ -4,7 +4,7 @@ import PaginationDropdown from '@hourglass/containers/PaginationDropdown';
 import LockdownInfo from '@hourglass/containers/LockdownInfo';
 
 const ExamNavbar: React.FC<{}> = () => (
-  <div>
+  <div className="position-fixed">
     <div>
       <h1>Hourglass</h1>
       <LockdownInfo />

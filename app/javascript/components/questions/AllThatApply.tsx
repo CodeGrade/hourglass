@@ -17,24 +17,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
     disabled,
   } = props;
   const { options, prompt } = info;
-  // if (readOnly) {
-  //   if (!value?.some((ans) => !!ans)) {
-  //     theRest = (<React.Fragment>
-  //       <b>Answer: </b>
-  //       <i>None selected</i>
-  //     </React.Fragment>);
-  //   } else {
-  //     theRest = (<React.Fragment>
-  //       <b>Answer: </b>
-  //       <ul>
-  //         {options.map((o, i) => {
-  //           if (value?.[i]) { return <li>{o}</li>; }
-  //           else { return null; }
-  //         })}
-  //       </ul>
-  //     </React.Fragment>)
-  //   }
-  // } else {
+
   const handler = (index: number) => (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
     onChange(index, val);

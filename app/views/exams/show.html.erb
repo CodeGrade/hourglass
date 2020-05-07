@@ -3,7 +3,7 @@
   <h1><%= @page_title %></h1>
   <h2 class="collapsed" data-toggle="collapse" data-target="#preview">Preview Exam <%= octicon "chevron-down", height: "1em", width: "1em" %><%= octicon "chevron-up", height: "1em", width: "1em" %></h2>
   <div class="row collapse" id="preview">
-    <div class="col" style="border: 5px solid black; height: 50em;">
+    <div class="col" style="border: 5px solid black; height: 50em; overflow: scroll;">
       <%= react_component('ExamViewer', {
         railsExam: {
           id: @exam.id,

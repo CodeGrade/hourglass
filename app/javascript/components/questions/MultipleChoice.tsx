@@ -17,22 +17,6 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
     disabled,
   } = props;
   const { options, prompt } = info;
-  // if (readOnly) {
-  //  if (value === undefined) {
-  //    theRest = (<React.Fragment>
-  //      <b>Answer: </b>
-  //      <i>None selected</i>
-  //    </React.Fragment>);
-  //  } else {
-  //    theRest = (<React.Fragment>
-  //      <b>Answer: </b>
-  //      <span className="btn btn-sm btn-outline-dark disabled">
-  //        {options[value]}
-  //      </span>
-
-  //    </React.Fragment>)
-  //  }
-  // } else {
   const handler = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.value;
     onChange(Number(val));

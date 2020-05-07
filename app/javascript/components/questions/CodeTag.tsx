@@ -39,6 +39,8 @@ const CodeTagVal: React.FC<CodeTagValProps> = (props) => {
   );
 };
 
+export { CodeTagVal };
+
 interface FileModalProps {
   references: FileRef[];
   show: boolean;
@@ -77,6 +79,7 @@ const FileModal: React.FC<FileModalProps> = (props) => {
       onEntering={refreshCodeMirror}
       dialogClassName="w-100 mw-100 m-2"
       centered
+      keyboard
     >
       <Modal.Header closeButton>
         <Modal.Title>Choose a line</Modal.Title>

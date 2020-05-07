@@ -69,7 +69,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
                             // Question choices are STATIC.
                             // eslint-disable-next-line react/no-array-index-key
                             key={j}
-                            value={j + 1}
+                            value={j}
                           >
                             {j + 1}
                           </MenuItem>

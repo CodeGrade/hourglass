@@ -21,21 +21,6 @@ const YesNo: React.FC<YesNoProps> = (props) => {
     disabled,
   } = props;
   const { prompt } = info;
-  // if (readOnly) {
-  //   if (value === undefined) {
-  //     theRest = (<React.Fragment>
-  //       <b>Answer: </b>
-  //       <i>No answer given</i>
-  //     </React.Fragment>);
-  //   } else {
-  //     theRest = (<React.Fragment>
-  //       <b>Answer: </b>
-  //       <span className="btn btn-sm btn-outline-dark disabled">
-  //         {value ? "Yes" : "No"}
-  //       </span>
-  //     </React.Fragment>)
-  //   }
-  // } else {
   return (
     <div>
       <div>{prompt}</div>

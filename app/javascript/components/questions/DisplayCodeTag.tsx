@@ -10,7 +10,7 @@ import { CodeTagVal } from '@hourglass/components/questions/CodeTag';
 
 interface FileModalProps {
   references: FileRef[];
-  startValue: CodeTagState;
+  value: CodeTagState;
   show: boolean;
   onClose: () => void;
 }
@@ -19,17 +19,11 @@ const FileModal: React.FC<FileModalProps> = (props) => {
   const {
     show,
     references,
-    startValue,
+    value,
     onClose,
   } = props;
-  // Modal has its own state so the user can manipulate it before saving.
-  const [selected, setSelected] = useState(startValue);
   const [refresher, setRefresher] = useState(false);
   const refreshCodeMirror = (): void => setRefresher((b) => !b);
-  useEffect(() => {
-    // Reset my starting state when outer state changes.
-    setSelected(startValue);
-  }, [startValue]);
   return (
     <Modal
       show={show}
@@ -44,18 +38,18 @@ const FileModal: React.FC<FileModalProps> = (props) => {
         <ControlledFileViewer
           refreshProps={[refresher]}
           references={references}
-          selection={selected}
+          selection={value}
           onChangeFile={(_newFile): void => {
             // do nothing
           }}
           onChangeLine={(_newLine): void => {
-            // do nothing
+            refreshCodeMirror();
           }}
         />
       </Modal.Body>
       <Modal.Footer>
         <div className="mr-auto">
-          <CodeTagVal value={selected} />
+          <CodeTagVal value={value} />
         </div>
         <Button variant="secondary" onClick={onClose}>
           Close
@@ -93,7 +87,7 @@ const DisplayCodeTag: React.FC<CodeTagProps> = (props) => {
               references={choices}
               show={showModal}
               onClose={(): void => setShowModal(false)}
-              startValue={value}
+              value={value}
             />
           </Col>
         </Row>

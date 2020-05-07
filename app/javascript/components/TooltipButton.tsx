@@ -21,34 +21,38 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
     placement = 'bottom',
     children,
   } = props;
-  // TODO: id below for a11y
-  const tooltip = (
-    <Tooltip
-      id={null}
+  const button = (
+    <Button
+      variant={variant}
+      onClick={onClick}
+      disabled={disabled}
+      className={disabled && 'pointer-events-none'}
     >
-      {disabledMessage}
-    </Tooltip>
+      {children}
+    </Button>
   );
-  const noTooltip = <span />;
-  return (
-    <OverlayTrigger
-      overlay={disabled ? tooltip : noTooltip}
-      placement={placement}
-    >
-      <div
-        className={`d-inline-block ${disabled && 'cursor-help'}`}
+  if (disabled) {
+    return (
+      <OverlayTrigger
+        overlay={(
+          <Tooltip
+            // TODO: id below for a11y
+            id={null}
+          >
+            {disabledMessage}
+          </Tooltip>
+        )}
+        placement={placement}
       >
-        <Button
-          variant={variant}
-          onClick={onClick}
-          disabled={disabled}
-          className={disabled && 'pointer-events-none'}
+        <div
+          className={`d-inline-block ${disabled && 'cursor-help'}`}
         >
-          {children}
-        </Button>
-      </div>
-    </OverlayTrigger>
-  );
+          {button}
+        </div>
+      </OverlayTrigger>
+    );
+  }
+  return button;
 };
 
 export default TooltipButton;

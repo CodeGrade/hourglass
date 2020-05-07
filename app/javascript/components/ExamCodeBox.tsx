@@ -100,16 +100,10 @@ export const Editor: React.FC<EditorProps> = (props) => {
   // EFFECT: refresh the instance if any item in refreshProps changes
   useEffect(() => {
     if (instance) {
+      if (cursor) instance.setCursor(cursor);
       instance.refresh();
     }
   }, refreshProps);
-
-  // Force reset cursor when prop changes.
-  useEffect(() => {
-    if (instance && cursor) {
-      setTimeout(() => instance.setCursor(cursor));
-    }
-  }, [instance, cursor?.line]);
 
   const disableCursor = disabled ? 'nocursor' : false;
 
@@ -138,9 +132,11 @@ export const Editor: React.FC<EditorProps> = (props) => {
       }}
       onGutterClick={onGutterClick}
       cursor={cursor}
-      onCursor={(...args): void => {
+      onCursor={(editor, data): void => {
         // this callback always needs to be defined
-        if (onCursor) onCursor(...args);
+        if (onCursor) {
+          onCursor(editor, data);
+        }
       }}
       onFocus={(...args): void => {
         // this callback always needs to be defined
@@ -153,8 +149,3 @@ export const Editor: React.FC<EditorProps> = (props) => {
     />
   );
 };
-
-// TODO: in separate file, for ExamViewer
-// export const Renderer = ({ value, ...props }) => (
-//   <Highlighter value={value} codeMirror={CM} theme="mdn-like" {...props} />
-// );

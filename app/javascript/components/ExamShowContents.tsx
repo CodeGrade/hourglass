@@ -37,15 +37,11 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const fmap = createMap(files);
   return (
     <ExamContext.Provider value={{ files, fmap }}>
-      <div>
-        <HTML value={instructions} />
-        {reference && <FileViewer references={reference} />}
-        <div>
-          <Questions
-            questions={questions}
-          />
-        </div>
-      </div>
+      <HTML value={instructions} />
+      {reference && <FileViewer references={reference} />}
+      <Questions
+        questions={questions}
+      />
     </ExamContext.Provider>
   );
 };

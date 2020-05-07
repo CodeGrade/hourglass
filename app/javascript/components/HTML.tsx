@@ -1,5 +1,4 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
 
 export interface HTMLProps {
   value: string;
@@ -8,15 +7,11 @@ export interface HTMLProps {
 const HTML: React.FC<HTMLProps> = (props) => {
   const { value } = props;
   return (
-    <Row>
-      <Col>
-        <div
-          className="no-hover"
-          // eslint-disable-next-line react/no-danger
-          dangerouslySetInnerHTML={{ __html: value }}
-        />
-      </Col>
-    </Row>
+    <div
+      className="no-hover"
+      // eslint-disable-next-line react/no-danger
+      dangerouslySetInnerHTML={{ __html: value }}
+    />
   );
 };
 

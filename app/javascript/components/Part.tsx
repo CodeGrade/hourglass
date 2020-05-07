@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Col } from 'react-bootstrap';
+import { Table, Col, Row } from 'react-bootstrap';
 import { PartInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 import { BodyProps } from './Body';
@@ -35,21 +35,23 @@ const Part: React.FC<PartProps> = (props) => {
       </h3>
       <div><HTML value={description} /></div>
       {reference && <FileViewer references={reference} />}
-      <Table hover borderless>
-        <tbody>
+      <div>
+        <div>
           {body.map((b, i) => (
             // Body numbers are STATIC.
             // eslint-disable-next-line react/no-array-index-key
-            <tr key={i}>
-              <td className="row w-100 no-gutters">
-                <Col>
-                  <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
-                </Col>
-              </td>
-            </tr>
+            <div key={i}>
+              <div className="w-100 no-gutters">
+                <Row>
+                  <Col>
+                    <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
+                  </Col>
+                </Row>
+              </div>
+            </div>
           ))}
-        </tbody>
-      </Table>
+        </div>
+      </div>
     </div>
   );
 };

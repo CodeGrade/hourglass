@@ -5,6 +5,7 @@ import Pagination from '@hourglass/components/Pagination';
 import SubmitButton from '@hourglass/containers/SubmitButton';
 import { RailsContext } from '@hourglass/context';
 import Body from '@hourglass/components/Body';
+import { Row, Col } from 'react-bootstrap';
 
 interface QuestionsProps {
   questions: QuestionInfo[];
@@ -21,23 +22,27 @@ const Questions: React.FC<QuestionsProps> = (props) => {
   const { railsExam } = useContext(RailsContext);
   const { id } = railsExam;
   return (
-    <Pagination
-      current={selectedQuestion}
-      paginated={paginated}
-      max={questions.length}
-      endItem={<SubmitButton examID={id} />}
-    >
-      {questions.map((q, i) => (
-        <ShowQuestion
-          // Question numbers are STATIC.
-          // eslint-disable-next-line react/no-array-index-key
-          key={i}
-          question={q}
-          qnum={i}
-          BodyRenderer={Body}
-        />
-      ))}
-    </Pagination>
+    <Row>
+      <Col>
+        <Pagination
+          current={selectedQuestion}
+          paginated={paginated}
+          max={questions.length}
+          endItem={<SubmitButton examID={id} />}
+        >
+          {questions.map((q, i) => (
+            <ShowQuestion
+              // Question numbers are STATIC.
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
+              question={q}
+              qnum={i}
+              BodyRenderer={Body}
+            />
+          ))}
+        </Pagination>
+      </Col>
+    </Row>
   );
 };
 export default Questions;

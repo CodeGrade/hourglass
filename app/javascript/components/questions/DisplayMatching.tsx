@@ -44,7 +44,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
                   </td>
                   <td>{p}</td>
                   <td>
-                    {valueI === -1 ? 'None' : `Option ${valueI}`}
+                    {valueI === -1 ? 'None' : `Option ${valueI + 1}`}
                   </td>
                   <td>
                     {valueI === -1 ? '' : values[valueI]}

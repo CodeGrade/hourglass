@@ -22,7 +22,7 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
   } = useContext(RailsContext);
   const body = ready ? (
     <Row>
-      <Col md="2">
+      <Col className="bg-dark text-white" md="2">
         <ExamNavbar />
       </Col>
       <Col md="10">

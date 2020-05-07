@@ -33,11 +33,13 @@ const FileModal: React.FC<FileModalProps> = (props) => {
   return (
     <Modal
       show={show}
+      onEscapeKeyDown={onClose}
+      onHide={onClose}
       onEntering={refreshCodeMirror}
       dialogClassName="w-100 mw-100 m-2"
       centered
+      keyboard
     >
-      <Modal.Header closeButton />
       <Modal.Body>
         <ControlledFileViewer
           refreshProps={[refresher]}
@@ -80,16 +82,12 @@ const DisplayCodeTag: React.FC<CodeTagProps> = (props) => {
     theRest = (
       <>
         <Row className="mt-2">
-          <Row className="mt-2">
-            <Col>
-              <CodeTagVal value={value} />
-            </Col>
-          </Row>
           <Col>
-            <Button
-              onClick={(): void => setShowModal(true)}
-            >
-              Choose line
+            <CodeTagVal value={value} />
+          </Col>
+          <Col>
+            <Button size="sm" onClick={(): void => setShowModal(true)} variant="outline-info">
+              Show line
             </Button>
             <FileModal
               references={choices}

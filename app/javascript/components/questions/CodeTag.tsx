@@ -75,6 +75,7 @@ const FileModal: React.FC<FileModalProps> = (props) => {
   return (
     <Modal
       show={show}
+      onEscapeKeyDown={onClose}
       onHide={onClose}
       onEntering={refreshCodeMirror}
       dialogClassName="w-100 mw-100 m-2"
@@ -161,8 +162,6 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
           <Col>
             <CodeTagVal value={value} />
           </Col>
-        </Row>
-        <Row className="mt-2">
           <Col>
             <Button
               disabled={disabled}

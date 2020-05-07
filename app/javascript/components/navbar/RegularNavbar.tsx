@@ -8,6 +8,7 @@ import { logOut } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import { RailsUser } from '@hourglass/types';
 import LockdownInfo from '@hourglass/containers/LockdownInfo';
+import './RegularNavbar.css';
 
 interface RegularNavbarProps {
   railsUser?: RailsUser;
@@ -21,7 +22,7 @@ const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
     <Navbar
       bg="light"
       expand="lg"
-      className="static-top"
+      className="regnav-fix static-top"
     >
       <Navbar.Brand
         href={Routes.root_path()}

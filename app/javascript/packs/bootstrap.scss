@@ -10,7 +10,7 @@ body {
 }
 
 .navbar + .container {
-  padding-top: 80px;
+  padding-top: $nav-link-height + $nav-link-padding-y * 2;
 }
 
 .table-hover tbody tr.no-hover:hover {

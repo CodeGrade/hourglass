@@ -5,7 +5,7 @@ import LockdownInfo from '@hourglass/containers/LockdownInfo';
 import './ExamNavbar.css';
 
 const ExamNavbar: React.FC<{}> = () => (
-  <div className="bg-dark text-white float-left position-sticky" id="examNavbar">
+  <div className="bg-dark text-white float-left position-sticky p-3" id="examNavbar">
     <div>
       <h1 className="d-inline align-middle">Hourglass</h1>
       <span className="ml-2">

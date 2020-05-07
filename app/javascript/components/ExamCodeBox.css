@@ -1,15 +1,13 @@
 .CodeMirror {
   border: 1px solid #eee;
-  height: auto;
   max-width: 100%;
   overflow: auto;
+  resize: vertical;
 }
 
 .CodeMirror-scroll {
-  height: auto;
   max-width: 100%;
-  overflow-y: hidden;
-  overflow-x: auto;
+  overflow: auto;
 }
 
 .CodeMirror .readOnly {

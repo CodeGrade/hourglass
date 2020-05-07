@@ -33,4 +33,6 @@ export default async function lock(policies: Policy[]): Promise<void> {
   if (!isFullscreen()) {
     throw new Error('Close the developer console to continue.');
   }
+
+  await navigator.clipboard.writeText('');
 }

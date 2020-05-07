@@ -7,7 +7,7 @@ import HTML from '@hourglass/components/HTML';
 
 interface TextProps {
   info: TextInfo;
-  value: TextState;
+  value?: TextState;
 }
 
 const Text: React.FC<TextProps> = (props) => {
@@ -17,7 +17,7 @@ const Text: React.FC<TextProps> = (props) => {
   } = props;
   const { prompt } = info;
   let theRest;
-  if (value === undefined) {
+  if (!value) {
     theRest = (
       <>
         <b>Answer: </b>

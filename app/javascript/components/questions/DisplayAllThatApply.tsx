@@ -3,7 +3,7 @@ import { AllThatApplyInfo, AllThatApplyState } from '@hourglass/types';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;
-  value: AllThatApplyState;
+  value?: AllThatApplyState;
 }
 
 const DisplayAllThatApply: React.FC<AllThatApplyProps> = (props) => {
@@ -13,7 +13,7 @@ const DisplayAllThatApply: React.FC<AllThatApplyProps> = (props) => {
   } = props;
   const { options, prompt } = info;
   let theRest;
-  if (!Object.values(value).some((ans) => !!ans)) {
+  if (!value || !Object.values(value).some((ans) => !!ans)) {
     theRest = (
       <>
         <b>Answer: </b>

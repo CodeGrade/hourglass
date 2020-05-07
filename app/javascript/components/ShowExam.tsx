@@ -1,9 +1,4 @@
 import React from 'react';
-import {
-  Row,
-  Col,
-  Container,
-} from 'react-bootstrap';
 import { Provider } from 'react-redux';
 import store from '@hourglass/store';
 import {

@@ -1,5 +1,4 @@
 import React from 'react';
-import { Col, Row } from 'react-bootstrap';
 import { PartInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 import { BodyProps } from './Body';

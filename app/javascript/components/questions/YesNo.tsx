@@ -4,8 +4,6 @@ import { YesNoInfo } from '@hourglass/types';
 
 export interface YesNoProps {
   info: YesNoInfo;
-  yesLabel?: string;
-  noLabel?: string;
   value: boolean;
   onChange: (newValue: boolean) => void;
   disabled: boolean;
@@ -14,13 +12,15 @@ export interface YesNoProps {
 const YesNo: React.FC<YesNoProps> = (props) => {
   const {
     info,
-    yesLabel = 'Yes',
-    noLabel = 'No',
     value,
     onChange,
     disabled,
   } = props;
-  const { prompt } = info;
+  const {
+    prompt,
+    yesLabel = 'Yes',
+    noLabel = 'No',
+  } = info;
   return (
     <div>
       <div>{prompt}</div>

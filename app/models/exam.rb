@@ -166,7 +166,9 @@ class Exam < ApplicationRecord
                   end
                 elsif b.key? 'TrueFalse'
                   {
-                    type: 'TrueFalse',
+                    type: 'YesNo',
+                    yesLabel: 'True',
+                    noLabel: 'False',
                     prompt:
                       if b['TrueFalse'] == !!b['TrueFalse']
                         []

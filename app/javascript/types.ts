@@ -214,7 +214,9 @@ export interface AllThatApplyState {
 }
 
 export interface YesNoInfo {
-  type: 'YesNo' | 'TrueFalse';
+  type: 'YesNo';
+  yesLabel?: string;
+  noLabel?: string;
   prompt: string[];
 }
 

@@ -34,8 +34,6 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return <DisplayAllThatApply info={body} value={answer as AllThatApplyState} />;
     case 'CodeTag':
       return <DisplayCodeTag info={body} value={answer as CodeTagState} />;
-    case 'TrueFalse':
-      return <DisplayYesNoInput info={body} value={answer as YesNoState} yesLabel="True" noLabel="False" />;
     case 'YesNo':
       return <DisplayYesNoInput info={body} value={answer as YesNoState} />;
     case 'MultipleChoice':

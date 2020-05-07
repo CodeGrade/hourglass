@@ -1,7 +1,11 @@
-#examNavbar {
+.t-0 {
   top: 0;
 }
 
-#examNavbarFooter {
+.b-0 {
   bottom: 0;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }

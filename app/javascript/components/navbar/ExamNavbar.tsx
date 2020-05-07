@@ -25,7 +25,7 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
   } = props;
   return (
     <Card className="border-info">
-      <Accordion.Toggle eventKey={eventKey} as={Card.Header} className="bg-info">
+      <Accordion.Toggle eventKey={eventKey} as={Card.Header} className="bg-info cursor-pointer">
         {icon}
         <span className="align-middle ml-1">
           {label}
@@ -76,7 +76,7 @@ const NavAccordion: React.FC<{}> = () => {
 };
 
 const ExamNavbar: React.FC<{}> = () => (
-  <div className="bg-dark text-white float-left position-sticky p-3 vh-100" id="examNavbar">
+  <div className="bg-dark text-white float-left position-sticky p-3 vh-100 t-0">
     <div>
       <h1 className="d-inline align-middle">Hourglass</h1>
       <span className="ml-2">
@@ -89,7 +89,7 @@ const ExamNavbar: React.FC<{}> = () => (
     <div className="mt-2">
       <NavAccordion />
     </div>
-    <div className="position-absolute" id="examNavbarFooter">
+    <div className="position-absolute b-0">
       TODO: Time Remaining
     </div>
   </div>

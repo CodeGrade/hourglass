@@ -1,6 +1,6 @@
-<% content_for :wide_content do %>
 <% @page_title = @exam.name %>
 <% if current_user.admin_or_prof? %>
+  <% @keepnavbar = true %>
   <h1><%= @page_title %></h1>
   <h2 class="collapsed" data-toggle="collapse" data-target="#preview">Preview Exam <%= octicon "chevron-down", height: "1em", width: "1em" %><%= octicon "chevron-up", height: "1em", width: "1em" %></h2>
   <div class="row collapse" id="preview">
@@ -29,6 +29,7 @@
   <% end %>
   <%= render 'registrations/table', exam: @exam, registrations: @exam.registrations %>
 <% else %>
+  <% content_for :wide_content do %>
   <%= react_component('ShowExam', {
     railsUser: {
       username: current_user.username
@@ -43,5 +44,5 @@
     },
     final: @final
   }) %>
-<% end %>
+  <% end %>
 <% end %>

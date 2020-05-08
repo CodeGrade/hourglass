@@ -18,7 +18,7 @@ import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 import { IconType } from 'react-icons';
 import JumpTo from '@hourglass/containers/navbar/JumpTo';
 import Scratch from '@hourglass/containers/navbar/Scratch';
-import ProfMessages from '@hourglass/containers/navbar/ProfMessages';
+import ExamMessages from '@hourglass/containers/navbar/ExamMessages';
 
 
 interface NavAccordionItemProps {
@@ -79,7 +79,7 @@ const NavAccordion: React.FC<{}> = () => (
       className="bg-warning text-dark"
       eventKey="profmsg"
     >
-      <ProfMessages />
+      <ExamMessages />
     </NavAccordionItem>
     <NavAccordionItem
       Icon={MdNoteAdd}

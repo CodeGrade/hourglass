@@ -42,7 +42,11 @@ export interface ContentsResponse {
 
   answers: AnswersState;
 
-  messages: ProfMessage[];
+  messages: {
+    time: string;
+    body: string;
+    personal: boolean;
+  }[];
 }
 
 export interface PaginationState {
@@ -173,9 +177,9 @@ export interface ExamTakerState {
   snapshot: SnapshotState;
 }
 
-export type MessagesState = ProfMessage[];
+export type MessagesState = ExamMessage[];
 
-export interface ProfMessage {
+export interface ExamMessage {
   body: string;
 
   time: DateTime;
@@ -188,7 +192,7 @@ export type MessagesAction = MessageReceivedAction;
 
 export interface MessageReceivedAction {
   type: 'MESSAGE_RECEIVED';
-  msg: ProfMessage;
+  msg: ExamMessage;
 }
 
 export interface RailsUser {

@@ -17,7 +17,7 @@ import {
   Thunk,
   policyPermits,
   UpdateScratchAction,
-  ProfMessage,
+  ExamMessage,
   MessageReceivedAction,
   MessagesState,
   AnswersState,
@@ -26,8 +26,9 @@ import {
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';
+import {DateTime} from 'luxon';
 
-export function messageReceived(msg: ProfMessage): MessageReceivedAction {
+export function messageReceived(msg: ExamMessage): MessageReceivedAction {
   return {
     type: 'MESSAGE_RECEIVED',
     msg,
@@ -127,9 +128,12 @@ export function doLoad(examID: number): Thunk {
         if (result.type === 'ANOMALOUS') {
           dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
         } else {
-          // TODO parse dates
           const { exam, answers, messages } = result;
-          dispatch(loadExam(exam, answers, messages));
+          const newMsgs = messages.map((m) => ({
+            ...m,
+            time: DateTime.fromISO(m.time),
+          }));
+          dispatch(loadExam(exam, answers, newMsgs));
         }
       }).catch((err) => {
         // TODO: store a message to tell the user what went wrong

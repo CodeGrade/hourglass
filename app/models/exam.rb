@@ -291,12 +291,32 @@ class Exam < ApplicationRecord
     clean_up(get_raw_files(""))
   end
 
-  def announcements
-    exam_messages.where(recipient: nil)
+  def professors
+    registrations.includes(:user).where(role: 'professor').map(&:user)
   end
 
-  def messages_for(user)
+  def students
+    registrations.includes(:user).where(role: 'student').map(&:user)
+  end
+
+  def announcements
+    exam_messages.where(recipient: nil, sender: professors)
+  end
+
+  def questions
+    exam_messages.where(recipient: nil, sender: students)
+  end
+
+  def private_messages_for(user)
     exam_messages.where(recipient: user)
+  end
+
+  def all_messages_for(user)
+    if user.reg_for(self).professor?
+      questions.or(announcements)
+    else
+      private_messages_for(user).or(announcements)
+    end
   end
 
   private

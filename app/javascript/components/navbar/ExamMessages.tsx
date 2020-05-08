@@ -1,11 +1,12 @@
 import React from 'react';
-import { ProfMessage } from '@hourglass/types';
+import { ExamMessage } from '@hourglass/types';
+import { DateTime } from 'luxon';
 
-interface ProfMessagesProps {
-  messages: ProfMessage[];
+interface ExamMessagesProps {
+  messages: ExamMessage[];
 }
 
-const ProfMessages: React.FC<ProfMessagesProps> = (props) => {
+const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   const {
     messages,
   } = props;
@@ -18,7 +19,7 @@ const ProfMessages: React.FC<ProfMessagesProps> = (props) => {
     <ul>
       {messages.map((msg) => (
         <li>
-          <p className="m-0">{msg.time.toLocaleString()}</p>
+          <p className="m-0">{msg.time.toLocaleString(DateTime.TIME_SIMPLE)}</p>
           {msg.personal && (<p className="m-0"><i>(directly to you)</i></p>)}
           <p className="m-0">{msg.body}</p>
         </li>
@@ -27,4 +28,4 @@ const ProfMessages: React.FC<ProfMessagesProps> = (props) => {
   );
 };
 
-export default ProfMessages;
+export default ExamMessages;

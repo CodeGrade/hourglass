@@ -11,7 +11,6 @@ import {
   AnswerState,
   UpdateAnswerAction,
   StartExamResponse,
-  ContentsData,
   LoadExamAction,
   RailsExam,
   LockdownFailedAction,
@@ -21,6 +20,8 @@ import {
   ProfMessage,
   MessageReceivedAction,
   MessagesState,
+  AnswersState,
+  Exam,
 } from '@hourglass/types';
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
@@ -50,7 +51,7 @@ export function viewQuestion(question: number, part?: number): ViewQuestionActio
 export function viewNextQuestion(): Thunk {
   return (dispatch, getState): void => {
     const state = getState();
-    const qnum = state.contents.pagination.selected.question;
+    const qnum = state.pagination.selected.question;
     dispatch(viewQuestion(qnum + 1, 0));
   };
 }
@@ -58,7 +59,7 @@ export function viewNextQuestion(): Thunk {
 export function viewPrevQuestion(): Thunk {
   return (dispatch, getState): void => {
     const state = getState();
-    const qnum = state.contents.pagination.selected.question;
+    const qnum = state.pagination.selected.question;
     dispatch(viewQuestion(qnum - 1, 0));
   };
 }
@@ -82,10 +83,15 @@ export function lockdownFailed(message: string): LockdownFailedAction {
   };
 }
 
-export function loadExam(contents: ContentsData, messages: MessagesState): LoadExamAction {
+export function loadExam(
+  exam: Exam,
+  answers: AnswersState,
+  messages: MessagesState,
+): LoadExamAction {
   return {
     type: 'LOAD_EXAM',
-    contents,
+    exam,
+    answers,
     messages,
   };
 }
@@ -122,12 +128,8 @@ export function doLoad(examID: number): Thunk {
           dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
         } else {
           // TODO parse dates
-          // TODO simplify this once reducers are split up more
-          const contents: ContentsData = {
-            exam: result.exam,
-            answers: result.answers,
-          };
-          dispatch(loadExam(contents, result.messages));
+          const { exam, answers, messages } = result;
+          dispatch(loadExam(exam, answers, messages));
         }
       }).catch((err) => {
         // TODO: store a message to tell the user what went wrong
@@ -180,7 +182,7 @@ function snapshotSaving(): SnapshotSaving {
 export function saveSnapshot(examID: number): Thunk {
   return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
-    const { answers } = state.contents.data;
+    const { answers } = state.contents;
     dispatch(snapshotSaving());
     const url = Routes.save_snapshot_exam_path(examID);
     fetch(url, {

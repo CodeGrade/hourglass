@@ -1,5 +1,5 @@
 import React from 'react';
-import { RailsExam, ContentsData } from '@hourglass/types';
+import { RailsExam, ContentsState } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 import { ExamContext, ExamViewerContext, RailsContext } from '@hourglass/context';
 import { createMap } from '@hourglass/files';
@@ -9,7 +9,7 @@ import Scratch from '@hourglass/components/navbar/Scratch';
 
 interface ExamViewerProps {
   railsExam: RailsExam;
-  contents: ContentsData;
+  contents: ContentsState;
 }
 
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {

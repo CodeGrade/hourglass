@@ -18,7 +18,7 @@ export interface RailsRegistration {
 
 export type ExamTakerAction =
   LoadExamAction |
-  LockdownAction | ContentsAction | SnapshotAction | MessagesAction;
+  LockdownAction | PaginationAction | ContentsAction | SnapshotAction | MessagesAction;
 
 export type Thunk = ThunkAction<void, ExamTakerState, unknown, ExamTakerAction>;
 export type ExamTakerDispatch = ThunkDispatch<ExamTakerState, unknown, ExamTakerAction>;
@@ -35,27 +35,14 @@ export interface AnomalousReponse {
   type: 'ANOMALOUS';
 }
 
-export interface ContentsResponse extends ContentsData {
+export interface ContentsResponse {
   type: 'CONTENTS';
 
-  messages: ProfMessage[];
-}
-
-export interface ContentsData {
-  // Exam information.
   exam: Exam;
 
-  // The student's current answers.
   answers: AnswersState;
-}
 
-export interface ContentsState {
-  loaded: boolean;
-
-  data?: ContentsData;
-
-  // Pagination information.
-  pagination: PaginationState;
+  messages: ProfMessage[];
 }
 
 export interface PaginationState {
@@ -95,12 +82,14 @@ export interface LockdownFailedAction {
 
 export interface LoadExamAction {
   type: 'LOAD_EXAM';
-  contents: ContentsData;
+  exam: Exam;
+  answers: AnswersState;
   messages: MessagesState;
 }
 
-export type ContentsAction =
-  UpdateAnswerAction | UpdateScratchAction | TogglePaginationAction | ViewQuestionAction;
+export type ContentsAction = UpdateAnswerAction | UpdateScratchAction;
+
+export type PaginationAction = TogglePaginationAction | ViewQuestionAction;
 
 export interface UpdateAnswerAction {
   type: 'UPDATE_ANSWER';
@@ -154,14 +143,28 @@ export interface LockdownState {
 
   // Error message to display.
   message: string;
+
+  // Whether the exam has been loaded from the server.
+  loaded: boolean;
+}
+
+export interface ContentsState {
+  // Exam information.
+  exam?: Exam;
+
+  // The student's current answers.
+  answers?: AnswersState;
 }
 
 export interface ExamTakerState {
   // The current state of lockdown.
   lockdown: LockdownState;
 
-  // The contents of the exam, and latest student answers.
+  // The exam and student answers.
   contents: ContentsState;
+
+  // Pagination information.
+  pagination: PaginationState;
 
   // Professor messages / anouncements.
   messages: MessagesState;

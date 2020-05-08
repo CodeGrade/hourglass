@@ -72,6 +72,19 @@ when "development"
     )
     student_reg.save!
 
+    ExamMessage.create(
+      exam: exam,
+      sender: prof,
+      recipient: user,
+      body: "Hello #{student}, nice work."
+    )
+
     which_room = !which_room
   end
+
+  ExamMessage.create(
+    exam: exam,
+    sender: prof,
+    body: 'Welcome all!'
+  )
 end

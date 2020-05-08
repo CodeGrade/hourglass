@@ -1,0 +1,10 @@
+ben_announcement:
+  exam: examOne
+  sender: ben
+  body: "Hello all students!"
+
+ben_individual:
+  exam: examOne
+  sender: ben
+  recipient: kyle
+  body: "Hello just kyle!"

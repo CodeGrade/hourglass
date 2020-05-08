@@ -21,15 +21,11 @@ export default (state: ContentsState = {
         data: action.contents,
       };
     case 'UPDATE_ANSWER': {
-      const ret = {
-        ...state.data.answers,
-      };
-      let cur = ret;
-      for (let i = 0; i < action.path.length - 1; i += 1) {
-        cur[action.path[i]] = { ...cur[action.path[i]] };
-        cur = cur[action.path[i]];
-      }
-      cur[action.path[action.path.length - 1]] = action.val;
+      const ret = { ...state.data.answers };
+      const [qnum, pnum, bnum] = action.path;
+      ret[qnum] = { ...state.data.answers[qnum] };
+      ret[qnum][pnum] = { ...state.data.answers[qnum][pnum] };
+      ret[qnum][pnum][bnum] = action.val;
       return {
         ...state,
         data: {

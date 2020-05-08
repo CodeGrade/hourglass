@@ -181,9 +181,12 @@ export interface AnswersState {
       [bnum: number]: AnswerState;
     };
   };
+
+  // The student's scratch space work.
+  scratch: string;
 }
 
-export type StatePath = Array<number | string>;
+export type StatePath = [number, number, number];
 
 export interface CodeInfo {
   type: 'Code';

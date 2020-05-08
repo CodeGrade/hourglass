@@ -10,7 +10,7 @@ import { MatchingInfo, MatchingState } from '@hourglass/types';
 interface MatchingProps {
   info: MatchingInfo;
   value: MatchingState;
-  onChange: (index: number, newVal: number) => void;
+  onChange: (newVal: MatchingState) => void;
   disabled: boolean;
 }
 
@@ -40,7 +40,10 @@ const Matching: React.FC<MatchingProps> = (props) => {
               const valueI = value?.[i] ?? -1;
               const handleChange = (event: React.ChangeEvent<{ value: number }>): void => {
                 const val = event.target.value;
-                onChange(i, val);
+                console.log(val);
+                const ret = { ...value };
+                ret[i] = val;
+                onChange(ret);
               };
               return (
                 // Prompt indices are STATIC.

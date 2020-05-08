@@ -5,7 +5,7 @@ import { AllThatApplyInfo, AllThatApplyState } from '@hourglass/types';
 interface AllThatApplyProps {
   info: AllThatApplyInfo;
   value: AllThatApplyState;
-  onChange: (index: number, newState: boolean) => void;
+  onChange: (newVal: AllThatApplyState) => void;
   disabled: boolean;
   qnum: number;
   pnum: number;
@@ -26,7 +26,9 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
 
   const handler = (index: number) => (event: React.ChangeEvent<HTMLInputElement>): void => {
     const val = event.target.checked;
-    onChange(index, val);
+    const ret = { ...value };
+    ret[index] = val;
+    onChange(ret);
   };
   const body = (
     <>

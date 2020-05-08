@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { connect } from 'react-redux';
 import { updateAnswer } from '@hourglass/actions';
 import {
@@ -7,54 +5,57 @@ import {
   AnswerState,
   StatePath,
   SnapshotStatus,
+  MSTP,
+  MDTP,
+  BodyItem,
 } from '@hourglass/types';
 import withLocked from '@hourglass/components/Locked';
 
-const getAtPath = (state: ExamTakerState, ...path: StatePath): AnswerState => {
-  let ret = state.contents.data.answers;
-  path.forEach((item) => {
-    ret = ret?.[item];
-  });
-  return ret as AnswerState;
+const getAtPath = (state: ExamTakerState, path: StatePath): AnswerState => {
+  const [qnum, pnum, bnum] = path;
+  return state.contents.data.answers[qnum]?.[pnum]?.[bnum];
 };
 
-const mapStateToProps = (state: ExamTakerState, ownProps) => {
+interface OwnProps {
+  info: BodyItem;
+  qnum: number;
+  pnum: number;
+  bnum: number;
+}
+
+const mapStateToProps: MSTP<{
+  value: AnswerState;
+  disabled: boolean;
+  locked: boolean;
+  lockedMsg: string;
+}, OwnProps> = (state: ExamTakerState, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
   const { snapshot } = state;
   const { status, message } = snapshot;
   const locked = status === SnapshotStatus.FAILURE;
   return {
-    value: getAtPath(state, qnum, pnum, bnum),
+    value: getAtPath(state, [qnum, pnum, bnum]),
     disabled: locked,
     locked,
     lockedMsg: message,
   };
 };
 
-const mapDispatchToProps = (dispatch, ownProps) => {
+const mapDispatchToProps: MDTP<{
+  onChange: (newState: AnswerState) => void;
+}, OwnProps> = (dispatch, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
   return {
-    onChange: (newState) => dispatch(
-      updateAnswer(
-        [qnum, pnum, bnum],
-        newState,
-      ),
-    ),
+    onChange: (newState: AnswerState): void => {
+      dispatch(
+        updateAnswer(
+          [qnum, pnum, bnum],
+          newState,
+        )
+      );
+    },
   };
 };
 
+// eslint-disable-next-line
 export const connectWithPath = (Component) => connect(mapStateToProps, mapDispatchToProps)(withLocked(Component));
-
-const mapDispatchToPropsIndexed = (dispatch, ownProps) => {
-  const { qnum, pnum, bnum } = ownProps;
-  return {
-    onChange: (index, newState) => dispatch(
-      updateAnswer(
-        [qnum, pnum, bnum, index],
-        newState,
-      ),
-    ),
-  };
-};
-
-export const connectWithPathIndexed = (Component) => connect(mapStateToProps, mapDispatchToPropsIndexed)(withLocked(Component));

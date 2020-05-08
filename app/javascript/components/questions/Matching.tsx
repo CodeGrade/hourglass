@@ -30,7 +30,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
         <Table>
           <thead>
             <tr>
-              <th colSpan={3}>
+              <th colSpan={3} className="text-center">
                 <p>{promptLabel ?? 'Column A'}</p>
               </th>
             </tr>
@@ -87,7 +87,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
         <Table>
           <thead>
             <tr>
-              <th colSpan={3}>
+              <th colSpan={2} className="text-center">
                 <p>{valuesLabel ?? 'Column B'}</p>
               </th>
             </tr>

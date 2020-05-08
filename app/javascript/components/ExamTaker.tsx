@@ -23,7 +23,7 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
   const body = ready ? (
     <>
       <ExamNavbar />
-      <Row>
+      <Row className="py-3">
         <Col>
           <ExamShowContents
             railsExam={railsExam}

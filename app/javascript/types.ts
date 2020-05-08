@@ -37,6 +37,8 @@ export interface AnomalousReponse {
 
 export interface ContentsResponse extends ContentsData {
   type: 'CONTENTS';
+
+  messages: ProfMessage[];
 }
 
 export interface ContentsData {
@@ -94,6 +96,7 @@ export interface LockdownFailedAction {
 export interface LoadExamAction {
   type: 'LOAD_EXAM';
   contents: ContentsData;
+  messages: MessagesState;
 }
 
 export type ContentsAction =

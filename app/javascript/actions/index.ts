@@ -20,6 +20,7 @@ import {
   UpdateScratchAction,
   ProfMessage,
   MessageReceivedAction,
+  MessagesState,
 } from '@hourglass/types';
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
@@ -81,10 +82,11 @@ export function lockdownFailed(message: string): LockdownFailedAction {
   };
 }
 
-export function loadExam(contents: ContentsData): LoadExamAction {
+export function loadExam(contents: ContentsData, messages: MessagesState): LoadExamAction {
   return {
     type: 'LOAD_EXAM',
     contents,
+    messages,
   };
 }
 
@@ -119,7 +121,13 @@ export function doLoad(examID: number): Thunk {
         if (result.type === 'ANOMALOUS') {
           dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
         } else {
-          dispatch(loadExam(result));
+          // TODO parse dates
+          // TODO simplify this once reducers are split up more
+          const contents: ContentsData = {
+            exam: result.exam,
+            answers: result.answers,
+          };
+          dispatch(loadExam(contents, result.messages));
         }
       }).catch((err) => {
         // TODO: store a message to tell the user what went wrong

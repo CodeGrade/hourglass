@@ -74,7 +74,8 @@ class ExamsController < ApplicationController
           instructions: @exam.info[:contents][:instructions],
           files: @exam.get_exam_files
         },
-        answers: answers
+        answers: answers,
+        messages: messages
       }
     )
   end
@@ -83,18 +84,6 @@ class ExamsController < ApplicationController
     registrations = Registration.where(user: current_user)
     @exams = registrations.map(&:exam)
     @exams.keep_if(&:enabled?)
-  end
-
-  # returns true if lockout should occur
-  def save_answers(final = false)
-    answers = params.permit(:id, exam: {}, answers: {}).to_h[:answers]
-    unless @registration.allow_submission?
-      return true
-    end
-
-    @registration.update_attribute(:final, final)
-    @registration.save_answers(answers)
-    return false
   end
 
   def finalize
@@ -129,5 +118,27 @@ class ExamsController < ApplicationController
     @exam.save!
     Registration.create(exam: @exam, user: current_user, role: current_user.role.to_s)
     redirect_to @exam
+  end
+
+  private
+
+  # returns true if lockout should occur
+  def save_answers(final = false)
+    answers = params.permit(:id, exam: {}, answers: {}).to_h[:answers]
+    unless @registration.allow_submission?
+      return true
+    end
+
+    @registration.update_attribute(:final, final)
+    @registration.save_answers(answers)
+    return false
+  end
+
+  # Returns the announcements and messages for the current registration.
+  def messages
+    personals = @exam.messages_for(current_user)
+    announcements = @exam.announcements
+    both = personals.or(announcements)
+    both.map(&:serialize)
   end
 end

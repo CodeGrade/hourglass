@@ -10,6 +10,8 @@ export default (state: MessagesState = [], action: ExamTakerAction): MessagesSta
         action.msg,
         ...state,
       ];
+    case 'LOAD_EXAM':
+      return action.messages;
     default:
       return state;
   }

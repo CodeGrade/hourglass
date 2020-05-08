@@ -8,7 +8,6 @@ import {
   SnapshotSuccess,
   SnapshotSaveResult,
   SnapshotSaving,
-  StatePath,
   AnswerState,
   UpdateAnswerAction,
   StartExamResponse,
@@ -80,10 +79,12 @@ export function loadExam(contents: ContentsData): LoadExamAction {
   };
 }
 
-export function updateAnswer(path: StatePath, val: AnswerState): UpdateAnswerAction {
+export function updateAnswer(qnum: number, pnum: number, bnum: number, val: AnswerState): UpdateAnswerAction {
   return {
     type: 'UPDATE_ANSWER',
-    path,
+    qnum,
+    pnum,
+    bnum,
     val,
   };
 }

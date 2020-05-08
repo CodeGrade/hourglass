@@ -97,7 +97,9 @@ export type ContentsAction =
 
 export interface UpdateAnswerAction {
   type: 'UPDATE_ANSWER';
-  path: StatePath;
+  qnum: number;
+  pnum: number;
+  bnum: number;
   val: AnswerState;
 }
 
@@ -191,8 +193,6 @@ export interface AnswersState {
   // The student's scratch space work.
   scratch: string;
 }
-
-export type StatePath = [number, number, number];
 
 export interface CodeInfo {
   type: 'Code';

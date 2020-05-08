@@ -3,18 +3,12 @@ import { updateAnswer } from '@hourglass/actions';
 import {
   ExamTakerState,
   AnswerState,
-  StatePath,
   SnapshotStatus,
   MSTP,
   MDTP,
   BodyItem,
 } from '@hourglass/types';
 import withLocked from '@hourglass/components/Locked';
-
-const getAtPath = (state: ExamTakerState, path: StatePath): AnswerState => {
-  const [qnum, pnum, bnum] = path;
-  return state.contents.data.answers[qnum]?.[pnum]?.[bnum];
-};
 
 interface OwnProps {
   info: BodyItem;
@@ -34,7 +28,7 @@ const mapStateToProps: MSTP<{
   const { status, message } = snapshot;
   const locked = status === SnapshotStatus.FAILURE;
   return {
-    value: getAtPath(state, [qnum, pnum, bnum]),
+    value: state.contents.data.answers[qnum]?.[pnum]?.[bnum],
     disabled: locked,
     locked,
     lockedMsg: message,
@@ -49,7 +43,9 @@ const mapDispatchToProps: MDTP<{
     onChange: (newState: AnswerState): void => {
       dispatch(
         updateAnswer(
-          [qnum, pnum, bnum],
+          qnum,
+          pnum,
+          bnum,
           newState,
         ),
       );

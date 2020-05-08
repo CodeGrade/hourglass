@@ -22,7 +22,7 @@ export default (state: ContentsState = {
       };
     case 'UPDATE_ANSWER': {
       const ret = { ...state.data.answers };
-      const [qnum, pnum, bnum] = action.path;
+      const { qnum, pnum, bnum } = action;
       ret[qnum] = { ...state.data.answers[qnum] };
       ret[qnum][pnum] = { ...state.data.answers[qnum][pnum] };
       ret[qnum][pnum][bnum] = action.val;

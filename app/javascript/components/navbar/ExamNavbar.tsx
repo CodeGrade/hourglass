@@ -16,6 +16,7 @@ import {
 import { GiOpenBook } from 'react-icons/gi';
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 import { IconType } from 'react-icons';
+import JumpTo from '@hourglass/containers/navbar/JumpTo';
 
 
 interface NavAccordionItemProps {
@@ -58,7 +59,7 @@ const NavAccordion: React.FC<{}> = () => (
       label="Jump to"
       eventKey="jump"
     >
-      TODO
+      <JumpTo />
     </NavAccordionItem>
     <NavAccordionItem
       Icon={MdFeedback}

@@ -16,7 +16,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
     );
   }
   return (
-    <ul>
+    <ul className="p-0">
       {messages.map((msg) => (
         <li>
           <p className="m-0">{msg.time.toLocaleString(DateTime.TIME_SIMPLE)}</p>

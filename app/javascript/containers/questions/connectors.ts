@@ -51,7 +51,7 @@ const mapDispatchToProps: MDTP<{
         updateAnswer(
           [qnum, pnum, bnum],
           newState,
-        )
+        ),
       );
     },
   };

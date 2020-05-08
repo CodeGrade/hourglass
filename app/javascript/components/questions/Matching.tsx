@@ -40,7 +40,6 @@ const Matching: React.FC<MatchingProps> = (props) => {
               const valueI = value?.[i] ?? -1;
               const handleChange = (event: React.ChangeEvent<{ value: number }>): void => {
                 const val = event.target.value;
-                console.log(val);
                 const ret = { ...value };
                 ret[i] = val;
                 onChange(ret);

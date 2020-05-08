@@ -28,4 +28,33 @@ class ExamMessageTest < ActiveSupport::TestCase
     )
     assert_not em.save
   end
+
+  test 'students can send question' do
+    em = ExamMessage.new(
+      exam: exams(:examOne),
+      sender: users(:kyle),
+      body: 'I have a question. Can I ask it?'
+    )
+    assert em.save
+  end
+
+  test 'professors can send announcements' do
+    em = ExamMessage.new(
+      exam: exams(:examOne),
+      sender: users(:ben),
+      body: 'No more questions.'
+    )
+    assert em.save
+  end
+
+  test 'students cannot send private messages' do
+    em = ExamMessage.new(
+      exam: exams(:examOne),
+      recipient: users(:tyler),
+      sender: users(:kyle),
+      body: 'hi'
+    )
+    assert_not em.private_message_only_by_prof
+    assert_not em.save
+  end
 end

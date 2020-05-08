@@ -46,6 +46,7 @@ export interface ContentsResponse {
     time: string;
     body: string;
     personal: boolean;
+    id: number;
   }[];
 }
 
@@ -186,6 +187,9 @@ export interface ExamMessage {
 
   // Whether the message was sent directly to the current user.
   personal: boolean;
+
+  // Rails ID of the message.
+  id: number;
 }
 
 export type MessagesAction = MessageReceivedAction;

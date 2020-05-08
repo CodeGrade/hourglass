@@ -18,7 +18,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   return (
     <ul className="p-0">
       {messages.map((msg) => (
-        <li>
+        <li key={msg.id}>
           <p className="m-0">{msg.time.toLocaleString(DateTime.TIME_SIMPLE)}</p>
           {msg.personal && (<p className="m-0"><i>(directly to you)</i></p>)}
           <p className="m-0">{msg.body}</p>

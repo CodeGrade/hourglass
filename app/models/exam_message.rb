@@ -35,7 +35,8 @@ class ExamMessage < ApplicationRecord
     {
       body: body,
       time: created_at,
-      personal: recipient.present?
+      personal: recipient.present?,
+      id: id
     }
   end
 end

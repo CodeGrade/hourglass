@@ -25,6 +25,7 @@ interface NavAccordionItemProps {
   label: string;
   className?: string;
   eventKey: string;
+  direction?: 'up' | 'down';
 }
 
 const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
@@ -34,21 +35,30 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
     eventKey,
     children,
     className = 'bg-secondary text-light',
+    direction = 'down',
   } = props;
   const iconSize = '1.5em';
+  const toggle = (
+    <Accordion.Toggle eventKey={eventKey} as={Card.Header} className={`${className} cursor-pointer`}>
+      <Icon size={iconSize} />
+      <span className="align-middle ml-3">
+        {label}
+      </span>
+    </Accordion.Toggle>
+  );
+  const collapse = (
+    <Accordion.Collapse eventKey={eventKey}>
+      <Card.Body className="bg-light text-dark">
+        {children}
+      </Card.Body>
+    </Accordion.Collapse>
+  );
+  const cardBody = direction === 'up'
+    ? [collapse, toggle]
+    : [toggle, collapse];
   return (
     <Card className="border-dark">
-      <Accordion.Toggle eventKey={eventKey} as={Card.Header} className={`${className} cursor-pointer`}>
-        <Icon size={iconSize} />
-        <span className="align-middle ml-3">
-          {label}
-        </span>
-      </Accordion.Toggle>
-      <Accordion.Collapse eventKey={eventKey}>
-        <Card.Body className="bg-light text-dark">
-          {children}
-        </Card.Body>
-      </Accordion.Collapse>
+      {cardBody}
     </Card>
   );
 };
@@ -126,6 +136,7 @@ const ExamNavbar: React.FC<{}> = () => {
             Icon={MdTimer}
             label="TODO: Time remaining"
             eventKey="time"
+            direction="up"
           >
             <p>Exam began: TODO</p>
             <p className="m-0 p-0">Exam ends: TODO</p>

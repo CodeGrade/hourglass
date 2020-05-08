@@ -18,9 +18,9 @@ const ProfMessages: React.FC<ProfMessagesProps> = (props) => {
     <ul>
       {messages.map((msg) => (
         <li>
-          <p className="m-0"><b>{msg.title}</b></p>
+          <p className="m-0">{msg.time.toLocaleString()}</p>
           {msg.personal && (<p className="m-0"><i>(directly to you)</i></p>)}
-          {msg.body && (<p className="m-0">{msg.body}</p>)}
+          <p className="m-0">{msg.body}</p>
         </li>
       ))}
     </ul>

@@ -1,5 +1,6 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
+import { DateTime } from 'luxon';
 
 export interface RailsExam {
   // The exam ID.
@@ -169,9 +170,9 @@ export interface ExamTakerState {
 export type MessagesState = ProfMessage[];
 
 export interface ProfMessage {
-  title: string;
+  body: string;
 
-  body?: string;
+  time: DateTime;
 
   // Whether the message was sent directly to the current user.
   personal: boolean;

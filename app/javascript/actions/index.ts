@@ -26,7 +26,7 @@ import {
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';
-import {DateTime} from 'luxon';
+import { DateTime } from 'luxon';
 
 export function messageReceived(msg: ExamMessage): MessageReceivedAction {
   return {

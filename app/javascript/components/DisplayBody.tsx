@@ -43,8 +43,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     case 'Matching':
       return <DisplayMatching info={body} value={answer as MatchingState} />;
     default:
-    //  throw new Error('invalid question type');
-      return <p>TODO</p>;
+      throw new Error('invalid question type');
   }
 };
 

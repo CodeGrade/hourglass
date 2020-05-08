@@ -3,13 +3,15 @@ import { Form } from 'react-bootstrap';
 
 interface ScratchProps {
   value: string;
-  onChange: (newVal: string) => void;
+  onChange?: (newVal: string) => void;
+  disabled?: boolean;
 }
 
 const Scratch: React.FC<ScratchProps> = (props) => {
   const {
     value,
     onChange,
+    disabled = false,
   } = props;
   return (
     <Form.Control
@@ -18,6 +20,7 @@ const Scratch: React.FC<ScratchProps> = (props) => {
         onChange(event.target.value);
       }}
       as="textarea"
+      disabled={disabled}
     />
   );
 };

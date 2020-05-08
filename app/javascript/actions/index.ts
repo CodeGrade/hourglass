@@ -18,10 +18,19 @@ import {
   Thunk,
   policyPermits,
   UpdateScratchAction,
+  ProfMessage,
+  MessageReceivedAction,
 } from '@hourglass/types';
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';
+
+export function messageReceived(msg: ProfMessage): MessageReceivedAction {
+  return {
+    type: 'MESSAGE_RECEIVED',
+    msg,
+  };
+}
 
 export function togglePagination(): TogglePaginationAction {
   return {

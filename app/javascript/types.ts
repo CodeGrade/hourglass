@@ -16,8 +16,8 @@ export interface RailsRegistration {
 }
 
 export type ExamTakerAction =
-     LockedDownAction | LockdownFailedAction | LockdownIgnoredAction
-   | LoadExamAction | ContentsAction | SnapshotAction;
+  LoadExamAction |
+  LockdownAction | ContentsAction | SnapshotAction | MessagesAction;
 
 export type Thunk = ThunkAction<void, ExamTakerState, unknown, ExamTakerAction>;
 export type ExamTakerDispatch = ThunkDispatch<ExamTakerState, unknown, ExamTakerAction>;
@@ -73,6 +73,9 @@ export interface ViewQuestionAction {
   question: number;
   part: number;
 }
+
+export type LockdownAction =
+  LockedDownAction | LockdownFailedAction | LockdownIgnoredAction;
 
 export interface LockdownIgnoredAction {
   type: 'LOCKDOWN_IGNORED';
@@ -156,8 +159,29 @@ export interface ExamTakerState {
   // The contents of the exam, and latest student answers.
   contents: ContentsState;
 
+  // Professor messages / anouncements.
+  messages: MessagesState;
+
   // The current state of saving snapshots.
   snapshot: SnapshotState;
+}
+
+export type MessagesState = ProfMessage[];
+
+export interface ProfMessage {
+  title: string;
+
+  body?: string;
+
+  // Whether the message was sent directly to the current user.
+  personal: boolean;
+}
+
+export type MessagesAction = MessageReceivedAction;
+
+export interface MessageReceivedAction {
+  type: 'MESSAGE_RECEIVED';
+  msg: ProfMessage;
 }
 
 export interface RailsUser {

@@ -1,33 +1,44 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import SnapshotInfo from '@hourglass/containers/SnapshotInfo';
 import LockdownInfo from '@hourglass/containers/LockdownInfo';
+import { RailsContext } from '@hourglass/context';
 import './ExamNavbar.css';
 import {
   Accordion,
   Card,
 } from 'react-bootstrap';
-import MenuBookIcon from '@material-ui/icons/MenuBook';
-import { MdFeedback, MdNoteAdd, MdLiveHelp } from 'react-icons/md';
+import {
+  MdFeedback,
+  MdNoteAdd,
+  MdLiveHelp,
+  MdTimer,
+} from 'react-icons/md';
+import { GiOpenBook } from 'react-icons/gi';
+import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
+import { IconType } from 'react-icons';
 
 
 interface NavAccordionItemProps {
-  icon: React.ReactNode;
+  Icon: IconType;
   label: string;
+  className?: string;
   eventKey: string;
 }
 
 const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
   const {
-    icon,
+    Icon,
     label,
     eventKey,
     children,
+    className = 'bg-secondary text-light',
   } = props;
+  const iconSize = '1.5em';
   return (
-    <Card className="border-info">
-      <Accordion.Toggle eventKey={eventKey} as={Card.Header} className="bg-info cursor-pointer">
-        {icon}
-        <span className="align-middle ml-1">
+    <Card className="border-dark">
+      <Accordion.Toggle eventKey={eventKey} as={Card.Header} className={`${className} cursor-pointer`}>
+        <Icon size={iconSize} />
+        <span className="align-middle ml-3">
           {label}
         </span>
       </Accordion.Toggle>
@@ -43,28 +54,29 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
 const NavAccordion: React.FC<{}> = () => (
   <Accordion>
     <NavAccordionItem
-      icon={<MenuBookIcon />}
+      Icon={GiOpenBook}
       label="Jump to"
       eventKey="jump"
     >
       TODO
     </NavAccordionItem>
     <NavAccordionItem
-      icon={<MdFeedback />}
-      label="Professor Messages"
+      Icon={MdFeedback}
+      label="Professor messages"
+      className="bg-warning text-dark"
       eventKey="profmsg"
     >
       TODO
     </NavAccordionItem>
     <NavAccordionItem
-      icon={<MdNoteAdd />}
+      Icon={MdNoteAdd}
       label="Scratch space"
       eventKey="scratch"
     >
       TODO
     </NavAccordionItem>
     <NavAccordionItem
-      icon={<MdLiveHelp />}
+      Icon={MdLiveHelp}
       label="Ask a question"
       eventKey="askq"
     >
@@ -73,24 +85,53 @@ const NavAccordion: React.FC<{}> = () => (
   </Accordion>
 );
 
-const ExamNavbar: React.FC<{}> = () => (
-  <div className="bg-dark text-white float-left position-sticky p-3 vh-100 t-0">
-    <div>
-      <h1 className="d-inline align-middle">Hourglass</h1>
-      <span className="ml-2">
-        <LockdownInfo />
-      </span>
-      <span className="ml-2">
-        <SnapshotInfo />
-      </span>
+const ExamNavbar: React.FC<{}> = () => {
+  const { railsUser } = useContext(RailsContext);
+  return (
+    <div className="bg-dark text-white float-left position-sticky d-flex flex-column p-3 vh-100 t-0">
+      <h1 className="d-flex align-items-center">
+        <span className="exam-navbar-collapse collapse show flex-fill">Hourglass</span>
+        <button
+          className="navbar-toggler ml-auto mr-n4 btn btn-secondary"
+          type="button"
+          data-toggle="collapse"
+          data-target=".exam-navbar-collapse"
+          aria-controls="navbarToggleExternalContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <FaAngleDoubleLeft className="to-collapse" />
+          <FaAngleDoubleRight className="to-show" />
+        </button>
+      </h1>
+      <div className="exam-navbar-collapse collapse show m-0 p-0">
+        <div className="d-flex align-items-center">
+          <h6 className="d-inline my-0 mr-auto">{railsUser.username}</h6>
+          <span className="ml-2">
+            <LockdownInfo />
+          </span>
+          <span className="ml-2">
+            <SnapshotInfo />
+          </span>
+        </div>
+      </div>
+      <div className="exam-navbar-collapse collapse show mt-4">
+        <NavAccordion />
+      </div>
+      <div className="exam-navbar-collapse collapse show mb-2 mt-auto">
+        <Accordion>
+          <NavAccordionItem
+            Icon={MdTimer}
+            label="TODO: Time remaining"
+            eventKey="time"
+          >
+            <p>Exam began: TODO</p>
+            <p className="m-0 p-0">Exam ends: TODO</p>
+          </NavAccordionItem>
+        </Accordion>
+      </div>
     </div>
-    <div className="mt-2">
-      <NavAccordion />
-    </div>
-    <div className="position-absolute b-0">
-      TODO: Time Remaining
-    </div>
-  </div>
-);
+  );
+};
 
 export default ExamNavbar;

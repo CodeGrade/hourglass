@@ -9,3 +9,14 @@
 .cursor-pointer {
   cursor: pointer;
 }
+
+.exam-navbar-collapse ~ button > svg.to-show,
+.exam-navbar-collapse ~ button > svg.to-collapse {
+  display: none;
+}
+.exam-navbar-collapse ~ button:not(.collapsed) > .to-collapse {
+  display: inline;
+}
+.exam-navbar-collapse ~ button.collapsed > .to-show {
+  display: inline;
+}

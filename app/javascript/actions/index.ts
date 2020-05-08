@@ -18,6 +18,7 @@ import {
   LockdownFailedAction,
   Thunk,
   policyPermits,
+  UpdateScratchAction,
 } from '@hourglass/types';
 import { getCSRFToken } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
@@ -87,6 +88,12 @@ export function updateAnswer(path: StatePath, val: AnswerState): UpdateAnswerAct
   };
 }
 
+export function updateScratch(val: string): UpdateScratchAction {
+  return {
+    type: 'UPDATE_SCRATCH',
+    val,
+  };
+}
 
 export function doLoad(examID: number): Thunk {
   return (dispatch): void => {

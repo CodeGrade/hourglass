@@ -17,6 +17,7 @@ import { GiOpenBook } from 'react-icons/gi';
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 import { IconType } from 'react-icons';
 import JumpTo from '@hourglass/containers/navbar/JumpTo';
+import Scratch from '@hourglass/containers/navbar/Scratch';
 
 
 interface NavAccordionItemProps {
@@ -74,7 +75,7 @@ const NavAccordion: React.FC<{}> = () => (
       label="Scratch space"
       eventKey="scratch"
     >
-      TODO
+      <Scratch />
     </NavAccordionItem>
     <NavAccordionItem
       Icon={MdLiveHelp}

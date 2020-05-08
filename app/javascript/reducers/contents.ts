@@ -34,6 +34,17 @@ export default (state: ContentsState = {
         },
       };
     }
+    case 'UPDATE_SCRATCH':
+      return {
+        ...state,
+        data: {
+          ...state.data,
+          answers: {
+            ...state.data.answers,
+            scratch: action.val,
+          },
+        },
+      };
     case 'TOGGLE_PAGINATION':
       return {
         ...state,

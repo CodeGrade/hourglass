@@ -92,12 +92,18 @@ export interface LoadExamAction {
   contents: ContentsData;
 }
 
-export type ContentsAction = UpdateAnswerAction | TogglePaginationAction | ViewQuestionAction;
+export type ContentsAction =
+  UpdateAnswerAction | UpdateScratchAction | TogglePaginationAction | ViewQuestionAction;
 
 export interface UpdateAnswerAction {
   type: 'UPDATE_ANSWER';
   path: StatePath;
   val: AnswerState;
+}
+
+export interface UpdateScratchAction {
+  type: 'UPDATE_SCRATCH';
+  val: string;
 }
 
 export interface SnapshotSaving {

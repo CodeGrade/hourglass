@@ -1,7 +1,6 @@
 .CodeMirror {
   border: 1px solid #eee;
   max-width: 100%;
-  overflow: auto;
   resize: vertical;
 }
 

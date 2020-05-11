@@ -4,8 +4,8 @@ class ExamsController < ApplicationController
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create, :save_snapshot]
   before_action :require_admin_or_prof, only: [:new, :create, :finalize]
-  before_action :check_anomaly, only: [:start, :submit]
-  before_action :check_final, only: [:start, :submit]
+  before_action :check_anomaly, only: [:start, :submit, :ask_question]
+  before_action :check_final, only: [:start, :submit, :ask_question]
 
   def catch_require_current_user
     begin
@@ -74,7 +74,8 @@ class ExamsController < ApplicationController
           instructions: @exam.info[:contents][:instructions],
           files: @exam.get_exam_files
         },
-        answers: answers
+        answers: answers,
+        messages: messages
       }
     )
   end
@@ -85,18 +86,6 @@ class ExamsController < ApplicationController
     @exams.keep_if(&:enabled?)
   end
 
-  # returns true if lockout should occur
-  def save_answers(final = false)
-    answers = params.permit(:id, exam: {}, answers: {}).to_h[:answers]
-    unless @registration.allow_submission?
-      return true
-    end
-
-    @registration.update_attribute(:final, final)
-    @registration.save_answers(answers)
-    return false
-  end
-
   def finalize
     @exam = Exam.find(params[:id])
     @exam.finalize!
@@ -104,13 +93,37 @@ class ExamsController < ApplicationController
   end
 
   def submit
-    lockout = save_answers(true)
+    permitted = params.permit(:id, exam: {}, answers: {})
+    answers = permitted[:answers].to_h
+    lockout = save_answers(answers, true)
     render json: { lockout: lockout }
   end
 
   def save_snapshot
-    lockout = save_answers
-    render json: { lockout: lockout }
+    permitted = params.permit(:id, :lastMessageId, exam: {}, answers: {})
+    last_message_id = permitted[:lastMessageId]
+    answers = permitted[:answers].to_h
+    lockout = save_answers(answers)
+    render({
+      json: {
+        lockout: lockout,
+        messages: messages_after(last_message_id)
+      }
+    })
+  end
+
+  def ask_question
+    em_params = params.require(:message).permit(:body)
+    em = ExamMessage.new(
+      exam: @exam,
+      sender: current_user,
+      recipient: nil,
+      body: em_params[:body],
+    )
+    render json: {
+      success: em.save,
+      messages: em.errors.full_messages
+    }
   end
 
   def new
@@ -129,5 +142,32 @@ class ExamsController < ApplicationController
     @exam.save!
     Registration.create(exam: @exam, user: current_user, role: current_user.role.to_s)
     redirect_to @exam
+  end
+
+  private
+
+  # returns true if lockout should occur
+  def save_answers(answers, final = false)
+    unless @registration.allow_submission?
+      return true
+    end
+
+    @registration.update_attribute(:final, final)
+    @registration.save_answers(answers)
+    return false
+  end
+
+  # Returns the announcements and messages for the current registration.
+  def messages
+    msgs = @exam.all_messages_for(current_user).order(created_at: :desc)
+    msgs.map(&:serialize)
+  end
+
+  def messages_after(last_message_id)
+    msgs = @exam
+           .all_messages_for(current_user)
+           .where('id > ?', last_message_id)
+           .order(:created_at)
+    msgs.map(&:serialize)
   end
 end

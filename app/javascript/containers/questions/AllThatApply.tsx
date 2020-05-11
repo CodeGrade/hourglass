@@ -1,4 +1,4 @@
 import AllThatApply from '@hourglass/components/questions/AllThatApply';
-import { connectWithPathIndexed } from './connectors';
+import { connectWithPath } from './connectors';
 
-export default connectWithPathIndexed(AllThatApply);
+export default connectWithPath(AllThatApply);

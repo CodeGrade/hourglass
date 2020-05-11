@@ -15,6 +15,7 @@ Rails.application.routes.draw do
       post :submit
 
       post :save_snapshot
+      post :ask_question
     end
 
     resources :registrations, only: [:show, :index] do

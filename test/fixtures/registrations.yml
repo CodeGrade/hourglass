@@ -22,5 +22,12 @@ kyleReg:
   exam: examOne
   user: kyle
   room: examOneRoomOne
-  role: <%= Registration::roles[:proctor] %>
+  role: <%= Registration::roles[:student] %>
+  final: false
+
+tylerReg:
+  exam: examOne
+  user: tyler
+  room: examOneRoomOne
+  role: <%= Registration::roles[:student] %>
   final: false

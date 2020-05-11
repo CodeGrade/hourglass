@@ -4,24 +4,45 @@ import {
   TogglePaginationAction,
   ViewQuestionAction,
   ExamTakerState,
+  SnapshotStatus,
   SnapshotFailure,
   SnapshotSuccess,
   SnapshotSaveResult,
   SnapshotSaving,
-  StatePath,
   AnswerState,
   UpdateAnswerAction,
   StartExamResponse,
-  ContentsData,
   LoadExamAction,
   RailsExam,
   LockdownFailedAction,
   Thunk,
   policyPermits,
+  UpdateScratchAction,
+  ExamMessage,
+  MessageReceivedAction,
+  MessagesOpenedAction,
+  AnswersState,
+  Exam,
 } from '@hourglass/types';
-import { getCSRFToken } from '@hourglass/helpers';
+import {
+  getCSRFToken,
+  convertMsgs,
+} from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';
+
+export function messageReceived(msg: ExamMessage): MessageReceivedAction {
+  return {
+    type: 'MESSAGE_RECEIVED',
+    msg,
+  };
+}
+
+export function messagesOpened(): MessagesOpenedAction {
+  return {
+    type: 'MESSAGES_OPENED',
+  };
+}
 
 export function togglePagination(): TogglePaginationAction {
   return {
@@ -33,23 +54,23 @@ export function viewQuestion(question: number, part?: number): ViewQuestionActio
   return {
     type: 'VIEW_QUESTION',
     question,
-    part: part ?? 0,
+    part,
   };
 }
 
 export function viewNextQuestion(): Thunk {
   return (dispatch, getState): void => {
     const state = getState();
-    const qnum = state.contents.pagination.selected.question;
-    dispatch(viewQuestion(qnum + 1, 0));
+    const qnum = state.pagination.selected.question;
+    dispatch(viewQuestion(qnum + 1));
   };
 }
 
 export function viewPrevQuestion(): Thunk {
   return (dispatch, getState): void => {
     const state = getState();
-    const qnum = state.contents.pagination.selected.question;
-    dispatch(viewQuestion(qnum - 1, 0));
+    const qnum = state.pagination.selected.question;
+    dispatch(viewQuestion(qnum - 1));
   };
 }
 
@@ -72,21 +93,40 @@ export function lockdownFailed(message: string): LockdownFailedAction {
   };
 }
 
-export function loadExam(contents: ContentsData): LoadExamAction {
+export function loadExam(
+  exam: Exam,
+  answers: AnswersState,
+  messages: ExamMessage[],
+): LoadExamAction {
   return {
     type: 'LOAD_EXAM',
-    contents,
+    exam,
+    answers,
+    messages,
   };
 }
 
-export function updateAnswer(path: StatePath, val: AnswerState): UpdateAnswerAction {
+export function updateAnswer(
+  qnum: number,
+  pnum: number,
+  bnum: number,
+  val: AnswerState,
+): UpdateAnswerAction {
   return {
     type: 'UPDATE_ANSWER',
-    path,
+    qnum,
+    pnum,
+    bnum,
     val,
   };
 }
 
+export function updateScratch(val: string): UpdateScratchAction {
+  return {
+    type: 'UPDATE_SCRATCH',
+    val,
+  };
+}
 
 export function doLoad(examID: number): Thunk {
   return (dispatch): void => {
@@ -97,7 +137,9 @@ export function doLoad(examID: number): Thunk {
         if (result.type === 'ANOMALOUS') {
           dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
         } else {
-          dispatch(loadExam(result));
+          const { exam, answers, messages } = result;
+          const newMsgs = convertMsgs(messages);
+          dispatch(loadExam(exam, answers, newMsgs));
         }
       }).catch((err) => {
         // TODO: store a message to tell the user what went wrong
@@ -150,8 +192,12 @@ function snapshotSaving(): SnapshotSaving {
 export function saveSnapshot(examID: number): Thunk {
   return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
-    const { answers } = state.contents.data;
-    dispatch(snapshotSaving());
+    if (state.snapshot.status === SnapshotStatus.SUCCESS) {
+      dispatch(snapshotSaving());
+    }
+    const { answers } = state.contents;
+    // The messages list is sorted from newest to oldest.
+    const lastMessageId = state.messages.messages[0]?.id ?? 0;
     const url = Routes.save_snapshot_exam_path(examID);
     fetch(url, {
       method: 'POST',
@@ -159,18 +205,28 @@ export function saveSnapshot(examID: number): Thunk {
         'Content-Type': 'application/json',
         'X-CSRF-Token': getCSRFToken(),
       },
-      body: JSON.stringify({ answers }),
+      body: JSON.stringify({
+        answers,
+        lastMessageId,
+      }),
       credentials: 'same-origin',
     })
       .then((result) => result.json() as Promise<SnapshotSaveResult>)
       .then((result) => {
-        const { lockout } = result;
+        const {
+          lockout,
+          messages,
+        } = result;
         if (lockout) {
           const error = 'Locked out of exam.';
           dispatch(snapshotFailure(error));
           window.location = Routes.exams_path();
         } else {
+          const newMsgs = convertMsgs(messages);
           dispatch(snapshotSuccess());
+          newMsgs.forEach((msg) => {
+            dispatch(messageReceived(msg));
+          });
         }
       }).catch((err) => {
         const error = `Error saving snapshot to server: ${err.message}`;
@@ -180,7 +236,9 @@ export function saveSnapshot(examID: number): Thunk {
 }
 
 export function submitExam(examID: number): Thunk {
-  return (dispatch): void => {
+  return (dispatch, getState): void => {
+    const state = getState();
+    const { answers } = state.contents;
     dispatch(saveSnapshot(examID));
     const url = Routes.submit_exam_path(examID);
     fetch(url, {
@@ -190,6 +248,9 @@ export function submitExam(examID: number): Thunk {
         'X-CSRF-Token': getCSRFToken(),
       },
       credentials: 'same-origin',
+      body: JSON.stringify({
+        answers,
+      }),
     })
       .then((result) => result.json() as Promise<SubmitResponse>)
       .then(() => {

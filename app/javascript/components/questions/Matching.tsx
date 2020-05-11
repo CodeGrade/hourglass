@@ -10,7 +10,7 @@ import { MatchingInfo, MatchingState } from '@hourglass/types';
 interface MatchingProps {
   info: MatchingInfo;
   value: MatchingState;
-  onChange: (index: number, newVal: number) => void;
+  onChange: (newVal: MatchingState) => void;
   disabled: boolean;
 }
 
@@ -30,7 +30,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
         <Table>
           <thead>
             <tr>
-              <th colSpan={3}>
+              <th colSpan={3} className="text-center">
                 <p>{promptLabel ?? 'Column A'}</p>
               </th>
             </tr>
@@ -40,7 +40,9 @@ const Matching: React.FC<MatchingProps> = (props) => {
               const valueI = value?.[i] ?? -1;
               const handleChange = (event: React.ChangeEvent<{ value: number }>): void => {
                 const val = event.target.value;
-                onChange(i, val);
+                const ret = { ...value };
+                ret[i] = val;
+                onChange(ret);
               };
               return (
                 // Prompt indices are STATIC.
@@ -87,7 +89,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
         <Table>
           <thead>
             <tr>
-              <th colSpan={3}>
+              <th colSpan={2} className="text-center">
                 <p>{valuesLabel ?? 'Column B'}</p>
               </th>
             </tr>

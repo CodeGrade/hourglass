@@ -19,7 +19,7 @@ const Pagination: React.FC<PaginationProps> = (props) => {
   } = props;
   const onFirstPage = current === 0;
   const onLastPage = current === max - 1;
-  const showEnd = (!paginated) || onLastPage;
+  const showEnd = paginated && onLastPage;
   return (
     <div>
       <div
@@ -44,6 +44,7 @@ const Pagination: React.FC<PaginationProps> = (props) => {
           );
         })}
       </div>
+      {!paginated && endItem}
     </div>
   );
 };

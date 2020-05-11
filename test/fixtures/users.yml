@@ -9,3 +9,7 @@ amit:
 kyle:
   username: "kyle"
   role: <%= User::roles[:unprivileged] %>
+
+tyler:
+  username: "tyler"
+  role: <%= User::roles[:unprivileged] %>

@@ -1,5 +1,6 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
+import { DateTime } from 'luxon';
 
 export interface RailsExam {
   // The exam ID.
@@ -13,11 +14,12 @@ export interface RailsExam {
 
 export interface RailsRegistration {
   id: number;
+  anomalous: boolean;
 }
 
 export type ExamTakerAction =
-     LockedDownAction | LockdownFailedAction | LockdownIgnoredAction
-   | LoadExamAction | ContentsAction | SnapshotAction;
+  LoadExamAction |
+  LockdownAction | PaginationAction | ContentsAction | SnapshotAction | MessagesAction;
 
 export type Thunk = ThunkAction<void, ExamTakerState, unknown, ExamTakerAction>;
 export type ExamTakerDispatch = ThunkDispatch<ExamTakerState, unknown, ExamTakerAction>;
@@ -34,25 +36,21 @@ export interface AnomalousReponse {
   type: 'ANOMALOUS';
 }
 
-export interface ContentsResponse extends ContentsData {
+export interface ContentsResponse {
   type: 'CONTENTS';
-}
 
-export interface ContentsData {
-  // Exam information.
   exam: Exam;
 
-  // The student's current answers.
   answers: AnswersState;
+
+  messages: RailsExamMessage[];
 }
 
-export interface ContentsState {
-  loaded: boolean;
-
-  data?: ContentsData;
-
-  // Pagination information.
-  pagination: PaginationState;
+export interface RailsExamMessage {
+  time: string;
+  body: string;
+  personal: boolean;
+  id: number;
 }
 
 export interface PaginationState {
@@ -71,8 +69,11 @@ export interface TogglePaginationAction {
 export interface ViewQuestionAction {
   type: 'VIEW_QUESTION';
   question: number;
-  part: number;
+  part?: number;
 }
+
+export type LockdownAction =
+  LockedDownAction | LockdownFailedAction | LockdownIgnoredAction;
 
 export interface LockdownIgnoredAction {
   type: 'LOCKDOWN_IGNORED';
@@ -89,15 +90,26 @@ export interface LockdownFailedAction {
 
 export interface LoadExamAction {
   type: 'LOAD_EXAM';
-  contents: ContentsData;
+  exam: Exam;
+  answers: AnswersState;
+  messages: ExamMessage[];
 }
 
-export type ContentsAction = UpdateAnswerAction | TogglePaginationAction | ViewQuestionAction;
+export type ContentsAction = UpdateAnswerAction | UpdateScratchAction;
+
+export type PaginationAction = TogglePaginationAction | ViewQuestionAction;
 
 export interface UpdateAnswerAction {
   type: 'UPDATE_ANSWER';
-  path: StatePath;
+  qnum: number;
+  pnum: number;
+  bnum: number;
   val: AnswerState;
+}
+
+export interface UpdateScratchAction {
+  type: 'UPDATE_SCRATCH';
+  val: string;
 }
 
 export interface SnapshotSaving {
@@ -115,6 +127,7 @@ export interface SnapshotFailure {
 
 export interface SnapshotSaveResult {
   lockout: boolean;
+  messages: RailsExamMessage[];
 }
 
 export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure;
@@ -139,17 +152,65 @@ export interface LockdownState {
 
   // Error message to display.
   message: string;
+
+  // Whether the exam has been loaded from the server.
+  loaded: boolean;
+}
+
+export interface ContentsState {
+  // Exam information.
+  exam?: Exam;
+
+  // The student's current answers.
+  answers?: AnswersState;
 }
 
 export interface ExamTakerState {
   // The current state of lockdown.
   lockdown: LockdownState;
 
-  // The contents of the exam, and latest student answers.
+  // The exam and student answers.
   contents: ContentsState;
+
+  // Pagination information.
+  pagination: PaginationState;
+
+  // Professor messages / anouncements.
+  messages: MessagesState;
 
   // The current state of saving snapshots.
   snapshot: SnapshotState;
+}
+
+export type MessagesState = {
+  // Whether there are unread messages.
+  unread: boolean;
+
+  // All messages for the current exam.
+  messages: ExamMessage[];
+}
+
+export interface ExamMessage {
+  body: string;
+
+  time: DateTime;
+
+  // Whether the message was sent directly to the current user.
+  personal: boolean;
+
+  // Rails ID of the message.
+  id: number;
+}
+
+export type MessagesAction = MessageReceivedAction | MessagesOpenedAction;
+
+export interface MessagesOpenedAction {
+  type: 'MESSAGES_OPENED';
+}
+
+export interface MessageReceivedAction {
+  type: 'MESSAGE_RECEIVED';
+  msg: ExamMessage;
 }
 
 export interface RailsUser {
@@ -181,9 +242,10 @@ export interface AnswersState {
       [bnum: number]: AnswerState;
     };
   };
-}
 
-export type StatePath = Array<number | string>;
+  // The student's scratch space work.
+  scratch: string;
+}
 
 export interface CodeInfo {
   type: 'Code';

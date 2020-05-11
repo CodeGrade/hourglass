@@ -1,0 +1,14 @@
+.CodeMirror {
+  border: 1px solid #eee;
+  max-width: 100%;
+  resize: vertical;
+}
+
+.CodeMirror-scroll {
+  max-width: 100%;
+  overflow: auto;
+}
+
+.CodeMirror .readOnly {
+  background: #8d6d001a;
+}

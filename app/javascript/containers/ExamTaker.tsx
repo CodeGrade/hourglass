@@ -8,7 +8,7 @@ import ExamTaker from '@hourglass/components/ExamTaker';
 const examTakerStateToProps: MSTP<{ ready: boolean }> = (state) => ({
   ready: (state.lockdown.status === LockdownStatus.LOCKED
           || state.lockdown.status === LockdownStatus.IGNORED)
-         && !!state.contents.data,
+         && !!state.lockdown.loaded,
 });
 
 export default connect(examTakerStateToProps)(ExamTaker);

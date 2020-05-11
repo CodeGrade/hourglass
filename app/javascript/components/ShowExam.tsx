@@ -1,9 +1,4 @@
 import React from 'react';
-import {
-  Row,
-  Col,
-  Container,
-} from 'react-bootstrap';
 import { Provider } from 'react-redux';
 import store from '@hourglass/store';
 import {
@@ -31,27 +26,21 @@ interface ShowExamProps {
 
 const ShowExam: React.FC<ShowExamProps> = (props) => {
   const {
-    railsExam,
     railsUser,
-    final,
+    railsExam,
     railsRegistration,
+    final,
   } = props;
   return (
-    <Container>
-      <RailsContext.Provider value={{
+    <RailsContext.Provider
+      value={{
         railsExam, railsRegistration, railsUser,
       }}
-      >
-        <Provider store={store}>
-          <Row>
-            <Col>
-              <h1>{railsExam.name}</h1>
-              {final ? <ExamSubmitted /> : <ExamTaker />}
-            </Col>
-          </Row>
-        </Provider>
-      </RailsContext.Provider>
-    </Container>
+    >
+      <Provider store={store}>
+        {final ? <ExamSubmitted /> : <ExamTaker />}
+      </Provider>
+    </RailsContext.Provider>
   );
 };
 

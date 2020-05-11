@@ -1,4 +1,9 @@
 import Routes from '@hourglass/routes';
+import {
+  RailsExamMessage,
+  ExamMessage,
+} from '@hourglass/types';
+import { DateTime } from 'luxon';
 
 export function getCSRFToken(): string {
   const elem: HTMLMetaElement = document.querySelector('[name=csrf-token]');
@@ -24,12 +29,10 @@ export function logOut(): void {
 function scrollToElem(id: string): void {
   setTimeout(() => {
     const elem = document.getElementById(id);
-    const nav = document.querySelectorAll('.navbar')[0] as HTMLDivElement;
-    const navHeight = nav?.offsetHeight ?? 0;
     const elemTop = elem.getBoundingClientRect().top + window.pageYOffset;
     window.scrollTo({
       left: 0,
-      top: elemTop - navHeight,
+      top: elemTop + 1,
       behavior: 'smooth',
     });
   });
@@ -49,4 +52,11 @@ export function scrollToPart(qnum: number, pnum: number): void {
  */
 export function sleep(milis: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, milis));
+}
+
+export function convertMsgs(msgs: RailsExamMessage[]): ExamMessage[] {
+  return msgs.map((m) => ({
+    ...m,
+    time: DateTime.fromISO(m.time),
+  }));
 }

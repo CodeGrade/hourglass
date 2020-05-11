@@ -1,4 +1,4 @@
 import Matching from '@hourglass/components/questions/Matching';
-import { connectWithPathIndexed } from './connectors';
+import { connectWithPath } from './connectors';
 
-export default connectWithPathIndexed(Matching);
+export default connectWithPath(Matching);

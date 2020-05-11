@@ -7,7 +7,10 @@
 html,
 body {
   height: 100%;
-  padding-top: 40px;
+}
+
+.navbar + .container {
+  padding-top: $nav-link-height + $nav-link-padding-y * 2;
 }
 
 .table-hover tbody tr.no-hover:hover {
@@ -57,114 +60,55 @@ body {
   padding-top: 20px;
 }
 
-.CodeMirror .readOnly {
-  background: #8d6d001a;
-}
-
-div#questions:not(.paginated) .question-nav { display: none; }
-
-@media screen {
-    div.paginated {
-        > div.question {
-            display: none;
-
-            > div > div.part {
-                display: none;
-            }
-
-            &.active {
-                display: initial;
-
-                > div > div.part {
-                    display: initial;
-                }
-            }
-
-            nav {
-                display: none;
-            }
-        }
-
-        > div.question.paginated {
-            > div > div.part {
-                display: none;
-            }
-
-            &.active {
-                > div > div.part.active {
-                    display: initial;
-                }
-            }
-
-            nav {
-                display: initial;
-            }
-        }
-    }
-}
-
 @media print {
-    div.paginated {
-        > div.question {
-            display: initial;
-            margin-left: 0;
-            margin-right: 0;
-            > .col, > [class*="col-"] {
-                padding-right: 0;
-                padding-left: 0;
-            }
-            > :last-child {
-                break-after: page;
-            }
-            > div > div.part {
-                display: initial;
-                margin-left: 0;
-                margin-right: 0;
-                > .col, > [class*="col-"] {
-                    padding-right: 0;
-                    padding-left: 0;
-                }
-                > * {
-                    break-after: avoid-page;
-                }
-                .btn-group > .btn:not(.active),
-                input[type="radio"]:not(:checked),
-                input[type="radio"]:not(:checked) + label,
-                input[type="checkbox"]:not(:checked),
-                input[type="checkbox"]:not(:checked) + label {
-                    border-color: transparent;
-                    text-decoration: line-through;
-                }
-                input[type="radio"], input[type="checkbox"] {
-                    display: none;
-                }
-                input[type="radio"]:checked + label,
-                input[type="checkbox"]:checked + label {
-                    @include button-variant(map-get($theme-colors, "primary"), map-get($theme-colors, "primary"));
-                    @include button-size($btn-padding-y, $btn-padding-x, $btn-font-size, $btn-line-height, $btn-border-radius);
-                    border-width: $btn-border-width;
+  div.paginated {
+    > div.question {
+      display: initial;
+      margin-left: 0;
+      margin-right: 0;
+      > .col, > [class*="col-"] {
+        padding-right: 0;
+        padding-left: 0;
+      }
+      > :last-child {
+        break-after: page;
+      }
+      > div > div.part {
+        display: initial;
+        margin-left: 0;
+        margin-right: 0;
+        > .col, > [class*="col-"] {
+          padding-right: 0;
+          padding-left: 0;
+        }
+        > * {
+          break-after: avoid-page;
+        }
+        .btn-group > .btn:not(.active),
+        input[type="radio"]:not(:checked),
+        input[type="radio"]:not(:checked) + label,
+        input[type="checkbox"]:not(:checked),
+        input[type="checkbox"]:not(:checked) + label {
+          border-color: transparent;
+          text-decoration: line-through;
+        }
+        input[type="radio"], input[type="checkbox"] {
+          display: none;
+        }
+        input[type="radio"]:checked + label,
+        input[type="checkbox"]:checked + label {
+          @include button-variant(map-get($theme-colors, "primary"), map-get($theme-colors, "primary"));
+          @include button-size($btn-padding-y, $btn-padding-x, $btn-font-size, $btn-line-height, $btn-border-radius);
+          border-width: $btn-border-width;
 
-                }
-            }
-            nav { display: none; }
         }
-        &:last-child > :last-child {
-            break-after: avoid-page;
-        }
+      }
+      nav { display: none; }
     }
-}
-        
-
-.treeview.condensed {
-  overflow: scroll;
-  border: 1px solid black;
-  border-radius: 5px;
-}
-
-.treeview.condensed .list-group-item {
-  padding: 0.1em;
-  white-space: nowrap;
-  border: 0px solid white;
+    &:last-child > :last-child {
+      break-after: avoid-page;
+    }
+  }
 }
 
 .tab-pane {

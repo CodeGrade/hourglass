@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import {
   Exam,
 } from '@hourglass/types';
 import { createMap } from '@hourglass/files';
-import { ExamContext } from '@hourglass/context';
+import { ExamContext, RailsContext } from '@hourglass/context';
 import Questions from '@hourglass/containers/Questions';
 import useAnomalyListeners from '@hourglass/lockdown/anomaly';
 import HTML from '@hourglass/components/HTML';
@@ -35,17 +35,15 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     files,
   } = exam;
   const fmap = createMap(files);
+  const { railsExam } = useContext(RailsContext);
   return (
     <ExamContext.Provider value={{ files, fmap }}>
-      <div>
-        <HTML value={instructions} />
-        {reference && <FileViewer references={reference} />}
-        <div>
-          <Questions
-            questions={questions}
-          />
-        </div>
-      </div>
+      <h1>{railsExam.name}</h1>
+      <HTML value={instructions} />
+      {reference && <FileViewer references={reference} />}
+      <Questions
+        questions={questions}
+      />
     </ExamContext.Provider>
   );
 };

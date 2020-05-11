@@ -1,9 +1,13 @@
 import React from 'react';
-import { Table, Col } from 'react-bootstrap';
 import { PartInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
+import {
+  ScrollspyTop,
+  ScrollspyBottom,
+} from '@hourglass/containers/Scrollspy';
 import { BodyProps } from './Body';
 import { FileViewer } from './FileViewer';
+import './Part.css';
 
 interface PartProps {
   part: PartInfo;
@@ -26,8 +30,12 @@ const Part: React.FC<PartProps> = (props) => {
   if (name) title += `: ${name}`;
   const subtitle = `(${points} points)`;
   return (
-    <div id={`question-${qnum}-part-${pnum}`} className="part">
-      <h3>
+    <div className="part">
+      <ScrollspyTop
+        qnum={qnum}
+        pnum={pnum}
+      />
+      <h3 id={`question-${qnum}-part-${pnum}`}>
         {title}
         <small className="float-right text-muted">
           {subtitle}
@@ -35,21 +43,21 @@ const Part: React.FC<PartProps> = (props) => {
       </h3>
       <div><HTML value={description} /></div>
       {reference && <FileViewer references={reference} />}
-      <Table hover borderless>
-        <tbody>
+      <div>
+        <div>
           {body.map((b, i) => (
             // Body numbers are STATIC.
             // eslint-disable-next-line react/no-array-index-key
-            <tr key={i}>
-              <td className="row w-100 no-gutters">
-                <Col>
-                  <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
-                </Col>
-              </td>
-            </tr>
+            <div className="p-2 bodyitem" key={i}>
+              <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
+            </div>
           ))}
-        </tbody>
-      </Table>
+        </div>
+      </div>
+      <ScrollspyBottom
+        qnum={qnum}
+        pnum={pnum}
+      />
     </div>
   );
 };

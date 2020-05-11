@@ -1,14 +1,15 @@
 import React from 'react';
-import { RailsExam, ContentsData } from '@hourglass/types';
+import { RailsExam, ContentsState } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 import { ExamContext, ExamViewerContext, RailsContext } from '@hourglass/context';
 import { createMap } from '@hourglass/files';
 import DisplayQuestions from '@hourglass/components/DisplayQuestions';
 import { FileViewer } from '@hourglass/components/FileViewer';
+import Scratch from '@hourglass/components/navbar/Scratch';
 
 interface ExamViewerProps {
   railsExam: RailsExam;
-  contents: ContentsData;
+  contents: ContentsState;
 }
 
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {
@@ -32,6 +33,15 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
       <ExamViewerContext.Provider value={{ answers }}>
         <RailsContext.Provider value={{ railsExam }}>
           <div>
+            {answers.scratch && (
+              <div>
+                <span>Scratch space:</span>
+                <Scratch
+                  value={answers.scratch}
+                  disabled
+                />
+              </div>
+            )}
             <HTML value={instructions} />
             {reference && <FileViewer references={reference} />}
             <div>

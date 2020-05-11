@@ -7,6 +7,9 @@ interface MultipleChoiceProps {
   value: MultipleChoiceState;
   onChange: (newVal: number) => void;
   disabled: boolean;
+  qnum: number;
+  pnum: number;
+  bnum: number;
 }
 
 const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
@@ -15,6 +18,9 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
     value,
     onChange,
     disabled,
+    qnum,
+    pnum,
+    bnum,
   } = props;
   const { options, prompt } = info;
   const handler = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -34,6 +40,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
             label={option}
             onChange={handler}
             checked={value === idx}
+            id={`opt-${qnum}-${pnum}-${bnum}-${idx}`}
             // Response indices are STATIC.
             // eslint-disable-next-line react/no-array-index-key
             key={idx}

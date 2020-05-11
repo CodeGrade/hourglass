@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import PaginationDropdown from '@hourglass/components/PaginationDropdown';
+import JumpTo from '@hourglass/components/navbar/JumpTo';
 import {
   MSTP, PaginationState, QuestionInfo, MDTP,
 } from '@hourglass/types';
@@ -12,8 +12,8 @@ const mapStateToProps: MSTP<{
   pagination: PaginationState;
   questions: QuestionInfo[];
 }> = (state) => ({
-  pagination: state.contents.pagination,
-  questions: state.contents.data.exam.questions,
+  pagination: state.pagination,
+  questions: state.contents.exam.questions,
 });
 
 const mapDispatchToProps: MDTP<{
@@ -28,4 +28,4 @@ const mapDispatchToProps: MDTP<{
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(PaginationDropdown);
+export default connect(mapStateToProps, mapDispatchToProps)(JumpTo);

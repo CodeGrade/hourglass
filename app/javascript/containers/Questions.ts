@@ -6,8 +6,8 @@ const mapStateToProps: MSTP<{
   paginated: boolean;
   selectedQuestion: number;
 }> = (state: ExamTakerState) => ({
-  paginated: state.contents.pagination.paginated,
-  selectedQuestion: state.contents.pagination.selected.question,
+  paginated: state.pagination.paginated,
+  selectedQuestion: state.pagination.selected.question,
 });
 
 export default connect(mapStateToProps, null)(Questions);

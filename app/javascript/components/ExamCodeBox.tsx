@@ -6,6 +6,7 @@ import 'codemirror/theme/mdn-like';
 import React, { useEffect, useState } from 'react';
 import { UnControlled as UnControlledCodeMirror, IUnControlledCodeMirror } from 'react-codemirror2';
 import { MarkDescription } from '@hourglass/types';
+import './ExamCodeBox.css';
 
 function applyMarks(cm: CM.Editor, marks: MarkDescription[]): CM.TextMarker[] {
   return marks.map((mark) => cm.markText(mark.from, mark.to, {

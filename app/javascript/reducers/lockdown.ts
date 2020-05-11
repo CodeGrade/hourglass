@@ -5,6 +5,7 @@ import {
 } from '@hourglass/types';
 
 export default (state: LockdownState = {
+  loaded: false,
   status: LockdownStatus.BEFORE,
   message: '',
 }, action: ExamTakerAction): LockdownState => {
@@ -26,6 +27,11 @@ export default (state: LockdownState = {
         ...state,
         status: LockdownStatus.FAILED,
         message: action.message,
+      };
+    case 'LOAD_EXAM':
+      return {
+        ...state,
+        loaded: true,
       };
     default:
       return state;

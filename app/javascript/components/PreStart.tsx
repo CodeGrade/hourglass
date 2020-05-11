@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button } from 'react-bootstrap';
+import { RailsContext } from '@hourglass/context';
 
 interface PreStartProps {
   onClick: () => void;
@@ -13,8 +14,24 @@ const PreStart: React.FC<PreStartProps> = (props) => {
     isError,
     errorMsg,
   } = props;
+  const {
+    railsExam,
+    railsRegistration,
+  } = useContext(RailsContext);
+  if (railsRegistration.anomalous) {
+    return (
+      <div>
+        <h1>{railsExam.name}</h1>
+        <i className="text-danger">
+          You have been locked out of this exam.
+          Please see an instructor.
+        </i>
+      </div>
+    );
+  }
   return (
     <div>
+      <h1>{railsExam.name}</h1>
       <p>Click the following button to enter secure mode and begin the exam.</p>
       <Button
         variant="success"

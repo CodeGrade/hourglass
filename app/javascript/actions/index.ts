@@ -19,19 +19,28 @@ import {
   UpdateScratchAction,
   ExamMessage,
   MessageReceivedAction,
+  MessagesOpenedAction,
   MessagesState,
   AnswersState,
   Exam,
 } from '@hourglass/types';
-import { getCSRFToken } from '@hourglass/helpers';
+import {
+  getCSRFToken,
+  convertMsgs,
+} from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';
-import { DateTime } from 'luxon';
 
 export function messageReceived(msg: ExamMessage): MessageReceivedAction {
   return {
     type: 'MESSAGE_RECEIVED',
     msg,
+  };
+}
+
+export function messagesOpened(): MessagesOpenedAction {
+  return {
+    type: 'MESSAGES_OPENED',
   };
 }
 
@@ -87,7 +96,7 @@ export function lockdownFailed(message: string): LockdownFailedAction {
 export function loadExam(
   exam: Exam,
   answers: AnswersState,
-  messages: MessagesState,
+  messages: ExamMessage[],
 ): LoadExamAction {
   return {
     type: 'LOAD_EXAM',
@@ -129,10 +138,7 @@ export function doLoad(examID: number): Thunk {
           dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
         } else {
           const { exam, answers, messages } = result;
-          const newMsgs = messages.map((m) => ({
-            ...m,
-            time: DateTime.fromISO(m.time),
-          }));
+          const newMsgs = convertMsgs(messages);
           dispatch(loadExam(exam, answers, newMsgs));
         }
       }).catch((err) => {
@@ -186,8 +192,9 @@ function snapshotSaving(): SnapshotSaving {
 export function saveSnapshot(examID: number): Thunk {
   return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
-    const { answers } = state.contents;
     dispatch(snapshotSaving());
+    const { answers } = state.contents;
+    const lastMessageId = state.messages.messages[0]?.id ?? 0;
     const url = Routes.save_snapshot_exam_path(examID);
     fetch(url, {
       method: 'POST',
@@ -195,18 +202,28 @@ export function saveSnapshot(examID: number): Thunk {
         'Content-Type': 'application/json',
         'X-CSRF-Token': getCSRFToken(),
       },
-      body: JSON.stringify({ answers }),
+      body: JSON.stringify({
+        answers,
+        lastMessageId,
+      }),
       credentials: 'same-origin',
     })
       .then((result) => result.json() as Promise<SnapshotSaveResult>)
       .then((result) => {
-        const { lockout } = result;
+        const {
+          lockout,
+          messages,
+        } = result;
         if (lockout) {
           const error = 'Locked out of exam.';
           dispatch(snapshotFailure(error));
           window.location = Routes.exams_path();
         } else {
+          const newMsgs = convertMsgs(messages);
           dispatch(snapshotSuccess());
+          newMsgs.forEach((msg) => {
+            dispatch(messageReceived(msg));
+          });
         }
       }).catch((err) => {
         const error = `Error saving snapshot to server: ${err.message}`;

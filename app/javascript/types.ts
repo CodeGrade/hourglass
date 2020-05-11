@@ -42,12 +42,14 @@ export interface ContentsResponse {
 
   answers: AnswersState;
 
-  messages: {
-    time: string;
-    body: string;
-    personal: boolean;
-    id: number;
-  }[];
+  messages: RailsExamMessage[];
+}
+
+export interface RailsExamMessage {
+  time: string;
+  body: string;
+  personal: boolean;
+  id: number;
 }
 
 export interface PaginationState {
@@ -89,7 +91,7 @@ export interface LoadExamAction {
   type: 'LOAD_EXAM';
   exam: Exam;
   answers: AnswersState;
-  messages: MessagesState;
+  messages: ExamMessage[];
 }
 
 export type ContentsAction = UpdateAnswerAction | UpdateScratchAction;
@@ -124,6 +126,7 @@ export interface SnapshotFailure {
 
 export interface SnapshotSaveResult {
   lockout: boolean;
+  messages: RailsExamMessage[];
 }
 
 export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure;
@@ -178,7 +181,13 @@ export interface ExamTakerState {
   snapshot: SnapshotState;
 }
 
-export type MessagesState = ExamMessage[];
+export type MessagesState = {
+  // Whether there are unread messages.
+  unread: boolean;
+
+  // All messages for the current exam.
+  messages: ExamMessage[];
+}
 
 export interface ExamMessage {
   body: string;
@@ -192,7 +201,11 @@ export interface ExamMessage {
   id: number;
 }
 
-export type MessagesAction = MessageReceivedAction;
+export type MessagesAction = MessageReceivedAction | MessagesOpenedAction;
+
+export interface MessagesOpenedAction {
+  type: 'MESSAGES_OPENED';
+}
 
 export interface MessageReceivedAction {
   type: 'MESSAGE_RECEIVED';

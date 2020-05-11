@@ -30,7 +30,7 @@ interface NavAccordionItemProps {
   direction?: 'up' | 'down';
 }
 
-const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
+export const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
   const {
     Icon,
     label,
@@ -41,7 +41,11 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
   } = props;
   const iconSize = '1.5em';
   const toggle = (
-    <Accordion.Toggle eventKey={eventKey} as={Card.Header} className={`${className} cursor-pointer`}>
+    <Accordion.Toggle
+      eventKey={eventKey}
+      as={Card.Header}
+      className={`${className} cursor-pointer`}
+    >
       <Icon size={iconSize} />
       <span className="align-middle ml-3">
         {label}
@@ -74,14 +78,7 @@ const NavAccordion: React.FC<{}> = () => (
     >
       <JumpTo />
     </NavAccordionItem>
-    <NavAccordionItem
-      Icon={MdFeedback}
-      label="Professor messages"
-      className="bg-warning text-dark"
-      eventKey="profmsg"
-    >
-      <ExamMessages />
-    </NavAccordionItem>
+    <ExamMessages />
     <NavAccordionItem
       Icon={MdNoteAdd}
       label="Scratch space"

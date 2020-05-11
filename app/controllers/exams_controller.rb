@@ -93,13 +93,23 @@ class ExamsController < ApplicationController
   end
 
   def submit
-    lockout = save_answers(true)
+    permitted = params.permit(:id, exam: {}, answers: {})
+    answers = permitted[:answers].to_h
+    lockout = save_answers(answers, true)
     render json: { lockout: lockout }
   end
 
   def save_snapshot
-    lockout = save_answers
-    render json: { lockout: lockout }
+    permitted = params.permit(:id, :lastMessageId, exam: {}, answers: {})
+    last_message_id = permitted[:lastMessageId]
+    answers = permitted[:answers].to_h
+    lockout = save_answers(answers)
+    render({
+      json: {
+        lockout: lockout,
+        messages: messages_after(last_message_id)
+      }
+    })
   end
 
   def ask_question
@@ -137,8 +147,7 @@ class ExamsController < ApplicationController
   private
 
   # returns true if lockout should occur
-  def save_answers(final = false)
-    answers = params.permit(:id, exam: {}, answers: {}).to_h[:answers]
+  def save_answers(answers, final = false)
     unless @registration.allow_submission?
       return true
     end
@@ -151,6 +160,15 @@ class ExamsController < ApplicationController
   # Returns the announcements and messages for the current registration.
   def messages
     msgs = @exam.all_messages_for(current_user).order(created_at: :desc)
+    msgs.map(&:serialize)
+  end
+
+  def messages_after(lastMessageId)
+    id_range = ((lastMessageId + 1)..)
+    msgs = @exam
+           .all_messages_for(current_user)
+           .where(id: id_range)
+           .order(created_at: :desc)
     msgs.map(&:serialize)
   end
 end

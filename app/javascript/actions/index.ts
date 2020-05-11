@@ -196,6 +196,7 @@ export function saveSnapshot(examID: number): Thunk {
       dispatch(snapshotSaving());
     }
     const { answers } = state.contents;
+    // The messages list is sorted from newest to oldest.
     const lastMessageId = state.messages.messages[0]?.id ?? 0;
     const url = Routes.save_snapshot_exam_path(examID);
     fetch(url, {

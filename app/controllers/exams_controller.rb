@@ -163,12 +163,11 @@ class ExamsController < ApplicationController
     msgs.map(&:serialize)
   end
 
-  def messages_after(lastMessageId)
-    id_range = ((lastMessageId + 1)..)
+  def messages_after(last_message_id)
     msgs = @exam
            .all_messages_for(current_user)
-           .where(id: id_range)
-           .order(created_at: :desc)
+           .where('id > ?', last_message_id)
+           .order(:created_at)
     msgs.map(&:serialize)
   end
 end

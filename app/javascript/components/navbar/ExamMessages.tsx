@@ -6,16 +6,20 @@ import { MdFeedback } from 'react-icons/md';
 import { NavAccordionItem } from '@hourglass/components/navbar/ExamNavbar';
 
 interface ExamMessagesProps {
+  expanded: boolean;
   messages: ExamMessage[];
   onMessagesOpened: () => void;
   unread: boolean;
+  onSectionClick: (eventKey: string) => void;
 }
 
 const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   const {
+    expanded,
     messages,
     onMessagesOpened,
     unread,
+    onSectionClick,
   } = props;
   const msgs = messages.map((msg) => (
     <li key={msg.id}>
@@ -30,10 +34,12 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   const classes = unread ? 'bg-warning text-dark' : undefined;
   return (
     <NavAccordionItem
+      expanded={expanded}
       Icon={MdFeedback}
       label="Professor messages"
       className={classes}
       eventKey="profmsg"
+      onSectionClick={onSectionClick}
     >
       <ul className="p-0">
         {body}

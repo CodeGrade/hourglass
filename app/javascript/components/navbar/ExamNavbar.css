@@ -10,13 +10,32 @@
   cursor: pointer;
 }
 
-.exam-navbar-collapse ~ button > svg.to-show,
-.exam-navbar-collapse ~ button > svg.to-collapse {
-  display: none;
+.transition {
+  transition: 5s all ease;
 }
-.exam-navbar-collapse ~ button:not(.collapsed) > .to-collapse {
-  display: inline;
+
+.sidebar-small {
+  min-width: 50px;
 }
-.exam-navbar-collapse ~ button.collapsed > .to-show {
-  display: inline;
+
+.sidebar-expanded {
+  min-width: 500px;
+}
+
+.width-0 {
+  width: 0;
+}
+
+.d-expanded {
+  transform-origin: left;
+  transform: scaleX(1);
+  max-width: 30em;
+  max-height: 5em;
+}
+
+.d-collapsed {
+  transform-origin: left;
+  transform: scaleX(0);
+  max-width: 0;
+  max-height: 0;
 }

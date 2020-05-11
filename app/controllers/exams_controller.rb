@@ -4,8 +4,8 @@ class ExamsController < ApplicationController
   before_action :require_enabled, except: [:index, :new, :create]
   before_action :require_registration, except: [:index, :new, :create, :save_snapshot]
   before_action :require_admin_or_prof, only: [:new, :create, :finalize]
-  before_action :check_anomaly, only: [:start, :submit]
-  before_action :check_final, only: [:start, :submit]
+  before_action :check_anomaly, only: [:start, :submit, :ask_question]
+  before_action :check_final, only: [:start, :submit, :ask_question]
 
   def catch_require_current_user
     begin
@@ -100,6 +100,20 @@ class ExamsController < ApplicationController
   def save_snapshot
     lockout = save_answers
     render json: { lockout: lockout }
+  end
+
+  def ask_question
+    em_params = params.require(:message).permit(:body)
+    em = ExamMessage.new(
+      exam: @exam,
+      sender: current_user,
+      recipient: nil,
+      body: em_params[:body],
+    )
+    render json: {
+      success: em.save,
+      messages: em.errors.full_messages
+    }
   end
 
   def new

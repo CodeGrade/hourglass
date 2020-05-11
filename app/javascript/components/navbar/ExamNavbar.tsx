@@ -19,6 +19,7 @@ import { IconType } from 'react-icons';
 import JumpTo from '@hourglass/containers/navbar/JumpTo';
 import Scratch from '@hourglass/containers/navbar/Scratch';
 import ExamMessages from '@hourglass/containers/navbar/ExamMessages';
+import AskQuestion from '@hourglass/components/navbar/AskQuestion';
 
 
 interface NavAccordionItemProps {
@@ -93,7 +94,7 @@ const NavAccordion: React.FC<{}> = () => (
       label="Ask a question"
       eventKey="askq"
     >
-      TODO
+      <AskQuestion />
     </NavAccordionItem>
   </Accordion>
 );

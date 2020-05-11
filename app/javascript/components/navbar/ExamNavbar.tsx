@@ -8,7 +8,6 @@ import {
   Card,
 } from 'react-bootstrap';
 import {
-  MdFeedback,
   MdNoteAdd,
   MdLiveHelp,
   MdTimer,
@@ -60,8 +59,8 @@ export const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
     </Accordion.Collapse>
   );
   const cardBody = direction === 'up'
-    ? [collapse, toggle]
-    : [toggle, collapse];
+    ? <>{collapse}{toggle}</>
+    : <>{toggle}{collapse}</>;
   return (
     <Card className="border-dark">
       {cardBody}

@@ -11,25 +11,21 @@ import { RailsContext } from '@hourglass/context';
 
 async function submitQuestion(examID: number, question: string): Promise<boolean> {
   const url = Routes.ask_question_exam_path(examID);
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': getCSRFToken(),
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': getCSRFToken(),
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify({
+      message: {
+        body: question,
       },
-      credentials: 'same-origin',
-      body: JSON.stringify({
-        message: {
-          body: question,
-        },
-      }),
-    });
-    const json = await (res.json() as Promise<{success: boolean}>);
-    return json.success;
-  } catch (e) {
-    return false;
-  }
+    }),
+  });
+  const json = await (res.json() as Promise<{success: boolean}>);
+  return json.success;
 }
 
 const AskQuestion: React.FC<{}> = () => {

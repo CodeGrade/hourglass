@@ -135,11 +135,11 @@ const ExamNavbar: React.FC<{}> = () => {
           </span>
         </div>
       </div>
-      <div className="exam-navbar-collapse collapse show mt-4">
+      <div className="exam-navbar-collapse collapse show mt-4 flex-fill overflow-auto">
         <NavAccordion />
       </div>
       <div className="exam-navbar-collapse collapse show mb-2 mt-auto">
-        <Accordion>
+        <Accordion className="mt-4">
           <NavAccordionItem
             Icon={MdTimer}
             label="TODO: Time remaining"

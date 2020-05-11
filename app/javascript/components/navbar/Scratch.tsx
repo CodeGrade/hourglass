@@ -1,5 +1,6 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
+import './Scratch.css';
 
 interface ScratchProps {
   value: string;
@@ -15,6 +16,7 @@ const Scratch: React.FC<ScratchProps> = (props) => {
   } = props;
   return (
     <Form.Control
+      id="scratchbox"
       value={value}
       onChange={(event): void => {
         onChange(event.target.value);

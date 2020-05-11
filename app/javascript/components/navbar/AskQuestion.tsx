@@ -46,6 +46,7 @@ const AskQuestion: React.FC<{}> = () => {
         disabled={saving}
       />
       <Button
+        className="mt-3"
         variant="success"
         disabled={saving}
         onClick={(): void => {

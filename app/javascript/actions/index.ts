@@ -4,6 +4,7 @@ import {
   TogglePaginationAction,
   ViewQuestionAction,
   ExamTakerState,
+  SnapshotStatus,
   SnapshotFailure,
   SnapshotSuccess,
   SnapshotSaveResult,
@@ -192,7 +193,9 @@ function snapshotSaving(): SnapshotSaving {
 export function saveSnapshot(examID: number): Thunk {
   return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
-    dispatch(snapshotSaving());
+    if (state.snapshot.status === SnapshotStatus.SUCCESS) {
+      dispatch(snapshotSaving());
+    }
     const { answers } = state.contents;
     const lastMessageId = state.messages.messages[0]?.id ?? 0;
     const url = Routes.save_snapshot_exam_path(examID);

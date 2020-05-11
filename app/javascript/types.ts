@@ -14,6 +14,7 @@ export interface RailsExam {
 
 export interface RailsRegistration {
   id: number;
+  anomalous: boolean;
 }
 
 export type ExamTakerAction =

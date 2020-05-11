@@ -6,7 +6,7 @@ import { updateScratch } from '@hourglass/actions';
 const mapStateToProps: MSTP<{
   value: string;
 }> = (state) => ({
-  value: state.contents.data?.answers.scratch ?? '',
+  value: state.contents.answers.scratch ?? '',
 });
 
 const mapDispatchToProps: MDTP<{

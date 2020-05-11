@@ -14,7 +14,21 @@ const PreStart: React.FC<PreStartProps> = (props) => {
     isError,
     errorMsg,
   } = props;
-  const { railsExam } = useContext(RailsContext);
+  const {
+    railsExam,
+    railsRegistration,
+  } = useContext(RailsContext);
+  if (railsRegistration.anomalous) {
+    return (
+      <div>
+        <h1>{railsExam.name}</h1>
+        <i className="text-danger">
+          You have been locked out of this exam.
+          Please see an instructor.
+        </i>
+      </div>
+    );
+  }
   return (
     <div>
       <h1>{railsExam.name}</h1>

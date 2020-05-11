@@ -66,13 +66,9 @@ class Registration < ApplicationRecord
     Registration.base_sub_dir.join(exam.id.to_i.to_s)
   end
 
-  private
-
   def filename
     exam_subs.join("user#{user.id.to_i}.json")
   end
-
-  private
 
   def append_json(json)
     ts = DateTime.now.iso8601

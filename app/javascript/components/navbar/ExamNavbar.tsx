@@ -8,7 +8,6 @@ import {
   Card,
 } from 'react-bootstrap';
 import {
-  MdFeedback,
   MdNoteAdd,
   MdLiveHelp,
   MdTimer,
@@ -18,6 +17,8 @@ import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 import { IconType } from 'react-icons';
 import JumpTo from '@hourglass/containers/navbar/JumpTo';
 import Scratch from '@hourglass/containers/navbar/Scratch';
+import ExamMessages from '@hourglass/containers/navbar/ExamMessages';
+import AskQuestion from '@hourglass/components/navbar/AskQuestion';
 
 
 interface NavAccordionItemProps {
@@ -28,7 +29,7 @@ interface NavAccordionItemProps {
   direction?: 'up' | 'down';
 }
 
-const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
+export const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
   const {
     Icon,
     label,
@@ -39,7 +40,11 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
   } = props;
   const iconSize = '1.5em';
   const toggle = (
-    <Accordion.Toggle eventKey={eventKey} as={Card.Header} className={`${className} cursor-pointer`}>
+    <Accordion.Toggle
+      eventKey={eventKey}
+      as={Card.Header}
+      className={`${className} cursor-pointer`}
+    >
       <Icon size={iconSize} />
       <span className="align-middle ml-3">
         {label}
@@ -54,8 +59,18 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
     </Accordion.Collapse>
   );
   const cardBody = direction === 'up'
-    ? [collapse, toggle]
-    : [toggle, collapse];
+    ? (
+      <>
+        {collapse}
+        {toggle}
+      </>
+    )
+    : (
+      <>
+        {toggle}
+        {collapse}
+      </>
+    );
   return (
     <Card className="border-dark">
       {cardBody}
@@ -72,14 +87,7 @@ const NavAccordion: React.FC<{}> = () => (
     >
       <JumpTo />
     </NavAccordionItem>
-    <NavAccordionItem
-      Icon={MdFeedback}
-      label="Professor messages"
-      className="bg-warning text-dark"
-      eventKey="profmsg"
-    >
-      TODO
-    </NavAccordionItem>
+    <ExamMessages />
     <NavAccordionItem
       Icon={MdNoteAdd}
       label="Scratch space"
@@ -92,7 +100,7 @@ const NavAccordion: React.FC<{}> = () => (
       label="Ask a question"
       eventKey="askq"
     >
-      TODO
+      <AskQuestion />
     </NavAccordionItem>
   </Accordion>
 );
@@ -127,11 +135,11 @@ const ExamNavbar: React.FC<{}> = () => {
           </span>
         </div>
       </div>
-      <div className="exam-navbar-collapse collapse show mt-4">
+      <div className="exam-navbar-collapse collapse show mt-4 flex-fill overflow-auto">
         <NavAccordion />
       </div>
       <div className="exam-navbar-collapse collapse show mb-2 mt-auto">
-        <Accordion>
+        <Accordion className="mt-4">
           <NavAccordionItem
             Icon={MdTimer}
             label="TODO: Time remaining"

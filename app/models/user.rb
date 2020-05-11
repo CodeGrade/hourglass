@@ -9,4 +9,8 @@ class User < ApplicationRecord
   def admin_or_prof?
     self.admin? || self.professor?
   end
+
+  def reg_for(exam)
+    registrations.find_by(exam: exam)
+  end
 end

@@ -13,7 +13,7 @@ interface OwnProps {
 }
 
 const mapStateToProps: MSTP<{exam: Exam}, OwnProps> = (state) => ({
-  exam: state.contents.data.exam,
+  exam: state.contents.exam,
 });
 
 const mapDispatchToProps: MDTP<{

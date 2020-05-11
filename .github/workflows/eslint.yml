@@ -1,7 +1,8 @@
 name: ESLint
 on:
-  pull_request:
+  push:
     branches: [ master ]
+  pull_request:
 jobs:
   eslint:
     runs-on: ubuntu-latest

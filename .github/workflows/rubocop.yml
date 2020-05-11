@@ -1,7 +1,8 @@
 name: Rubocop
 on:
-  pull_request:
+  push:
     branches: [ master ]
+  pull_request:
 jobs:
   rubocop:
     runs-on: ubuntu-latest

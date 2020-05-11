@@ -4,6 +4,7 @@ class Exam < ApplicationRecord
   has_many :registrations
   has_many :users, through: :registrations
   has_many :rooms
+  has_many :exam_messages
   has_one :upload, dependent: :destroy
 
   validates_presence_of :upload
@@ -288,6 +289,34 @@ class Exam < ApplicationRecord
 
   def get_exam_files
     clean_up(get_raw_files(""))
+  end
+
+  def professors
+    registrations.includes(:user).where(role: 'professor').map(&:user)
+  end
+
+  def students
+    registrations.includes(:user).where(role: 'student').map(&:user)
+  end
+
+  def announcements
+    exam_messages.where(recipient: nil, sender: professors)
+  end
+
+  def questions
+    exam_messages.where(recipient: nil, sender: students)
+  end
+
+  def private_messages_for(user)
+    exam_messages.where(recipient: user)
+  end
+
+  def all_messages_for(user)
+    if user.reg_for(self).professor?
+      questions.or(announcements)
+    else
+      private_messages_for(user).or(announcements)
+    end
   end
 
   private

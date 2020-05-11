@@ -216,7 +216,9 @@ export function saveSnapshot(examID: number): Thunk {
 }
 
 export function submitExam(examID: number): Thunk {
-  return (dispatch): void => {
+  return (dispatch, getState): void => {
+    const state = getState();
+    const { answers } = state.contents;
     dispatch(saveSnapshot(examID));
     const url = Routes.submit_exam_path(examID);
     fetch(url, {
@@ -226,6 +228,9 @@ export function submitExam(examID: number): Thunk {
         'X-CSRF-Token': getCSRFToken(),
       },
       credentials: 'same-origin',
+      body: JSON.stringify({
+        answers,
+      }),
     })
       .then((result) => result.json() as Promise<SubmitResponse>)
       .then(() => {

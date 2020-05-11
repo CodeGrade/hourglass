@@ -21,7 +21,6 @@ import {
   ExamMessage,
   MessageReceivedAction,
   MessagesOpenedAction,
-  MessagesState,
   AnswersState,
   Exam,
 } from '@hourglass/types';

@@ -25,8 +25,8 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
     </li>
   ));
   const body = msgs.length === 0
-             ? <i>No messages.</i>
-             : msgs;
+    ? <i>No messages.</i>
+    : msgs;
   const classes = unread ? 'bg-warning text-dark' : undefined;
   return (
     <NavAccordionItem
@@ -41,7 +41,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
       {unread && (
         <Button
           variant="success"
-          onClick={() => onMessagesOpened()}
+          onClick={(): void => onMessagesOpened()}
         >
           Acknowledge unread messages
         </Button>

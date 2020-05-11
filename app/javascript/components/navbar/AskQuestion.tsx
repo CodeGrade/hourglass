@@ -1,5 +1,10 @@
 import React, { useState, useContext } from 'react';
-import { Form, Button, Alert, AlertProps } from 'react-bootstrap';
+import {
+  Form,
+  Button,
+  Alert,
+  AlertProps,
+} from 'react-bootstrap';
 import Routes from '@hourglass/routes';
 import { getCSRFToken } from '@hourglass/helpers';
 import { RailsContext } from '@hourglass/context';

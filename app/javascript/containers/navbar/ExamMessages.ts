@@ -14,7 +14,7 @@ const mapStateToProps: MSTP<{
 const mapDispatchToProps: MDTP<{
   onMessagesOpened: () => void;
 }> = (dispatch) => ({
-  onMessagesOpened: () => {
+  onMessagesOpened: (): void => {
     dispatch(messagesOpened());
   },
 });

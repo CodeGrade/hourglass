@@ -16,7 +16,7 @@ export default (state: MessagesState = {
           action.msg,
           ...state.messages,
         ],
-      }
+      };
     case 'LOAD_EXAM':
       return {
         messages: action.messages,

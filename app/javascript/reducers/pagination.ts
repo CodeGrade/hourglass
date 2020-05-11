@@ -6,7 +6,7 @@ export default (state: PaginationState = {
   paginated: false,
   selected: {
     question: 0,
-    part: 0,
+    part: undefined,
   },
 }, action: ExamTakerAction): PaginationState => {
   switch (action.type) {

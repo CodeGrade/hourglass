@@ -1,6 +1,10 @@
 import React from 'react';
 import { PartInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
+import {
+  ScrollspyTop,
+  ScrollspyBottom,
+} from '@hourglass/containers/Scrollspy';
 import { BodyProps } from './Body';
 import { FileViewer } from './FileViewer';
 import './Part.css';
@@ -26,8 +30,12 @@ const Part: React.FC<PartProps> = (props) => {
   if (name) title += `: ${name}`;
   const subtitle = `(${points} points)`;
   return (
-    <div id={`question-${qnum}-part-${pnum}`} className="part">
-      <h3>
+    <div className="part">
+      <ScrollspyTop
+        qnum={qnum}
+        pnum={pnum}
+      />
+      <h3 id={`question-${qnum}-part-${pnum}`}>
         {title}
         <small className="float-right text-muted">
           {subtitle}
@@ -46,6 +54,10 @@ const Part: React.FC<PartProps> = (props) => {
           ))}
         </div>
       </div>
+      <ScrollspyBottom
+        qnum={qnum}
+        pnum={pnum}
+      />
     </div>
   );
 };

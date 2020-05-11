@@ -54,7 +54,7 @@ export function viewQuestion(question: number, part?: number): ViewQuestionActio
   return {
     type: 'VIEW_QUESTION',
     question,
-    part: part ?? 0,
+    part,
   };
 }
 
@@ -62,7 +62,7 @@ export function viewNextQuestion(): Thunk {
   return (dispatch, getState): void => {
     const state = getState();
     const qnum = state.pagination.selected.question;
-    dispatch(viewQuestion(qnum + 1, 0));
+    dispatch(viewQuestion(qnum + 1));
   };
 }
 
@@ -70,7 +70,7 @@ export function viewPrevQuestion(): Thunk {
   return (dispatch, getState): void => {
     const state = getState();
     const qnum = state.pagination.selected.question;
-    dispatch(viewQuestion(qnum - 1, 0));
+    dispatch(viewQuestion(qnum - 1));
   };
 }
 

@@ -69,7 +69,7 @@ export interface TogglePaginationAction {
 export interface ViewQuestionAction {
   type: 'VIEW_QUESTION';
   question: number;
-  part: number;
+  part?: number;
 }
 
 export type LockdownAction =

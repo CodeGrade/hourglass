@@ -30,6 +30,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
     paginated,
     selected,
   } = pagination;
+  const justQuestion = selected.part === undefined;
   return (
     <>
       <Form.Check
@@ -54,7 +55,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
               <Nav.Item>
                 <Nav.Link
                   eventKey={qi}
-                  active={false}
+                  active={selectedQuestion && justQuestion}
                   onSelect={(): void => {
                     changeQuestion(qi);
                     scrollToQuestion(qi);

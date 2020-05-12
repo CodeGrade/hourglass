@@ -2,6 +2,9 @@ import React, { useState, useContext } from 'react';
 import {
   Form,
   Button,
+  OverlayTrigger,
+  Tooltip,
+  Spinner,
 } from 'react-bootstrap';
 import {
   ProfQuestion,
@@ -12,7 +15,6 @@ import { DateTime } from 'luxon';
 import { ExhaustiveSwitchError } from '@hourglass/helpers';
 import { MdCloudDone, MdError } from 'react-icons/md';
 import { ICON_SIZE } from '@hourglass/constants';
-import TooltipButton from '@hourglass/components/TooltipButton';
 
 interface ShowStatusProps {
   status: ProfQuestionStatus;
@@ -25,43 +27,67 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
   switch (status) {
     case 'SENDING':
       return (
-        <TooltipButton
-          variant="info"
-          disabled
-          disabledMessage="Sending question..."
+        <OverlayTrigger
+          overlay={(
+            <Tooltip
+              // TODO: id below for a11y
+              id={null}
+            >
+              Sending question...
+            </Tooltip>
+          )}
         >
           <span
-            className="spinner-border align-middle"
+            className="text-info align-middle"
             style={{ width: ICON_SIZE, height: ICON_SIZE }}
             role="status"
-          />
-        </TooltipButton>
+          >
+            <Spinner
+              size="sm"
+              animation="border"
+            />
+          </span>
+        </OverlayTrigger>
       );
     case 'FAILED':
       return (
-        <TooltipButton
-          variant="danger"
-          disabled
-          disabledMessage="Failed sending question."
+        <OverlayTrigger
+          overlay={(
+            <Tooltip
+              // TODO: id below for a11y
+              id={null}
+            >
+              Failed sending question.
+            </Tooltip>
+          )}
         >
-          <MdError
-            size={ICON_SIZE}
-            role="status"
-          />
-        </TooltipButton>
+          <span className="text-danger">
+            <MdError
+              size={ICON_SIZE}
+              role="status"
+            />
+          </span>
+        </OverlayTrigger>
       );
     case 'SENT':
       return (
-        <TooltipButton
-          variant="success"
-          disabled
-          disabledMessage="Question sent successfully."
+        <OverlayTrigger
+          overlay={(
+            <Tooltip
+              // TODO: id below for a11y
+              id={null}
+            >
+              Question sent successfully.
+            </Tooltip>
+          )}
         >
-          <MdCloudDone
-            size={ICON_SIZE}
-            role="status"
-          />
-        </TooltipButton>
+          <span className="text-success">
+            <MdCloudDone
+              size={ICON_SIZE}
+              role="status"
+            />
+          </span>
+        </OverlayTrigger>
       );
     default:
       throw new ExhaustiveSwitchError(status);

@@ -19,10 +19,6 @@ import {
 } from 'react-icons/ai';
 import { ShowMessage } from '@hourglass/components/navbar/ExamMessages';
 
-interface ShowStatusProps {
-  status: ProfQuestionStatus;
-}
-
 const statusIcon = (status: ProfQuestionStatus): IconType => {
   switch (status) {
     case 'SENDING': return AiOutlineLoading;
@@ -114,6 +110,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
       <ul className="p-0">
         {questions.map((q) => (
           <ShowQuestion
+            key={q.id}
             question={q}
           />
         ))}

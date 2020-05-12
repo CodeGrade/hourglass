@@ -18,7 +18,6 @@ interface ExamMessagesProps {
 }
 
 export interface MessageProps {
-  id?: React.ReactText;
   icon: IconType;
   iconClass?: string;
   tooltip: string;
@@ -28,7 +27,6 @@ export interface MessageProps {
 
 export const ShowMessage: React.FC<MessageProps> = (props) => {
   const {
-    id,
     icon,
     iconClass,
     tooltip,
@@ -36,7 +34,7 @@ export const ShowMessage: React.FC<MessageProps> = (props) => {
     body,
   } = props;
   return (
-    <Media as="li" key={id}>
+    <Media as="li">
       <span className="mr-2">
         <Tooltip message={tooltip}><Icon I={icon} className={iconClass} /></Tooltip>
       </span>
@@ -58,7 +56,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   } = props;
   const msgs = messages.map((msg) => (
     <ShowMessage
-      id={msg.id}
+      key={msg.id}
       body={msg.body}
       icon={msg.personal ? MdMessage : GiBugleCall}
       tooltip={msg.personal ? 'Sent only to you' : 'Announcement'}

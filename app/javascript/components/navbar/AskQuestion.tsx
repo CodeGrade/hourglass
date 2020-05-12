@@ -92,6 +92,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
 
   const [val, setVal] = useState('');
   const buttonText = anySending ? 'Saving...' : 'Submit';
+  const valEmpty = val === '';
   return (
     <div>
       <Form.Control
@@ -105,7 +106,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
       <Button
         className="ml-auto mt-3"
         variant="success"
-        disabled={anySending}
+        disabled={anySending || valEmpty}
         onClick={(): void => {
           onSubmit(railsExam.id, val);
           setVal('');

@@ -7,6 +7,7 @@ import {
   Accordion,
   Card,
   Button,
+  Collapse,
 } from 'react-bootstrap';
 import {
   MdNoteAdd,
@@ -21,8 +22,6 @@ import Scratch from '@hourglass/containers/navbar/Scratch';
 import ExamMessages from '@hourglass/containers/navbar/ExamMessages';
 import AskQuestion from '@hourglass/components/navbar/AskQuestion';
 
-const displayClass = (expanded) => (expanded ? 'transition d-expanded' : 'transition d-collapsed');
-
 interface NavAccordionItemProps {
   onSectionClick: (eventKey: string) => void;
   expanded: boolean;
@@ -32,6 +31,8 @@ interface NavAccordionItemProps {
   eventKey: string;
   direction?: 'up' | 'down';
 }
+
+const iconSize = '1.5em';
 
 export const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
   const {
@@ -44,25 +45,35 @@ export const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
     className = 'bg-secondary text-light',
     direction = 'down',
   } = props;
-  const dExpanded = displayClass(expanded);
-  const iconSize = '1.5em';
+  // const dExpanded = displayClass(expanded);
   const toggle = (
     <Accordion.Toggle
       eventKey={eventKey}
       as={Card.Header}
-      className={`${className} cursor-pointer`}
+      className={`${className} d-flex cursor-pointer`}
       onClick={(): void => onSectionClick(eventKey)}
     >
-      <Icon size={iconSize} />
-      <span className={`align-middle ml-3 d-inline-block ${dExpanded}`}>
-        {label}
-      </span>
+      <Icon size={iconSize} className="" />
+      <Collapse
+        in={expanded}
+        dimension="width"
+      >
+        <span className="align-self-baseline">
+          <span className="mr-3" />
+          <span>{label}</span>
+        </span>
+      </Collapse>
     </Accordion.Toggle>
   );
   const collapse = (
     <Accordion.Collapse eventKey={eventKey}>
       <Card.Body className="bg-light text-dark">
-        {children}
+        <Collapse
+          in={expanded}
+          dimension="width"
+        >
+          <div className="w-100">{children}</div>
+        </Collapse>
       </Card.Body>
     </Accordion.Collapse>
   );
@@ -135,14 +146,14 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
       </NavAccordionItem>
     </Accordion>
   );
-}
+};
 
 const ExamNavbar: React.FC<{}> = () => {
   const { railsUser } = useContext(RailsContext);
   const [expanded, setExpanded] = useState(false);
   const [openSection, setOpenSection] = useState('');
+  const [openTimer, setOpenTimer] = useState('');
   const additionalClass = expanded ? 'sidebar-expanded' : 'sidebar-small';
-  const dExpanded = displayClass(expanded);
   return (
     <div
       className={`
@@ -159,32 +170,51 @@ const ExamNavbar: React.FC<{}> = () => {
         ${additionalClass}
       `}
     >
-      <h1 className="d-flex align-items-center">
-        <span className={`flex-fill ${dExpanded}`}>
-          Hourglass
-        </span>
+      <div className="d-flex align-items-center">
+        <Collapse
+          in={expanded}
+          dimension="width"
+        >
+          <h1 className="flex-fill">
+            Hourglass
+          </h1>
+        </Collapse>
+        <h1 aria-hidden="true" className="width-0">&nbsp;</h1>
         <Button
-          onClick={() => {
+          className="ml-2"
+          onClick={(): void => {
             if (expanded) {
               setOpenSection('');
+              setOpenTimer('');
               setExpanded(false);
             } else {
               setExpanded(true);
             }
           }}
         >
-          {expanded ? '<<' : '>>'}
+          {expanded
+            ? <FaAngleDoubleLeft size={iconSize} />
+            : <FaAngleDoubleRight size={iconSize} />}
         </Button>
-      </h1>
+      </div>
       <div className="m-0 p-0">
         <div className="d-flex align-items-center">
-          <h6
-            className={`my-0 mr-auto ${dExpanded}`}>
-            {railsUser.username}
-          </h6>
-          <span className={`ml-2 ${dExpanded}`}>
-            <LockdownInfo />
-          </span>
+          <Collapse
+            in={expanded}
+            dimension="width"
+          >
+            <span className="flex-fill">
+              <span className="d-flex w-100 align-items-center">
+                <h6 className="my-0">
+                  {railsUser.username}
+                </h6>
+                <span className="flex-fill" />
+                <span className="ml-2">
+                  <LockdownInfo />
+                </span>
+              </span>
+            </span>
+          </Collapse>
           <span className="ml-2">
             <SnapshotInfo />
           </span>
@@ -209,13 +239,27 @@ const ExamNavbar: React.FC<{}> = () => {
         />
       </div>
       <div className="mb-2 mt-auto">
-        <Accordion className="mt-4">
+        <Accordion
+          className="mt-4"
+          activeKey={openTimer}
+        >
           <NavAccordionItem
             expanded={expanded}
             Icon={MdTimer}
             label="TODO: Time remaining"
             eventKey="time"
-            onSectionClick={() => console.log('TODO')}
+            onSectionClick={(eventKey): void => {
+              if (expanded) {
+                if (openTimer === eventKey) {
+                  setOpenTimer('');
+                } else {
+                  setOpenTimer(eventKey);
+                }
+              } else {
+                setExpanded(true);
+                setOpenTimer(eventKey);
+              }
+            }}
             direction="up"
           >
             <p>Exam began: TODO</p>

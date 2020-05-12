@@ -75,7 +75,8 @@ class ExamsController < ApplicationController
           files: @exam.get_exam_files
         },
         answers: answers,
-        messages: messages
+        messages: messages,
+        questions: questions
       }
     )
   end
@@ -155,6 +156,12 @@ class ExamsController < ApplicationController
     @registration.update_attribute(:final, final)
     @registration.save_answers(answers)
     return false
+  end
+
+  # Returns all of the questions the current user has asked for this exam.
+  def questions
+    qs = @exam.questions_by(current_user).order(created_at: :desc)
+    qs.map(&:serialize)
   end
 
   # Returns the announcements and messages for the current registration.

@@ -8,6 +8,7 @@ import {
 } from '@hourglass/types';
 import { ExamContext } from '@hourglass/context';
 import { firstFile, getFilesForRefs } from '@hourglass/files';
+import { ExhaustiveSwitchError } from '@hourglass/helpers';
 import { Editor } from './ExamCodeBox';
 
 interface FilesProps {
@@ -32,7 +33,7 @@ const Files: React.FC<FilesProps> = (props) => {
               <TreeItem label={f.text} key={nodeId} nodeId={nodeId} />
             );
           default:
-            throw new Error('Invalid file type');
+            throw new ExhaustiveSwitchError(f);
         }
       })}
     </>

@@ -20,8 +20,8 @@ import { IconType } from 'react-icons';
 import JumpTo from '@hourglass/containers/navbar/JumpTo';
 import Scratch from '@hourglass/containers/navbar/Scratch';
 import ExamMessages from '@hourglass/containers/navbar/ExamMessages';
-import AskQuestion from '@hourglass/components/navbar/AskQuestion';
-import { ICON_SIZE } from '@hourglass/constants';
+import AskQuestion from '@hourglass/containers/navbar/AskQuestion';
+import RenderIcon from '@hourglass/components/Icon';
 
 interface NavAccordionItemProps {
   onSectionClick: (eventKey: string) => void;
@@ -51,7 +51,7 @@ export const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
       className={`${className} d-flex cursor-pointer`}
       onClick={(): void => onSectionClick(eventKey)}
     >
-      <Icon size={ICON_SIZE} className="" />
+      <RenderIcon I={Icon} className="" />
       <span aria-hidden="true" className="width-0">&nbsp;</span>
       <Collapse
         in={expanded}
@@ -192,8 +192,8 @@ const ExamNavbar: React.FC<{}> = () => {
           }}
         >
           {expanded
-            ? <FaAngleDoubleLeft size={ICON_SIZE} />
-            : <FaAngleDoubleRight size={ICON_SIZE} />}
+            ? <RenderIcon I={FaAngleDoubleLeft} />
+            : <RenderIcon I={FaAngleDoubleRight} />}
         </Button>
       </div>
       <div className="m-0 p-0">

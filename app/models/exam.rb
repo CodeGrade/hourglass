@@ -307,6 +307,10 @@ class Exam < ApplicationRecord
     exam_messages.where(recipient: nil, sender: students)
   end
 
+  def questions_by(user)
+    exam_messages.where(recipient: nil, sender: user)
+  end
+
   def private_messages_for(user)
     exam_messages.where(recipient: user)
   end

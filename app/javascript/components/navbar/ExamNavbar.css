@@ -11,7 +11,7 @@
 }
 
 .transition {
-  transition: 0.35s all ease-in-out;
+  transition: 0.35s width ease-in-out;
 }
 
 .sidebar-small {

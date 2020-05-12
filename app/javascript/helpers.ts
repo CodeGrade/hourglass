@@ -2,6 +2,8 @@ import Routes from '@hourglass/routes';
 import {
   RailsExamMessage,
   ExamMessage,
+  RailsExamQuestion,
+  ProfQuestion,
 } from '@hourglass/types';
 import { DateTime } from 'luxon';
 
@@ -59,4 +61,23 @@ export function convertMsgs(msgs: RailsExamMessage[]): ExamMessage[] {
     ...m,
     time: DateTime.fromISO(m.time),
   }));
+}
+
+export function convertQs(qs: RailsExamQuestion[]): ProfQuestion[] {
+  return qs.map((m) => ({
+    ...m,
+    status: 'SENT',
+    time: DateTime.fromISO(m.time),
+  }));
+}
+
+/**
+ * Error to throw in the default case of an exhaustive `switch` statement.
+ * This will cause a compilation-time error with the missing types.
+ * @param v the item being switched over
+ */
+export class ExhaustiveSwitchError extends Error {
+  constructor(v: never) {
+    super(`Switch is not exhaustive on ${v}`);
+  }
 }

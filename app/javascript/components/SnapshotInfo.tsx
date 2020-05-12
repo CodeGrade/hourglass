@@ -1,8 +1,10 @@
 import React from 'react';
 import { SnapshotStatus } from '@hourglass/types';
 import { MdCloudDone, MdError } from 'react-icons/md';
-import { ICON_SIZE } from '@hourglass/constants';
 import TooltipButton from '@hourglass/components/TooltipButton';
+import { ExhaustiveSwitchError } from '@hourglass/helpers';
+import Icon from '@hourglass/components/Icon';
+import { AiOutlineLoading } from 'react-icons/ai';
 
 interface SnapshotInfoProps {
   status: SnapshotStatus;
@@ -22,7 +24,7 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
           disabled
           disabledMessage="Saving answers..."
         >
-          <span className="spinner-border align-middle" style={{ width: ICON_SIZE, height: ICON_SIZE }} role="status" />
+          <Icon I={AiOutlineLoading} />
         </TooltipButton>
       );
     case SnapshotStatus.SUCCESS:
@@ -32,7 +34,7 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
           disabled
           disabledMessage="Answers saved to server."
         >
-          <MdCloudDone size={ICON_SIZE} role="status" />
+          <Icon I={MdCloudDone} />
         </TooltipButton>
       );
     case SnapshotStatus.FAILURE:
@@ -42,11 +44,11 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
           disabled
           disabledMessage={`Failed saving snapshot: ${message}.`}
         >
-          <MdError size={ICON_SIZE} />
+          <Icon I={MdError} />
         </TooltipButton>
       );
     default:
-      throw new Error('CASE NOT HANDLED');
+      throw new ExhaustiveSwitchError(status);
   }
 };
 

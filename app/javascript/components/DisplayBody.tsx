@@ -13,6 +13,7 @@ import {
   CodeState, TextState, YesNoState, MultipleChoiceState,
   MatchingState, AllThatApplyState, CodeTagState,
 } from '@hourglass/types';
+import { ExhaustiveSwitchError } from '@hourglass/helpers';
 
 const DisplayBody: React.FC<BodyProps> = (props) => {
   const {
@@ -43,7 +44,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     case 'Matching':
       return <DisplayMatching info={body} value={answer as MatchingState} />;
     default:
-      throw new Error('invalid question type');
+      throw new ExhaustiveSwitchError(body);
   }
 };
 

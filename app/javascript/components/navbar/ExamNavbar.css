@@ -10,13 +10,57 @@
   cursor: pointer;
 }
 
-.exam-navbar-collapse ~ button > svg.to-show,
-.exam-navbar-collapse ~ button > svg.to-collapse {
+.transition {
+  transition: 0.35s all ease-in-out;
+}
+
+.sidebar-small {
+  width: calc(6em + 2px);
+}
+
+.sidebar-expanded {
+  width: 500px;
+}
+
+.width-0 {
+  width: 0;
+}
+
+.collapse:not(.width):not(.show) {
   display: none;
 }
-.exam-navbar-collapse ~ button:not(.collapsed) > .to-collapse {
-  display: inline;
+
+.collapsing:not(.width) {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  transition: height 0.35s ease-in-out; 
 }
-.exam-navbar-collapse ~ button.collapsed > .to-show {
-  display: inline;
+
+@media (prefers-reduced-motion: reduce) {
+  .collapsing {
+    transition: none;
+  } 
+}
+
+.collapse.width, .collapsing.width {
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block;
+  height: unset; /* undoes bootstrap .collapsing height */
+  transition: 0.35s width ease-in-out;
+}
+
+.collapse.width:not(.show) {
+  display: none;
+  height: unset;
+}
+.collapsing.width {
+  position: relative;
+  height: unset; /* undoes bootstrap .collapsing height */
+  width: 0;
+}
+
+.collapse.width.show {
+  width: calc(500px - 7em);
 }

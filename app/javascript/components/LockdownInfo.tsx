@@ -1,6 +1,7 @@
 import React from 'react';
 import { MdLock, MdLockOpen } from 'react-icons/md';
 import { LockdownStatus } from '@hourglass/types';
+import { ICON_SIZE } from '@hourglass/constants';
 import TooltipButton from '@hourglass/components/TooltipButton';
 
 interface LockdownInfoProps {
@@ -13,7 +14,6 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
     status,
     message,
   } = props;
-  const size = '1.5em';
   switch (status) {
     case 'BEFORE':
       return (
@@ -22,7 +22,7 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
           disabledMessage="Waiting for session lock."
           disabled
         >
-          <MdLockOpen size={size} />
+          <MdLockOpen size={ICON_SIZE} />
         </TooltipButton>
       );
     case 'FAILED':
@@ -32,7 +32,7 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
           disabledMessage={message}
           disabled
         >
-          <MdLockOpen size={size} />
+          <MdLockOpen size={ICON_SIZE} />
         </TooltipButton>
       );
     case 'LOCKED':
@@ -42,7 +42,7 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
           disabledMessage="Session locked."
           disabled
         >
-          <MdLock size={size} />
+          <MdLock size={ICON_SIZE} />
         </TooltipButton>
       );
     case 'IGNORED':
@@ -52,7 +52,7 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
           disabledMessage="Session lock ignored"
           disabled
         >
-          <MdLockOpen size={size} />
+          <MdLockOpen size={ICON_SIZE} />
         </TooltipButton>
       );
     default:

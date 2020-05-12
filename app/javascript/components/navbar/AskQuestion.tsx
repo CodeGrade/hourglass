@@ -2,10 +2,77 @@ import React, { useState, useContext } from 'react';
 import {
   Form,
   Button,
+  Spinner,
 } from 'react-bootstrap';
-import { ProfQuestion } from '@hourglass/types';
+import {
+  ProfQuestion,
+  ProfQuestionStatus,
+} from '@hourglass/types';
 import { RailsContext } from '@hourglass/context';
 import { DateTime } from 'luxon';
+import { ExhaustiveSwitchError } from '@hourglass/helpers';
+import { AiFillCheckCircle, AiFillCloseCircle } from 'react-icons/ai';
+
+interface ShowStatusProps {
+  status: ProfQuestionStatus;
+}
+
+const ShowStatus: React.FC<ShowStatusProps> = (props) => {
+  const {
+    status,
+  } = props;
+  const size = '1.5em';
+  switch (status) {
+    case 'SENDING':
+      return (
+        <span className="text-info">
+          <Spinner
+            size="sm"
+            animation="border"
+          />
+        </span>
+      );
+    case 'FAILED':
+      return (
+        <span className="text-danger">
+          <AiFillCloseCircle
+            size={size}
+          />
+        </span>
+      );
+    case 'SENT':
+      return (
+        <span className="text-success">
+          <AiFillCheckCircle
+            size={size}
+          />
+        </span>
+      );
+    default:
+      throw new ExhaustiveSwitchError(status);
+  }
+};
+
+interface ShowQuestionProps {
+  question: ProfQuestion;
+}
+
+const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
+  const {
+    question,
+  } = props;
+  return (
+    <>
+      <div>
+        <div className="mr-1 d-inline">
+          <ShowStatus status={question.status} />
+        </div>
+        <i>{question.time.toLocaleString(DateTime.TIME_SIMPLE)}</i>
+      </div>
+      <p>{question.body}</p>
+    </>
+  );
+};
 
 interface AskQuestionProps {
   questions: ProfQuestion[];
@@ -46,15 +113,16 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
       >
         {buttonText}
       </Button>
-      <ul>
+      <hr className="my-2" />
+      <div>
         {questions.map((q) => (
-          <li key={q.id}>
-            <i>{q.time.toLocaleString(DateTime.TIME_SIMPLE)}</i>
-            <p>{q.body}</p>
-            <p>{q.status}</p>
-          </li>
+          <div key={q.id}>
+            <ShowQuestion
+              question={q}
+            />
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };

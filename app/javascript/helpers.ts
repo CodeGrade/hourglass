@@ -70,3 +70,16 @@ export function convertQs(qs: RailsExamQuestion[]): ProfQuestion[] {
     time: DateTime.fromISO(m.time),
   }));
 }
+
+
+// TODO use this for all of the switches that currently throw "case not handled"
+/**
+ * Error to throw in the default case of an exhaustive `switch` statement.
+ * This will cause a compilation-time error with the missing types.
+ * @param v the item being switched over
+ */
+export class ExhaustiveSwitchError extends Error {
+  constructor(v: never) {
+    super(`Switch is not exhaustive on ${v}`);
+  }
+}

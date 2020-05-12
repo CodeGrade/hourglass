@@ -1,10 +1,9 @@
 import React from 'react';
 import { IconType } from 'react-icons';
 import { AiOutlineLoading } from 'react-icons/ai';
-
-// TODO move here
-import { ICON_SIZE } from '@hourglass/constants';
 import './Icon.css';
+
+const ICON_SIZE = '1.5em';
 
 interface IconProps {
   I: IconType;

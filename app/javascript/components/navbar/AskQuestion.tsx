@@ -12,6 +12,7 @@ import { RailsContext } from '@hourglass/context';
 import { DateTime } from 'luxon';
 import { ExhaustiveSwitchError } from '@hourglass/helpers';
 import { MdCloudDone, MdError } from 'react-icons/md';
+import { ICON_SIZE } from '@hourglass/constants';
 
 interface ShowStatusProps {
   status: ProfQuestionStatus;
@@ -21,7 +22,6 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
   const {
     status,
   } = props;
-  const size = '1.5em';
   switch (status) {
     case 'SENDING':
       return (
@@ -38,7 +38,7 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
         <span className="text-danger">
           <MdError
             title="Failed sending question."
-            size={size}
+            size={ICON_SIZE}
           />
         </span>
       );
@@ -49,7 +49,7 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
           title="Question sent successfully."
         >
           <MdCloudDone
-            size={size}
+            size={ICON_SIZE}
           />
         </span>
       );

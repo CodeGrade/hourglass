@@ -27,6 +27,7 @@ import {
   QuestionFailedAction,
   QuestionSucceededAction,
   ProfQuestion,
+  SpyQuestionAction,
 } from '@hourglass/types';
 import {
   getCSRFToken,
@@ -111,6 +112,14 @@ export function togglePagination(): TogglePaginationAction {
 export function viewQuestion(question: number, part?: number): ViewQuestionAction {
   return {
     type: 'VIEW_QUESTION',
+    question,
+    part,
+  };
+}
+
+export function spyQuestion(question: number, part?: number): SpyQuestionAction {
+  return {
+    type: 'SPY_QUESTION',
     question,
     part,
   };

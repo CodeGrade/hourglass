@@ -6,6 +6,7 @@ import {
 import {
   togglePagination,
   viewQuestion,
+  spyQuestion,
 } from '@hourglass/actions';
 
 const mapStateToProps: MSTP<{
@@ -25,6 +26,7 @@ const mapDispatchToProps: MDTP<{
   },
   changeQuestion: (question: number, part?: number): void => {
     dispatch(viewQuestion(question, part));
+    //dispatch(spyQuestion(question, part));
   },
 });
 

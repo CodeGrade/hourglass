@@ -22,16 +22,14 @@ const Pagination: React.FC<PaginationProps> = (props) => {
   const showEnd = paginated && onLastPage;
   return (
     <div>
-      <div
-        className={paginated ? 'carousel' : undefined}
-      >
+      <div>
         {children.map((b, i) => {
           const active = current === i;
-          const activeClass = active ? 'active' : '';
+          const activeClass = active ? '' : 'd-none';
           return (
             // Page indices are STATIC.
             // eslint-disable-next-line react/no-array-index-key
-            <div key={i} className={paginated ? `carousel-item ${activeClass}` : ''}>
+            <div key={i} className={activeClass}>
               {b}
               {paginated && (
                 <PaginationArrows

@@ -29,30 +29,28 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     parts,
   } = question;
   return (
-    <>
+    <div className={`question no-gutters ${separateSubparts ? 'paginated' : ''}`}>
       <ScrollspyTop
         qnum={qnum}
       />
-      <div id={`question-${qnum}`} className={`question no-gutters ${separateSubparts ? 'paginated' : ''}`}>
-        <h1>{`Question ${qnum + 1}: ${name}`}</h1>
-        <HTML value={description} />
-        {reference && <FileViewer references={reference} />}
-        <ScrollspyBottom
+      <h1 id={`question-${qnum}`}>{`Question ${qnum + 1}: ${name}`}</h1>
+      <HTML value={description} />
+      {reference && <FileViewer references={reference} />}
+      <ScrollspyBottom
+        qnum={qnum}
+      />
+      {parts.map((p, i) => (
+        <Part
+          part={p}
+          pnum={i}
           qnum={qnum}
+          // Part numbers are STATIC.
+          // eslint-disable-next-line react/no-array-index-key
+          key={i}
+          BodyRenderer={BodyRenderer}
         />
-        {parts.map((p, i) => (
-          <Part
-            part={p}
-            pnum={i}
-            qnum={qnum}
-            // Part numbers are STATIC.
-            // eslint-disable-next-line react/no-array-index-key
-            key={i}
-            BodyRenderer={BodyRenderer}
-          />
-        ))}
-      </div>
-    </>
+      ))}
+    </div>
   );
 };
 export default ShowQuestion;

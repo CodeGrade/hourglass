@@ -8,6 +8,7 @@ import MultipleChoice from '@hourglass/containers/questions/MultipleChoice';
 import AllThatApply from '@hourglass/containers/questions/AllThatApply';
 import { BodyItem } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
+import { ExhaustiveSwitchError } from '@hourglass/helpers';
 
 export interface BodyProps {
   body: BodyItem;
@@ -38,7 +39,7 @@ const Body: React.FC<BodyProps> = (props) => {
     case 'Matching':
       return <Matching info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     default:
-      throw new Error('invalid question type');
+      throw new ExhaustiveSwitchError(body);
   }
 };
 

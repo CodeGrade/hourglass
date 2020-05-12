@@ -3,6 +3,7 @@ import { SnapshotStatus } from '@hourglass/types';
 import { MdCloudDone, MdError } from 'react-icons/md';
 import { ICON_SIZE } from '@hourglass/constants';
 import TooltipButton from '@hourglass/components/TooltipButton';
+import { ExhaustiveSwitchError } from '@hourglass/helpers';
 
 interface SnapshotInfoProps {
   status: SnapshotStatus;
@@ -46,7 +47,7 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
         </TooltipButton>
       );
     default:
-      throw new Error('CASE NOT HANDLED');
+      throw new ExhaustiveSwitchError(status);
   }
 };
 

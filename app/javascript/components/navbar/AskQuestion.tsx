@@ -27,6 +27,7 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
       return (
         <span className="text-info">
           <Spinner
+            title="Sending question..."
             size="sm"
             animation="border"
           />
@@ -36,13 +37,17 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
       return (
         <span className="text-danger">
           <MdError
+            title="Failed sending question."
             size={size}
           />
         </span>
       );
     case 'SENT':
       return (
-        <span className="text-success">
+        <span
+          className="text-success"
+          title="Question sent successfully."
+        >
           <MdCloudDone
             size={size}
           />

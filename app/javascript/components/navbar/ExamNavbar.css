@@ -27,7 +27,8 @@
 }
 
 .collapse:not(.width):not(.show) {
-  display: none; }
+  display: none;
+}
 
 .collapsing:not(.width) {
   position: relative;

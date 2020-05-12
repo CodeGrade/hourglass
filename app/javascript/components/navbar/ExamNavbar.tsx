@@ -45,7 +45,6 @@ export const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
     className = 'bg-secondary text-light',
     direction = 'down',
   } = props;
-  // const dExpanded = displayClass(expanded);
   const toggle = (
     <Accordion.Toggle
       eventKey={eventKey}

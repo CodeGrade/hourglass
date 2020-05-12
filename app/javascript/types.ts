@@ -49,6 +49,14 @@ export interface ContentsResponse {
   answers: AnswersState;
 
   messages: RailsExamMessage[];
+
+  questions: RailsExamQuestion[];
+}
+
+export interface RailsExamQuestion {
+  time: string;
+  body: string;
+  id: number;
 }
 
 export interface RailsExamMessage {
@@ -98,6 +106,7 @@ export interface LoadExamAction {
   exam: Exam;
   answers: AnswersState;
   messages: ExamMessage[];
+  questions: ProfQuestion[];
 }
 
 export type ContentsAction = UpdateAnswerAction | UpdateScratchAction;

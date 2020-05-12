@@ -9,7 +9,14 @@ export default (state: ProfQuestionState = {
   questions: [],
 }, action: ExamTakerAction): ProfQuestionState => {
   switch (action.type) {
-    // TODO handle LOAD_EXAM, with the questions so far
+    case 'LOAD_EXAM': {
+      const lastId = action.questions[0]?.id ?? 0;
+      return {
+        ...state,
+        lastId,
+        questions: action.questions,
+      };
+    }
     case 'QUESTION_ASKED':
       return {
         ...state,

@@ -2,6 +2,8 @@ import Routes from '@hourglass/routes';
 import {
   RailsExamMessage,
   ExamMessage,
+  RailsExamQuestion,
+  ProfQuestion,
 } from '@hourglass/types';
 import { DateTime } from 'luxon';
 
@@ -57,6 +59,14 @@ export function sleep(milis: number): Promise<void> {
 export function convertMsgs(msgs: RailsExamMessage[]): ExamMessage[] {
   return msgs.map((m) => ({
     ...m,
+    time: DateTime.fromISO(m.time),
+  }));
+}
+
+export function convertQs(qs: RailsExamQuestion[]): ProfQuestion[] {
+  return qs.map((m) => ({
+    ...m,
+    status: 'SENT',
     time: DateTime.fromISO(m.time),
   }));
 }

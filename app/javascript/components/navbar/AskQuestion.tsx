@@ -2,7 +2,6 @@ import React, { useState, useContext } from 'react';
 import {
   Form,
   Button,
-  Spinner,
 } from 'react-bootstrap';
 import {
   ProfQuestion,
@@ -13,6 +12,7 @@ import { DateTime } from 'luxon';
 import { ExhaustiveSwitchError } from '@hourglass/helpers';
 import { MdCloudDone, MdError } from 'react-icons/md';
 import { ICON_SIZE } from '@hourglass/constants';
+import TooltipButton from '@hourglass/components/TooltipButton';
 
 interface ShowStatusProps {
   status: ProfQuestionStatus;
@@ -25,33 +25,43 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
   switch (status) {
     case 'SENDING':
       return (
-        <span className="text-info">
-          <Spinner
-            title="Sending question..."
-            size="sm"
-            animation="border"
+        <TooltipButton
+          variant="info"
+          disabled
+          disabledMessage="Sending question..."
+        >
+          <span
+            className="spinner-border align-middle"
+            style={{ width: ICON_SIZE, height: ICON_SIZE }}
+            role="status"
           />
-        </span>
+        </TooltipButton>
       );
     case 'FAILED':
       return (
-        <span className="text-danger">
+        <TooltipButton
+          variant="danger"
+          disabled
+          disabledMessage="Failed sending question."
+        >
           <MdError
-            title="Failed sending question."
             size={ICON_SIZE}
+            role="status"
           />
-        </span>
+        </TooltipButton>
       );
     case 'SENT':
       return (
-        <span
-          className="text-success"
-          title="Question sent successfully."
+        <TooltipButton
+          variant="success"
+          disabled
+          disabledMessage="Question sent successfully."
         >
           <MdCloudDone
             size={ICON_SIZE}
+            role="status"
           />
-        </span>
+        </TooltipButton>
       );
     default:
       throw new ExhaustiveSwitchError(status);

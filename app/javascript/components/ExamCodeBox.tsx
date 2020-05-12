@@ -16,15 +16,6 @@ function applyMarks(cm: CM.Editor, marks: MarkDescription[]): CM.TextMarker[] {
   }));
 }
 
-// TODO: upstream these properties to DefinitelyTyped
-declare module 'codemirror' {
-  export interface TextMarker {
-    readOnly: boolean;
-    inclusiveLeft: boolean;
-    inclusiveRight: boolean;
-  }
-}
-
 function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
   return marks.map((m) => {
     const { readOnly, inclusiveLeft, inclusiveRight } = m;

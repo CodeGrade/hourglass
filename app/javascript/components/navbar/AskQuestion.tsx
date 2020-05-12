@@ -2,82 +2,60 @@ import React, { useState, useContext } from 'react';
 import {
   Form,
   Button,
-  Alert,
-  AlertProps,
 } from 'react-bootstrap';
-import Routes from '@hourglass/routes';
-import { getCSRFToken } from '@hourglass/helpers';
+import { ProfQuestion } from '@hourglass/types';
 import { RailsContext } from '@hourglass/context';
+import { DateTime } from 'luxon';
 
-async function submitQuestion(examID: number, question: string): Promise<boolean> {
-  const url = Routes.ask_question_exam_path(examID);
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': getCSRFToken(),
-    },
-    credentials: 'same-origin',
-    body: JSON.stringify({
-      message: {
-        body: question,
-      },
-    }),
-  });
-  const json = await (res.json() as Promise<{success: boolean}>);
-  return json.success;
+interface AskQuestionProps {
+  questions: ProfQuestion[];
+  onSubmit: (examID: number, body: string) => void;
 }
 
-const AskQuestion: React.FC<{}> = () => {
+const AskQuestion: React.FC<AskQuestionProps> = (props) => {
+  const {
+    questions,
+    onSubmit,
+  } = props;
+  const {
+    railsExam,
+  } = useContext(RailsContext);
+
+  const anySending = questions.some((q) => q.status === 'SENDING');
+
   const [val, setVal] = useState('');
-  const [error, setError] = useState('');
-  const [variant, setVariant] = useState<AlertProps['variant']>('danger');
-  const [showAlert, setShowAlert] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const buttonText = saving ? 'Saving...' : 'Submit';
-  const { railsExam } = useContext(RailsContext);
+  const buttonText = anySending ? 'Saving...' : 'Submit';
   return (
-    <>
+    <div>
       <Form.Control
         value={val}
         onChange={(event): void => {
           setVal(event.target.value);
         }}
         as="textarea"
-        disabled={saving}
+        disabled={anySending}
       />
       <Button
         className="ml-auto mt-3"
         variant="success"
-        disabled={saving}
+        disabled={anySending}
         onClick={(): void => {
-          setSaving(true);
-          submitQuestion(railsExam.id, val).then(() => {
-            setSaving(false);
-            setVariant('success');
-            setVal('');
-            setError('Successfully submitted question.');
-            setShowAlert(true);
-          }).catch((e) => {
-            setSaving(false);
-            setVariant('danger');
-            setError(e.message);
-            setShowAlert(true);
-          });
+          onSubmit(railsExam.id, val);
+          setVal('');
         }}
       >
         {buttonText}
       </Button>
-      <Alert
-        show={showAlert}
-        variant={variant}
-        dismissible
-        onClose={(): void => setShowAlert(false)}
-      >
-        <Alert.Heading>Question</Alert.Heading>
-        <p>{error}</p>
-      </Alert>
-    </>
+      <ul>
+        {questions.map((q) => (
+          <li key={q.id}>
+            <i>{q.time.toLocaleString(DateTime.TIME_SIMPLE)}</i>
+            <p>{q.body}</p>
+            <p>{q.status}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
 

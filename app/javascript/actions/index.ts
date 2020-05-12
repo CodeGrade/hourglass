@@ -23,6 +23,9 @@ import {
   MessagesOpenedAction,
   AnswersState,
   Exam,
+  QuestionAskedAction,
+  QuestionFailedAction,
+  QuestionSucceededAction,
 } from '@hourglass/types';
 import {
   getCSRFToken,
@@ -30,6 +33,59 @@ import {
 } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';
+
+export function questionAsked(id: number, body: string): QuestionAskedAction {
+  return {
+    type: 'QUESTION_ASKED',
+    id,
+    body,
+  };
+}
+
+export function questionFailed(id: number): QuestionFailedAction {
+  return {
+    type: 'QUESTION_FAILED',
+    id,
+  };
+}
+
+export function questionSucceeded(id: number): QuestionSucceededAction {
+  return {
+    type: 'QUESTION_SUCCEEDED',
+    id,
+  };
+}
+
+export function askQuestion(examID: number, body: string): Thunk {
+  return (dispatch, getState): void => {
+    const qID = getState().questions.lastId + 1;
+    dispatch(questionAsked(qID, body));
+    const url = Routes.ask_question_exam_path(examID);
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': getCSRFToken(),
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        message: {
+          body,
+        },
+      }),
+    })
+      .then((res) => res.json() as Promise<{success: boolean}>)
+      .then((res) => {
+        if (!res.success) {
+          throw new Error('Problem saving question.');
+        }
+        dispatch(questionSucceeded(qID));
+      })
+      .catch((_reason) => {
+        dispatch(questionFailed(qID));
+      });
+  };
+}
 
 export function messageReceived(msg: ExamMessage): MessageReceivedAction {
   return {

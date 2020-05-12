@@ -5,6 +5,7 @@ import contents from './contents';
 import pagination from './pagination';
 import messages from './messages';
 import snapshot from './snapshot';
+import questions from './questions';
 
 export default combineReducers({
   lockdown,
@@ -12,4 +13,5 @@ export default combineReducers({
   pagination,
   messages,
   snapshot,
+  questions,
 });

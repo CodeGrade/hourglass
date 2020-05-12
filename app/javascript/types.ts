@@ -19,7 +19,12 @@ export interface RailsRegistration {
 
 export type ExamTakerAction =
   LoadExamAction |
-  LockdownAction | PaginationAction | ContentsAction | SnapshotAction | MessagesAction;
+  LockdownAction |
+  PaginationAction |
+  ContentsAction |
+  SnapshotAction |
+  MessagesAction |
+  ProfQuestionAction;
 
 export type Thunk = ThunkAction<void, ExamTakerState, unknown, ExamTakerAction>;
 export type ExamTakerDispatch = ThunkDispatch<ExamTakerState, unknown, ExamTakerAction>;
@@ -178,11 +183,50 @@ export interface ExamTakerState {
   // Professor messages / anouncements.
   messages: MessagesState;
 
+  // Questions the current user has sent to professors.
+  questions: ProfQuestionState;
+
   // The current state of saving snapshots.
   snapshot: SnapshotState;
 }
 
-export type MessagesState = {
+export interface ProfQuestionState {
+  lastId: number;
+  questions: ProfQuestion[];
+}
+
+export interface ProfQuestion {
+  id: number;
+
+  time: DateTime;
+
+  status: ProfQuestionStatus;
+
+  body: string;
+}
+
+export type ProfQuestionStatus = 'SENDING' | 'FAILED' | 'SENT';
+
+export type ProfQuestionAction =
+  QuestionAskedAction | QuestionFailedAction | QuestionSucceededAction;
+
+export interface QuestionAskedAction {
+  type: 'QUESTION_ASKED';
+  id: number;
+  body: string;
+}
+
+export interface QuestionFailedAction {
+  type: 'QUESTION_FAILED';
+  id: number;
+}
+
+export interface QuestionSucceededAction {
+  type: 'QUESTION_SUCCEEDED';
+  id: number;
+}
+
+export interface MessagesState {
   // Whether there are unread messages.
   unread: boolean;
 

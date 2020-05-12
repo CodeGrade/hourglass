@@ -8,8 +8,8 @@ import {
   ProfQuestionStatus,
 } from '@hourglass/types';
 import { RailsContext } from '@hourglass/context';
-import { DateTime } from 'luxon';
 import { ExhaustiveSwitchError } from '@hourglass/helpers';
+import { IconType } from 'react-icons';
 import {
   MdCloudDone,
   MdError,
@@ -17,53 +17,36 @@ import {
 import {
   AiOutlineLoading,
 } from 'react-icons/ai';
-import Tooltip from '@hourglass/components/Tooltip';
-import Icon from '@hourglass/components/Icon';
+import { ShowMessage } from '@hourglass/components/navbar/ExamMessages';
 
 interface ShowStatusProps {
   status: ProfQuestionStatus;
 }
 
-const ShowStatus: React.FC<ShowStatusProps> = (props) => {
-  const {
-    status,
-  } = props;
+const statusIcon = (status: ProfQuestionStatus): IconType => {
   switch (status) {
-    case 'SENDING':
-      return (
-        <Tooltip
-          message="Sending question..."
-        >
-          <Icon
-            I={AiOutlineLoading}
-            className="text-info"
-          />
-        </Tooltip>
-      );
-    case 'FAILED':
-      return (
-        <Tooltip
-          message="Failed sending question."
-        >
-          <Icon
-            I={MdError}
-            className="text-danger"
-          />
-        </Tooltip>
-      );
-    case 'SENT':
-      return (
-        <Tooltip
-          message="Question sent successfully."
-        >
-          <Icon
-            I={MdCloudDone}
-            className="text-success"
-          />
-        </Tooltip>
-      );
-    default:
-      throw new ExhaustiveSwitchError(status);
+    case 'SENDING': return AiOutlineLoading;
+    case 'FAILED': return MdError;
+    case 'SENT': return MdCloudDone;
+    default: throw new ExhaustiveSwitchError(status);
+  }
+};
+
+const iconClass = (status: ProfQuestionStatus): string => {
+  switch (status) {
+    case 'SENDING': return 'text-info';
+    case 'FAILED': return 'text-danger';
+    case 'SENT': return 'text-success';
+    default: throw new ExhaustiveSwitchError(status);
+  }
+};
+
+const tooltipMessage = (status: ProfQuestionStatus): string => {
+  switch (status) {
+    case 'SENDING': return 'Sending question...';
+    case 'FAILED': return 'Failed to send question.';
+    case 'SENT': return 'Question sent successfully';
+    default: throw new ExhaustiveSwitchError(status);
   }
 };
 
@@ -76,15 +59,13 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     question,
   } = props;
   return (
-    <>
-      <div>
-        <div className="mr-1 d-inline">
-          <ShowStatus status={question.status} />
-        </div>
-        <i className="text-muted">{`(sent ${question.time.toLocaleString(DateTime.TIME_SIMPLE)})`}</i>
-      </div>
-      <p>{question.body}</p>
-    </>
+    <ShowMessage
+      icon={statusIcon(question.status)}
+      iconClass={iconClass(question.status)}
+      tooltip={tooltipMessage(question.status)}
+      time={question.time}
+      body={question.body}
+    />
   );
 };
 
@@ -130,15 +111,13 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
       </Button>
       <span className="clearfix" />
       <hr className="my-2" />
-      <div>
+      <ul className="p-0">
         {questions.map((q) => (
-          <div key={q.id}>
-            <ShowQuestion
-              question={q}
-            />
-          </div>
+          <ShowQuestion
+            question={q}
+          />
         ))}
-      </div>
+      </ul>
     </div>
   );
 };

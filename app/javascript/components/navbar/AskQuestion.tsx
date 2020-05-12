@@ -2,9 +2,6 @@ import React, { useState, useContext } from 'react';
 import {
   Form,
   Button,
-  OverlayTrigger,
-  Tooltip,
-  Spinner,
 } from 'react-bootstrap';
 import {
   ProfQuestion,
@@ -13,8 +10,15 @@ import {
 import { RailsContext } from '@hourglass/context';
 import { DateTime } from 'luxon';
 import { ExhaustiveSwitchError } from '@hourglass/helpers';
-import { MdCloudDone, MdError } from 'react-icons/md';
-import { ICON_SIZE } from '@hourglass/constants';
+import {
+  MdCloudDone,
+  MdError,
+} from 'react-icons/md';
+import {
+  AiOutlineLoading,
+} from 'react-icons/ai';
+import Tooltip from '@hourglass/components/Tooltip';
+import Icon from '@hourglass/components/Icon';
 
 interface ShowStatusProps {
   status: ProfQuestionStatus;
@@ -27,67 +31,36 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
   switch (status) {
     case 'SENDING':
       return (
-        <OverlayTrigger
-          overlay={(
-            <Tooltip
-              // TODO: id below for a11y
-              id={null}
-            >
-              Sending question...
-            </Tooltip>
-          )}
+        <Tooltip
+          message="Sending question..."
         >
-          <span
-            className="text-info align-middle"
-            style={{ width: ICON_SIZE, height: ICON_SIZE }}
-            role="status"
-          >
-            <Spinner
-              size="sm"
-              animation="border"
-            />
-          </span>
-        </OverlayTrigger>
+          <Icon
+            I={AiOutlineLoading}
+            className="text-info"
+          />
+        </Tooltip>
       );
     case 'FAILED':
       return (
-        <OverlayTrigger
-          overlay={(
-            <Tooltip
-              // TODO: id below for a11y
-              id={null}
-            >
-              Failed sending question.
-            </Tooltip>
-          )}
+        <Tooltip
+          message="Failed sending question."
         >
-          <span className="text-danger">
-            <MdError
-              size={ICON_SIZE}
-              role="status"
-            />
-          </span>
-        </OverlayTrigger>
+          <Icon
+            I={MdError}
+            className="text-danger"
+          />
+        </Tooltip>
       );
     case 'SENT':
       return (
-        <OverlayTrigger
-          overlay={(
-            <Tooltip
-              // TODO: id below for a11y
-              id={null}
-            >
-              Question sent successfully.
-            </Tooltip>
-          )}
+        <Tooltip
+          message="Question sent succesfully."
         >
-          <span className="text-success">
-            <MdCloudDone
-              size={ICON_SIZE}
-              role="status"
-            />
-          </span>
-        </OverlayTrigger>
+          <Icon
+            I={MdCloudDone}
+            className="text-success"
+          />
+        </Tooltip>
       );
     default:
       throw new ExhaustiveSwitchError(status);

@@ -1,7 +1,8 @@
 import React from 'react';
 import {
-  Button, ButtonProps, Tooltip, OverlayTrigger, OverlayTriggerProps,
+  Button, ButtonProps, OverlayTriggerProps,
 } from 'react-bootstrap';
+import Tooltip from '@hourglass/components/Tooltip';
 import './TooltipButton.css';
 
 interface TooltipButtonProps {
@@ -21,38 +22,23 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
     placement = 'bottom',
     children,
   } = props;
-  const button = (
-    <Button
-      variant={variant}
-      onClick={onClick}
-      disabled={disabled}
-      className={disabled && 'pointer-events-none'}
+  return (
+    <Tooltip
+      showTooltip={disabled}
+      message={disabledMessage}
+      placement={placement}
+      className={`d-inline-block ${disabled && 'cursor-help'}`}
     >
-      {children}
-    </Button>
-  );
-  if (disabled) {
-    return (
-      <OverlayTrigger
-        overlay={(
-          <Tooltip
-            // TODO: id below for a11y
-            id={null}
-          >
-            {disabledMessage}
-          </Tooltip>
-        )}
-        placement={placement}
+      <Button
+        variant={variant}
+        onClick={onClick}
+        disabled={disabled}
+        className={disabled && 'pointer-events-none'}
       >
-        <div
-          className={`d-inline-block ${disabled && 'cursor-help'}`}
-        >
-          {button}
-        </div>
-      </OverlayTrigger>
-    );
-  }
-  return button;
+        {children}
+      </Button>
+    </Tooltip>
+  );
 };
 
 export default TooltipButton;

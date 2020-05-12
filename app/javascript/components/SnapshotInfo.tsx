@@ -1,6 +1,7 @@
 import React from 'react';
 import { SnapshotStatus } from '@hourglass/types';
 import { MdCloudDone, MdError } from 'react-icons/md';
+import { ICON_SIZE } from '@hourglass/constants';
 import TooltipButton from '@hourglass/components/TooltipButton';
 
 interface SnapshotInfoProps {
@@ -13,7 +14,6 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
     status,
     message,
   } = props;
-  const size = '1.5em';
   switch (status) {
     case SnapshotStatus.LOADING:
       return (
@@ -22,7 +22,7 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
           disabled
           disabledMessage="Saving answers..."
         >
-          <span className="spinner-border align-middle" style={{ width: size, height: size }} role="status" />
+          <span className="spinner-border align-middle" style={{ width: ICON_SIZE, height: ICON_SIZE }} role="status" />
         </TooltipButton>
       );
     case SnapshotStatus.SUCCESS:
@@ -32,7 +32,7 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
           disabled
           disabledMessage="Answers saved to server."
         >
-          <MdCloudDone size={size} role="status" />
+          <MdCloudDone size={ICON_SIZE} role="status" />
         </TooltipButton>
       );
     case SnapshotStatus.FAILURE:
@@ -42,7 +42,7 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
           disabled
           disabledMessage={`Failed saving snapshot: ${message}.`}
         >
-          <MdError size={size} />
+          <MdError size={ICON_SIZE} />
         </TooltipButton>
       );
     default:

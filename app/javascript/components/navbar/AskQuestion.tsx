@@ -54,7 +54,7 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
     case 'SENT':
       return (
         <Tooltip
-          message="Question sent succesfully."
+          message="Question sent successfully."
         >
           <Icon
             I={MdCloudDone}

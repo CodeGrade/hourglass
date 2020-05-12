@@ -11,7 +11,7 @@ import {
 import { RailsContext } from '@hourglass/context';
 import { DateTime } from 'luxon';
 import { ExhaustiveSwitchError } from '@hourglass/helpers';
-import { AiFillCheckCircle, AiFillCloseCircle } from 'react-icons/ai';
+import { MdCloudDone, MdError } from 'react-icons/md';
 
 interface ShowStatusProps {
   status: ProfQuestionStatus;
@@ -35,7 +35,7 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
     case 'FAILED':
       return (
         <span className="text-danger">
-          <AiFillCloseCircle
+          <MdError
             size={size}
           />
         </span>
@@ -43,7 +43,7 @@ const ShowStatus: React.FC<ShowStatusProps> = (props) => {
     case 'SENT':
       return (
         <span className="text-success">
-          <AiFillCheckCircle
+          <MdCloudDone
             size={size}
           />
         </span>

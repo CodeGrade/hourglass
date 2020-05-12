@@ -197,7 +197,12 @@ export function doLoad(examID: number): Thunk {
         if (result.type === 'ANOMALOUS') {
           dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
         } else {
-          const { exam, answers, messages, questions } = result;
+          const {
+            exam,
+            answers,
+            messages,
+            questions,
+          } = result;
           const newMsgs = convertMsgs(messages);
           const newQs = convertQs(questions);
           dispatch(loadExam(exam, answers, newMsgs, newQs));

@@ -52,13 +52,14 @@ export const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
       onClick={(): void => onSectionClick(eventKey)}
     >
       <Icon size={ICON_SIZE} className="" />
+      <span aria-hidden="true" className="width-0">&nbsp;</span>
       <Collapse
         in={expanded}
         dimension="width"
       >
-        <span className="align-self-baseline">
+        <span className="align-self-center flex-fill">
           <span className="mr-3" />
-          <span>{label}</span>
+          <span className="flex-fill">{label}</span>
         </span>
       </Collapse>
     </Accordion.Toggle>

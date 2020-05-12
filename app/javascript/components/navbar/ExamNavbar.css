@@ -15,11 +15,11 @@
 }
 
 .sidebar-small {
-  min-width: 6em;
+  width: calc(6em + 2px);
 }
 
 .sidebar-expanded {
-  min-width: 500px;
+  width: 500px;
 }
 
 .width-0 {
@@ -48,7 +48,7 @@
   overflow: hidden;
   display: inline-block;
   height: unset; /* undoes bootstrap .collapsing height */
-  transition: 0.35s max-width ease-in-out;
+  transition: 0.35s width ease-in-out;
 }
 
 .collapse.width:not(.show) {
@@ -58,9 +58,9 @@
 .collapsing.width {
   position: relative;
   height: unset; /* undoes bootstrap .collapsing height */
-  max-width: 0;
+  width: 0;
 }
 
 .collapse.width.show {
-  max-width: 500px;
+  width: calc(500px - 7em);
 }

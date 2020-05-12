@@ -116,9 +116,7 @@ const ExamNavbar: React.FC<{
   const additionalClass = expanded ? 'sidebar-expanded' : 'sidebar-small';
   return (
     <div
-      id="sidebar"
       className={`
-        transition
         bg-dark
         text-white
         float-left
@@ -140,7 +138,7 @@ const ExamNavbar: React.FC<{
             Hourglass
           </h1>
         </Collapse>
-        <h1 aria-hidden="true" className="width-0">&nbsp;</h1>
+        <h1 aria-hidden="true" className="mw-0">&nbsp;</h1>
         <Button
           className="ml-2"
           onClick={(): void => {

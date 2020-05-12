@@ -72,7 +72,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
         <div className="mr-1 d-inline">
           <ShowStatus status={question.status} />
         </div>
-        <i>{question.time.toLocaleString(DateTime.TIME_SIMPLE)}</i>
+        <i className="text-muted">{`(sent ${question.time.toLocaleString(DateTime.TIME_SIMPLE)})`}</i>
       </div>
       <p>{question.body}</p>
     </>
@@ -109,7 +109,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
         disabled={anySending}
       />
       <Button
-        className="ml-auto mt-3"
+        className="ml-auto mt-3 float-right"
         variant="success"
         disabled={anySending || valEmpty}
         onClick={(): void => {
@@ -119,6 +119,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
       >
         {buttonText}
       </Button>
+      <span className="clearfix" />
       <hr className="my-2" />
       <div>
         {questions.map((q) => (

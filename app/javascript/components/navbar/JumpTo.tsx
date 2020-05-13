@@ -16,6 +16,7 @@ interface JumpToProps {
   pagination: PaginationState;
   togglePagination: () => void;
   changeQuestion: (qnum: number, pnum?: number) => void;
+  spyQuestion: (qnum: number, pnum?: number) => void;
   questions: QuestionInfo[];
 }
 
@@ -24,6 +25,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
     pagination,
     togglePagination,
     changeQuestion,
+    spyQuestion,
     questions,
   } = props;
   const {
@@ -58,6 +60,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
                   active={selectedQuestion && justQuestion}
                   onSelect={(): void => {
                     changeQuestion(qi);
+                    spyQuestion(qi);
                     scrollToQuestion(qi);
                   }}
                 >
@@ -80,6 +83,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
                       active={active}
                       onSelect={(): void => {
                         changeQuestion(qi, pi);
+                        spyQuestion(qi, pi);
                         scrollToPart(qi, pi);
                       }}
                     >

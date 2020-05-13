@@ -3,8 +3,8 @@ import { QuestionInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 import { BodyProps } from '@hourglass/components/Body';
 import { Waypoint } from 'react-waypoint';
-import Part from './Part';
-import { FileViewer } from './FileViewer';
+import Part from '@hourglass/components/Part';
+import { FileViewer } from '@hourglass/components/FileViewer';
 
 interface ShowQuestionProps {
   question: QuestionInfo;
@@ -66,8 +66,8 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
       />
       {parts.map((p, i) => {
         const current = selectedPart === i;
-        const active = !split || current;
-        const activeClass = active ? '' : 'd-none';
+        const activePart = !split || current;
+        const activeClass = activePart ? '' : 'd-none';
         return (
           <div className={activeClass}>
             <Part

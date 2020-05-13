@@ -4,10 +4,12 @@ import {
 } from '@hourglass/types';
 import { createMap } from '@hourglass/files';
 import { ExamContext, RailsContext } from '@hourglass/context';
-import Questions from '@hourglass/components/Questions';
 import useAnomalyListeners from '@hourglass/lockdown/anomaly';
 import HTML from '@hourglass/components/HTML';
-import { FileViewer } from './FileViewer';
+import { Row, Col } from 'react-bootstrap';
+import { FileViewer } from '@hourglass/components/FileViewer';
+import ShowQuestion from '@hourglass/containers/ShowQuestion';
+import Body from '@hourglass/components/Body';
 
 interface ExamShowContentsProps {
   exam: Exam;
@@ -41,9 +43,24 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
       <h1>{railsExam.name}</h1>
       <HTML value={instructions} />
       {reference && <FileViewer references={reference} />}
-      <Questions
-        questions={questions}
-      />
+      <Row>
+        <Col>
+          <div>
+            <div>
+              {questions.map((q, i) => (
+                <ShowQuestion
+                  // Question numbers are STATIC.
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={i}
+                  question={q}
+                  qnum={i}
+                  BodyRenderer={Body}
+                />
+              ))}
+            </div>
+          </div>
+        </Col>
+      </Row>
     </ExamContext.Provider>
   );
 };

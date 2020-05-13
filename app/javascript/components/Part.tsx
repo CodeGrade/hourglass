@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { PartInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
-import { BodyProps } from './Body';
-import { FileViewer } from './FileViewer';
+import { BodyProps } from '@hourglass/components/Body';
+import { FileViewer } from '@hourglass/components/FileViewer';
 import { Waypoint } from 'react-waypoint';
+import SubmitButton from '@hourglass/containers/SubmitButton';
+import { RailsContext } from '@hourglass/context';
 import './Part.css';
 
 interface PartProps {
@@ -23,17 +25,25 @@ const Part: React.FC<PartProps> = (props) => {
     spyQuestion,
   } = props;
   const {
-    name, reference, description, points, body,
+    name,
+    reference,
+    description,
+    points,
+    body,
   } = part;
+  const {
+    railsExam,
+  } = useContext(RailsContext);
   let title = `Part ${pnum + 1}`;
   if (name) title += `: ${name}`;
   const subtitle = `(${points} points)`;
+  const showSubmit = false;
+  const submitClass = showSubmit ? 'text-center' : 'd-none';
   return (
     <div>
       <Waypoint
         fireOnRapidScroll={false}
         onLeave={({ currentPosition, previousPosition }): void => {
-          // if (paginated && selectedQuestion !== qnum) return;
           if (currentPosition === Waypoint.above && previousPosition === Waypoint.inside) {
             spyQuestion(qnum, pnum);
           }
@@ -61,12 +71,14 @@ const Part: React.FC<PartProps> = (props) => {
       <Waypoint
         fireOnRapidScroll={false}
         onEnter={({ currentPosition, previousPosition }): void => {
-          // if (paginated && selectedQuestion !== qnum) return;
           if (currentPosition === Waypoint.inside && previousPosition === Waypoint.above) {
             spyQuestion(qnum, pnum);
           }
         }}
       />
+      <div className={submitClass}>
+        <SubmitButton examID={railsExam.id} />
+      </div>
     </div>
   );
 };

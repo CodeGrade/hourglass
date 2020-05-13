@@ -7,7 +7,7 @@ import { Row, Col, Container } from 'react-bootstrap';
 import { RailsContext } from '@hourglass/context';
 import ExamShowContents from '@hourglass/containers/ExamShowContents';
 import PreStart from '@hourglass/containers/PreStart';
-import './ExamTaker.css';
+import './ExamTaker.scss';
 
 interface ExamTakerProps {
   ready: boolean;

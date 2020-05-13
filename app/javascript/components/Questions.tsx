@@ -28,7 +28,11 @@ const Questions: React.FC<QuestionsProps> = (props) => {
           current={selectedQuestion}
           paginated={paginated}
           max={questions.length}
-          endItem={<SubmitButton examID={id} />}
+          endItem={(
+            <div className="text-center">
+              <SubmitButton examID={id} />
+            </div>
+          )}
         >
           {questions.map((q, i) => (
             <ShowQuestion

@@ -62,5 +62,5 @@
 }
 
 .collapse.width.show {
-  width: calc(500px - 7em);
+  width: calc(var(--sidebar-expanded) - 7em);
 }

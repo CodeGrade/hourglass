@@ -155,6 +155,7 @@ const ExamNavbar: React.FC<{}> = () => {
   const additionalClass = expanded ? 'sidebar-expanded' : 'sidebar-small';
   return (
     <div
+      id="sidebar"
       className={`
         transition
         bg-dark

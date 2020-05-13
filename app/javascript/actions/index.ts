@@ -27,11 +27,13 @@ import {
   QuestionFailedAction,
   QuestionSucceededAction,
   ProfQuestion,
+  SpyQuestionAction,
 } from '@hourglass/types';
 import {
   getCSRFToken,
   convertMsgs,
   convertQs,
+  scrollToQuestion,
 } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';
@@ -116,11 +118,20 @@ export function viewQuestion(question: number, part?: number): ViewQuestionActio
   };
 }
 
+export function spyQuestion(question: number, part?: number): SpyQuestionAction {
+  return {
+    type: 'SPY_QUESTION',
+    question,
+    part,
+  };
+}
+
 export function viewNextQuestion(): Thunk {
   return (dispatch, getState): void => {
     const state = getState();
     const qnum = state.pagination.selected.question;
     dispatch(viewQuestion(qnum + 1));
+    scrollToQuestion(qnum + 1);
   };
 }
 
@@ -129,6 +140,7 @@ export function viewPrevQuestion(): Thunk {
     const state = getState();
     const qnum = state.pagination.selected.question;
     dispatch(viewQuestion(qnum - 1));
+    scrollToQuestion(qnum - 1);
   };
 }
 

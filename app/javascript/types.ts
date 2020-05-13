@@ -73,6 +73,11 @@ export interface PaginationState {
     question: number;
     part?: number;
   };
+
+  spy: {
+    question: number;
+    part?: number;
+  };
 }
 
 export interface TogglePaginationAction {
@@ -81,6 +86,12 @@ export interface TogglePaginationAction {
 
 export interface ViewQuestionAction {
   type: 'VIEW_QUESTION';
+  question: number;
+  part?: number;
+}
+
+export interface SpyQuestionAction {
+  type: 'SPY_QUESTION';
   question: number;
   part?: number;
 }
@@ -111,7 +122,7 @@ export interface LoadExamAction {
 
 export type ContentsAction = UpdateAnswerAction | UpdateScratchAction;
 
-export type PaginationAction = TogglePaginationAction | ViewQuestionAction;
+export type PaginationAction = TogglePaginationAction | ViewQuestionAction | SpyQuestionAction;
 
 export interface UpdateAnswerAction {
   type: 'UPDATE_ANSWER';

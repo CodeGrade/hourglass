@@ -3,16 +3,24 @@ import {
   ScrollspyTop as Top,
   ScrollspyBottom as Bottom,
 } from '@hourglass/components/Scrollspy';
-import { MDTP } from '@hourglass/types';
-import { viewQuestion } from '@hourglass/actions';
+import { MDTP, MSTP } from '@hourglass/types';
+import { spyQuestion } from '@hourglass/actions';
+
+const mapStateToProps: MSTP<{
+  paginated: boolean;
+  selectedQuestion: number;
+}> = (state) => ({
+  paginated: state.pagination.paginated,
+  selectedQuestion: state.pagination.selected.question,
+});
 
 const mapDispatchToProps: MDTP<{
-  viewQuestion: (qnum: number, pnum?: number) => void;
+  spyQuestion: (qnum: number, pnum?: number) => void;
 }> = (dispatch) => ({
-  viewQuestion: (qnum, pnum): void => {
-    dispatch(viewQuestion(qnum, pnum));
+  spyQuestion: (qnum, pnum): void => {
+    dispatch(spyQuestion(qnum, pnum));
   },
 });
 
-export const ScrollspyTop = connect(null, mapDispatchToProps)(Top);
-export const ScrollspyBottom = connect(null, mapDispatchToProps)(Bottom);
+export const ScrollspyTop = connect(mapStateToProps, mapDispatchToProps)(Top);
+export const ScrollspyBottom = connect(mapStateToProps, mapDispatchToProps)(Bottom);

@@ -2,22 +2,28 @@ import React from 'react';
 import { Waypoint } from 'react-waypoint';
 
 interface ScrollspyProps {
+  paginated: boolean;
+  selectedQuestion: number;
   qnum: number;
   pnum?: number;
-  viewQuestion: (qnum: number, pnum?: number) => void;
+  spyQuestion: (qnum: number, pnum?: number) => void;
 }
 
 export const ScrollspyTop: React.FC<ScrollspyProps> = (props) => {
   const {
+    paginated,
+    selectedQuestion,
     qnum,
     pnum,
-    viewQuestion,
+    spyQuestion,
   } = props;
   return (
     <Waypoint
-      onPositionChange={({ currentPosition, previousPosition }): void => {
+      fireOnRapidScroll={false}
+      onLeave={({ currentPosition, previousPosition }): void => {
+        if (paginated && selectedQuestion !== qnum) return;
         if (currentPosition === Waypoint.above && previousPosition === Waypoint.inside) {
-          viewQuestion(qnum, pnum);
+          spyQuestion(qnum, pnum);
         }
       }}
     />
@@ -26,15 +32,19 @@ export const ScrollspyTop: React.FC<ScrollspyProps> = (props) => {
 
 export const ScrollspyBottom: React.FC<ScrollspyProps> = (props) => {
   const {
+    paginated,
+    selectedQuestion,
     qnum,
     pnum,
-    viewQuestion,
+    spyQuestion,
   } = props;
   return (
     <Waypoint
-      onPositionChange={({ currentPosition, previousPosition }): void => {
+      fireOnRapidScroll={false}
+      onEnter={({ currentPosition, previousPosition }): void => {
+        if (paginated && selectedQuestion !== qnum) return;
         if (currentPosition === Waypoint.inside && previousPosition === Waypoint.above) {
-          viewQuestion(qnum, pnum);
+          spyQuestion(qnum, pnum);
         }
       }}
     />

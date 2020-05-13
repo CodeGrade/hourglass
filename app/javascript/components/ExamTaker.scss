@@ -1,0 +1,26 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
+#exam-taker {
+  --sidebar-small: calc(6em + 2px);
+  --sidebar-expanded: 500px;
+}
+
+.bg-pulse {
+  background-color: unset;
+  animation-name: bg-pulse;
+  animation-duration: 0.5s;
+  animation-iteration-count: 2;
+}
+
+@keyframes bg-pulse {
+  0% {
+    background-color: unset;
+  }
+  50% {
+    background-color: rgba(theme-color("info"), .2);
+  }
+  100% {
+    background-color: unset;
+  }
+}

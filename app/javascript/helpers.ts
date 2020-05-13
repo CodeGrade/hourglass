@@ -28,6 +28,18 @@ export function logOut(): void {
   });
 }
 
+/**
+ * Flash an element's background color for emphasis.
+ */
+function pulse(elem: HTMLElement): void {
+  const listener = (): void => {
+    elem.removeEventListener('animationend', listener);
+    elem.classList.remove('bg-pulse');
+  };
+  elem.addEventListener('animationend', listener);
+  elem.classList.add('bg-pulse');
+}
+
 function scrollToElem(id: string): void {
   setTimeout(() => {
     const elem = document.getElementById(id);
@@ -37,6 +49,7 @@ function scrollToElem(id: string): void {
       top: elemTop + 1,
       behavior: 'smooth',
     });
+    pulse(elem);
   });
 }
 

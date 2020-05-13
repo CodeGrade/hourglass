@@ -28,9 +28,9 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
   } = props;
   const {
     paginated,
-    selected,
+    spy,
   } = pagination;
-  const justQuestion = selected.part === undefined;
+  const justQuestion = spy.part === undefined;
   return (
     <>
       <Form.Check
@@ -44,7 +44,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
       />
       <Nav variant="pills" className="flex-column">
         {questions.map((q, qi) => {
-          const selectedQuestion = qi === selected.question;
+          const selectedQuestion = qi === spy.question;
           const qlabel = `Question ${qi + 1}`;
           return (
             <React.Fragment
@@ -65,7 +65,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
                 </Nav.Link>
               </Nav.Item>
               {q.parts.map((_p, pi) => {
-                const selectedPart = pi === selected.part;
+                const selectedPart = pi === spy.part;
                 const active = selectedQuestion && selectedPart;
                 const plabel = `Part ${pi + 1}`;
                 return (

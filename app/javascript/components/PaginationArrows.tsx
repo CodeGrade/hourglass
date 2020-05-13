@@ -17,7 +17,7 @@ const PaginationArrows: React.FC<PaginationArrowsProps> = (props) => {
     onNext,
   } = props;
   return (
-    <div>
+    <div className="w-100">
       <Button
         disabled={!showBack}
         onClick={onBack}
@@ -27,7 +27,7 @@ const PaginationArrows: React.FC<PaginationArrowsProps> = (props) => {
       </Button>
       <Button
         disabled={!showNext}
-        className="ml-2"
+        className="float-right"
         onClick={onNext}
       >
         <span>Next</span>

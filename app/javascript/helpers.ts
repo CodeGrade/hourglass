@@ -32,15 +32,12 @@ export function logOut(): void {
  * Flash an element's background color for emphasis.
  */
 function pulse(elem: HTMLElement): void {
-  elem.classList.remove('bg-pulse');
-
-  // We need two animation frames to ensure the style has been fully recomputed.
-  // https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations/Tips#JavaScript_content
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => {
-      elem.classList.add('bg-pulse');
-    });
-  });
+  const listener = (): void => {
+    elem.removeEventListener('animationend', listener);
+    elem.classList.remove('bg-pulse');
+  };
+  elem.addEventListener('animationend', listener);
+  elem.classList.add('bg-pulse');
 }
 
 function scrollToElem(id: string): void {

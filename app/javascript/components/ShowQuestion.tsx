@@ -25,11 +25,10 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     name,
     reference,
     description,
-    separateSubparts, // TODO
     parts,
   } = question;
   return (
-    <div className={`question no-gutters ${separateSubparts ? 'paginated' : ''}`}>
+    <div className="no-gutters">
       <ScrollspyTop
         qnum={qnum}
       />

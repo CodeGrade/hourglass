@@ -41,16 +41,14 @@ function pulse(elem: HTMLElement): void {
 }
 
 function scrollToElem(id: string): void {
-  setTimeout(() => {
-    const elem = document.getElementById(id);
-    const elemTop = elem.getBoundingClientRect().top + window.pageYOffset;
-    window.scrollTo({
-      left: 0,
-      top: elemTop + 1,
-      behavior: 'smooth',
-    });
-    pulse(elem);
+  const elem = document.getElementById(id);
+  const elemTop = elem.getBoundingClientRect().top + window.pageYOffset;
+  window.scrollTo({
+    left: 0,
+    top: elemTop + 1,
+    behavior: 'smooth',
   });
+  pulse(elem);
 }
 
 export function scrollToQuestion(qnum: number): void {

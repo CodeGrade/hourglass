@@ -30,6 +30,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
   } = props;
   const {
     paginated,
+    selected,
     spy,
   } = pagination;
   const justQuestion = spy.part === undefined;
@@ -41,6 +42,9 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
         checked={paginated}
         onChange={(_e): void => {
           togglePagination();
+          if (!paginated) {
+            spyQuestion(selected.question, selected.part);
+          }
         }}
         label="Toggle pagination"
       />
@@ -60,7 +64,6 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
                   active={selectedQuestion && justQuestion}
                   onSelect={(): void => {
                     changeQuestion(qi);
-                    spyQuestion(qi);
                     scrollToQuestion(qi);
                   }}
                 >
@@ -83,8 +86,10 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
                       active={active}
                       onSelect={(): void => {
                         changeQuestion(qi, pi);
-                        spyQuestion(qi, pi);
                         scrollToPart(qi, pi);
+                        if (paginated && q.separateSubparts) {
+                          spyQuestion(qi, pi);
+                        }
                       }}
                     >
                       {plabel}

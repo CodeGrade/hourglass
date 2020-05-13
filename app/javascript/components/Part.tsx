@@ -14,6 +14,10 @@ interface PartProps {
   pnum: number;
   BodyRenderer: React.ComponentType<BodyProps>;
   spyQuestion: (qnum: number, pnum?: number) => void;
+  paginated?: boolean;
+  selectedQuestion?: number;
+  selectedPart?: number;
+  separateSubparts?: boolean;
 }
 
 const Part: React.FC<PartProps> = (props) => {
@@ -23,6 +27,10 @@ const Part: React.FC<PartProps> = (props) => {
     pnum,
     BodyRenderer,
     spyQuestion,
+    paginated,
+    selectedQuestion,
+    selectedPart,
+    separateSubparts,
   } = props;
   const {
     name,
@@ -44,6 +52,8 @@ const Part: React.FC<PartProps> = (props) => {
       <Waypoint
         fireOnRapidScroll={false}
         onLeave={({ currentPosition, previousPosition }): void => {
+          if (paginated && selectedQuestion !== qnum) return;
+          if (paginated && separateSubparts && selectedPart !== pnum) return;
           if (currentPosition === Waypoint.above && previousPosition === Waypoint.inside) {
             spyQuestion(qnum, pnum);
           }
@@ -71,6 +81,8 @@ const Part: React.FC<PartProps> = (props) => {
       <Waypoint
         fireOnRapidScroll={false}
         onEnter={({ currentPosition, previousPosition }): void => {
+          if (paginated && selectedQuestion !== qnum) return;
+          if (paginated && separateSubparts && selectedPart !== pnum) return;
           if (currentPosition === Waypoint.inside && previousPosition === Waypoint.above) {
             spyQuestion(qnum, pnum);
           }

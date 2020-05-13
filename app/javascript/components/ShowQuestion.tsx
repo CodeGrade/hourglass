@@ -76,11 +76,15 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             className={activeClass}
           >
             <Part
-              spyQuestion={spyQuestion}
               part={p}
               pnum={i}
               qnum={qnum}
+              spyQuestion={spyQuestion}
               BodyRenderer={BodyRenderer}
+              paginated={paginated}
+              selectedQuestion={selectedQuestion}
+              selectedPart={selectedPart}
+              separateSubparts={separateSubparts}
             />
           </div>
         );

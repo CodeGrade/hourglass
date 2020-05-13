@@ -15,11 +15,11 @@
 }
 
 .sidebar-small {
-  width: calc(6em + 2px);
+  width: var(--sidebar-small);
 }
 
 .sidebar-expanded {
-  width: 500px;
+  width: var(--sidebar-expanded);
 }
 
 .width-0 {

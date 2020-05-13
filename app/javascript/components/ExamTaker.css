@@ -1,0 +1,16 @@
+#exam-taker {
+  --sidebar-small: calc(6em + 2px);
+  --sidebar-expanded: 500px;
+}
+
+#exam-body {
+  transition: 0.35s margin-left ease-in-out;
+}
+
+#sidebar.sidebar-small ~ #exam-body {
+  margin-left: var(--sidebar-small);
+}
+
+#sidebar.sidebar-expanded ~ #exam-body {
+  margin-left: var(--sidebar-expanded);
+}

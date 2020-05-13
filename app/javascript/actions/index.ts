@@ -33,8 +33,6 @@ import {
   getCSRFToken,
   convertMsgs,
   convertQs,
-  scrollToQuestion,
-  scrollToPart,
 } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';

@@ -20,9 +20,9 @@ export const ScrollspyTop: React.FC<ScrollspyProps> = (props) => {
   return (
     <Waypoint
       fireOnRapidScroll={false}
-      onLeave={({ currentPosition }): void => {
+      onLeave={({ currentPosition, previousPosition }): void => {
         if (paginated && selectedQuestion !== qnum) return;
-        if (currentPosition === Waypoint.above) {
+        if (currentPosition === Waypoint.above && previousPosition === Waypoint.inside) {
           spyQuestion(qnum, pnum);
         }
       }}
@@ -41,9 +41,9 @@ export const ScrollspyBottom: React.FC<ScrollspyProps> = (props) => {
   return (
     <Waypoint
       fireOnRapidScroll={false}
-      onEnter={({ previousPosition }): void => {
+      onEnter={({ currentPosition, previousPosition }): void => {
         if (paginated && selectedQuestion !== qnum) return;
-        if (previousPosition === Waypoint.above) {
+        if (currentPosition === Waypoint.inside && previousPosition === Waypoint.above) {
           spyQuestion(qnum, pnum);
         }
       }}

@@ -33,6 +33,7 @@ import {
   getCSRFToken,
   convertMsgs,
   convertQs,
+  scrollToQuestion,
 } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';
@@ -130,6 +131,7 @@ export function viewNextQuestion(): Thunk {
     const state = getState();
     const qnum = state.pagination.selected.question;
     dispatch(viewQuestion(qnum + 1));
+    scrollToQuestion(qnum + 1);
   };
 }
 
@@ -138,6 +140,7 @@ export function viewPrevQuestion(): Thunk {
     const state = getState();
     const qnum = state.pagination.selected.question;
     dispatch(viewQuestion(qnum - 1));
+    scrollToQuestion(qnum - 1);
   };
 }
 

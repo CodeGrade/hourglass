@@ -24,7 +24,8 @@ const Pagination: React.FC<PaginationProps> = (props) => {
     <div>
       <div>
         {children.map((b, i) => {
-          const active = current === i;
+          const isCurrent = current === i;
+          const active = !paginated || isCurrent;
           const activeClass = active ? '' : 'd-none';
           return (
             // Page indices are STATIC.

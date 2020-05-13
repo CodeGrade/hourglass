@@ -69,15 +69,17 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
         const activePart = !split || current;
         const activeClass = activePart ? '' : 'd-none';
         return (
-          <div className={activeClass}>
+          <div
+            // Part numbers are STATIC.
+            // eslint-disable-next-line react/no-array-index-key
+            key={i}
+            className={activeClass}
+          >
             <Part
               spyQuestion={spyQuestion}
               part={p}
               pnum={i}
               qnum={qnum}
-              // Part numbers are STATIC.
-              // eslint-disable-next-line react/no-array-index-key
-              key={i}
               BodyRenderer={BodyRenderer}
             />
           </div>

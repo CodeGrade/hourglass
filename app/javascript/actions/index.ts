@@ -34,6 +34,7 @@ import {
   convertMsgs,
   convertQs,
   scrollToQuestion,
+  scrollToPart,
 } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';
@@ -123,24 +124,6 @@ export function spyQuestion(question: number, part?: number): SpyQuestionAction 
     type: 'SPY_QUESTION',
     question,
     part,
-  };
-}
-
-export function viewNextQuestion(): Thunk {
-  return (dispatch, getState): void => {
-    const state = getState();
-    const qnum = state.pagination.selected.question;
-    dispatch(viewQuestion(qnum + 1));
-    scrollToQuestion(qnum + 1);
-  };
-}
-
-export function viewPrevQuestion(): Thunk {
-  return (dispatch, getState): void => {
-    const state = getState();
-    const qnum = state.pagination.selected.question;
-    dispatch(viewQuestion(qnum - 1));
-    scrollToQuestion(qnum - 1);
   };
 }
 

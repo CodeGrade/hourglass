@@ -21,6 +21,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           question={q}
           qnum={i}
           BodyRenderer={DisplayBody}
+          paginated={false}
         />
       ))}
     </>

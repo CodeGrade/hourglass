@@ -4,7 +4,7 @@ import {
 } from '@hourglass/types';
 import { createMap } from '@hourglass/files';
 import { ExamContext, RailsContext } from '@hourglass/context';
-import Questions from '@hourglass/containers/Questions';
+import Questions from '@hourglass/components/Questions';
 import useAnomalyListeners from '@hourglass/lockdown/anomaly';
 import HTML from '@hourglass/components/HTML';
 import { FileViewer } from './FileViewer';

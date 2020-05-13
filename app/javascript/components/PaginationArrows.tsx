@@ -3,34 +3,48 @@ import { MdArrowForward, MdArrowBack } from 'react-icons/md';
 import { Button } from 'react-bootstrap';
 
 interface PaginationArrowsProps {
-  showBack: boolean;
-  showNext: boolean;
-  onBack: () => void;
-  onNext: () => void;
+  qnumNext?: number;
+  pnumNext?: number;
+  qnumPrev?: number;
+  pnumPrev?: number;
+  onChange: (qnum: number, pnum?: number) => void;
 }
 
 const PaginationArrows: React.FC<PaginationArrowsProps> = (props) => {
   const {
-    showBack,
-    showNext,
-    onBack,
-    onNext,
+    qnumNext,
+    pnumNext,
+    qnumPrev,
+    pnumPrev,
+    onChange,
   } = props;
+  const prevNoun = pnumPrev === undefined ? 'Question' : 'Part';
+  const nextNoun = pnumNext === undefined ? 'Question' : 'Part';
   return (
     <div className="w-100">
       <Button
-        disabled={!showBack}
-        onClick={onBack}
+        disabled={qnumPrev === undefined}
+        onClick={(): void => {
+          onChange(qnumPrev, pnumPrev);
+        }}
       >
         <MdArrowBack />
-        <span>Previous</span>
+        <span>
+          Previous
+          {prevNoun}
+        </span>
       </Button>
       <Button
-        disabled={!showNext}
+        disabled={qnumNext === undefined}
         className="float-right"
-        onClick={onNext}
+        onClick={(): void => {
+          onChange(qnumNext, pnumNext);
+        }}
       >
-        <span>Next</span>
+        <span>
+          Next
+          {nextNoun}
+        </span>
         <MdArrowForward />
       </Button>
     </div>

@@ -1,12 +1,9 @@
 import React from 'react';
 import { PartInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
-import {
-  ScrollspyTop,
-  ScrollspyBottom,
-} from '@hourglass/containers/Scrollspy';
 import { BodyProps } from './Body';
 import { FileViewer } from './FileViewer';
+import { Waypoint } from 'react-waypoint';
 import './Part.css';
 
 interface PartProps {
@@ -14,6 +11,7 @@ interface PartProps {
   qnum: number;
   pnum: number;
   BodyRenderer: React.ComponentType<BodyProps>;
+  spyQuestion: (qnum: number, pnum?: number) => void;
 }
 
 const Part: React.FC<PartProps> = (props) => {
@@ -22,6 +20,7 @@ const Part: React.FC<PartProps> = (props) => {
     qnum,
     pnum,
     BodyRenderer,
+    spyQuestion,
   } = props;
   const {
     name, reference, description, points, body,
@@ -30,10 +29,15 @@ const Part: React.FC<PartProps> = (props) => {
   if (name) title += `: ${name}`;
   const subtitle = `(${points} points)`;
   return (
-    <div className="part">
-      <ScrollspyTop
-        qnum={qnum}
-        pnum={pnum}
+    <div>
+      <Waypoint
+        fireOnRapidScroll={false}
+        onLeave={({ currentPosition, previousPosition }): void => {
+          // if (paginated && selectedQuestion !== qnum) return;
+          if (currentPosition === Waypoint.above && previousPosition === Waypoint.inside) {
+            spyQuestion(qnum, pnum);
+          }
+        }}
       />
       <h3 id={`question-${qnum}-part-${pnum}`}>
         {title}
@@ -54,9 +58,14 @@ const Part: React.FC<PartProps> = (props) => {
           ))}
         </div>
       </div>
-      <ScrollspyBottom
-        qnum={qnum}
-        pnum={pnum}
+      <Waypoint
+        fireOnRapidScroll={false}
+        onEnter={({ currentPosition, previousPosition }): void => {
+          // if (paginated && selectedQuestion !== qnum) return;
+          if (currentPosition === Waypoint.inside && previousPosition === Waypoint.above) {
+            spyQuestion(qnum, pnum);
+          }
+        }}
       />
     </div>
   );

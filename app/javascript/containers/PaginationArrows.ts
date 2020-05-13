@@ -1,20 +1,21 @@
 import { connect } from 'react-redux';
 import {
-  viewNextQuestion,
-  viewPrevQuestion,
+  viewQuestion,
 } from '@hourglass/actions';
 import PaginationArrows from '@hourglass/components/PaginationArrows';
 import { MDTP } from '@hourglass/types';
+import { scrollToQuestion, scrollToPart } from '@hourglass/helpers';
 
 const mapDispatchToProps: MDTP<{
-  onBack: () => void;
-  onNext: () => void;
+  onChange: (qnum: number, pnum?: number) => void;
 }> = (dispatch) => ({
-  onBack: (): void => {
-    dispatch(viewPrevQuestion());
-  },
-  onNext: (): void => {
-    dispatch(viewNextQuestion());
+  onChange: (qnum, pnum): void => {
+    dispatch(viewQuestion(qnum, pnum));
+    if (pnum) {
+      scrollToPart(qnum, pnum);
+    } else {
+      scrollToQuestion(qnum);
+    }
   },
 });
 

@@ -1,13 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { PartInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 import { BodyProps } from '@hourglass/components/Body';
 import { FileViewer } from '@hourglass/components/FileViewer';
-import { Waypoint } from 'react-waypoint';
-import SubmitButton from '@hourglass/containers/SubmitButton';
-import { RailsContext } from '@hourglass/context';
-import PaginationArrows from '@hourglass/containers/PaginationArrows';
-
+import {
+  TopScrollspy,
+  BottomScrollspy,
+} from '@hourglass/containers/scrollspy/Part';
 import './Part.css';
 
 interface PartProps {
@@ -15,12 +14,6 @@ interface PartProps {
   qnum: number;
   pnum: number;
   BodyRenderer: React.ComponentType<BodyProps>;
-  spyQuestion: (qnum: number, pnum?: number) => void;
-  paginated?: boolean;
-  selectedQuestion?: number;
-  selectedPart?: number;
-  lastPart?: boolean;
-  lastQuestion?: boolean;
   separateSubparts?: boolean;
 }
 
@@ -30,12 +23,6 @@ const Part: React.FC<PartProps> = (props) => {
     qnum,
     pnum,
     BodyRenderer,
-    spyQuestion,
-    paginated,
-    selectedQuestion,
-    selectedPart,
-    lastPart,
-    lastQuestion,
     separateSubparts,
   } = props;
   const {
@@ -45,27 +32,15 @@ const Part: React.FC<PartProps> = (props) => {
     points,
     body,
   } = part;
-  const {
-    railsExam,
-  } = useContext(RailsContext);
   let title = `Part ${pnum + 1}`;
   if (name) title += `: ${name}`;
   const subtitle = `(${points} points)`;
-  const showSubmit = lastPart && lastQuestion;
-  const submitClass = showSubmit ? 'text-center' : 'd-none';
-  const showArrows = paginated && (separateSubparts || lastPart);
-  const arrowsClass = showArrows ? '' : 'd-none';
   return (
     <div>
-      <Waypoint
-        fireOnRapidScroll={false}
-        onLeave={({ currentPosition, previousPosition }): void => {
-          if (paginated && selectedQuestion !== qnum) return;
-          if (paginated && separateSubparts && selectedPart !== pnum) return;
-          if (currentPosition === Waypoint.above && previousPosition === Waypoint.inside) {
-            spyQuestion(qnum, pnum);
-          }
-        }}
+      <TopScrollspy
+        question={qnum}
+        part={pnum}
+        separateSubparts={separateSubparts}
       />
       <h3 id={`question-${qnum}-part-${pnum}`}>
         {title}
@@ -86,28 +61,11 @@ const Part: React.FC<PartProps> = (props) => {
           ))}
         </div>
       </div>
-      <Waypoint
-        fireOnRapidScroll={false}
-        onEnter={({ currentPosition, previousPosition }): void => {
-          if (paginated && selectedQuestion !== qnum) return;
-          if (paginated && separateSubparts && selectedPart !== pnum) return;
-          if (currentPosition === Waypoint.inside && previousPosition === Waypoint.above) {
-            spyQuestion(qnum, pnum);
-          }
-        }}
+      <BottomScrollspy
+        question={qnum}
+        part={pnum}
+        separateSubparts={separateSubparts}
       />
-      <div className={arrowsClass}>
-        <PaginationArrows
-          pnumNext={lastPart ? undefined : pnum + 1}
-          pnumPrev={(!separateSubparts || pnum === 0) ? undefined : pnum - 1}
-          qnumNext={lastQuestion ? undefined : qnum + 1}
-          qnumPrev={qnum === 0 ? undefined : qnum - 1}
-          qnumCurrent={qnum}
-        />
-      </div>
-      <div className={submitClass}>
-        <SubmitButton examID={railsExam.id} />
-      </div>
     </div>
   );
 };

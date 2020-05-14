@@ -2,9 +2,13 @@ import React from 'react';
 import { QuestionInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 import { BodyProps } from '@hourglass/components/Body';
-import { Waypoint } from 'react-waypoint';
 import Part from '@hourglass/components/Part';
 import { FileViewer } from '@hourglass/components/FileViewer';
+import PaginationArrows from '@hourglass/containers/PaginationArrows';
+import {
+  TopScrollspy,
+  BottomScrollspy,
+} from '@hourglass/containers/scrollspy/Question';
 
 interface ShowQuestionProps {
   question: QuestionInfo;
@@ -13,8 +17,6 @@ interface ShowQuestionProps {
   paginated: boolean;
   selectedQuestion?: number;
   selectedPart?: number;
-  spyQuestion?: (qnum: number, pnum?: number) => void;
-  lastQuestion?: boolean;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
@@ -25,8 +27,6 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     paginated,
     selectedQuestion,
     selectedPart,
-    spyQuestion,
-    lastQuestion,
   } = props;
   const {
     name,
@@ -41,35 +41,23 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const classes = active ? '' : 'd-none';
   return (
     <div className={classes}>
-      <Waypoint
-        fireOnRapidScroll={false}
-        onLeave={({ currentPosition, previousPosition }): void => {
-          if (paginated && selectedQuestion !== qnum) return;
-          if (paginated && separateSubparts) {
-            spyQuestion(qnum, selectedPart);
-          } else if (currentPosition === Waypoint.above && previousPosition === Waypoint.inside) {
-            spyQuestion(qnum);
-          }
-        }}
+      <TopScrollspy
+        question={qnum}
+        separateSubparts={separateSubparts}
       />
       <h1 id={`question-${qnum}`}>{`Question ${qnum + 1}: ${name}`}</h1>
       <HTML value={description} />
       {reference && <FileViewer references={reference} />}
-      <Waypoint
-        fireOnRapidScroll={false}
-        onEnter={({ currentPosition, previousPosition }): void => {
-          if (paginated && selectedQuestion !== qnum) return;
-          if (paginated && separateSubparts) {
-            spyQuestion(qnum, selectedPart);
-          } else if (currentPosition === Waypoint.inside && previousPosition === Waypoint.above) {
-            spyQuestion(qnum);
-          }
-        }}
+      <BottomScrollspy
+        question={qnum}
+        separateSubparts={separateSubparts}
       />
       {parts.map((p, i) => {
         const current = selectedPart === i;
         const activePart = !split || current;
         const activeClass = activePart ? '' : 'd-none';
+        const lastPart = i === parts.length - 1;
+        const showArrows = separateSubparts || lastPart;
         return (
           <div
             // Part numbers are STATIC.
@@ -81,15 +69,12 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               part={p}
               pnum={i}
               qnum={qnum}
-              spyQuestion={spyQuestion}
               BodyRenderer={BodyRenderer}
-              paginated={paginated}
-              selectedQuestion={selectedQuestion}
-              selectedPart={selectedPart}
-              lastPart={i === parts.length - 1}
-              lastQuestion={lastQuestion}
               separateSubparts={separateSubparts}
             />
+            <div className={showArrows ? '' : 'd-none'}>
+              <PaginationArrows />
+            </div>
           </div>
         );
       })}

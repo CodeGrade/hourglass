@@ -53,12 +53,12 @@ function scrollToElem(id: string): void {
   });
 }
 
-export function scrollToQuestion(qnum: number): void {
-  scrollToElem(`question-${qnum}`);
-}
-
-export function scrollToPart(qnum: number, pnum: number): void {
-  scrollToElem(`question-${qnum}-part-${pnum}`);
+export function scrollToQuestion(qnum: number, pnum?: number): void {
+  if (pnum !== undefined) {
+    scrollToElem(`question-${qnum}-part-${pnum}`);
+  } else {
+    scrollToElem(`question-${qnum}`);
+  }
 }
 
 /**

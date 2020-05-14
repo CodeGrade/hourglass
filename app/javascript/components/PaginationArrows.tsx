@@ -3,56 +3,40 @@ import { MdArrowForward, MdArrowBack } from 'react-icons/md';
 import { Button } from 'react-bootstrap';
 
 interface PaginationArrowsProps {
-  qnumNext?: number;
-  pnumNext?: number;
-  qnumPrev?: number;
-  pnumPrev?: number;
-  qnumCurrent: number;
-  onChange: (qnum: number, pnum?: number) => void;
+  show: boolean;
+  hasNext: boolean;
+  hasPrev: boolean;
+  next: () => void;
+  prev: () => void;
 }
 
 const PaginationArrows: React.FC<PaginationArrowsProps> = (props) => {
   const {
-    qnumNext,
-    pnumNext,
-    qnumPrev,
-    pnumPrev,
-    qnumCurrent,
-    onChange,
+    show,
+    hasNext,
+    hasPrev,
+    next,
+    prev,
   } = props;
-  const prevNoun = pnumPrev === undefined ? 'Question' : 'Part';
-  const nextNoun = pnumNext === undefined ? 'Question' : 'Part';
-  const showPrev = qnumPrev !== undefined || pnumPrev !== undefined;
-  const showNext = qnumNext !== undefined || pnumNext !== undefined;
   return (
-    <div className="w-100">
+    <div
+      className={show ? 'w-100' : 'd-none'}
+    >
       <Button
-        className={showPrev ? '' : 'd-none'}
-        onClick={(): void => {
-          if (pnumPrev !== undefined) {
-            onChange(qnumCurrent, pnumPrev);
-          } else {
-            onChange(qnumPrev, 0);
-          }
-        }}
+        className={hasPrev ? '' : 'd-none'}
+        onClick={prev}
       >
         <MdArrowBack />
         <span>
-          {`Previous ${prevNoun}`}
+          Previous
         </span>
       </Button>
       <Button
-        className={showNext ? 'float-right' : 'd-none'}
-        onClick={(): void => {
-          if (pnumNext !== undefined) {
-            onChange(qnumCurrent, pnumNext);
-          } else {
-            onChange(qnumNext, 0);
-          }
-        }}
+        className={hasNext ? 'float-right' : 'd-none'}
+        onClick={next}
       >
         <span>
-          {`Next ${nextNoun}`}
+          Next
         </span>
         <MdArrowForward />
       </Button>

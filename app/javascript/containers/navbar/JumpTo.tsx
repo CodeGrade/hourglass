@@ -26,10 +26,10 @@ const mapDispatchToProps: MDTP<{
     dispatch(togglePagination());
   },
   changeQuestion: (question: number, part?: number): void => {
-    dispatch(viewQuestion(question, part));
+    dispatch(viewQuestion({ question, part }));
   },
   spyQuestion: (question: number, part?: number): void => {
-    dispatch(spyQuestion(question, part));
+    dispatch(spyQuestion({ question, part }));
   },
 });
 

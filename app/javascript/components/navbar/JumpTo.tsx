@@ -9,7 +9,6 @@ import {
 } from '@hourglass/types';
 import {
   scrollToQuestion,
-  scrollToPart,
 } from '@hourglass/helpers';
 
 interface JumpToProps {
@@ -30,10 +29,11 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
   } = props;
   const {
     paginated,
-    selected,
+    coords,
     spy,
   } = pagination;
-  const justQuestion = spy.part === undefined;
+  const selectedCoords = coords[spy];
+  const justQuestion = selectedCoords.part === undefined;
   return (
     <>
       <Form.Check
@@ -44,17 +44,17 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
           togglePagination();
           // If there's a selected part, use it.
           // If not and separatesubparts, we need to select part 0.
-          const fallback = questions[selected.question].separateSubparts ? 0 : undefined;
-          const part = selected.part ?? fallback;
-          changeQuestion(selected.question, part);
-          scrollToPart(selected.question, selected.part);
-          setTimeout(() => spyQuestion(selected.question, part));
+          const fallback = questions[selectedCoords.question].separateSubparts ? 0 : undefined;
+          const part = selectedCoords.part ?? fallback;
+          changeQuestion(selectedCoords.question, part);
+          scrollToQuestion(selectedCoords.question, selectedCoords.part);
+          setTimeout(() => spyQuestion(selectedCoords.question, part));
         }}
         label="Toggle pagination"
       />
       <Nav variant="pills" className="flex-column">
         {questions.map((q, qi) => {
-          const selectedQuestion = qi === spy.question;
+          const selectedQuestion = qi === selectedCoords.question;
           const qlabel = `Question ${qi + 1}`;
           return (
             <React.Fragment
@@ -81,7 +81,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
                 </Nav.Link>
               </Nav.Item>
               {q.parts.map((_p, pi) => {
-                const selectedPart = pi === spy.part;
+                const selectedPart = pi === selectedCoords.part;
                 const active = selectedQuestion && selectedPart;
                 const plabel = `Part ${pi + 1}`;
                 return (
@@ -96,7 +96,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
                       active={active}
                       onSelect={(): void => {
                         changeQuestion(qi, pi);
-                        scrollToPart(qi, pi);
+                        scrollToQuestion(qi, pi);
                         if (paginated && q.separateSubparts) {
                           spyQuestion(qi, pi);
                         }

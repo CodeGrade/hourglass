@@ -28,6 +28,9 @@ import {
   QuestionSucceededAction,
   ProfQuestion,
   SpyQuestionAction,
+  PaginationCoordinates,
+  PrevQuestionAction,
+  NextQuestionAction,
 } from '@hourglass/types';
 import {
   getCSRFToken,
@@ -109,19 +112,29 @@ export function togglePagination(): TogglePaginationAction {
   };
 }
 
-export function viewQuestion(question: number, part?: number): ViewQuestionAction {
+export function viewQuestion(coords: PaginationCoordinates): ViewQuestionAction {
   return {
     type: 'VIEW_QUESTION',
-    question,
-    part,
+    coords,
   };
 }
 
-export function spyQuestion(question: number, part?: number): SpyQuestionAction {
+export function spyQuestion(coords: PaginationCoordinates): SpyQuestionAction {
   return {
     type: 'SPY_QUESTION',
-    question,
-    part,
+    coords,
+  };
+}
+
+export function prevQuestion(): PrevQuestionAction {
+  return {
+    type: 'PREV_QUESTION',
+  };
+}
+
+export function nextQuestion(): NextQuestionAction {
+  return {
+    type: 'NEXT_QUESTION',
   };
 }
 

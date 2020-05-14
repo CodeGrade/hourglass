@@ -7,17 +7,20 @@ const mapStateToProps: MSTP<{
   paginated: boolean;
   selectedQuestion: number;
   selectedPart: number;
-}> = (state: ExamTakerState) => ({
-  paginated: state.pagination.paginated,
-  selectedQuestion: state.pagination.selected.question,
-  selectedPart: state.pagination.selected.part,
-});
+}> = (state: ExamTakerState) => {
+  const { coords, paginated, selected } = state.pagination;
+  return {
+    paginated,
+    selectedQuestion: coords[selected].question,
+    selectedPart: coords[selected].part,
+  };
+};
 
 const mapDispatchToProps: MDTP<{
-  spyQuestion: (qnum: number, pnum?: number) => void;
+  spyQuestion: (question: number, pnum?: number) => void;
 }> = (dispatch) => ({
-  spyQuestion: (qnum: number, pnum?: number): void => {
-    dispatch(spyQuestion(qnum, pnum));
+  spyQuestion: (question, part): void => {
+    dispatch(spyQuestion({ question, part }));
   },
 });
 

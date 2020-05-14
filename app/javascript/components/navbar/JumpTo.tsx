@@ -9,7 +9,6 @@ import {
 } from '@hourglass/types';
 import {
   scrollToQuestion,
-  scrollToTop,
 } from '@hourglass/helpers';
 
 interface JumpToProps {
@@ -43,6 +42,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
         checked={paginated}
         onChange={(_e): void => {
           togglePagination();
+          scrollToQuestion(selectedCoords.question, selectedCoords.part, false);
         }}
         label="Toggle pagination"
       />

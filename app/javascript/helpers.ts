@@ -40,33 +40,24 @@ function pulse(elem: HTMLElement): void {
   elem.classList.add('bg-pulse');
 }
 
-function scrollToElem(id: string): void {
+function scrollToElem(id: string, smooth = true): void {
   setTimeout(() => {
     const elem = document.getElementById(id);
     const elemTop = elem.getBoundingClientRect().top + window.pageYOffset;
     window.scrollTo({
       left: 0,
       top: elemTop + 1,
-      behavior: 'smooth',
+      behavior: smooth ? 'smooth' : 'auto',
     });
     pulse(elem);
   });
 }
 
-export function scrollToTop(): void {
-  setTimeout(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  });
-}
-
-export function scrollToQuestion(qnum: number, pnum?: number): void {
+export function scrollToQuestion(qnum: number, pnum?: number, smooth?: boolean): void {
   if (pnum !== undefined) {
-    scrollToElem(`question-${qnum}-part-${pnum}`);
+    scrollToElem(`question-${qnum}-part-${pnum}`, smooth);
   } else {
-    scrollToElem(`question-${qnum}`);
+    scrollToElem(`question-${qnum}`, smooth);
   }
 }
 

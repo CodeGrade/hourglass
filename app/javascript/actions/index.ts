@@ -28,12 +28,15 @@ import {
   QuestionSucceededAction,
   ProfQuestion,
   SpyQuestionAction,
+  PaginationCoordinates,
+  PrevQuestionAction,
+  NextQuestionAction,
+  ActivateWaypointsAction,
 } from '@hourglass/types';
 import {
   getCSRFToken,
   convertMsgs,
   convertQs,
-  scrollToQuestion,
 } from '@hourglass/helpers';
 import Routes from '@hourglass/routes';
 import lock from '@hourglass/lockdown/lock';
@@ -110,37 +113,36 @@ export function togglePagination(): TogglePaginationAction {
   };
 }
 
-export function viewQuestion(question: number, part?: number): ViewQuestionAction {
+export function viewQuestion(coords: PaginationCoordinates): ViewQuestionAction {
   return {
     type: 'VIEW_QUESTION',
-    question,
-    part,
+    coords,
   };
 }
 
-export function spyQuestion(question: number, part?: number): SpyQuestionAction {
+export function spyQuestion(coords: PaginationCoordinates): SpyQuestionAction {
   return {
     type: 'SPY_QUESTION',
-    question,
-    part,
+    coords,
   };
 }
 
-export function viewNextQuestion(): Thunk {
-  return (dispatch, getState): void => {
-    const state = getState();
-    const qnum = state.pagination.selected.question;
-    dispatch(viewQuestion(qnum + 1));
-    scrollToQuestion(qnum + 1);
+export function prevQuestion(): PrevQuestionAction {
+  return {
+    type: 'PREV_QUESTION',
   };
 }
 
-export function viewPrevQuestion(): Thunk {
-  return (dispatch, getState): void => {
-    const state = getState();
-    const qnum = state.pagination.selected.question;
-    dispatch(viewQuestion(qnum - 1));
-    scrollToQuestion(qnum - 1);
+export function nextQuestion(): NextQuestionAction {
+  return {
+    type: 'NEXT_QUESTION',
+  };
+}
+
+export function activateWaypoints(enabled: boolean): ActivateWaypointsAction {
+  return {
+    type: 'ACTIVATE_WAYPOINTS',
+    enabled,
   };
 }
 

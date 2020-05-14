@@ -1,55 +1,106 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { QuestionInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
-import { BodyProps } from '@hourglass/components/Body';
+import Part from '@hourglass/components/Part';
+import { FileViewer } from '@hourglass/components/FileViewer';
+import PaginationArrows from '@hourglass/containers/PaginationArrows';
 import {
-  ScrollspyTop,
-  ScrollspyBottom,
-} from '@hourglass/containers/Scrollspy';
-import Part from './Part';
-import { FileViewer } from './FileViewer';
+  TopScrollspy,
+  BottomScrollspy,
+} from '@hourglass/containers/scrollspy/Question';
+import SubmitButton from '@hourglass/containers/SubmitButton';
+import { RailsContext } from '@hourglass/context';
 
 interface ShowQuestionProps {
   question: QuestionInfo;
   qnum: number;
-  BodyRenderer: React.ComponentType<BodyProps>;
+  paginated: boolean;
+  selectedQuestion?: number;
+  selectedPart?: number;
+  displayOnly?: boolean;
+  spyQuestion?: (question: number, pnum?: number) => void;
+  lastQuestion?: boolean;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const {
     question,
     qnum,
-    BodyRenderer,
+    paginated,
+    selectedQuestion,
+    selectedPart,
+    displayOnly = false,
+    spyQuestion,
+    lastQuestion = false,
   } = props;
   const {
     name,
     reference,
     description,
-    separateSubparts, // TODO
     parts,
+    separateSubparts,
   } = question;
+  const {
+    railsExam,
+  } = useContext(RailsContext);
+  const split = paginated && separateSubparts;
+  const isCurrent = selectedQuestion === qnum;
+  const active = !paginated || isCurrent;
+  const classes = active ? '' : 'd-none';
   return (
-    <div className={`question no-gutters ${separateSubparts ? 'paginated' : ''}`}>
-      <ScrollspyTop
-        qnum={qnum}
-      />
+    <div className={classes}>
+      {displayOnly || (
+        <TopScrollspy
+          question={qnum}
+          separateSubparts={separateSubparts}
+        />
+      )}
       <h1 id={`question-${qnum}`}>{`Question ${qnum + 1}: ${name}`}</h1>
       <HTML value={description} />
       {reference && <FileViewer references={reference} />}
-      <ScrollspyBottom
-        qnum={qnum}
-      />
-      {parts.map((p, i) => (
-        <Part
-          part={p}
-          pnum={i}
-          qnum={qnum}
-          // Part numbers are STATIC.
-          // eslint-disable-next-line react/no-array-index-key
-          key={i}
-          BodyRenderer={BodyRenderer}
+      {displayOnly || (
+        <BottomScrollspy
+          question={qnum}
+          separateSubparts={separateSubparts}
         />
-      ))}
+      )}
+      {parts.map((p, i) => {
+        const current = selectedPart === i;
+        const activePart = !split || current;
+        const activeClass = activePart ? '' : 'd-none';
+        const lastPart = i === parts.length - 1;
+        const showArrows = separateSubparts || lastPart;
+        const showSubmit = lastPart && lastQuestion;
+        return (
+          <div
+            // Part numbers are STATIC.
+            // eslint-disable-next-line react/no-array-index-key
+            key={i}
+            className={activeClass}
+          >
+            <Part
+              part={p}
+              pnum={i}
+              qnum={qnum}
+              separateSubparts={separateSubparts}
+              displayOnly={displayOnly}
+              spyQuestion={spyQuestion}
+            />
+            {!displayOnly && (
+              <div className={showArrows ? '' : 'd-none'}>
+                <PaginationArrows />
+              </div>
+            )}
+            {!displayOnly && showSubmit && (
+              <div className="text-center">
+                <SubmitButton
+                  examID={railsExam.id}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

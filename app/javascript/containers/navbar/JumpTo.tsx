@@ -6,6 +6,8 @@ import {
 import {
   togglePagination,
   viewQuestion,
+  spyQuestion,
+  activateWaypoints,
 } from '@hourglass/actions';
 
 const mapStateToProps: MSTP<{
@@ -19,12 +21,22 @@ const mapStateToProps: MSTP<{
 const mapDispatchToProps: MDTP<{
   togglePagination: () => void;
   changeQuestion: (q: number, part?: number) => void;
+  spyQuestion: (q: number, part?: number) => void;
 }> = (dispatch) => ({
   togglePagination: (): void => {
+    dispatch(activateWaypoints(false));
     dispatch(togglePagination());
+
+    // Double setTimeout to mask waypoints until scrolling is really finished.
+    setTimeout(() => setTimeout(() => dispatch(activateWaypoints(true))));
   },
   changeQuestion: (question: number, part?: number): void => {
-    dispatch(viewQuestion(question, part));
+    dispatch(activateWaypoints(false));
+    dispatch(viewQuestion({ question, part }));
+    setTimeout(() => setTimeout(() => dispatch(activateWaypoints(true))));
+  },
+  spyQuestion: (question: number, part?: number): void => {
+    dispatch(spyQuestion({ question, part }));
   },
 });
 

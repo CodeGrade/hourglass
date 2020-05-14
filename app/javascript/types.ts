@@ -66,18 +66,25 @@ export interface RailsExamMessage {
   id: number;
 }
 
+export interface PaginationCoordinates {
+  question: number;
+  part?: number;
+}
+
 export interface PaginationState {
   paginated: boolean;
 
-  selected: {
-    question: number;
-    part?: number;
-  };
+  waypointsActive: boolean;
 
-  spy: {
-    question: number;
-    part?: number;
-  };
+  spyCoords: PaginationCoordinates[];
+
+  pageCoords: PaginationCoordinates[];
+
+  // Index into pageCoords.
+  page: number;
+
+  // Index into spyCoords.
+  spy: number;
 }
 
 export interface TogglePaginationAction {
@@ -86,14 +93,25 @@ export interface TogglePaginationAction {
 
 export interface ViewQuestionAction {
   type: 'VIEW_QUESTION';
-  question: number;
-  part?: number;
+  coords: PaginationCoordinates;
 }
 
 export interface SpyQuestionAction {
   type: 'SPY_QUESTION';
-  question: number;
-  part?: number;
+  coords: PaginationCoordinates;
+}
+
+export interface PrevQuestionAction {
+  type: 'PREV_QUESTION';
+}
+
+export interface NextQuestionAction {
+  type: 'NEXT_QUESTION';
+}
+
+export interface ActivateWaypointsAction {
+  type: 'ACTIVATE_WAYPOINTS';
+  enabled: boolean;
 }
 
 export type LockdownAction =
@@ -122,7 +140,13 @@ export interface LoadExamAction {
 
 export type ContentsAction = UpdateAnswerAction | UpdateScratchAction;
 
-export type PaginationAction = TogglePaginationAction | ViewQuestionAction | SpyQuestionAction;
+export type PaginationAction =
+  TogglePaginationAction |
+  ViewQuestionAction |
+  SpyQuestionAction |
+  PrevQuestionAction |
+  NextQuestionAction |
+  ActivateWaypointsAction;
 
 export interface UpdateAnswerAction {
   type: 'UPDATE_ANSWER';

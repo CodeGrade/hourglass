@@ -1,21 +1,31 @@
 import { connect } from 'react-redux';
 import {
-  viewNextQuestion,
-  viewPrevQuestion,
+  nextQuestion,
+  prevQuestion,
 } from '@hourglass/actions';
 import PaginationArrows from '@hourglass/components/PaginationArrows';
-import { MDTP } from '@hourglass/types';
+import { MDTP, MSTP } from '@hourglass/types';
+
+const mapStateToProps: MSTP<{
+  show: boolean;
+  hasNext: boolean;
+  hasPrev: boolean;
+}> = (state) => ({
+  show: state.pagination.paginated,
+  hasNext: state.pagination.page !== state.pagination.pageCoords.length - 1,
+  hasPrev: state.pagination.page !== 0,
+});
 
 const mapDispatchToProps: MDTP<{
-  onBack: () => void;
-  onNext: () => void;
+  next: () => void;
+  prev: () => void;
 }> = (dispatch) => ({
-  onBack: (): void => {
-    dispatch(viewPrevQuestion());
+  next: (): void => {
+    dispatch(nextQuestion());
   },
-  onNext: (): void => {
-    dispatch(viewNextQuestion());
+  prev: (): void => {
+    dispatch(prevQuestion());
   },
 });
 
-export default connect(null, mapDispatchToProps)(PaginationArrows);
+export default connect(mapStateToProps, mapDispatchToProps)(PaginationArrows);

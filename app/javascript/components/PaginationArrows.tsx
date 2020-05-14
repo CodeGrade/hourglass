@@ -3,34 +3,41 @@ import { MdArrowForward, MdArrowBack } from 'react-icons/md';
 import { Button } from 'react-bootstrap';
 
 interface PaginationArrowsProps {
-  showBack: boolean;
-  showNext: boolean;
-  onBack: () => void;
-  onNext: () => void;
+  show: boolean;
+  hasNext: boolean;
+  hasPrev: boolean;
+  next: () => void;
+  prev: () => void;
 }
 
 const PaginationArrows: React.FC<PaginationArrowsProps> = (props) => {
   const {
-    showBack,
-    showNext,
-    onBack,
-    onNext,
+    show,
+    hasNext,
+    hasPrev,
+    next,
+    prev,
   } = props;
   return (
-    <div className="w-100">
+    <div
+      className={show ? 'w-100' : 'd-none'}
+    >
       <Button
-        disabled={!showBack}
-        onClick={onBack}
+        className={hasPrev ? '' : 'd-none'}
+        onClick={prev}
       >
         <MdArrowBack />
-        <span>Previous</span>
+        <span>
+          Previous
+        </span>
       </Button>
       <Button
-        disabled={!showNext}
-        className="float-right"
-        onClick={onNext}
+        className={hasNext ? 'float-right' : 'd-none'}
+        onClick={next}
       >
-        <span>Next</span>
+        <span>
+          Next
+        </span>
         <MdArrowForward />
       </Button>
     </div>

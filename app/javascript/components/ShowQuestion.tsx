@@ -47,6 +47,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const isCurrent = selectedQuestion === qnum;
   const active = !paginated || isCurrent;
   const classes = active ? '' : 'd-none';
+  const title = name ? `Question ${qnum + 1}: ${name}` : `Question ${qnum + 1}`;
   return (
     <div className={classes}>
       {displayOnly || (
@@ -55,7 +56,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           separateSubparts={separateSubparts}
         />
       )}
-      <h1 id={`question-${qnum}`}>{`Question ${qnum + 1}: ${name}`}</h1>
+      <h1 id={`question-${qnum}`}>{title}</h1>
       <HTML value={description} />
       {reference && <FileViewer references={reference} />}
       {displayOnly || (

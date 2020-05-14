@@ -35,6 +35,9 @@ ActiveRecord::Schema.define(version: 2020_05_08_175801) do
     t.string "secret_key", null: false
     t.boolean "enabled", null: false
     t.string "name", null: false
+    t.integer "duration", null: false
+    t.datetime "start_time", null: false
+    t.datetime "end_time", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

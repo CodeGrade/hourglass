@@ -23,7 +23,10 @@ when "development"
 
   m1 = Exam.new(
     enabled: true,
-    name: 'Midterm One'
+    name: 'Midterm One',
+    duration: 5,
+    start_time: DateTime.now,
+    end_time: DateTime.now + 3.months
   )
 
   m1_zip = Rails.root.join("test", "fixtures", "files", "midterm-one.zip")
@@ -41,7 +44,10 @@ when "development"
 
   m2 = Exam.new(
     enabled: true,
-    name: 'Midterm Two'
+    name: 'Midterm Two',
+    duration: 120,
+    start_time: DateTime.now + 1.hour,
+    end_time: DateTime.now + 3.days
   )
 
   m2_zip = Rails.root.join("test", "fixtures", "files", "midterm-two.zip")

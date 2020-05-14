@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { QuestionInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
 import Part from '@hourglass/components/Part';
@@ -8,6 +8,8 @@ import {
   TopScrollspy,
   BottomScrollspy,
 } from '@hourglass/containers/scrollspy/Question';
+import SubmitButton from '@hourglass/containers/SubmitButton';
+import { RailsContext } from '@hourglass/context';
 
 interface ShowQuestionProps {
   question: QuestionInfo;
@@ -17,6 +19,7 @@ interface ShowQuestionProps {
   selectedPart?: number;
   displayOnly?: boolean;
   spyQuestion?: (question: number, pnum?: number) => void;
+  lastQuestion?: boolean;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
@@ -28,6 +31,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     selectedPart,
     displayOnly = false,
     spyQuestion,
+    lastQuestion = false,
   } = props;
   const {
     name,
@@ -36,6 +40,9 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     parts,
     separateSubparts,
   } = question;
+  const {
+    railsExam,
+  } = useContext(RailsContext);
   const split = paginated && separateSubparts;
   const isCurrent = selectedQuestion === qnum;
   const active = !paginated || isCurrent;
@@ -63,6 +70,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
         const activeClass = activePart ? '' : 'd-none';
         const lastPart = i === parts.length - 1;
         const showArrows = separateSubparts || lastPart;
+        const showSubmit = lastPart && lastQuestion;
         return (
           <div
             // Part numbers are STATIC.
@@ -78,9 +86,16 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               displayOnly={displayOnly}
               spyQuestion={spyQuestion}
             />
-            {displayOnly || (
+            {!displayOnly && (
               <div className={showArrows ? '' : 'd-none'}>
                 <PaginationArrows />
+              </div>
+            )}
+            {!displayOnly && showSubmit && (
+              <div className="text-center">
+                <SubmitButton
+                  examID={railsExam.id}
+                />
               </div>
             )}
           </div>

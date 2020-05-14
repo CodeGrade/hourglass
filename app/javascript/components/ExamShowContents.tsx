@@ -51,6 +51,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
               key={i}
               question={q}
               qnum={i}
+              lastQuestion={i === questions.length - 1}
             />
           ))}
         </Col>

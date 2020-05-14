@@ -42,8 +42,11 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
         checked={paginated}
         onChange={(_e): void => {
           togglePagination();
+          // If there's a selected part, use it. If not and separatesubparts, we need to select part 0.
+          const part = selected.part ?? questions[selected.question].separateSubparts ? 0 : undefined;
+          changeQuestion(selected.question, part);
           scrollToPart(selected.question, selected.part);
-          setTimeout(() => spyQuestion(selected.question, selected.part));
+          setTimeout(() => spyQuestion(selected.question, part));
         }}
         label="Toggle pagination"
       />

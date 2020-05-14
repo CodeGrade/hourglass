@@ -29,7 +29,7 @@ export default (state: PaginationState = {
       if (state.paginated) {
         let idx = state.pageCoords.findIndex(sameCoords(action.coords));
         if (idx === -1) {
-          idx = state.pageCoords.findIndex(sameCoords({ question: action.coords.question }));
+          idx = state.pageCoords.findIndex((c) => c.question === action.coords.question);
         }
         page = idx;
       }
@@ -81,6 +81,8 @@ export default (state: PaginationState = {
         ...state,
         spyCoords,
         pageCoords,
+        page: 0,
+        spy: 0,
       };
     }
     default:

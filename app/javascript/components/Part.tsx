@@ -60,17 +60,13 @@ const Part: React.FC<PartProps> = (props) => {
       </h3>
       <div><HTML value={description} /></div>
       {reference && <FileViewer references={reference} />}
-      <div>
-        <div>
-          {body.map((b, i) => (
-            // Body numbers are STATIC.
-            // eslint-disable-next-line react/no-array-index-key
-            <div className="p-2 bodyitem" key={i}>
-              <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
-            </div>
-          ))}
+      {body.map((b, i) => (
+        // Body numbers are STATIC.
+        // eslint-disable-next-line react/no-array-index-key
+        <div className="p-2 bodyitem" key={i}>
+          <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
         </div>
-      </div>
+      ))}
       {displayOnly || (
         <BottomScrollspy
           question={qnum}

@@ -14,15 +14,20 @@ export default (state: PaginationState = {
   pageCoords: [],
   page: 0,
   spy: 0,
+  waypointsActive: true,
 }, action: ExamTakerAction): PaginationState => {
   switch (action.type) {
-    case 'TOGGLE_PAGINATION':
+    case 'TOGGLE_PAGINATION': {
+      let idx = state.pageCoords.findIndex(sameCoords(state.spyCoords[state.spy]));
+      if (idx === -1) {
+        idx = state.pageCoords.findIndex((c) => c.question === state.spyCoords[state.spy].question);
+      }
       return {
         ...state,
         paginated: !state.paginated,
-        page: 0,
-        spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[0])),
+        page: idx,
       };
+    }
     case 'VIEW_QUESTION': {
       // If paginated, find the most specific page and switch to it.
       let { page } = state;
@@ -59,6 +64,11 @@ export default (state: PaginationState = {
         spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[page])),
       };
     }
+    case 'ACTIVATE_WAYPOINTS':
+      return {
+        ...state,
+        waypointsActive: action.enabled,
+      };
     case 'LOAD_EXAM': {
       const pageCoords = [];
       const spyCoords = [];
@@ -81,8 +91,6 @@ export default (state: PaginationState = {
         ...state,
         spyCoords,
         pageCoords,
-        page: 0,
-        spy: 0,
       };
     }
     default:

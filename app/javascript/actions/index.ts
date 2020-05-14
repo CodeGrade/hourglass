@@ -31,6 +31,7 @@ import {
   PaginationCoordinates,
   PrevQuestionAction,
   NextQuestionAction,
+  ActivateWaypointsAction,
 } from '@hourglass/types';
 import {
   getCSRFToken,
@@ -135,6 +136,13 @@ export function prevQuestion(): PrevQuestionAction {
 export function nextQuestion(): NextQuestionAction {
   return {
     type: 'NEXT_QUESTION',
+  };
+}
+
+export function activateWaypoints(enabled: boolean): ActivateWaypointsAction {
+  return {
+    type: 'ACTIVATE_WAYPOINTS',
+    enabled,
   };
 }
 

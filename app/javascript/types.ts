@@ -74,6 +74,8 @@ export interface PaginationCoordinates {
 export interface PaginationState {
   paginated: boolean;
 
+  waypointsActive: boolean;
+
   spyCoords: PaginationCoordinates[];
 
   pageCoords: PaginationCoordinates[];
@@ -107,6 +109,11 @@ export interface NextQuestionAction {
   type: 'NEXT_QUESTION';
 }
 
+export interface ActivateWaypointsAction {
+  type: 'ACTIVATE_WAYPOINTS';
+  enabled: boolean;
+}
+
 export type LockdownAction =
   LockedDownAction | LockdownFailedAction | LockdownIgnoredAction;
 
@@ -138,7 +145,8 @@ export type PaginationAction =
   ViewQuestionAction |
   SpyQuestionAction |
   PrevQuestionAction |
-  NextQuestionAction;
+  NextQuestionAction |
+  ActivateWaypointsAction;
 
 export interface UpdateAnswerAction {
   type: 'UPDATE_ANSWER';

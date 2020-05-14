@@ -1,8 +1,6 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { Waypoint } from 'react-waypoint';
-import { MSTP, MDTP } from '@hourglass/types';
-import { spyQuestion } from '@hourglass/actions';
+import connect from './connectors';
 
 interface QScrollspyProps {
   paginated: boolean;
@@ -11,6 +9,7 @@ interface QScrollspyProps {
   selectedQuestion: number;
   selectedPart: number;
   spy: (qnum: number, pnum?: number) => void;
+  waypointsActive: boolean;
 }
 
 const TopWaypoint: React.FC<QScrollspyProps> = (props) => {
@@ -21,11 +20,13 @@ const TopWaypoint: React.FC<QScrollspyProps> = (props) => {
     selectedPart,
     separateSubparts,
     spy,
+    waypointsActive,
   } = props;
   return (
     <Waypoint
       fireOnRapidScroll={false}
       onLeave={({ currentPosition, previousPosition }): void => {
+        if (!waypointsActive) return;
         if (paginated && selectedQuestion !== question) return;
         if (paginated && separateSubparts) {
           spy(question, selectedPart);
@@ -45,11 +46,13 @@ const BottomWaypoint: React.FC<QScrollspyProps> = (props) => {
     selectedPart,
     separateSubparts,
     spy,
+    waypointsActive,
   } = props;
   return (
     <Waypoint
       fireOnRapidScroll={false}
       onEnter={({ currentPosition, previousPosition }): void => {
+        if (!waypointsActive) return;
         if (paginated && selectedQuestion !== question) return;
         if (paginated && separateSubparts) {
           spy(question, selectedPart);
@@ -61,26 +64,5 @@ const BottomWaypoint: React.FC<QScrollspyProps> = (props) => {
   );
 };
 
-const mapStateToProps: MSTP<{
-  paginated: boolean;
-  selectedQuestion: number;
-  selectedPart: number;
-}> = (state) => {
-  const { paginated, pageCoords, page } = state.pagination;
-  return {
-    paginated,
-    selectedQuestion: pageCoords[page].question,
-    selectedPart: pageCoords[page].part,
-  };
-};
-
-const mapDispatchToProps: MDTP<{
-  spy: (question: number, pnum?: number) => void;
-}> = (dispatch) => ({
-  spy: (question, part): void => {
-    dispatch(spyQuestion({ question, part }));
-  },
-});
-
-export const TopScrollspy = connect(mapStateToProps, mapDispatchToProps)(TopWaypoint);
-export const BottomScrollspy = connect(mapStateToProps, mapDispatchToProps)(BottomWaypoint);
+export const TopScrollspy = connect(TopWaypoint);
+export const BottomScrollspy = connect(BottomWaypoint);

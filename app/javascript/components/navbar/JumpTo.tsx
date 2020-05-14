@@ -43,8 +43,6 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
         checked={paginated}
         onChange={(_e): void => {
           togglePagination();
-          scrollToTop();
-          // setTimeout(() => spyQuestion(selectedCoords.question, part));
         }}
         label="Toggle pagination"
       />

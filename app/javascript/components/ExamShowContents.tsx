@@ -44,19 +44,15 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
       {reference && <FileViewer references={reference} />}
       <Row>
         <Col>
-          <div>
-            <div>
-              {questions.map((q, i) => (
-                <ShowQuestion
-                  // Question numbers are STATIC.
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={i}
-                  question={q}
-                  qnum={i}
-                />
-              ))}
-            </div>
-          </div>
+          {questions.map((q, i) => (
+            <ShowQuestion
+              // Question numbers are STATIC.
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
+              question={q}
+              qnum={i}
+            />
+          ))}
         </Col>
       </Row>
     </ExamContext.Provider>

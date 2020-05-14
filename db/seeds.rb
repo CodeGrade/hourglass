@@ -21,70 +21,91 @@ when "development"
   )
   prof.save!
 
-  exam = Exam.new(
+  m1 = Exam.new(
     enabled: true,
-    name: "Demo Exam"
+    name: 'Midterm One'
   )
 
-  zipfile = Rails.root.join("test", "fixtures", "files", "demo-exam.zip")
-  ArchiveUtils.create_zip zipfile, Dir.glob(Rails.root.join("test", "fixtures", "files", "demo-exam", "**"))
-  upload = Upload.new(
+  m1_zip = Rails.root.join("test", "fixtures", "files", "midterm-one.zip")
+  ArchiveUtils.create_zip m1_zip, Dir.glob(Rails.root.join("test", "fixtures", "files", "midterm-one", "**"))
+  m1_upload = Upload.new(
     user: prof,
-    file_name: zipfile,
-    exam: exam
+    file_name: m1_zip,
+    exam: m1
   )
-  upload.upload_data = FakeUpload.new(upload.file_name)
+  m1_upload.upload_data = FakeUpload.new(m1_upload.file_name)
 
-  exam.save!
-  upload.save!
-  FileUtils.rm zipfile
+  m1.save!
+  m1_upload.save!
+  FileUtils.rm m1_zip
 
-  room_one = Room.new(
-    exam: exam,
-    name: "Room One"
-  )
-  room_two = Room.new(
-    exam: exam,
-    name: "Room Two"
+  m2 = Exam.new(
+    enabled: true,
+    name: 'Midterm Two'
   )
 
-  prof_reg = Registration.new(
+  m2_zip = Rails.root.join("test", "fixtures", "files", "midterm-two.zip")
+  ArchiveUtils.create_zip m2_zip, Dir.glob(Rails.root.join("test", "fixtures", "files", "midterm-two", "**"))
+  m2_upload = Upload.new(
     user: prof,
-    exam: exam,
-    role: :professor,
-    room: room_one
+    file_name: m2_zip,
+    exam: m2
   )
-  prof_reg.save!
+  m2_upload.upload_data = FakeUpload.new(m2_upload.file_name)
 
-  which_room = true
-  %w(ben rebecca matthias amit).each do |student|
+  m2.save!
+  m2_upload.save!
+  FileUtils.rm m2_zip
+
+  %w[ben rebecca matthias amit].each do |student|
     user = User.new(
       username: student,
       password: student,
       role: :unprivileged
     )
     user.save!
-    student_reg = Registration.new(
-      user: user,
-      exam: exam,
-      role: :student,
-      room: which_room ? room_one : room_two
-    )
-    student_reg.save!
+  end
 
+  which_room = true
+  [m1, m2].each do |exam|
+    r1 = Room.new(
+      exam: exam,
+      name: 'Room One'
+    )
+    r2 = Room.new(
+      exam: exam,
+      name: 'Room Two'
+    )
+    prof_reg = Registration.new(
+      user: prof,
+      exam: exam,
+      role: :professor,
+      room: r1
+    )
+    prof_reg.save!
     ExamMessage.create(
       exam: exam,
       sender: prof,
-      recipient: user,
-      body: "Hello #{student}, nice work."
+      body: "Welcome all to #{exam.name}!"
     )
+    %w[ben rebecca matthias amit].each do |student|
+      user = User.find_by(username: student)
+      reg = Registration.new(
+        user: user,
+        exam: exam,
+        role: :student,
+        room: which_room ? r1 : r2
+      )
+      reg.save!
 
-    which_room = !which_room
+      ExamMessage.create(
+        exam: exam,
+        sender: prof,
+        recipient: user,
+        body: "Hello #{student} (in #{exam.name}), nice work."
+      )
+
+      which_room = !which_room
+    end
   end
-
-  ExamMessage.create(
-    exam: exam,
-    sender: prof,
-    body: 'Welcome all!'
-  )
 end

@@ -6,6 +6,17 @@ const sameCoords = (a: PaginationCoordinates) => (b: PaginationCoordinates): boo
   a.question === b.question && a.part === b.part
 );
 
+const findBestPageCoordIdx = (
+  pageCoords: PaginationCoordinates[],
+  coord: PaginationCoordinates,
+): number => {
+  let idx = pageCoords.findIndex(sameCoords(coord));
+  if (idx === -1) {
+    idx = pageCoords.findIndex((c) => c.question === coord.question);
+  }
+  return idx;
+};
+
 export default (state: PaginationState = {
   paginated: false,
   spyCoords: [],
@@ -15,26 +26,17 @@ export default (state: PaginationState = {
   waypointsActive: true,
 }, action: ExamTakerAction): PaginationState => {
   switch (action.type) {
-    case 'TOGGLE_PAGINATION': {
-      let idx = state.pageCoords.findIndex(sameCoords(state.spyCoords[state.spy]));
-      if (idx === -1) {
-        idx = state.pageCoords.findIndex((c) => c.question === state.spyCoords[state.spy].question);
-      }
+    case 'TOGGLE_PAGINATION':
       return {
         ...state,
         paginated: !state.paginated,
-        page: idx,
+        page: findBestPageCoordIdx(state.pageCoords, state.spyCoords[state.spy]),
       };
-    }
     case 'VIEW_QUESTION': {
       // If paginated, find the most specific page and switch to it.
       let { page } = state;
       if (state.paginated) {
-        let idx = state.pageCoords.findIndex(sameCoords(action.coords));
-        if (idx === -1) {
-          idx = state.pageCoords.findIndex((c) => c.question === action.coords.question);
-        }
-        page = idx;
+        page = findBestPageCoordIdx(state.pageCoords, action.coords);
       }
       return {
         ...state,

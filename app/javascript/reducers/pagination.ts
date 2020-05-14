@@ -6,8 +6,6 @@ const sameCoords = (a: PaginationCoordinates) => (b: PaginationCoordinates): boo
   a.question === b.question && a.part === b.part
 );
 
-const wrap = (max: number, wrappee: number): number => (wrappee + max) % max;
-
 export default (state: PaginationState = {
   paginated: false,
   spyCoords: [],
@@ -49,7 +47,7 @@ export default (state: PaginationState = {
         spy: state.spyCoords.findIndex(sameCoords(action.coords)),
       };
     case 'PREV_QUESTION': {
-      const page = wrap(state.pageCoords.length, state.page - 1);
+      const page = state.page - 1;
       return {
         ...state,
         page,
@@ -57,7 +55,7 @@ export default (state: PaginationState = {
       };
     }
     case 'NEXT_QUESTION': {
-      const page = wrap(state.pageCoords.length, state.page + 1);
+      const page = state.page + 1;
       return {
         ...state,
         page,

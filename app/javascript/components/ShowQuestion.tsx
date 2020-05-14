@@ -1,7 +1,6 @@
 import React from 'react';
 import { QuestionInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
-import { BodyProps } from '@hourglass/components/Body';
 import Part from '@hourglass/components/Part';
 import { FileViewer } from '@hourglass/components/FileViewer';
 import PaginationArrows from '@hourglass/containers/PaginationArrows';
@@ -17,6 +16,7 @@ interface ShowQuestionProps {
   selectedQuestion?: number;
   selectedPart?: number;
   displayOnly?: boolean;
+  spyQuestion?: (question: number, pnum?: number) => void;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
@@ -27,6 +27,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     selectedQuestion,
     selectedPart,
     displayOnly = false,
+    spyQuestion,
   } = props;
   const {
     name,
@@ -75,6 +76,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               qnum={qnum}
               separateSubparts={separateSubparts}
               displayOnly={displayOnly}
+              spyQuestion={spyQuestion}
             />
             {displayOnly || (
               <div className={showArrows ? '' : 'd-none'}>

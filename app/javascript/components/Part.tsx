@@ -16,6 +16,7 @@ interface PartProps {
   pnum: number;
   separateSubparts: boolean;
   displayOnly?: boolean;
+  spyQuestion?: (question: number, pnum?: number) => void;
 }
 
 const Part: React.FC<PartProps> = (props) => {
@@ -25,6 +26,7 @@ const Part: React.FC<PartProps> = (props) => {
     pnum,
     separateSubparts,
     displayOnly = false,
+    spyQuestion,
   } = props;
   const {
     name,
@@ -38,7 +40,11 @@ const Part: React.FC<PartProps> = (props) => {
   if (name) title += `: ${name}`;
   const subtitle = `(${points} points)`;
   return (
-    <div>
+    <div
+      onFocus={(): void => {
+        if (!displayOnly) spyQuestion(qnum, pnum);
+      }}
+    >
       {displayOnly || (
         <TopScrollspy
           question={qnum}

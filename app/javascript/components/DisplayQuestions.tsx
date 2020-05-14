@@ -1,7 +1,6 @@
 import React from 'react';
 import { QuestionInfo } from '@hourglass/types';
 import ShowQuestion from '@hourglass/components/ShowQuestion';
-import DisplayBody from '@hourglass/components/DisplayBody';
 
 interface DisplayQuestionsProps {
   questions: QuestionInfo[];
@@ -20,8 +19,8 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           key={i}
           question={q}
           qnum={i}
-          BodyRenderer={DisplayBody}
           paginated={false}
+          displayOnly
         />
       ))}
     </>

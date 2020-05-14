@@ -1,20 +1,21 @@
 import React from 'react';
 import { PartInfo } from '@hourglass/types';
 import HTML from '@hourglass/components/HTML';
-import { BodyProps } from '@hourglass/components/Body';
 import { FileViewer } from '@hourglass/components/FileViewer';
 import {
   TopScrollspy,
   BottomScrollspy,
 } from '@hourglass/containers/scrollspy/Part';
 import './Part.css';
+import Body from '@hourglass/components/Body';
+import DisplayBody from '@hourglass/components/DisplayBody';
 
 interface PartProps {
   part: PartInfo;
   qnum: number;
   pnum: number;
-  BodyRenderer: React.ComponentType<BodyProps>;
-  separateSubparts?: boolean;
+  separateSubparts: boolean;
+  displayOnly?: boolean;
 }
 
 const Part: React.FC<PartProps> = (props) => {
@@ -22,8 +23,8 @@ const Part: React.FC<PartProps> = (props) => {
     part,
     qnum,
     pnum,
-    BodyRenderer,
     separateSubparts,
+    displayOnly = false,
   } = props;
   const {
     name,
@@ -32,16 +33,19 @@ const Part: React.FC<PartProps> = (props) => {
     points,
     body,
   } = part;
+  const BodyRenderer = displayOnly ? DisplayBody : Body;
   let title = `Part ${pnum + 1}`;
   if (name) title += `: ${name}`;
   const subtitle = `(${points} points)`;
   return (
     <div>
-      <TopScrollspy
-        question={qnum}
-        part={pnum}
-        separateSubparts={separateSubparts}
-      />
+      {displayOnly || (
+        <TopScrollspy
+          question={qnum}
+          part={pnum}
+          separateSubparts={separateSubparts}
+        />
+      )}
       <h3 id={`question-${qnum}-part-${pnum}`}>
         {title}
         <small className="float-right text-muted">
@@ -61,11 +65,13 @@ const Part: React.FC<PartProps> = (props) => {
           ))}
         </div>
       </div>
-      <BottomScrollspy
-        question={qnum}
-        part={pnum}
-        separateSubparts={separateSubparts}
-      />
+      {displayOnly || (
+        <BottomScrollspy
+          question={qnum}
+          part={pnum}
+          separateSubparts={separateSubparts}
+        />
+      )}
     </div>
   );
 };

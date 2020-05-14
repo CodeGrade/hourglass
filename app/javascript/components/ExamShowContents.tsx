@@ -9,7 +9,6 @@ import HTML from '@hourglass/components/HTML';
 import { Row, Col } from 'react-bootstrap';
 import { FileViewer } from '@hourglass/components/FileViewer';
 import ShowQuestion from '@hourglass/containers/ShowQuestion';
-import Body from '@hourglass/components/Body';
 
 interface ExamShowContentsProps {
   exam: Exam;
@@ -54,7 +53,6 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
                   key={i}
                   question={q}
                   qnum={i}
-                  BodyRenderer={Body}
                 />
               ))}
             </div>

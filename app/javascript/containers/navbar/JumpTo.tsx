@@ -26,6 +26,8 @@ const mapDispatchToProps: MDTP<{
   togglePagination: (): void => {
     dispatch(activateWaypoints(false));
     dispatch(togglePagination());
+
+    // Double setTimeout to mask waypoints until scrolling is really finished.
     setTimeout(() => setTimeout(() => dispatch(activateWaypoints(true))));
   },
   changeQuestion: (question: number, part?: number): void => {

@@ -6,6 +6,8 @@ import { FileViewer } from '@hourglass/components/FileViewer';
 import { Waypoint } from 'react-waypoint';
 import SubmitButton from '@hourglass/containers/SubmitButton';
 import { RailsContext } from '@hourglass/context';
+import PaginationArrows from '@hourglass/containers/PaginationArrows';
+
 import './Part.css';
 
 interface PartProps {
@@ -17,6 +19,8 @@ interface PartProps {
   paginated?: boolean;
   selectedQuestion?: number;
   selectedPart?: number;
+  lastPart?: boolean;
+  lastQuestion?: boolean;
   separateSubparts?: boolean;
 }
 
@@ -30,6 +34,8 @@ const Part: React.FC<PartProps> = (props) => {
     paginated,
     selectedQuestion,
     selectedPart,
+    lastPart,
+    lastQuestion,
     separateSubparts,
   } = props;
   const {
@@ -45,8 +51,10 @@ const Part: React.FC<PartProps> = (props) => {
   let title = `Part ${pnum + 1}`;
   if (name) title += `: ${name}`;
   const subtitle = `(${points} points)`;
-  const showSubmit = false;
+  const showSubmit = lastPart && lastQuestion;
   const submitClass = showSubmit ? 'text-center' : 'd-none';
+  const showArrows = paginated && (separateSubparts || lastPart);
+  const arrowsClass = showArrows ? '' : 'd-none';
   return (
     <div>
       <Waypoint
@@ -88,6 +96,15 @@ const Part: React.FC<PartProps> = (props) => {
           }
         }}
       />
+      <div className={arrowsClass}>
+        <PaginationArrows
+          pnumNext={lastPart ? undefined : pnum + 1}
+          pnumPrev={(!separateSubparts || pnum === 0) ? undefined : pnum - 1}
+          qnumNext={lastQuestion ? undefined : qnum + 1}
+          qnumPrev={qnum === 0 ? undefined : qnum - 1}
+          qnumCurrent={qnum}
+        />
+      </div>
       <div className={submitClass}>
         <SubmitButton examID={railsExam.id} />
       </div>

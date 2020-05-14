@@ -7,6 +7,7 @@ interface PaginationArrowsProps {
   pnumNext?: number;
   qnumPrev?: number;
   pnumPrev?: number;
+  qnumCurrent: number;
   onChange: (qnum: number, pnum?: number) => void;
 }
 
@@ -16,6 +17,7 @@ const PaginationArrows: React.FC<PaginationArrowsProps> = (props) => {
     pnumNext,
     qnumPrev,
     pnumPrev,
+    qnumCurrent,
     onChange,
   } = props;
   const prevNoun = pnumPrev === undefined ? 'Question' : 'Part';
@@ -25,25 +27,31 @@ const PaginationArrows: React.FC<PaginationArrowsProps> = (props) => {
       <Button
         disabled={qnumPrev === undefined}
         onClick={(): void => {
-          onChange(qnumPrev, pnumPrev);
+          if (pnumPrev !== undefined) {
+            onChange(qnumCurrent, pnumPrev);
+          } else {
+            onChange(qnumPrev, 0);
+          }
         }}
       >
         <MdArrowBack />
         <span>
-          Previous
-          {prevNoun}
+          {`Previous ${prevNoun}`}
         </span>
       </Button>
       <Button
         disabled={qnumNext === undefined}
         className="float-right"
         onClick={(): void => {
-          onChange(qnumNext, pnumNext);
+          if (pnumNext !== undefined) {
+            onChange(qnumCurrent, pnumNext);
+          } else {
+            onChange(qnumNext, 0);
+          }
         }}
       >
         <span>
-          Next
-          {nextNoun}
+          {`Next ${nextNoun}`}
         </span>
         <MdArrowForward />
       </Button>

@@ -14,6 +14,7 @@ interface ShowQuestionProps {
   selectedQuestion?: number;
   selectedPart?: number;
   spyQuestion?: (qnum: number, pnum?: number) => void;
+  lastQuestion?: boolean;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
@@ -25,6 +26,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     selectedQuestion,
     selectedPart,
     spyQuestion,
+    lastQuestion,
   } = props;
   const {
     name,
@@ -84,6 +86,8 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               paginated={paginated}
               selectedQuestion={selectedQuestion}
               selectedPart={selectedPart}
+              lastPart={i === parts.length - 1}
+              lastQuestion={lastQuestion}
               separateSubparts={separateSubparts}
             />
           </div>

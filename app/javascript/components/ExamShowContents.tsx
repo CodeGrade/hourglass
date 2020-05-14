@@ -55,6 +55,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
                   question={q}
                   qnum={i}
                   BodyRenderer={Body}
+                  lastQuestion={i === questions.length - 1}
                 />
               ))}
             </div>

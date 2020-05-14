@@ -43,18 +43,22 @@ export default (state: PaginationState = {
         ...state,
         spy: state.spyCoords.findIndex(sameCoords(action.coords)),
       };
-    case 'PREV_QUESTION':
+    case 'PREV_QUESTION': {
+      const page = wrap(state.pageCoords.length, state.page - 1);
       return {
         ...state,
-        page: wrap(state.pageCoords.length, state.page - 1),
-        spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[state.page])),
+        page,
+        spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[page])),
       };
-    case 'NEXT_QUESTION':
+    }
+    case 'NEXT_QUESTION': {
+      const page = wrap(state.pageCoords.length, state.page + 1);
       return {
         ...state,
-        page: wrap(state.pageCoords.length, state.page + 1),
-        spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[state.page])),
+        page,
+        spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[page])),
       };
+    }
     case 'LOAD_EXAM': {
       const pageCoords = [];
       const spyCoords = [];

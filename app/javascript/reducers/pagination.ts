@@ -10,8 +10,9 @@ const wrap = (max: number, wrappee: number): number => (wrappee + max) % max;
 
 export default (state: PaginationState = {
   paginated: false,
-  coords: [],
-  selected: 0,
+  spyCoords: [],
+  pageCoords: [],
+  page: 0,
   spy: 0,
 }, action: ExamTakerAction): PaginationState => {
   switch (action.type) {
@@ -19,44 +20,63 @@ export default (state: PaginationState = {
       return {
         ...state,
         paginated: !state.paginated,
+        page: 0,
+        spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[0])),
       };
-    case 'VIEW_QUESTION':
+    case 'VIEW_QUESTION': {
+      // If paginated, find the most specific page and switch to it.
+      let { page } = state;
+      if (state.paginated) {
+        let idx = state.pageCoords.findIndex(sameCoords(action.coords));
+        if (idx === -1) {
+          idx = state.pageCoords.findIndex(sameCoords({ question: action.coords.question }));
+        }
+        page = idx;
+      }
       return {
         ...state,
-        selected: state.coords.findIndex(sameCoords(action.coords)),
+        page,
       };
+    }
     case 'SPY_QUESTION':
       return {
         ...state,
-        spy: state.coords.findIndex(sameCoords(action.coords)),
+        spy: state.spyCoords.findIndex(sameCoords(action.coords)),
       };
     case 'PREV_QUESTION':
       return {
         ...state,
-        selected: wrap(state.coords.length, state.selected - 1),
+        page: wrap(state.pageCoords.length, state.page - 1),
+        spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[state.page])),
       };
     case 'NEXT_QUESTION':
       return {
         ...state,
-        selected: wrap(state.coords.length, state.selected + 1),
+        page: wrap(state.pageCoords.length, state.page + 1),
+        spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[state.page])),
       };
     case 'LOAD_EXAM': {
-      const coords = action.exam.questions.reduce((acc, q, qnum) => {
+      const pageCoords = [];
+      const spyCoords = [];
+      action.exam.questions.forEach((q, qnum) => {
         const thisQ = {
           question: qnum,
         };
-        const parts = q.parts.reduce((pacc, _p, pnum) => {
+        spyCoords.push(thisQ);
+        if (!q.separateSubparts) pageCoords.push(thisQ);
+        q.parts.forEach((_p, pnum) => {
           const thisP = {
             question: qnum,
             part: pnum,
           };
-          return [...pacc, thisP];
-        }, []);
-        return [...acc, thisQ, ...parts];
-      }, []);
+          spyCoords.push(thisP);
+          if (q.separateSubparts) pageCoords.push(thisP);
+        });
+      });
       return {
         ...state,
-        coords,
+        spyCoords,
+        pageCoords,
       };
     }
     default:

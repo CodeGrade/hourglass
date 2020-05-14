@@ -66,11 +66,11 @@ const mapStateToProps: MSTP<{
   selectedQuestion: number;
   selectedPart: number;
 }> = (state) => {
-  const { paginated, coords, selected } = state.pagination;
+  const { paginated, pageCoords, page } = state.pagination;
   return {
     paginated,
-    selectedQuestion: coords[selected].question,
-    selectedPart: coords[selected].part,
+    selectedQuestion: pageCoords[page].question,
+    selectedPart: pageCoords[page].part,
   };
 };
 

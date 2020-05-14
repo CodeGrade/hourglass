@@ -12,8 +12,8 @@ const mapStateToProps: MSTP<{
   hasPrev: boolean;
 }> = (state) => ({
   show: state.pagination.paginated,
-  hasNext: state.pagination.selected !== state.pagination.coords.length - 1,
-  hasPrev: state.pagination.selected !== 0,
+  hasNext: state.pagination.page !== state.pagination.pageCoords.length - 1,
+  hasPrev: state.pagination.page !== 0,
 });
 
 const mapDispatchToProps: MDTP<{

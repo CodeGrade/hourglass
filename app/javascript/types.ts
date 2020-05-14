@@ -74,12 +74,14 @@ export interface PaginationCoordinates {
 export interface PaginationState {
   paginated: boolean;
 
-  coords: PaginationCoordinates[];
+  spyCoords: PaginationCoordinates[];
 
-  // Index into coords.
-  selected: number;
+  pageCoords: PaginationCoordinates[];
 
-  // Index into coords.
+  // Index into pageCoords.
+  page: number;
+
+  // Index into spyCoords.
   spy: number;
 }
 

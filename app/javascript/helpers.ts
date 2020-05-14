@@ -53,6 +53,15 @@ function scrollToElem(id: string): void {
   });
 }
 
+export function scrollToTop(): void {
+  setTimeout(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  });
+}
+
 export function scrollToQuestion(qnum: number, pnum?: number): void {
   if (pnum !== undefined) {
     scrollToElem(`question-${qnum}-part-${pnum}`);

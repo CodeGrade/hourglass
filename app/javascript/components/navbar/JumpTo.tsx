@@ -9,6 +9,7 @@ import {
 } from '@hourglass/types';
 import {
   scrollToQuestion,
+  scrollToTop,
 } from '@hourglass/helpers';
 
 interface JumpToProps {
@@ -29,10 +30,10 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
   } = props;
   const {
     paginated,
-    coords,
+    spyCoords,
     spy,
   } = pagination;
-  const selectedCoords = coords[spy];
+  const selectedCoords = spyCoords[spy];
   const justQuestion = selectedCoords.part === undefined;
   return (
     <>
@@ -42,13 +43,8 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
         checked={paginated}
         onChange={(_e): void => {
           togglePagination();
-          // If there's a selected part, use it.
-          // If not and separatesubparts, we need to select part 0.
-          const fallback = questions[selectedCoords.question].separateSubparts ? 0 : undefined;
-          const part = selectedCoords.part ?? fallback;
-          changeQuestion(selectedCoords.question, part);
-          scrollToQuestion(selectedCoords.question, selectedCoords.part);
-          setTimeout(() => spyQuestion(selectedCoords.question, part));
+          scrollToTop();
+          // setTimeout(() => spyQuestion(selectedCoords.question, part));
         }}
         label="Toggle pagination"
       />
@@ -67,14 +63,15 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
                   eventKey={qi}
                   active={selectedQuestion && justQuestion}
                   onSelect={(): void => {
-                    if (paginated && q.separateSubparts) {
-                      changeQuestion(qi, 0);
-                      scrollToQuestion(qi);
-                      spyQuestion(qi, 0);
-                    } else {
-                      changeQuestion(qi);
-                      scrollToQuestion(qi);
+                    if (paginated) {
+                      if (q.separateSubparts) {
+                        changeQuestion(qi, 0);
+                        spyQuestion(qi, 0);
+                      } else {
+                        changeQuestion(qi);
+                      }
                     }
+                    scrollToQuestion(qi);
                   }}
                 >
                   {qlabel}
@@ -95,11 +92,14 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
                       className="pl-5"
                       active={active}
                       onSelect={(): void => {
-                        changeQuestion(qi, pi);
-                        scrollToQuestion(qi, pi);
-                        if (paginated && q.separateSubparts) {
-                          spyQuestion(qi, pi);
+                        if (paginated) {
+                          if (q.separateSubparts) {
+                            changeQuestion(qi, pi);
+                            spyQuestion(qi, pi);
+                          }
+                          changeQuestion(qi, pi);
                         }
+                        scrollToQuestion(qi, pi);
                       }}
                     >
                       {plabel}

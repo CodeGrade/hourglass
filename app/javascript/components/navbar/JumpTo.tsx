@@ -65,6 +65,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
                     if (paginated && q.separateSubparts) {
                       changeQuestion(qi, 0);
                       scrollToQuestion(qi);
+                      spyQuestion(qi, 0);
                     } else {
                       changeQuestion(qi);
                       scrollToQuestion(qi);

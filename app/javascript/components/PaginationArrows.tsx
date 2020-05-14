@@ -22,10 +22,12 @@ const PaginationArrows: React.FC<PaginationArrowsProps> = (props) => {
   } = props;
   const prevNoun = pnumPrev === undefined ? 'Question' : 'Part';
   const nextNoun = pnumNext === undefined ? 'Question' : 'Part';
+  const showPrev = qnumPrev !== undefined || pnumPrev !== undefined;
+  const showNext = qnumNext !== undefined || pnumNext !== undefined;
   return (
     <div className="w-100">
       <Button
-        disabled={qnumPrev === undefined}
+        className={showPrev ? '' : 'd-none'}
         onClick={(): void => {
           if (pnumPrev !== undefined) {
             onChange(qnumCurrent, pnumPrev);
@@ -40,8 +42,7 @@ const PaginationArrows: React.FC<PaginationArrowsProps> = (props) => {
         </span>
       </Button>
       <Button
-        disabled={qnumNext === undefined}
-        className="float-right"
+        className={showNext ? 'float-right' : 'd-none'}
         onClick={(): void => {
           if (pnumNext !== undefined) {
             onChange(qnumCurrent, pnumNext);

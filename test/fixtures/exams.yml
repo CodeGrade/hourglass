@@ -1,9 +1,9 @@
-examOne:
+cs2500midterm:
   secret_key: "94ae378e-53f3-4022-94cf-cbe6fe0c6a03"
-  enabled: false
-  name: "Exam One"
+  enabled: true
+  name: "CS2500 Midterm"
 
-examTwo:
+cs3500final:
   secret_key: "f772d1aa-4def-4af5-b650-d353519f3dad"
-  enabled: false
-  name: "Exam Two"
+  enabled: true
+  name: "CS3500 Final"

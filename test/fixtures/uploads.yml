@@ -1,13 +1,11 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
+cs2500_upload:
   user: ben
   file_name: MyString
   secret_key: "0dc33c2a-f74c-4197-b970-c6acfea9526c"
-  exam: examOne
+  exam: cs2500midterm
 
-two:
+cs3500_upload:
   user: amit
   file_name: MyString
   secret_key: "dbb68b83-1a8b-4bb8-9878-369f475a11c8"
-  exam: examTwo
+  exam: cs3500final

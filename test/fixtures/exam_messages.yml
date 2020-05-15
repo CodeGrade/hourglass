@@ -1,10 +1,15 @@
-ben_announcement:
-  exam: examOne
-  sender: ben
-  body: "Hello all students!"
-
-ben_individual:
-  exam: examOne
+kyle_question_response:
+  exam: cs2500midterm
   sender: ben
   recipient: kyle
-  body: "Hello just kyle!"
+  body: "I can't just tell you the answers..."
+
+kyle_question:
+  exam: cs2500midterm
+  sender: kyle
+  body: "What's the answer to question 2 part 3?"
+
+ben_announcement:
+  exam: cs2500midterm
+  sender: ben
+  body: "Hello all students, welcome to cs2500 midterm one!"

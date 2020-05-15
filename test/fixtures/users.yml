@@ -1,15 +1,19 @@
 ben:
   username: "ben"
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'ben') %>
   role: <%= User::roles[:admin] %>
 
 amit:
   username: "amit"
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'amit') %>
   role: <%= User::roles[:professor] %>
 
 kyle:
   username: "kyle"
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'kyle') %>
   role: <%= User::roles[:unprivileged] %>
 
 tyler:
   username: "tyler"
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'tyler') %>
   role: <%= User::roles[:unprivileged] %>

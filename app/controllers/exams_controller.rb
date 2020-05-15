@@ -69,10 +69,10 @@ class ExamsController < ApplicationController
       json: {
         type: 'CONTENTS',
         exam: {
-          questions: @exam.info[:contents][:questions],
-          reference: @exam.info[:contents][:reference],
-          instructions: @exam.info[:contents][:instructions],
-          files: @exam.get_exam_files
+          questions: @exam.info['contents']['questions'],
+          reference: @exam.info['contents']['reference'],
+          instructions: @exam.info['contents']['instructions'],
+          files: @exam.files
         },
         answers: answers,
         messages: messages,
@@ -132,16 +132,25 @@ class ExamsController < ApplicationController
   end
 
   def create
-    exam_params = params.require(:exam).permit(:name, :yaml, :enabled)
-    @exam = Exam.new
-    uploaded_yaml = exam_params[:yaml]
-    @exam.name = exam_params[:name]
-    upload = Upload.new(upload_data: uploaded_yaml, user: current_user, exam: @exam)
-    @exam.upload = upload
-    @exam.enabled = exam_params[:enabled]
-    upload.save!
+    exam_params = params.require(:exam).permit(:name, :file, :enabled)
+    upload = Upload.new(exam_params[:file], current_user)
+    @exam = Exam.new(
+      name: exam_params[:name],
+      enabled: exam_params[:enabled],
+      info: upload.info,
+      files: upload.files
+    )
     @exam.save!
-    Registration.create(exam: @exam, user: current_user, role: current_user.role.to_s)
+    room = Room.create!(
+      exam: @exam,
+      name: 'Exam Room'
+    )
+    Registration.create!(
+      exam: @exam,
+      user: current_user,
+      role: current_user.role.to_s,
+      room: room
+    )
     redirect_to @exam
   end
 

@@ -144,31 +144,4 @@ module ApplicationHelper
     end
   end
 
-  def code_textarea(str, options = {})
-    # Within textareas, the initial newline is ignored
-    # (https://w3c.github.io/html/syntax.html#restrictions-on-content-models)
-    # so to handle files that start with whitespace, we have to be a bit careful.
-
-    # The content_tag function will implicitly add a newline always, and using
-    # a helper renderer function (as opposed to writing a <textarea> tag directly),
-    # avoids any confusion of how to use it
-
-    # The string will be rendered to html (to escape any special characters),
-    # unless it's already been explicitly marked as html_safe.
-    str = render(html: str) unless str.html_safe?
-    content_tag(:textarea, str, options)
-  end
-
-  def censor_full_paths(obj)
-    if obj.is_a? Hash
-      obj = obj.dup
-      obj.delete(:full_path)
-      obj.each do |k, v|
-        obj[k] = censor_full_paths(v)
-      end
-    elsif obj.is_a? Array
-      obj = obj.map { |v| censor_full_paths(v) }
-    end
-    obj
-  end
 end

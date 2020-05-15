@@ -1,5 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "$id": "https://hourglass.ccs.neu.edu/schemas/exam-schema#",
   "type": "object",
   "additionalProperties": false,
@@ -26,7 +26,7 @@
     "Version": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["questions"],
+      "required": ["questions"],
       "properties": {
         "instructions": { "$ref": "#/definitions/HTML" },
         "questions": { "$ref": "#/definitions/Questions" },
@@ -41,7 +41,7 @@
     "Question": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["parts"],
+      "required": ["parts"],
       "properties": {
         "name": { "type": "string" },
         "description": { "$ref": "#/definitions/HTML" },
@@ -58,7 +58,7 @@
     "Part": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["body", "points"],
+      "required": ["body", "points"],
       "properties": {
         "name": { "type": "string" },
         "description": { "$ref": "#/definitions/HTML" },
@@ -80,7 +80,7 @@
     "File": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["file"],
+      "required": ["file"],
       "properties": {
         "file": { "type": "string" }
       }
@@ -88,7 +88,7 @@
     "Dir": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["dir"],
+      "required": ["dir"],
       "properties": {
         "dir": { "type": "string" }
       }
@@ -123,12 +123,12 @@
     "Code": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["Code"],
+      "required": ["Code"],
       "properties": {
         "Code": {
           "type": "object",
           "additionalProperties": false,
-          "requiredProperties": ["lang"],
+          "required": ["lang"],
           "properties": {
             "prompt": { "$ref": "#/definitions/HTMLs" },
             "lang": { "type": "string" },
@@ -140,7 +140,7 @@
     "YesNo": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["YesNo"],
+      "required": ["YesNo"],
       "properties": {
         "YesNo": {
           "oneOf": [
@@ -153,7 +153,7 @@
     "YesNoPrompt": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["correctAnswer"],
+      "required": ["correctAnswer"],
       "properties": {
         "prompt": { "$ref": "#/definitions/HTMLs" },
         "correctAnswer": { "type": "boolean" }
@@ -162,7 +162,7 @@
     "TrueFalse": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["TrueFalse"],
+      "required": ["TrueFalse"],
       "properties": {
         "TrueFalse": {
           "oneOf": [
@@ -175,7 +175,7 @@
     "TrueFalsePrompt": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["correctAnswer"],
+      "required": ["correctAnswer"],
       "properties": {
         "prompt": { "$ref": "#/definitions/HTMLs" },
         "correctAnswer": { "type": "boolean" }
@@ -184,12 +184,12 @@
     "MultipleChoice": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["MultipleChoice"],
+      "required": ["MultipleChoice"],
       "properties": {
         "MultipleChoice": {
           "type": "object",
           "additionalProperties": false,
-          "requiredProperties": ["options", "correctAnswer"],
+          "required": ["options", "correctAnswer"],
           "properties": {
             "prompt": { "$ref": "#/definitions/HTMLs" },
             "options": { "$ref": "#/definitions/Options" },
@@ -209,12 +209,12 @@
     "Matching": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["Matching"],
+      "required": ["Matching"],
       "properties": {
         "Matching": {
           "type": "object",
           "additionalProperties": false,
-          "requiredProperties": ["prompts", "values", "correctAnswers"],
+          "required": ["prompts", "values", "correctAnswers"],
           "properties": {
             "prompt": { "$ref": "#/definitions/HTMLs" },
             "prompts": { "$ref": "#/definitions/Options" },
@@ -235,12 +235,12 @@
     "AllThatApply": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["AllThatApply"],
+      "required": ["AllThatApply"],
       "properties": {
         "AllThatApply": {
           "type": "object",
           "additionalProperties": false,
-          "requiredProperties": ["options"],
+          "required": ["options"],
           "properties": {
             "prompt": { "$ref": "#/definitions/HTMLs" },
             "options": { "$ref": "#/definitions/ATAOptions" }
@@ -264,12 +264,12 @@
     "CodeTag": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["CodeTag"],
+      "required": ["CodeTag"],
       "properties": {
         "CodeTag": {
           "type": "object",
           "additionalProperties": false,
-          "requiredProperties": ["correctAnswer", "choices"],
+          "required": ["correctAnswer", "choices"],
           "properties": {
             "prompt": { "$ref": "#/definitions/HTMLs" },
             "correctAnswer": { "$ref": "#/definitions/TagAnswer" },
@@ -284,7 +284,7 @@
     "TagAnswer": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["filename", "line"],
+      "required": ["filename", "line"],
       "properties": {
         "filename": { "type": "string" },
         "line": { "type": "integer", "minimum": 0 }
@@ -293,7 +293,7 @@
     "Text": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["Text"],
+      "required": ["Text"],
       "properties": {
         "Text": {
           "oneOf": [
@@ -306,7 +306,7 @@
     "TextPrompt": {
       "type": "object",
       "additionalProperties": false,
-      "requiredProperties": ["prompt"],
+      "required": ["prompt"],
       "properties": {
         "prompt": { "$ref": "#/definitions/HTMLs" }
       }

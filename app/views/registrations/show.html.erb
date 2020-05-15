@@ -18,14 +18,14 @@
       railsExam: {
         id: @exam.id,
         name: @exam.name,
-        policies: @exam.policies
+        policies: @exam.info['policies']
       },
       contents: {
         exam: {
-          questions: @exam.info[:contents][:questions],
-          reference: @exam.info[:contents][:reference],
-          instructions: @exam.info[:contents][:instructions],
-          files: @exam.get_exam_files
+          questions: @exam.info['contents']['questions'],
+          reference: @exam.info['contents']['reference'],
+          instructions: @exam.info['contents']['instructions'],
+          files: @exam.files
         },
         answers: @answers
       }

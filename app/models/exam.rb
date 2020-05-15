@@ -388,7 +388,7 @@ class Exam < ApplicationRecord
   end
 
   def get_raw_files(folder)
-    self.upload.extracted_files(folder, true)
+    self.upload.extracted_files(folder, false)
   end
 
   def clean_up(raw_files)

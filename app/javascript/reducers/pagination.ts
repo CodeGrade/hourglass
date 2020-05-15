@@ -78,14 +78,18 @@ export default (state: PaginationState = {
         };
         spyCoords.push(thisQ);
         if (!q.separateSubparts) pageCoords.push(thisQ);
-        q.parts.forEach((_p, pnum) => {
-          const thisP = {
-            question: qnum,
-            part: pnum,
-          };
-          spyCoords.push(thisP);
-          if (q.separateSubparts) pageCoords.push(thisP);
-        });
+        // Only include parts if there are multiple of them,
+        // or if the solo part isn't anonymous
+        if (q.parts.length > 1 || q.parts[0].name) {
+          q.parts.forEach((_p, pnum) => {
+            const thisP = {
+              question: qnum,
+              part: pnum,
+            };
+            spyCoords.push(thisP);
+            if (q.separateSubparts) pageCoords.push(thisP);
+          });
+        }
       });
       return {
         ...state,

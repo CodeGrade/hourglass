@@ -3,7 +3,7 @@
   "$id": "https://hourglass.ccs.neu.edu/schemas/exam-schema#",
   "type": "object",
   "additionalProperties": false,
-  "requiredProperties": ["versions"],
+  "required": ["versions"],
   "properties": {
     "policies": { "$ref": "#/definitions/Policies" },
     "versions": { "$ref": "#/definitions/Versions" }

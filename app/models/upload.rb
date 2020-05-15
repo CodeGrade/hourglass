@@ -56,8 +56,11 @@ class Upload
     }
   end
 
+  EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload-schema.json').to_s
+
   def parse_info!
     properties = YAML.safe_load(File.read(@dir.join('exam.yaml')))
+    JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
     exam_info = properties['versions'][0]
 
     exam_info['questions'].each do |q|
@@ -229,7 +232,7 @@ class Upload
           instructions: exam_info['instructions']
         },
         answers: answers
-    }.to_json
+    }
   end
 
   def rec_path(base_path, path)
@@ -280,7 +283,7 @@ class Upload
     @files = @files.map do |f|
       with_extracted(f)
     end
-    @files = @files.compact.to_json
+    @files = @files.compact
   end
 
   def with_extracted(item)

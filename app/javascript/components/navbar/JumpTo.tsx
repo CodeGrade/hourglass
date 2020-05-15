@@ -47,65 +47,65 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
         label="Toggle pagination"
       />
       <Nav variant="pills" className="flex-column">
-        {questions.map((q, qi) => {
+        {spyCoords.map((c, ci) => {
+          const { question: qi, part: pi } = c;
           const selectedQuestion = qi === selectedCoords.question;
           const qlabel = `Question ${qi + 1}`;
-          return (
-            <React.Fragment
+          const { separateSubparts } = questions[qi];
+          if (c.part === undefined) {
+            return (
               // Question indices are STATIC
               // eslint-disable-next-line react/no-array-index-key
-              key={qi}
-            >
-              <Nav.Item>
+              <Nav.Item key={ci}>
                 <Nav.Link
-                  eventKey={qi}
+                  eventKey={c.question}
                   active={selectedQuestion && justQuestion}
                   onSelect={(): void => {
                     if (paginated) {
-                      if (q.separateSubparts) {
-                        changeQuestion(qi, 0);
-                        spyQuestion(qi, 0);
+                      if (separateSubparts) {
+                        changeQuestion(c.question, 0);
+                        spyQuestion(c.question, 0);
                       } else {
-                        changeQuestion(qi);
+                        changeQuestion(c.question);
                       }
                     }
-                    scrollToQuestion(qi);
+                    scrollToQuestion(c.question);
                   }}
                 >
                   {qlabel}
                 </Nav.Link>
               </Nav.Item>
-              {q.parts.map((_p, pi) => {
-                const selectedPart = pi === selectedCoords.part;
-                const active = selectedQuestion && selectedPart;
-                const plabel = `Part ${pi + 1}`;
-                return (
-                  <Nav.Item
-                    // Part indices are STATIC
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={pi}
-                  >
-                    <Nav.Link
-                      eventKey={pi}
-                      className="pl-5"
-                      active={active}
-                      onSelect={(): void => {
-                        if (paginated) {
-                          if (q.separateSubparts) {
-                            changeQuestion(qi, pi);
-                            spyQuestion(qi, pi);
-                          }
-                          changeQuestion(qi, pi);
-                        }
-                        scrollToQuestion(qi, pi);
-                      }}
-                    >
-                      {plabel}
-                    </Nav.Link>
-                  </Nav.Item>
-                );
-              })}
-            </React.Fragment>
+            );
+          }
+          // The only parts in spyCoords are the ones that aren't
+          // solo or anonymous parts
+          const selectedPart = c.part === selectedCoords.part;
+          const active = selectedQuestion && selectedPart;
+          const plabel = `Part ${c.part + 1}`;
+          return (
+            <Nav.Item
+              // Part indices are STATIC
+              // eslint-disable-next-line react/no-array-index-key
+              key={ci}
+            >
+              <Nav.Link
+                eventKey={ci}
+                className="pl-5"
+                active={active}
+                onSelect={(): void => {
+                  if (paginated) {
+                    if (separateSubparts) {
+                      changeQuestion(qi, pi);
+                      spyQuestion(qi, pi);
+                    }
+                    changeQuestion(qi, pi);
+                  }
+                  scrollToQuestion(qi, pi);
+                }}
+              >
+                {plabel}
+              </Nav.Link>
+            </Nav.Item>
           );
         })}
       </Nav>

@@ -14,6 +14,7 @@ interface PartProps {
   part: PartInfo;
   qnum: number;
   pnum: number;
+  anonymous?: boolean;
   separateSubparts: boolean;
   displayOnly?: boolean;
   spyQuestion?: (question: number, pnum?: number) => void;
@@ -24,6 +25,7 @@ const Part: React.FC<PartProps> = (props) => {
     part,
     qnum,
     pnum,
+    anonymous,
     separateSubparts,
     displayOnly = false,
     spyQuestion,
@@ -38,26 +40,29 @@ const Part: React.FC<PartProps> = (props) => {
   const BodyRenderer = displayOnly ? DisplayBody : Body;
   let title = `Part ${pnum + 1}`;
   if (name) title += `: ${name}`;
-  const subtitle = `(${points} points)`;
+  const strPoints = points > 1 || points === 0 ? 'points' : 'point';
+  const subtitle = `(${points} ${strPoints})`;
   return (
     <div
       onFocus={(): void => {
         if (!displayOnly) spyQuestion(qnum, pnum);
       }}
     >
-      {displayOnly || (
+      {displayOnly || anonymous || (
         <TopScrollspy
           question={qnum}
           part={pnum}
           separateSubparts={separateSubparts}
         />
       )}
-      <h3 id={`question-${qnum}-part-${pnum}`}>
-        {title}
-        <small className="float-right text-muted">
-          {subtitle}
-        </small>
-      </h3>
+      {anonymous || (
+        <h3 id={`question-${qnum}-part-${pnum}`}>
+          {title}
+          <small className="float-right text-muted">
+            {subtitle}
+          </small>
+        </h3>
+      )}
       <div><HTML value={description} /></div>
       {reference && <FileViewer references={reference} />}
       {body.map((b, i) => (
@@ -67,7 +72,7 @@ const Part: React.FC<PartProps> = (props) => {
           <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
         </div>
       ))}
-      {displayOnly || (
+      {displayOnly || anonymous || (
         <BottomScrollspy
           question={qnum}
           part={pnum}

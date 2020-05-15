@@ -312,6 +312,29 @@ class ArchiveUtils
     end
   end
 
+  def self.to_json(file, mime)
+    # Extracts the file to a JSON dictionary
+    # Ensures that any symlinks are entirely local to the JSON result
+    # Assumes that too_many_files? and total_size_too_large? are ok with this file
+    # Raises an exception if symlinks are malicious
+
+    if is_zip?(file, mime)
+      zip_to_json(file)
+    elsif is_tar?(file, mime)
+      tar_to_json(file)
+    elsif is_tar_gz?(file, mime)
+      tar_gz_to_json(file)
+    elsif is_gz?(file, mime)
+      gzip_to_json(file)
+    else
+      if File.symlink?(file)
+        raise SafeExtractionError.new(file, dest, nil)
+      end
+
+      file_to_json(file, File.read(file), File.stat(file).mode)
+    end
+  end
+
   def self.entries(file, mime, from_stream: nil)
     if is_zip?(file, mime)
       zip_entries(file, from_stream)
@@ -640,4 +663,118 @@ class ArchiveUtils
     end
     return true
   end
+
+
+
+  def self.traverse_and_make_path(file, dest, entry_name, safe_dir, cur)
+    safe_dir.each do |dir|
+      if cur[:type] == :file
+        raise SafeExtractionError(file, dest, entry_name)
+      elsif cur[:contents][dir].nil?
+        cur[:contents][dir] = dir_to_json(dir)
+      end
+      cur = cur[:contents][dir]
+    end
+    cur
+  end
+  
+  def self.helper_to_json(file, type, archive)
+    seen_symlinks = false
+    dest = "/tmp/<json>"
+    ans = dir_to_json("")
+    archive.safe_each do |entry|
+      out = encode_or_escape(File.join(dest, entry.name.gsub("\\", "/").sub(/\/$/, "")))
+      if out.to_s.match?("__MACOSX") || out.to_s.match?(".DS_Store")
+        next
+      end
+
+      safe_dir = safe_realdir(out)
+      puts "Safe_dir: #{safe_dir}, out: #{out}, dest: #{dest}"
+      if (safe_dir.starts_with?(dest) rescue false)
+        path = Pathname.new(out.gsub(dest, "")).each_filename.to_a
+        puts "Path: #{path}"
+        if entry.directory?
+          traverse_and_make_path(file, dest, entry.name, path, ans)
+        elsif entry.file?
+          filename = path.pop
+          cur = traverse_and_make_path(file, dest, entry.name, path, ans)
+          cur[:contents][filename] = file_to_json(filename, entry.read, entry.unix_perms)
+        else
+          path.pop
+          traverse_and_make_path(file, dest, entry.name, path, ans)
+          seen_symlinks = true
+          # skip creating the symlink for now
+        end
+      else
+        puts safe_realdir(out)
+        puts dest
+        puts file
+        puts entry.name
+        raise SafeExtractionError.new(file, dest, entry.name)
+      end
+    end
+    if seen_symlinks
+      # Now go through again, only for creating the symlinks
+      archive.safe_each do |entry|
+        if entry.symlink?
+          out = encode_or_escape(File.join(dest, entry.name))
+          src_path = Pathname.new(safe_realdir(out).gsub(dest, ""))
+          link_target = entry.read
+          dest_path = safe_realdir(link_target)
+          if (dest_path.starts_with(dest))
+            target = traverse_and_make_path(file, dest, entry.name, Path.name.new(dest_path.gsub(dest, "")), ans)
+            filename = src_path.pop
+            src_dir = traverse_and_make_path(file, dest, entry.name, src_path, ans)
+            src_dir[:contents][filename] = {
+              name: filename,
+              type: :symlink,
+              target: target
+            }
+          else
+            raise SafeExtractionError.new(file, "<json>", entry.name)
+          end
+        end
+      end
+    end
+    return ans
+  rescue Exception => e
+    puts e
+    puts e.backtrace
+    raise FileReadError.new(file, type, e)
+  end
+
+  def self.zip_to_json(file)
+    Zip::File.open(file) do |zf| helper_to_json(file, 'zip', zf) end
+  end
+
+  def self.tar_to_json(file)
+    File.open(file) do |source| helper_to_json(file, 'tar', Gem::Package::TarReader.new(source)) end
+  end
+
+  def self.tar_gz_to_json(file)
+    Zlib::GzipReader.open(file) do |source| helper_to_json(file, 'tar_gz', Gem::Package::TarReader.new(source)) end
+  end
+
+  def self.gzip_to_json(file)
+    Zlib::GzipReader.open(file) do |input_stream|
+      file_to_json(file, input_stream.read, File.stat(file).mode)
+    end
+  end
+
+  def self.file_to_json(name, contents, perms)
+    {
+      name: name,
+      type: :file,
+      contents: contents,
+      perms: perms
+    }
+  end
+
+  def self.dir_to_json(name)
+    {
+      name: name,
+      type: :dir,
+      contents: {}
+    }
+  end  
 end

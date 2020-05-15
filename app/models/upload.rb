@@ -59,6 +59,15 @@ class Upload
   def parse_info!
     properties = YAML.safe_load(File.read(@dir.join('exam.yaml')))
     exam_info = properties['versions'][0]
+
+    exam_info['questions'].each do |q|
+      if q['parts'].length.zero?
+        throw 'Cannot have a question with zero parts'
+      elsif q['parts'].length == 1 && q['separateSubparts']
+        throw 'Cannot separateSubparts for a question with only one part'
+      end
+    end
+
     answers = exam_info['questions'].map do |q|
       q['parts'].map do |p|
         p['body'].map do |b|

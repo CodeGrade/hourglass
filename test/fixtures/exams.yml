@@ -2,10 +2,7 @@
   # TODO abstract this into a test helper, and rescue, deleting zip
   cs2500zip = Rails.root.join("test", "fixtures", "files", "cs2500midterm.zip")
   ArchiveUtils.create_zip cs2500zip, Dir.glob(Rails.root.join("test", "fixtures", "files", "cs2500midterm", "**"))
-  cs2500upload = Upload.new(
-    FakeUpload.new(cs2500zip),
-    User.find(ActiveRecord::FixtureSet.identify(:ben))
-  )
+  cs2500upload = Upload.new(FakeUpload.new(cs2500zip))
   FileUtils.remove_entry_secure cs2500zip
 %>
 cs2500midterm:
@@ -18,10 +15,7 @@ cs2500midterm:
 <%
   cs3500zip = Rails.root.join("test", "fixtures", "files", "cs3500final.zip")
   ArchiveUtils.create_zip cs3500zip, Dir.glob(Rails.root.join("test", "fixtures", "files", "cs3500final", "**"))
-  cs3500upload = Upload.new(
-    FakeUpload.new(cs3500zip),
-    User.find(ActiveRecord::FixtureSet.identify(:amit))
-  )
+  cs3500upload = Upload.new(FakeUpload.new(cs3500zip))
   FileUtils.remove_entry_secure cs3500zip
 %>
 cs3500final:

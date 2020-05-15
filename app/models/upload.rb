@@ -30,13 +30,11 @@ class Upload
   attr_reader :files
   attr_reader :info
 
-  def initialize(upload, user)
+  def initialize(upload)
     @upload = upload
     @upload_data = @upload.read
-    @user = user
     @files = []
     @info = {}
-    Audit.log("Uploaded file #{@upload.original_filename} for #{@user&.username} (#{@user&.id})")
     @dir = Pathname.new(Dir.mktmpdir)
     extract_contents!
     parse_info!

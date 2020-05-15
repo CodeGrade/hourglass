@@ -48,7 +48,7 @@ const Part: React.FC<PartProps> = (props) => {
         if (!displayOnly) spyQuestion(qnum, pnum);
       }}
     >
-      {displayOnly || (
+      {displayOnly || anonymous || (
         <TopScrollspy
           question={qnum}
           part={pnum}
@@ -72,7 +72,7 @@ const Part: React.FC<PartProps> = (props) => {
           <BodyRenderer body={b} qnum={qnum} pnum={pnum} bnum={i} />
         </div>
       ))}
-      {displayOnly || (
+      {displayOnly || anonymous || (
         <BottomScrollspy
           question={qnum}
           part={pnum}

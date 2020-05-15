@@ -176,7 +176,7 @@ class ExamsController < ApplicationController
 
   # Returns the announcements and messages for the current registration.
   def messages
-    msgs = @exam.all_messages_for(current_user).order(created_at: :desc)
+    msgs = @exam.all_messages_for(current_user).order(id: :desc)
     msgs.map(&:serialize)
   end
 

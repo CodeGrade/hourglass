@@ -185,7 +185,7 @@
       "additionalProperties": false,
       "required": ["type", "path"],
       "properties": {
-        "type": { "type": "string" },
+        "type": { "enum": ["file", "dir"] },
         "path": { "type": "string" }
       }
     },

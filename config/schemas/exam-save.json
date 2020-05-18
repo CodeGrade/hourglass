@@ -9,12 +9,12 @@
     "policies"
   ],
   "properties": {
-    "answers": { "$ref": "#/definitions/Answers" },
+    "answers": { "$ref": "#/definitions/ExamAnswers" },
     "contents": { "$ref": "#/definitions/Contents" },
     "policies": { "$ref": "#/definitions/Policies" }
   },
   "definitions": {
-    "Answers": {
+    "ExamAnswers": {
       "type": "array",
       "items": { "$ref": "#/definitions/PartAnswers" }
     },

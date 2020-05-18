@@ -4,8 +4,6 @@ Web-based exam server.
 
 Sister project of [Bottlenose][bottlenose].
 
-## TODOs and Current Progress
-
 [Anomaly Detection Progress](ANOMALIES.md)
 
 ## Development Environment Setup

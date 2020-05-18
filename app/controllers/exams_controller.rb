@@ -58,8 +58,6 @@ class ExamsController < ApplicationController
   end
 
   def start
-    # TODO make secret in "show" and check it here with a POST before rendering
-    #   so that users cannot just visit /exams/1/start in the browser easily
     unless @registration.visible_to? current_user
       render json: { message: "There is no submission for that user." }
       return

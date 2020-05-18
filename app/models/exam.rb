@@ -15,7 +15,7 @@ class Exam < ApplicationRecord
   }
 
   FILES_SCHEMA = Rails.root.join('config/schemas/files.json').to_s
-  validates :files, presence: true, json: {
+  validates :files, presence: true, allow_blank: true, json: {
     schema: -> { FILES_SCHEMA },
     message: ->(errors) { errors }
   }

@@ -57,7 +57,13 @@ class Upload
   EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload.json').to_s
 
   def parse_info!
-    properties = YAML.safe_load(File.read(@dir.join('exam.yaml')))
+    file =
+      if @dir.children.length == 1
+        @dir.children.first
+      else
+        @dir.join('exam.yaml')
+      end
+    properties = YAML.safe_load(File.read(file))
     JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
     exam_info = properties['versions'][0]
 

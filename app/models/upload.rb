@@ -295,15 +295,17 @@ class Upload
       return nil if File.basename(item[:full_path].to_s) == ".DS_Store"
 
       mimetype = ApplicationHelper.mime_type(item[:full_path])
-      contents = begin
-        File.read(item[:full_path].to_s)
-                 rescue Errno::EACCES => e
-                   "Could not access file:\n#{e.to_s}"
-                 rescue Errno::ENOENT => e
-                   "Somehow, #{item[:full_path]} does not exist"
-                 rescue Exception => e
-                   "Error reading file:\n#{e.to_s}"
-      end
+      contents =
+        begin
+          File.read(item[:full_path].to_s)
+        rescue Errno::EACCES => e
+          "Could not access file:\n#{e.to_s}"
+        rescue Errno::ENOENT => e
+          "Somehow, #{item[:full_path]} does not exist"
+        rescue Exception => e
+          "Error reading file:\n#{e.to_s}"
+        end
+
       if mimetype.starts_with? "image/"
         contents = Base64.encode(contents)
         item[:contents] = ensure_utf8(contents, mimetype)

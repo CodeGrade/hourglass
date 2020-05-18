@@ -193,14 +193,15 @@
           "properties": {
             "prompt": { "$ref": "#/definitions/HTMLs" },
             "options": { "$ref": "#/definitions/Options" },
-            "correctAnswer": {
-              "type": "number",
-              "minimum": 0,
-              "$comment": "can't enforce the max-range constraint here"
-            }
+            "correctAnswer": { "$ref": "#/definitions/MultipleChoiceAnswer" }
           }
         }
       }
+    },
+    "MultipleChoiceAnswer": {
+      "type": "number",
+      "minimum": 0,
+      "$comment": "can't enforce the max-range constraint here"
     },
     "Options": {
       "type": "array",

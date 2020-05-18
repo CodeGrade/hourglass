@@ -28,10 +28,7 @@
           "type": "array",
           "items": { "$ref": "#/definitions/Question" }
         },
-        "reference": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/Reference" }
-        }
+        "reference": { "$ref": "#/definitions/References" }
       }
     },
     "Question": {
@@ -43,7 +40,7 @@
         "description": { "type": "string" },
         "separateSubparts": { "type": "boolean" },
         "parts": { "$ref": "#/definitions/Parts" },
-        "reference": { "$ref": "#/definitions/Reference" }
+        "reference": { "$ref": "#/definitions/References" }
       }
     },
     "Parts": {
@@ -60,7 +57,7 @@
         "description": { "type": "string" },
         "points": { "type": "number" },
         "body": { "$ref": "#/definitions/BodyItems" },
-        "reference": { "$ref": "#/definitions/Reference" }
+        "reference": { "$ref": "#/definitions/References" }
       }
     },
     "BodyItems": {
@@ -101,7 +98,7 @@
     "YesNo": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type", "yesLabel", "noLabel"],
+      "required": ["type"],
       "properties": {
         "type": { "enum": ["YesNo"] },
         "yesLabel": { "type": "string" },
@@ -134,7 +131,7 @@
       "additionalProperties": false,
       "required": ["type", "options"],
       "properties": {
-        "type": { "enum": ["Matching"] },
+        "type": { "enum": ["AllThatApply"] },
         "prompt": { "$ref": "#/definitions/HTMLs" },
         "options": { "$ref": "#/definitions/Options" }
       }
@@ -145,7 +142,7 @@
       "required": ["type", "choices"],
       "properties": {
         "type": { "enum": ["CodeTag"] },
-        "choices": { "$ref": "#/definitions/Reference" },
+        "choices": { "$ref": "#/definitions/References" },
         "prompt": { "$ref": "#/definitions/HTMLs" }
       }
     },
@@ -175,6 +172,10 @@
       "type": "array",
       "items": { "type": "string" },
       "minItems": 1
+    },
+    "References": {
+      "type": "array",
+      "items": { "$ref": "#definitions/Reference" }
     },
     "Reference": {
       "type": "object",

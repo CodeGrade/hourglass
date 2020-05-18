@@ -142,7 +142,7 @@ class Upload
                     prompt: b['Code']['prompt'],
                     lang: b['Code']['lang'],
                     initial: b['Code']['initial'],
-                  }
+                  }.compact
                 elsif b.key? 'CodeTag'
                   referent =
                     if b['CodeTag']['choices'] == 'part'

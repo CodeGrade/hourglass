@@ -30,6 +30,7 @@
     },
     "Questions": {
       "type": "array",
+      "minItems": 1,
       "items": { "$ref": "#/definitions/Question" }
     },
     "Question": {
@@ -63,6 +64,7 @@
     },
     "BodyItems": {
       "type": "array",
+      "minItems": 1,
       "items": { "$ref": "#/definitions/BodyItem" }
     },
     "BodyItem": {

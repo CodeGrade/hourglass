@@ -69,4 +69,13 @@ class Exam < ApplicationRecord
       private_messages_for(user).or(announcements)
     end
   end
+
+  def version(num)
+    info['versions'][num]
+  end
+
+  # Return the exam version for the given registration.
+  def version_for(_reg)
+    version(0)
+  end
 end

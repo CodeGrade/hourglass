@@ -28,10 +28,6 @@ class Exam < ApplicationRecord
     rooms.map(&:finalize!)
   end
 
-  def policy_permits?(policy)
-    policies.include? policy
-  end
-
   def generate_secret_key!
     return unless new_record?
 

@@ -272,8 +272,6 @@ class Upload
       found_any = true
       next if File.extname(f).empty?
 
-      # TODO rewrite postprocessor to take callbacks for reading and writing files
-      # and use ArchiveUtils.to_json
       Postprocessor.process(@dir, f)
     end
     Postprocessor.no_files_found(@dir) unless found_any

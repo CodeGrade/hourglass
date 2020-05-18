@@ -263,7 +263,6 @@ class Upload
 
   def extract_contents!
     mimetype = @upload.content_type
-    # TODO rewrite archiveutils to take callbacks for reading and writing files
     ArchiveUtils.extract(@upload.path.to_s, mimetype, @dir, force_readable: true)
 
     found_any = false
@@ -273,6 +272,8 @@ class Upload
       found_any = true
       next if File.extname(f).empty?
 
+      # TODO rewrite postprocessor to take callbacks for reading and writing files
+      # and use ArchiveUtils.to_json
       Postprocessor.process(@dir, f)
     end
     Postprocessor.no_files_found(@dir) unless found_any

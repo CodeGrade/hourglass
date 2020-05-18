@@ -6,7 +6,6 @@
   FileUtils.remove_entry_secure cs2500zip
 %>
 cs2500midterm:
-  secret_key: "94ae378e-53f3-4022-94cf-cbe6fe0c6a03"
   enabled: true
   name: "CS2500 Midterm"
   info: <%= cs2500upload.info.to_json %>
@@ -19,7 +18,6 @@ cs2500midterm:
   FileUtils.remove_entry_secure cs3500zip
 %>
 cs3500final:
-  secret_key: "f772d1aa-4def-4af5-b650-d353519f3dad"
   enabled: true
   name: "CS3500 Final"
   info: <%= cs3500upload.info.to_json %>

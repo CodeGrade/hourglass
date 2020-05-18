@@ -6,8 +6,6 @@ class Exam < ApplicationRecord
   has_many :rooms
   has_many :exam_messages
 
-  after_initialize :generate_secret_key!
-
   EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save.json').to_s
   validates :info, presence: true, json: {
     schema: -> { EXAM_SAVE_SCHEMA },
@@ -26,16 +24,6 @@ class Exam < ApplicationRecord
 
   def finalize!
     rooms.map(&:finalize!)
-  end
-
-  def generate_secret_key!
-    return unless new_record?
-
-    unless secret_key.nil?
-      raise "Can't generate a second secret key for an exam."
-    end
-
-    self.secret_key = SecureRandom.urlsafe_base64
   end
 
   def professors

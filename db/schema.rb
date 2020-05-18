@@ -32,7 +32,6 @@ ActiveRecord::Schema.define(version: 2020_05_14_210728) do
   end
 
   create_table "exams", force: :cascade do |t|
-    t.string "secret_key", null: false
     t.boolean "enabled", null: false
     t.string "name", null: false
     t.jsonb "files", null: false

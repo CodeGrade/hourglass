@@ -56,6 +56,7 @@ in mkShell {
     stop_postgres
     nodePackages.typescript
     nodePackages.eslint_d
+    racket
   ];
 
   shellHook = ''

@@ -62,9 +62,7 @@ class Upload
     exam_info = properties['versions'][0]
 
     exam_info['questions'].each do |q|
-      if q['parts'].length.zero?
-        raise 'Cannot have a question with zero parts'
-      elsif q['parts'].length == 1 && q['separateSubparts']
+      if q['parts'].length == 1 && q['separateSubparts']
         raise 'Cannot separateSubparts for a question with only one part'
       end
     end
@@ -217,9 +215,9 @@ class Upload
                 raise 'Bad body item.'
               end
             end
-          }
+          }.compact
         end
-      }
+      }.compact
     end
     @info =
       {
@@ -228,7 +226,7 @@ class Upload
           questions: questions,
           reference: e_reference,
           instructions: exam_info['instructions']
-        },
+        }.compact,
         answers: answers
     }
   end

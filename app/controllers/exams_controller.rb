@@ -133,8 +133,9 @@ class ExamsController < ApplicationController
 
   def create
     exam_params = params.require(:exam).permit(:name, :file, :enabled)
-    upload = Upload.new(exam_params[:file], current_user)
-    Audit.log("Uploaded file #{upload.original_filename} for #{current_user.username} (#{current_user.id})")
+    file = exam_params[:file]
+    upload = Upload.new(file)
+    Audit.log("Uploaded file #{file.original_filename} for #{current_user.username} (#{current_user.id})")
     @exam = Exam.new(
       name: exam_params[:name],
       enabled: exam_params[:enabled],

@@ -54,7 +54,7 @@ class Upload
     }
   end
 
-  EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload-schema.json').to_s
+  EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload.json').to_s
 
   def parse_info!
     properties = YAML.safe_load(File.read(@dir.join('exam.yaml')))
@@ -317,7 +317,6 @@ class Upload
       return nil if item[:path] == "__MACOSX"
       item[:filedir] = "dir"
       item[:text] = item[:path] + "/"
-      item[:selectable] = false
       item[:nodes] = item[:children].map { |n| with_extracted(n) }.compact
       item.delete(:children)
     end

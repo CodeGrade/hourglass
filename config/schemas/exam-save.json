@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "$id": "https://hourglass.ccs.neu.edu/schemas/exam-save-schema#",
+  "$id": "https://hourglass.ccs.neu.edu/schemas/exam-save#",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -186,7 +186,7 @@
         "path": { "type": "string" }
       }
     },
-    "Policies": { "$ref": "exam-upload-schema.json#/definitions/Policies" },
+    "Policies": { "$ref": "exam-upload.json#/definitions/Policies" },
     "PartAnswers": {
       "type": "array",
       "items": { "$ref": "#/definitions/BodyItemAnswers" }
@@ -202,8 +202,8 @@
           "type": "boolean",
           "$comment": "YesNo / TrueFalse"
         },
-        { "$ref": "exam-upload-schema.json#/definitions/MultipleChoiceAnswer" },
-        { "$ref": "exam-upload-schema.json#/definitions/MatchingAnswers" },
+        { "$ref": "exam-upload.json#/definitions/MultipleChoiceAnswer" },
+        { "$ref": "exam-upload.json#/definitions/MatchingAnswers" },
         { "$ref": "#/definitions/ATAAnswer" },
         { "$ref": "#/definitions/CodeTagAnswer" }
       ]

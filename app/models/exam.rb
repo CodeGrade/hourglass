@@ -8,13 +8,17 @@ class Exam < ApplicationRecord
 
   after_initialize :generate_secret_key!
 
-  EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save-schema.json').to_s
+  EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save.json').to_s
   validates :info, presence: true, json: {
     schema: -> { EXAM_SAVE_SCHEMA },
     message: ->(errors) { errors }
   }
 
-  # TODO: json schema validation for files
+  FILES_SCHEMA = Rails.root.join('config/schemas/files.json').to_s
+  validates :files, presence: true, json: {
+    schema: -> { FILES_SCHEMA },
+    message: ->(errors) { errors }
+  }
 
   def finalized?
     registrations.all?(&:final)

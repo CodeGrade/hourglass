@@ -13,12 +13,12 @@
         },
         contents: {
           exam: {
-            questions: @exam.info['contents']['questions'],
-            reference: @exam.info['contents']['reference'],
-            instructions: @exam.info['contents']['instructions'],
+            questions: @exam.version(0)['contents']['questions'],
+            reference: @exam.version(0)['contents']['reference'],
+            instructions: @exam.version(0)['contents']['instructions'],
             files: @exam.files
           },
-          answers: @exam.info['answers']
+          answers: @exam.version(0)['answers']
         }
       }) %>
     </div>

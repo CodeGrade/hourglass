@@ -4,6 +4,7 @@ class RegistrationsController < ApplicationController
   def show
     @exam = Exam.find(params[:exam_id])
     @registration = Registration.find(params[:id])
+    @version = @exam.version_for(@registration)
     @answers = @registration.get_current_answers
   end
 

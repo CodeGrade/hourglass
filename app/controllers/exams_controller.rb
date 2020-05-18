@@ -63,13 +63,14 @@ class ExamsController < ApplicationController
       return
     end
     answers = @registration.get_current_answers
+    version = @exam.version_for(@registration)
     render(
       json: {
         type: 'CONTENTS',
         exam: {
-          questions: @exam.info['contents']['questions'],
-          reference: @exam.info['contents']['reference'],
-          instructions: @exam.info['contents']['instructions'],
+          questions: version['contents']['questions'],
+          reference: version['contents']['reference'],
+          instructions: version['contents']['instructions'],
           files: @exam.files
         },
         answers: answers,

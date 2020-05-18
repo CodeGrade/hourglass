@@ -50,7 +50,7 @@ class MarksProcessor
           marks[:byLine][lineNum][idx][:close].unshift(marks[:byNum][match[1]])
         else
           m = match.to_a.join(', ')
-          throw "No information found for mark [#{m}]"
+          raise "No information found for mark [#{m}]"
         end
         match = reTag.match(lines[lineNum], idx)
       end

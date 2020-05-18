@@ -63,9 +63,9 @@ class Upload
 
     exam_info['questions'].each do |q|
       if q['parts'].length.zero?
-        throw 'Cannot have a question with zero parts'
+        raise 'Cannot have a question with zero parts'
       elsif q['parts'].length == 1 && q['separateSubparts']
-        throw 'Cannot separateSubparts for a question with only one part'
+        raise 'Cannot separateSubparts for a question with only one part'
       end
     end
 
@@ -103,7 +103,7 @@ class Upload
                 b['YesNo']['correctAnswer']
               end
             else
-              throw 'Bad body item'
+              raise 'Bad body item'
             end
           end
         end
@@ -148,16 +148,16 @@ class Upload
                 elsif b.key? 'CodeTag'
                   referent =
                     if b['CodeTag']['choices'] == 'part'
-                      throw 'No reference for part.' if p_reference.nil?
+                      raise 'No reference for part.' if p_reference.nil?
                       p_reference
                     elsif b['CodeTag']['choices'] == 'question'
-                      throw 'No reference for question.' if q_reference.nil?
+                      raise 'No reference for question.' if q_reference.nil?
                       q_reference
                     elsif b['CodeTag']['choices'] == 'all'
-                      throw 'No reference for exam.' if e_reference.nil?
+                      raise 'No reference for exam.' if e_reference.nil?
                       e_reference
                     else
-                      throw "CodeTag reference is invalid."
+                      raise "CodeTag reference is invalid."
                     end
                   {
                     type: 'CodeTag',
@@ -211,10 +211,10 @@ class Upload
                       end
                   }
                 else
-                  throw 'Bad question type.'
+                  raise 'Bad question type.'
                 end
               else
-                throw 'Bad body item.'
+                raise 'Bad body item.'
               end
             end
           }

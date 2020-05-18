@@ -37,7 +37,7 @@ class Exam < ApplicationRecord
     return unless new_record?
 
     unless secret_key.nil?
-      raise Exception.new("Can't generate a second secret key for an exam.")
+      raise "Can't generate a second secret key for an exam."
     end
 
     self.secret_key = SecureRandom.urlsafe_base64

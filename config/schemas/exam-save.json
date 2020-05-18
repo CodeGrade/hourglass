@@ -24,12 +24,13 @@
       "additionalProperties": false,
       "properties": {
         "instructions": { "type": "string" },
-        "questions": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/Question" }
-        },
+        "questions": { "$ref": "#/definitions/Questions" },
         "reference": { "$ref": "#/definitions/References" }
       }
+    },
+    "Questions": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Question" }
     },
     "Question": {
       "type": "object",

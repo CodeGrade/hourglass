@@ -1,9 +1,24 @@
-examOne:
-  secret_key: "94ae378e-53f3-4022-94cf-cbe6fe0c6a03"
-  enabled: false
-  name: "Exam One"
+<%
+  # TODO abstract this into a test helper, and rescue, deleting zip
+  cs2500zip = Rails.root.join("test", "fixtures", "files", "cs2500midterm.zip")
+  ArchiveUtils.create_zip cs2500zip, Dir.glob(Rails.root.join("test", "fixtures", "files", "cs2500midterm", "**"))
+  cs2500upload = Upload.new(FakeUpload.new(cs2500zip))
+  FileUtils.remove_entry_secure cs2500zip
+%>
+cs2500midterm:
+  enabled: true
+  name: "CS2500 Midterm"
+  info: <%= cs2500upload.info.to_json %>
+  files: <%= cs2500upload.files.to_json %>
 
-examTwo:
-  secret_key: "f772d1aa-4def-4af5-b650-d353519f3dad"
-  enabled: false
-  name: "Exam Two"
+<%
+  cs3500zip = Rails.root.join("test", "fixtures", "files", "cs3500final.zip")
+  ArchiveUtils.create_zip cs3500zip, Dir.glob(Rails.root.join("test", "fixtures", "files", "cs3500final", "**"))
+  cs3500upload = Upload.new(FakeUpload.new(cs3500zip))
+  FileUtils.remove_entry_secure cs3500zip
+%>
+cs3500final:
+  enabled: true
+  name: "CS3500 Final"
+  info: <%= cs3500upload.info.to_json %>
+  files: <%= cs3500upload.files.to_json %>

@@ -1,0 +1,240 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://hourglass.ccs.neu.edu/schemas/exam-save#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "versions",
+    "policies"
+  ],
+  "properties": {
+    "versions": { "$ref": "#/definitions/Versions" },
+    "policies": { "$ref": "#/definitions/Policies" }
+  },
+  "definitions": {
+    "Versions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/Version" }
+    },
+    "Version": {
+      "type": "object",
+      "required": ["contents", "answers"],
+      "additionalProperties": false,
+      "properties": {
+        "answers": { "$ref": "#/definitions/ExamAnswers" },
+        "contents": { "$ref": "#/definitions/Contents" }
+      }
+    },
+    "ExamAnswers": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/PartAnswers" }
+    },
+    "Contents": {
+      "type": "object",
+      "required": ["questions"],
+      "additionalProperties": false,
+      "properties": {
+        "instructions": { "type": "string" },
+        "questions": { "$ref": "#/definitions/Questions" },
+        "reference": { "$ref": "#/definitions/References" }
+      }
+    },
+    "Questions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/Question" }
+    },
+    "Question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parts"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "separateSubparts": { "type": "boolean" },
+        "parts": { "$ref": "#/definitions/Parts" },
+        "reference": { "$ref": "#/definitions/References" }
+      }
+    },
+    "Parts": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Part" },
+      "minItems": 1
+    },
+    "Part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["body", "points"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "points": { "type": "number" },
+        "body": { "$ref": "#/definitions/BodyItems" },
+        "reference": { "$ref": "#/definitions/References" }
+      }
+    },
+    "BodyItems": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/BodyItem" }
+    },
+    "BodyItem": {
+      "oneOf": [
+        { "$ref": "#/definitions/HTML" },
+        { "$ref": "#/definitions/Response" }
+      ]
+    },
+    "Response": {
+      "oneOf": [
+        { "$ref": "#/definitions/Code" },
+        {
+          "$ref": "#/definitions/YesNo",
+          "$comment": "Also covers TrueFalse."
+        },
+        { "$ref": "#/definitions/MultipleChoice" },
+        { "$ref": "#/definitions/Matching" },
+        { "$ref": "#/definitions/AllThatApply" },
+        { "$ref": "#/definitions/CodeTag" },
+        { "$ref": "#/definitions/Text" }
+      ]
+    },
+    "Code": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "lang"],
+      "properties": {
+        "type": { "enum": ["Code"] },
+        "prompt": { "$ref": "#/definitions/HTMLs" },
+        "lang": { "type": "string" },
+        "initial": { "type": "string" }
+      }
+    },
+    "YesNo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["YesNo"] },
+        "yesLabel": { "type": "string" },
+        "noLabel": { "type": "string" },
+        "prompt": { "$ref": "#/definitions/HTMLs" }
+      }
+    },
+    "MultipleChoice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "options"],
+      "properties": {
+        "type": { "enum": ["MultipleChoice"] },
+        "prompt": { "$ref": "#/definitions/HTMLs" },
+        "options": { "$ref": "#/definitions/Options" }
+      }
+    },
+    "Matching": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "prompts", "values"],
+      "properties": {
+        "type": { "enum": ["Matching"] },
+        "prompts": { "$ref": "#/definitions/Options" },
+        "values": { "$ref": "#/definitions/Options" }
+      }
+    },
+    "AllThatApply": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "options"],
+      "properties": {
+        "type": { "enum": ["AllThatApply"] },
+        "prompt": { "$ref": "#/definitions/HTMLs" },
+        "options": { "$ref": "#/definitions/Options" }
+      }
+    },
+    "CodeTag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "choices"],
+      "properties": {
+        "type": { "enum": ["CodeTag"] },
+        "choices": { "$ref": "#/definitions/References" },
+        "prompt": { "$ref": "#/definitions/HTMLs" }
+      }
+    },
+    "Text": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["Text"] },
+        "prompt": { "$ref": "#/definitions/HTMLs" }
+      }
+    },
+    "Options": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "HTML": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "value"],
+      "properties": {
+        "type": { "enum": [ "HTML" ] },
+        "value": { "type": "string" }
+      }
+    },
+    "HTMLs": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "References": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Reference" }
+    },
+    "Reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "path"],
+      "properties": {
+        "type": { "enum": ["file", "dir"] },
+        "path": { "type": "string" }
+      }
+    },
+    "Policies": { "$ref": "exam-upload.json#/definitions/Policies" },
+    "PartAnswers": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/BodyItemAnswers" }
+    },
+    "BodyItemAnswers": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/BodyItemAnswer" }
+    },
+    "BodyItemAnswer": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "boolean",
+          "$comment": "YesNo / TrueFalse"
+        },
+        { "$ref": "exam-upload.json#/definitions/MultipleChoiceAnswer" },
+        { "$ref": "exam-upload.json#/definitions/MatchingAnswers" },
+        { "$ref": "#/definitions/ATAAnswer" },
+        { "$ref": "#/definitions/CodeTagAnswer" }
+      ]
+    },
+    "ATAAnswer": {
+      "type": "array",
+      "items": { "type": "boolean" }
+    },
+    "CodeTagAnswer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["selectedFile", "lineNumber"],
+      "properties": {
+        "selectedFile": { "type": "string" },
+        "lineNumber": { "type": "number" }
+      }
+    }
+  }
+}

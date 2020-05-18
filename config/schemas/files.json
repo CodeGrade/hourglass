@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://hourglass.ccs.neu.edu/schemas/files#",
+  "type": "array",
+  "items": {
+    "$ref": "#/definitions/FileDir"
+  },
+  "definitions": {
+    "FileDir": {
+      "oneOf": [
+        { "$ref": "#/definitions/Dir" },
+        { "$ref": "#/definitions/File" }
+      ]
+    },
+    "Dir": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "text", "nodes", "filedir", "relPath"],
+      "properties": {
+        "path": { "type": "string" },
+        "text": { "type": "string" },
+        "nodes": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/FileDir" }
+        },
+        "filedir": { "enum": ["dir"] },
+        "relPath": { "type": "string" }
+      }
+    },
+    "File": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "text", "type", "marks", "filedir", "relPath", "contents"],
+      "properties": {
+        "path": { "type": "string" },
+        "text": { "type": "string" },
+        "type": { "type": "string" },
+        "marks": { "$ref": "#/definitions/Marks" },
+        "filedir": { "enum": ["file"] },
+        "relPath": { "type": "string" },
+        "contents": { "type": "string" }
+      }
+    },
+    "Marks": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Mark" }
+    },
+    "Mark": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["to", "from", "options"],
+      "properties": {
+        "to": { "$ref": "#/definitions/MarkLocation" },
+        "from": { "$ref": "#/definitions/MarkLocation" },
+        "options": { "$ref": "#/definitions/MarkOptions" }
+      }
+    },
+    "MarkLocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ch", "line"],
+      "properties": {
+        "ch": { "type": "number" },
+        "line": { "type": "number" }
+      }
+    },
+    "MarkOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["inclusiveLeft", "inclusiveRight"],
+      "properties": {
+        "inclusiveLeft": { "type": "boolean" },
+        "inclusiveRight": { "type": "boolean" }
+      }
+    }
+  }
+}

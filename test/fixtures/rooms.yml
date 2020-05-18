@@ -1,6 +1,6 @@
-examOneRoomOne:
-  exam: examOne
-  name: "Exam 1 Room 1"
-examTwoRoomOne:
-  exam: examTwo
-  name: "Exam 2 Room 1"
+cs2500_room1:
+  exam: cs2500midterm
+  name: "Richards 201"
+cs3500_room1:
+  exam: cs3500final
+  name: "Robinson 411"

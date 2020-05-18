@@ -1,4 +1,6 @@
 class FakeUpload
+  attr_reader :path
+
   def initialize(path, content = nil)
     @path = path
     @name = File.basename(path)

@@ -1,0 +1,316 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "https://hourglass.ccs.neu.edu/schemas/exam-upload#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["versions"],
+  "properties": {
+    "policies": { "$ref": "#/definitions/Policies" },
+    "versions": { "$ref": "#/definitions/Versions" }
+  },
+  "definitions": {
+    "HTML": { "type": "string" },
+    "Policies": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Policy" }
+    },
+    "Policy": {
+      "type": "string",
+      "enum": ["ignore-lockdown", "tolerate-windowed"]
+    },
+    "Versions": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Version" },
+      "minItems": 1
+    },
+    "Version": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["questions"],
+      "properties": {
+        "instructions": { "$ref": "#/definitions/HTML" },
+        "questions": { "$ref": "#/definitions/Questions" },
+        "reference": { "$ref": "#/definitions/FileDirs" }
+      }
+    },
+    "Questions": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Question" },
+      "minItems": 1
+    },
+    "Question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parts"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "$ref": "#/definitions/HTML" },
+        "separateSubparts": { "type": "boolean" },
+        "parts": { "$ref": "#/definitions/Parts" },
+        "reference": { "$ref": "#/definitions/FileDirs" }
+      }
+    },
+    "Parts": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Part" },
+      "minItems": 1
+    },
+    "Part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["body", "points"],
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "$ref": "#/definitions/HTML" },
+        "points": { "type": "number" },
+        "body": { "$ref": "#/definitions/BodyItems" },
+        "reference": { "$ref": "#/definitions/FileDirs" }
+      }
+    },
+    "FileDirs": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/FileDir" }
+    },
+    "FileDir": {
+      "oneOf": [
+        { "$ref": "#/definitions/File" },
+        { "$ref": "#/definitions/Dir" }
+      ]
+    },
+    "File": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file"],
+      "properties": {
+        "file": { "type": "string" }
+      }
+    },
+    "Dir": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dir"],
+      "properties": {
+        "dir": { "type": "string" }
+      }
+    },
+    "BodyItems": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/BodyItem" }
+    },
+    "BodyItem": {
+      "oneOf": [
+        { "$ref": "#/definitions/HTML" },
+        { "$ref": "#/definitions/Response" }
+      ]
+    },
+    "HTMLs": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/HTML" },
+      "minItems": 1
+    },
+    "Response": {
+      "oneOf": [
+        { "$ref": "#/definitions/Code" },
+        { "$ref": "#/definitions/YesNo" },
+        { "$ref": "#/definitions/TrueFalse" },
+        { "$ref": "#/definitions/MultipleChoice" },
+        { "$ref": "#/definitions/Matching" },
+        { "$ref": "#/definitions/AllThatApply" },
+        { "$ref": "#/definitions/CodeTag" },
+        { "$ref": "#/definitions/Text" }
+      ]
+    },
+    "Code": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["Code"],
+      "properties": {
+        "Code": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lang"],
+          "properties": {
+            "prompt": { "$ref": "#/definitions/HTMLs" },
+            "lang": { "type": "string" },
+            "initial": { "type": "string" }
+          }
+        }
+      }
+    },
+    "YesNo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["YesNo"],
+      "properties": {
+        "YesNo": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "$ref": "#/definitions/YesNoPrompt" }
+          ]
+        }
+      }
+    },
+    "YesNoPrompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["correctAnswer"],
+      "properties": {
+        "prompt": { "$ref": "#/definitions/HTMLs" },
+        "correctAnswer": { "type": "boolean" }
+      }
+    },
+    "TrueFalse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["TrueFalse"],
+      "properties": {
+        "TrueFalse": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "$ref": "#/definitions/TrueFalsePrompt" }
+          ]
+        }
+      }
+    },
+    "TrueFalsePrompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["correctAnswer"],
+      "properties": {
+        "prompt": { "$ref": "#/definitions/HTMLs" },
+        "correctAnswer": { "type": "boolean" }
+      }
+    },
+    "MultipleChoice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["MultipleChoice"],
+      "properties": {
+        "MultipleChoice": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["options", "correctAnswer"],
+          "properties": {
+            "prompt": { "$ref": "#/definitions/HTMLs" },
+            "options": { "$ref": "#/definitions/Options" },
+            "correctAnswer": { "$ref": "#/definitions/MultipleChoiceAnswer" }
+          }
+        }
+      }
+    },
+    "MultipleChoiceAnswer": {
+      "type": "number",
+      "minimum": 0,
+      "$comment": "can't enforce the max-range constraint here"
+    },
+    "Options": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/HTML" }
+    },
+    "Matching": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["Matching"],
+      "properties": {
+        "Matching": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["prompts", "values", "correctAnswers"],
+          "properties": {
+            "prompt": { "$ref": "#/definitions/HTMLs" },
+            "prompts": { "$ref": "#/definitions/Options" },
+            "values": { "$ref": "#/definitions/Options" },
+            "correctAnswers": { "$ref": "#/definitions/MatchingAnswers" }
+          }
+        }
+      }
+    },
+    "MatchingAnswers": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 0,
+        "$comment": "can't enforce the max-range constraint here"
+      }
+    },
+    "AllThatApply": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["AllThatApply"],
+      "properties": {
+        "AllThatApply": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["options"],
+          "properties": {
+            "prompt": { "$ref": "#/definitions/HTMLs" },
+            "options": { "$ref": "#/definitions/ATAOptions" }
+          }
+        }
+      }
+    },
+    "ATAOptions": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/ATAOption" },
+      "minItems": 1
+    },
+    "ATAOption": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "patternProperties": {
+        ".*": { "type": "boolean" }
+      }
+    },
+    "CodeTag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["CodeTag"],
+      "properties": {
+        "CodeTag": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["correctAnswer", "choices"],
+          "properties": {
+            "prompt": { "$ref": "#/definitions/HTMLs" },
+            "correctAnswer": { "$ref": "#/definitions/TagAnswer" },
+            "choices": {
+              "type": "string",
+              "enum": ["all", "question", "part"]
+            }
+          }
+        }
+      }
+    },
+    "TagAnswer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["filename", "line"],
+      "properties": {
+        "filename": { "type": "string" },
+        "line": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "Text": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["Text"],
+      "properties": {
+        "Text": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/definitions/TextPrompt" }
+          ]
+        }
+      }
+    },
+    "TextPrompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prompt"],
+      "properties": {
+        "prompt": { "$ref": "#/definitions/HTMLs" }
+      }
+    }
+  }
+}

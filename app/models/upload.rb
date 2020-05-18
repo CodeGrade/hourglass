@@ -1,196 +1,356 @@
+# frozen_string_literal: true
+
+require 'marks_processor'
 require 'find'
 
-class Upload < ApplicationRecord
+# Uploaded files from the user.
+# Used for processing the upload before storing it in the exam.
+# Needs at least exam.yaml.
+#
+# optionally a ZIP:
+# zip_dir/
+# +-- exam.yaml
+# +-- files/
+# |   ...
+#
+# The 'files' dir contains the relevant code for the exam.
+#
+# upload_dir/
+# +-- original/
+# |   +-- original_filename
+# +-- extracted/
+# |   ... unzipped contents, or copied file ...
+# +-- embedded/
+#     +-- files/
+#         +-- Example.rkt/
+#         |   ... extracted embedded contents
+class Upload
   include UploadsHelper
 
-  belongs_to :user
-  belongs_to :exam
+  attr_reader :files
+  attr_reader :info
 
-  after_initialize :generate_secret_key!
-  before_create :store_upload!
-  after_commit :purge!, on: :destroy
+  def initialize(upload)
+    @upload = upload
+    @upload_data = @upload.read
+    @files = []
+    @info = {}
+    @dir = Pathname.new(Dir.mktmpdir)
+    extract_contents!
+    parse_info!
+    purge!
+  end
+
+  private
 
   def purge!
-    FileUtils.rm_rf base_dir.to_s
-    if Dir.empty? exam_dir
-      FileUtils.rm_rf exam_dir
-    end
-    if Dir.empty? user_dir
-      FileUtils.rm_rf user_dir
-    end
+    FileUtils.remove_entry_secure @dir
   end
 
-  def create_exam_structure(upload)
-    # upload needs at least exam.yaml
-    #
-    # optionally a ZIP:
-    # zip_dir/
-    # +-- exam.yaml
-    # +-- files/
-    # |   ...
-
-    # 'files' contains the relevant code for the exam
-
-    # storage of the upload in /private is as follows:
-    #
-    # upload_dir/
-    # +-- original/
-    # |   +-- original_filename
-    # +-- extracted/
-    # |   ... unzipped contents, or copied file ...
-    # +-- embedded/
-    #     +-- files/
-    #         +-- Example.rkt/
-    #         |   ... extracted embedded contents
-    upload_dir.mkpath
-    upload_dir.join("original").mkpath
-    File.open(original_path, 'wb') do |file|
-      file.write(upload.read)
-    end
+  def map_reference(ref)
+    {
+      type: ref.keys.first,
+      path: ref.values.first
+    }
   end
 
-  def relative_path(path, target)
-    target = target.to_s
-    if target.starts_with?(path.to_s)
-      target.gsub(path.to_s, "")
-    else
-      target
-    end
+  EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload.json').to_s
+
+  def parse_info!
+    file =
+      if @dir.children.length == 1
+        @dir.children.first
+      else
+        @dir.join('exam.yaml')
+      end
+    properties = YAML.safe_load(File.read(file))
+    JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
+    @info['policies'] = properties['policies'] || []
+    @info['versions'] =
+      properties['versions'].map do |version|
+        parse_single_version(version)
+      end
   end
 
-  def extracted_files(folder, strict = false)
-    def rec_path(path)
-      if path.symlink?
-        {
-          path: path.basename.to_s,
-          link_to: path.dirname.join(File.readlink(path)),
-          broken: (!File.exist?(File.realpath(path)) rescue true),
-        }
-      elsif path.file?
-        {
-          path: path.basename.to_s,
-          full_path: path,
-          relPath: path.relative_path_from(files_path),
-        }
-      elsif path.directory?
-        {
-          path: path.basename.to_s,
-          relPath: path.relative_path_from(files_path),
-          children: path.children.sort.collect do |child|
-            rec_path(child)
-          end,
-        }
+  def parse_single_version(version_info)
+    version_info['questions'].each do |q|
+      if q['parts'].length == 1 && q['separateSubparts']
+        raise 'Cannot separateSubparts for a question with only one part'
       end
     end
-    folder_path = files_path.join(folder)
-    if File.directory? folder_path
-      rec_path(folder_path)[:children]
-    elsif File.exist? folder_path
-      [rec_path(folder_path)]
-    elsif strict
-      throw "Folder path not found: '#{folder}'"
-    else
-      []
+
+    answers = version_info['questions'].map do |q|
+      q['parts'].map do |p|
+        p['body'].map do |b|
+          if b.is_a? String
+            nil
+          elsif b.is_a? Hash
+            if b.key? 'AllThatApply'
+              b['AllThatApply']['options'].map(&:values).flatten
+            elsif b.key? 'Code'
+              nil
+            elsif b.key? 'CodeTag'
+              {
+                selectedFile: b['CodeTag']['correctAnswer']['filename'],
+                lineNumber: b['CodeTag']['correctAnswer']['line']
+              }
+            elsif b.key? 'Matching'
+              b['Matching']['correctAnswers']
+            elsif b.key? 'MultipleChoice'
+              b['MultipleChoice']['correctAnswer']
+            elsif b.key? 'Text'
+              nil
+            elsif b.key? 'TrueFalse'
+              if b['TrueFalse'] == !! b['YesNo']
+                b['TrueFalse']
+              else
+                b['TrueFalse']['correctAnswer']
+              end
+            elsif b.key? 'YesNo'
+              if b['YesNo'] == !! b['YesNo']
+                b['YesNo']
+              else
+                b['YesNo']['correctAnswer']
+              end
+            else
+              raise 'Bad body item'
+            end
+          end
+        end
+      end
+    end
+
+    e_reference = version_info['reference']&.map{|r| map_reference r}
+    questions = version_info['questions'].map do |q|
+      q_reference = q['reference']&.map{|r| map_reference r}
+      {
+        name: q['name'],
+        separateSubparts: q['separateSubparts'],
+        description: q['description'],
+        reference: q_reference,
+        parts: q['parts'].map do |p|
+          p_reference = p['reference']&.map{|r| map_reference r}
+          {
+            name: p['name'],
+            description: p['description'],
+            points: p['points'],
+            reference: p_reference,
+            body: p['body'].map do |b|
+              if b.is_a? String
+                {
+                  type: 'HTML',
+                  value: b
+                }
+              elsif b.is_a? Hash
+                if b.key? 'AllThatApply'
+                  {
+                    type: 'AllThatApply',
+                    prompt: b['AllThatApply']['prompt'],
+                    options: b['AllThatApply']['options'].map(&:keys).flatten
+                  }
+                elsif b.key? 'Code'
+                  {
+                    type: 'Code',
+                    prompt: b['Code']['prompt'],
+                    lang: b['Code']['lang'],
+                    initial: b['Code']['initial'],
+                  }.compact
+                elsif b.key? 'CodeTag'
+                  referent =
+                    if b['CodeTag']['choices'] == 'part'
+                      raise 'No reference for part.' if p_reference.nil?
+                      p_reference
+                    elsif b['CodeTag']['choices'] == 'question'
+                      raise 'No reference for question.' if q_reference.nil?
+                      q_reference
+                    elsif b['CodeTag']['choices'] == 'all'
+                      raise 'No reference for exam.' if e_reference.nil?
+                      e_reference
+                    else
+                      raise "CodeTag reference is invalid."
+                    end
+                  {
+                    type: 'CodeTag',
+                    choices: referent,
+                    prompt: b['CodeTag']['prompt'],
+                  }
+                elsif b.key? 'Matching'
+                  {
+                    type: 'Matching',
+                    prompts: b['Matching']['prompts'],
+                    values: b['Matching']['values']
+                  }
+                elsif b.key? 'MultipleChoice'
+                  {
+                    type: 'MultipleChoice',
+                    prompt: b['MultipleChoice']['prompt'],
+                    options: b['MultipleChoice']['options']
+                  }
+                elsif b.key? 'Text'
+                  if b['Text'].nil?
+                    {
+                      type: 'Text',
+                      prompt: []
+                    }
+                  else
+                    {
+                      type: 'Text',
+                      prompt: b['Text']['prompt']
+                    }
+                  end
+                elsif b.key? 'TrueFalse'
+                  {
+                    type: 'YesNo',
+                    yesLabel: 'True',
+                    noLabel: 'False',
+                    prompt:
+                      if b['TrueFalse'] == !!b['TrueFalse']
+                        []
+                      else
+                        b['TrueFalse']['prompt']
+                      end
+                  }
+                elsif b.key? 'YesNo'
+                  {
+                    type: 'YesNo',
+                    prompt:
+                      if b['YesNo'] == !!b['YesNo']
+                        []
+                      else
+                        b['YesNo']['prompt']
+                      end
+                  }
+                else
+                  raise 'Bad question type.'
+                end
+              else
+                raise 'Bad body item.'
+              end
+            end
+          }.compact
+        end
+      }.compact
+    end
+    {
+      contents: {
+        questions: questions,
+        reference: e_reference,
+        instructions: version_info['instructions']
+      }.compact,
+      answers: answers
+    }
+  end
+
+  def rec_path(base_path, path)
+    if path.symlink?
+      {
+        path: path.basename.to_s,
+        link_to: path.dirname.join(File.readlink(path)),
+        broken: (!File.exist?(File.realpath(path)) rescue true)
+      }
+    elsif path.file?
+      {
+        path: path.basename.to_s,
+        full_path: path,
+        relPath: path.relative_path_from(base_path)
+      }
+    elsif path.directory?
+      {
+        path: path.basename.to_s,
+        relPath: path.relative_path_from(base_path),
+        children: path.children.sort.collect do |child|
+          rec_path(base_path, child)
+        end
+      }
     end
   end
 
-  def original_path
-    upload_dir.join("original", file_name)
-  end
-
-  def extracted_path
-    upload_dir.join("extracted")
-  end
-
-  def files_path
-    extracted_path.join("files")
-  end
-
-  def extract_contents!(mimetype)
-    return if Dir.exist?(extracted_path)
-
-    extract_contents_to!(mimetype, extracted_path, postprocess: true, force_readable: true)
-  end
-
-  def extract_contents_to!(mimetype, extracted_path, postprocess: false, force_readable: false)
-    extracted_path.mkpath
-    ArchiveUtils.extract(original_path.to_s, mimetype, extracted_path.to_s, force_readable: force_readable)
-    return unless postprocess
+  def extract_contents!
+    mimetype = @upload.content_type
+    ArchiveUtils.extract(@upload.path.to_s, mimetype, @dir, force_readable: true)
 
     found_any = false
-    Find.find(extracted_path) do |f|
+    Find.find(@dir) do |f|
       next unless File.file? f
 
       found_any = true
       next if File.extname(f).empty?
 
-      Postprocessor.process(extracted_path, f)
+      Postprocessor.process(@dir, f)
     end
-    Postprocessor.no_files_found(extracted_path) unless found_any
-  end
+    Postprocessor.no_files_found(@dir) unless found_any
 
-  def self.base_upload_dir
-    Rails.root.join("private", "uploads", Rails.env)
-  end
+    base_path = @dir.join('files')
+    return unless File.directory? base_path
 
-  def user_dir
-    Upload.base_upload_dir.join(user_id.to_s)
-  end
+    @files = rec_path(base_path, base_path)[:children]
 
-  def exam_dir
-    user_dir.join(exam_id.to_s)
-  end
-
-  def base_dir
-    pre = secret_key.slice(0, 2)
-    exam_dir.join(pre)
-  end
-
-  def upload_dir
-    base_dir.join(secret_key)
-  end
-
-  def generate_secret_key!
-    return unless new_record?
-
-    unless secret_key.nil?
-      raise Exception.new("Can't generate a second secret key for an upload.")
+    @files = @files.map do |f|
+      with_extracted(f)
     end
-
-    self.secret_key = SecureRandom.urlsafe_base64
-
-    if Dir.exist?(upload_dir)
-      raise Exception.new("Duplicate secret key (2). That's unpossible!")
-    end
+    @files = @files.compact
   end
 
-  def upload_data=(upload)
-    @upload = upload
-  end
+  def with_extracted(item)
+    return nil if item.nil?
 
-  private
+    if item[:full_path]
+      return nil if File.basename(item[:full_path].to_s) == ".DS_Store"
 
-  def store_upload!
-    self.file_name = @upload.original_filename
+      mimetype = ApplicationHelper.mime_type(item[:full_path])
+      contents =
+        begin
+          File.read(item[:full_path].to_s)
+        rescue Errno::EACCES => e
+          "Could not access file:\n#{e.to_s}"
+        rescue Errno::ENOENT => e
+          "Somehow, #{item[:full_path]} does not exist"
+        rescue Exception => e
+          "Error reading file:\n#{e.to_s}"
+        end
 
-    if Dir.exist?(upload_dir)
-      raise Exception.new("Duplicate secret key (1). That's unpossible!")
-    end
-
-    create_exam_structure(@upload)
-
-    # TODO bring back archiveutils checking
-    if @upload.is_a? ActionDispatch::Http::UploadedFile
-      upload_path = @upload.path
-    elsif @upload.is_a? String
-      upload_path = @upload
+      if mimetype.starts_with? "image/"
+        contents = Base64.encode(contents)
+        item[:contents] = ensure_utf8(contents, mimetype)
+      else
+        processed = MarksProcessor.process_marks(ensure_utf8(contents, mimetype))
+        item[:contents] = processed[:text]
+        item[:marks] = processed[:marks]
+      end
+      item[:text] = item[:path]
+      # pdf_path: item[:converted_path],
+      item[:type] = mimetype
+      item[:filedir] = "file"
+      item.delete(:full_path)
+    elsif item[:link_to]
+      item[:type] = "symlink"
     else
-      upload_path = original_path
+      return nil if item[:path] == "__MACOSX"
+      item[:filedir] = "dir"
+      item[:text] = item[:path] + "/"
+      item[:nodes] = item[:children].map { |n| with_extracted(n) }.compact
+      item.delete(:children)
     end
-    effective_mime = @upload.content_type
+    item
+  end
 
-    extract_contents!(effective_mime)
-
-    Audit.log("Uploaded file #{file_name} for #{user&.username} (#{user_id}) at #{secret_key}")
+  def ensure_utf8(str, mimetype)
+    if ApplicationHelper.binary?(mimetype)
+      str
+    else
+      if str.is_utf8?
+        str
+      else
+        begin
+          if str.dup.force_encoding(Encoding::CP1252).valid_encoding?
+            str.encode(Encoding::UTF_8, Encoding::CP1252)
+          else
+            str.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '?')
+          end
+        rescue Exception => e
+          str
+        end
+      end
+    end
   end
 end

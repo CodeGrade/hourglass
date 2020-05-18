@@ -6,7 +6,7 @@ class ExamMessageTest < ActiveSupport::TestCase
   test 'should save valid message' do
     em = ExamMessage.new(
       sender: users(:ben),
-      exam: exams(:examOne),
+      exam: exams(:cs2500midterm),
       body: 'This is a valid message'
     )
     assert em.save
@@ -15,14 +15,14 @@ class ExamMessageTest < ActiveSupport::TestCase
   test 'should not save message without body' do
     em = ExamMessage.new(
       sender: users(:ben),
-      exam: exams(:examOne)
+      exam: exams(:cs2500midterm)
     )
     assert_not em.save
   end
 
   test 'should not save message without sender' do
     em = ExamMessage.new(
-      exam: exams(:examOne),
+      exam: exams(:cs2500midterm),
       recipient: users(:kyle),
       body: 'Bad message'
     )
@@ -31,7 +31,7 @@ class ExamMessageTest < ActiveSupport::TestCase
 
   test 'students can send question' do
     em = ExamMessage.new(
-      exam: exams(:examOne),
+      exam: exams(:cs2500midterm),
       sender: users(:kyle),
       body: 'I have a question. Can I ask it?'
     )
@@ -40,7 +40,7 @@ class ExamMessageTest < ActiveSupport::TestCase
 
   test 'professors can send announcements' do
     em = ExamMessage.new(
-      exam: exams(:examOne),
+      exam: exams(:cs2500midterm),
       sender: users(:ben),
       body: 'No more questions.'
     )
@@ -49,7 +49,7 @@ class ExamMessageTest < ActiveSupport::TestCase
 
   test 'students cannot send private messages' do
     em = ExamMessage.new(
-      exam: exams(:examOne),
+      exam: exams(:cs2500midterm),
       recipient: users(:tyler),
       sender: users(:kyle),
       body: 'hi'

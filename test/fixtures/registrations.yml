@@ -1,33 +1,27 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-# This model initially had no columns defined. If you add columns to the
-# model remove the '{}' from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
 benReg:
-  exam: examOne
+  exam: cs2500midterm
   user: ben
-  room: examOneRoomOne
-  role: <%= Registration::roles[:professor] %>
-  final: false
-
-amitReg:
-  exam: examTwo
-  user: amit
-  room: examTwoRoomOne
+  room: cs2500_room1
   role: <%= Registration::roles[:professor] %>
   final: false
 
 kyleReg:
-  exam: examOne
+  exam: cs2500midterm
   user: kyle
-  room: examOneRoomOne
+  room: cs2500_room1
   role: <%= Registration::roles[:student] %>
   final: false
 
+amitReg:
+  exam: cs3500final
+  user: amit
+  room: cs3500_room1
+  role: <%= Registration::roles[:professor] %>
+  final: false
+
 tylerReg:
-  exam: examOne
+  exam: cs3500final
   user: tyler
-  room: examOneRoomOne
+  room: cs3500_room1
   role: <%= Registration::roles[:student] %>
   final: false

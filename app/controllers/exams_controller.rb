@@ -58,21 +58,20 @@ class ExamsController < ApplicationController
   end
 
   def start
-    # TODO make secret in "show" and check it here with a POST before rendering
-    #   so that users cannot just visit /exams/1/start in the browser easily
     unless @registration.visible_to? current_user
       render json: { message: "There is no submission for that user." }
       return
     end
     answers = @registration.get_current_answers
+    version = @exam.version_for(@registration)
     render(
       json: {
         type: 'CONTENTS',
         exam: {
-          questions: @exam.info[:contents][:questions],
-          reference: @exam.info[:contents][:reference],
-          instructions: @exam.info[:contents][:instructions],
-          files: @exam.get_exam_files
+          questions: version['contents']['questions'],
+          reference: version['contents']['reference'],
+          instructions: version['contents']['instructions'],
+          files: @exam.files
         },
         answers: answers,
         messages: messages,
@@ -132,16 +131,27 @@ class ExamsController < ApplicationController
   end
 
   def create
-    exam_params = params.require(:exam).permit(:name, :yaml, :enabled)
-    @exam = Exam.new
-    uploaded_yaml = exam_params[:yaml]
-    @exam.name = exam_params[:name]
-    upload = Upload.new(upload_data: uploaded_yaml, user: current_user, exam: @exam)
-    @exam.upload = upload
-    @exam.enabled = exam_params[:enabled]
-    upload.save!
+    exam_params = params.require(:exam).permit(:name, :file, :enabled)
+    file = exam_params[:file]
+    upload = Upload.new(file)
+    Audit.log("Uploaded file #{file.original_filename} for #{current_user.username} (#{current_user.id})")
+    @exam = Exam.new(
+      name: exam_params[:name],
+      enabled: exam_params[:enabled],
+      info: upload.info,
+      files: upload.files
+    )
     @exam.save!
-    Registration.create(exam: @exam, user: current_user, role: current_user.role.to_s)
+    room = Room.create!(
+      exam: @exam,
+      name: 'Exam Room'
+    )
+    Registration.create!(
+      exam: @exam,
+      user: current_user,
+      role: current_user.role.to_s,
+      room: room
+    )
     redirect_to @exam
   end
 
@@ -166,7 +176,7 @@ class ExamsController < ApplicationController
 
   # Returns the announcements and messages for the current registration.
   def messages
-    msgs = @exam.all_messages_for(current_user).order(created_at: :desc)
+    msgs = @exam.all_messages_for(current_user).order(id: :desc)
     msgs.map(&:serialize)
   end
 

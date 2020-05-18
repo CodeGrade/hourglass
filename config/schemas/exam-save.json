@@ -178,7 +178,7 @@
     },
     "References": {
       "type": "array",
-      "items": { "$ref": "#definitions/Reference" }
+      "items": { "$ref": "#/definitions/Reference" }
     },
     "Reference": {
       "type": "object",

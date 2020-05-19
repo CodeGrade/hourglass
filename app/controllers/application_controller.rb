@@ -34,4 +34,23 @@ class ApplicationController < ActionController::Base
       return
     end
   end
+
+  def bottlenose_token
+    @bottlenose_token ||=
+      if current_user
+        OAuth2::AccessToken.new(
+          bottlenose_oauth_client, current_user.bottlenose_access_token
+        )
+      end
+  end
+
+  private
+
+  def bottlenose_oauth_client
+    @bottlenose_oauth_client ||= OAuth2::Client.new(
+      ENV.fetch("BOTTLENOSE_APP_ID"),
+      ENV.fetch("BOTTLENOSE_APP_SECRET"),
+      site: ENV.fetch("BOTTLENOSE_URL")
+    )
+  end
 end

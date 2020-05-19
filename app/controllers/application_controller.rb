@@ -1,10 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
-  rescue_from DeviseLdapAuthenticatable::LdapException, Net::LDAP::Error do |exception|
-    redirect_back fallback_location: root_path, alert: "There was an error logging in. Please contact a professor or site admin, and provide them the following information:<br>#{exception}"
-  end
-
   rescue_from DoubleLoginException do |e|
     redirect_to root_path, alert: "You are currently logged into another session."
   end

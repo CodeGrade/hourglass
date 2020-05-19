@@ -112,9 +112,6 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
-    devise_ldap_authenticatable (0.8.6)
-      devise (>= 3.4.1)
-      net-ldap (>= 0.16.0)
     erubi (1.9.0)
     execjs (2.7.0)
     faraday (1.0.1)
@@ -161,7 +158,6 @@ GEM
     multi_json (1.14.1)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
-    net-ldap (0.16.2)
     nio4r (2.5.2)
     nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
@@ -322,7 +318,6 @@ DEPENDENCIES
   capybara (>= 2.15)
   capybara-webkit
   devise
-  devise_ldap_authenticatable
   headless
   jbuilder (~> 2.7)
   js-routes

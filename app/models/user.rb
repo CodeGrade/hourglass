@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-  devise :omniauthable, :ldap_authenticatable, :database_authenticatable, :session_limitable, omniauth_providers: [:bottlenose]
+  devise :omniauthable, :database_authenticatable, :session_limitable, omniauth_providers: [:bottlenose]
 
   has_many :registrations
   has_many :exams, through: :registrations

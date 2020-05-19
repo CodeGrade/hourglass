@@ -1,12 +1,9 @@
 Rails.application.routes.draw do
   root to: 'main#home'
 
-  devise_for :users, :skip => [:registrations, :passwords, :sessions]
-  devise_scope :user do
-    get "/login" => "devise/sessions#new", :as => :new_user_session
-    post "/login" => "devise/sessions#create", :as => :user_session
-    delete "/logout" => "devise/sessions#destroy", :as => :destroy_user_session
-  end
+  devise_for :users, skip: [:registrations, :passwords], controllers: {
+    omniauth_callbacks: 'users/omniauth_callbacks'
+  }
 
   resources :exams, only: [:show, :index, :new, :create] do
     member do

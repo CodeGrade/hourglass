@@ -18,6 +18,9 @@ gem 'react-rails'
 
 gem 'devise'
 gem 'devise_ldap_authenticatable'
+gem 'omniauth-oauth2', '~> 1.6.0'
+
+gem 'omniauth-bottlenose', git: 'https://github.com/CodeGrade/omniauth-bottlenose'
 
 gem "bootstrap_form", ">= 4.2.0"
 gem 'octicons_helper'

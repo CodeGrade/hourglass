@@ -10,23 +10,25 @@ Rails.application.routes.draw do
   end
 
   namespace :proctor do
-    resources :exams, only: [:show]
-    resources :anomalies, only: [:show, :index, :destroy]
-
-    resources :registrations, only: [] do
-      post :clear_anomalies
+    resources :exams, only: [:show] do
       post :finalize
-    end
 
-    resources :rooms, only: [:show, :index] do
-      post :finalize
+      resources :anomalies, only: [:show, :index, :destroy]
+
+      resources :registrations, only: [] do
+        post :clear_anomalies
+        post :finalize
+      end
+
+      resources :rooms, only: [:show, :index] do
+        post :finalize
+      end
     end
   end
 
   namespace :student do
     resources :exams, only: [:show] do
       get :start
-      post :finalize
       post :submit
 
       resources :anomalies, only: [:create]

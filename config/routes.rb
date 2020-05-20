@@ -1,16 +1,16 @@
 Rails.application.routes.draw do
-  root to: 'main#home'
+  root to: 'main#index'
 
   devise_for :users, skip: [:registrations, :passwords], controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks'
   }
 
   namespace :professor do
-    resources :exams, only: [:show, :index, :new, :create, :edit, :update]
+    resources :exams, only: [:show, :new, :create, :edit, :update]
   end
 
   namespace :proctor do
-    resources :exams, only: [:show, :index]
+    resources :exams, only: [:show]
     resources :anomalies, only: [:show, :index, :destroy]
 
     resources :registrations, only: [] do
@@ -24,7 +24,7 @@ Rails.application.routes.draw do
   end
 
   namespace :student do
-    resources :exams, only: [:show, :index] do
+    resources :exams, only: [:show] do
       get :start
       post :finalize
       post :submit

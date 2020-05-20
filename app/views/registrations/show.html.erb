@@ -1,5 +1,5 @@
 <% @keepnavbar = true %>
-<% @page_title = "#{@exam.name} Registration for #{@registration.user.username}" %>
+<% @page_title = "#{@exam.name} Registration for #{@registration.user.display_name}" %>
 <div class="row">
   <div class="col-12">
     <h2><%= @exam.name %> Registration</h2>
@@ -11,7 +11,7 @@
       <p><%= link_to "View exam", @registration.exam, class: "btn btn-info" %></p>
       <p><%= link_to "View room", [@exam, @registration.room], class: "btn btn-info" %></p>
     </div>
-    <p>Registration for <i><%= @registration.user.username %></i>.</p>
+    <p>Registration for <i><%= @registration.user.display_name %></i>.</p>
     <p>Updated at <i><%= @registration.updated_at %></i>.</p>
 
     <%= react_component('ExamViewer', {

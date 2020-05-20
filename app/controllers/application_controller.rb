@@ -1,10 +1,6 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
-  rescue_from DeviseLdapAuthenticatable::LdapException, Net::LDAP::Error do |exception|
-    redirect_back fallback_location: root_path, alert: "There was an error logging in. Please contact a professor or site admin, and provide them the following information:<br>#{exception}"
-  end
-
   rescue_from DoubleLoginException do |e|
     redirect_to root_path, alert: "You are currently logged into another session."
   end
@@ -37,5 +33,24 @@ class ApplicationController < ActionController::Base
       redirect_to root_path, alert: "Must be an admin or professor."
       return
     end
+  end
+
+  def bottlenose_token
+    @bottlenose_token ||=
+      if current_user
+        OAuth2::AccessToken.new(
+          bottlenose_oauth_client, current_user.bottlenose_access_token
+        )
+      end
+  end
+
+  private
+
+  def bottlenose_oauth_client
+    @bottlenose_oauth_client ||= OAuth2::Client.new(
+      ENV.fetch("BOTTLENOSE_APP_ID"),
+      ENV.fetch("BOTTLENOSE_APP_SECRET"),
+      site: ENV.fetch("BOTTLENOSE_URL")
+    )
   end
 end

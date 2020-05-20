@@ -1,24 +1,35 @@
 admin:
   username: "admin"
+  email: "admin@localhost"
+  display_name: "Administrator"
+  nuid: 1
   encrypted_password: <%= Devise::Encryptor.digest(User, 'admin') %>
   role: <%= User::roles[:admin] %>
 
 ben:
   username: "ben"
+  email: "ben@localhost"
+  display_name: "Benjamin"
   encrypted_password: <%= Devise::Encryptor.digest(User, 'ben') %>
   role: <%= User::roles[:professor] %>
 
 amit:
   username: "amit"
+  email: "amit@localhost"
+  display_name: "Amit"
   encrypted_password: <%= Devise::Encryptor.digest(User, 'amit') %>
   role: <%= User::roles[:professor] %>
 
 kyle:
   username: "kyle"
+  email: "kyle@localhost"
+  display_name: "Kyle"
   encrypted_password: <%= Devise::Encryptor.digest(User, 'kyle') %>
   role: <%= User::roles[:unprivileged] %>
 
 tyler:
   username: "tyler"
+  email: "tyler@localhost"
+  display_name: "Tyler"
   encrypted_password: <%= Devise::Encryptor.digest(User, 'tyler') %>
   role: <%= User::roles[:unprivileged] %>

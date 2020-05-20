@@ -66,10 +66,15 @@ ActiveRecord::Schema.define(version: 2020_05_14_210728) do
 
   create_table "users", force: :cascade do |t|
     t.string "username", null: false
+    t.string "display_name", null: false
+    t.integer "nuid"
+    t.string "email", null: false
     t.string "encrypted_password", default: "", null: false
-    t.datetime "remember_created_at"
     t.integer "role", default: 0, null: false
     t.string "unique_session_id"
+    t.string "image_url"
+    t.string "bottlenose_access_token"
+    t.string "bottlenose_refresh_token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["username"], name: "index_users_on_username", unique: true

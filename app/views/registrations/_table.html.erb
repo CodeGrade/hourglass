@@ -27,7 +27,7 @@
         %>
         <tr class="<%= row_class %>" data-toggle="tooltip" title="<%= row_title %>">
           <td class="align-middle"><%= link_to "View", [exam, reg], class: "btn btn-info" %></td>
-          <td class="align-middle"><%= reg.user.username %></td>
+          <td class="align-middle"><%= reg.user.display_name %></td>
           <td class="align-middle"><%= reg.role %></td>
           <td class="align-middle">
               <span>

@@ -1,20 +1,9 @@
 # frozen_string_literal: true
+require 'omniauth-bottlenose'
 
 # Use this hook to configure devise mailer, warden hooks and so forth.
 # Many of these configuration options can be set straight in your model.
 Devise.setup do |config|
-  # ==> LDAP Configuration
-  # config.ldap_logger = true
-  config.ldap_create_user = true
-  config.ldap_update_password = false
-  # config.ldap_config = "#{Rails.root}/config/ldap.yml"
-  # config.ldap_check_group_membership = false
-  # config.ldap_check_group_membership_without_admin = false
-  # config.ldap_check_attributes = false
-  # config.ldap_check_attributes_presence = false
-  # config.ldap_use_admin_to_bind = false
-  # config.ldap_ad_group_check = false
-
   # The secret key used by Devise. Devise uses this key to generate
   # random tokens. Changing this key will render invalid all existing
   # confirmation, reset password and unlock tokens in the database.
@@ -272,6 +261,7 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
+  config.omniauth :bottlenose, ENV['BOTTLENOSE_APP_ID'], ENV['BOTTLENOSE_APP_SECRET'], scope: 'all', client_options: { site: ENV['BOTTLENOSE_URL'] }
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or

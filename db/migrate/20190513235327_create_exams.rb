@@ -3,6 +3,8 @@ class CreateExams < ActiveRecord::Migration[5.2]
     create_table :exams do |t|
       t.boolean :enabled, null: false
       t.string :name, null: false
+      t.integer :course_id, null: false
+      t.integer :assignment_id
 
       t.jsonb :files, null: false
       t.jsonb :info, null: false

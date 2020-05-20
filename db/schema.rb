@@ -32,7 +32,7 @@ ActiveRecord::Schema.define(version: 2020_05_14_210728) do
   end
 
   create_table "exams", force: :cascade do |t|
-    t.boolean "enabled", null: false
+    t.boolean "enabled", default: false, null: false
     t.string "name", null: false
     t.integer "course_id", null: false
     t.integer "assignment_id"

@@ -5,25 +5,34 @@ Rails.application.routes.draw do
     omniauth_callbacks: 'users/omniauth_callbacks'
   }
 
-  resources :exams, only: [:show, :index, :new, :create] do
-    member do
-      get :start
-      post :finalize
-      post :submit
+  namespace :professor do
+    resources :exams, only: [:show, :index, :new, :create, :edit, :update]
+  end
 
-      post :save_snapshot
-      post :ask_question
-    end
+  namespace :proctor do
+    resources :exams, only: [:show, :index]
+    resources :anomalies, only: [:show, :index, :destroy]
 
-    resources :registrations, only: [:show, :index] do
-      resources :anomalies, only: [:show, :index, :destroy, :create]
-
+    resources :registrations, only: [] do
       post :clear_anomalies
       post :finalize
     end
 
     resources :rooms, only: [:show, :index] do
       post :finalize
+    end
+  end
+
+  namespace :student do
+    resources :exams, only: [:show, :index] do
+      get :start
+      post :finalize
+      post :submit
+
+      resources :anomalies, only: [:create]
+      post :save_snapshot
+
+      post :ask_question
     end
   end
 end

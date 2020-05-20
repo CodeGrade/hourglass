@@ -5,20 +5,21 @@ class User < ApplicationRecord
   has_many :exams, through: :registrations
 
   def self.from_omniauth(auth)
-    where(username: auth.uid).first_or_create do |user|
-      user.display_name = auth.info.display_name
-      user.nuid = auth.info.nuid
-      user.email = auth.info.email
-      unless user.admin?
-        user.role =
-          if auth.info.prof
-            roles[:professor]
-          else
-            roles[:unprivileged]
-          end
-      end
-      user.image_url = auth.info.image_url
+    user = where(username: auth.uid).first_or_initialize
+    user.display_name = auth.info.display_name
+    user.nuid = auth.info.nuid
+    user.email = auth.info.email
+    unless user.admin?
+      user.role =
+        if auth.info.prof
+          roles[:professor]
+        else
+          roles[:unprivileged]
+        end
     end
+    user.image_url = auth.info.image_url
+    user.save!
+    user
   end
 
   def update_bottlenose_credentials(auth)

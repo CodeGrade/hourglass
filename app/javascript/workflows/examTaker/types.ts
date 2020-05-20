@@ -525,7 +525,10 @@ export interface AnomalyListener {
  * - `'ignore-lockdown'`: don't install anomaly handlers
  * - `'tolerate-windowed'`: allow the browser to not be fullscreen
  */
-export type Policy = 'ignore-lockdown' | 'tolerate-windowed';
+export enum Policy {
+  ignoreLockdown = 'ignore-lockdown',
+  tolerateWindowed = 'tolerate-windowed',
+}
 
 export function policyPermits(policy: Policy[], query: Policy): boolean {
   return policy.find((p) => p === query) !== undefined;

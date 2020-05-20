@@ -139,5 +139,5 @@ body {
 
 h2 svg.octicon-chevron-up { display: none; }
 h2 svg.octicon-chevron-down { display: initial; }
-h2.collapsed svg.octicon-chevron-up { display: initial; }
-h2.collapsed svg.octicon-chevron-down { display: none; }
+h2 .collapsed svg.octicon-chevron-up { display: initial; }
+h2 .collapsed svg.octicon-chevron-down { display: none; }

@@ -32,6 +32,7 @@ import {
   PrevQuestionAction,
   NextQuestionAction,
   ActivateWaypointsAction,
+  Policy,
 } from '@examTaker/types';
 import {
   getCSRFToken,
@@ -233,7 +234,7 @@ export function doTryLockdown(
 ): Thunk {
   return (dispatch): void => {
     lock(exam.policies).then(() => {
-      if (policyPermits(exam.policies, 'ignore-lockdown')) {
+      if (policyPermits(exam.policies, Policy.ignoreLockdown)) {
         dispatch(lockdownIgnored());
       } else {
         dispatch(lockedDown());

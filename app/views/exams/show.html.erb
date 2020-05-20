@@ -32,7 +32,7 @@
   <% content_for :wide_content do %>
   <%= react_component('examTaker/components/ShowExam', {
     railsUser: {
-      username: current_user.username
+      displayName: current_user.display_name
     },
     railsExam: {
       id: @exam.id,

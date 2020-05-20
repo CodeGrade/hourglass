@@ -206,7 +206,7 @@ const ExamNavbar: React.FC<{}> = () => {
             <span className="flex-fill">
               <span className="d-flex w-100 align-items-center">
                 <h6 className="my-0">
-                  {railsUser.username}
+                  {railsUser.displayName}
                 </h6>
                 <span className="flex-fill" />
                 <span className="ml-2">

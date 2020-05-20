@@ -38,7 +38,7 @@ const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
             <Navbar.Text
               className="mr-2"
             >
-              {railsUser.username}
+              {railsUser.displayName}
             </Navbar.Text>
             <Form inline>
               <Button

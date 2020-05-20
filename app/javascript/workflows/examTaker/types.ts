@@ -302,7 +302,7 @@ export interface MessageReceivedAction {
 }
 
 export interface RailsUser {
-  username: string;
+  displayName: string;
 }
 
 export enum SnapshotStatus {

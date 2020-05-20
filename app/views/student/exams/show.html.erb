@@ -1,0 +1,17 @@
+<% content_for :wide_content do %>
+  <%= react_component('student/components/ShowExam', {
+    railsUser: {
+      displayName: current_user.display_name
+    },
+    railsExam: {
+      id: @exam.id,
+      name: @exam.name,
+      policies: @exam.info['policies']
+    },
+    railsRegistration: {
+      id: @registration.id,
+      anomalous: @registration.anomalous?
+    },
+    final: @final
+  }) %>
+<% end %>

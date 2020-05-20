@@ -5,7 +5,7 @@ require 'test_helper'
 class ExamMessageTest < ActiveSupport::TestCase
   test 'should save valid message' do
     em = ExamMessage.new(
-      sender: users(:ben),
+      sender: users(:prof),
       exam: exams(:cs2500midterm),
       body: 'This is a valid message'
     )
@@ -14,7 +14,7 @@ class ExamMessageTest < ActiveSupport::TestCase
 
   test 'should not save message without body' do
     em = ExamMessage.new(
-      sender: users(:ben),
+      sender: users(:prof),
       exam: exams(:cs2500midterm)
     )
     assert_not em.save
@@ -41,7 +41,7 @@ class ExamMessageTest < ActiveSupport::TestCase
   test 'professors can send announcements' do
     em = ExamMessage.new(
       exam: exams(:cs2500midterm),
-      sender: users(:ben),
+      sender: users(:prof),
       body: 'No more questions.'
     )
     assert em.save

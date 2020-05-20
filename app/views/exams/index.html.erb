@@ -1,21 +1,28 @@
 <% @keepnavbar = true %>
-<% if @exams.empty? %>
-  <% @page_title = "No Exam Ready" %>
-  <div class="row">
-    <div class="col-sm-12">
-      <h1>No exam ready.</h1>
-    </div>
-  </div>
-<% else %>
-  <% @page_title = "My Exams" %>
-  <h1>My Exams</h1>
-  <ul>
-    <% @exams.each do |exam| %>
-      <li><%= link_to exam.name, exam %></li>
-    <% end %>
-  </ul>
-<% end %>
+<% #content_for :wide_content do %>
+  <%= react_component('index', {
+    exams: @exams,
+    courses: @courses
+  }) %>
+<% #end %>
 
-<% if current_user.admin_or_prof? %>
-  <%= link_to "New Exam", new_exam_path, class: "btn btn-success" %>
-<% end %>
+<%# <% if @exams.empty? %1> %>
+<%#   <% @page_title = "No Exam Ready" %1> %>
+<%#   <div class="row"> %>
+<%#     <div class="col-sm-12"> %>
+<%#       <h1>No exam ready.</h1> %>
+<%#     </div> %>
+<%#   </div> %>
+<%# <% else %1> %>
+<%#   <% @page_title = "My Exams" %1> %>
+<%#   <h1>My Exams</h1> %>
+<%#   <ul> %>
+<%#     <% @exams.each do |exam| %1> %>
+<%#       <li><%= link_to exam.name, exam %1></li> %>
+<%#     <% end %1> %>
+<%#   </ul> %>
+<%# <% end %1> %>
+
+<%# <% if current_user.admin_or_prof? %1> %>
+<%#   <%= link_to "New Exam", new_exam_path, class: "btn btn-success" %1> %>
+<%# <% end %1> %>

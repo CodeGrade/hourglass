@@ -1,8 +1,5 @@
-<% @keepnavbar = true %>
-
-<%= bootstrap_form_for(@exam) do |f| %>
-  <%= f.text_field :name %>
-  <%= f.check_box :enabled %>
-  <%= f.file_field :file %>
-  <%= f.submit %>
+<% content_for :wide_content do %>
+  <%= react_component('examCreator', {
+    courses: @courses
+  }) %>
 <% end %>

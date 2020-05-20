@@ -5,7 +5,7 @@
   <h2 class="collapsed" data-toggle="collapse" data-target="#preview">Preview Exam <%= octicon "chevron-down", height: "1em", width: "1em" %><%= octicon "chevron-up", height: "1em", width: "1em" %></h2>
   <div class="row collapse" id="preview">
     <div class="col" style="border: 5px solid black; height: 50em; overflow: scroll;">
-      <%= react_component('ExamViewer', {
+      <%= react_component('examTaker/components/ExamViewer', {
         railsExam: {
           id: @exam.id,
           name: @exam.name,
@@ -30,9 +30,9 @@
   <%= render 'registrations/table', exam: @exam, registrations: @exam.registrations %>
 <% else %>
   <% content_for :wide_content do %>
-  <%= react_component('ShowExam', {
+  <%= react_component('examTaker/components/ShowExam', {
     railsUser: {
-      username: current_user.username
+      displayName: current_user.display_name
     },
     railsExam: {
       id: @exam.id,

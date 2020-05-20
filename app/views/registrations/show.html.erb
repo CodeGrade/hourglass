@@ -14,7 +14,7 @@
     <p>Registration for <i><%= @registration.user.display_name %></i>.</p>
     <p>Updated at <i><%= @registration.updated_at %></i>.</p>
 
-    <%= react_component('ExamViewer', {
+    <%= react_component('examTaker/components/ExamViewer', {
       railsExam: {
         id: @exam.id,
         name: @exam.name,

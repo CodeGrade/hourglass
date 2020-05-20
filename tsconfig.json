@@ -12,7 +12,10 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": "app/javascript",
     "paths": {
-      "@hourglass/*": ["./*"]
+      "@hourglass/*": ["./*"],
+      "@examTaker/*": ["./workflows/examTaker/*"],
+      "@examGrader/*": ["./workflows/examGrader/*"],
+      "@examCreator/*": ["./workflows/examCreator/*"]
     }
   },
   "exclude": ["**/*.spec.ts", "node_modules", "vendor", "public"],

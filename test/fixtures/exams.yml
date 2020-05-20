@@ -7,6 +7,7 @@
 %>
 cs2500midterm:
   enabled: true
+  course_id: 1
   name: "CS2500 Midterm"
   info: <%= cs2500upload.info.to_json %>
   files: <%= cs2500upload.files.to_json %>
@@ -19,6 +20,7 @@ cs2500midterm:
 %>
 cs3500final:
   enabled: true
+  course_id: 2
   name: "CS3500 Final"
   info: <%= cs3500upload.info.to_json %>
   files: <%= cs3500upload.files.to_json %>

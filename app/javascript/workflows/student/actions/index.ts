@@ -68,7 +68,7 @@ export function askQuestion(examID: number, body: string): Thunk {
   return (dispatch, getState): void => {
     const qID = getState().questions.lastId + 1;
     dispatch(questionAsked(qID, body));
-    const url = Routes.ask_question_exam_path(examID);
+    const url = Routes.student_exam_ask_question_path(examID);
     fetch(url, {
       method: 'POST',
       headers: {
@@ -205,7 +205,7 @@ export function updateScratch(val: string): UpdateScratchAction {
 
 export function doLoad(examID: number): Thunk {
   return (dispatch): void => {
-    const url = Routes.start_exam_path(examID);
+    const url = Routes.student_exam_start_path(examID);
     fetch(url)
       .then((result) => result.json() as Promise<StartExamResponse>)
       .then((result) => {
@@ -279,7 +279,7 @@ export function saveSnapshot(examID: number): Thunk {
     const { answers } = state.contents;
     // The messages list is sorted from newest to oldest.
     const lastMessageId = state.messages.messages[0]?.id ?? 0;
-    const url = Routes.save_snapshot_exam_path(examID);
+    const url = Routes.student_exam_save_snapshot_path(examID);
     fetch(url, {
       method: 'POST',
       headers: {
@@ -301,7 +301,7 @@ export function saveSnapshot(examID: number): Thunk {
         if (lockout) {
           const error = 'Locked out of exam.';
           dispatch(snapshotFailure(error));
-          window.location = Routes.exams_path();
+          window.location = Routes.root_path();
         } else {
           const newMsgs = convertMsgs(messages);
           dispatch(snapshotSuccess());
@@ -321,7 +321,7 @@ export function submitExam(examID: number): Thunk {
     const state = getState();
     const { answers } = state.contents;
     dispatch(saveSnapshot(examID));
-    const url = Routes.submit_exam_path(examID);
+    const url = Routes.student_exam_submit_path(examID);
     fetch(url, {
       method: 'POST',
       headers: {
@@ -335,7 +335,7 @@ export function submitExam(examID: number): Thunk {
     })
       .then((result) => result.json() as Promise<SubmitResponse>)
       .then(() => {
-        window.location = Routes.exam_path(examID);
+        window.location = Routes.student_exam_path(examID);
       });
     // TODO: catch
   };

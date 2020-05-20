@@ -7,7 +7,7 @@ import { installListeners, removeListeners } from './listeners';
 
 function lockOut(): void {
   // TODO: redirect with flash
-  const url = Routes.exams_path();
+  const url = Routes.root_path();
   window.location = url;
 }
 
@@ -16,9 +16,9 @@ function lockOut(): void {
  * @param examID the ID of the current exam
  * @param registrationID the ID of the current registration
  */
-const anom = (examID: number, registrationID: number) => (reason: string): void => {
+const anom = (examID: number) => (reason: string): void => {
   // TODO use event argument?
-  const anomalyPath = Routes.exam_registration_anomalies_path(examID, registrationID);
+  const anomalyPath = Routes.student_exam_anomalies_path(examID);
   fetch(anomalyPath, {
     method: 'POST',
     headers: {
@@ -43,13 +43,12 @@ const anom = (examID: number, registrationID: number) => (reason: string): void 
 export default function useAnomalyListeners(): void {
   const {
     railsExam,
-    railsRegistration,
   } = useContext(RailsContext);
   const {
     policies,
   } = railsExam;
   const [lst, setLst] = useState([]);
-  const anomalyDetected: AnomalyDetected = anom(railsExam.id, railsRegistration.id);
+  const anomalyDetected: AnomalyDetected = anom(railsExam.id);
   useEffect(() => {
     setLst(installListeners(policies, anomalyDetected));
     return (): void => {

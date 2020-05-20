@@ -6,7 +6,7 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav ml-auto">
       <% if current_user %>
-        <span class="navbar-text mr-3"><%= current_user.username %></span>
+        <span class="navbar-text mr-3"><%= current_user.display_name %></span>
         <%= button_to "Log Out", destroy_user_session_path, method: :delete, class: "btn btn-outline-danger mr-auto" %>
       <% end %>
     </ul>

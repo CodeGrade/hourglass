@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
 
     @registration ||= Registration.find_by(user: current_user, exam_id: exam_id)
     if @registration.nil?
-      redirect_back fallback_location :root_path, alert: 'You are not registered for that exam.'
+      redirect_back fallback_location: root_path, alert: 'You are not registered for that exam.'
     end
   end
 

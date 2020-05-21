@@ -1,5 +1,7 @@
 class Student::ExamsController < StudentController
-  before_action -> { find_exam(params[:id]) }
+  before_action -> { find_exam(params[:id]) }, only: [:show]
+  before_action :find_exam, except: [:show]
+
   before_action :require_exam_enabled
   before_action :require_current_user_registration
 

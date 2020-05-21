@@ -1,5 +1,7 @@
 class Proctor::ExamsController < ProctorController
-  before_action -> { find_exam(params[:id]) }, only: [:show, :finalize]
+  before_action -> { find_exam(params[:id]) }, only: [:show]
+  before_action :find_exam, except: [:show]
+
   before_action :require_exam_enabled
   before_action :require_current_user_registration_proctor
 

@@ -1,9 +1,11 @@
 <% @keepnavbar = true %>
-TODO new exam component
-<%= bootstrap_form_for Exam.new, url: professor_exams_path do |f| %>
-  <%= f.text_field :name %>
-  <%= f.check_box :enabled %>
-  <%= f.select :course_id, @courses %>
-  <%= f.file_field :file %>
-  <%= f.submit %>
-<% end %>
+<%= react_component('professor/exams/new', {
+}) %>
+
+<%# <%= bootstrap_form_for Exam.new, url: professor_exams_path do |f| %1> %>
+<%#   <%= f.text_field :name %1> %>
+<%#   <%= f.check_box :enabled %1> %>
+<%#   <%= f.select :course_id, @courses %1> %>
+<%#   <%= f.file_field :file %1> %>
+<%#   <%= f.submit %1> %>
+<%# <% end %1> %>

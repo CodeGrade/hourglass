@@ -9,6 +9,6 @@ class Proctor::AnomaliesController < ProctorController
   def destroy
     @anomaly = Anomaly.find(params[:id])
     @anomaly.destroy
-    redirect_back fallback_location: exam_registration_anomalies_path(@exam, @registration), notice: 'Anomaly removed.'
+    redirect_back fallback_location: proctor_exam_anomalies_path(@exam), notice: 'Anomaly removed.'
   end
 end

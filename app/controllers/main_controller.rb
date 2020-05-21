@@ -21,16 +21,20 @@ class MainController < ApplicationController
       end.compact
     @exams = exams.group_by { |e| e[:courseId] }
     @courses =
-      @exams.keys.map do |course_id|
-        bottlenose_token.get("/api/courses/#{course_id}").parsed
+      @exams.map do |course_id, course_exams|
+        bottlenose_token.get('/api/courses', course_id: course_id).parsed.merge(
+          {
+            createExams: current_user_professor_for_course(course_id)
+          }
+        )
       rescue StandardError
         if Rails.env.development?
           {
             id: course_id,
-            name: "DEV COURSE (id: #{course_id})"
+            name: "DEV COURSE (id: #{course_id})",
+            createExams: course_exams.first[:role] == 'professor'
           }
         end
       end.compact
-    @role = current_user.role
   end
 end

@@ -1,17 +1,19 @@
 import React from 'react';
 import Routes from '@hourglass/routes';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { Button } from 'react-bootstrap';
 
 interface Exam {
   id: number;
   name: string;
-  role: Role;
   courseId: number;
+  role: ExamRole;
 }
 
 interface Course {
   id: number;
   name: string;
+  createExams: boolean;
 }
 
 interface ExamProps {
@@ -23,9 +25,9 @@ const Exam: React.FC<ExamProps> = (props) => {
     exam,
   } = props;
   const {
-    role,
     id,
     name,
+    role,
   } = exam;
   let route;
   switch (role) {
@@ -63,19 +65,37 @@ const Course: React.FC<CourseProps> = (props) => {
     course,
     exams,
   } = props;
+  const {
+    createExams,
+  } = course;
   return (
     <div>
-      <h2>{course.name}</h2>
+      <h2>
+        {course.name}
+        {createExams && (
+          <Button
+            href={Routes.new_professor_exam_path()}
+            variant="success"
+            className="d-inline float-right"
+          >
+            New exam
+          </Button>
+        )}
+      </h2>
       <ul>
         {exams.map((e) => (
-          <Exam key={e.id} exam={e} />
+          <Exam
+            key={e.id}
+            exam={e}
+          />
         ))}
       </ul>
     </div>
   );
 };
 
-export type Role = 'student' | 'proctor' | 'professor';
+export type ExamRole = 'student' | 'proctor' | 'professor';
+export type UserRole = 'unprivileged' | 'professor' | 'admin';
 
 interface OverviewProps {
   exams: {

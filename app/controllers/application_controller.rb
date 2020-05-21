@@ -82,6 +82,26 @@ class ApplicationController < ActionController::Base
       end
   end
 
+  def require_current_user_professor_for_course(course_id = params[:exam][:course_id])
+    unless current_user_professor_for_course(course_id)
+      redirect_to root_path, alert: 'Must be a registered professor for the course.'
+    end
+  end
+
+  def current_user_professor_for_course(course_id)
+    return true if current_user&.admin?
+
+    # course_id needs to be a number
+    course_num = course_id.to_i
+    course =
+      begin
+        bottlenose_token.get("/api/courses/#{course_num}").parsed
+      rescue StandardError
+        return false
+      end
+    course['role'] == 'professor'
+  end
+
   private
 
   def bottlenose_oauth_client

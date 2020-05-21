@@ -2,6 +2,8 @@ class Professor::ExamsController < ProfessorController
   before_action -> { find_exam(params[:id]) }, except: [:new, :create]
   before_action :require_current_user_registration, except: [:new, :create]
 
+  before_action :require_current_user_professor_for_course, only: [:create]
+
   def new
     semesters =
       begin
@@ -19,13 +21,6 @@ class Professor::ExamsController < ProfessorController
   def create
     exam_params = params.require(:exam).permit(:name, :file, :course_id, :enabled)
     course_id = exam_params[:course_id]
-    courses = bottlenose_token.get('/api/courses').parsed
-    ids = courses.map { |sem| sem['courses'].map { |c| c['id'].to_s } }.flatten(1)
-    unless ids.member? course_id
-      redirect_back fallback_location: root_path, alert: 'You are not registered for that course.'
-      return
-    end
-
     file = exam_params[:file]
     upload = Upload.new(file)
     Audit.log("Uploaded file #{file.original_filename} for #{current_user.username} (#{current_user.id})")

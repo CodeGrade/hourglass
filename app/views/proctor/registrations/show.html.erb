@@ -14,7 +14,7 @@
     <p>Registration for <i><%= @registration.user.display_name %></i>.</p>
     <p>Updated at <i><%= @registration.updated_at %></i>.</p>
 
-    <%= react_component('student/components/ExamViewer', {
+    <%= react_component('proctor/registrations/show', {
       railsExam: {
         id: @exam.id,
         name: @exam.name,

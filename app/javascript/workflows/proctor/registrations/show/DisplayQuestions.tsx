@@ -1,6 +1,6 @@
 import React from 'react';
 import { QuestionInfo } from '@student/types';
-import ShowQuestion from '@student/components/ShowQuestion';
+import ShowQuestion from '@proctor/registrations/show/ShowQuestion';
 
 interface DisplayQuestionsProps {
   questions: QuestionInfo[];
@@ -19,8 +19,6 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           key={i}
           question={q}
           qnum={i}
-          paginated={false}
-          displayOnly
         />
       ))}
     </>

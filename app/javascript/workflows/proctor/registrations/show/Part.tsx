@@ -2,20 +2,14 @@ import React from 'react';
 import { PartInfo } from '@student/types';
 import HTML from '@student/components/HTML';
 import { FileViewer } from '@student/components/FileViewer';
-import {
-  TopScrollspy,
-  BottomScrollspy,
-} from '@student/containers/scrollspy/Part';
-import './Part.css';
-import Body from '@student/components/Body';
+import DisplayBody from '@proctor/registrations/show/DisplayBody';
+import '@student/components/Part.css';
 
 interface PartProps {
   part: PartInfo;
   qnum: number;
   pnum: number;
   anonymous?: boolean;
-  separateSubparts: boolean;
-  spyQuestion?: (question: number, pnum?: number) => void;
 }
 
 const Part: React.FC<PartProps> = (props) => {
@@ -24,8 +18,6 @@ const Part: React.FC<PartProps> = (props) => {
     qnum,
     pnum,
     anonymous,
-    separateSubparts,
-    spyQuestion,
   } = props;
   const {
     name,
@@ -39,18 +31,7 @@ const Part: React.FC<PartProps> = (props) => {
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
   return (
-    <div
-      onFocus={(): void => {
-        spyQuestion(qnum, pnum);
-      }}
-    >
-      {anonymous || (
-        <TopScrollspy
-          question={qnum}
-          part={pnum}
-          separateSubparts={separateSubparts}
-        />
-      )}
+    <div>
       {anonymous || (
         <h3 id={`question-${qnum}-part-${pnum}`}>
           {title}
@@ -65,16 +46,9 @@ const Part: React.FC<PartProps> = (props) => {
         // Body numbers are STATIC.
         // eslint-disable-next-line react/no-array-index-key
         <div className="p-2 bodyitem" key={i}>
-          <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
+          <DisplayBody body={b} qnum={qnum} pnum={pnum} bnum={i} />
         </div>
       ))}
-      {anonymous || (
-        <BottomScrollspy
-          question={qnum}
-          part={pnum}
-          separateSubparts={separateSubparts}
-        />
-      )}
     </div>
   );
 };

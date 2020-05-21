@@ -17,7 +17,6 @@ interface ShowQuestionProps {
   paginated: boolean;
   selectedQuestion?: number;
   selectedPart?: number;
-  displayOnly?: boolean;
   spyQuestion?: (question: number, pnum?: number) => void;
   lastQuestion?: boolean;
 }
@@ -29,7 +28,6 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     paginated,
     selectedQuestion,
     selectedPart,
-    displayOnly = false,
     spyQuestion,
     lastQuestion = false,
   } = props;
@@ -54,12 +52,10 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const subtitle = `(${points} ${strPoints})`;
   return (
     <div className={classes}>
-      {displayOnly || (
-        <TopScrollspy
-          question={qnum}
-          separateSubparts={separateSubparts}
-        />
-      )}
+      <TopScrollspy
+        question={qnum}
+        separateSubparts={separateSubparts}
+      />
       <h1 id={`question-${qnum}`}>
         {title}
         {singlePart && (
@@ -70,12 +66,10 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
       </h1>
       <HTML value={description} />
       {reference && <FileViewer references={reference} />}
-      {displayOnly || (
-        <BottomScrollspy
-          question={qnum}
-          separateSubparts={separateSubparts}
-        />
-      )}
+      <BottomScrollspy
+        question={qnum}
+        separateSubparts={separateSubparts}
+      />
       {parts.map((p, i) => {
         const current = selectedPart === i;
         const activePart = !split || current;
@@ -96,15 +90,12 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               pnum={i}
               qnum={qnum}
               separateSubparts={separateSubparts}
-              displayOnly={displayOnly}
               spyQuestion={spyQuestion}
             />
-            {!displayOnly && (
-              <div className={showArrows ? '' : 'd-none'}>
-                <PaginationArrows />
-              </div>
-            )}
-            {!displayOnly && showSubmit && (
+            <div className={showArrows ? '' : 'd-none'}>
+              <PaginationArrows />
+            </div>
+            {showSubmit && (
               <div className="text-center">
                 <SubmitButton
                   examID={railsExam.id}

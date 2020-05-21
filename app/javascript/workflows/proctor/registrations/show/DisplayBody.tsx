@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import { ExamViewerContext } from '@student/context';
 import Code from '@student/components/questions/Code';
-import DisplayYesNoInput from '@student/components/questions/DisplayYesNo';
-import DisplayCodeTag from '@student/components/questions/DisplayCodeTag';
-import DisplayText from '@student/components/questions/DisplayText';
-import DisplayMatching from '@student/components/questions/DisplayMatching';
-import DisplayMultipleChoice from '@student/components/questions/DisplayMultipleChoice';
-import DisplayAllThatApply from '@student/components/questions/DisplayAllThatApply';
+import DisplayYesNoInput from '@proctor/registrations/show/questions/DisplayYesNo';
+import DisplayCodeTag from '@proctor/registrations/show/questions/DisplayCodeTag';
+import DisplayText from '@proctor/registrations/show/questions/DisplayText';
+import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
+import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
+import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import HTML from '@student/components/HTML';
 import { BodyProps } from '@student/components/Body';
 import {

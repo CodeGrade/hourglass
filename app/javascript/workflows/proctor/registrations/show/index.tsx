@@ -3,7 +3,7 @@ import { RailsExam, ContentsState } from '@student/types';
 import HTML from '@student/components/HTML';
 import { ExamContext, ExamViewerContext, RailsContext } from '@student/context';
 import { createMap } from '@student/files';
-import DisplayQuestions from '@student/components/DisplayQuestions';
+import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/components/FileViewer';
 import Scratch from '@student/components/navbar/Scratch';
 

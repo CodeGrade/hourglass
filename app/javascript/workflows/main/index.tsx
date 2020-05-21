@@ -5,6 +5,8 @@ import { ExhaustiveSwitchError } from '../student/helpers';
 interface Exam {
   id: number;
   name: string;
+  role: Role;
+  courseId: number;
 }
 
 interface Course {
@@ -12,18 +14,19 @@ interface Course {
   name: string;
 }
 
-interface CourseProps {
-  course: Course;
-  exams: Exam[];
-  role: Role;
+interface ExamProps {
+  exam: Exam;
 }
 
-const Course: React.FC<CourseProps> = (props) => {
+const Exam: React.FC<ExamProps> = (props) => {
   const {
-    course,
-    exams,
-    role,
+    exam,
   } = props;
+  const {
+    role,
+    id,
+    name,
+  } = exam;
   let route;
   switch (role) {
     case 'student':
@@ -38,22 +41,35 @@ const Course: React.FC<CourseProps> = (props) => {
     default:
       throw new ExhaustiveSwitchError(role);
   }
+  const url = route(id);
+  return (
+    <li>
+      <a
+        href={url}
+      >
+        {`${name} (${role})`}
+      </a>
+    </li>
+  );
+};
+
+interface CourseProps {
+  course: Course;
+  exams: Exam[];
+}
+
+const Course: React.FC<CourseProps> = (props) => {
+  const {
+    course,
+    exams,
+  } = props;
   return (
     <div>
       <h2>{course.name}</h2>
       <ul>
-        {exams.map((e) => {
-          const url = route(e.id);
-          return (
-            <li key={e.id}>
-              <a
-                href={url}
-              >
-                {e.name}
-              </a>
-            </li>
-          );
-        })}
+        {exams.map((e) => (
+          <Exam key={e.id} exam={e} />
+        ))}
       </ul>
     </div>
   );
@@ -63,17 +79,15 @@ export type Role = 'student' | 'proctor' | 'professor';
 
 interface OverviewProps {
   exams: {
-    [id: number]: Exam[];
+    [courseId: number]: Exam[];
   };
   courses: Course[];
-  role: Role;
 }
 
 const Overview: React.FC<OverviewProps> = (props) => {
   const {
     exams,
     courses,
-    role,
   } = props;
   return (
     <div>
@@ -83,7 +97,6 @@ const Overview: React.FC<OverviewProps> = (props) => {
           key={c.id}
           course={c}
           exams={exams[c.id]}
-          role={role}
         />
       ))}
     </div>

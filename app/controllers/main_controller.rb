@@ -6,12 +6,20 @@ class MainController < ApplicationController
     end
 
     registrations = current_user.registrations
-    @exams =
+    exams =
       registrations
-      .map(&:exam)
-      .keep_if(&:enabled?)
-      .map { |e| e.slice(:name, :id, :course_id) }
-      .group_by { |e| e[:course_id] }
+      .map do |r|
+        e = r.exam
+        return nil unless e.enabled?
+
+        {
+          name: e.name,
+          id: e.id,
+          role: r.role,
+          courseId: e.course_id
+        }
+      end.compact
+    @exams = exams.group_by { |e| e[:courseId] }
     @courses =
       @exams.keys.map do |course_id|
         bottlenose_token.get("/api/courses/#{course_id}").parsed

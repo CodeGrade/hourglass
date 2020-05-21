@@ -1,4 +1,4 @@
-import { sleep } from '@student/exams/show/helpers';
+import { sleep } from '@hourglass/common/helpers';
 
 export function isCovered(): boolean {
   return window.screenLeft === 0 && window.screenTop === 0;

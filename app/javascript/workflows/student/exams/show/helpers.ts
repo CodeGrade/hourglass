@@ -61,14 +61,6 @@ export function scrollToQuestion(qnum: number, pnum?: number, smooth?: boolean):
   }
 }
 
-/**
- * Returns a promise that sleeps for the specified duration before resolving.
- * @param milis duration in miliseconds
- */
-export function sleep(milis: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, milis));
-}
-
 export function convertMsgs(msgs: RailsExamMessage[]): ExamMessage[] {
   return msgs.map((m) => ({
     ...m,

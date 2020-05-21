@@ -21,7 +21,7 @@ class Proctor::RegistrationsController < ProctorController
 
   def finalize
     @registration = Registration.find(params[:registration_id])
-    @registration.update(:final, true)
+    @registration.update(final: true)
     redirect_back fallback_location: proctor_exam_path(@exam)
   end
 end

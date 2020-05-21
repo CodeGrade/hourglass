@@ -2,7 +2,20 @@ class Professor::ExamsController < ProfessorController
   before_action -> { find_exam(params[:id]) }, except: [:new, :create]
   before_action :require_current_user_registration, except: [:new, :create]
 
-  def new; end
+  def new
+    semesters =
+      begin
+        bottlenose_token.get('/api/courses').parsed
+      rescue StandardError
+        []
+      end
+    @courses = semesters.map do |s|
+      s['courses'].collect do |c|
+        [c['name'], c['id']]
+      end
+    end.flatten(1)
+    pp @courses
+  end
 
   def create
     # TODO handle course_id and make sure prof is registered for the course before creating

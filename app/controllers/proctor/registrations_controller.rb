@@ -15,8 +15,8 @@ class Proctor::RegistrationsController < ProctorController
 
   def clear_anomalies
     @registration = Registration.find(params[:registration_id])
-    @registration.anomalies.destroy_all!
-    redirect_back fallback_location: exam_path(@exam), notice: 'Anomalies cleared.'
+    @registration.anomalies.destroy_all
+    redirect_back fallback_location: proctor_exam_path(@exam), notice: 'Anomalies cleared.'
   end
 
   def finalize

@@ -1,6 +1,5 @@
 class Professor::ExamsController < ProfessorController
   before_action -> { find_exam(params[:id]) }, except: [:new, :create]
-  before_action :require_exam_enabled, except: [:new, :create]
   before_action :require_current_user_registration, except: [:new, :create]
 
   def new; end
@@ -31,6 +30,9 @@ class Professor::ExamsController < ProfessorController
     redirect_to @exam
   end
   
-  def show
-  end
+  def show; end
+
+  def edit; end
+
+  def update; end
 end

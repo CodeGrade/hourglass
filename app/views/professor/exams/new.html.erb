@@ -1,2 +1,8 @@
 <% @keepnavbar = true %>
 TODO new exam component
+<%= bootstrap_form_for Exam.new, url: professor_exams_path do |f| %>
+  <%= f.text_field :name %>
+  <%= f.check_box :enabled %>
+  <%= f.file_field :file %>
+  <%= f.submit %>
+<% end %>

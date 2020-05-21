@@ -8,7 +8,7 @@ import {
 } from '@student/exams/show/types';
 import { ExamContext } from '@student/exams/show/context';
 import { firstFile, getFilesForRefs } from '@student/exams/show/files';
-import { ExhaustiveSwitchError } from '@student/exams/show/helpers';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Editor } from './ExamCodeBox';
 
 interface FilesProps {

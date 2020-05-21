@@ -2,7 +2,7 @@ import React from 'react';
 import { MdLock, MdLockOpen } from 'react-icons/md';
 import { LockdownStatus } from '@student/exams/show/types';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import { ExhaustiveSwitchError } from '@student/exams/show/helpers';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Icon from '@student/exams/show/components/Icon';
 
 interface LockdownInfoProps {

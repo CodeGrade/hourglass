@@ -2,7 +2,7 @@ import React from 'react';
 import { SnapshotStatus } from '@student/exams/show/types';
 import { MdCloudDone, MdError } from 'react-icons/md';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import { ExhaustiveSwitchError } from '@student/exams/show/helpers';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Icon from '@student/exams/show/components/Icon';
 import { AiOutlineLoading } from 'react-icons/ai';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import Routes from '@hourglass/routes';
-import { ExhaustiveSwitchError } from '../student/exams/show/helpers';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 interface Exam {
   id: number;

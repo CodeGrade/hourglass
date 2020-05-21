@@ -8,7 +8,7 @@ import MultipleChoice from '@student/exams/show/containers/questions/MultipleCho
 import AllThatApply from '@student/exams/show/containers/questions/AllThatApply';
 import { BodyItem } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
-import { ExhaustiveSwitchError } from '@student/exams/show/helpers';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 export interface BodyProps {
   body: BodyItem;

@@ -13,7 +13,7 @@ import {
   CodeState, TextState, YesNoState, MultipleChoiceState,
   MatchingState, AllThatApplyState, CodeTagState,
 } from '@student/exams/show/types';
-import { ExhaustiveSwitchError } from '@student/exams/show/helpers';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 const DisplayBody: React.FC<BodyProps> = (props) => {
   const {

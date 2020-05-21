@@ -8,7 +8,7 @@ import {
   ProfQuestionStatus,
 } from '@student/exams/show/types';
 import { RailsContext } from '@student/exams/show/context';
-import { ExhaustiveSwitchError } from '@student/exams/show/helpers';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { IconType } from 'react-icons';
 import {
   MdCloudDone,

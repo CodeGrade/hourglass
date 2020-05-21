@@ -36,7 +36,7 @@
                   <% if reg.anomalous? %>
                     <br>
                     <span class="col-12">
-                      <%= link_to "Clear", exam_registration_clear_anomalies_path(@exam, reg), class: "col-4 btn btn-success", method: :post, data: {confirm: "Are you sure you want to allow this student to continue?"} %>
+                      <%= link_to "Clear", proctor_exam_registration_clear_anomalies_path(@exam, reg), class: "col-4 btn btn-success", method: :post, data: {confirm: "Are you sure you want to allow this student to continue?"} %>
                       <%= link_to "Finalize", proctor_exam_registration_finalize_path(@exam, reg), class: "col-4 btn btn-danger", method: :post, data: {confirm: "Are you sure you want to finalize this student's submission?"} %>
                     </span>
                   <% else %>

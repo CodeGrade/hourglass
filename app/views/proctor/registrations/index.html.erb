@@ -1,5 +1,5 @@
 <% @keepnavbar = true %>
 <% @page_title = "#{@exam.name} Registrations" %>
 <h2><%= @page_title %></h2>
-<p><%= link_to "Proctor exam", proctor_exam_path(@exam), class: "btn btn-info" %></p>
+<p><%= link_to "Back to proctoring", proctor_exam_path(@exam), class: "btn btn-info" %></p>
 <%= render 'table', registrations: @registrations, exam: @exam %>

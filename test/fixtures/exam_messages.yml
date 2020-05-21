@@ -1,7 +1,7 @@
-ben_announcement:
+prof_announcement:
   id: 1
   exam: cs2500midterm
-  sender: ben
+  sender: prof
   body: "Hello all students, welcome to cs2500 midterm one!"
 
 kyle_question:
@@ -13,6 +13,6 @@ kyle_question:
 kyle_question_response:
   id: 3
   exam: cs2500midterm
-  sender: ben
+  sender: prof
   recipient: kyle
   body: "I can't just tell you the answers..."

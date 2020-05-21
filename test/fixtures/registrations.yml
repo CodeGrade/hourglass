@@ -1,6 +1,6 @@
-benReg:
+profReg:
   exam: cs2500midterm
-  user: ben
+  user: prof
   room: cs2500_room1
   role: <%= Registration::roles[:professor] %>
   final: false

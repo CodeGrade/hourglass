@@ -1,0 +1,7 @@
+<% @page_title = "Proctor #{@exam.name}" %>
+<% @keepnavbar = true %>
+<div>
+  TODO proctoring component for <%= @exam.name %>
+</div>
+
+<%= link_to "Registrations", ['proctor', @exam, 'registrations'], class: "btn btn-info" %>

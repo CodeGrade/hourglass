@@ -13,9 +13,9 @@
     "baseUrl": "app/javascript",
     "paths": {
       "@hourglass/*": ["./*"],
-      "@examTaker/*": ["./workflows/examTaker/*"],
-      "@examGrader/*": ["./workflows/examGrader/*"],
-      "@examCreator/*": ["./workflows/examCreator/*"]
+      "@student/*": ["./workflows/student/*"],
+      "@proctor/*": ["./workflows/proctor/*"],
+      "@professor/*": ["./workflows/professor/*"]
     }
   },
   "exclude": ["**/*.spec.ts", "node_modules", "vendor", "public"],

@@ -3,6 +3,7 @@
 class Exam < ApplicationRecord
   has_many :registrations
   has_many :users, through: :registrations
+  has_many :anomalies, through: :registrations
   has_many :rooms
   has_many :exam_messages
 

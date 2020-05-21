@@ -2,16 +2,53 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
 
   rescue_from DoubleLoginException do |e|
-    redirect_to root_path, alert: "You are currently logged into another session."
+    redirect_to root_path, alert: 'You are currently logged into another session.'
   end
 
   def after_sign_in_path_for(resource)
     params[:next] || super
   end
 
+  def find_exam(id = params[:exam_id])
+    return unless @exam.nil?
+
+    @exam ||= Exam.find(id)
+    if @exam.nil?
+      redirect_back fallback_location :root_path, alert: 'No such exam.'
+    end
+  end
+
+  def require_current_user_registration
+    return unless @registration.nil?
+
+    find_exam
+
+    @registration ||= Registration.find_by(user: current_user, exam: @exam)
+    if @registration.nil?
+      redirect_back fallback_location: root_path, alert: 'You are not registered for that exam.'
+    end
+  end
+
+  def require_current_user_registration_proctor
+    find_exam
+    require_current_user_registration
+
+    return if @registration.professor?
+
+    unless @registration&.proctor?
+      redirect_back fallback_location :root_path, alert: 'You are not registered to proctor that exam.'
+    end
+  end
+
+  def require_exam_enabled
+    unless @exam&.enabled?
+      redirect_back fallback_location: root_path, alert: 'This exam has not been enabled yet.'
+    end
+  end
+
   def require_current_user
     if current_user.nil?
-      redirect_to new_user_session_path(next: request.fullpath), alert: "You need to log in first."
+      redirect_to new_user_session_path(next: request.fullpath), alert: 'You need to log in first.'
       return false
     end
     true

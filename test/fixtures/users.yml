@@ -6,11 +6,11 @@ admin:
   encrypted_password: <%= Devise::Encryptor.digest(User, 'admin') %>
   role: <%= User::roles[:admin] %>
 
-ben:
-  username: "ben"
-  email: "ben@localhost"
-  display_name: "Benjamin"
-  encrypted_password: <%= Devise::Encryptor.digest(User, 'ben') %>
+prof:
+  username: "prof"
+  email: "prof@localhost"
+  display_name: "Professor"
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'prof') %>
   role: <%= User::roles[:professor] %>
 
 amit:

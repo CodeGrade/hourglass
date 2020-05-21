@@ -1,8 +1,0 @@
-<% @keepnavbar = true %>
-
-<%= bootstrap_form_for(@exam) do |f| %>
-  <%= f.text_field :name %>
-  <%= f.check_box :enabled %>
-  <%= f.file_field :file %>
-  <%= f.submit %>
-<% end %>

@@ -1,11 +1,10 @@
 import React from 'react';
 import Routes from '@hourglass/routes';
-import {ExhaustiveSwitchError} from '../student/helpers';
+import { ExhaustiveSwitchError } from '../student/helpers';
 
 interface Exam {
   id: number;
   name: string;
-  course_id: number;
 }
 
 interface Course {

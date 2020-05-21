@@ -1,5 +1,0 @@
-<% @keepnavbar = true %>
-<% @page_title = "#{@exam.name} Registrations" %>
-<h2><%= @page_title %></h2>
-<p><%= link_to "View exam", @exam, class: "btn btn-info" %></p>
-<%= render 'registrations/table', registrations: @registrations, exam: @exam %>

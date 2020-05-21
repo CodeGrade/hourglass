@@ -26,7 +26,7 @@
            end
         %>
         <tr class="<%= row_class %>" data-toggle="tooltip" title="<%= row_title %>">
-          <td class="align-middle"><%= link_to "View", [exam, reg], class: "btn btn-info" %></td>
+          <td class="align-middle"><%= link_to "View", ['proctor', exam, reg], class: "btn btn-info" %></td>
           <td class="align-middle"><%= reg.user.display_name %></td>
           <td class="align-middle"><%= reg.role %></td>
           <td class="align-middle">
@@ -37,15 +37,15 @@
                     <br>
                     <span class="col-12">
                       <%= link_to "Clear", exam_registration_clear_anomalies_path(@exam, reg), class: "col-4 btn btn-success", method: :post, data: {confirm: "Are you sure you want to allow this student to continue?"} %>
-                      <%= link_to "Finalize", exam_registration_finalize_path(@exam, reg), class: "col-4 btn btn-danger", method: :post, data: {confirm: "Are you sure you want to finalize this student's submission?"} %>
+                      <%= link_to "Finalize", proctor_exam_registration_finalize_path(@exam, reg), class: "col-4 btn btn-danger", method: :post, data: {confirm: "Are you sure you want to finalize this student's submission?"} %>
                     </span>
                   <% else %>
-                      <%= link_to "Finalize", exam_registration_finalize_path(@exam, reg), class: "col-8 btn btn-outline-secondary", method: :post, data: {confirm: "Are you sure you want to finalize this student's submission?"} %>
+                      <%= link_to "Finalize", proctor_exam_registration_finalize_path(@exam, reg), class: "col-8 btn btn-outline-secondary", method: :post, data: {confirm: "Are you sure you want to finalize this student's submission?"} %>
                   <% end %>
                 <% end %>
               </span>
           </td>
-          <td class="align-middle"><%= link_to reg.room.name, [exam, reg.room] %></td>
+          <td class="align-middle"><%= link_to reg.room.name, ['proctor', exam, reg.room] %></td>
         </tr>
       <% end %>
     </table>

@@ -14,7 +14,7 @@ Rails.application.routes.draw do
       post :finalize
       resources :anomalies, only: [:index, :destroy]
 
-      resources :registrations, only: [] do
+      resources :registrations, only: [:index, :show] do
         post :clear_anomalies
         post :finalize
       end

@@ -30,11 +30,8 @@ class ApplicationController < ActionController::Base
   end
 
   def require_current_user_registration_proctor
-    return unless @registration.nil?
-
     find_exam
-
-    @registration ||= Registration.find_by(user: current_user, exam: @exam)
+    require_current_user_registration
 
     return if @registration.professor?
 

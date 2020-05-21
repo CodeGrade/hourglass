@@ -41,9 +41,9 @@ class Student::ExamsController < StudentController
   end
 
   def save_snapshot
-    permitted = params.permit(:id, :lastMessageId, exam: {}, answers: {})
-    last_message_id = permitted[:lastMessageId]
-    answers = permitted[:answers].to_h
+    permitted = params.permit(:lastMessageId, :exam_id, answers: {}, exam: {})
+    last_message_id = permitted.require(:lastMessageId)
+    answers = permitted.require(:answers).to_h
     lockout = save_answers(answers)
     render({
       json: {

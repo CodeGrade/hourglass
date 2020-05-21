@@ -10,7 +10,7 @@ class MainController < ApplicationController
       registrations
       .map do |r|
         e = r.exam
-        return nil unless e.enabled?
+        next unless e.enabled?
 
         {
           name: e.name,

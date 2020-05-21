@@ -18,19 +18,23 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def require_current_user_registration(exam_id = params[:id])
+  def require_current_user_registration
     return unless @registration.nil?
 
-    @registration ||= Registration.find_by(user: current_user, exam_id: exam_id)
+    find_exam
+
+    @registration ||= Registration.find_by(user: current_user, exam: @exam)
     if @registration.nil?
       redirect_back fallback_location: root_path, alert: 'You are not registered for that exam.'
     end
   end
 
-  def require_current_user_registration_proctor(exam_id = params[:id])
+  def require_current_user_registration_proctor
     return unless @registration.nil?
 
-    @registration ||= Registration.find_by(user: current_user, exam_id: exam_id)
+    find_exam
+
+    @registration ||= Registration.find_by(user: current_user, exam: @exam)
 
     return if @registration.professor?
 

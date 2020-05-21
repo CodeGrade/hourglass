@@ -18,14 +18,15 @@ class Professor::ExamsController < ProfessorController
   end
 
   def create
-    # TODO handle course_id and make sure prof is registered for the course before creating
-    exam_params = params.require(:exam).permit(:name, :file, :enabled)
+    # TODO make sure prof is registered for the course in BN before creating
+    exam_params = params.require(:exam).permit(:name, :file, :course_id, :enabled)
     file = exam_params[:file]
     upload = Upload.new(file)
     Audit.log("Uploaded file #{file.original_filename} for #{current_user.username} (#{current_user.id})")
     @exam = Exam.new(
       name: exam_params[:name],
       enabled: exam_params[:enabled],
+      course_id: exam_params[:course_id],
       info: upload.info,
       files: upload.files
     )
@@ -40,7 +41,7 @@ class Professor::ExamsController < ProfessorController
       role: current_user.role.to_s,
       room: room
     )
-    redirect_to @exam
+    redirect_to ['professor', @exam]
   end
   
   def show; end

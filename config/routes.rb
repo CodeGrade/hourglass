@@ -12,8 +12,7 @@ Rails.application.routes.draw do
   namespace :proctor do
     resources :exams, only: [:show] do
       post :finalize
-
-      resources :anomalies, only: [:show, :index, :destroy]
+      resources :anomalies, only: [:index, :destroy]
 
       resources :registrations, only: [] do
         post :clear_anomalies

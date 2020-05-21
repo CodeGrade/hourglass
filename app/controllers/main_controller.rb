@@ -24,7 +24,12 @@ class MainController < ApplicationController
       @exams.keys.map do |course_id|
         bottlenose_token.get("/api/courses/#{course_id}").parsed
       rescue StandardError
-        nil
+        if Rails.env.development?
+          {
+            id: course_id,
+            name: "DEV COURSE (id: #{course_id})"
+          }
+        end
       end.compact
     @role = current_user.role
   end

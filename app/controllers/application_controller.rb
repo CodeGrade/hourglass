@@ -6,7 +6,7 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_in_path_for(resource)
-    params[:next] || super
+    stored_location_for(resource) || super
   end
 
   def find_exam(id = params[:exam_id])
@@ -48,7 +48,8 @@ class ApplicationController < ActionController::Base
 
   def require_current_user
     if current_user.nil?
-      redirect_to new_user_session_path(next: request.fullpath), alert: 'You need to log in first.'
+      store_user_location! if storable_location?
+      redirect_to new_user_session_path, alert: 'You need to log in first.'
       return false
     end
     true
@@ -89,5 +90,19 @@ class ApplicationController < ActionController::Base
       ENV.fetch("BOTTLENOSE_APP_SECRET"),
       site: ENV.fetch("BOTTLENOSE_URL")
     )
+  end
+
+  # Its important that the location is NOT stored if:
+  # - The request method is not GET (non idempotent)
+  # - The request is handled by a Devise controller such as Devise::SessionsController as that could cause an
+  #    infinite redirect loop.
+  # - The request is an Ajax request as this can lead to very unexpected behaviour.
+  def storable_location?
+    request.get? && is_navigational_format? && !devise_controller? && !request.xhr?
+  end
+
+  def store_user_location!
+    # :user is the scope we are authenticating
+    store_location_for(:user, request.fullpath)
   end
 end

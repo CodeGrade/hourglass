@@ -1,5 +1,5 @@
 import React from 'react';
-import { QuestionInfo } from '@student/types';
+import { QuestionInfo } from '@student/exams/show/types';
 import ShowQuestion from '@proctor/registrations/show/ShowQuestion';
 
 interface DisplayQuestionsProps {

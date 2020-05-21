@@ -1,5 +1,5 @@
 import React from 'react';
-import { MultipleChoiceInfo, MultipleChoiceState } from '@student/types';
+import { MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
 
 interface MultipleChoiceProps {
   info: MultipleChoiceInfo;

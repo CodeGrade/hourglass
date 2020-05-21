@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { FileRef, CodeTagInfo, CodeTagState } from '@student/types';
+import { FileRef, CodeTagInfo, CodeTagState } from '@student/exams/show/types';
 import {
   Row, Col, Modal, Button,
 } from 'react-bootstrap';
-import { ControlledFileViewer } from '@student/components/FileViewer';
-import HTML from '@student/components/HTML';
-import { CodeTagVal } from '@student/components/questions/CodeTag';
+import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
+import HTML from '@student/exams/show/components/HTML';
+import { CodeTagVal } from '@student/exams/show/components/questions/CodeTag';
 
 
 interface FileModalProps {

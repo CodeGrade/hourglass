@@ -1,19 +1,19 @@
 import React, { useContext } from 'react';
-import { ExamViewerContext } from '@student/context';
-import Code from '@student/components/questions/Code';
+import { ExamViewerContext } from '@student/exams/show/context';
+import Code from '@student/exams/show/components/questions/Code';
 import DisplayYesNoInput from '@proctor/registrations/show/questions/DisplayYesNo';
 import DisplayCodeTag from '@proctor/registrations/show/questions/DisplayCodeTag';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
-import HTML from '@student/components/HTML';
-import { BodyProps } from '@student/components/Body';
+import HTML from '@student/exams/show/components/HTML';
+import { BodyProps } from '@student/exams/show/components/Body';
 import {
   CodeState, TextState, YesNoState, MultipleChoiceState,
   MatchingState, AllThatApplyState, CodeTagState,
-} from '@student/types';
-import { ExhaustiveSwitchError } from '@student/helpers';
+} from '@student/exams/show/types';
+import { ExhaustiveSwitchError } from '@student/exams/show/helpers';
 
 const DisplayBody: React.FC<BodyProps> = (props) => {
   const {

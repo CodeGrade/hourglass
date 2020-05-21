@@ -1,5 +1,5 @@
 import React from 'react';
-import { YesNoInfo } from '@student/types';
+import { YesNoInfo } from '@student/exams/show/types';
 
 export interface YesNoProps {
   info: YesNoInfo;

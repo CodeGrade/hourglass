@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Row, Col, Table,
 } from 'react-bootstrap';
-import { MatchingInfo, MatchingState } from '@student/types';
+import { MatchingInfo, MatchingState } from '@student/exams/show/types';
 
 interface MatchingProps {
   info: MatchingInfo;

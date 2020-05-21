@@ -1,8 +1,8 @@
 import React from 'react';
-import { QuestionInfo } from '@student/types';
-import HTML from '@student/components/HTML';
+import { QuestionInfo } from '@student/exams/show/types';
+import HTML from '@student/exams/show/components/HTML';
 import Part from '@proctor/registrations/show/Part';
-import { FileViewer } from '@student/components/FileViewer';
+import { FileViewer } from '@student/exams/show/components/FileViewer';
 
 interface ShowQuestionProps {
   question: QuestionInfo;

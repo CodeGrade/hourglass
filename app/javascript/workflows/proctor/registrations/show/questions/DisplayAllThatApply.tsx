@@ -1,5 +1,5 @@
 import React from 'react';
-import { AllThatApplyInfo, AllThatApplyState } from '@student/types';
+import { AllThatApplyInfo, AllThatApplyState } from '@student/exams/show/types';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;

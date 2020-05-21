@@ -7,34 +7,19 @@ import HTML from '@student/exams/show/components/HTML';
 
 interface TextProps {
   info: TextInfo;
-  value?: TextState;
+  value: TextState;
+  onChange: (newVal: TextState) => void;
+  disabled: boolean;
 }
 
 const Text: React.FC<TextProps> = (props) => {
   const {
     info,
     value,
+    onChange,
+    disabled,
   } = props;
   const { prompt } = info;
-  let theRest;
-  if (!value) {
-    theRest = (
-      <>
-        <b>Answer: </b>
-        <i>No answer given</i>
-      </>
-    );
-  } else {
-    theRest = (
-      <Form.Control
-        disabled
-        as="textarea"
-        rows={3}
-        placeholder="Enter your answer here."
-        value={value}
-      />
-    );
-  }
   return (
     <>
       <Row>
@@ -51,7 +36,17 @@ const Text: React.FC<TextProps> = (props) => {
       </Row>
       <Row>
         <Col>
-          {theRest}
+          <Form.Control
+            disabled={disabled}
+            as="textarea"
+            rows={3}
+            placeholder="Enter your answer here."
+            value={value}
+            onChange={(e): void => {
+              const elem = e.target as HTMLTextAreaElement;
+              onChange(elem.value);
+            }}
+          />
         </Col>
       </Row>
     </>

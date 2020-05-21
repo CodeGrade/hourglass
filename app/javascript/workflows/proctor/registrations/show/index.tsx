@@ -1,11 +1,11 @@
 import React from 'react';
-import { RailsExam, ContentsState } from '@student/types';
-import HTML from '@student/components/HTML';
-import { ExamContext, ExamViewerContext, RailsContext } from '@student/context';
-import { createMap } from '@student/files';
+import { RailsExam, ContentsState } from '@student/exams/show/types';
+import HTML from '@student/exams/show/components/HTML';
+import { ExamContext, ExamViewerContext, RailsContext } from '@student/exams/show/context';
+import { createMap } from '@student/exams/show/files';
 import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
-import { FileViewer } from '@student/components/FileViewer';
-import Scratch from '@student/components/navbar/Scratch';
+import { FileViewer } from '@student/exams/show/components/FileViewer';
+import Scratch from '@student/exams/show/components/navbar/Scratch';
 
 interface ExamViewerProps {
   railsExam: RailsExam;

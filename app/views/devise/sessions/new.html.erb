@@ -11,7 +11,7 @@
 </div>
 
 <% if Rails.env.development? %>
-  <%= bootstrap_form_for(resource, as: resource_name, url: session_path(resource_name, next: params[:next])) do |f| %>
+  <%= bootstrap_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
     <div class="form-signin text-center">
       <h1 class="h4 mb-4 font-weight-normal">DEV LOGIN</h1>
       <%= f.text_field :username, class: "form-control", autofocus: true, hide_label: true, placeholder: "Username", id: "username" %>

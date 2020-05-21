@@ -8,8 +8,8 @@
         <p><%= link_to "Show anomalies", exam_registration_anomalies_path(@registration.exam, @registration), class: "btn btn-danger" %></p>
       <% end %>
       <p><%= link_to "View exam registrations", proctor_exam_registrations_path(@registration.exam), class: "btn btn-info" %></p>
-      <p><%= link_to "View exam", ['proctor', @registration.exam], class: "btn btn-info" %></p>
-      <p><%= link_to "View room", ['proctor', @exam, @registration.room], class: "btn btn-info" %></p>
+      <p><%= link_to "View exam", proctor_exam_path(@registration.exam), class: "btn btn-info" %></p>
+      <p><%= link_to "View room", proctor_exam_room_path(@exam, @registration.room), class: "btn btn-info" %></p>
     </div>
     <p>Registration for <i><%= @registration.user.display_name %></i>.</p>
     <p>Updated at <i><%= @registration.updated_at %></i>.</p>

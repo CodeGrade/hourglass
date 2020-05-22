@@ -20,7 +20,7 @@ const RegularNavbar: React.FC<RegularNavbarProps> = (props) => {
   return (
     <Navbar
       bg="light"
-      expand="lg"
+      expand="md"
       fixed="top"
     >
       <Navbar.Brand

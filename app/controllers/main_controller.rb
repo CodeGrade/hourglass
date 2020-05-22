@@ -22,7 +22,7 @@ class MainController < ApplicationController
     @exams = exams.group_by { |e| e[:courseId] }
     @courses =
       @exams.map do |course_id, course_exams|
-        bottlenose_token.get('/api/courses', course_id: course_id).parsed.merge(
+        bottlenose_token.get("/api/courses/#{course_id}").parsed.merge(
           {
             createExams: current_user_professor_for_course(course_id)
           }

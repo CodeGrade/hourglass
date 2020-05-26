@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
 
   create_table "anomalies", force: :cascade do |t|
     t.bigint "registration_id", null: false
-    t.string "reason", null: false
+    t.string "reason", default: "", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["registration_id"], name: "index_anomalies_on_registration_id"
@@ -35,6 +35,8 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   create_table "exam_announcements", force: :cascade do |t|
     t.bigint "exam_id", null: false
     t.text "body", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["exam_id"], name: "index_exam_announcements_on_exam_id"
   end
 
@@ -55,6 +57,8 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.bigint "sender_id", null: false
     t.bigint "recipient_id", null: false
     t.text "body", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["exam_id", "recipient_id"], name: "index_messages_on_exam_id_and_recipient_id"
     t.index ["exam_id"], name: "index_messages_on_exam_id"
     t.index ["recipient_id"], name: "index_messages_on_recipient_id"
@@ -75,6 +79,8 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   create_table "professor_course_registrations", force: :cascade do |t|
     t.bigint "course_id", null: false
     t.bigint "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["course_id", "user_id"], name: "index_professor_course_registrations_on_course_id_and_user_id", unique: true
     t.index ["course_id"], name: "index_professor_course_registrations_on_course_id"
     t.index ["user_id", "course_id"], name: "index_professor_course_registrations_on_user_id_and_course_id", unique: true
@@ -85,6 +91,8 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.bigint "exam_id", null: false
     t.bigint "sender_id", null: false
     t.text "body", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["exam_id"], name: "index_questions_on_exam_id"
     t.index ["sender_id"], name: "index_questions_on_sender_id"
   end
@@ -104,6 +112,8 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   create_table "room_announcements", force: :cascade do |t|
     t.bigint "room_id", null: false
     t.text "body", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["room_id"], name: "index_room_announcements_on_room_id"
   end
 
@@ -118,6 +128,8 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   create_table "sections", force: :cascade do |t|
     t.bigint "course_id", null: false
     t.string "title", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["course_id"], name: "index_sections_on_course_id"
   end
 

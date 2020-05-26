@@ -33,17 +33,17 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.references :course, null: false, foreign_key: true
 
       t.string :title, null: false
+      t.timestamps
     end
 
-    # registrations for professors to a course
     create_table :professor_course_registrations do |t|
       t.references :course, null: false, foreign_key: true
       t.references :user, null: false, foreign_key: true
       t.index [:course_id, :user_id], unique: true
       t.index [:user_id, :course_id], unique: true
+      t.timestamps
     end
 
-    # registrations for students to a section
     create_table :student_registrations do |t|
       t.references :section, null: false, foreign_key: true
       t.references :user, null: false, foreign_key: true
@@ -53,7 +53,6 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
-    # registrations for staff to a section
     create_table :staff_registrations do |t|
       t.references :section, null: false, foreign_key: true
       t.references :user, null: false, foreign_key: true
@@ -84,7 +83,6 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
-    # room regs for exam-taking students
     create_table :registrations do |t|
       t.references :user, null: false, foreign_key: true
       t.references :room, null: false, foreign_key: true
@@ -96,7 +94,6 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
-    # room regs for proctors
     create_table :proctor_registrations do |t|
       t.references :user, null: false, foreign_key: true
       t.references :room, null: false, foreign_key: true
@@ -106,29 +103,27 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
-    # anomalies for student registrations
     create_table :anomalies do |t|
       t.references :registration, null: false, foreign_key: true
-      t.string :reason, null: false
+      t.string :reason, null: false, default: ''
 
       t.timestamps
     end
 
-    # messages from professors to all students taking exam
     create_table :exam_announcements do |t|
       t.references :exam, null: false, foreign_key: true
-
       t.text :body, null: false
+
+      t.timestamps
     end
 
-    # messages from professors to all students in an exam room
     create_table :room_announcements do |t|
       t.references :room, null: false, foreign_key: true
-
       t.text :body, null: false
+
+      t.timestamps
     end
 
-    # messages from professors to students
     create_table :messages do |t|
       t.references :exam, null: false, foreign_key: true
 
@@ -138,18 +133,18 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.index [:exam_id, :recipient_id]
 
       t.text :body, null: false
+      t.timestamps
     end
 
-    # questions from students during exam
     create_table :questions do |t|
       t.references :exam, null: false, foreign_key: true
 
       t.references :sender, null: false, foreign_key: { to_table: 'users' }
 
       t.text :body, null: false
+      t.timestamps
     end
 
-    # set of answers for student registrations
     create_table :snapshots do |t|
       t.references :registration, null: false, foreign_key: true
       t.jsonb :answers, null: false

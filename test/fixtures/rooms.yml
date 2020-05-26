@@ -1,6 +1,7 @@
-cs2500_room1:
+2500room1:
   exam: cs2500midterm
   name: "Richards 201"
-cs3500_room1:
+
+3500room1:
   exam: cs3500final
   name: "Robinson 411"

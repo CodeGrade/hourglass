@@ -6,4 +6,7 @@ class Snapshot < ApplicationRecord
 
   delegate :user, to: :registration
   delegate :exam, to: :registration
+
+  validates :registration, presence: true
+  validates :answers, presence: true
 end

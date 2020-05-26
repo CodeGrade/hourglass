@@ -1,8 +1,10 @@
 class Room < ApplicationRecord
   belongs_to :exam
-  has_many :registrations
+  has_many :registrations, dependent: :destroy
+  has_many :room_announcements, dependent: :destroy
 
-  validates_presence_of :name
+  validates :exam, presence: true
+  validates :name, presence: true
 
   def finalized?
     registrations.all?(&:final)

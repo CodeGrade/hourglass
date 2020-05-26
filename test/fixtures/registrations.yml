@@ -1,27 +1,9 @@
-profReg:
-  exam: cs2500midterm
-  user: prof
-  room: cs2500_room1
-  role: <%= Registration::roles[:professor] %>
+2500student:
+  user: 2500student
+  room: 2500room1
   final: false
 
-kyleReg:
-  exam: cs2500midterm
-  user: kyle
-  room: cs2500_room1
-  role: <%= Registration::roles[:student] %>
-  final: false
-
-amitReg:
-  exam: cs3500final
-  user: amit
-  room: cs3500_room1
-  role: <%= Registration::roles[:professor] %>
-  final: false
-
-tylerReg:
-  exam: cs3500final
-  user: tyler
-  room: cs3500_room1
-  role: <%= Registration::roles[:student] %>
+3500student:
+  user: 3500student
+  room: 3500room1
   final: false

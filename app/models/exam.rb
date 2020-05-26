@@ -1,11 +1,19 @@
 # frozen_string_literal: true
 
 class Exam < ApplicationRecord
-  has_many :registrations
+  belongs_to :course
+
+  has_many :registrations, dependent: :destroy
   has_many :users, through: :registrations
   has_many :anomalies, through: :registrations
-  has_many :rooms
-  has_many :exam_messages
+  has_many :rooms, dependent: :destroy
+  has_many :exam_announcements, dependent: :destroy
+  has_many :room_announcements, dependent: :destroy
+  has_many :messages, dependent: :destroy
+  has_many :questions, dependent: :destroy
+
+  validates :course, presence: true
+  validates :name, presence: true
 
   EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save.json').to_s
   validates :info, presence: true, json: {

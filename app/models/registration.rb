@@ -1,21 +1,21 @@
+# frozen_string_literal: true
+
+# Room registrations for exam-taking students.
 class Registration < ApplicationRecord
   belongs_to :user
-  belongs_to :exam
   belongs_to :room
 
-  has_many :anomalies
-  has_many :snapshots
+  has_many :anomalies, dependent: :destroy
+  has_many :snapshots, dependent: :destroy
 
-  # student takes exams
-  # grader just grades
-  # proctor can fix anomalies and finalize exams
-  enum role: [:student, :grader, :proctor, :professor]
+  validates :user, presence: true
+  validates :room, presence: true
 
-  def visible_to?(user)
-    reg = Registration.find_by(user: user, exam: exam)
-    return true if Registration::roles[reg.role] > Registration::roles[:grader]
+  delegate :exam, to: :room
 
-    self.user == user
+  def visible_to?(other_user)
+    # TODO if other user is a prof for the course or an admin
+    other_user == user
   end
 
   def anomalous?
@@ -26,16 +26,13 @@ class Registration < ApplicationRecord
     !(final? || anomalous?)
   end
 
-  def get_all_answers
-    snapshots.map(&:answers)
-  end
-
-  def get_current_answers
+  def current_answers
     snapshots.last&.answers || {}
   end
 
   def save_answers(answers)
-    json = get_current_answers
+    # TODO move to snapshots#create
+    json = current_answers
     return if json == answers
 
     Snapshot.create!(

@@ -1,0 +1,15 @@
+2500studentlec:
+  user: 2500student
+  section: 2500lec
+
+2500studentlab:
+  user: 2500student
+  section: 2500lab
+
+3500studentlec:
+  user: 3500student
+  section: 3500lec
+
+3500studentlab:
+  user: 3500student
+  section: 3500lab

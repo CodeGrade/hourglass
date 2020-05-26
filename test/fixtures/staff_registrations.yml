@@ -1,7 +1,7 @@
-2500proctorlec:
-  user: 2500proctor
-  section: 2500lec
+cs2500proctorlec:
+  user: cs2500proctor
+  section: cs2500lec
 
-3500proctorlab:
-  user: 3500proctor
-  section: 3500lab
+cs3500proctorlab:
+  user: cs3500proctor
+  section: cs3500lab

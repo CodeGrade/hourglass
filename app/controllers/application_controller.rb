@@ -1,8 +1,9 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
-  rescue_from DoubleLoginException do |e|
-    redirect_to root_path, alert: 'You are currently logged into another session.'
+  rescue_from DoubleLoginException do |_e|
+    redirect_to root_path,
+                alert: 'You are currently logged into another session.'
   end
 
   def after_sign_in_path_for(resource)
@@ -10,40 +11,100 @@ class ApplicationController < ActionController::Base
   end
 
   def find_exam(id = params[:exam_id])
+    @exam ||= @course&.exams&.find_by(id: id)
     return unless @exam.nil?
 
-    @exam ||= Exam.find(id)
-    if @exam.nil?
-      redirect_back fallback_location :root_path, alert: 'No such exam.'
-    end
+    redirect_back fallback_location: root_path, alert: 'No such exam.'
   end
 
-  def require_current_user_registration
+  def find_section(id = params[:section_id])
+    @section ||= @course&.sections&.find_by(id: id)
+    return unless @section.nil?
+
+    redirect_back fallback_location: root_path, alert: 'No such section.'
+  end
+
+  def find_room(id = params[:room_id])
+    @room ||= @exam&.rooms&.find_by(id: id)
+    return unless @room.nil?
+
+    redirect_back fallback_location: root_path, alert: 'No such room.'
+  end
+
+  def find_course(id = params[:course_id])
+    @course ||= Course.find_by(id: id)
+    return unless @course.nil?
+
+    redirect_back fallback_location: root_path, alert: 'No such course.'
+  end
+
+  def require_proctor_reg
+    @proctor_registration ||= ProctorRegistration.find_by(
+      user: current_user,
+      exam: @exam
+    )
+    return unless @proctor_registration.nil?
+
+    redirect_back fallback_location: root_path,
+                  alert: 'You are not registered to proctor that exam.'
+  end
+
+  def require_student_reg
+    @registration ||= Registration.find_by(
+      user: current_user,
+      room: @exam.rooms
+    )
     return unless @registration.nil?
 
-    find_exam
+    redirect_back fallback_location: root_path,
+                  alert: 'You are not registered to take that exam.'
+  end
 
-    @registration ||= Registration.find_by(user: current_user, exam: @exam)
+  def find_registration(id = params[:registration_id])
+    @registration ||= @room&.registrations&.find_by(id: id)
+
     if @registration.nil?
-      redirect_back fallback_location: root_path, alert: 'You are not registered for that exam.'
+      redirect_back fallback_location: root_path,
+                    alert: 'You are not registered to take that exam.'
+    end
+
+    if @registration.user != current_user
+      redirect_back fallback_location: root_path, alert: 'You do not have permission for that registration.'
     end
   end
 
-  def require_current_user_registration_proctor
-    find_exam
-    require_current_user_registration
+  def find_anomaly(id = params[:anomaly_id])
+    @anomaly ||= @registration&.anomalies&.find_by(id: id)
+    return unless @anomaly.nil?
+  end
 
-    return if @registration.professor?
+  def require_prof_reg
+    @professor_course_registration ||= ProfessorCourseRegistration.where(
+      user: current_user,
+      course: @course
+    )
+    return unless @professor_course_registration.nil?
 
-    unless @registration&.proctor?
-      redirect_back fallback_location :root_path, alert: 'You are not registered to proctor that exam.'
-    end
+    redirect_to root_path,
+                alert: 'Must be a registered professor for the course.'
+  end
+
+  def student_reg
+    @registration ||= Registration.where(
+      user: current_user,
+      exam: @exam
+    )
+    return unless @professor_course_registration.nil?
+
+    redirect_to root_path,
+                alert: 'You are not registered to take that exam.'
   end
 
   def require_exam_enabled
-    unless @exam&.enabled?
-      redirect_back fallback_location: root_path, alert: 'This exam has not been enabled yet.'
-    end
+    return if @exam&.enabled?
+
+    redirect_back fallback_location: root_path,
+                  alert: 'That exam is not enabled.'
   end
 
   def require_current_user
@@ -56,21 +117,32 @@ class ApplicationController < ActionController::Base
   end
 
   def require_admin
-    return unless require_current_user
+    require_current_user
+    return if current_user&.admin?
 
-    unless current_user&.admin?
-      redirect_to root_path, alert: "Must be an admin."
-      return
+    redirect_to root_path, alert: 'Must be an admin.'
+  end
+
+  module Bottlenose
+    class ApiError < RuntimeError
+      def initialize
+        super 'Bottlenose API error. Please report to a professor or site admin.'
+      end
+    end
+
+    class ConnectionFailed < RuntimeError
+      def initialize()
+        super 'Error contacting Bottlenose. Please report to a professor or site admin.'
+      end
     end
   end
 
-  def require_admin_or_prof
-    return unless require_current_user
-
-    unless current_user&.admin_or_prof?
-      redirect_to root_path, alert: "Must be an admin or professor."
-      return
-    end
+  def bottlenose_get(*args)
+    bottlenose_token.get(*args).parsed
+  rescue OAuth2::Error
+    raise Bottlenose::ApiError
+  rescue Faraday::ConnectionFailed
+    raise Bottlenose::ConnectionFailed
   end
 
   def bottlenose_token
@@ -80,26 +152,6 @@ class ApplicationController < ActionController::Base
           bottlenose_oauth_client, current_user.bottlenose_access_token
         )
       end
-  end
-
-  def require_current_user_professor_for_course(course_id = params[:exam][:course_id])
-    unless current_user_professor_for_course(course_id)
-      redirect_to root_path, alert: 'Must be a registered professor for the course.'
-    end
-  end
-
-  def current_user_professor_for_course(course_id)
-    return true if current_user&.admin?
-
-    # course_id needs to be a number
-    course_num = course_id.to_i
-    course =
-      begin
-        bottlenose_token.get("/api/courses/#{course_num}").parsed
-      rescue StandardError
-        return false
-      end
-    course['role'] == 'professor'
   end
 
   private

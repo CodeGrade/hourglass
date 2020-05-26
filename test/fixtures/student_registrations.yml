@@ -1,15 +1,15 @@
-2500studentlec:
-  user: 2500student
-  section: 2500lec
+cs2500studentlec:
+  user: cs2500student
+  section: cs2500lec
 
-2500studentlab:
-  user: 2500student
-  section: 2500lab
+cs2500studentlab:
+  user: cs2500student
+  section: cs2500lab
 
-3500studentlec:
-  user: 3500student
-  section: 3500lec
+cs3500studentlec:
+  user: cs3500student
+  section: cs3500lec
 
-3500studentlab:
-  user: 3500student
-  section: 3500lab
+cs3500studentlab:
+  user: cs3500student
+  section: cs3500lab

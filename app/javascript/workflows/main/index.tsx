@@ -1,124 +1,115 @@
 import React from 'react';
 import Routes from '@hourglass/routes';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { Button } from 'react-bootstrap';
+
+const TakeExamLink: React.FC<{
+  course: Course;
+  exam: Exam;
+}> = (props) => {
+  const {
+    course,
+    exam,
+  } = props;
+  const url = Routes.take_exam_path(course.id, exam.id);
+  return (
+    <a
+      href={url}
+    >
+      {exam.name}
+    </a>
+  );
+};
+
+interface StudentRegsProps {
+  regs: Reg[];
+  regInfo: RegInfo;
+}
+
+const StudentRegs: React.FC<StudentRegsProps> = (props) => {
+  const {
+    regs,
+    regInfo,
+  } = props;
+  return (
+    <>
+      <h1>Take an Exam</h1>
+      <ul>
+        {regs.map((reg) => {
+          const info = regInfo[reg.id];
+          return (
+            <li
+              key={reg.id}
+            >
+              <TakeExamLink
+                exam={info.exam}
+                course={info.course}
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+};
+
+interface ProctorRegsProps {
+  regs: Reg[];
+  regInfo: RegInfo;
+}
+
+const ProctorRegs: React.FC<ProctorRegsProps> = (props) => {
+  const {
+    regs,
+  } = props;
+  return (
+    <>
+      <h1>Proctor an Exam</h1>
+      <p>{JSON.stringify(regs)}</p>
+    </>
+  );
+};
+
+interface Reg {
+  id: number;
+}
 
 interface Exam {
   id: number;
   name: string;
-  courseId: number;
-  role: ExamRole;
 }
 
 interface Course {
   id: number;
-  name: string;
-  createExams: boolean;
 }
 
-interface ExamProps {
-  exam: Exam;
+interface RegInfo {
+  [regId: number]: {
+    exam: Exam;
+    course: Course;
+  };
 }
-
-const Exam: React.FC<ExamProps> = (props) => {
-  const {
-    exam,
-  } = props;
-  const {
-    id,
-    name,
-    role,
-  } = exam;
-  let route;
-  switch (role) {
-    case 'student':
-      route = Routes.student_exam_path;
-      break;
-    case 'proctor':
-      route = Routes.proctor_exam_path;
-      break;
-    case 'professor':
-      route = Routes.professor_exam_path;
-      break;
-    default:
-      throw new ExhaustiveSwitchError(role);
-  }
-  const url = route(id);
-  return (
-    <li>
-      <a
-        href={url}
-      >
-        {`${name} (${role})`}
-      </a>
-    </li>
-  );
-};
-
-interface CourseProps {
-  course: Course;
-  exams: Exam[];
-}
-
-const Course: React.FC<CourseProps> = (props) => {
-  const {
-    course,
-    exams,
-  } = props;
-  const {
-    createExams,
-  } = course;
-  return (
-    <div>
-      <h2>
-        {course.name}
-        {createExams && (
-          <Button
-            href={Routes.new_professor_exam_path()}
-            variant="success"
-            className="d-inline float-right"
-          >
-            New exam
-          </Button>
-        )}
-      </h2>
-      <ul>
-        {exams.map((e) => (
-          <Exam
-            key={e.id}
-            exam={e}
-          />
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-export type ExamRole = 'student' | 'proctor' | 'professor';
-export type UserRole = 'unprivileged' | 'professor' | 'admin';
 
 interface OverviewProps {
-  exams: {
-    [courseId: number]: Exam[];
+  regs: {
+    student: Reg[];
+    proctor: Reg[];
   };
-  courses: Course[];
+  regInfo: RegInfo;
 }
 
 const Overview: React.FC<OverviewProps> = (props) => {
   const {
-    exams,
-    courses,
+    regs: {
+      student,
+      proctor,
+    },
+    regInfo,
   } = props;
+  const hasStudentExams = student.length !== 0;
+  const hasProctorExams = proctor.length !== 0;
   return (
     <div>
-      <h1>My Exams</h1>
-      {courses.map((c) => (
-        <Course
-          key={c.id}
-          course={c}
-          exams={exams[c.id]}
-        />
-      ))}
+      {hasStudentExams && <StudentRegs regs={student} regInfo={regInfo} />}
+      {hasProctorExams && <ProctorRegs regs={proctor} regInfo={regInfo} />}
     </div>
   );
 };

@@ -12,9 +12,10 @@ class Registration < ApplicationRecord
   validates :room, presence: true
 
   delegate :exam, to: :room
+  delegate :course, to: :exam
 
   def visible_to?(other_user)
-    # TODO if other user is a prof for the course or an admin
+    # TODO: if other user is a prof for the course or an admin
     other_user == user
   end
 
@@ -31,7 +32,8 @@ class Registration < ApplicationRecord
   end
 
   def save_answers(answers)
-    # TODO move to snapshots#create
+    return false unless allow_submission?
+
     json = current_answers
     return if json == answers
 
@@ -39,5 +41,9 @@ class Registration < ApplicationRecord
       registration: self,
       answers: answers
     )
+  end
+
+  def serialize
+    slice(:id)
   end
 end

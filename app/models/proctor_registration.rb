@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Registrations for professors to a course.
+# Registrations for proctors to an exam.
 class ProctorRegistration < ApplicationRecord
   belongs_to :user
   belongs_to :room

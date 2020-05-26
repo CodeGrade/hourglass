@@ -1,15 +1,15 @@
-2500lec:
+cs2500lec:
   course: cs2500
   title: "Lecture (MWR 10:30-11:35)"
 
-2500lab:
+cs2500lab:
   course: cs2500
   title: "Lab (T 3:25-5:05)"
 
-3500lec:
+cs3500lec:
   course: cs3500
   title: "Lecture (TF 11:45-1:25)"
 
-3500lab:
+cs3500lab:
   course: cs3500
   title: "Lab (F 1:25-3:15)"

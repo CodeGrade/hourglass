@@ -6,38 +6,38 @@ admin:
   encrypted_password: <%= Devise::Encryptor.digest(User, 'admin') %>
   admin: true
 
-prof:
-  username: "2500prof"
-  email: "2500prof@localhost.localdomain"
-  display_name: "Fundies 1 Professor"
-  encrypted_password: <%= Devise::Encryptor.digest(User, '2500prof') %>
+cs2500prof:
+  username: "cs2500prof"
+  email: "cs2500prof@localhost.localdomain"
+  display_name: "CS2500 Professor"
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'cs2500prof') %>
 
-prof3500:
-  username: "3500prof"
-  email: "3500prof@localhost.localdomain"
-  display_name: "OOD Professor"
-  encrypted_password: <%= Devise::Encryptor.digest(User, '3500prof') %>
+cs3500prof:
+  username: "cs3500prof"
+  email: "cs3500prof@localhost.localdomain"
+  display_name: "CS3500 Professor"
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'cs3500prof') %>
 
-2500proctor:
-  username: "2500proctor"
-  email: "2500proctor@localhost.localdomain"
+cs2500proctor:
+  username: "cs2500proctor"
+  email: "cs2500proctor@localhost.localdomain"
   display_name: "CS2500 Proctor"
-  encrypted_password: <%= Devise::Encryptor.digest(User, '2500proctor') %>
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'cs2500proctor') %>
 
-3500proctor:
-  username: "3500proctor"
-  email: "3500proctor@localhost.localdomain"
+cs3500proctor:
+  username: "cs3500proctor"
+  email: "cs3500proctor@localhost.localdomain"
   display_name: "CS3500 Proctor"
-  encrypted_password: <%= Devise::Encryptor.digest(User, '3500proctor') %>
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'cs3500proctor') %>
 
-2500student:
-  username: "2500student"
-  email: "2500student@localhost.localdomain"
+cs2500student:
+  username: "cs2500student"
+  email: "cs2500student@localhost.localdomain"
   display_name: "CS2500 Student"
-  encrypted_password: <%= Devise::Encryptor.digest(User, '2500student') %>
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'cs2500student') %>
 
-3500student:
-  username: "3500student"
-  email: "3500student@localhost.localdomain"
+cs3500student:
+  username: "cs3500student"
+  email: "cs3500student@localhost.localdomain"
   display_name: "CS3500 Student"
-  encrypted_password: <%= Devise::Encryptor.digest(User, '3500student') %>
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'cs3500student') %>

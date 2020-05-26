@@ -6,7 +6,7 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import 'react-widgets/dist/css/react-widgets.css';
+// import 'react-widgets/dist/css/react-widgets.css';
 // import { NumberPicker } from 'react-widgets';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/containers/ShowBodyItems';

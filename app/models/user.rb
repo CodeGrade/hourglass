@@ -12,6 +12,8 @@ class User < ApplicationRecord
   validates :display_name, presence: true
   validates :email, presence: true
 
+  has_many :registrations, dependent: :destroy
+
   has_many :sent_messages,
            foreign_key: 'sender',
            class_name: 'Message',
@@ -42,6 +44,6 @@ class User < ApplicationRecord
   end
 
   def reg_for(exam)
-    registrations.find_by(exam: exam)
+    registrations.find_by(room: exam.rooms)
   end
 end

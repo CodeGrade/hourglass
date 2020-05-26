@@ -18,6 +18,7 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
     ready,
   } = props;
   const {
+    railsCourse,
     railsExam,
     railsUser,
   } = useContext(RailsContext);
@@ -31,6 +32,7 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
         >
           <Col>
             <ExamShowContents
+              railsCourse={railsCourse}
               railsExam={railsExam}
             />
           </Col>
@@ -44,6 +46,7 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
       />
       <Container>
         <PreStart
+          railsCourse={railsCourse}
           railsExam={railsExam}
         />
       </Container>

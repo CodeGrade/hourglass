@@ -14,7 +14,9 @@ Rails.application.routes.draw do
       end
       resources :exams, param: 'exam_id', only: [:new, :create, :edit, :update] do
         member do
-          get :take
+          get :take, to: 'exams#take'
+          post :take, to: 'exams#during'
+
           get :proctor
           post :finalize
           resources :rooms, param: 'room_id', only: [] do
@@ -22,12 +24,8 @@ Rails.application.routes.draw do
               post :finalize
               resources :registrations, param: 'registration_id', only: [:show] do
                 member do
-                  get :start
-                  post :submit
                   post :finalize
-                  resources :anomalies, param: 'anomaly_id', only: [:index, :create, :destroy]
-                  resources :snapshots, param: 'snapshot_id', only: [:create]
-                  resources :questions, param: 'question_id', only: [:create]
+                  resources :anomalies, param: 'anomaly_id', only: [:index, :destroy]
                 end
               end
             end

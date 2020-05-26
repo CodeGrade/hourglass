@@ -6,18 +6,20 @@ import {
   MDTP,
   RailsExam,
   MSTP,
+  RailsCourse,
 } from '@student/exams/show/types';
 import { doTryLockdown } from '@student/exams/show/actions';
 
 interface OwnProps {
   railsExam: RailsExam;
+  railsCourse: RailsCourse;
 }
 
 const mapDispatchToProps: MDTP<{
   onClick: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   onClick: (): void => {
-    dispatch(doTryLockdown(ownProps.railsExam));
+    dispatch(doTryLockdown(ownProps.railsCourse, ownProps.railsExam));
   },
 });
 

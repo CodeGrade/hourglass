@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# An exam for a course.
 class Exam < ApplicationRecord
   belongs_to :course
 
@@ -41,30 +42,6 @@ class Exam < ApplicationRecord
 
   def students
     registrations.includes(:user).where(role: 'student').map(&:user)
-  end
-
-  def announcements
-    exam_messages.where(recipient: nil, sender: professors)
-  end
-
-  def questions
-    exam_messages.where(recipient: nil, sender: students)
-  end
-
-  def questions_by(user)
-    exam_messages.where(recipient: nil, sender: user)
-  end
-
-  def private_messages_for(user)
-    exam_messages.where(recipient: user)
-  end
-
-  def all_messages_for(user)
-    if user.reg_for(self).professor?
-      questions.or(announcements)
-    else
-      private_messages_for(user).or(announcements)
-    end
   end
 
   def version(num)

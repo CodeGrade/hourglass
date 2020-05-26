@@ -12,6 +12,10 @@ export interface RailsExam {
   policies: Policy[];
 }
 
+export interface RailsCourse {
+  id: number;
+}
+
 export interface RailsRegistration {
   id: number;
   anomalous: boolean;

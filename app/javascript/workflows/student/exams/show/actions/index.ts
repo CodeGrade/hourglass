@@ -33,6 +33,7 @@ import {
   NextQuestionAction,
   ActivateWaypointsAction,
   Policy,
+  RailsCourse,
 } from '@student/exams/show/types';
 import {
   getCSRFToken,
@@ -64,11 +65,11 @@ export function questionSucceeded(id: number): QuestionSucceededAction {
   };
 }
 
-export function askQuestion(examID: number, body: string): Thunk {
+export function askQuestion(courseID: number, examID: number, body: string): Thunk {
   return (dispatch, getState): void => {
     const qID = getState().questions.lastId + 1;
     dispatch(questionAsked(qID, body));
-    const url = Routes.student_exam_ask_question_path(examID);
+    const url = Routes.take_exam_path(courseID, examID);
     fetch(url, {
       method: 'POST',
       headers: {
@@ -77,7 +78,8 @@ export function askQuestion(examID: number, body: string): Thunk {
       },
       credentials: 'same-origin',
       body: JSON.stringify({
-        message: {
+        task: 'question',
+        question: {
           body,
         },
       }),
@@ -203,10 +205,20 @@ export function updateScratch(val: string): UpdateScratchAction {
   };
 }
 
-export function doLoad(examID: number): Thunk {
+export function doLoad(courseID: number, examID: number): Thunk {
   return (dispatch): void => {
-    const url = Routes.student_exam_start_path(examID);
-    fetch(url)
+    const url = Routes.take_exam_path(courseID, examID);
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': getCSRFToken(),
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        task: 'start',
+      }),
+    })
       .then((result) => result.json() as Promise<StartExamResponse>)
       .then((result) => {
         if (result.type === 'ANOMALOUS') {
@@ -230,6 +242,7 @@ export function doLoad(examID: number): Thunk {
 }
 
 export function doTryLockdown(
+  course: RailsCourse,
   exam: RailsExam,
 ): Thunk {
   return (dispatch): void => {
@@ -239,7 +252,7 @@ export function doTryLockdown(
       } else {
         dispatch(lockedDown());
       }
-      dispatch(doLoad(exam.id));
+      dispatch(doLoad(course.id, exam.id));
     }).catch((err) => {
       dispatch(lockdownFailed(err.message));
     });
@@ -270,7 +283,7 @@ function snapshotSaving(): SnapshotSaving {
   };
 }
 
-export function saveSnapshot(examID: number): Thunk {
+export function saveSnapshot(courseID: number, examID: number): Thunk {
   return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
     if (state.snapshot.status === SnapshotStatus.SUCCESS) {
@@ -279,7 +292,7 @@ export function saveSnapshot(examID: number): Thunk {
     const { answers } = state.contents;
     // The messages list is sorted from newest to oldest.
     const lastMessageId = state.messages.messages[0]?.id ?? 0;
-    const url = Routes.student_exam_save_snapshot_path(examID);
+    const url = Routes.take_exam_path(courseID, examID);
     fetch(url, {
       method: 'POST',
       headers: {
@@ -287,6 +300,7 @@ export function saveSnapshot(examID: number): Thunk {
         'X-CSRF-Token': getCSRFToken(),
       },
       body: JSON.stringify({
+        task: 'snapshot',
         answers,
         lastMessageId,
       }),
@@ -317,10 +331,9 @@ export function saveSnapshot(examID: number): Thunk {
 }
 
 export function submitExam(examID: number): Thunk {
-  return (dispatch, getState): void => {
+  return (_dispatch, getState): void => {
     const state = getState();
     const { answers } = state.contents;
-    dispatch(saveSnapshot(examID));
     const url = Routes.student_exam_submit_path(examID);
     fetch(url, {
       method: 'POST',

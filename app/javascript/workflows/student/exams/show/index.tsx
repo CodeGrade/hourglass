@@ -5,6 +5,7 @@ import {
   RailsExam,
   RailsUser,
   RailsRegistration,
+  RailsCourse,
 } from '@student/exams/show/types';
 import ExamTaker from '@student/exams/show/containers/ExamTaker';
 import ExamSubmitted from '@student/exams/show/components/ExamSubmitted';
@@ -20,6 +21,9 @@ interface ShowExamProps {
   // Information about the registration.
   railsRegistration: RailsRegistration;
 
+  // Information about the course.
+  railsCourse: RailsCourse;
+
   // Whether the exam is complete.
   final: boolean;
 }
@@ -29,12 +33,16 @@ const ShowExam: React.FC<ShowExamProps> = (props) => {
     railsUser,
     railsExam,
     railsRegistration,
+    railsCourse,
     final,
   } = props;
   return (
     <RailsContext.Provider
       value={{
-        railsExam, railsRegistration, railsUser,
+        railsExam,
+        railsRegistration,
+        railsUser,
+        railsCourse,
       }}
     >
       <Provider store={store}>

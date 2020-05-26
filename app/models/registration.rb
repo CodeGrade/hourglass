@@ -35,15 +35,25 @@ class Registration < ApplicationRecord
     return false unless allow_submission?
 
     json = current_answers
-    return if json == answers
+    return true if json == answers
 
-    Snapshot.create!(
+    Snapshot.create(
       registration: self,
       answers: answers
     )
   end
 
-  def serialize
-    slice(:id)
+  def my_questions
+    exam.questions.where(sender: user)
+  end
+
+  def private_messages_for(user)
+    exam.messages.where(recipient: user)
+  end
+
+  def all_messages_for(user)
+    private_messages_for(user) +
+      room.room_announcements +
+      exam.exam_announcements
   end
 end

@@ -14,10 +14,10 @@ const mapStateToProps: MSTP<{
 });
 
 const mapDispatchToProps: MDTP<{
-  onSubmit: (examID: number, body: string) => void;
+  onSubmit: (courseID: number, examID: number, body: string) => void;
 }> = (dispatch) => ({
-  onSubmit: (examID, body): void => {
-    dispatch(askQuestion(examID, body));
+  onSubmit: (courseID, examID, body): void => {
+    dispatch(askQuestion(courseID, examID, body));
   },
 });
 

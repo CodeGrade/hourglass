@@ -22,13 +22,12 @@
     <% unless flash.empty? %>
       <%= render "layouts/flash" %>
     <% end %>
-    <% if content_for?(:wide_content) %>
-      <!-- Wide content -->
-      <%= yield(:wide_content) %>
-    <% else %>
+    <% if @keepnavbar %>
       <div class="container mt-f">
-        <%= content_for?(:content) ? yield(:content) : yield %>
+        <%= yield %>
       </div>
+    <% else %>
+      <%= yield %>
     <% end %>
   </body>
 </html>

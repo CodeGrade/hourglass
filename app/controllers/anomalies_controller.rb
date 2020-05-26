@@ -8,7 +8,7 @@ class AnomaliesController < ApplicationController
   before_action :find_anomaly, only: [:destroy]
 
   before_action :require_exam_enabled
-  before_action :require_current_user_registration_proctor, except: [:create]
+  before_action :require_current_user_registration_proctor
 
   def index
     @anomalies = @exam.anomalies
@@ -26,16 +26,5 @@ class AnomaliesController < ApplicationController
     @registration.anomalies.destroy_all!
     redirect_back fallback_location: exam_path(@exam),
                   notice: 'Anomalies cleared.'
-  end
-
-  def create
-    if @registration.user != current_user
-      render json: { created: false }
-      return
-    end
-    @anomaly = Anomaly.new(params.require(:anomaly).permit(:reason))
-    @anomaly.registration = @registration
-    saved = @anomaly.save
-    render json: { created: saved }
   end
 end

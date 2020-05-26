@@ -67,7 +67,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
 
 interface AskQuestionProps {
   questions: ProfQuestion[];
-  onSubmit: (examID: number, body: string) => void;
+  onSubmit: (courseID: number, examID: number, body: string) => void;
 }
 
 const AskQuestion: React.FC<AskQuestionProps> = (props) => {
@@ -77,6 +77,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
   } = props;
   const {
     railsExam,
+    railsCourse,
   } = useContext(RailsContext);
 
   const anySending = questions.some((q) => q.status === 'SENDING');
@@ -99,7 +100,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
         variant="success"
         disabled={anySending || valEmpty}
         onClick={(): void => {
-          onSubmit(railsExam.id, val);
+          onSubmit(railsCourse.id, railsExam.id, val);
           setVal('');
         }}
       >

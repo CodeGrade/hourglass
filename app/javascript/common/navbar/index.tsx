@@ -35,9 +35,13 @@ const RegularNavbar: React.FC<{}> = () => {
       expand="md"
     >
       <Navbar.Brand>
-        <Link to="/">
-          Hourglass
-        </Link>
+        {railsUser ? (
+          <Link to="/">
+            Hourglass
+          </Link>
+        ) : (
+          <a href="/">Hourglass</a>
+        )}
       </Navbar.Brand>
       {/* TODO */}
       {/* <span className="ml-2 mr-auto"> */}

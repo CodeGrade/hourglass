@@ -30,7 +30,6 @@
     "luxon": "^1.24.1",
     "popper.js": "^1.16.1",
     "prop-types": "^15.7.2",
-    "rails-erb-loader": "^5.5.2",
     "react": "^16.13.0",
     "react-bootstrap": "^1.0.0",
     "react-codemirror-runmode": "^1.0.5",

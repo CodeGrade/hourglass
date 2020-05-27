@@ -16,6 +16,7 @@ import * as ApiStudentExamsShow from '@hourglass/common/api/student/exams/show';
 import * as ApiStudentReg from '@hourglass/common/api/student/registrations';
 import * as ApiProfessorCourses from '@hourglass/common/api/professor/courses';
 import ShowExam from '@student/exams/show';
+import NewExam from '../professor/exams/new';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -39,7 +40,7 @@ const StudentRegs: React.FC<StudentRegsProps> = (props) => {
               key={reg.id}
             >
               <Link
-                to={`/exams/${exam.id}/take`}
+                to={`/exams/${exam.id}`}
               >
                 {exam.name}
               </Link>
@@ -100,17 +101,6 @@ const Exams: React.FC<{}> = () => {
   );
 };
 
-const Home: React.FC<{}> = () => {
-  return (
-    <>
-      <RegularNavbar />
-      <Container>
-        <Exams />
-      </Container>
-    </>
-  );
-};
-
 const Exam = () => {
   const { examId } = useParams();
   const { railsUser } = useContext(RailsContext);
@@ -130,6 +120,20 @@ const Exam = () => {
   );
 };
 
+const NewExamForm = () => {
+  const { courseId } = useParams();
+  const course = {
+    id: courseId,
+    name: 'test',
+  };
+  return (
+    <NewExam
+      course={course}
+    />
+  );
+};
+
+
 const Entry: React.FC<{}> = () => {
   const res = ApiMe.useResponse();
   return (
@@ -141,10 +145,19 @@ const Entry: React.FC<{}> = () => {
       <BrowserRouter>
         <Switch>
           <Route exact path="/">
-            <Home />
+            <RegularNavbar />
+            <Container>
+              <Exams />
+            </Container>
           </Route>
-          <Route path="/exams/:examId">
+          <Route path="/exams/:examId" exact>
             <Exam />
+          </Route>
+          <Route path="/courses/:courseId/exams/new">
+            <RegularNavbar />
+            <Container>
+              <NewExamForm />
+            </Container>
           </Route>
           <Route path="*">
             <RegularNavbar />

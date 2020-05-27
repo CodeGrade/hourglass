@@ -24,6 +24,14 @@ module Api
         )
         head :created
       end
+
+      def index
+        render json: {
+          exams: @course.exams.each do |exam|
+            exam.slice(:id, :name)
+          end
+        }
+      end
     end
   end
 end

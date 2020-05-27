@@ -3,9 +3,9 @@ Rails.application.routes.draw do
     get :me
 
     namespace :professor do
-      resources :courses, param: 'course_id', only: [:index, :show] do
+      resources :courses, shallow: true, param: 'course_id', only: [:index, :show] do
         member do
-          resources :exams, param: 'exam_id', only: [:create, :index]
+          resources :exams, param: 'exam_id', only: [:create, :index, :show]
         end
       end
       # resources :sections, only: [] do

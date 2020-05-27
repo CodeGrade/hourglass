@@ -20,8 +20,9 @@ class ApiController < ApplicationController
     return head :unauthorized if current_user.nil?
   end
 
-  def find_exam
+  def find_exam_and_course
     @exam ||= Exam.find_by(id: params[:exam_id])
+    @course ||= @exam.course
     return unless @exam.nil?
 
     head :forbidden
@@ -51,7 +52,7 @@ class ApiController < ApplicationController
   end
 
   def require_prof_reg
-    @professor_course_registration ||= ProfessorCourseRegistration.where(
+    @professor_course_registration ||= ProfessorCourseRegistration.find_by(
       user: current_user,
       course: @course
     )

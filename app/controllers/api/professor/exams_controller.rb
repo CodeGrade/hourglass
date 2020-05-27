@@ -3,6 +3,7 @@
 module Api
   module Professor
     class ExamsController < ProfessorController
+      before_action :find_exam_and_course, only: [:show]
       before_action :find_course
       before_action :require_prof_reg
 
@@ -31,6 +32,10 @@ module Api
             exam.slice(:id, :name)
           end
         }
+      end
+
+      def show
+        render json: @exam.slice(:name)
       end
     end
   end

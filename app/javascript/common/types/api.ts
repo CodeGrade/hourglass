@@ -42,8 +42,14 @@ export function useApiResponse<T>(url: string): ApiResponse<T> {
       })
       .then((res) => res.json() as Promise<T>)
       .then(setResponse)
-      .catch((_err: Error) => {
-        // no-op
+      .catch((e: Error) => {
+        if (e.name === 'SyntaxError') {
+          setError({
+            type: 'ERROR',
+            status: -1,
+            text: 'Error fetching data from server.',
+          });
+        }
       });
   }, [setResponse, setError]);
   if (error) {

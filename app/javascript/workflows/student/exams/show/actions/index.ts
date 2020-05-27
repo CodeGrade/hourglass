@@ -349,7 +349,7 @@ export function submitExam(courseID: number, examID: number): Thunk {
     })
       .then((result) => result.json() as Promise<SubmitResponse>)
       .then(() => {
-        window.location = Routes.student_exam_path(examID);
+        window.location.href = '/';
       });
     // TODO: catch
   };

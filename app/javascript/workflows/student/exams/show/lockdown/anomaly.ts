@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from 'react';
-import Routes from '@hourglass/routes';
 import { getCSRFToken } from '@student/exams/show/helpers';
 import { RailsContext } from '@student/exams/show/context';
 import { AnomalyDetected } from '@student/exams/show/types';
@@ -7,8 +6,7 @@ import { installListeners, removeListeners } from './listeners';
 
 function lockOut(): void {
   // TODO: redirect with flash
-  const url = Routes.root_path();
-  window.location = url;
+  window.location.href = '/';
 }
 
 /**
@@ -18,7 +16,7 @@ function lockOut(): void {
  */
 const anom = (examID: number) => (reason: string): void => {
   // TODO use event argument?
-  const anomalyPath = Routes.student_exam_anomalies_path(examID);
+  const anomalyPath = `/api/student/exams/${examID}/take`;
   fetch(anomalyPath, {
     method: 'POST',
     headers: {
@@ -27,6 +25,7 @@ const anom = (examID: number) => (reason: string): void => {
     },
     credentials: 'same-origin',
     body: JSON.stringify({
+      task: 'anomaly',
       anomaly: {
         reason,
       },

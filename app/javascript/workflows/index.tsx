@@ -15,6 +15,7 @@ import * as ApiStudentReg from '@hourglass/common/api/student/registrations';
 import * as ApiProfessorCourses from '@hourglass/common/api/professor/courses';
 import ShowExam from '@student/exams/show';
 import NewExam from '@professor/exams/new';
+import ShowCourse from '@professor/courses/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 interface StudentRegsProps {
@@ -62,14 +63,14 @@ const ProfessorRegs: React.FC<ProfessorCoursesProps> = (props) => {
   if (courses.length === 0) return null;
   return (
     <>
-      <h1>Create an Exam</h1>
+      <h1>Courses</h1>
       <ul>
         {courses.map((c) => (
           <li
             key={c.id}
           >
             <Link
-              to={`/courses/${c.id}/exams/new`}
+              to={`/courses/${c.id}`}
             >
               {c.title}
             </Link>
@@ -165,7 +166,13 @@ const Entry: React.FC<{}> = () => {
           <Route path="/exams/:examId" exact>
             <Exam />
           </Route>
-          <Route path="/courses/:courseId/exams/new">
+          <Route path="/courses/:courseId" exact>
+            <RegularNavbar />
+            <Container>
+              <ShowCourse />
+            </Container>
+          </Route>
+          <Route path="/courses/:courseId/exams/new" exact>
             <RegularNavbar />
             <Container>
               <NewExamForm />

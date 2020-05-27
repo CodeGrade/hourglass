@@ -13,6 +13,7 @@ module.exports = function(api) {
       {
         allExtensions: true,
         isTSX: true,
+        modules: false,
       },
     ],
     [

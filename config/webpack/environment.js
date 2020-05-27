@@ -11,6 +11,8 @@ const aliasConfig = {
 };
 
 environment.config.set('resolve.alias', aliasConfig);
+environment.config.set('optimization.usedExports', true);
+environment.config.set('optimization.sideEffects', true);
 
 environment.loaders.prepend('typescript', {
   test: /.(ts|tsx)$/,

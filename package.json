@@ -1,5 +1,9 @@
 {
   "name": "hourglass",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss"
+  ],
   "private": true,
   "scripts": {
     "dev": "./bin/webpack-dev-server",

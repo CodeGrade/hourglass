@@ -15,6 +15,7 @@ import * as ApiStudentReg from '@hourglass/common/api/student/registrations';
 import * as ApiProfessorCourses from '@hourglass/common/api/professor/courses';
 import ShowExam from '@student/exams/show';
 import NewExam from '@professor/exams/new';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -84,13 +85,13 @@ const Exams: React.FC<{}> = () => {
   const profResponse = ApiProfessorCourses.useResponse();
   return (
     <div>
-      {studentResponse.response && (
+      {studentResponse.type === 'RESULT' && (
         <StudentRegs
           regs={studentResponse.response.regs}
           regInfo={studentResponse.response.regInfo}
         />
       )}
-      {profResponse.response && (
+      {profResponse.type === 'RESULT' && (
         <ProfessorRegs
           courses={profResponse.response.courses}
         />
@@ -103,19 +104,38 @@ const Exam: React.FC<{}> = () => {
   const { examId } = useParams();
   const { railsUser } = useContext(RailsContext);
   const showRes = ApiStudentExamsShow.useResponse(examId);
-  if (!showRes.response) {
-    return <p>Loading...</p>;
+  switch (showRes.type) {
+    case 'ERROR':
+      return (
+        <>
+          <RegularNavbar />
+          <Container>
+            <span className="text-danger">{showRes.text}</span>
+          </Container>
+        </>
+      );
+    case 'LOADING':
+      return (
+        <>
+          <RegularNavbar />
+          <Container>
+            <p>Loading...</p>
+          </Container>
+        </>
+      );
+    case 'RESULT':
+      return (
+        <ShowExam
+          railsUser={railsUser}
+          railsExam={showRes.response.railsExam}
+          railsCourse={showRes.response.railsCourse}
+          railsRegistration={showRes.response.railsRegistration}
+          final={showRes.response.final}
+        />
+      );
+    default:
+      throw new ExhaustiveSwitchError(showRes);
   }
-  const { response } = showRes;
-  return (
-    <ShowExam
-      railsUser={railsUser}
-      railsExam={response.railsExam}
-      railsCourse={response.railsCourse}
-      railsRegistration={response.railsRegistration}
-      final={response.final}
-    />
-  );
 };
 
 const NewExamForm: React.FC<{}> = () => {
@@ -125,13 +145,13 @@ const NewExamForm: React.FC<{}> = () => {
   );
 };
 
-
 const Entry: React.FC<{}> = () => {
   const res = ApiMe.useResponse();
+  const railsUser = res.type === 'RESULT' ? res.response.user : undefined;
   return (
     <RailsContext.Provider
       value={{
-        railsUser: res.response?.user,
+        railsUser,
       }}
     >
       <BrowserRouter>

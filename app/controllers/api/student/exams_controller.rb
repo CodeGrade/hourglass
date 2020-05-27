@@ -8,8 +8,8 @@ module Api
       before_action :find_exam
 
       before_action :require_student_reg
-      before_action :check_anomaly
-      before_action :check_final
+      before_action :check_anomaly, only: [:take]
+      before_action :check_final, only: [:take]
 
       def show
         render json: {
@@ -115,17 +115,13 @@ module Api
       def check_anomaly
         return unless @registration.anomalous?
 
-        render(
-          json: {
-            type: 'ANOMALOUS'
-          }
-        )
+        head :forbidden
       end
 
       def check_final
         return unless @registration.final?
 
-        head :forbidden
+        head :locked
       end
 
       def messages_after(last_message_id)

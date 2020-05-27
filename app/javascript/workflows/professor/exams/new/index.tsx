@@ -8,6 +8,7 @@ import {
 import { Course, useResponse as showCourse } from '@hourglass/common/api/professor/courses/show';
 import { useParams } from 'react-router-dom';
 import { getCSRFToken } from '@hourglass/workflows/student/exams/show/helpers';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 interface NewExamProps {
   courseId: number;
@@ -18,17 +19,22 @@ const NewExam: React.FC<NewExamProps> = (props) => {
     courseId,
   } = props;
   const res = showCourse(courseId);
-  if (!res.response) {
-    return <p>Loading...</p>;
+  switch (res.type) {
+    case 'ERROR':
+    case 'LOADING':
+      return <p>Loading...</p>;
+    case 'RESULT':
+      return (
+        <div>
+          <h1>{`${res.response.course.title} - New Exam`}</h1>
+          <NewExamForm
+            course={res.response.course}
+          />
+        </div>
+      );
+    default:
+      throw new ExhaustiveSwitchError(res);
   }
-  return (
-    <div>
-      <h1>{`${res.response.course.title} - New Exam`}</h1>
-      <NewExamForm
-        course={res.response.course}
-      />
-    </div>
-  );
 };
 export default NewExam;
 

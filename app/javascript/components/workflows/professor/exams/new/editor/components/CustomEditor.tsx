@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow';
+import 'react-quill/dist/quill.bubble';
+import './CustomEditor.css';
 
 interface HTMLValProps {
   value: string;
@@ -22,8 +23,7 @@ const toolbarOptions = [
   //  [{ header: [4, 5, 6, false] }],
 
   [{ color: [] }, { background: [] }], // dropdown with defaults from theme
-  [{ font: [] }],
-  [{ align: [] }],
+  [{ font: [] }, { align: [] }],
 
   ['clean'], // remove formatting button
 ];
@@ -41,7 +41,7 @@ const CustomEditor: React.FC<HTMLValProps> = (props) => {
     <ReactQuill
       id={id}
       className={className}
-      theme="snow"
+      theme="bubble"
       placeholder={placeholder}
       value={value}
       modules={{

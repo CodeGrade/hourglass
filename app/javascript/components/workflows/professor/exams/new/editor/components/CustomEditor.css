@@ -1,0 +1,7 @@
+.ql-container {
+  font-size: unset;
+}
+
+.ql-bubble .ql-tooltip {
+  z-index: 1;
+}

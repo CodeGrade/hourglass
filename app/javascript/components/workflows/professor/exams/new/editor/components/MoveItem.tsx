@@ -31,8 +31,20 @@ const MoveItem: React.FC<MoveProps> = (props) => {
         className="m-0 p-0 bg-white rounded position-relative"
         style={{ left: '-100%' }}
       >
-        <Button variant={variant} disabled={!enableUp} onClick={onUp}><FaChevronUp /></Button>
-        <Button variant={variant} disabled={!enableDown} onClick={onDown}>
+        <Button
+          variant={variant}
+          disabled={!enableUp}
+          onClick={onUp}
+          title="Move up"
+        >
+          <FaChevronUp />
+        </Button>
+        <Button
+          variant={variant}
+          disabled={!enableDown}
+          onClick={onDown}
+          title="Move down"
+        >
           <FaChevronDown />
         </Button>
       </ButtonGroup>

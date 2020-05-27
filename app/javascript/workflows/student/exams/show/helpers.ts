@@ -1,4 +1,3 @@
-import Routes from '@hourglass/routes';
 import {
   RailsExamMessage,
   ExamMessage,

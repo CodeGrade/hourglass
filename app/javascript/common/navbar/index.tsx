@@ -4,14 +4,13 @@ import {
   Form,
   Button,
 } from 'react-bootstrap';
-import Routes from '@hourglass/routes';
 import { getCSRFToken } from '@student/exams/show/helpers';
 import { RailsContext } from '@hourglass/workflows/student/exams/show/context';
 import { Link } from 'react-router-dom';
 // import LockdownInfo from '@student/exams/show/containers/LockdownInfo';
 
 function logOut(): void {
-  const url = Routes.destroy_user_session_path();
+  const url = '/users/sign_out';
   fetch(url, {
     method: 'DELETE',
     headers: {
@@ -20,7 +19,7 @@ function logOut(): void {
     },
     credentials: 'same-origin',
   }).then(() => {
-    window.location = Routes.root_path();
+    window.location.href = '/';
   }).catch(() => {
     // TODO
   });

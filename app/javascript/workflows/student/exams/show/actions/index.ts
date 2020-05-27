@@ -40,7 +40,6 @@ import {
   convertMsgs,
   convertQs,
 } from '@student/exams/show/helpers';
-import Routes from '@hourglass/routes';
 import lock from '@student/exams/show/lockdown/lock';
 
 export function questionAsked(id: number, body: string): QuestionAskedAction {
@@ -315,7 +314,7 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
         if (lockout) {
           const error = 'Locked out of exam.';
           dispatch(snapshotFailure(error));
-          window.location = Routes.root_path();
+          window.location.href = '/';
         } else {
           const newMsgs = convertMsgs(messages);
           dispatch(snapshotSuccess());

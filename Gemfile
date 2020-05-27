@@ -43,7 +43,6 @@ gem 'rubyzip'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'activerecord_json_validator'
-gem 'js-routes'
 
 group :development, :test do
   gem 'pry'

@@ -1,3 +1,4 @@
+import { hot } from 'react-hot-loader';
 import React, { useContext } from 'react';
 import { RailsContext } from '@student/exams/show/context';
 import RegularNavbar from '@hourglass/common/navbar';
@@ -197,4 +198,4 @@ const Entry: React.FC<{}> = () => {
   );
 };
 
-export default Entry;
+export default hot(module)(Entry);

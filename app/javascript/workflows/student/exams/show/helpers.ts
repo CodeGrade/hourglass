@@ -12,22 +12,6 @@ export function getCSRFToken(): string {
   return elem.content;
 }
 
-export function logOut(): void {
-  const url = Routes.destroy_user_session_path();
-  fetch(url, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': getCSRFToken(),
-    },
-    credentials: 'same-origin',
-  }).then(() => {
-    window.location = Routes.root_path();
-  }).catch(() => {
-    // TODO
-  });
-}
-
 /**
  * Flash an element's background color for emphasis.
  */

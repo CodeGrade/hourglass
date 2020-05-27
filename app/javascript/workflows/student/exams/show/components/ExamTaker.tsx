@@ -1,8 +1,6 @@
 import React, { useContext } from 'react';
-import {
-  ExamNavbar,
-  RegularNavbar,
-} from '@student/exams/show/components/navbar';
+import ExamNavbar from '@student/exams/show/components/navbar';
+import RegularNavbar from '@hourglass/common/navbar';
 import { Row, Col, Container } from 'react-bootstrap';
 import { RailsContext } from '@student/exams/show/context';
 import ExamShowContents from '@student/exams/show/containers/ExamShowContents';
@@ -41,9 +39,7 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
     </div>
   ) : (
     <>
-      <RegularNavbar
-        railsUser={railsUser}
-      />
+      <RegularNavbar />
       <Container>
         <PreStart
           railsCourse={railsCourse}

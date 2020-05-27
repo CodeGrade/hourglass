@@ -69,7 +69,7 @@ export function askQuestion(courseID: number, examID: number, body: string): Thu
   return (dispatch, getState): void => {
     const qID = getState().questions.lastId + 1;
     dispatch(questionAsked(qID, body));
-    const url = Routes.take_exam_path(courseID, examID);
+    const url = `/api/student/exams/${examID}/take`;
     fetch(url, {
       method: 'POST',
       headers: {
@@ -207,7 +207,7 @@ export function updateScratch(val: string): UpdateScratchAction {
 
 export function doLoad(courseID: number, examID: number): Thunk {
   return (dispatch): void => {
-    const url = Routes.take_exam_path(courseID, examID);
+    const url = `/api/student/exams/${examID}/take`;
     fetch(url, {
       method: 'POST',
       headers: {
@@ -292,7 +292,7 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
     const { answers } = state.contents;
     // The messages list is sorted from newest to oldest.
     const lastMessageId = state.messages.messages[0]?.id ?? 0;
-    const url = Routes.take_exam_path(courseID, examID);
+    const url = `/api/student/exams/${examID}/take`;
     fetch(url, {
       method: 'POST',
       headers: {
@@ -330,11 +330,11 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
   };
 }
 
-export function submitExam(examID: number): Thunk {
+export function submitExam(courseID: number, examID: number): Thunk {
   return (_dispatch, getState): void => {
     const state = getState();
     const { answers } = state.contents;
-    const url = Routes.student_exam_submit_path(examID);
+    const url = `/api/student/exams/${examID}/take`;
     fetch(url, {
       method: 'POST',
       headers: {
@@ -343,6 +343,7 @@ export function submitExam(examID: number): Thunk {
       },
       credentials: 'same-origin',
       body: JSON.stringify({
+        task: 'submit',
         answers,
       }),
     })

@@ -39,6 +39,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     separateSubparts,
   } = question;
   const {
+    railsCourse,
     railsExam,
   } = useContext(RailsContext);
   const split = paginated && separateSubparts;
@@ -98,6 +99,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             {showSubmit && (
               <div className="text-center">
                 <SubmitButton
+                  courseID={railsCourse.id}
                   examID={railsExam.id}
                 />
               </div>

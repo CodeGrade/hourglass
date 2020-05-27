@@ -9,4 +9,5 @@ class ProctorRegistration < ApplicationRecord
   validates :room, presence: true
 
   delegate :exam, to: :room
+  delegate :course, to: :exam
 end

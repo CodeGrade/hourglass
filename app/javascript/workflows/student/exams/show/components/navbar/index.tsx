@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import SnapshotInfo from '@student/exams/show/containers/SnapshotInfo';
 import LockdownInfo from '@student/exams/show/containers/LockdownInfo';
 import { RailsContext } from '@student/exams/show/context';
-import './ExamNavbar.css';
+import './index.css';
 import {
   Accordion,
   Card,

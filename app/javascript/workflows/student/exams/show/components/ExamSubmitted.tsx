@@ -1,24 +1,16 @@
-import React, { useContext } from 'react';
-import { RailsContext } from '@student/exams/show/context';
+import React from 'react';
 import { Container } from 'react-bootstrap';
-import { RegularNavbar } from '@student/exams/show/components/navbar';
+import RegularNavbar from '@hourglass/common/navbar';
 
-const ExamSubmitted: React.FC<{}> = () => {
-  const {
-    railsUser,
-  } = useContext(RailsContext);
-  return (
-    <>
-      <RegularNavbar
-        railsUser={railsUser}
-      />
-      <Container>
-        <div>
-          <i>Exam submitted at (TODO)</i>
-        </div>
-      </Container>
-    </>
-  );
-};
+const ExamSubmitted: React.FC<{}> = () => (
+  <>
+    <RegularNavbar />
+    <Container>
+      <div>
+        <i>Exam submitted at (TODO)</i>
+      </div>
+    </Container>
+  </>
+);
 
 export default ExamSubmitted;

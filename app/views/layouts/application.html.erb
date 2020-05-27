@@ -15,19 +15,6 @@
   </head>
 
   <body>
-    <% if @keepnavbar %>
-      <% # TODO remove this (and the partial once erb views are gone) %>
-      <%= render "layouts/navbar"  %>
-    <% end %>
-    <% unless flash.empty? %>
-      <%= render "layouts/flash" %>
-    <% end %>
-    <% if @keepnavbar %>
-      <div class="container mt-f">
-        <%= yield %>
-      </div>
-    <% else %>
-      <%= yield %>
-    <% end %>
+    <%= yield %>
   </body>
 </html>

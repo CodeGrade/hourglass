@@ -5,12 +5,13 @@ import { MDTP } from '@student/exams/show/types';
 
 interface OwnProps {
   examID: number;
+  courseID: number;
 }
 
 const mapDispatchToProps: MDTP<{
   submit: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
-  submit: (): void => dispatch(submitExam(ownProps.examID)),
+  submit: (): void => dispatch(submitExam(ownProps.courseID, ownProps.examID)),
 });
 
 export default connect(null, mapDispatchToProps)(SubmitButton);

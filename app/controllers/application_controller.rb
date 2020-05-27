@@ -10,6 +10,8 @@ class ApplicationController < ActionController::Base
     stored_location_for(resource) || super
   end
 
+  # TODO: all of the find_ methods will be API helpers
+
   def find_exam(id = params[:exam_id])
     @exam ||= @course&.exams&.find_by(id: id)
     return unless @exam.nil?

@@ -10,6 +10,7 @@ import {
   ContentsState,
   Policy,
   RailsExam,
+  HTMLVal,
 } from '@student/exams/show/types';
 
 export type Thunk = ThunkAction<void, ContentsState, unknown, ExamEditorAction>;
@@ -32,7 +33,8 @@ export type ExamEditorAction = LoadExamAction
 | UpdateAnswerAction
 | AddQuestionAction | DeleteQuestionAction | UpdateQuestionAction | MoveQuestionAction
 | AddPartAction | DeletePartAction | UpdatePartAction | MovePartAction
-| AddBodyItemAction | DeleteBodyItemAction | UpdateBodyItemAction | MoveBodyItemAction;
+| AddBodyItemAction | DeleteBodyItemAction | UpdateBodyItemAction | MoveBodyItemAction
+| UpdateHTMLBodyItemAction;
 
 export interface LoadExamAction {
   type: 'LOAD_EXAM';
@@ -131,6 +133,15 @@ export interface UpdateBodyItemAction {
   pnum: number;
   bnum: number;
 }
+
+export interface UpdateHTMLBodyItemAction {
+  type: 'UPDATE_HTML_BODY_ITEM';
+  qnum: number;
+  pnum: number;
+  bnum: number;
+  value: HTMLVal;
+}
+
 
 export interface MoveBodyItemAction {
   type: 'MOVE_BODY_ITEM';

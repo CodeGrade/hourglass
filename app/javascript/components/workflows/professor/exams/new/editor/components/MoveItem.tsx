@@ -2,12 +2,15 @@ import React from 'react';
 import {
   ButtonGroup,
   Button,
+  ButtonProps,
 } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 
 export interface MoveProps {
   enableUp?: boolean;
   enableDown?: boolean;
+  variant?: ButtonProps['variant'];
+  visible: boolean;
   onUp?: () => void;
   onDown?: () => void;
 }
@@ -16,14 +19,24 @@ const MoveItem: React.FC<MoveProps> = (props) => {
   const {
     enableUp,
     enableDown,
+    variant,
+    visible,
     onUp,
     onDown,
   } = props;
   return (
-    <ButtonGroup className="mr-3">
-      <Button disabled={!enableUp} onClick={onUp}><FaChevronUp /></Button>
-      <Button disabled={!enableDown} onClick={onDown}><FaChevronDown /></Button>
-    </ButtonGroup>
+    <div className={`position-absolute ${visible ? '' : 'd-none'}`}>
+      <ButtonGroup
+        vertical
+        className="m-0 p-0 bg-white rounded position-relative"
+        style={{ left: '-100%' }}
+      >
+        <Button variant={variant} disabled={!enableUp} onClick={onUp}><FaChevronUp /></Button>
+        <Button variant={variant} disabled={!enableDown} onClick={onDown}>
+          <FaChevronDown />
+        </Button>
+      </ButtonGroup>
+    </div>
   );
 };
 

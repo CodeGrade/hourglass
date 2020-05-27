@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Form,
   Card,
@@ -34,16 +34,26 @@ const Part: React.FC<PartProps> = (props) => {
     points,
     onChange,
   } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
   return (
-    <Card border="secondary">
-      <Alert variant="secondary">
+    <Card
+      className="mb-3"
+      border="success"
+      onMouseOver={(): void => setMoversVisible(true)}
+      onFocus={(): void => setMoversVisible(true)}
+      onBlur={(): void => setMoversVisible(false)}
+      onMouseOut={(): void => setMoversVisible(false)}
+    >
+      <MoveItem
+        visible={moversVisible}
+        variant="success"
+        enableUp={pnum > 0}
+        enableDown={pnum + 1 < numParts}
+        onUp={(): MovePartAction => movePart(qnum, pnum, pnum - 1)}
+        onDown={(): MovePartAction => movePart(qnum, pnum, pnum + 1)}
+      />
+      <Alert variant="success">
         <Card.Title>
-          <MoveItem
-            enableUp={pnum > 0}
-            enableDown={pnum + 1 < numParts}
-            onUp={(): MovePartAction => movePart(qnum, pnum, pnum - 1)}
-            onDown={(): MovePartAction => movePart(qnum, pnum, pnum + 1)}
-          />
           {`Part ${String.fromCharCode(65 + pnum)}`}
         </Card.Title>
         <Card.Subtitle>

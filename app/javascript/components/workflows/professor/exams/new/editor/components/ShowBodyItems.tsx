@@ -16,7 +16,7 @@ const ShowBodyItems: React.FC<BodyItemsProps> = (props) => {
   return (
     <>
       {Array.from(Array(numBodyItems).keys()).map((_, bnum) => (
-      // eslint-disable-next-line react/no-array-index-key
+        // eslint-disable-next-line react/no-array-index-key
         <BodyItem key={bnum} qnum={qnum} pnum={pnum} bnum={bnum} numBodyItems={numBodyItems} />
       ))}
     </>

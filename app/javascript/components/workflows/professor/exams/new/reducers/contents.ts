@@ -205,6 +205,11 @@ export default (state: ContentsState = {
         bnum,
         body,
       } = action;
+      ret.questions = [...ret.questions];
+      ret.questions[qnum] = { ...ret.questions[qnum] };
+      ret.questions[qnum].parts = [...ret.questions[qnum].parts];
+      ret.questions[qnum].parts[pnum] = { ...ret.questions[qnum].parts[pnum] };
+      ret.questions[qnum].parts[pnum].body = [...ret.questions[qnum].parts[pnum].body];
       ret.questions[qnum].parts[pnum].body.splice(bnum, 0, body);
       return {
         ...state,
@@ -214,7 +219,31 @@ export default (state: ContentsState = {
     case 'DELETE_BODY_ITEM': {
       const ret = { ...state.exam };
       const { qnum, pnum, bnum } = action;
+      ret.questions = [...ret.questions];
+      ret.questions[qnum] = { ...ret.questions[qnum] };
+      ret.questions[qnum].parts = [...ret.questions[qnum].parts];
+      ret.questions[qnum].parts[pnum] = { ...ret.questions[qnum].parts[pnum] };
+      ret.questions[qnum].parts[pnum].body = [...ret.questions[qnum].parts[pnum].body];
       ret.questions[qnum].parts[pnum].body.splice(bnum, 1);
+      return {
+        ...state,
+        exam: ret,
+      };
+    }
+    case 'UPDATE_HTML_BODY_ITEM': {
+      const {
+        qnum,
+        pnum,
+        bnum,
+        value,
+      } = action;
+      const ret = { ...state.exam };
+      ret.questions = [...ret.questions];
+      ret.questions[qnum] = { ...ret.questions[qnum] };
+      ret.questions[qnum].parts = [...ret.questions[qnum].parts];
+      ret.questions[qnum].parts[pnum] = { ...ret.questions[qnum].parts[pnum] };
+      ret.questions[qnum].parts[pnum].body = [...ret.questions[qnum].parts[pnum].body];
+      ret.questions[qnum].parts[pnum].body[bnum] = { type: 'HTML', value };
       return {
         ...state,
         exam: ret,

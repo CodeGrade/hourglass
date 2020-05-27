@@ -5,9 +5,9 @@ import {
   Form,
   Row,
   Col,
-  Card,
 } from 'react-bootstrap';
 import { YesNoInfo } from '@student/exams/show/types';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 
 export interface YesNoProps {
   info: YesNoInfo;
@@ -35,73 +35,73 @@ const YesNo: React.FC<YesNoProps> = (props) => {
     noLabel = 'No',
   } = info;
   return (
-    <Card>
-      <Card.Body>
-        <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-prompt`}>
-          <Form.Label column sm={2}>Prompt</Form.Label>
-          <Col sm={10}>
-            <Form.Control
-              type="input"
-              value={prompt}
-              placeholder="Prompt for this question"
-              onChange={(e): void => onChange(e.target.value, value)}
-            />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-wording`}>
-          <Form.Label column sm={2}>Answer format</Form.Label>
-          <Col sm={10}>
-            <ToggleButtonGroup
-              name="wording"
-              type="radio"
-              value={value}
-              onChange={(v): void => onChange(prompt, v)}
+    <>
+      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-prompt`}>
+        <Form.Label column sm={2}>Prompt</Form.Label>
+        <Col sm={10}>
+          <CustomEditor
+            className="bg-white"
+            value={prompt}
+            placeholder="Prompt for this question"
+            onChange={(newPrompt): void => onChange(newPrompt, value)}
+          />
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-wording`}>
+        <Form.Label column sm={2}>Answer format</Form.Label>
+        <Col sm={10}>
+          <ToggleButtonGroup
+            className="bg-white rounded"
+            name="wording"
+            type="radio"
+            value={value}
+            onChange={(v): void => onChange(prompt, v)}
+          >
+            <ToggleButton
+              disabled={disabled}
+              variant={value ? 'primary' : 'outline-primary'}
+              value
             >
-              <ToggleButton
-                disabled={disabled}
-                variant={value ? 'primary' : 'outline-primary'}
-                value
-              >
-                Yes/No
-              </ToggleButton>
-              <ToggleButton
-                disabled={disabled}
-                variant={(value === false) ? 'primary' : 'outline-primary'}
-                value={false}
-              >
-                True/False
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-answer`}>
-          <Form.Label column sm={2}>Correct answer</Form.Label>
-          <Col sm={10}>
-            <ToggleButtonGroup
-              name="tbg"
-              type="radio"
-              value={value}
-              onChange={(v): void => onChange(prompt, v)}
+              Yes/No
+            </ToggleButton>
+            <ToggleButton
+              disabled={disabled}
+              variant={(value === false) ? 'primary' : 'outline-primary'}
+              value={false}
             >
-              <ToggleButton
-                disabled={disabled}
-                variant={value ? 'primary' : 'outline-primary'}
-                value
-              >
-                {yesLabel}
-              </ToggleButton>
-              <ToggleButton
-                disabled={disabled}
-                variant={(value === false) ? 'primary' : 'outline-primary'}
-                value={false}
-              >
-                {noLabel}
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Col>
-        </Form.Group>
-      </Card.Body>
-    </Card>
+              True/False
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-answer`}>
+        <Form.Label column sm={2}>Correct answer</Form.Label>
+        <Col sm={10}>
+          <ToggleButtonGroup
+            className="bg-white rounded"
+            name="tbg"
+            type="radio"
+            value={value}
+            onChange={(v): void => onChange(prompt, v)}
+          >
+            <ToggleButton
+              disabled={disabled}
+              variant={value ? 'primary' : 'outline-primary'}
+              value
+            >
+              {yesLabel}
+            </ToggleButton>
+            <ToggleButton
+              disabled={disabled}
+              variant={(value === false) ? 'primary' : 'outline-primary'}
+              value={false}
+            >
+              {noLabel}
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Col>
+      </Form.Group>
+    </>
   );
 };
 

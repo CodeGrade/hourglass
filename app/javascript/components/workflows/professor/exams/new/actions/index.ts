@@ -3,6 +3,7 @@ import {
   AnswersState,
   Policy,
   RailsExam,
+  HTMLVal,
 } from '@student/exams/show/types';
 import {
   LoadExamAction,
@@ -14,6 +15,7 @@ import {
   MovePartAction,
   MoveBodyItemAction,
   UpdatePartAction,
+  UpdateHTMLBodyItemAction,
 } from '@professor/exams/new/types';
 
 
@@ -116,6 +118,21 @@ export function moveBodyItem(
     pnum,
     from,
     to,
+  };
+}
+
+export function editHtmlBodyItem(
+  qnum: number,
+  pnum: number,
+  bnum: number,
+  value: HTMLVal,
+): UpdateHTMLBodyItemAction {
+  return {
+    type: 'UPDATE_HTML_BODY_ITEM',
+    qnum,
+    pnum,
+    bnum,
+    value,
   };
 }
 

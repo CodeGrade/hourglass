@@ -359,7 +359,7 @@ export type CodeState = {
   marks: MarkDescription[];
 };
 
-type HTMLVal = string;
+export type HTMLVal = string;
 
 export interface AllThatApplyInfo {
   type: 'AllThatApply';
@@ -426,7 +426,7 @@ export type AnswerState =
   AllThatApplyState | CodeState | YesNoState |
   CodeTagState | MultipleChoiceState | TextState | MatchingState;
 
-type HTML = {
+export type HTML = {
   type: 'HTML';
   value: string;
 };

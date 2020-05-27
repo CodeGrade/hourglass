@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Form,
   Card,
@@ -33,16 +33,27 @@ const Question: React.FC<QuestionProps> = (props) => {
     separateSubparts,
     onChange,
   } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
+
   return (
-    <Card border="primary">
+    <Card
+      className="mb-3"
+      border="primary"
+      onMouseOver={(): void => setMoversVisible(true)}
+      onFocus={(): void => setMoversVisible(true)}
+      onBlur={(): void => setMoversVisible(false)}
+      onMouseOut={(): void => setMoversVisible(false)}
+    >
+      <MoveItem
+        visible={moversVisible}
+        variant="primary"
+        enableUp={qnum > 0}
+        enableDown={qnum + 1 < numQuestions}
+        onUp={(): MoveQuestionAction => moveQuestion(qnum, qnum - 1)}
+        onDown={(): MoveQuestionAction => moveQuestion(qnum, qnum + 1)}
+      />
       <Alert variant="primary">
         <Card.Title>
-          <MoveItem
-            enableUp={qnum > 0}
-            enableDown={qnum + 1 < numQuestions}
-            onUp={(): MoveQuestionAction => moveQuestion(qnum, qnum - 1)}
-            onDown={(): MoveQuestionAction => moveQuestion(qnum, qnum + 1)}
-          />
           {`Question ${qnum + 1}`}
         </Card.Title>
         <Card.Subtitle>
@@ -78,6 +89,7 @@ const Question: React.FC<QuestionProps> = (props) => {
             <Form.Label column sm="2">Separate subparts?</Form.Label>
             <Col sm="10">
               <YesNo
+                className="bg-white rounded"
                 value={!!separateSubparts}
                 info={{ type: 'YesNo', prompt: '' }}
                 onChange={(newVal): void => {

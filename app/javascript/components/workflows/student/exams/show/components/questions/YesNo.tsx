@@ -6,6 +6,7 @@ import HTML from '../HTML';
 export interface YesNoProps {
   info: YesNoInfo;
   value: boolean;
+  className?: string;
   onChange: (newValue: boolean) => void;
   disabled?: boolean;
 }
@@ -14,6 +15,7 @@ const YesNo: React.FC<YesNoProps> = (props) => {
   const {
     info,
     value,
+    className,
     onChange,
     disabled,
   } = props;
@@ -29,6 +31,7 @@ const YesNo: React.FC<YesNoProps> = (props) => {
         name="tbg"
         type="radio"
         value={value}
+        className={className}
         onChange={onChange}
       >
         <ToggleButton

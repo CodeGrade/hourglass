@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Code from '@professor/exams/new/editor/containers/questions/Code';
 import YesNoInput from '@professor/exams/new/editor/containers/questions/YesNo';
 import CodeTag from '@professor/exams/new/editor/containers/questions/CodeTag';
@@ -6,15 +6,21 @@ import Text from '@professor/exams/new/editor/containers/questions/Text';
 import Matching from '@professor/exams/new/editor/containers/questions/Matching';
 import MultipleChoice from '@professor/exams/new/editor/containers/questions/MultipleChoice';
 import AllThatApply from '@professor/exams/new/editor/containers/questions/AllThatApply';
+import EditHTML from '@professor/exams/new/editor/containers/EditHTML';
 import { BodyItem } from '@student/exams/show/types';
-import HTML from '@student/exams/show/components/HTML';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { MoveBodyItemAction } from '@professor/exams/new/types';
+import { moveBodyItem } from '@professor/exams/new/actions';
+import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
+import { Card } from 'react-bootstrap';
+
 
 export interface BodyProps {
   body: BodyItem;
   qnum: number;
   pnum: number;
   bnum: number;
+  numBodyItems: number;
 }
 
 const Body: React.FC<BodyProps> = (props) => {
@@ -23,7 +29,7 @@ const Body: React.FC<BodyProps> = (props) => {
   } = props;
   switch (body.type) {
     case 'HTML':
-      return <HTML value={body.value} />;
+      return <EditHTML qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'Code':
       return <Code info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'AllThatApply':
@@ -43,4 +49,33 @@ const Body: React.FC<BodyProps> = (props) => {
   }
 };
 
-export default Body;
+const WrappedBody: React.FC<BodyProps> = (props) => {
+  const {
+    qnum,
+    pnum,
+    bnum,
+    numBodyItems,
+  } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
+  return (
+    <Card
+      className="border border-secondary alert-secondary mb-3"
+      onMouseOver={(): void => setMoversVisible(true)}
+      onFocus={(): void => setMoversVisible(true)}
+      onMouseOut={(): void => setMoversVisible(false)}
+      onBlur={(): void => setMoversVisible(false)}
+    >
+      <MoveItem
+        visible={moversVisible}
+        variant="secondary"
+        enableUp={bnum > 0}
+        enableDown={bnum + 1 < numBodyItems}
+        onUp={(): MoveBodyItemAction => moveBodyItem(qnum, pnum, bnum, bnum - 1)}
+        onDown={(): MoveBodyItemAction => moveBodyItem(qnum, pnum, bnum, bnum + 1)}
+      />
+      <Card.Body>{Body(props)}</Card.Body>
+    </Card>
+  );
+};
+
+export default WrappedBody;

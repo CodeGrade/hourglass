@@ -1,20 +1,31 @@
-import React, {useState, useRef} from 'react';
-import { Bottlenose } from '@hourglass/common/types';
-import { Form, Button, Card, CardDeck } from 'react-bootstrap';
+import React, { useState } from 'react';
+import {
+  Form,
+  Button,
+  Card,
+  CardDeck,
+} from 'react-bootstrap';
+import { Course, useResponse as showCourse } from '@hourglass/common/api/professor/courses/show';
+import { useParams } from 'react-router-dom';
+import { getCSRFToken } from '@hourglass/workflows/student/exams/show/helpers';
 
 interface NewExamProps {
-  course: Bottlenose.Course;
+  courseId: number;
 }
 
 const NewExam: React.FC<NewExamProps> = (props) => {
   const {
-    course,
+    courseId,
   } = props;
+  const res = showCourse(courseId);
+  if (!res.response) {
+    return <p>Loading...</p>;
+  }
   return (
     <div>
-      <h1>{`${course.name} - New Exam`}</h1>
+      <h1>{`${res.response.course.title} - New Exam`}</h1>
       <NewExamForm
-        course={course}
+        course={res.response.course}
       />
     </div>
   );
@@ -22,22 +33,13 @@ const NewExam: React.FC<NewExamProps> = (props) => {
 export default NewExam;
 
 interface NewExamFormProps {
-  course: Bottlenose.Course;
+  course: Course;
 }
 
-async function readFile(file: File): Promise<string | ArrayBuffer> {
-  return new Promise((resolve) => {
-    const fr = new FileReader();
-    fr.onload = (_e): void => {
-      resolve(fr.result);
-    };
-    fr.readAsText(file);
-  });
-}
-
-const NewExamForm: React.FC<NewExamFormProps> = (props) => {
+const NewExamForm: React.FC<NewExamFormProps> = () => {
   const [name, setName] = useState('');
   const [file, setFile] = useState(undefined);
+  const { courseId } = useParams();
   return (
     <Form
       onSubmit={(e): void => {
@@ -46,7 +48,22 @@ const NewExamForm: React.FC<NewExamFormProps> = (props) => {
           // Form validated with no file.
           return;
         }
-        readFile(file).then(console.log);
+        const data = new FormData();
+        data.append('file', file);
+        data.append('name', name);
+        fetch(`/api/professor/courses/${courseId}/exams`, {
+          method: 'POST',
+          headers: {
+            // 'Content-Type': 'multipart/form-data',
+            'X-CSRF-Token': getCSRFToken(),
+          },
+          credentials: 'same-origin',
+          body: data,
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            console.log('success', res);
+          });
       }}
     >
       <Form.Group>
@@ -134,13 +151,13 @@ const NewRoom: React.FC<NewRoomProps> = (props) => {
     room,
   } = props;
   return (
-    <Form>
+    <>
       <Form.Group>
         <Form.Label>Name</Form.Label>
         <Form.Control
           required
-          value={room.name}
-          //onChange={(e): void => setName(e.target.value)}
+          // value={room.name}
+          // onChange={(e): void => setName(e.target.value)}
           placeholder="Enter a name"
         />
       </Form.Group>
@@ -149,7 +166,7 @@ const NewRoom: React.FC<NewRoomProps> = (props) => {
       >
         Remove room
       </Button>
-    </Form>
+    </>
   );
 };
 

@@ -3,7 +3,11 @@ Rails.application.routes.draw do
     get :me
 
     namespace :professor do
-      resources :courses, only: [:index]
+      resources :courses, param: 'course_id', only: [:index, :show] do
+        member do
+          resources :exams, param: 'exam_id', only: [:create]
+        end
+      end
       # resources :sections, only: [] do
       #   member do
       #     post :sync

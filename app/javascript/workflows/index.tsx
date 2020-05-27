@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { RailsContext } from '@student/exams/show/context';
 import RegularNavbar from '@hourglass/common/navbar';
-import { RailsUser } from '@student/exams/show/types';
 import { Container } from 'react-bootstrap';
 import {
   BrowserRouter,
@@ -10,13 +9,12 @@ import {
   Switch,
   useParams,
 } from 'react-router-dom';
-import { getCSRFToken } from '@student/exams/show/helpers';
 import * as ApiMe from '@hourglass/common/api/me';
 import * as ApiStudentExamsShow from '@hourglass/common/api/student/exams/show';
 import * as ApiStudentReg from '@hourglass/common/api/student/registrations';
 import * as ApiProfessorCourses from '@hourglass/common/api/professor/courses';
 import ShowExam from '@student/exams/show';
-import NewExam from '../professor/exams/new';
+import NewExam from '@professor/exams/new';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -101,7 +99,7 @@ const Exams: React.FC<{}> = () => {
   );
 };
 
-const Exam = () => {
+const Exam: React.FC<{}> = () => {
   const { examId } = useParams();
   const { railsUser } = useContext(RailsContext);
   const showRes = ApiStudentExamsShow.useResponse(examId);
@@ -120,16 +118,10 @@ const Exam = () => {
   );
 };
 
-const NewExamForm = () => {
+const NewExamForm: React.FC<{}> = () => {
   const { courseId } = useParams();
-  const course = {
-    id: courseId,
-    name: 'test',
-  };
   return (
-    <NewExam
-      course={course}
-    />
+    <NewExam courseId={courseId} />
   );
 };
 

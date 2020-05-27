@@ -27,12 +27,29 @@ class ApiController < ApplicationController
     head :forbidden
   end
 
+  def find_course
+    @course ||= Course.find_by(id: params[:course_id])
+    return unless @course.nil?
+
+    head :forbidden
+  end
+
   def require_student_reg
     @registration ||= Registration.find_by(
       user: current_user,
       room: @exam.rooms
     )
     return unless @registration.nil?
+
+    head :forbidden
+  end
+
+  def require_prof_reg
+    @professor_course_registration ||= ProfessorCourseRegistration.where(
+      user: current_user,
+      course: @course
+    )
+    return unless @professor_course_registration.nil?
 
     head :forbidden
   end

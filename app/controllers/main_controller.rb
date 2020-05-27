@@ -5,6 +5,6 @@ class MainController < ApplicationController
   def index
     return redirect_to new_user_session_path unless current_user
 
-    render component: 'main', prerender: false
+    render component: '', prerender: false
   end
 end

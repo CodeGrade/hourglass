@@ -40,16 +40,16 @@ class ApplicationController < ActionController::Base
     redirect_back fallback_location: root_path, alert: 'No such course.'
   end
 
-  def require_proctor_reg
-    @proctor_registration ||= ProctorRegistration.find_by(
-      user: current_user,
-      exam: @exam
-    )
-    return unless @proctor_registration.nil?
+  # def require_proctor_reg
+  #   @proctor_registration ||= ProctorRegistration.find_by(
+  #     user: current_user,
+  #     exam: @exam
+  #   )
+  #   return unless @proctor_registration.nil?
 
-    redirect_back fallback_location: root_path,
-                  alert: 'You are not registered to proctor that exam.'
-  end
+  #   redirect_back fallback_location: root_path,
+  #                 alert: 'You are not registered to proctor that exam.'
+  # end
 
   def require_student_reg
     @registration ||= Registration.find_by(
@@ -80,16 +80,6 @@ class ApplicationController < ActionController::Base
     return unless @anomaly.nil?
   end
 
-  def require_prof_reg
-    @professor_course_registration ||= ProfessorCourseRegistration.where(
-      user: current_user,
-      course: @course
-    )
-    return unless @professor_course_registration.nil?
-
-    redirect_to root_path,
-                alert: 'Must be a registered professor for the course.'
-  end
 
   def student_reg
     @registration ||= Registration.where(

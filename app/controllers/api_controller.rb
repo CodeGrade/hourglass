@@ -34,6 +34,12 @@ class ApiController < ApplicationController
     head :forbidden
   end
 
+  def require_exam_enabled
+    return if @exam&.enabled?
+
+    head :forbidden
+  end
+
   def require_student_reg
     @registration ||= Registration.find_by(
       user: current_user,

@@ -6,7 +6,7 @@ import {
   CardDeck,
 } from 'react-bootstrap';
 import { Course, useResponse as showCourse } from '@hourglass/common/api/professor/courses/show';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import { getCSRFToken } from '@hourglass/workflows/student/exams/show/helpers';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
@@ -46,6 +46,7 @@ const NewExamForm: React.FC<NewExamFormProps> = () => {
   const [name, setName] = useState('');
   const [file, setFile] = useState(undefined);
   const { courseId } = useParams();
+  const history = useHistory();
   return (
     <Form
       onSubmit={(e): void => {
@@ -66,10 +67,14 @@ const NewExamForm: React.FC<NewExamFormProps> = () => {
           credentials: 'same-origin',
           body: data,
         })
-          .then((res) => res.json())
           .then((res) => {
-            console.log('success', res);
-          });
+            if (res.status !== 201) {
+              throw new Error('Not created');
+            }
+            return res;
+          })
+          .then((res) => res.json() as Promise<{ id: number }>)
+          .then(({ id }) => history.push(`/exams/${id}/admin`));
       }}
     >
       <Form.Group>

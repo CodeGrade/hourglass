@@ -23,7 +23,7 @@ module Api
           exam: @exam,
           name: 'Exam Room'
         )
-        head :created
+        render json: { id: @exam.id }, status: :created
       end
 
       def index

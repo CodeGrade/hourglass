@@ -43,6 +43,7 @@
     "react-dom": "npm:@hot-loader/react-dom",
     "react-hot-loader": "^4.12.21",
     "react-icons": "^3.10.0",
+    "react-quill": "^2.0.0-beta.2",
     "react-redux": "^7.2.0",
     "react-router-dom": "^5.2.0",
     "react-select": "^3.1.0",

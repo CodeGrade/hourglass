@@ -14,6 +14,22 @@ environment.config.set('resolve.alias', aliasConfig);
 environment.config.set('optimization.usedExports', true);
 environment.config.set('optimization.sideEffects', true);
 
+environment.config.merge({
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        default: false,
+        vendors: false,
+        vendor: {
+          name: 'vendor',
+          chunks: 'all',
+          test: /node_modules/,
+        },
+      },
+    },
+  },
+});
+
 environment.loaders.prepend('typescript', {
   test: /.(ts|tsx)$/,
   loader: 'babel-loader',

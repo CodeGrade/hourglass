@@ -3,7 +3,6 @@ import { MapStateToProps } from 'react-redux';
 import {
   Exam,
   AnswersState,
-  UpdateAnswerAction,
   QuestionInfo,
   PartInfo,
   BodyItem,
@@ -11,6 +10,7 @@ import {
   Policy,
   RailsExam,
   HTMLVal,
+  AnswerState,
 } from '@student/exams/show/types';
 
 export type Thunk = ThunkAction<void, ContentsState, unknown, ExamEditorAction>;
@@ -30,11 +30,11 @@ export interface ExamEditorState {
 
 export type ExamEditorAction = LoadExamAction
 | UpdateInstructionsAction | UpdatePoliciesAction | UpdateTitleAction
-| UpdateAnswerAction
 | AddQuestionAction | DeleteQuestionAction | UpdateQuestionAction | MoveQuestionAction
 | AddPartAction | DeletePartAction | UpdatePartAction | MovePartAction
 | AddBodyItemAction | DeleteBodyItemAction | UpdateBodyItemAction | MoveBodyItemAction
 | UpdateHTMLBodyItemAction;
+
 
 export interface LoadExamAction {
   type: 'LOAD_EXAM';
@@ -132,6 +132,8 @@ export interface UpdateBodyItemAction {
   qnum: number;
   pnum: number;
   bnum: number;
+  info: BodyItem;
+  answer: AnswerState;
 }
 
 export interface UpdateHTMLBodyItemAction {

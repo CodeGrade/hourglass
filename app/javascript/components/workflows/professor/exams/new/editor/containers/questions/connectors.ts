@@ -3,9 +3,13 @@ import { connect } from 'react-redux';
 import {
   AnswerState,
   BodyItem,
-  UpdateAnswerAction,
 } from '@student/exams/show/types';
-import { MSTP, MDTP, ExamEditorState } from '@professor/exams/new/types';
+import {
+  MSTP,
+  MDTP,
+  UpdateBodyItemAction,
+  ExamEditorState,
+} from '@professor/exams/new/types';
 
 interface OwnProps {
   info: BodyItem;
@@ -18,14 +22,16 @@ export function updateAnswer(
   qnum: number,
   pnum: number,
   bnum: number,
-  val: AnswerState,
-): UpdateAnswerAction {
+  info: BodyItem,
+  answer: AnswerState,
+): UpdateBodyItemAction {
   return {
-    type: 'UPDATE_ANSWER',
+    type: 'UPDATE_BODY_ITEM',
     qnum,
     pnum,
     bnum,
-    val,
+    info,
+    answer,
   };
 }
 
@@ -40,16 +46,17 @@ const mapStateToProps: MSTP<{
 };
 
 const mapDispatchToProps: MDTP<{
-  onChange: (newState: AnswerState) => void;
+  onChange: (newInfo: BodyItem, newState: AnswerState) => void;
 }, OwnProps> = (dispatch, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
   return {
-    onChange: (newState: AnswerState): void => {
+    onChange: (newInfo: BodyItem, newState: AnswerState): void => {
       dispatch(
         updateAnswer(
           qnum,
           pnum,
           bnum,
+          newInfo,
           newState,
         ),
       );

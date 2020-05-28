@@ -1,5 +1,6 @@
 import { ContentsState } from '@student/exams/show/types';
 import { ExamEditorAction } from '@professor/exams/new/types';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 const arrayLikeToArray = <T>(obj: {[key: number]: T}, minLength: number): T[] => {
   const len = Math.max(minLength, ...Object.keys(obj).map((k) => Number.parseInt(k, 10)));
@@ -31,20 +32,6 @@ export default (state: ContentsState = {
         exam: {
           ...exam,
           instructions: action.val,
-        },
-      };
-    }
-    case 'UPDATE_ANSWER': {
-      const { qnum, pnum, bnum } = action;
-      const answers = { ...state.answers.answers };
-      answers[qnum] = { ...answers[qnum] };
-      answers[qnum][pnum] = { ...answers[qnum]?.[pnum] };
-      answers[qnum][pnum][bnum] = action.val;
-      return {
-        ...state,
-        answers: {
-          ...state.answers,
-          answers,
         },
       };
     }
@@ -250,7 +237,58 @@ export default (state: ContentsState = {
       };
     }
     case 'UPDATE_BODY_ITEM': {
-      return state; // TODO
+      const {
+        qnum,
+        pnum,
+        bnum,
+        info,
+        answer,
+      } = action;
+      const questions = [...state.exam.questions];
+      questions[qnum] = { ...questions[qnum] };
+      questions[qnum].parts = [...questions[qnum].parts];
+      questions[qnum].parts[pnum] = { ...questions[qnum].parts[pnum] };
+      questions[qnum].parts[pnum].body = [...questions[qnum].parts[pnum].body];
+      let bodyItem = questions[qnum].parts[pnum].body[bnum];
+      const answers = arrayLikeToArray(state.answers.answers, questions.length);
+      const ansQnum = arrayLikeToArray(answers[qnum], questions[qnum].parts.length);
+      const ansPnum = arrayLikeToArray(ansQnum[pnum], questions[qnum].parts[pnum].body.length);
+      switch (bodyItem.type) {
+        case 'HTML':
+          bodyItem = {
+            ...bodyItem,
+            ...info,
+          };
+          break;
+        case 'Code':
+        case 'AllThatApply':
+        case 'CodeTag':
+        case 'Matching':
+        case 'MultipleChoice':
+        case 'Text':
+        case 'YesNo':
+          bodyItem = {
+            ...bodyItem,
+            ...info,
+          };
+          break;
+        default:
+          throw new ExhaustiveSwitchError(bodyItem);
+      }
+      questions[qnum].parts[pnum].body[bnum] = bodyItem;
+      ansPnum[bnum] = answer;
+      ansQnum[pnum] = ansPnum;
+      answers[qnum] = ansQnum;
+      return {
+        exam: {
+          ...state.exam,
+          questions,
+        },
+        answers: {
+          ...state.answers,
+          answers,
+        },
+      };
     }
     case 'MOVE_BODY_ITEM': {
       const {

@@ -6,7 +6,7 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import { YesNoInfo } from '@student/exams/show/types';
+import { YesNoInfo, YesNoState } from '@student/exams/show/types';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 
 export interface YesNoProps {
@@ -15,7 +15,7 @@ export interface YesNoProps {
   qnum: number;
   pnum: number;
   bnum: number;
-  onChange: (prompt: string, newValue: boolean) => void;
+  onChange: (newInfo: YesNoInfo, newState: YesNoState) => void;
   disabled: boolean;
 }
 
@@ -34,6 +34,7 @@ const YesNo: React.FC<YesNoProps> = (props) => {
     yesLabel = 'Yes',
     noLabel = 'No',
   } = info;
+  const isYesNo = (yesLabel === 'Yes');
   return (
     <>
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-prompt`}>
@@ -43,7 +44,9 @@ const YesNo: React.FC<YesNoProps> = (props) => {
             className="bg-white"
             value={prompt}
             placeholder="Prompt for this question"
-            onChange={(newPrompt): void => onChange(newPrompt, value)}
+            onChange={(newPrompt): void => {
+              onChange({ ...info, prompt: newPrompt }, value);
+            }}
           />
         </Col>
       </Form.Group>
@@ -54,19 +57,25 @@ const YesNo: React.FC<YesNoProps> = (props) => {
             className="bg-white rounded"
             name="wording"
             type="radio"
-            value={value}
-            onChange={(v): void => onChange(prompt, v)}
+            value={isYesNo}
+            onChange={(v): void => {
+              if (v) {
+                onChange({ ...info, yesLabel: 'Yes', noLabel: 'No' }, value);
+              } else {
+                onChange({ ...info, yesLabel: 'True', noLabel: 'False' }, value);
+              }
+            }}
           >
             <ToggleButton
               disabled={disabled}
-              variant={value ? 'primary' : 'outline-primary'}
+              variant={isYesNo ? 'primary' : 'outline-primary'}
               value
             >
               Yes/No
             </ToggleButton>
             <ToggleButton
               disabled={disabled}
-              variant={(value === false) ? 'primary' : 'outline-primary'}
+              variant={(isYesNo === false) ? 'primary' : 'outline-primary'}
               value={false}
             >
               True/False
@@ -82,7 +91,7 @@ const YesNo: React.FC<YesNoProps> = (props) => {
             name="tbg"
             type="radio"
             value={value}
-            onChange={(v): void => onChange(prompt, v)}
+            onChange={(v): void => onChange(info, !!v)}
           >
             <ToggleButton
               disabled={disabled}

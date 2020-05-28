@@ -1,19 +1,25 @@
 import React from 'react';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.bubble';
+import QuillPasteSmart from 'quill-paste-smart';
+import 'react-quill/dist/quill.snow';
 import './CustomEditor.css';
+
+
+ReactQuill.Quill.register('modules/clipboard', QuillPasteSmart, true);
 
 interface HTMLValProps {
   value: string;
   placeholder?: string;
   className?: string;
   id?: string;
-  onChange?: (content: string) => void;
+  onChange?: ReactQuill.ReactQuillProps['onChange'];
 }
 
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike', 'code'], // toggled buttons
   ['blockquote', 'code-block'],
+
+  ['image'],
 
   [{ list: 'ordered' }, { list: 'bullet' }],
   [{ script: 'sub' }, { script: 'super' }], // superscript/subscript
@@ -26,6 +32,14 @@ const toolbarOptions = [
   [{ font: [] }, { align: [] }],
 
   ['clean'], // remove formatting button
+];
+
+const formatOptions = [
+  'background', 'color', 'bold', 'italic', 'underline', 'font', 'code', 'size', 'strike', 'script',
+  // NO 'link'
+  'blockquote', 'header', 'indent', 'list', 'align', 'code-block', 'direction',
+  'formula', 'image',
+  // NO 'video'
 ];
 
 const CustomEditor: React.FC<HTMLValProps> = (props) => {
@@ -41,9 +55,10 @@ const CustomEditor: React.FC<HTMLValProps> = (props) => {
     <ReactQuill
       id={id}
       className={className}
-      theme="bubble"
+      theme="snow"
       placeholder={placeholder}
       value={value}
+      formats={formatOptions}
       modules={{
         toolbar: toolbarOptions,
       }}

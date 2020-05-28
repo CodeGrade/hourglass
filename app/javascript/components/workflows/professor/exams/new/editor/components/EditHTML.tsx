@@ -26,14 +26,13 @@ const EditHTML: React.FC<HTMLProps> = (props) => {
     <>
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-content`}>
         <Form.Label column sm={2}>Prompt</Form.Label>
-        <Col sm={10}>
-          <div className="bg-white">
-            <CustomEditor
-              value={value}
-              placeholder="Body item..."
-              onChange={onChange}
-            />
-          </div>
+        <Col sm={10} style={{ minHeight: '100px' }}>
+          <CustomEditor
+            className="bg-white"
+            value={value}
+            placeholder="Body item..."
+            onChange={onChange}
+          />
         </Col>
       </Form.Group>
     </>

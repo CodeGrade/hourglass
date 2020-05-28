@@ -11,16 +11,17 @@ import { moveQuestion } from '@professor/exams/new/actions';
 import YesNo from '@student/exams/show/components/questions/YesNo';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import ShowParts from '@professor/exams/new/editor/containers/ShowParts';
-import { PartInfo } from '@student/exams/show/types';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import { PartInfo, HTMLVal } from '@student/exams/show/types';
 
 export interface QuestionProps {
   qnum: number;
   numQuestions: number;
-  name: string;
-  description: string;
+  name: HTMLVal;
+  description: HTMLVal;
   separateSubparts: boolean;
   parts: PartInfo[];
-  onChange: (name: string, description: string, separateSubparts: boolean) => void;
+  onChange: (name: HTMLVal, description: HTMLVal, separateSubparts: boolean) => void;
 }
 
 
@@ -60,13 +61,12 @@ const Question: React.FC<QuestionProps> = (props) => {
           <Form.Group as={Row} controlId={`${qnum}-name`}>
             <Form.Label column sm="2">Question name</Form.Label>
             <Col sm="10">
-              <Form.Control
-                type="input"
+              <CustomEditor
+                className="bg-white"
                 value={name}
                 placeholder="Give a short (optional) descriptive name for the question"
-                onChange={(e): void => {
-                  const elem = e.target;
-                  onChange(elem.value, description, separateSubparts);
+                onChange={(newName, _delta, source, _editor): void => {
+                  if (source === 'user') onChange(newName, description, separateSubparts);
                 }}
               />
             </Col>
@@ -74,13 +74,12 @@ const Question: React.FC<QuestionProps> = (props) => {
           <Form.Group as={Row} controlId={`${qnum}-desc`}>
             <Form.Label column sm="2">Description:</Form.Label>
             <Col sm="10">
-              <Form.Control
-                type="input"
+              <CustomEditor
+                className="bg-white"
                 value={description}
                 placeholder="Give a longer description of the question"
-                onChange={(e): void => {
-                  const elem = e.target;
-                  onChange(name, elem.value, separateSubparts);
+                onChange={(newDesc, _delta, source, _editor): void => {
+                  if (source === 'user') onChange(name, newDesc, separateSubparts);
                 }}
               />
             </Col>

@@ -6,8 +6,8 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-// import 'react-widgets/dist/css/react-widgets.css';
-// import { NumberPicker } from 'react-widgets';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import { HTMLVal } from '@student/exams/show/types';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/containers/ShowBodyItems';
 import { MovePartAction } from '../../types';
@@ -18,10 +18,10 @@ export interface PartProps {
   qnum: number;
   pnum: number;
   numParts: number;
-  name: string;
-  description: string;
+  name: HTMLVal;
+  description: HTMLVal;
   points: number;
-  onChange: (name: string, description: string, points: number) => void;
+  onChange: (name: HTMLVal, description: HTMLVal, points: number) => void;
 }
 
 const Part: React.FC<PartProps> = (props) => {
@@ -60,22 +60,26 @@ const Part: React.FC<PartProps> = (props) => {
           <Form.Group as={Row} controlId={`${qnum}-${pnum}-name`}>
             <Form.Label column sm="2">Part name</Form.Label>
             <Col sm="10">
-              <Form.Control
-                type="input"
+              <CustomEditor
+                className="bg-white"
                 value={name}
-                onChange={(e): void => onChange(e.target.value, description, points)}
-                placeholder="Give a short (optional) descriptive name for the question"
+                placeholder="Give a short (optional) descriptive name for the part"
+                onChange={(newName, _delta, source, _editor): void => {
+                  if (source === 'user') onChange(newName, description, points);
+                }}
               />
             </Col>
           </Form.Group>
           <Form.Group as={Row} controlId={`${qnum}-${pnum}-desc`}>
             <Form.Label column sm="2">Description:</Form.Label>
             <Col sm="10">
-              <Form.Control
-                type="input"
+              <CustomEditor
+                className="bg-white"
                 value={description}
-                onChange={(e): void => onChange(name, e.target.value, points)}
                 placeholder="Give a longer description of the question"
+                onChange={(newDesc, _delta, source, _editor): void => {
+                  if (source === 'user') onChange(name, newDesc, points);
+                }}
               />
             </Col>
           </Form.Group>

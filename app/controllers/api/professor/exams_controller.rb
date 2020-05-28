@@ -47,7 +47,9 @@ module Api
               instructions: @exam.version(0)['contents']['instructions'],
               files: @exam.files
             },
-            answers: @exam.version(0)['answers']
+            answers: {
+              answers: @exam.version(0)['answers']
+            }
           }
         }
       end

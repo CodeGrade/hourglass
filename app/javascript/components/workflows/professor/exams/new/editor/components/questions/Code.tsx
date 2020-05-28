@@ -1,20 +1,26 @@
 import React, { useContext } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Form, Row, Col } from 'react-bootstrap';
 import { CodeInfo, CodeState } from '@student/exams/show/types';
 import { ExamContext } from '@student/exams/show/context';
-import HTML from '@student/exams/show/components/HTML';
 import { Editor } from '@student/exams/show/components/ExamCodeBox';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 
 interface CodeProps {
+  qnum: number;
+  pnum: number;
+  bnum: number;
   info: CodeInfo;
   value: CodeState;
-  onChange?: (newVal: CodeState) => void;
+  onChange?: (newInfo: CodeInfo, newVal: CodeState) => void;
   disabled: boolean;
 }
 
 const Code: React.FC<CodeProps> = (props) => {
   const {
     info,
+    qnum,
+    pnum,
+    bnum,
     value: state,
     onChange,
     disabled,
@@ -30,30 +36,52 @@ const Code: React.FC<CodeProps> = (props) => {
 
   return (
     <>
-      <Row>
-        <Col>
-          <HTML value={prompt} />
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Editor
-            disabled={disabled}
-            value={text}
-            markDescriptions={marks}
-            valueUpdate={[disabled]}
-            language={lang}
-            onChange={(newText, newMarks): void => {
-              if (onChange) {
-                onChange({
-                  text: newText,
-                  marks: newMarks,
-                });
+      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-prompt`}>
+        <Form.Label column sm={2}>Prompt</Form.Label>
+        <Col sm={10}>
+          <CustomEditor
+            className="bg-white"
+            value={prompt}
+            placeholder="Body item..."
+            onChange={(newVal, _delta, source, _editor): void => {
+              if (onChange && source === 'user') {
+                onChange(
+                  { ...info, prompt: newVal },
+                  state,
+                );
               }
             }}
           />
         </Col>
-      </Row>
+      </Form.Group>
+      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
+        <Form.Label column sm={2}>Starter</Form.Label>
+        <Col sm={10}>
+          <div>
+            <div className="ql-toolbar">
+              TODO
+            </div>
+            <Editor
+              disabled={disabled}
+              value={text}
+              markDescriptions={marks}
+              valueUpdate={[disabled]}
+              language={lang}
+              onChange={(newText, newMarks): void => {
+                if (onChange) {
+                  onChange(
+                    info,
+                    {
+                      text: newText,
+                      marks: newMarks,
+                    },
+                  );
+                }
+              }}
+            />
+          </div>
+        </Col>
+      </Form.Group>
     </>
   );
 };

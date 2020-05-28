@@ -1,11 +1,13 @@
 import React from 'react';
 import {
-  Row, Col, Form,
+  Row, Col,
 } from 'react-bootstrap';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import { HTMLVal } from '@student/exams/show/types';
 
 interface TextProps {
-  value: string;
-  onChange: (newVal: string) => void;
+  value: HTMLVal;
+  onChange: (newVal: HTMLVal) => void;
 }
 
 const Instructions: React.FC<TextProps> = (props) => {
@@ -16,15 +18,13 @@ const Instructions: React.FC<TextProps> = (props) => {
   return (
     <Row className="py-3">
       <Col>
-        <p>Give exam-wide instructions here</p>
-        <Form.Control
-          as="textarea"
-          rows={3}
-          placeholder="Enter your answer here."
+        <p>Exam instructions</p>
+        <CustomEditor
+          className="bg-white"
           value={value}
-          onChange={(e): void => {
-            const elem = e.target as HTMLTextAreaElement;
-            onChange(elem.value);
+          placeholder="Give exam-wide instructions here"
+          onChange={(newVal, _delta, source, _editor): void => {
+            if (source === 'user') onChange(newVal);
           }}
         />
       </Col>

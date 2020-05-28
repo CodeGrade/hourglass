@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { FileRef, CodeTagInfo, CodeTagState } from '@student/exams/show/types';
 import {
-  Row, Col, Modal, Button,
+  Form, Row, Col, Modal, Button,
 } from 'react-bootstrap';
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import HTML from '@student/exams/show/components/HTML';
+import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 
 interface CodeTagValProps {
   value: CodeTagState;
@@ -125,14 +125,20 @@ const FileModal: React.FC<FileModalProps> = (props) => {
 };
 
 interface CodeTagProps {
+  qnum: number;
+  pnum: number;
+  bnum: number;
   info: CodeTagInfo;
   value: CodeTagState;
-  onChange: (newVal: CodeTagState) => void;
+  onChange: (newInfo: CodeTagInfo, newVal: CodeTagState) => void;
   disabled: boolean;
 }
 
 const CodeTag: React.FC<CodeTagProps> = (props) => {
   const {
+    qnum,
+    pnum,
+    bnum,
     info,
     value,
     onChange,
@@ -141,42 +147,42 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
   const { choices, prompt } = info;
   const [showModal, setShowModal] = useState(false);
   return (
-    <Row>
-      <Col>
-        {prompt
-         && (
-         <Row>
-           <Col sm={12}>
-             <HTML value={prompt} />
-           </Col>
-         </Row>
-         )}
-        <Row className="mt-2">
-          <Col>
-            <CodeTagVal value={value} />
-          </Col>
-          <Col>
-            <Button
-              disabled={disabled}
-              onClick={(): void => setShowModal(true)}
-            >
-              Choose line
-            </Button>
-            <FileModal
-              disabled={disabled}
-              references={choices}
-              show={showModal}
-              onClose={(): void => setShowModal(false)}
-              onSave={(newState): void => {
-                setShowModal(false);
-                onChange(newState);
-              }}
-              startValue={value}
-            />
-          </Col>
-        </Row>
-      </Col>
-    </Row>
+    <>
+      <Prompted
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        prompt={prompt}
+        onChange={(newPrompt): void => {
+          if (onChange) { onChange({ ...info, prompt: newPrompt }, value); }
+        }}
+      />
+      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
+        <Form.Label column sm={2}>Correct answer</Form.Label>
+        <Col sm={6}>
+          <CodeTagVal value={value} />
+        </Col>
+        <Col sm={4}>
+          <Button
+            disabled={disabled}
+            onClick={(): void => setShowModal(true)}
+          >
+            Choose line
+          </Button>
+          <FileModal
+            disabled={disabled}
+            references={choices}
+            show={showModal}
+            onClose={(): void => setShowModal(false)}
+            onSave={(newState): void => {
+              setShowModal(false);
+              onChange(info, newState);
+            }}
+            startValue={value}
+          />
+        </Col>
+      </Form.Group>
+    </>
   );
 };
 

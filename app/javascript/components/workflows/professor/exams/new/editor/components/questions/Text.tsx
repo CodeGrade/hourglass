@@ -3,17 +3,23 @@ import {
   Row, Col, Form,
 } from 'react-bootstrap';
 import { TextInfo, TextState } from '@student/exams/show/types';
-import HTML from '@student/exams/show/components/HTML';
+import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 
 interface TextProps {
+  qnum: number;
+  pnum: number;
+  bnum: number;
   info: TextInfo;
   value: TextState;
-  onChange: (newVal: TextState) => void;
+  onChange: (newInfo: TextInfo, newVal: TextState) => void;
   disabled: boolean;
 }
 
 const Text: React.FC<TextProps> = (props) => {
   const {
+    qnum,
+    pnum,
+    bnum,
     info,
     value,
     onChange,
@@ -22,26 +28,31 @@ const Text: React.FC<TextProps> = (props) => {
   const { prompt } = info;
   return (
     <>
-      <Row>
-        <Col>
-          <HTML value={prompt} />
-        </Col>
-      </Row>
-      <Row>
-        <Col>
+      <Prompted
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        prompt={prompt}
+        onChange={(newPrompt): void => {
+          if (onChange) { onChange({ ...info, prompt: newPrompt }, value); }
+        }}
+      />
+      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-prompt`}>
+        <Form.Label column sm={2}>Correct answer</Form.Label>
+        <Col sm={10}>
           <Form.Control
             disabled={disabled}
             as="textarea"
             rows={3}
-            placeholder="Enter your answer here."
+            placeholder="Sketch the intended answer here."
             value={value ?? ''}
             onChange={(e): void => {
               const elem = e.target as HTMLTextAreaElement;
-              onChange(elem.value);
+              onChange(info, elem.value);
             }}
           />
         </Col>
-      </Row>
+      </Form.Group>
     </>
   );
 };

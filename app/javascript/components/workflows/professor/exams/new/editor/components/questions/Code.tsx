@@ -3,14 +3,14 @@ import { Form, Row, Col } from 'react-bootstrap';
 import { CodeInfo, CodeState } from '@student/exams/show/types';
 import { ExamContext } from '@student/exams/show/context';
 import { Editor } from '@student/exams/show/components/ExamCodeBox';
-import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 
 interface CodeProps {
   qnum: number;
   pnum: number;
   bnum: number;
   info: CodeInfo;
-  value: CodeState;
+  state: CodeState;
   onChange?: (newInfo: CodeInfo, newVal: CodeState) => void;
   disabled: boolean;
 }
@@ -21,7 +21,7 @@ const Code: React.FC<CodeProps> = (props) => {
     qnum,
     pnum,
     bnum,
-    value: state,
+    state,
     onChange,
     disabled,
   } = props;
@@ -36,24 +36,15 @@ const Code: React.FC<CodeProps> = (props) => {
 
   return (
     <>
-      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-prompt`}>
-        <Form.Label column sm={2}>Prompt</Form.Label>
-        <Col sm={10}>
-          <CustomEditor
-            className="bg-white"
-            value={prompt}
-            placeholder="Body item..."
-            onChange={(newVal, _delta, source, _editor): void => {
-              if (onChange && source === 'user') {
-                onChange(
-                  { ...info, prompt: newVal },
-                  state,
-                );
-              }
-            }}
-          />
-        </Col>
-      </Form.Group>
+      <Prompted
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        prompt={prompt}
+        onChange={(newPrompt): void => {
+          if (onChange) { onChange({ ...info, prompt: newPrompt }, state); }
+        }}
+      />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
         <Form.Label column sm={2}>Starter</Form.Label>
         <Col sm={10}>

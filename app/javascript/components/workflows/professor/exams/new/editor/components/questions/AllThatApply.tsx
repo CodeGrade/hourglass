@@ -1,11 +1,12 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
+import { Form, Row, Col } from 'react-bootstrap';
 import { AllThatApplyInfo, AllThatApplyState } from '@student/exams/show/types';
+import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;
   value: AllThatApplyState;
-  onChange: (newVal: AllThatApplyState) => void;
+  onChange: (newInfo: AllThatApplyInfo, newVal: AllThatApplyState) => void;
   disabled: boolean;
   qnum: number;
   pnum: number;
@@ -28,33 +29,43 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
     const val = event.target.checked;
     const ret = { ...value };
     ret[index] = val;
-    onChange(ret);
+    onChange(info, ret);
   };
   const body = (
-    <>
-      <i>(Select all that apply)</i>
-      {options.map((o, i) => {
-        const val = !!value?.[i];
-        return (
-          <Form.Group key={o}>
-            <Form.Check
-              disabled={disabled}
-              type="checkbox"
-              label={o}
-              checked={val}
-              id={`ata-${qnum}-${pnum}-${bnum}-${i}`}
-              onChange={handler(i)}
-            />
-          </Form.Group>
-        );
-      })}
-    </>
+    <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
+      <Form.Label column sm={2}>Correct answers</Form.Label>
+      <Col sm={10}>
+        {options.map((o, i) => {
+          const val = !!value?.[i];
+          return (
+            <Form.Group key={o}>
+              <Form.Check
+                disabled={disabled}
+                type="checkbox"
+                label={o}
+                checked={val}
+                id={`ata-${qnum}-${pnum}-${bnum}-${i}`}
+                onChange={handler(i)}
+              />
+            </Form.Group>
+          );
+        })}
+      </Col>
+    </Form.Group>
   );
   return (
-    <div>
-      <div>{prompt}</div>
+    <>
+      <Prompted
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        prompt={prompt}
+        onChange={(newPrompt): void => {
+          if (onChange) { onChange({ ...info, prompt: newPrompt }, value); }
+        }}
+      />
       {body}
-    </div>
+    </>
   );
 };
 

@@ -7,7 +7,7 @@ import {
   Col,
 } from 'react-bootstrap';
 import { YesNoInfo, YesNoState } from '@student/exams/show/types';
-import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 
 export interface YesNoProps {
   info: YesNoInfo;
@@ -37,19 +37,15 @@ const YesNo: React.FC<YesNoProps> = (props) => {
   const isYesNo = (yesLabel === 'Yes');
   return (
     <>
-      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-prompt`}>
-        <Form.Label column sm={2}>Prompt</Form.Label>
-        <Col sm={10}>
-          <CustomEditor
-            className="bg-white"
-            value={prompt}
-            placeholder="Prompt for this question"
-            onChange={(newPrompt): void => {
-              onChange({ ...info, prompt: newPrompt }, value);
-            }}
-          />
-        </Col>
-      </Form.Group>
+      <Prompted
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        prompt={prompt}
+        onChange={(newPrompt): void => {
+          if (onChange) { onChange({ ...info, prompt: newPrompt }, value); }
+        }}
+      />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-wording`}>
         <Form.Label column sm={2}>Answer format</Form.Label>
         <Col sm={10}>

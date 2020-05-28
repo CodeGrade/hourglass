@@ -15,7 +15,6 @@ import * as ApiStudentExamsShow from '@hourglass/common/api/student/exams/show';
 import * as ApiStudentReg from '@hourglass/common/api/student/registrations';
 import * as ApiProfessorCourses from '@hourglass/common/api/professor/courses';
 import ShowExam from '@student/exams/show';
-import NewExam from '@professor/exams/new';
 import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
@@ -141,13 +140,6 @@ const Exam: React.FC<{}> = () => {
   }
 };
 
-const NewExamForm: React.FC<{}> = () => {
-  const { courseId } = useParams();
-  return (
-    <NewExam courseId={courseId} />
-  );
-};
-
 const Entry: React.FC<{}> = () => {
   const res = ApiMe.useResponse();
   const railsUser = res.type === 'RESULT' ? res.response.user : undefined;
@@ -174,16 +166,10 @@ const Entry: React.FC<{}> = () => {
               <ExamAdmin />
             </Container>
           </Route>
-          <Route path="/courses/:courseId" exact>
+          <Route path="/courses/:courseId">
             <RegularNavbar />
             <Container>
               <ShowCourse />
-            </Container>
-          </Route>
-          <Route path="/courses/:courseId/exams/new" exact>
-            <RegularNavbar />
-            <Container>
-              <NewExamForm />
             </Container>
           </Route>
           <Route path="*">

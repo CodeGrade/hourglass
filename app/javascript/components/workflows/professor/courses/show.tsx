@@ -1,9 +1,11 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Route } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { useResponse as showCourse } from '@hourglass/common/api/professor/courses/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { useResponse as examsIndex } from '@hourglass/common/api/professor/exams';
+import NewExam from '@professor/exams/new';
+import SyncCourse from '@professor/courses/sync';
 
 interface CourseExamsProps {
   courseId: number;
@@ -54,15 +56,32 @@ const ShowCourse: React.FC<{}> = () => {
             <h1>
               {res.response.course.title}
             </h1>
-            <Link to={`/courses/${courseId}/exams/new`}>
-              <Button
-                variant="success"
-              >
-                New Exam
-              </Button>
-            </Link>
+            <div>
+              <Link to={`/courses/${courseId}/sync`}>
+                <Button
+                  variant="danger"
+                >
+                  Sync
+                </Button>
+              </Link>
+              <Link to={`/courses/${courseId}/new`} className="ml-1">
+                <Button
+                  variant="success"
+                >
+                  New Exam
+                </Button>
+              </Link>
+            </div>
           </div>
-          <CourseExams courseId={courseId} />
+          <Route path="/courses/:courseId" exact>
+            <CourseExams courseId={courseId} />
+          </Route>
+          <Route path="/courses/:courseId/sync" exact>
+            <SyncCourse />
+          </Route>
+          <Route path="/courses/:courseId/new" exact>
+            <NewExam courseId={courseId} />
+          </Route>
         </>
       );
     default:

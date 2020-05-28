@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useResponse as examsShow } from '@hourglass/common/api/professor/exams/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
@@ -53,6 +53,12 @@ const PreviewExam: React.FC<{
   } = props;
   const { examId } = useParams();
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    document.querySelectorAll('.CodeMirror').forEach((cm: any) => {
+      setTimeout(() => cm.CodeMirror.refresh());
+    });
+  }, [open]);
   return (
     <>
       <Link to={`/exams/${examId}/edit`}>

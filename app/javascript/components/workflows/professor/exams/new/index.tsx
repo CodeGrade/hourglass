@@ -26,7 +26,7 @@ const NewExam: React.FC<NewExamProps> = (props) => {
     case 'RESULT':
       return (
         <div>
-          <h1>{`${res.response.course.title} - New Exam`}</h1>
+          <h2>New Exam</h2>
           <NewExamForm
             course={res.response.course}
           />

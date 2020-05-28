@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useResponse as examsShow } from '@hourglass/common/api/professor/exams/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Collapse, Button } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
 import ExamViewer from '@hourglass/workflows/proctor/registrations/show';
+import { RailsExam, ContentsState } from '@hourglass/workflows/student/exams/show/types';
 
 const ExamAdmin: React.FC<{}> = () => {
   const { examId } = useParams();
@@ -24,7 +25,7 @@ const ExamAdmin: React.FC<{}> = () => {
     case 'RESULT':
       return (
         <>
-          <h2>{res.response.exam.name}</h2>
+          <h1>{res.response.exam.name}</h1>
           <PreviewExam
             railsExam={{
               id: examId,
@@ -50,12 +51,20 @@ const PreviewExam: React.FC<{
     contents,
     railsExam,
   } = props;
+  const { examId } = useParams();
   const [open, setOpen] = useState(false);
   return (
     <>
+      <Link to={`/exams/${examId}/edit`}>
+        <Button
+          variant="info"
+        >
+          Edit Exam
+        </Button>
+      </Link>
       <Button
         variant="outline-primary"
-        className="d-flex align-items-center justify-content-between"
+        className="mt-3 d-flex align-items-center justify-content-between"
         as="div"
         onClick={(): void => setOpen((o) => !o)}
       >
@@ -71,11 +80,5 @@ const PreviewExam: React.FC<{
         </div>
       </Collapse>
     </>
-  );
-};
-
-const ExamAnswers: React.FC<{}> = () => {
-  return (
-    <p>answers here!</p>
   );
 };

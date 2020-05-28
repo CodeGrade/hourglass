@@ -6,8 +6,8 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import { MoveQuestionAction } from '@professor/exams/new/types';
-import { moveQuestion } from '@professor/exams/new/actions';
+import { MoveQuestionAction, DeleteQuestionAction } from '@professor/exams/new/types';
+import { moveQuestion, deleteQuestion } from '@professor/exams/new/actions';
 import YesNo from '@student/exams/show/components/questions/YesNo';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import ShowParts from '@professor/exams/new/editor/containers/ShowParts';
@@ -52,6 +52,7 @@ const Question: React.FC<QuestionProps> = (props) => {
         enableDown={qnum + 1 < numQuestions}
         onUp={(): MoveQuestionAction => moveQuestion(qnum, qnum - 1)}
         onDown={(): MoveQuestionAction => moveQuestion(qnum, qnum + 1)}
+        onDelete={(): DeleteQuestionAction => deleteQuestion(qnum)}
       />
       <Alert variant="primary">
         <Card.Title>

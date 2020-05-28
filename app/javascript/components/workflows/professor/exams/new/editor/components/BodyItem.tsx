@@ -9,8 +9,8 @@ import AllThatApply from '@professor/exams/new/editor/containers/questions/AllTh
 import EditHTML from '@professor/exams/new/editor/containers/EditHTML';
 import { BodyItem } from '@student/exams/show/types';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { MoveBodyItemAction } from '@professor/exams/new/types';
-import { moveBodyItem } from '@professor/exams/new/actions';
+import { MoveBodyItemAction, DeleteBodyItemAction } from '@professor/exams/new/types';
+import { moveBodyItem, deleteBodyItem } from '@professor/exams/new/actions';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { Card } from 'react-bootstrap';
 
@@ -72,6 +72,7 @@ const WrappedBody: React.FC<BodyProps> = (props) => {
         enableDown={bnum + 1 < numBodyItems}
         onUp={(): MoveBodyItemAction => moveBodyItem(qnum, pnum, bnum, bnum - 1)}
         onDown={(): MoveBodyItemAction => moveBodyItem(qnum, pnum, bnum, bnum + 1)}
+        onDelete={(): DeleteBodyItemAction => deleteBodyItem(qnum, pnum, bnum)}
       />
       <Card.Body>{Body(props)}</Card.Body>
     </Card>

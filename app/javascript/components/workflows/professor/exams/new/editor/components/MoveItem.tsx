@@ -4,7 +4,7 @@ import {
   Button,
   ButtonProps,
 } from 'react-bootstrap';
-import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { FaChevronUp, FaChevronDown, FaTrashAlt } from 'react-icons/fa';
 
 export interface MoveProps {
   enableUp?: boolean;
@@ -13,6 +13,7 @@ export interface MoveProps {
   visible: boolean;
   onUp?: () => void;
   onDown?: () => void;
+  onDelete?: () => void;
 }
 
 const MoveItem: React.FC<MoveProps> = (props) => {
@@ -23,6 +24,7 @@ const MoveItem: React.FC<MoveProps> = (props) => {
     visible,
     onUp,
     onDown,
+    onDelete,
   } = props;
   return (
     <div className={`position-absolute ${visible ? '' : 'd-none'}`}>
@@ -46,6 +48,13 @@ const MoveItem: React.FC<MoveProps> = (props) => {
           title="Move down"
         >
           <FaChevronDown />
+        </Button>
+        <Button
+          variant="danger"
+          onClick={onDelete}
+          title="Delete"
+        >
+          <FaTrashAlt />
         </Button>
       </ButtonGroup>
     </div>

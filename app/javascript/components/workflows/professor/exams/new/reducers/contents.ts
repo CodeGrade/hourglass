@@ -54,7 +54,7 @@ export default (state: ContentsState = {
       };
     }
     case 'DELETE_QUESTION': {
-      const questions = { ...state.exam.questions };
+      const questions = [...state.exam.questions];
       const answers = arrayLikeToArray(state.answers.answers, questions.length);
       const { qnum } = action;
       questions.splice(qnum, 1);

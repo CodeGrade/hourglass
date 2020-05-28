@@ -12,10 +12,13 @@ import {
   UpdateTitleAction,
   UpdateQuestionAction,
   MoveQuestionAction,
+  DeleteQuestionAction,
   MovePartAction,
-  MoveBodyItemAction,
   UpdatePartAction,
+  DeletePartAction,
+  MoveBodyItemAction,
   UpdateHTMLBodyItemAction,
+  DeleteBodyItemAction,
 } from '@professor/exams/new/types';
 
 
@@ -75,6 +78,15 @@ export function moveQuestion(
   };
 }
 
+export function deleteQuestion(
+  qnum: number,
+): DeleteQuestionAction {
+  return {
+    type: 'DELETE_QUESTION',
+    qnum,
+  };
+}
+
 export function updatePart(
   qnum: number,
   pnum: number,
@@ -106,6 +118,18 @@ export function movePart(
   };
 }
 
+export function deletePart(
+  qnum: number,
+  pnum: number,
+): DeletePartAction {
+  return {
+    type: 'DELETE_PART',
+    qnum,
+    pnum,
+  };
+}
+
+
 export function moveBodyItem(
   qnum: number,
   pnum: number,
@@ -118,6 +142,19 @@ export function moveBodyItem(
     pnum,
     from,
     to,
+  };
+}
+
+export function deleteBodyItem(
+  qnum: number,
+  pnum: number,
+  bnum: number,
+): DeleteBodyItemAction {
+  return {
+    type: 'DELETE_BODY_ITEM',
+    qnum,
+    pnum,
+    bnum,
   };
 }
 

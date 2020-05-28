@@ -10,8 +10,8 @@ import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import { HTMLVal } from '@student/exams/show/types';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/containers/ShowBodyItems';
-import { MovePartAction } from '../../types';
-import { movePart } from '../../actions';
+import { MovePartAction, DeletePartAction } from '../../types';
+import { movePart, deletePart } from '../../actions';
 
 
 export interface PartProps {
@@ -51,6 +51,7 @@ const Part: React.FC<PartProps> = (props) => {
         enableDown={pnum + 1 < numParts}
         onUp={(): MovePartAction => movePart(qnum, pnum, pnum - 1)}
         onDown={(): MovePartAction => movePart(qnum, pnum, pnum + 1)}
+        onDelete={(): DeletePartAction => deletePart(qnum, pnum)}
       />
       <Alert variant="success">
         <Card.Title>

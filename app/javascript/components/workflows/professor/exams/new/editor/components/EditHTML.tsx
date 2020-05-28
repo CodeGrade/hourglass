@@ -31,7 +31,9 @@ const EditHTML: React.FC<HTMLProps> = (props) => {
             className="bg-white"
             value={value}
             placeholder="Body item..."
-            onChange={onChange}
+            onChange={(newVal, _delta, source, _editor): void => {
+              if (source === 'user') onChange(newVal);
+            }}
           />
         </Col>
       </Form.Group>

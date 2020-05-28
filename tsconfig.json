@@ -9,7 +9,7 @@
     "target": "esnext",
     "jsx": "preserve",
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "app/javascript",
+    "baseUrl": "app/javascript/components",
     "paths": {
       "@hourglass/*": ["./*"],
       "@student/*": ["./workflows/student/*"],

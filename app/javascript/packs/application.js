@@ -6,7 +6,7 @@
 // that code so it'll be compiled.
 
 require('@rails/ujs').start();
-const componentRequireContext = require.context('../', true);
+const componentRequireContext = require.context('components', true);
 const ReactRailsUJS = require('react_ujs');
 
 ReactRailsUJS.useContext(componentRequireContext);

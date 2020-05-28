@@ -4,10 +4,10 @@ const path = require('path')
 const webpack = require('webpack');
 
 const aliasConfig = {
-  '@hourglass': path.resolve(__dirname, '..', '..', 'app/javascript'),
-  '@student': path.resolve(__dirname, '..', '..', 'app/javascript/workflows/student'),
-  '@proctor': path.resolve(__dirname, '..', '..', 'app/javascript/workflows/proctor'),
-  '@professor': path.resolve(__dirname, '..', '..', 'app/javascript/workflows/professor'),
+  '@hourglass': path.resolve(__dirname, '..', '..', 'app/javascript/components'),
+  '@student': path.resolve(__dirname, '..', '..', 'app/javascript/components/workflows/student'),
+  '@proctor': path.resolve(__dirname, '..', '..', 'app/javascript/components/workflows/proctor'),
+  '@professor': path.resolve(__dirname, '..', '..', 'app/javascript/components/workflows/professor'),
 };
 
 environment.config.set('resolve.alias', aliasConfig);

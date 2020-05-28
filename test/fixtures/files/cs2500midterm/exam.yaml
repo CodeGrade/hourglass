@@ -23,31 +23,28 @@ versions:
               - "Answer all of the following true/false questions."
               - TrueFalse:
                   correctAnswer: true
-                  prompt:
-                    - "Java requires the use of semicolons to end statements."
+                  prompt: "Java requires the use of semicolons to end statements."
               - TrueFalse:
                   correctAnswer: false
-                  prompt:
-                    - "Racket requires the use of semicolons to end statements."
+                  prompt: "Racket requires the use of semicolons to end statements."
               - "The next one is tricky! Be careful."
               - TrueFalse:
                   correctAnswer: false
-                  prompt:
-                    - "Java does not require the use of semicolons to end statements."
+                  prompt: "Java does not require the use of semicolons to end statements."
               - CodeTag:
-                  prompt: ["Tag line one of a file."]
+                  prompt: "Tag line one of a file."
                   correctAnswer:
                     filename: "q1/p1/anything.txt"
                     line: 1
                   choices: "part"
               - CodeTag:
-                  prompt: ["Tag line two of a file."]
+                  prompt: "Tag line two of a file."
                   correctAnswer:
                     filename: "q1/all/src/packagetwo/Example2.java"
                     line: 7
                   choices: "question"
               - CodeTag:
-                  prompt: ["Tag line three of a file."]
+                  prompt: "Tag line three of a file."
                   correctAnswer:
                     filename: "q1/all/src/packageone/Example.java"
                     line: 5
@@ -56,14 +53,12 @@ versions:
             points: 11
             body:
               - Code:
-                  prompt:
-                    - "Type some code in the box."
+                  prompt: "Type some code in the box."
                   initial: "q1/all/src/packagetwo/Example2.java"
                   lang: "text/x-java"
               - "<p>This is an interlude of <b>HTML</b> content</p>"
               - MultipleChoice:
-                  prompt:
-                    - "What does the code in PartB.java do?"
+                  prompt: "What does the code in PartB.java do?"
                   options:
                     - "Nothing"
                     - "Prints 4"
@@ -86,16 +81,14 @@ versions:
                     - 1
                     - 0
               - Code:
-                  prompt:
-                    - "Type some code"
+                  prompt: "Type some code"
                   lang: "text/x-java"
             points: 2
           - name: "The second part! Name is optional."
             points: 6
             body:
               - AllThatApply:
-                  prompt:
-                    - "Which are true about Java?"
+                  prompt: "Which are true about Java?"
                   options:
                     - "this one applies": true
                     - "this one also applies": true
@@ -103,10 +96,8 @@ versions:
           - points: 30
             body:
               - YesNo:
-                  prompt:
-                    - "Did you choose no?"
+                  prompt: "Did you choose no?"
                   correctAnswer: true # wrong
               - Text:
-                  prompt:
-                    - "Explain your reasoning for taking this course."
+                  prompt: "Explain your reasoning for taking this course."
 

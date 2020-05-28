@@ -39,14 +39,7 @@ const Text: React.FC<TextProps> = (props) => {
     <>
       <Row>
         <Col>
-          {prompt.map((p, i) => (
-            <HTML
-              // Prompt indices are STATIC.
-              // eslint-disable-next-line react/no-array-index-key
-              key={i}
-              value={p}
-            />
-          ))}
+          <HTML value={prompt} />
         </Col>
       </Row>
       <Row>

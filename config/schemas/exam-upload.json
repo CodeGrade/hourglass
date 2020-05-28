@@ -103,11 +103,6 @@
         { "$ref": "#/definitions/Response" }
       ]
     },
-    "HTMLs": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/HTML" },
-      "minItems": 1
-    },
     "Response": {
       "oneOf": [
         { "$ref": "#/definitions/Code" },
@@ -130,7 +125,7 @@
           "additionalProperties": false,
           "required": ["lang"],
           "properties": {
-            "prompt": { "$ref": "#/definitions/HTMLs" },
+            "prompt": { "$ref": "#/definitions/HTML" },
             "lang": { "type": "string" },
             "initial": { "type": "string" }
           }
@@ -155,7 +150,7 @@
       "additionalProperties": false,
       "required": ["correctAnswer"],
       "properties": {
-        "prompt": { "$ref": "#/definitions/HTMLs" },
+        "prompt": { "$ref": "#/definitions/HTML" },
         "correctAnswer": { "type": "boolean" }
       }
     },
@@ -177,7 +172,7 @@
       "additionalProperties": false,
       "required": ["correctAnswer"],
       "properties": {
-        "prompt": { "$ref": "#/definitions/HTMLs" },
+        "prompt": { "$ref": "#/definitions/HTML" },
         "correctAnswer": { "type": "boolean" }
       }
     },
@@ -191,7 +186,7 @@
           "additionalProperties": false,
           "required": ["options", "correctAnswer"],
           "properties": {
-            "prompt": { "$ref": "#/definitions/HTMLs" },
+            "prompt": { "$ref": "#/definitions/HTML" },
             "options": { "$ref": "#/definitions/Options" },
             "correctAnswer": { "$ref": "#/definitions/MultipleChoiceAnswer" }
           }
@@ -217,7 +212,7 @@
           "additionalProperties": false,
           "required": ["prompts", "values", "correctAnswers"],
           "properties": {
-            "prompt": { "$ref": "#/definitions/HTMLs" },
+            "prompt": { "$ref": "#/definitions/HTML" },
             "prompts": { "$ref": "#/definitions/Options" },
             "values": { "$ref": "#/definitions/Options" },
             "correctAnswers": { "$ref": "#/definitions/MatchingAnswers" }
@@ -243,7 +238,7 @@
           "additionalProperties": false,
           "required": ["options"],
           "properties": {
-            "prompt": { "$ref": "#/definitions/HTMLs" },
+            "prompt": { "$ref": "#/definitions/HTML" },
             "options": { "$ref": "#/definitions/ATAOptions" }
           }
         }
@@ -272,7 +267,7 @@
           "additionalProperties": false,
           "required": ["correctAnswer", "choices"],
           "properties": {
-            "prompt": { "$ref": "#/definitions/HTMLs" },
+            "prompt": { "$ref": "#/definitions/HTML" },
             "correctAnswer": { "$ref": "#/definitions/TagAnswer" },
             "choices": {
               "type": "string",
@@ -309,7 +304,7 @@
       "additionalProperties": false,
       "required": ["prompt"],
       "properties": {
-        "prompt": { "$ref": "#/definitions/HTMLs" }
+        "prompt": { "$ref": "#/definitions/HTML" }
       }
     }
   }

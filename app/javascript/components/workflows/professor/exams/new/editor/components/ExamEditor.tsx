@@ -8,7 +8,6 @@ import {
 import {
   Exam,
   RailsExam,
-  ExamFile,
   AnswersState,
 } from '@student/exams/show/types';
 import Instructions from '@hourglass/workflows/professor/exams/new/editor/containers/Instructions';
@@ -18,7 +17,6 @@ import ShowQuestions from './ShowQuestions';
 export interface ExamEditorProps {
   exam: Exam;
   railsExam: RailsExam;
-  files: ExamFile[];
   answers: AnswersState;
 }
 

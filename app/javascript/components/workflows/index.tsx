@@ -17,6 +17,7 @@ import * as ApiProfessorCourses from '@hourglass/common/api/professor/courses';
 import ShowExam from '@student/exams/show';
 import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
+import EditExam from '@professor/exams/edit';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 interface StudentRegsProps {
@@ -164,6 +165,12 @@ const Entry: React.FC<{}> = () => {
             <RegularNavbar />
             <Container>
               <ExamAdmin />
+            </Container>
+          </Route>
+          <Route path="/exams/:examId/edit" exact>
+            <RegularNavbar />
+            <Container>
+              <EditExam />
             </Container>
           </Route>
           <Route path="/courses/:courseId">

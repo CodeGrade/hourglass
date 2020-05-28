@@ -38,7 +38,7 @@ module Api
         render json: {
           exam: {
             name: @exam.name,
-            polcies: @exam.info['policies']
+            policies: @exam.info['policies']
           },
           contents: {
             exam: {

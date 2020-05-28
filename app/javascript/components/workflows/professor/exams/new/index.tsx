@@ -5,44 +5,19 @@ import {
   Card,
   CardDeck,
 } from 'react-bootstrap';
-import { Course, useResponse as showCourse } from '@hourglass/common/api/professor/courses/show';
 import { useParams, useHistory } from 'react-router-dom';
 import { getCSRFToken } from '@hourglass/workflows/student/exams/show/helpers';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
-interface NewExamProps {
-  courseId: number;
-}
+const NewExam: React.FC<{}> = () => (
+  <div>
+    <h2>New Exam</h2>
+    <NewExamForm />
+  </div>
+);
 
-const NewExam: React.FC<NewExamProps> = (props) => {
-  const {
-    courseId,
-  } = props;
-  const res = showCourse(courseId);
-  switch (res.type) {
-    case 'ERROR':
-    case 'LOADING':
-      return <p>Loading...</p>;
-    case 'RESULT':
-      return (
-        <div>
-          <h2>New Exam</h2>
-          <NewExamForm
-            course={res.response.course}
-          />
-        </div>
-      );
-    default:
-      throw new ExhaustiveSwitchError(res);
-  }
-};
 export default NewExam;
 
-interface NewExamFormProps {
-  course: Course;
-}
-
-const NewExamForm: React.FC<NewExamFormProps> = () => {
+const NewExamForm: React.FC<{}> = () => {
   const [name, setName] = useState('');
   const [file, setFile] = useState(undefined);
   const { courseId } = useParams();

@@ -4,10 +4,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { Row, Col } from 'react-bootstrap';
 import {
-  CodeTagState, FileRef, ExamFile,
+  CodeTagState, FileRef, ExamFile, FileMap,
 } from '@student/exams/show/types';
 import { ExamContext } from '@student/exams/show/context';
-import { firstFile, getFilesForRefs } from '@student/exams/show/files';
+import { firstFile, getFilesForRefs, createMap } from '@student/exams/show/files';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Editor } from './ExamCodeBox';
 
@@ -45,6 +45,7 @@ interface FileContentsProps {
   selectedLine?: number;
   onChangeLine?: (lineNum: number) => void;
   refreshProps?: React.DependencyList;
+  fmap: FileMap;
 }
 
 const FileContents: React.FC<FileContentsProps> = (props) => {
@@ -53,9 +54,9 @@ const FileContents: React.FC<FileContentsProps> = (props) => {
     selectedLine,
     onChangeLine,
     refreshProps: rp,
+    fmap,
   } = props;
   const refreshProps = rp ?? [];
-  const { fmap } = useContext(ExamContext);
   const f = fmap[selectedFile];
   let cursor: CodeMirror.Position;
   if (selectedLine) {
@@ -105,11 +106,16 @@ interface FileTreeProps {
   files: ExamFile[];
   selectedFile: string;
   onChangeFile: (id: string) => void;
+  fmap: FileMap;
 }
 
 const FileTree: React.FC<FileTreeProps> = (props) => {
-  const { files, onChangeFile, selectedFile } = props;
-  const { fmap } = useContext(ExamContext);
+  const {
+    files,
+    onChangeFile,
+    selectedFile,
+    fmap,
+  } = props;
   const allIds = Object.keys(fmap);
   return (
     <TreeView
@@ -145,10 +151,12 @@ export const FileViewer: React.FC<FileViewerProps> = (props) => {
           files={filteredFiles}
           selectedFile={selectedID}
           onChangeFile={setSelectedID}
+          fmap={fmap}
         />
       </Col>
       <Col sm={9}>
         <FileContents
+          fmap={fmap}
           selectedFile={selectedID}
         />
       </Col>
@@ -178,6 +186,7 @@ export const ControlledFileViewer: React.FC<ControlledFileViewerProps> = (props)
           files={filteredFiles}
           selectedFile={selection?.selectedFile ?? ''}
           onChangeFile={onChangeFile}
+          fmap={fmap}
         />
       </Col>
       <Col sm={9}>
@@ -186,6 +195,37 @@ export const ControlledFileViewer: React.FC<ControlledFileViewerProps> = (props)
           selectedLine={selection?.lineNumber}
           onChangeLine={onChangeLine}
           refreshProps={refreshProps}
+          fmap={fmap}
+        />
+      </Col>
+    </Row>
+  );
+};
+
+export const VeryControlledFileViewer: React.FC<{
+  files: ExamFile[];
+}> = (props) => {
+  const {
+    files,
+  } = props;
+  const fmap = createMap(files);
+  const first = firstFile(files);
+  const firstID = first?.relPath;
+  const [selectedID, setSelectedID] = useState(firstID);
+  return (
+    <Row>
+      <Col sm={3}>
+        <FileTree
+          files={files}
+          selectedFile={selectedID}
+          onChangeFile={setSelectedID}
+          fmap={fmap}
+        />
+      </Col>
+      <Col sm={9}>
+        <FileContents
+          fmap={fmap}
+          selectedFile={selectedID}
         />
       </Col>
     </Row>

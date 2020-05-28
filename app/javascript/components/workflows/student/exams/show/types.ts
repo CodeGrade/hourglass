@@ -477,13 +477,8 @@ export interface ExamSingleFile {
   // Label for the file.
   text: string;
 
-  // Path name of this file (no trailing slash)
-  path: string;
-
+  // path relative to root
   relPath: string;
-
-  // Sequential ID of this file.
-  id: number;
 
   // The contents of the file.
   contents: string;
@@ -501,13 +496,8 @@ export interface ExamDir {
   // Label for the directory (with trailing slash)
   text: string;
 
-  // Path name of this directory (no trailing slash)
-  path: string;
-
+  // path relative to root
   relPath: string;
-
-  // Sequential ID of this directory.
-  id: number;
 
   // Files within this directory.
   nodes: ExamFile[];

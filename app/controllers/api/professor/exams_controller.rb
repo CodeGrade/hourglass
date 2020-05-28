@@ -35,7 +35,21 @@ module Api
       end
 
       def show
-        render json: @exam.slice(:name)
+        render json: {
+          exam: {
+            name: @exam.name,
+            polcies: @exam.info['policies']
+          },
+          contents: {
+            exam: {
+              questions: @exam.version(0)['contents']['questions'],
+              reference: @exam.version(0)['contents']['reference'],
+              instructions: @exam.version(0)['contents']['instructions'],
+              files: @exam.files
+            },
+            answers: @exam.version(0)['answers']
+          }
+        }
       end
     end
   end

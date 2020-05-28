@@ -1,7 +1,12 @@
 import { ApiResponse, useApiResponse } from '@hourglass/common/types/api';
+import { ContentsState, Policy } from '@hourglass/workflows/student/exams/show/types';
 
 export interface Response {
-  name: string;
+  exam: {
+    name: string;
+    policies: Policy[];
+  };
+  contents: ContentsState;
 }
 
 export function useResponse(examId: number): ApiResponse<Response> {

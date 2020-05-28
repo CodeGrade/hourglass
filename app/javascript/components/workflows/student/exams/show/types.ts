@@ -329,9 +329,11 @@ export interface SnapshotState {
 }
 
 export interface AnswersState {
-  [qnum: number]: {
-    [pnum: number]: {
-      [bnum: number]: AnswerState;
+  answers: {
+    [qnum: number]: {
+      [pnum: number]: {
+        [bnum: number]: AnswerState;
+      };
     };
   };
 

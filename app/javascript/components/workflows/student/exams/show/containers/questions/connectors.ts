@@ -28,7 +28,7 @@ const mapStateToProps: MSTP<{
   const { status, message } = snapshot;
   const locked = status === SnapshotStatus.FAILURE;
   return {
-    value: state.contents.answers[qnum]?.[pnum]?.[bnum],
+    value: state.contents.answers.answers?.[qnum]?.[pnum]?.[bnum],
     disabled: locked,
     locked,
     lockedMsg: message,

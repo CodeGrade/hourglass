@@ -8,4 +8,5 @@ cs3500student:
   registration: cs3500student
   answers: {
     scratch: "cs3500student scratch space!"
+    answers: [],
   }

@@ -5,24 +5,33 @@ import {
 
 export default (state: ContentsState = {
   exam: undefined,
-  answers: undefined,
+  answers: {
+    answers: [],
+    scratch: '',
+  },
 }, action: ExamTakerAction): ContentsState => {
   switch (action.type) {
     case 'LOAD_EXAM':
       return {
         ...state,
         exam: action.exam,
-        answers: action.answers,
+        answers: {
+          ...state.answers,
+          ...action.answers,
+        },
       };
     case 'UPDATE_ANSWER': {
-      const ret = { ...state.answers };
       const { qnum, pnum, bnum } = action;
-      ret[qnum] = { ...state.answers[qnum] };
-      ret[qnum][pnum] = { ...state.answers[qnum]?.[pnum] };
-      ret[qnum][pnum][bnum] = action.val;
+      const answers = { ...state.answers.answers };
+      answers[qnum] = { ...answers[qnum] };
+      answers[qnum][pnum] = { ...answers[qnum]?.[pnum] };
+      answers[qnum][pnum][bnum] = action.val;
       return {
         ...state,
-        answers: ret,
+        answers: {
+          ...state.answers,
+          answers,
+        },
       };
     }
     case 'UPDATE_SCRATCH':

@@ -134,7 +134,7 @@ const Rooms: React.FC<{}> = (props) => {
     fields,
   } = props;
   return (
-    <div className="d-flex flex-wrap justify-content-between">
+    <div className="d-flex mx-n1 flex-wrap justify-content-between">
       {fields.map((member, index) => {
         const room = fields.get(index);
         return (

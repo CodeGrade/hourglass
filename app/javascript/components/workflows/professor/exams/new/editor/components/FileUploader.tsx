@@ -3,7 +3,11 @@ import {
   Row,
   Col,
   Form,
+  Button,
+  Collapse,
+  InputGroup,
 } from 'react-bootstrap';
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import {
   ExamFile,
 } from '@student/exams/show/types';
@@ -18,30 +22,58 @@ interface FileUploaderProps {
 const FileUploader: React.FC<FileUploaderProps> = (props) => {
   const { files, onChange } = props;
   const [file, setFile] = useState<File>(undefined);
+  const [open, setOpen] = useState(false);
+  const noFiles = files === undefined || files.length === 0;
   useEffect(() => {
     if (!file) return;
     handleZip(file).then(onChange);
   }, [file]);
+  const curLabel = file?.name ?? (noFiles ? 'Choose a file' : 'Saved files');
   return (
     <Form>
       <Form.Group as={Row}>
         <Col sm={12}>
-          <Form.File
-            required
-            onChange={(e): void => {
-              const { files: uploaded } = e.target;
-              const upload = uploaded[0];
-              if (upload) setFile(upload);
-            }}
-            label={file?.name ?? 'Choose a file'}
-            accept="application/zip,.yaml,.yml"
-            custom
-          />
+          <InputGroup>
+            <Form.File
+              required
+              onChange={(e): void => {
+                const { files: uploaded } = e.target;
+                const upload = uploaded[0];
+                if (upload) setFile(upload);
+              }}
+              label={curLabel}
+              accept="application/zip,.yaml,.yml"
+              custom
+            />
+            <InputGroup.Append>
+              <Button
+                variant="danger"
+                disabled={noFiles}
+                onClick={(): void => {
+                  setOpen(false);
+                  setFile(undefined);
+                  onChange([]);
+                }}
+              >
+                Clear files
+              </Button>
+              <Button
+                variant="info"
+                disabled={noFiles}
+                onClick={(): void => setOpen((o) => !o)}
+              >
+                Preview files
+                {open ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+              </Button>
+            </InputGroup.Append>
+          </InputGroup>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row}>
         <Col sm={12}>
-          <VeryControlledFileViewer files={files} />
+          <Collapse in={open}>
+            <div className="border">
+              <VeryControlledFileViewer files={files} />
+            </div>
+          </Collapse>
         </Col>
       </Form.Group>
     </Form>

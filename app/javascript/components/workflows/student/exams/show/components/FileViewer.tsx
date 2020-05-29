@@ -10,6 +10,7 @@ import { ExamContext } from '@student/exams/show/context';
 import { firstFile, getFilesForRefs, createMap } from '@student/exams/show/files';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Editor } from './ExamCodeBox';
+import './FileViewer.scss';
 
 interface FilesProps {
   files: ExamFile[];
@@ -181,7 +182,7 @@ export const ControlledFileViewer: React.FC<ControlledFileViewerProps> = (props)
   const filteredFiles = getFilesForRefs(fmap, references);
   return (
     <Row>
-      <Col sm={3}>
+      <Col sm={3} className="overflow-scroll-x">
         <FileTree
           files={filteredFiles}
           selectedFile={selection?.selectedFile ?? ''}
@@ -217,7 +218,7 @@ export const VeryControlledFileViewer: React.FC<{
   }, [files, setSelectedID]);
   return (
     <Row>
-      <Col sm={3}>
+      <Col sm={3} className="overflow-scroll-x">
         <FileTree
           files={files}
           selectedFile={selectedID}

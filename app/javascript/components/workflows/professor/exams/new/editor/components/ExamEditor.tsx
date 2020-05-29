@@ -11,6 +11,7 @@ import {
   AnswersState,
 } from '@student/exams/show/types';
 import Instructions from '@hourglass/workflows/professor/exams/new/editor/containers/Instructions';
+import FileUploader from '@professor/exams/new/editor/containers/FileUploader';
 import Policies from '@professor/exams/new/editor/containers/Policies';
 import ShowQuestions from './ShowQuestions';
 
@@ -47,6 +48,7 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
       </Form>
 
       <Instructions />
+      <FileUploader />
       <ShowQuestions questions={questions} />
     </Container>
   );

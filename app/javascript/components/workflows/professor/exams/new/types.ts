@@ -11,6 +11,7 @@ import {
   RailsExam,
   HTMLVal,
   AnswerState,
+  ExamFile,
 } from '@student/exams/show/types';
 
 export type Thunk = ThunkAction<void, ContentsState, unknown, ExamEditorAction>;
@@ -29,7 +30,7 @@ export interface ExamEditorState {
 }
 
 export type ExamEditorAction = LoadExamAction
-| UpdateInstructionsAction | UpdatePoliciesAction | UpdateTitleAction
+| UpdateInstructionsAction | UpdatePoliciesAction | UpdateTitleAction | UpdateExamFilesAction
 | AddQuestionAction | DeleteQuestionAction | UpdateQuestionAction | MoveQuestionAction
 | AddPartAction | DeletePartAction | UpdatePartAction | MovePartAction
 | AddBodyItemAction | DeleteBodyItemAction | UpdateBodyItemAction | MoveBodyItemAction
@@ -51,6 +52,11 @@ export interface UpdateTitleAction {
 export interface UpdateInstructionsAction {
   type: 'UPDATE_INSTRUCTIONS';
   val: string;
+}
+
+export interface UpdateExamFilesAction {
+  type: 'UPDATE_EXAM_FILES';
+  files: ExamFile[];
 }
 
 export interface UpdatePoliciesAction {

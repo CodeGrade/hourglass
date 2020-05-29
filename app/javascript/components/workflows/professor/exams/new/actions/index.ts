@@ -4,9 +4,11 @@ import {
   Policy,
   RailsExam,
   HTMLVal,
+  ExamFile,
 } from '@student/exams/show/types';
 import {
   LoadExamAction,
+  UpdateExamFilesAction,
   UpdateInstructionsAction,
   UpdatePoliciesAction,
   UpdateTitleAction,
@@ -43,12 +45,22 @@ export function updateTitle(
     title,
   };
 }
+
 export function updateInstructions(
   val: string,
 ): UpdateInstructionsAction {
   return {
     type: 'UPDATE_INSTRUCTIONS',
     val,
+  };
+}
+
+export function updateExamFiles(
+  files: ExamFile[],
+): UpdateExamFilesAction {
+  return {
+    type: 'UPDATE_EXAM_FILES',
+    files,
   };
 }
 

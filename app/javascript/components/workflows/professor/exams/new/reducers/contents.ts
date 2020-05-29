@@ -35,6 +35,15 @@ export default (state: ContentsState = {
         },
       };
     }
+    case 'UPDATE_EXAM_FILES': {
+      return {
+        ...state,
+        exam: {
+          ...state.exam,
+          files: action.files,
+        },
+      };
+    }
     case 'ADD_QUESTION': {
       const questions = { ...state.exam.questions };
       const { qnum, question } = action;

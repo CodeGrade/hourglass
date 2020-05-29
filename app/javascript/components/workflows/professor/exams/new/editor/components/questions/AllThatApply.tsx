@@ -104,7 +104,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
             </thead>
             <tbody>
               {options.map((option, idx) => {
-                const selected = value[idx];
+                const selected = value?.[idx];
                 return (
                   <tr
                     // We don't have a better option than this index right now.

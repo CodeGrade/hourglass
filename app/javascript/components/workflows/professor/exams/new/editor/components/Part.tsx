@@ -77,7 +77,7 @@ const Part: React.FC<PartProps> = (props) => {
               <CustomEditor
                 className="bg-white"
                 value={description}
-                placeholder="Give a longer description of the question"
+                placeholder="Give a longer description of the part"
                 onChange={(newDesc, _delta, source, _editor): void => {
                   if (source === 'user') onChange(name, newDesc, points);
                 }}

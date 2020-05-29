@@ -45,7 +45,7 @@ export default (state: ContentsState = {
       };
     }
     case 'ADD_QUESTION': {
-      const questions = { ...state.exam.questions };
+      const questions = [...state.exam.questions];
       const { qnum, question } = action;
       questions.splice(qnum, 0, question);
       const answers = arrayLikeToArray(state.answers.answers, questions.length);
@@ -125,12 +125,25 @@ export default (state: ContentsState = {
       };
     }
     case 'ADD_PART': {
-      const ret = { ...state.exam };
       const { qnum, pnum, part } = action;
-      ret.questions[qnum].parts.splice(pnum, 0, part);
+      const questions = [...state.exam.questions];
+      questions[qnum] = { ...questions[qnum] };
+      questions[qnum].parts = [...questions[qnum].parts];
+      questions[qnum].parts.splice(pnum, 0, part);
+      const answers = arrayLikeToArray(state.answers.answers, questions.length);
+      const ansQnum = arrayLikeToArray(answers[qnum] || {}, questions[qnum].parts.length);
+      ansQnum.splice(pnum, 0, {});
+      answers[qnum] = ansQnum;
       return {
         ...state,
-        exam: ret,
+        exam: {
+          ...state.exam,
+          questions,
+        },
+        answers: {
+          ...state.answers,
+          answers,
+        },
       };
     }
     case 'DELETE_PART': {

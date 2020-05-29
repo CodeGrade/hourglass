@@ -5,6 +5,9 @@ import {
   RailsExam,
   HTMLVal,
   ExamFile,
+  QuestionInfo,
+  PartInfo,
+  BodyItem,
 } from '@student/exams/show/types';
 import {
   LoadExamAction,
@@ -12,12 +15,15 @@ import {
   UpdateInstructionsAction,
   UpdatePoliciesAction,
   UpdateTitleAction,
+  AddQuestionAction,
   UpdateQuestionAction,
   MoveQuestionAction,
   DeleteQuestionAction,
+  AddPartAction,
   MovePartAction,
   UpdatePartAction,
   DeletePartAction,
+  AddBodyItemAction,
   MoveBodyItemAction,
   UpdateHTMLBodyItemAction,
   DeleteBodyItemAction,
@@ -64,6 +70,17 @@ export function updateExamFiles(
   };
 }
 
+export function addQuestion(
+  qnum: number,
+  question: QuestionInfo,
+): AddQuestionAction {
+  return {
+    type: 'ADD_QUESTION',
+    qnum,
+    question,
+  };
+}
+
 export function updateQuestion(
   qnum: number,
   name: string,
@@ -96,6 +113,19 @@ export function deleteQuestion(
   return {
     type: 'DELETE_QUESTION',
     qnum,
+  };
+}
+
+export function addPart(
+  qnum: number,
+  pnum: number,
+  part: PartInfo,
+): AddPartAction {
+  return {
+    type: 'ADD_PART',
+    qnum,
+    pnum,
+    part,
   };
 }
 
@@ -141,6 +171,20 @@ export function deletePart(
   };
 }
 
+export function addBodyItem(
+  qnum: number,
+  pnum: number,
+  bnum: number,
+  body: BodyItem,
+): AddBodyItemAction {
+  return {
+    type: 'ADD_BODY_ITEM',
+    qnum,
+    pnum,
+    bnum,
+    body,
+  };
+}
 
 export function moveBodyItem(
   qnum: number,

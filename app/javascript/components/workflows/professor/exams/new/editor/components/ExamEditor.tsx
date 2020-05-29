@@ -13,7 +13,7 @@ import {
 import Instructions from '@professor/exams/new/editor/containers/Instructions';
 import FileUploader from '@professor/exams/new/editor/containers/FileUploader';
 import Policies from '@professor/exams/new/editor/containers/Policies';
-import ShowQuestions from './ShowQuestions';
+import ShowQuestions from '@professor/exams/new/editor/containers/ShowQuestions';
 
 export interface ExamEditorProps {
   exam: Exam;

@@ -33,6 +33,7 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
     <Form>
       <Form.Group as={Row}>
         <Col sm={12}>
+          <p>All exam files</p>
           <InputGroup>
             <Form.File
               required

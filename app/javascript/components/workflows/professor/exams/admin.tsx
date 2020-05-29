@@ -7,6 +7,7 @@ import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
 import { RailsExam, ContentsState } from '@student/exams/show/types';
+import { Editor as CodeMirrorEditor } from 'codemirror';
 
 const ExamAdmin: React.FC<{}> = () => {
   const { examId } = useParams();
@@ -43,6 +44,10 @@ const ExamAdmin: React.FC<{}> = () => {
 
 export default ExamAdmin;
 
+interface CodeMirroredElement extends Element {
+  CodeMirror: CodeMirrorEditor;
+}
+
 const PreviewExam: React.FC<{
   contents: ContentsState;
   railsExam: RailsExam;
@@ -55,8 +60,8 @@ const PreviewExam: React.FC<{
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (!open) return;
-    document.querySelectorAll('.CodeMirror').forEach((cm: any) => {
-      setTimeout(() => cm.CodeMirror.refresh());
+    document.querySelectorAll('.CodeMirror').forEach((cm) => {
+      setTimeout(() => (cm as CodeMirroredElement).CodeMirror.refresh());
     });
   }, [open]);
   return (

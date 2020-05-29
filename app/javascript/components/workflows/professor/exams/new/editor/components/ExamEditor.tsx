@@ -19,12 +19,14 @@ export interface ExamEditorProps {
   exam: Exam;
   railsExam: RailsExam;
   answers: AnswersState;
+  onChange: (newTitle: string) => void;
 }
 
 const Editor: React.FC<ExamEditorProps> = (props) => {
   const {
     exam,
     railsExam,
+    onChange,
   } = props;
   const {
     questions,
@@ -40,7 +42,8 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
               size="lg"
               type="text"
               placeholder="Enter an exam name"
-              defaultValue={name}
+              value={name}
+              onChange={(e): void => onChange(e.target.value)}
             />
           </Col>
         </Form.Group>

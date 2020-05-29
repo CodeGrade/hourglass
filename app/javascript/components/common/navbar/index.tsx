@@ -5,7 +5,7 @@ import {
   Button,
 } from 'react-bootstrap';
 import { getCSRFToken } from '@student/exams/show/helpers';
-import { RailsContext } from '@hourglass/workflows/student/exams/show/context';
+import { RailsContext } from '@student/exams/show/context';
 import { Link } from 'react-router-dom';
 // import LockdownInfo from '@student/exams/show/containers/LockdownInfo';
 

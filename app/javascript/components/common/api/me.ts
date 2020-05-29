@@ -1,4 +1,4 @@
-import { RailsUser } from '@hourglass/workflows/student/exams/show/types';
+import { RailsUser } from '@student/exams/show/types';
 import { ApiResponse, useApiResponse } from '../types/api';
 
 export interface Response {

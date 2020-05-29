@@ -4,9 +4,9 @@ import { useResponse as examsShow } from '@hourglass/common/api/professor/exams/
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Collapse, Button } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
-import ExamViewer from '@hourglass/workflows/proctor/registrations/show';
-import { RailsExam, ContentsState } from '@hourglass/workflows/student/exams/show/types';
+import Icon from '@student/exams/show/components/Icon';
+import ExamViewer from '@proctor/registrations/show';
+import { RailsExam, ContentsState } from '@student/exams/show/types';
 
 const ExamAdmin: React.FC<{}> = () => {
   const { examId } = useParams();

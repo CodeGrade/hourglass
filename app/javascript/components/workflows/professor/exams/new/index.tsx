@@ -6,7 +6,7 @@ import {
   CardDeck,
 } from 'react-bootstrap';
 import { useParams, useHistory } from 'react-router-dom';
-import { getCSRFToken } from '@hourglass/workflows/student/exams/show/helpers';
+import { getCSRFToken } from '@student/exams/show/helpers';
 
 const NewExam: React.FC<{}> = () => (
   <div>

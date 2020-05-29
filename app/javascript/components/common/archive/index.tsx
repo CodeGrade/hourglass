@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
-import { VeryControlledFileViewer } from '@hourglass/workflows/student/exams/show/components/FileViewer';
-import { ExamFile, ExamDir, ExamSingleFile } from '@hourglass/workflows/student/exams/show/types';
+import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
+import { ExamFile, ExamDir, ExamSingleFile } from '@student/exams/show/types';
 import JSZip, { loadAsync } from 'jszip';
 import mime from '@hourglass/common/mime';
 import { extractMarks } from '@hourglass/common/archive/fileMarks';

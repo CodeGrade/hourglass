@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCSRFToken } from '@hourglass/workflows/student/exams/show/helpers';
+import { getCSRFToken } from '@student/exams/show/helpers';
 
 export type ApiResponse<T> = Result<T> | Loading | ApiError;
 

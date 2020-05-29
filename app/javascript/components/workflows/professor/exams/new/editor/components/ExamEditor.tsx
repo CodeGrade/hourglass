@@ -10,7 +10,7 @@ import {
   RailsExam,
   AnswersState,
 } from '@student/exams/show/types';
-import Instructions from '@hourglass/workflows/professor/exams/new/editor/containers/Instructions';
+import Instructions from '@professor/exams/new/editor/containers/Instructions';
 import FileUploader from '@professor/exams/new/editor/containers/FileUploader';
 import Policies from '@professor/exams/new/editor/containers/Policies';
 import ShowQuestions from './ShowQuestions';

@@ -47,9 +47,18 @@ const mapStateToProps: MSTP<{
 
 const mapDispatchToProps: MDTP<{
   onChange: (newInfo: BodyItem, newState: AnswerState) => void;
+  makeChangeAction: (newInfo: BodyItem, newState: AnswerState) => UpdateBodyItemAction;
 }, OwnProps> = (dispatch, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
   return {
+    makeChangeAction: (newInfo: BodyItem, newState: AnswerState):
+        UpdateBodyItemAction => updateAnswer(
+      qnum,
+      pnum,
+      bnum,
+      newInfo,
+      newState,
+    ),
     onChange: (newInfo: BodyItem, newState: AnswerState): void => {
       dispatch(
         updateAnswer(

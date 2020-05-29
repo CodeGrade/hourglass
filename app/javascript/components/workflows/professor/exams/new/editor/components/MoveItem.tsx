@@ -5,6 +5,7 @@ import {
   ButtonProps,
 } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown, FaTrashAlt } from 'react-icons/fa';
+import './MoveItem.scss';
 
 export interface MoveProps {
   enableUp?: boolean;
@@ -27,36 +28,39 @@ const MoveItem: React.FC<MoveProps> = (props) => {
     onDelete,
   } = props;
   return (
-    <div className={`position-absolute ${visible ? '' : 'd-none'}`}>
-      <ButtonGroup
-        vertical
-        className="m-0 p-0 bg-white rounded position-relative"
-        style={{ left: '-100%' }}
-      >
-        <Button
-          variant={variant}
-          disabled={!enableUp}
-          onClick={onUp}
-          title="Move up"
+    <div
+      className={`float-left size-0 ${visible ? '' : 'd-none'}`}
+    >
+      <div className="float-left">
+        <ButtonGroup
+          vertical
+          className="m-0 p-0 bg-white rounded position-relative overhang-left-100"
         >
-          <FaChevronUp />
-        </Button>
-        <Button
-          variant={variant}
-          disabled={!enableDown}
-          onClick={onDown}
-          title="Move down"
-        >
-          <FaChevronDown />
-        </Button>
-        <Button
-          variant="danger"
-          onClick={onDelete}
-          title="Delete"
-        >
-          <FaTrashAlt />
-        </Button>
-      </ButtonGroup>
+          <Button
+            variant={variant}
+            disabled={!enableUp}
+            onClick={onUp}
+            title="Move up"
+          >
+            <FaChevronUp />
+          </Button>
+          <Button
+            variant={variant}
+            disabled={!enableDown}
+            onClick={onDown}
+            title="Move down"
+          >
+            <FaChevronDown />
+          </Button>
+          <Button
+            variant="danger"
+            onClick={onDelete}
+            title="Delete"
+          >
+            <FaTrashAlt />
+          </Button>
+        </ButtonGroup>
+      </div>
     </div>
   );
 };

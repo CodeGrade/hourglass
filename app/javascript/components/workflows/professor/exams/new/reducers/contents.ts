@@ -2,7 +2,7 @@ import { ContentsState } from '@student/exams/show/types';
 import { ExamEditorAction } from '@professor/exams/new/types';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
-const arrayLikeToArray = <T>(obj: {[key: number]: T}, minLength: number): T[] => {
+export const arrayLikeToArray = <T>(obj: {[key: number]: T}, minLength: number): T[] => {
   const len = Math.max(minLength, ...Object.keys(obj).map((k) => Number.parseInt(k, 10)));
   return Array.from({ ...obj, length: len });
 };

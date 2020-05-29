@@ -2,6 +2,7 @@ import React from 'react';
 import ReactQuill from 'react-quill';
 import QuillPasteSmart from 'quill-paste-smart';
 import 'react-quill/dist/quill.snow';
+import 'react-quill/dist/quill.bubble';
 import './CustomEditor.css';
 
 
@@ -12,6 +13,7 @@ interface HTMLValProps {
   placeholder?: string;
   className?: string;
   id?: string;
+  theme?: string;
   onChange?: ReactQuill.ReactQuillProps['onChange'];
 }
 
@@ -53,6 +55,7 @@ const CustomEditor: React.FC<HTMLValProps> = (props) => {
     placeholder,
     className,
     id,
+    theme,
     onChange,
   } = props;
 
@@ -60,7 +63,7 @@ const CustomEditor: React.FC<HTMLValProps> = (props) => {
     <ReactQuill
       id={id}
       className={className}
-      theme="snow"
+      theme={theme || 'snow'}
       placeholder={placeholder}
       value={value}
       formats={formatOptions}

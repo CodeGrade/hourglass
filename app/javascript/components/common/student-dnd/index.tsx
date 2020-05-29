@@ -84,15 +84,15 @@ const Students: React.FC<{}> = (props) => {
     fields,
   } = props;
   return (
-    <div className="d-flex justify-content-around bg-secondary rounded mb-2 flex-wrap">
-      <DropTarget
-        onAdd={(student) => fields.push(student)}
+    <DropTarget
+      onAdd={(student) => fields.push(student)}
+    >
+      <p
+        className={fields.length === 0 ? '' : 'd-none'}
       >
-        <p
-          className={fields.length === 0 ? '' : 'd-none'}
-        >
-          Drop students here!
-        </p>
+        Drop students here!
+      </p>
+      <div className="d-flex justify-content-around rounded mb-2 flex-wrap">
         {fields.map((member, index) => {
           const student = fields.get(index);
           return (
@@ -107,8 +107,8 @@ const Students: React.FC<{}> = (props) => {
             </span>
           );
         })}
-      </DropTarget>
-    </div>
+      </div>
+    </DropTarget>
   );
 }
 

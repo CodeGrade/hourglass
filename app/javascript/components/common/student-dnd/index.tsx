@@ -1,6 +1,9 @@
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd'
 import { Badge } from 'react-bootstrap';
+import { Field, FieldArray, reduxForm } from 'redux-form';
+import store from '@hourglass/common/student-dnd/store';
+import { Provider } from 'react-redux';
 
 interface Student {
   username: string;
@@ -10,6 +13,7 @@ interface Student {
 interface Room {
   id: number;
   name: string;
+  students: Student[];
 }
 
 const ItemTypes = {
@@ -24,63 +28,60 @@ const students: Student[] = Array(20).fill(undefined).map((_, i) => ({
 const rooms: Room[] = Array(3).fill(undefined).map((_, i) => ({
   id: i + 1,
   name: `Room ${i + 1}`,
+  students: [],
 }));
 
-const StudentDND: React.FC<{}> = () => (
-  <>
-    <p>student dnd</p>
-    <div className="d-flex justify-content-around bg-secondary rounded mb-2 flex-wrap">
-      {students.map((s) => <DraggableStudent key={s.username} student={s} />)}
-    </div>
-    <div className="d-flex flex-wrap justify-content-between">
-      {rooms.map((r) => (
-        <div className="flex-fill mx-1" key={r.id}>
-          <DropTarget room={r} />
-        </div>
-      ))}
-    </div>
-  </>
-);
-
 const DropTarget: React.FC<{
-  room: Room;
-}> = ({ room }) => {
+  onAdd: (student: Student) => void;
+}> = (props) => {
+  const {
+    children,
+    onAdd,
+  } = props;
   const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.STUDENT,
     drop: ({ student }) => {
-      // TODO: move student in state
-      console.log('student', student.username, 'dropped in room', room.name);
+      onAdd(student);
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
     }),
   });
+  const bg = isOver ? 'bg-info' : 'bg-secondary';
   return (
     <div
       ref={drop}
-      className="bg-secondary rounded text-white px-2 text-center"
+      className={`${bg} rounded text-white px-2 text-center flex-fill`}
     >
-      <p>{room.name}</p>
-      <p>{isOver ? 'drop here!' : 'waiting'}</p>
+      {children}
     </div>
   );
 };
 
 const DraggableStudent: React.FC<{
+  onRemove: () => void;
   student: Student;
-}> = ({ student }) => {
+}> = (props) => {
+  const {
+    onRemove,
+    student,
+  } = props;
   const [{ isDragging }, drag] = useDrag({
     item: {
       type: ItemTypes.STUDENT,
       student,
     },
+    end: (_item, monitor) => {
+      if (monitor.didDrop()) onRemove();
+    },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
   });
-  const classes = isDragging ? 'd-none' : '';
+  // Need to unmount while dragging to prevent duplicate keys.
+  if (isDragging) return null;
   return (
-    <span ref={drag} className={classes}>
+    <span ref={drag}>
       <StudentBadge student={student} />
     </span>
   );
@@ -95,4 +96,83 @@ const StudentBadge: React.FC<{
 );
 
 
-export default StudentDND;
+const Students: React.FC<{}> = (props) => {
+  const {
+    fields,
+  } = props;
+  return (
+    <div className="d-flex justify-content-around bg-secondary rounded mb-2 flex-wrap">
+      <DropTarget
+        onAdd={(student) => fields.push(student)}
+      >
+        <p
+          className={fields.length === 0 ? '' : 'd-none'}
+        >
+          Drop students here!
+        </p>
+        {fields.map((member, index) => {
+          const student = fields.get(index);
+          return (
+            <span
+              className="mx-1"
+              key={`${student.username}-${member}`}
+            >
+              <DraggableStudent
+                student={student}
+                onRemove={() => fields.remove(index)}
+              />
+            </span>
+          );
+        })}
+      </DropTarget>
+    </div>
+  );
+}
+
+const Rooms: React.FC<{}> = (props) => {
+  const {
+    fields,
+  } = props;
+  return (
+    <div className="d-flex flex-wrap justify-content-between">
+      {fields.map((member, index) => {
+        const room = fields.get(index);
+        return (
+          <div className="flex-fill mx-1" key={room.id}>
+            <h2>{room.name}</h2>
+            <FieldArray name={`${member}.students`} component={Students} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+const StudentDNDForm: React.FC<{}> = (props) => {
+  return (
+    <form>
+      <div>
+        <h2>Unassigned Students</h2>
+        <FieldArray name="students" component={Students} />
+      </div>
+      <FieldArray name="rooms" component={Rooms} />
+    </form>
+  );
+};
+
+const DNDForm = reduxForm({
+  form: 'student-dnd',
+})(StudentDNDForm);
+
+export default () => {
+  return (
+    <Provider store={store}>
+      <DNDForm
+        initialValues={{
+          students,
+          rooms,
+        }}
+      />
+    </Provider>
+  );
+}

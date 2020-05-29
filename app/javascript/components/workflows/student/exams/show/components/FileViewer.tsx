@@ -211,7 +211,7 @@ export const VeryControlledFileViewer: React.FC<{
   const fmap = createMap(files);
   const first = firstFile(files);
   const firstID = first?.relPath;
-  const [selectedID, setSelectedID] = useState(firstID);
+  const [selectedID, setSelectedID] = useState(firstID || '');
   return (
     <Row>
       <Col sm={3}>

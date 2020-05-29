@@ -18,7 +18,6 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
   const {
     railsCourse,
     railsExam,
-    railsUser,
   } = useContext(RailsContext);
   const body = ready ? (
     <div id="exam-taker" className="d-flex">

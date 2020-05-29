@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -209,9 +209,12 @@ export const VeryControlledFileViewer: React.FC<{
     files,
   } = props;
   const fmap = createMap(files);
-  const first = firstFile(files);
-  const firstID = first?.relPath;
-  const [selectedID, setSelectedID] = useState(firstID || '');
+  const [selectedID, setSelectedID] = useState('');
+  useEffect(() => {
+    const first = firstFile(files);
+    const firstID = first?.relPath ?? '';
+    setSelectedID(firstID);
+  }, [files, setSelectedID]);
   return (
     <Row>
       <Col sm={3}>

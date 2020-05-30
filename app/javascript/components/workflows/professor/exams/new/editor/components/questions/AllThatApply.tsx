@@ -3,15 +3,12 @@ import {
   Form,
   Row,
   Col,
-  Table,
   Button,
 } from 'react-bootstrap';
 import {
   AllThatApplyInfo,
   AllThatApplyState,
   HTMLVal,
-  BodyItem,
-  AnswerState,
 } from '@student/exams/show/types';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
@@ -25,7 +22,8 @@ interface AllThatApplyProps {
   info: AllThatApplyInfo;
   value: AllThatApplyState;
   onChange: (newInfo: AllThatApplyInfo, newVal: AllThatApplyState) => void;
-  makeChangeAction: (newInfo: BodyItem, newState: AnswerState) => UpdateBodyItemAction;
+  makeChangeAction: (newInfo: AllThatApplyInfo, newState: AllThatApplyState)
+    => UpdateBodyItemAction;
   qnum: number;
   pnum: number;
   bnum: number;
@@ -71,7 +69,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
     return makeChangeAction({ ...info, options: newOptions }, newValue);
   };
   const moveOption = (from: number, to: number): UpdateBodyItemAction => {
-    const newOptions = [...info.options];
+    const newOptions = [...options];
     const fromOpt = newOptions[from];
     newOptions.splice(from, 1);
     newOptions.splice(to, 0, fromOpt);
@@ -95,67 +93,69 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
         <Form.Label column sm={2}>Answers</Form.Label>
         <Col sm={10}>
-          <Table bordered hover size="sm">
-            <thead>
-              <tr>
-                <th>Correct?</th>
-                <th className="w-100">Prompt</th>
-              </tr>
-            </thead>
-            <tbody>
-              {options.map((option, idx) => {
-                const selected = value?.[idx];
-                return (
-                  <tr
-                    // We don't have a better option than this index right now.
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={idx}
-                    onMouseOver={(): void => setMoversVisible(idx, true)}
-                    onFocus={(): void => setMoversVisible(idx, true)}
-                    onBlur={(): void => setMoversVisible(idx, false)}
-                    onMouseOut={(): void => setMoversVisible(idx, false)}
-                  >
-                    <td className="text-center">
-                      <MoveItem
-                        visible={moversVisible[idx]}
-                        variant="dark"
-                        enableUp={idx > 0}
-                        enableDown={idx + 1 < options.length}
-                        onDelete={(): UpdateBodyItemAction => deleteOption(idx)}
-                        onDown={(): UpdateBodyItemAction => moveOption(idx, idx + 1)}
-                        onUp={(): UpdateBodyItemAction => moveOption(idx - 1, idx)}
-                      />
-                      <Button
-                        variant={selected ? 'dark' : 'outline-dark'}
-                        onClick={(): void => toggleAnswer(idx)}
-                      >
-                        <Icon I={FaCheck} className={selected ? '' : 'invisible'} />
-                      </Button>
-                    </td>
-                    <td className="w-100">
-                      <CustomEditor
-                        className="bg-white"
-                        theme="bubble"
-                        value={option}
-                        onChange={(newPrompt): void => setPrompt(idx, newPrompt)}
-                      />
-                    </td>
-                  </tr>
-                );
-              })}
-              <tr>
-                <td />
-                <td className="text-center">
-                  <Button
+          <Row className="p-2">
+            <Col
+              className="flex-grow-0"
+              style={{ flexBasis: 'content' }}
+            >
+              <b>Correct?</b>
+            </Col>
+            <Col><b>Prompt</b></Col>
+          </Row>
+          {options.map((option, idx) => {
+            const selected = value?.[idx];
+            return (
+              <Row
+                className="p-2"
+                // We don't have a better option than this index right now.
+                // eslint-disable-next-line react/no-array-index-key
+                key={idx}
+                onMouseOver={(): void => setMoversVisible(idx, true)}
+                onFocus={(): void => setMoversVisible(idx, true)}
+                onBlur={(): void => setMoversVisible(idx, false)}
+                onMouseOut={(): void => setMoversVisible(idx, false)}
+              >
+                <Col
+                  className="flex-grow-0"
+                  style={{ flexBasis: 'content' }}
+                >
+                  <MoveItem
+                    visible={moversVisible[idx]}
                     variant="dark"
-                    onClick={addOption}
+                    enableUp={idx > 0}
+                    enableDown={idx + 1 < options.length}
+                    onDelete={(): UpdateBodyItemAction => deleteOption(idx)}
+                    onDown={(): UpdateBodyItemAction => moveOption(idx, idx + 1)}
+                    onUp={(): UpdateBodyItemAction => moveOption(idx - 1, idx)}
+                  />
+                  <Button
+                    variant={selected ? 'dark' : 'outline-dark'}
+                    onClick={(): void => toggleAnswer(idx)}
                   >
-                    Add new option
+                    <Icon I={FaCheck} className={selected ? '' : 'invisible'} />
                   </Button>
-                </td>
-              </tr>
-            </tbody>
-          </Table>
+                </Col>
+                <Col className="pr-0">
+                  <CustomEditor
+                    className="bg-white"
+                    theme="bubble"
+                    value={option}
+                    onChange={(newPrompt): void => setPrompt(idx, newPrompt)}
+                  />
+                </Col>
+              </Row>
+            );
+          })}
+          <Row className="p-2">
+            <Col className="text-center p-0">
+              <Button
+                variant="dark"
+                onClick={addOption}
+              >
+                Add new option
+              </Button>
+            </Col>
+          </Row>
         </Col>
       </Form.Group>
     </>

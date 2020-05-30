@@ -6,13 +6,20 @@
   z-index: 1;
 }
 
-.ql-snow .ql-picker-label {
-  display: inline-flex;
-  padding: inherit !important;
+.ql-snow .ql-picker:not(.ql-font) .ql-picker-label svg {
+  padding: 2px 4px;
+  position: inherit;
+  bottom: 2px;
 }
+
+.ql-snow .ql-picker:not(.ql-font):hover .ql-picker-label svg {
+  bottom: 3px;
+}
+
 
 .ql-snow .ql-font .ql-picker-label::before {
   line-height: 18px;
+  padding: 1px !important;
 }
 
 .quill.bg-white {

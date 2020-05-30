@@ -54,10 +54,9 @@ const FileContents: React.FC<FileContentsProps> = (props) => {
     selectedFile,
     selectedLine,
     onChangeLine,
-    refreshProps: rp,
+    refreshProps = [],
     fmap,
   } = props;
-  const refreshProps = rp ?? [];
   const f = fmap[selectedFile];
   let cursor: CodeMirror.Position;
   if (selectedLine) {

@@ -9,7 +9,7 @@ import { MultipleChoiceInfo, MultipleChoiceState, HTMLVal } from '@student/exams
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
-import { FaCheck } from 'react-icons/fa';
+import { FaCircle } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
 
@@ -123,7 +123,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
                     variant={selected ? 'dark' : 'outline-dark'}
                     onClick={(): void => setAnswer(idx)}
                   >
-                    <Icon I={FaCheck} className={selected ? '' : 'invisible'} />
+                    <Icon I={FaCircle} className={selected ? '' : 'invisible'} />
                   </Button>
                 </Col>
                 <Col className="pr-0">

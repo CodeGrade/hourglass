@@ -93,6 +93,17 @@ const ShowBodyItems: React.FC<BodyItemsProps> = (props) => {
             <Dropdown.Item
               onClick={(): void => {
                 addBodyItem(numBodyItems, {
+                  type: 'MultipleChoice',
+                  prompt: '',
+                  options: [],
+                });
+              }}
+            >
+              Multiple choice
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(): void => {
+                addBodyItem(numBodyItems, {
                   type: 'Text',
                   prompt: '',
                 });

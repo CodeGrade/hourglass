@@ -5,7 +5,11 @@ Rails.application.routes.draw do
     namespace :professor do
       resources :courses, shallow: true, param: 'course_id', only: [:index, :show] do
         member do
-          resources :exams, param: 'exam_id', only: [:create, :index, :show]
+          resources :exams, param: 'exam_id', only: [:create, :index, :show] do
+            member do
+              resources :rooms, param: 'room_id', only: [:index]
+            end
+          end
         end
       end
       # resources :sections, only: [] do

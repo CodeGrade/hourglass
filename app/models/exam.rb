@@ -4,14 +4,15 @@
 class Exam < ApplicationRecord
   belongs_to :course
 
-  has_many :registrations, dependent: :destroy
-  has_many :users, through: :registrations
-  has_many :anomalies, through: :registrations
   has_many :rooms, dependent: :destroy
   has_many :exam_announcements, dependent: :destroy
   has_many :room_announcements, dependent: :destroy
   has_many :messages, dependent: :destroy
   has_many :questions, dependent: :destroy
+
+  has_many :registrations, through: :rooms
+  has_many :users, through: :registrations
+  has_many :anomalies, through: :registrations
 
   validates :course, presence: true
   validates :name, presence: true
@@ -51,6 +52,12 @@ class Exam < ApplicationRecord
   # Return the exam version for the given registration.
   def version_for(_reg)
     version(0)
+  end
+
+  def unassigned_students
+    course.students.reject do |s|
+      registrations.exists? user: s
+    end
   end
 
   def default_answers_for(reg)

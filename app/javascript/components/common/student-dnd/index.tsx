@@ -1,35 +1,18 @@
 import React from 'react';
-import { useDrag, useDrop } from 'react-dnd'
-import { Badge } from 'react-bootstrap';
-import { Field, FieldArray, reduxForm } from 'redux-form';
+import { useDrag, useDrop } from 'react-dnd';
+import { Badge, Col, Row } from 'react-bootstrap';
+import { FieldArray, reduxForm } from 'redux-form';
 import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
-
-interface Student {
-  username: string;
-  name: string;
-}
-
-interface Room {
-  id: number;
-  name: string;
-  students: Student[];
-}
+import {
+  useResponse as useRoomsIndex,
+  Student,
+  Room,
+} from '@hourglass/common/api/professor/rooms';
 
 const ItemTypes = {
   STUDENT: 'student',
 };
-
-const students: Student[] = Array(20).fill(undefined).map((_, i) => ({
-  username: `student${i + 1}`,
-  name: `Student ${i + 1}`,
-}));
-
-const rooms: Room[] = Array(3).fill(undefined).map((_, i) => ({
-  id: i + 1,
-  name: `Room ${i + 1}`,
-  students: [],
-}));
 
 const DropTarget: React.FC<{
   onAdd: (student: Student) => void;
@@ -91,7 +74,7 @@ const StudentBadge: React.FC<{
   student: Student;
 }> = ({ student }) => (
   <Badge variant="primary">
-    {student.name}
+    {student.displayName}
   </Badge>
 );
 
@@ -134,17 +117,17 @@ const Rooms: React.FC<{}> = (props) => {
     fields,
   } = props;
   return (
-    <div className="d-flex mx-n1 flex-wrap justify-content-between">
+    <Row>
       {fields.map((member, index) => {
         const room = fields.get(index);
         return (
-          <div className="flex-fill mx-1" key={room.id}>
+          <Col key={room.id}>
             <h2>{room.name}</h2>
             <FieldArray name={`${member}.students`} component={Students} />
-          </div>
+          </Col>
         );
       })}
-    </div>
+    </Row>
   );
 }
 
@@ -165,14 +148,18 @@ const DNDForm = reduxForm({
 })(StudentDNDForm);
 
 export default () => {
+  const response = useRoomsIndex(400167349);
+  if (response.type === 'ERROR' || response.type === 'LOADING') {
+    return <p>Loading...</p>;
+  }
   return (
     <Provider store={store}>
       <DNDForm
         initialValues={{
-          students,
-          rooms,
+          students: response.response.unassigned,
+          rooms: response.response.rooms,
         }}
       />
     </Provider>
   );
-}
+};

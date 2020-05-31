@@ -3,6 +3,7 @@ import { Form, Row, Col } from 'react-bootstrap';
 import { Policy } from '@student/exams/show/types';
 import Select from 'react-select';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import '@professor/exams/new/editor/Select.css';
 
 export interface PoliciesProps {
   policies: Policy[];
@@ -36,7 +37,7 @@ const Policies: React.FC<PoliciesProps> = (props) => {
       <Form.Label column sm="3">Policies:</Form.Label>
       <Col>
         <Select
-          className="basic-multi-select"
+          className="basic-multi-select z-1000"
           isMulti
           placeholder="Choose security policies..."
           options={policyValues}

@@ -35,6 +35,15 @@ export default (state: ContentsState = {
         },
       };
     }
+    case 'UPDATE_EXAM_FILE_REFS': {
+      return {
+        ...state,
+        exam: {
+          ...state.exam,
+          reference: action.reference,
+        },
+      };
+    }
     case 'UPDATE_EXAM_FILES': {
       return {
         ...state,
@@ -93,6 +102,21 @@ export default (state: ContentsState = {
         name,
         description,
         separateSubparts,
+      };
+      return {
+        ...state,
+        exam: {
+          ...state.exam,
+          questions,
+        },
+      };
+    }
+    case 'UPDATE_QUESTION_FILE_REFS': {
+      const questions = [...state.exam.questions];
+      const { qnum, reference } = action;
+      questions[qnum] = {
+        ...questions[qnum],
+        reference,
       };
       return {
         ...state,
@@ -171,6 +195,23 @@ export default (state: ContentsState = {
         name,
         description,
         points,
+      };
+      return {
+        ...state,
+        exam: {
+          ...state.exam,
+          questions,
+        },
+      };
+    }
+    case 'UPDATE_PART_FILE_REFS': {
+      const questions = [...state.exam.questions];
+      const { qnum, pnum, reference } = action;
+      questions[qnum] = { ...questions[qnum] };
+      questions[qnum].parts = [...questions[qnum].parts];
+      questions[qnum].parts[pnum] = {
+        ...questions[qnum].parts[pnum],
+        reference,
       };
       return {
         ...state,

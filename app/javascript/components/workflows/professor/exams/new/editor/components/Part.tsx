@@ -5,13 +5,20 @@ import {
   Alert,
   Row,
   Col,
+  InputGroup,
+  Collapse,
+  Button,
 } from 'react-bootstrap';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
-import { HTMLVal } from '@student/exams/show/types';
+import { HTMLVal, FileRef, ExamFile } from '@student/exams/show/types';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/containers/ShowBodyItems';
-import { MovePartAction, DeletePartAction } from '../../types';
-import { movePart, deletePart } from '../../actions';
+import { FilePickerPart } from '@professor/exams/new/editor/containers/FilePicker';
+import { MovePartAction, DeletePartAction } from '@professor/exams/new/types';
+import { movePart, deletePart } from '@professor/exams/new/actions';
+import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { createMap, getFilesForRefs } from '@student/exams/show/files';
 
 
 export interface PartProps {
@@ -21,6 +28,8 @@ export interface PartProps {
   name: HTMLVal;
   description: HTMLVal;
   points: number;
+  reference: FileRef[];
+  files: ExamFile[];
   onChange: (name: HTMLVal, description: HTMLVal, points: number) => void;
 }
 
@@ -33,8 +42,15 @@ const Part: React.FC<PartProps> = (props) => {
     description,
     points,
     onChange,
+    files = [],
+    reference = [],
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
+  const [open, setOpen] = useState(false);
+  const noFiles = reference.length === 0;
+  const fmap = createMap(files);
+  const filteredFiles = getFilesForRefs(fmap, reference);
+
   return (
     <Card
       className="mb-3"
@@ -113,6 +129,31 @@ const Part: React.FC<PartProps> = (props) => {
                 step={0.5}
                 format="#.#"
               /> */}
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} controlId={`${qnum}-${pnum}-files`}>
+            <Form.Label column sm="2">Files to be shown for this question part:</Form.Label>
+            <Col sm={10}>
+              <InputGroup>
+                <div className="flex-grow-1">
+                  <FilePickerPart qnum={qnum} pnum={pnum} />
+                </div>
+                <InputGroup.Append>
+                  <Button
+                    variant="info"
+                    disabled={noFiles}
+                    onClick={(): void => setOpen((o) => !o)}
+                  >
+                    Preview files
+                    {open ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+                  </Button>
+                </InputGroup.Append>
+              </InputGroup>
+              <Collapse in={open}>
+                <div className="border">
+                  <VeryControlledFileViewer files={filteredFiles} />
+                </div>
+              </Collapse>
             </Col>
           </Form.Group>
         </Card.Subtitle>

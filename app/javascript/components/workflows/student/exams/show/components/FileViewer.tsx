@@ -16,7 +16,7 @@ interface FilesProps {
   files: ExamFile[];
 }
 
-const Files: React.FC<FilesProps> = (props) => {
+export const Files: React.FC<FilesProps> = (props) => {
   const { files } = props;
   return (
     <>

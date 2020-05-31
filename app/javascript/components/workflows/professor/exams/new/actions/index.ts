@@ -4,6 +4,7 @@ import {
   Policy,
   RailsExam,
   HTMLVal,
+  FileRef,
   ExamFile,
   QuestionInfo,
   PartInfo,
@@ -12,16 +13,19 @@ import {
 import {
   LoadExamAction,
   UpdateExamFilesAction,
+  UpdateExamFileRefsAction,
   UpdateInstructionsAction,
   UpdatePoliciesAction,
   UpdateTitleAction,
   AddQuestionAction,
   UpdateQuestionAction,
+  UpdateQuestionFileRefsAction,
   MoveQuestionAction,
   DeleteQuestionAction,
   AddPartAction,
   MovePartAction,
   UpdatePartAction,
+  UpdatePartFileRefsAction,
   DeletePartAction,
   AddBodyItemAction,
   MoveBodyItemAction,
@@ -70,6 +74,15 @@ export function updateExamFiles(
   };
 }
 
+export function updateExamFileRefs(
+  reference: FileRef[],
+): UpdateExamFileRefsAction {
+  return {
+    type: 'UPDATE_EXAM_FILE_REFS',
+    reference,
+  };
+}
+
 export function addQuestion(
   qnum: number,
   question: QuestionInfo,
@@ -93,6 +106,17 @@ export function updateQuestion(
     name,
     description,
     separateSubparts,
+  };
+}
+
+export function updateQuestionFileRefs(
+  qnum: number,
+  reference: FileRef[],
+): UpdateQuestionFileRefsAction {
+  return {
+    type: 'UPDATE_QUESTION_FILE_REFS',
+    qnum,
+    reference,
   };
 }
 
@@ -146,6 +170,18 @@ export function updatePart(
   };
 }
 
+export function updatePartFileRefs(
+  qnum: number,
+  pnum: number,
+  reference: FileRef[],
+): UpdatePartFileRefsAction {
+  return {
+    type: 'UPDATE_PART_FILE_REFS',
+    qnum,
+    pnum,
+    reference,
+  };
+}
 
 export function movePart(
   qnum: number,

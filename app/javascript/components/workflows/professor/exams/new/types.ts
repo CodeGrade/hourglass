@@ -12,6 +12,7 @@ import {
   HTMLVal,
   AnswerState,
   ExamFile,
+  FileRef,
 } from '@student/exams/show/types';
 
 export type Thunk = ThunkAction<void, ContentsState, unknown, ExamEditorAction>;
@@ -30,9 +31,12 @@ export interface ExamEditorState {
 }
 
 export type ExamEditorAction = LoadExamAction
-| UpdateInstructionsAction | UpdatePoliciesAction | UpdateTitleAction | UpdateExamFilesAction
-| AddQuestionAction | DeleteQuestionAction | UpdateQuestionAction | MoveQuestionAction
-| AddPartAction | DeletePartAction | UpdatePartAction | MovePartAction
+| UpdateInstructionsAction | UpdatePoliciesAction | UpdateTitleAction
+| UpdateExamFilesAction | UpdateExamFileRefsAction
+| AddQuestionAction | DeleteQuestionAction | MoveQuestionAction
+| UpdateQuestionAction | UpdateQuestionFileRefsAction
+| AddPartAction | DeletePartAction | MovePartAction
+| UpdatePartAction | UpdatePartFileRefsAction
 | AddBodyItemAction | DeleteBodyItemAction | UpdateBodyItemAction | MoveBodyItemAction
 | UpdateHTMLBodyItemAction;
 
@@ -57,6 +61,24 @@ export interface UpdateInstructionsAction {
 export interface UpdateExamFilesAction {
   type: 'UPDATE_EXAM_FILES';
   files: ExamFile[];
+}
+
+export interface UpdateExamFileRefsAction {
+  type: 'UPDATE_EXAM_FILE_REFS';
+  reference: FileRef[];
+}
+
+export interface UpdateQuestionFileRefsAction {
+  type: 'UPDATE_QUESTION_FILE_REFS';
+  qnum: number;
+  reference: FileRef[];
+}
+
+export interface UpdatePartFileRefsAction {
+  type: 'UPDATE_PART_FILE_REFS';
+  qnum: number;
+  pnum: number;
+  reference: FileRef[];
 }
 
 export interface UpdatePoliciesAction {

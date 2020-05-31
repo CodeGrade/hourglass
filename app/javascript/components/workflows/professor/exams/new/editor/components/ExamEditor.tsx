@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Row,
   Col,
   Container,
   Form,
+  InputGroup,
+  Collapse,
+  Button,
+  Alert,
 } from 'react-bootstrap';
 import {
   Exam,
@@ -14,6 +18,11 @@ import Instructions from '@professor/exams/new/editor/containers/Instructions';
 import FileUploader from '@professor/exams/new/editor/containers/FileUploader';
 import Policies from '@professor/exams/new/editor/containers/Policies';
 import ShowQuestions from '@professor/exams/new/editor/containers/ShowQuestions';
+import { FilePickerExam } from '@professor/exams/new/editor/containers/FilePicker';
+import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { createMap, getFilesForRefs } from '@student/exams/show/files';
+
 
 export interface ExamEditorProps {
   exam: Exam;
@@ -30,8 +39,15 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
   } = props;
   const {
     questions,
+    reference = [],
+    files = [],
   } = exam;
   const { name } = railsExam;
+  const [open, setOpen] = useState(false);
+  const noFiles = reference.length === 0;
+  const fmap = createMap(files);
+  const filteredFiles = getFilesForRefs(fmap, reference);
+
   return (
     <Container fluid className="flex-fill">
       <Form>
@@ -49,9 +65,34 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
         </Form.Group>
         <Policies />
       </Form>
-
-      <Instructions />
       <FileUploader />
+
+      <Alert variant="info">
+        <h3>Exam-wide information</h3>
+        <Instructions />
+        <p>Choose files to be shown for the entire exam</p>
+        <InputGroup>
+          <div className="flex-grow-1">
+            <FilePickerExam />
+          </div>
+          <InputGroup.Append>
+            <Button
+              variant="info"
+              disabled={noFiles}
+              onClick={(): void => setOpen((o) => !o)}
+            >
+              Preview files
+              {open ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+            </Button>
+          </InputGroup.Append>
+        </InputGroup>
+        <Collapse in={open}>
+          <div className="border">
+            <VeryControlledFileViewer files={filteredFiles} />
+          </div>
+        </Collapse>
+
+      </Alert>
       <ShowQuestions questions={questions} />
     </Container>
   );

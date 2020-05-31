@@ -6,7 +6,7 @@ import {
   ExamEditorState,
 } from '@professor/exams/new/types';
 import { updateQuestion } from '@professor/exams/new/actions';
-import { PartInfo } from '@student/exams/show/types';
+import { PartInfo, FileRef, ExamFile } from '@student/exams/show/types';
 
 interface OwnProps {
   qnum: number;
@@ -18,6 +18,8 @@ const mapStateToProps: MSTP<{
   description: string;
   separateSubparts: boolean;
   parts: PartInfo[];
+  reference: FileRef[];
+  files: ExamFile[];
 }, OwnProps> = (state: ExamEditorState, ownProps) => {
   const { qnum } = ownProps;
   const { contents } = state;
@@ -27,6 +29,8 @@ const mapStateToProps: MSTP<{
     description: q.description,
     separateSubparts: q.separateSubparts,
     parts: q.parts,
+    reference: q.reference,
+    files: contents.exam?.files,
   };
 };
 

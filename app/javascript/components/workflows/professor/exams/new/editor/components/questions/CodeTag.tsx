@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { FileRef, CodeTagInfo, CodeTagState } from '@student/exams/show/types';
 import {
-  Form, Row, Col, Modal, Button,
+  Form,
+  Row,
+  Col,
+  Modal,
+  Button,
+  ButtonGroup,
 } from 'react-bootstrap';
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
@@ -157,6 +162,16 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
           if (onChange) { onChange({ ...info, prompt: newPrompt }, value); }
         }}
       />
+      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-source`}>
+        <Form.Label column sm={2}>Files source</Form.Label>
+        <Col sm={10}>
+          <ButtonGroup>
+            <Button variant="secondary">Files for full exam</Button>
+            <Button variant="secondary">Files for current question</Button>
+            <Button variant="secondary">Files for current part</Button>
+          </ButtonGroup>
+        </Col>
+      </Form.Group>
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
         <Form.Label column sm={2}>Correct answer</Form.Label>
         <Col sm={6}>

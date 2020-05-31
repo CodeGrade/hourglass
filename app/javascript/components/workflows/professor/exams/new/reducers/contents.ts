@@ -50,6 +50,15 @@ export default (state: ContentsState = {
         exam: {
           ...state.exam,
           files: action.files,
+          reference: [],
+          questions: state.exam.questions.map((q) => ({
+            ...q,
+            reference: [],
+            parts: q.parts.map((p) => ({
+              ...p,
+              reference: [],
+            })),
+          })),
         },
       };
     }

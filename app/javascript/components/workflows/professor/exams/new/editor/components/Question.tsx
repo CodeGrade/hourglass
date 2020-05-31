@@ -129,11 +129,11 @@ const Question: React.FC<QuestionProps> = (props) => {
                     onClick={(): void => setOpen((o) => !o)}
                   >
                     Preview files
-                    {open ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+                    {open && !noFiles ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
                   </Button>
                 </InputGroup.Append>
               </InputGroup>
-              <Collapse in={open}>
+              <Collapse in={open && !noFiles}>
                 <div className="border">
                   <VeryControlledFileViewer files={filteredFiles} />
                 </div>

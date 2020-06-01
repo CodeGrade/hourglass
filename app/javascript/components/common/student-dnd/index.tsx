@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import {
-  Badge,
   Col,
   Row,
   Button,
@@ -24,9 +23,10 @@ import {
   Room,
   Section,
 } from '@hourglass/common/api/professor/rooms';
-import { hitApi } from '../types/api';
 import { updateAll } from '../api/professor/rooms/updateAll';
 import { ExhaustiveSwitchError } from '../helpers';
+import { useHistory } from 'react-router-dom';
+import { AlertContext } from '../alerts';
 
 interface FormContextType {
   sections: Section[];
@@ -218,6 +218,8 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
       }),
     }));
   };
+  const history = useHistory();
+  const { alert } = useContext(AlertContext);
   return (
     <form
       onSubmit={handleSubmit(({ all }) => {
@@ -230,7 +232,19 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           rooms,
         };
         updateAll(examId, body).then((result) => {
-          console.log(result);
+          if (!result.created) throw new Error('Server error.');
+          alert({
+            variant: 'success',
+            message: 'Registrations successfully created.',
+          });
+          history.push(`/exams/${examId}/admin`);
+        }).catch((e) => {
+          alert({
+            variant: 'danger',
+            title: 'Registrations not created.',
+            message: e.message,
+          });
+          history.push(`/exams/${examId}/admin`);
         });
       })}
     >

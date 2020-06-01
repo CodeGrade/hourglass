@@ -23,6 +23,7 @@ import EditExam from '@professor/exams/edit';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Archive from '@hourglass/common/archive';
 import StudentDND from '@hourglass/common/student-dnd';
+import { AllAlerts } from '@hourglass/common/alerts';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -163,29 +164,31 @@ const Entry: React.FC<{}> = () => {
             <Route path="/">
               <RegularNavbar />
               <Container>
-                <Switch>
-                  <Route exact path="/">
-                    <Exams />
-                  </Route>
-                  <Route exact path="/dev">
-                    <Archive />
-                  </Route>
-                  <Route exact path="/dnddev">
-                    <StudentDND />
-                  </Route>
-                  <Route path="/exams/:examId/admin" exact>
-                    <ExamAdmin />
-                  </Route>
-                  <Route path="/exams/:examId/edit" exact>
-                    <EditExam />
-                  </Route>
-                  <Route path="/courses/:courseId">
-                    <ShowCourse />
-                  </Route>
-                  <Route path="*">
-                    TODO: 404!
-                  </Route>
-                </Switch>
+                <AllAlerts>
+                  <Switch>
+                    <Route exact path="/">
+                      <Exams />
+                    </Route>
+                    <Route exact path="/dev">
+                      <Archive />
+                    </Route>
+                    <Route exact path="/dnddev">
+                      <StudentDND />
+                    </Route>
+                    <Route path="/exams/:examId/admin" exact>
+                      <ExamAdmin />
+                    </Route>
+                    <Route path="/exams/:examId/edit" exact>
+                      <EditExam />
+                    </Route>
+                    <Route path="/courses/:courseId">
+                      <ShowCourse />
+                    </Route>
+                    <Route path="*">
+                      TODO: 404!
+                    </Route>
+                  </Switch>
+                </AllAlerts>
               </Container>
             </Route>
           </Switch>

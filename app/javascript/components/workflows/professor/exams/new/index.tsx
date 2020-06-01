@@ -132,12 +132,7 @@ interface NewRoomProps {
   room: Room;
 }
 
-const NewRoom: React.FC<NewRoomProps> = (props) => {
-  const {
-    // TEMPORARY
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    room,
-  } = props;
+const NewRoom: React.FC<NewRoomProps> = () => {
   return (
     <>
       <Form.Group>

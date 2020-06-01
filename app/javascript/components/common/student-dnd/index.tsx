@@ -23,10 +23,10 @@ import {
   Room,
   Section,
 } from '@hourglass/common/api/professor/rooms';
-import { updateAll } from '../api/professor/rooms/updateAll';
-import { ExhaustiveSwitchError } from '../helpers';
+import { updateAll } from '@hourglass/common/api/professor/rooms/updateAll';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { useHistory, useParams } from 'react-router-dom';
-import { AlertContext } from '../alerts';
+import { AlertContext } from '@hourglass/common/alerts';
 
 interface FormContextType {
   sections: Section[];

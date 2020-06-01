@@ -22,6 +22,7 @@ module Api
 
       def serialize_student(user)
         {
+          id: user.id,
           displayName: user.display_name,
           username: user.username
         }

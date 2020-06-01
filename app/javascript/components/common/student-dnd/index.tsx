@@ -1,13 +1,12 @@
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Badge, Col, Row, Button } from 'react-bootstrap';
-import { FieldArray, reduxForm } from 'redux-form';
+import { Badge, Col, Row, Button, Form } from 'react-bootstrap';
+import { FieldArray, reduxForm, InjectedFormProps } from 'redux-form';
 import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
 import {
   useResponse as useRoomsIndex,
   Student,
-  Room,
 } from '@hourglass/common/api/professor/rooms';
 
 const ItemTypes = {
@@ -88,7 +87,7 @@ const Students: React.FC<{}> = (props) => {
       onAdd={(student) => fields.push(student)}
     >
       <p
-        className={fields.length === 0 ? '' : 'd-none'}
+        className={fields.length === 0 ? 'm-0' : 'd-none'}
       >
         Drop students here!
       </p>
@@ -98,7 +97,7 @@ const Students: React.FC<{}> = (props) => {
           return (
             <span
               className="mx-1"
-              key={`${student.username}-${member}`}
+              key={`${member}-${student.id}`}
             >
               <DraggableStudent
                 student={student}
@@ -131,9 +130,11 @@ const Rooms: React.FC<{}> = (props) => {
   );
 }
 
-const StudentDNDForm: React.FC<{}> = (props) => {
+const StudentDNDForm: React.FC<InjectedFormProps> = (props) => {
   const {
     handleSubmit,
+    reset,
+    pristine,
   } = props;
   return (
     <form
@@ -146,12 +147,23 @@ const StudentDNDForm: React.FC<{}> = (props) => {
         <FieldArray name="students" component={Students} />
       </div>
       <FieldArray name="rooms" component={Rooms} />
-      <Button
-        variant="success"
-        type="submit"
-      >
-        Submit
-      </Button>
+      <Form.Group>
+        <Button
+          variant="danger"
+          className={pristine && 'd-none'}
+          onClick={reset}
+        >
+          Reset
+        </Button>
+      </Form.Group>
+      <Form.Group>
+        <Button
+          variant="success"
+          type="submit"
+        >
+          Submit
+        </Button>
+      </Form.Group>
     </form>
   );
 };

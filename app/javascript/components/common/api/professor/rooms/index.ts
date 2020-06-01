@@ -6,6 +6,7 @@ export interface Response {
 }
 
 export interface Student {
+  id: number;
   username: string;
   displayName: string;
 }

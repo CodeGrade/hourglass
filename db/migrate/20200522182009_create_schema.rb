@@ -33,6 +33,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.references :course, null: false, foreign_key: true
 
       t.string :title, null: false
+      t.integer :bottlenose_id, null: false
       t.timestamps
     end
 

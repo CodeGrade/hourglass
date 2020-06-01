@@ -128,6 +128,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   create_table "sections", force: :cascade do |t|
     t.bigint "course_id", null: false
     t.string "title", null: false
+    t.integer "bottlenose_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["course_id"], name: "index_sections_on_course_id"

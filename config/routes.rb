@@ -12,11 +12,6 @@ Rails.application.routes.draw do
           end
         end
       end
-      # resources :sections, only: [] do
-      #   member do
-      #     post :sync
-      #   end
-      # end
     end
 
     # namespace :proctor do

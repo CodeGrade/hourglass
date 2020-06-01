@@ -26,6 +26,7 @@ import {
 } from '@hourglass/common/api/professor/rooms';
 import { hitApi } from '../types/api';
 import { updateAll } from '../api/professor/rooms/updateAll';
+import { ExhaustiveSwitchError } from '../helpers';
 
 interface FormContextType {
   sections: Section[];
@@ -282,27 +283,33 @@ const DNDForm = reduxForm({
 
 const DND: React.FC<{}> = () => {
   const response = useRoomsIndex(examId);
-  if (response.type === 'ERROR' || response.type === 'LOADING') {
-    return <p>Loading...</p>;
+  switch (response.type) {
+    case 'ERROR':
+      return <p className="text-danger">{response.text}</p>;
+    case 'LOADING':
+      return <p>Loading...</p>;
+    case 'RESULT':
+      return (
+        <Provider store={store}>
+          <FormContext.Provider
+            value={{
+              sections: response.response.sections,
+            }}
+          >
+            <DNDForm
+              initialValues={{
+                all: {
+                  unassigned: response.response.unassigned,
+                  rooms: response.response.rooms,
+                },
+              }}
+            />
+          </FormContext.Provider>
+        </Provider>
+      );
+    default:
+      throw new ExhaustiveSwitchError(response);
   }
-  return (
-    <Provider store={store}>
-      <FormContext.Provider
-        value={{
-          sections: response.response.sections,
-        }}
-      >
-        <DNDForm
-          initialValues={{
-            all: {
-              unassigned: response.response.unassigned,
-              rooms: response.response.rooms,
-            },
-          }}
-        />
-      </FormContext.Provider>
-    </Provider>
-  );
 };
 
 export default DND;

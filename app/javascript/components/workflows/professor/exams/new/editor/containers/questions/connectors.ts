@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import {
   AnswerState,
   BodyItem,
+  NoAnswerState,
 } from '@student/exams/show/types';
 import {
   MSTP,
@@ -35,13 +36,18 @@ export function updateAnswer(
   };
 }
 
+const isNoAns = (answer: AnswerState): boolean => (
+  (answer instanceof Object) && (answer as NoAnswerState).NO_ANS
+);
+
 const mapStateToProps: MSTP<{
   value: AnswerState;
 }, OwnProps> = (state: ExamEditorState, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
   const { contents } = state;
+  const answer = contents.answers?.answers?.[qnum][pnum][bnum];
   return {
-    value: contents.answers?.answers?.[qnum]?.[pnum]?.[bnum],
+    value: isNoAns(answer) ? undefined : answer,
   };
 };
 

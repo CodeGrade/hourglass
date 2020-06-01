@@ -28,7 +28,7 @@ class Registration < ApplicationRecord
   end
 
   def current_answers
-    snapshots.last&.answers || {}
+    snapshots.last&.answers || exam.default_answers_for(self)
   end
 
   def save_answers(answers)

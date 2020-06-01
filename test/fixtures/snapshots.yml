@@ -2,12 +2,22 @@ cs2500student:
   registration: cs2500student
   answers: {
     scratch: "cs2500student scratch space!",
-    answers: []
+    answers: [
+      [
+        [{ NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }],
+        [{ NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }]
+        ],
+      [
+        [{ NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }],
+        [{ NO_ANS: true }],
+        [{ NO_ANS: true }, { NO_ANS: true }]
+      ]
+    ]
   }
 
 cs3500student:
   registration: cs3500student
   answers: {
     scratch: "cs3500student scratch space!",
-    answers: []
+    answers: [[[{ NO_ANS: true }]]]
   }

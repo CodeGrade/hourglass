@@ -11,20 +11,17 @@ export default (state: ContentsState = {
   },
 }, action: ExamTakerAction): ContentsState => {
   switch (action.type) {
-    case 'LOAD_EXAM':
+    case 'LOAD_EXAM': {
       return {
-        ...state,
         exam: action.exam,
-        answers: {
-          ...state.answers,
-          ...action.answers,
-        },
+        answers: action.answers,
       };
+    }
     case 'UPDATE_ANSWER': {
       const { qnum, pnum, bnum } = action;
-      const answers = { ...state.answers.answers };
-      answers[qnum] = { ...answers[qnum] };
-      answers[qnum][pnum] = { ...answers[qnum]?.[pnum] };
+      const answers = [...state.answers.answers];
+      answers[qnum] = [...answers[qnum]];
+      answers[qnum][pnum] = [...answers[qnum][pnum]];
       answers[qnum][pnum][bnum] = action.val;
       return {
         ...state,

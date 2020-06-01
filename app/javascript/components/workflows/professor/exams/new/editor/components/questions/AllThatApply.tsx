@@ -16,7 +16,6 @@ import { FaCheck } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
-import { arrayLikeToArray } from '@professor/exams/new/reducers/contents';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;
@@ -27,6 +26,31 @@ interface AllThatApplyProps {
   qnum: number;
   pnum: number;
   bnum: number;
+}
+
+function cutAndShiftDown(obj: AllThatApplyState, cutoff: number): AllThatApplyState {
+  const ans = {};
+  Object.keys(obj).forEach((key) => {
+    if (Number(key) < cutoff) {
+      ans[key] = obj[key];
+    } else if (Number(key) === cutoff) {
+      // do nothing, and delete the key
+    } else {
+      ans[Number(key) - 1] = obj[key];
+    }
+  });
+  return ans;
+}
+function shiftUp(obj: AllThatApplyState, cutoff: number): AllThatApplyState {
+  const ans = {};
+  Object.keys(obj).forEach((key) => {
+    if (Number(key) < cutoff) {
+      ans[key] = obj[key];
+    } else {
+      ans[Number(key) + 1] = obj[key];
+    }
+  });
+  return ans;
 }
 
 const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
@@ -64,8 +88,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
   const deleteOption = (index: number): UpdateBodyItemAction => {
     const newOptions = [...options];
     newOptions.splice(index, 1);
-    const newValue = arrayLikeToArray(value, options.length);
-    newValue.splice(index, 1);
+    const newValue = cutAndShiftDown(value, index);
     return makeChangeAction({ ...info, options: newOptions }, newValue);
   };
   const moveOption = (from: number, to: number): UpdateBodyItemAction => {
@@ -73,10 +96,9 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
     const fromOpt = newOptions[from];
     newOptions.splice(from, 1);
     newOptions.splice(to, 0, fromOpt);
-    const newValue = arrayLikeToArray(value, options.length);
-    const fromAns = newValue[from];
-    newValue.splice(from, 1);
-    newValue.splice(to, 0, fromAns);
+    const cutFromValue = cutAndShiftDown(value, from);
+    const newValue = shiftUp(cutFromValue, to);
+    newValue[to] = value[from];
     return makeChangeAction({ ...info, options: newOptions }, newValue);
   };
   return (

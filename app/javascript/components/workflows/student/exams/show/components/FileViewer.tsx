@@ -214,7 +214,7 @@ export const VeryControlledFileViewer: React.FC<{
     const first = firstFile(files);
     const firstID = first?.relPath ?? '';
     setSelectedID(firstID);
-  }, [files, setSelectedID]);
+  }, [files]);
   return (
     <Row>
       <Col sm={3} className="overflow-scroll-x">

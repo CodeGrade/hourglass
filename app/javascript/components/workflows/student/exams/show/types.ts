@@ -329,13 +329,8 @@ export interface SnapshotState {
 }
 
 export interface AnswersState {
-  answers: {
-    [qnum: number]: {
-      [pnum: number]: {
-        [bnum: number]: AnswerState;
-      };
-    };
-  };
+  // indices are [qnum][pnum][bnum]
+  answers: AnswerState[][][];
 
   // The student's scratch space work.
   scratch: string;
@@ -424,7 +419,12 @@ export type BodyItem =
 
 export type AnswerState =
   AllThatApplyState | CodeState | YesNoState |
-  CodeTagState | MultipleChoiceState | TextState | MatchingState;
+  CodeTagState | MultipleChoiceState | TextState | MatchingState |
+  NoAnswerState;
+
+export interface NoAnswerState {
+  NO_ANS: true;
+}
 
 export type HTML = {
   type: 'HTML';

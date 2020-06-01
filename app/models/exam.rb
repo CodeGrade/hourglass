@@ -52,4 +52,12 @@ class Exam < ApplicationRecord
   def version_for(_reg)
     version(0)
   end
+
+  def default_answers_for(reg)
+    version_for(reg)["answers"].map do |ansQ|
+      ansQ.map do |ansP|
+        ansP.map do |_| { "NO_ANS": true} end
+      end
+    end
+  end
 end

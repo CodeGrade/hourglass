@@ -2,11 +2,6 @@ import { ContentsState } from '@student/exams/show/types';
 import { ExamEditorAction } from '@professor/exams/new/types';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
-export const arrayLikeToArray = <T>(obj: {[key: number]: T}, minLength: number): T[] => {
-  const len = Math.max(minLength, ...Object.keys(obj).map((k) => Number.parseInt(k, 10)));
-  return Array.from({ ...obj, length: len });
-};
-
 export default (state: ContentsState = {
   exam: {
     questions: [],
@@ -21,7 +16,6 @@ export default (state: ContentsState = {
   switch (action.type) {
     case 'LOAD_EXAM':
       return {
-        ...state,
         exam: action.exam,
         answers: action.answers,
       };
@@ -66,7 +60,7 @@ export default (state: ContentsState = {
       const questions = [...state.exam.questions];
       const { qnum, question } = action;
       questions.splice(qnum, 0, question);
-      const answers = arrayLikeToArray(state.answers.answers, questions.length);
+      const answers = [...state.answers.answers];
       answers.splice(qnum, 0, undefined);
       return {
         ...state,
@@ -82,7 +76,7 @@ export default (state: ContentsState = {
     }
     case 'DELETE_QUESTION': {
       const questions = [...state.exam.questions];
-      const answers = arrayLikeToArray(state.answers.answers, questions.length);
+      const answers = [...state.answers.answers];
       const { qnum } = action;
       questions.splice(qnum, 1);
       answers.splice(qnum, 1);
@@ -141,7 +135,7 @@ export default (state: ContentsState = {
       const q = questions[from];
       questions.splice(from, 1);
       questions.splice(to, 0, q);
-      const answers = arrayLikeToArray(state.answers.answers, questions.length);
+      const answers = [...state.answers.answers];
       const a = answers[from];
       answers.splice(from, 1);
       answers.splice(to, 0, a);
@@ -163,9 +157,9 @@ export default (state: ContentsState = {
       questions[qnum] = { ...questions[qnum] };
       questions[qnum].parts = [...questions[qnum].parts];
       questions[qnum].parts.splice(pnum, 0, part);
-      const answers = arrayLikeToArray(state.answers.answers, questions.length);
-      const ansQnum = arrayLikeToArray(answers[qnum] || {}, questions[qnum].parts.length);
-      ansQnum.splice(pnum, 0, {});
+      const answers = [...state.answers.answers];
+      const ansQnum = [...answers[qnum] || []];
+      ansQnum.splice(pnum, 0, []);
       answers[qnum] = ansQnum;
       return {
         ...state,
@@ -238,8 +232,8 @@ export default (state: ContentsState = {
       const p = questions[qnum].parts[from];
       questions[qnum].parts.splice(from, 1);
       questions[qnum].parts.splice(to, 0, p);
-      const answers = arrayLikeToArray(state.answers.answers, questions.length);
-      const ansQnum = arrayLikeToArray(answers[qnum], questions[qnum].parts.length);
+      const answers = [...state.answers.answers];
+      const ansQnum = [...answers[qnum]];
       const a = answers[qnum][from];
       ansQnum.splice(from, 1);
       ansQnum.splice(to, 0, a);
@@ -322,9 +316,9 @@ export default (state: ContentsState = {
       questions[qnum].parts[pnum] = { ...questions[qnum].parts[pnum] };
       questions[qnum].parts[pnum].body = [...questions[qnum].parts[pnum].body];
       let bodyItem = questions[qnum].parts[pnum].body[bnum];
-      const answers = arrayLikeToArray(state.answers.answers, questions.length);
-      const ansQnum = arrayLikeToArray(answers[qnum], questions[qnum].parts.length);
-      const ansPnum = arrayLikeToArray(ansQnum[pnum], questions[qnum].parts[pnum].body.length);
+      const answers = [...state.answers.answers];
+      const ansQnum = [...answers[qnum]];
+      const ansPnum = [...ansQnum[pnum]];
       switch (bodyItem.type) {
         case 'HTML':
           bodyItem = {
@@ -377,9 +371,9 @@ export default (state: ContentsState = {
       const b = questions[qnum].parts[pnum].body[from];
       questions[qnum].parts[pnum].body.splice(from, 1);
       questions[qnum].parts[pnum].body.splice(to, 0, b);
-      const answers = arrayLikeToArray(state.answers.answers, questions.length);
-      const ansQnum = arrayLikeToArray(answers[qnum], questions[qnum].parts.length);
-      const ansPnum = arrayLikeToArray(ansQnum[pnum], questions[qnum].parts[pnum].body.length);
+      const answers = [...state.answers.answers];
+      const ansQnum = [...answers[qnum]];
+      const ansPnum = [...ansQnum[pnum]];
       const a = answers[qnum][pnum][from];
       ansPnum.splice(from, 1);
       ansPnum.splice(to, 0, a);

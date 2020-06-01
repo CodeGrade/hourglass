@@ -337,11 +337,6 @@ export default (state: ContentsState = {
       const ansPnum = [...ansQnum[pnum]];
       switch (bodyItem.type) {
         case 'HTML':
-          bodyItem = {
-            ...bodyItem,
-            ...info,
-          };
-          break;
         case 'Code':
         case 'AllThatApply':
         case 'CodeTag':

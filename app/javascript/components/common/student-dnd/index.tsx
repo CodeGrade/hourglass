@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Badge, Col, Row } from 'react-bootstrap';
+import { Badge, Col, Row, Button } from 'react-bootstrap';
 import { FieldArray, reduxForm } from 'redux-form';
 import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
@@ -132,13 +132,26 @@ const Rooms: React.FC<{}> = (props) => {
 }
 
 const StudentDNDForm: React.FC<{}> = (props) => {
+  const {
+    handleSubmit,
+  } = props;
   return (
-    <form>
+    <form
+      onSubmit={handleSubmit((data) => {
+        console.log(data);
+      })}
+    >
       <div>
         <h2>Unassigned Students</h2>
         <FieldArray name="students" component={Students} />
       </div>
       <FieldArray name="rooms" component={Rooms} />
+      <Button
+        variant="success"
+        type="submit"
+      >
+        Submit
+      </Button>
     </form>
   );
 };

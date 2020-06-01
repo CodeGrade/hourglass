@@ -28,6 +28,17 @@ module Api
         }
       end
 
+      def update_all
+        # TODO
+        created = true
+        pp params[:registrations]
+        render json: {
+          created: created
+        }
+      end
+
+      private
+
       def serialize_student(user)
         {
           id: user.id,

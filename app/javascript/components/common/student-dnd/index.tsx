@@ -24,6 +24,8 @@ import {
   Room,
   Section,
 } from '@hourglass/common/api/professor/rooms';
+import { hitApi } from '../types/api';
+import { updateAll } from '../api/professor/rooms/updateAll';
 
 interface FormContextType {
   sections: Section[];
@@ -184,6 +186,8 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
   );
 };
 
+const examId = 400167349;
+
 const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const {
     handleSubmit,
@@ -215,9 +219,18 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   };
   return (
     <form
-      onSubmit={handleSubmit((data) => {
-        // TODO
-        console.log(data);
+      onSubmit={handleSubmit(({ all }) => {
+        const rooms = {};
+        all.rooms.forEach((room) => {
+          rooms[room.id] = room.students.map((s) => s.id);
+        });
+        const body = {
+          unassigned: all.unassigned.map((s) => s.id),
+          rooms,
+        };
+        updateAll(examId, body).then((result) => {
+          console.log(result);
+        });
       })}
     >
       <FormSection name="all">
@@ -268,7 +281,7 @@ const DNDForm = reduxForm({
 })(StudentDNDForm);
 
 const DND: React.FC<{}> = () => {
-  const response = useRoomsIndex(400167349);
+  const response = useRoomsIndex(examId);
   if (response.type === 'ERROR' || response.type === 'LOADING') {
     return <p>Loading...</p>;
   }

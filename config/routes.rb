@@ -8,7 +8,11 @@ Rails.application.routes.draw do
           post :sync
           resources :exams, param: 'exam_id', only: [:create, :index, :show] do
             member do
-              resources :rooms, param: 'room_id', only: [:index]
+              resources :rooms, param: 'room_id', only: [:index] do
+                collection do
+                  post :update_all
+                end
+              end
             end
           end
         end

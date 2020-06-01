@@ -157,49 +157,35 @@ const Entry: React.FC<{}> = () => {
       <DndProvider backend={HTML5Backend}>
         <BrowserRouter>
           <Switch>
-            <Route exact path="/">
-              <RegularNavbar />
-              <Container>
-                <Exams />
-              </Container>
-            </Route>
-            <Route exact path="/dev">
-              <RegularNavbar />
-              <Container>
-                <Archive />
-              </Container>
-            </Route>
-            <Route exact path="/dnddev">
-              <RegularNavbar />
-              <Container>
-                <StudentDND />
-              </Container>
-            </Route>
             <Route path="/exams/:examId" exact>
               <Exam />
             </Route>
-            <Route path="/exams/:examId/admin" exact>
+            <Route path="/">
               <RegularNavbar />
               <Container>
-                <ExamAdmin />
-              </Container>
-            </Route>
-            <Route path="/exams/:examId/edit" exact>
-              <RegularNavbar />
-              <Container>
-                <EditExam />
-              </Container>
-            </Route>
-            <Route path="/courses/:courseId">
-              <RegularNavbar />
-              <Container>
-                <ShowCourse />
-              </Container>
-            </Route>
-            <Route path="*">
-              <RegularNavbar />
-              <Container>
-                TODO
+                <Switch>
+                  <Route exact path="/">
+                    <Exams />
+                  </Route>
+                  <Route exact path="/dev">
+                    <Archive />
+                  </Route>
+                  <Route exact path="/dnddev">
+                    <StudentDND />
+                  </Route>
+                  <Route path="/exams/:examId/admin" exact>
+                    <ExamAdmin />
+                  </Route>
+                  <Route path="/exams/:examId/edit" exact>
+                    <EditExam />
+                  </Route>
+                  <Route path="/courses/:courseId">
+                    <ShowCourse />
+                  </Route>
+                  <Route path="*">
+                    TODO: 404!
+                  </Route>
+                </Switch>
               </Container>
             </Route>
           </Switch>

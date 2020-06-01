@@ -39,6 +39,7 @@ export default (state: ContentsState = {
       };
     }
     case 'UPDATE_EXAM_FILES': {
+      const { questions } = state.exam;
       return {
         ...state,
         exam: {
@@ -53,6 +54,21 @@ export default (state: ContentsState = {
               reference: [],
             })),
           })),
+        },
+        answers: {
+          scratch: state.answers.scratch,
+          answers: state.answers.answers.map(
+            (qans, qnum) => qans.map(
+              (pans, pnum) => pans.map(
+                (bans, bnum) => {
+                  switch (questions[qnum].parts[pnum].body[bnum].type) {
+                    case 'CodeTag': return { NO_ANS: true };
+                    default: return bans;
+                  }
+                },
+              ),
+            ),
+          ),
         },
       };
     }

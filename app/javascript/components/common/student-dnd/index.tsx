@@ -25,7 +25,7 @@ import {
 } from '@hourglass/common/api/professor/rooms';
 import { updateAll } from '../api/professor/rooms/updateAll';
 import { ExhaustiveSwitchError } from '../helpers';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { AlertContext } from '../alerts';
 
 interface FormContextType {
@@ -187,8 +187,6 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
   );
 };
 
-const examId = 400167349;
-
 const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const {
     handleSubmit,
@@ -196,6 +194,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
     pristine,
     change,
   } = props;
+  const { examId } = useParams();
   const addSectionToRoom = (section: Section, roomId: number): void => {
     change('all', ({ unassigned, rooms }) => ({
       unassigned: unassigned.filter((unassignedStudent: Student) => (
@@ -296,6 +295,7 @@ const DNDForm = reduxForm({
 })(StudentDNDForm);
 
 const DND: React.FC<{}> = () => {
+  const { examId } = useParams();
   const response = useRoomsIndex(examId);
   switch (response.type) {
     case 'ERROR':

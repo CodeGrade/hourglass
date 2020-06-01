@@ -29,11 +29,24 @@ module Api
       end
 
       def update_all
-        # TODO
-        created = true
-        pp params[:registrations]
+        body = params.permit(unassigned: [], rooms: {})
+        body[:unassigned].each do |id|
+          # TODO: remove registration
+          pp "UNASSIGNED: #{id}"
+        end
+        body[:rooms].each do |room_id, student_ids|
+          student_ids.each do |id|
+            student_reg = @exam.registrations.find_or_initialize_by(user_id: id)
+            student_reg.room_id = room_id
+            student_reg.save!
+          end
+        end
         render json: {
-          created: created
+          created: true
+        }
+      rescue StandardError
+        render json: {
+          created: false
         }
       end
 

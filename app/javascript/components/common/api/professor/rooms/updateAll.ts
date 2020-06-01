@@ -5,15 +5,16 @@ export interface Response {
   created: boolean;
 }
 
-export interface Registrations {
-  [roomId: number]: Array<Student['id']>;
+interface Body {
+  unassigned: Array<Student['id']>;
+  rooms: {
+    [roomId: number]: Array<Student['id']>;
+  };
 }
 
-export function updateAll(examId: number, regs: Registrations): Promise<Response> {
+export function updateAll(examId: number, body: Body): Promise<Response> {
   return hitApi(`/api/professor/exams/${examId}/rooms/update_all`, {
     method: 'POST',
-    body: JSON.stringify({
-      registrations: regs,
-    }),
+    body: JSON.stringify(body),
   });
 }

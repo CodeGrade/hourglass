@@ -58,11 +58,11 @@ const DropTarget: React.FC<{
       isOver: !!monitor.isOver(),
     }),
   });
-  const bg = isOver ? 'bg-info' : 'bg-secondary';
+  const bg = isOver ? 'bg-secondary border-secondary text-white' : 'border-secondary';
   return (
     <div
       ref={drop}
-      className={`${bg} rounded text-white px-2 text-center flex-fill`}
+      className={`${bg} border rounded px-2 text-center flex-fill`}
     >
       {children}
     </div>
@@ -101,9 +101,9 @@ const DraggableStudent: React.FC<{
 const StudentBadge: React.FC<{
   student: Student;
 }> = ({ student }) => (
-  <Badge variant="primary">
+  <Button className="badge badge-primary badge-pill" size="sm">
     {student.displayName}
-  </Badge>
+  </Button>
 );
 
 const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {

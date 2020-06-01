@@ -6,6 +6,8 @@ import {
   Row,
   Button,
   Form,
+  DropdownButton,
+  Dropdown,
 } from 'react-bootstrap';
 import {
   FieldArray,
@@ -20,11 +22,28 @@ import {
   useResponse as useRoomsIndex,
   Student,
   Room,
+  Section,
 } from '@hourglass/common/api/professor/rooms';
 
-enum ItemTypes {
-  STUDENT = 'student',
+type ItemTypes = DropStudent;
+
+interface DropStudent {
+  type: 'STUDENT';
+  student: Student;
 }
+
+const sections: Section[] = [
+  {
+    id: 1,
+    title: 'lab',
+    studentIds: [199568445],
+  },
+  {
+    id: 2,
+    title: 'lecture',
+    studentIds: [1053353715],
+  },
+];
 
 const DropTarget: React.FC<{
   onAdd: (student: Student) => void;
@@ -33,14 +52,10 @@ const DropTarget: React.FC<{
     children,
     onAdd,
   } = props;
-  const [{ isOver }, drop] = useDrop<{
-    type: ItemTypes.STUDENT;
-    student: Student;
-  }, void, { isOver: boolean }>({
-    accept: ItemTypes.STUDENT,
+  const [{ isOver }, drop] = useDrop<ItemTypes, void, { isOver: boolean }>({
+    accept: ['STUDENT', 'SECTION'],
     drop: (dropped) => {
-      const { student } = dropped;
-      onAdd(student);
+      if (dropped.type === 'STUDENT') onAdd(dropped.student);
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -65,9 +80,9 @@ const DraggableStudent: React.FC<{
     onRemove,
     student,
   } = props;
-  const [{ isDragging }, drag] = useDrag({
+  const [{ isDragging }, drag] = useDrag<DropStudent, DropStudent, { isDragging: boolean }>({
     item: {
-      type: ItemTypes.STUDENT,
+      type: 'STUDENT',
       student,
     },
     end: (_item, monitor) => {
@@ -93,7 +108,6 @@ const StudentBadge: React.FC<{
     {student.displayName}
   </Badge>
 );
-
 
 const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
   const {
@@ -140,6 +154,23 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room>> = (props) => {
           <Col key={room.id}>
             <FormSection name={member}>
               <h2>{room.name}</h2>
+              <DropdownButton
+                title="Add entire section"
+                id={`add-section-${room.id}`}
+                size="sm"
+                className="mb-2"
+              >
+                {sections.map((s) => (
+                  <Dropdown.Item
+                    key={s.id}
+                    onClick={(): void => {
+                      console.log('add', s.title, 'to', room.name);
+                    }}
+                  >
+                    {s.title}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
               <FieldArray
                 name="students"
                 component={Students}
@@ -161,14 +192,17 @@ const StudentDNDForm: React.FC<InjectedFormProps> = (props) => {
   return (
     <form
       onSubmit={handleSubmit((data) => {
+        // TODO
         console.log(data);
       })}
     >
-      <div>
+      <Form.Group>
         <h2>Unassigned Students</h2>
         <FieldArray name="unassigned" component={Students} />
-      </div>
-      <FieldArray name="rooms" component={Rooms} />
+      </Form.Group>
+      <Form.Group>
+        <FieldArray name="rooms" component={Rooms} />
+      </Form.Group>
       <Form.Group>
         <Button
           variant="danger"

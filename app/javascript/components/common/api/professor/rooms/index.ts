@@ -5,6 +5,12 @@ export interface Response {
   rooms: Room[];
 }
 
+export interface Section {
+  id: number;
+  title: string;
+  studentIds: number[];
+}
+
 export interface Student {
   id: number;
   username: string;

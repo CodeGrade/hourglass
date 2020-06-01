@@ -7,15 +7,23 @@ module Api
       before_action :require_prof_reg
 
       def index
-        rooms = @exam.rooms
         room_regs = @exam.registrations.group_by(&:room)
         render json: {
           unassigned: @exam.unassigned_students.map do |s|
             serialize_student s
           end,
-          rooms: rooms.map do |room|
+          rooms: @exam.rooms.map do |room|
             regs = room_regs[room] || []
             serialize_room_regs room, regs
+          end,
+          sections: @exam.course.sections.map do |section|
+            {
+              id: section.id,
+              title: section.title,
+              students: section.students.map do |student|
+                serialize_student student
+              end
+            }
           end
         }
       end

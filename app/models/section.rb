@@ -7,7 +7,7 @@ class Section < ApplicationRecord
   has_many :student_registrations, dependent: :destroy
   has_many :staff_registrations, dependent: :destroy
 
-  has_many :users, through: :section_registrations
+  has_many :students, through: :student_registrations, source: :user
 
   validates :course, presence: true
 end

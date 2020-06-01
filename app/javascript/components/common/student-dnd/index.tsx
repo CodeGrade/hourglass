@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import {
   Badge,
@@ -25,25 +25,20 @@ import {
   Section,
 } from '@hourglass/common/api/professor/rooms';
 
+interface FormContextType {
+  sections: Section[];
+}
+
+const FormContext = React.createContext<FormContextType>({
+  sections: [],
+});
+
 type ItemTypes = DropStudent;
 
 interface DropStudent {
   type: 'STUDENT';
   student: Student;
 }
-
-const sections: Section[] = [
-  {
-    id: 1,
-    title: 'lab',
-    studentIds: [199568445],
-  },
-  {
-    id: 2,
-    title: 'lecture',
-    studentIds: [1053353715],
-  },
-];
 
 const DropTarget: React.FC<{
   onAdd: (student: Student) => void;
@@ -122,7 +117,7 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
       >
         Drop students here!
       </p>
-      <div className="d-flex justify-content-around rounded mb-2 flex-wrap">
+      <div className="d-flex mx-n1 justify-content-around rounded mb-2 flex-wrap">
         {fields.map((member, index) => {
           const student = fields.get(index);
           return (
@@ -142,10 +137,16 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
   );
 };
 
-const Rooms: React.FC<WrappedFieldArrayProps<Room>> = (props) => {
+interface RoomsProps {
+  addSectionToRoom: (section: Section, roomId: number) => void;
+}
+
+const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
   const {
     fields,
+    addSectionToRoom,
   } = props;
+  const { sections } = useContext(FormContext);
   return (
     <Row>
       {fields.map((member, index) => {
@@ -164,7 +165,7 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room>> = (props) => {
                   <Dropdown.Item
                     key={s.id}
                     onClick={(): void => {
-                      console.log('add', s.title, 'to', room.name);
+                      addSectionToRoom(s, room.id);
                     }}
                   >
                     {s.title}
@@ -183,12 +184,35 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room>> = (props) => {
   );
 };
 
-const StudentDNDForm: React.FC<InjectedFormProps> = (props) => {
+const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const {
     handleSubmit,
     reset,
     pristine,
+    change,
   } = props;
+  const addSectionToRoom = (section: Section, roomId: number): void => {
+    change('all', ({ unassigned, rooms }) => ({
+      unassigned: unassigned.filter((unassignedStudent: Student) => (
+        !section.students.find((student) => student.id === unassignedStudent.id)
+      )),
+      rooms: rooms.map((room: Room) => {
+        const filtered = room.students.filter((roomStudent) => (
+          !section.students.find((student) => student.id === roomStudent.id)
+        ));
+        if (room.id === roomId) {
+          return {
+            ...room,
+            students: filtered.concat(section.students),
+          };
+        }
+        return {
+          ...room,
+          students: filtered,
+        };
+      }),
+    }));
+  };
   return (
     <form
       onSubmit={handleSubmit((data) => {
@@ -196,33 +220,48 @@ const StudentDNDForm: React.FC<InjectedFormProps> = (props) => {
         console.log(data);
       })}
     >
-      <Form.Group>
-        <h2>Unassigned Students</h2>
-        <FieldArray name="unassigned" component={Students} />
-      </Form.Group>
-      <Form.Group>
-        <FieldArray name="rooms" component={Rooms} />
-      </Form.Group>
-      <Form.Group>
-        <Button
-          variant="danger"
-          className={pristine && 'd-none'}
-          onClick={reset}
-        >
-          Reset
-        </Button>
-      </Form.Group>
-      <Form.Group>
-        <Button
-          variant="success"
-          type="submit"
-        >
-          Submit
-        </Button>
-      </Form.Group>
+      <FormSection name="all">
+        <Form.Group>
+          <h2>Unassigned Students</h2>
+          <FieldArray name="unassigned" component={Students} />
+        </Form.Group>
+        <Form.Group>
+          <FieldArray
+            name="rooms"
+            component={Rooms}
+            props={{
+              addSectionToRoom,
+            }}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Button
+            variant="danger"
+            className={pristine && 'd-none'}
+            onClick={reset}
+          >
+            Reset
+          </Button>
+        </Form.Group>
+        <Form.Group>
+          <Button
+            variant="success"
+            type="submit"
+          >
+            Submit
+          </Button>
+        </Form.Group>
+      </FormSection>
     </form>
   );
 };
+
+interface FormValues {
+  all: {
+    unassigned: Student[];
+    rooms: Room[];
+  };
+}
 
 const DNDForm = reduxForm({
   form: 'student-dnd',
@@ -235,12 +274,20 @@ const DND: React.FC<{}> = () => {
   }
   return (
     <Provider store={store}>
-      <DNDForm
-        initialValues={{
-          unassigned: response.response.unassigned,
-          rooms: response.response.rooms,
+      <FormContext.Provider
+        value={{
+          sections: response.response.sections,
         }}
-      />
+      >
+        <DNDForm
+          initialValues={{
+            all: {
+              unassigned: response.response.unassigned,
+              rooms: response.response.rooms,
+            },
+          }}
+        />
+      </FormContext.Provider>
     </Provider>
   );
 };

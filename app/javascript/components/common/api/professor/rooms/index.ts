@@ -3,12 +3,13 @@ import { ApiResponse, useApiResponse } from '@hourglass/common/types/api';
 export interface Response {
   unassigned: Student[];
   rooms: Room[];
+  sections: Section[];
 }
 
 export interface Section {
   id: number;
   title: string;
-  studentIds: number[];
+  students: Student[];
 }
 
 export interface Student {

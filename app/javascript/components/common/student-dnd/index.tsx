@@ -1,17 +1,30 @@
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Badge, Col, Row, Button, Form } from 'react-bootstrap';
-import { FieldArray, reduxForm, InjectedFormProps } from 'redux-form';
+import {
+  Badge,
+  Col,
+  Row,
+  Button,
+  Form,
+} from 'react-bootstrap';
+import {
+  FieldArray,
+  reduxForm,
+  InjectedFormProps,
+  WrappedFieldArrayProps,
+  FormSection,
+} from 'redux-form';
 import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
 import {
   useResponse as useRoomsIndex,
   Student,
+  Room,
 } from '@hourglass/common/api/professor/rooms';
 
-const ItemTypes = {
-  STUDENT: 'student',
-};
+enum ItemTypes {
+  STUDENT = 'student',
+}
 
 const DropTarget: React.FC<{
   onAdd: (student: Student) => void;
@@ -20,9 +33,13 @@ const DropTarget: React.FC<{
     children,
     onAdd,
   } = props;
-  const [{ isOver }, drop] = useDrop({
+  const [{ isOver }, drop] = useDrop<{
+    type: ItemTypes.STUDENT;
+    student: Student;
+  }, void, { isOver: boolean }>({
     accept: ItemTypes.STUDENT,
-    drop: ({ student }) => {
+    drop: (dropped) => {
+      const { student } = dropped;
       onAdd(student);
     },
     collect: (monitor) => ({
@@ -78,13 +95,13 @@ const StudentBadge: React.FC<{
 );
 
 
-const Students: React.FC<{}> = (props) => {
+const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
   const {
     fields,
   } = props;
   return (
     <DropTarget
-      onAdd={(student) => fields.push(student)}
+      onAdd={(student): void => fields.push(student)}
     >
       <p
         className={fields.length === 0 ? 'm-0' : 'd-none'}
@@ -101,7 +118,7 @@ const Students: React.FC<{}> = (props) => {
             >
               <DraggableStudent
                 student={student}
-                onRemove={() => fields.remove(index)}
+                onRemove={(): void => fields.remove(index)}
               />
             </span>
           );
@@ -109,9 +126,9 @@ const Students: React.FC<{}> = (props) => {
       </div>
     </DropTarget>
   );
-}
+};
 
-const Rooms: React.FC<{}> = (props) => {
+const Rooms: React.FC<WrappedFieldArrayProps<Room>> = (props) => {
   const {
     fields,
   } = props;
@@ -121,14 +138,19 @@ const Rooms: React.FC<{}> = (props) => {
         const room = fields.get(index);
         return (
           <Col key={room.id}>
-            <h2>{room.name}</h2>
-            <FieldArray name={`${member}.students`} component={Students} />
+            <FormSection name={member}>
+              <h2>{room.name}</h2>
+              <FieldArray
+                name="students"
+                component={Students}
+              />
+            </FormSection>
           </Col>
         );
       })}
     </Row>
   );
-}
+};
 
 const StudentDNDForm: React.FC<InjectedFormProps> = (props) => {
   const {
@@ -144,7 +166,7 @@ const StudentDNDForm: React.FC<InjectedFormProps> = (props) => {
     >
       <div>
         <h2>Unassigned Students</h2>
-        <FieldArray name="students" component={Students} />
+        <FieldArray name="unassigned" component={Students} />
       </div>
       <FieldArray name="rooms" component={Rooms} />
       <Form.Group>
@@ -172,7 +194,7 @@ const DNDForm = reduxForm({
   form: 'student-dnd',
 })(StudentDNDForm);
 
-export default () => {
+const DND: React.FC<{}> = () => {
   const response = useRoomsIndex(400167349);
   if (response.type === 'ERROR' || response.type === 'LOADING') {
     return <p>Loading...</p>;
@@ -181,10 +203,12 @@ export default () => {
     <Provider store={store}>
       <DNDForm
         initialValues={{
-          students: response.response.unassigned,
+          unassigned: response.response.unassigned,
           rooms: response.response.rooms,
         }}
       />
     </Provider>
   );
 };
+
+export default DND;

@@ -75,6 +75,6 @@ class Registration < ApplicationRecord
   def all_messages_for(user)
     private_messages_for(user) +
       room.room_announcements +
-      exam.exam_announcements
+      exam_version.version_announcements
   end
 end

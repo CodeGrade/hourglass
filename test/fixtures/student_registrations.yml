@@ -6,6 +6,10 @@ cs2500studentlab:
   user: cs2500student
   section: cs2500lab
 
+cs2500student_no_room_lec:
+  user: cs2500student_no_room
+  section: cs2500lec
+
 cs3500studentlec:
   user: cs3500student
   section: cs3500lec

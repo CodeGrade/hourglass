@@ -10,4 +10,8 @@ class Course < ApplicationRecord
 
   validates :title, presence: true
   validates :bottlenose_id, presence: true
+
+  def students
+    student_registrations.select(:user_id).distinct.map(&:user)
+  end
 end

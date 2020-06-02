@@ -132,31 +132,24 @@ interface NewRoomProps {
   room: Room;
 }
 
-const NewRoom: React.FC<NewRoomProps> = (props) => {
-  const {
-    // TEMPORARY
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    room,
-  } = props;
-  return (
-    <>
-      <Form.Group>
-        <Form.Label>Name</Form.Label>
-        <Form.Control
-          required
-          // value={room.name}
-          // onChange={(e): void => setName(e.target.value)}
-          placeholder="Enter a name"
-        />
-      </Form.Group>
-      <Button
-        variant="danger"
-      >
-        Remove room
-      </Button>
-    </>
-  );
-};
+const NewRoom: React.FC<NewRoomProps> = () => (
+  <>
+    <Form.Group>
+      <Form.Label>Name</Form.Label>
+      <Form.Control
+        required
+        // value={room.name}
+        // onChange={(e): void => setName(e.target.value)}
+        placeholder="Enter a name"
+      />
+    </Form.Group>
+    <Button
+      variant="danger"
+    >
+      Remove room
+    </Button>
+  </>
+);
 
 /*
 // import Editor from '@professor/exams/new/editor';

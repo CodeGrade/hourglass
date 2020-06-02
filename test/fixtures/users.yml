@@ -36,6 +36,12 @@ cs2500student:
   display_name: "CS2500 Student"
   encrypted_password: <%= Devise::Encryptor.digest(User, 'cs2500student') %>
 
+cs2500student_no_room:
+  username: "cs2500student_no_room"
+  email: "cs2500student_no_room@localhost.localdomain"
+  display_name: "CS2500 Student (No Room)"
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'cs2500student_no_room') %>
+
 cs3500student:
   username: "cs3500student"
   email: "cs3500student@localhost.localdomain"

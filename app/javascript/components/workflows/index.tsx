@@ -1,4 +1,6 @@
 import { hot } from 'react-hot-loader';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import React, { useContext } from 'react';
 import { RailsContext } from '@student/exams/show/context';
 import RegularNavbar from '@hourglass/common/navbar';
@@ -20,6 +22,8 @@ import ExamAdmin from '@professor/exams/admin';
 import EditExam from '@professor/exams/edit';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Archive from '@hourglass/common/archive';
+import StudentDND from '@hourglass/common/student-dnd';
+import { AllAlerts } from '@hourglass/common/alerts';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -151,49 +155,45 @@ const Entry: React.FC<{}> = () => {
         railsUser,
       }}
     >
-      <BrowserRouter>
-        <Switch>
-          <Route exact path="/">
-            <RegularNavbar />
-            <Container>
-              <Exams />
-            </Container>
-          </Route>
-          <Route exact path="/dev">
-            <RegularNavbar />
-            <Container>
-              <Archive />
-            </Container>
-          </Route>
-          <Route path="/exams/:examId" exact>
-            <Exam />
-          </Route>
-          <Route path="/exams/:examId/admin" exact>
-            <RegularNavbar />
-            <Container>
-              <ExamAdmin />
-            </Container>
-          </Route>
-          <Route path="/exams/:examId/edit" exact>
-            <RegularNavbar />
-            <Container>
-              <EditExam />
-            </Container>
-          </Route>
-          <Route path="/courses/:courseId">
-            <RegularNavbar />
-            <Container>
-              <ShowCourse />
-            </Container>
-          </Route>
-          <Route path="*">
-            <RegularNavbar />
-            <Container>
-              TODO
-            </Container>
-          </Route>
-        </Switch>
-      </BrowserRouter>
+      <DndProvider backend={HTML5Backend}>
+        <BrowserRouter>
+          <Switch>
+            <Route path="/exams/:examId" exact>
+              <Exam />
+            </Route>
+            <Route path="/">
+              <RegularNavbar />
+              <Container>
+                <AllAlerts>
+                  <Switch>
+                    <Route exact path="/">
+                      <Exams />
+                    </Route>
+                    <Route exact path="/dev">
+                      <Archive />
+                    </Route>
+                    <Route path="/exams/:examId/admin" exact>
+                      <ExamAdmin />
+                    </Route>
+                    <Route path="/exams/:examId/edit" exact>
+                      <EditExam />
+                    </Route>
+                    <Route path="/exams/:examId/register" exact>
+                      <StudentDND />
+                    </Route>
+                    <Route path="/courses/:courseId">
+                      <ShowCourse />
+                    </Route>
+                    <Route path="*">
+                      TODO: 404!
+                    </Route>
+                  </Switch>
+                </AllAlerts>
+              </Container>
+            </Route>
+          </Switch>
+        </BrowserRouter>
+      </DndProvider>
     </RailsContext.Provider>
   );
 };

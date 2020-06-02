@@ -18,7 +18,19 @@ export interface ApiError {
   text: string;
 }
 
-export function useApiResponse<T>(url: string): ApiResponse<T> {
+export async function hitApi<T>(url: string, options?: RequestInit): Promise<T> {
+  return fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-Token': getCSRFToken(),
+    },
+    credentials: 'same-origin',
+    ...options,
+  })
+    .then((res) => res.json() as Promise<T>);
+}
+
+export function useApiResponse<T>(url: string, options?: RequestInit): ApiResponse<T> {
   const [response, setResponse] = useState<T>(undefined);
   const [error, setError] = useState<ApiError>(undefined);
   useEffect(() => {
@@ -28,6 +40,7 @@ export function useApiResponse<T>(url: string): ApiResponse<T> {
         'X-CSRF-Token': getCSRFToken(),
       },
       credentials: 'same-origin',
+      ...options,
     })
       .then((res) => {
         if (!res.ok) {

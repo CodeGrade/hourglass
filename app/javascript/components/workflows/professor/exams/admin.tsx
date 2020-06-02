@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useResponse as examsShow } from '@hourglass/common/api/professor/exams/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { Collapse, Button } from 'react-bootstrap';
+import { Collapse, Button, Form } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
@@ -66,13 +66,24 @@ const PreviewExam: React.FC<{
   }, [open]);
   return (
     <>
-      <Link to={`/exams/${examId}/edit`}>
-        <Button
-          variant="info"
-        >
-          Edit Exam
-        </Button>
-      </Link>
+      <Form.Group>
+        <Link to={`/exams/${examId}/edit`}>
+          <Button
+            variant="info"
+          >
+            Edit Exam
+          </Button>
+        </Link>
+      </Form.Group>
+      <Form.Group>
+        <Link to={`/exams/${examId}/register`}>
+          <Button
+            variant="info"
+          >
+            Register Students
+          </Button>
+        </Link>
+      </Form.Group>
       <Button
         variant="outline-primary"
         className="mt-3 d-flex align-items-center justify-content-between"

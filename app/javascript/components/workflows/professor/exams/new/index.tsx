@@ -75,7 +75,7 @@ const NewExamForm: React.FC<{}> = () => {
           custom
         />
       </Form.Group>
-      <AssocRooms />
+      {/* <AssocRooms /> */}
       <Button
         variant="success"
         type="submit"

@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { useResponse as examsShow } from '@hourglass/common/api/professor/exams/show';
+import { useParams } from 'react-router-dom';
+import { useResponse as examsShow, Version } from '@hourglass/common/api/professor/exams/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { Collapse, Button, Form, InputGroup, ButtonGroup } from 'react-bootstrap';
+import {
+  Collapse,
+  Button,
+  InputGroup,
+  ButtonGroup,
+} from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
@@ -40,7 +45,7 @@ const ExamAdmin: React.FC<{}> = () => {
             ))}
           </ul>
         </>
-    );
+      );
     default:
       throw new ExhaustiveSwitchError(res);
   }
@@ -74,7 +79,7 @@ const ShowVersion: React.FC<{
             </Button>
             <LinkButton
               variant="info"
-              to={`/exams/${examId}/edit`}
+              to={`/exams/${examId}/versions/${version.id}/edit`}
             >
               Edit
             </LinkButton>
@@ -117,7 +122,6 @@ const PreviewVersion: React.FC<{
     contents,
     railsExam,
   } = props;
-  const { examId } = useParams();
   useEffect(() => {
     if (!open) return;
     document.querySelectorAll('.CodeMirror').forEach((cm) => {

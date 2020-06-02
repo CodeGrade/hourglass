@@ -5,24 +5,27 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Editor from '@professor/exams/new/editor';
 
 const EditExam: React.FC<{}> = () => {
-  const { examId } = useParams();
+  const { examId, versionId } = useParams();
   const res = showExam(examId);
   switch (res.type) {
     case 'ERROR':
     case 'LOADING':
       return <p>Loading...</p>;
-    case 'RESULT':
+    case 'RESULT': {
+      const version = res.response.versions.find((v) => v.id.toString() === versionId);
+      if (!version) return <p>No such version.</p>;
       return (
         <Editor
-          exam={res.response.contents.exam}
-          answers={res.response.contents.answers}
+          exam={version.contents.exam}
+          answers={version.contents.answers}
           railsExam={{
-            name: res.response.exam.name,
+            name: res.response.name,
             id: examId,
-            policies: res.response.exam.policies,
+            policies: version.policies,
           }}
         />
       );
+    }
     default:
       throw new ExhaustiveSwitchError(res);
   }

@@ -6,6 +6,18 @@
   --sidebar-expanded: 500px;
 }
 
+#exam-taker .sidebar-small + .flex-fill {
+  width: calc(100% - var(--sidebar-small));
+}
+
+#exam-taker .sidebar-expanded + .flex-fill {
+  width: calc(100% - var(--sidebar-expanded));
+}
+
+.transition {
+  transition: 0.35s width ease-in-out;
+}
+
 .bg-pulse {
   background-color: unset;
   animation-name: bg-pulse;

@@ -22,7 +22,7 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
   const body = ready ? (
     <div id="exam-taker" className="d-flex">
       <ExamNavbar />
-      <Container fluid className="flex-fill">
+      <Container fluid className="flex-fill transition">
         <Row
           id="exam-body"
           className="py-3"

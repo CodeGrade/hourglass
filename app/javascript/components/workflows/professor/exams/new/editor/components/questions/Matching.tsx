@@ -11,6 +11,7 @@ import { MatchingInfo, MatchingState, HTMLVal } from '@student/exams/show/types'
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
+import './questions.scss';
 
 
 interface MatchingProps {
@@ -188,10 +189,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
               onBlur={(): void => setPromptMoversVisible(idx, false)}
               onMouseOut={(): void => setPromptMoversVisible(idx, false)}
             >
-              <Col
-                className="flex-grow-0 pl-0"
-                style={{ flexBasis: 'content' }}
-              >
+              <Col className="flex-grow-01 pl-0">
                 <MoveItem
                   visible={promptMoversVisible[idx]}
                   variant="dark"
@@ -255,10 +253,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
             onBlur={(): void => setValueMoversVisible(idx, false)}
             onMouseOut={(): void => setValueMoversVisible(idx, false)}
           >
-            <Col
-              className="flex-grow-0 pl-0"
-              style={{ flexBasis: 'content' }}
-            >
+            <Col className="flex-grow-01 pl-0">
               <MoveItem
                 visible={valueMoversVisible[idx]}
                 variant="dark"

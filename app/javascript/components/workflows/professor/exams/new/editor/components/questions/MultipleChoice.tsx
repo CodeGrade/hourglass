@@ -12,6 +12,7 @@ import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { FaCircle } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
+import './questions.scss';
 
 interface MultipleChoiceProps {
   info: MultipleChoiceInfo;
@@ -85,10 +86,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
         <Form.Label column sm={2}>Answers</Form.Label>
         <Col sm={10}>
           <Row className="p-2">
-            <Col
-              className="flex-grow-0"
-              style={{ flexBasis: 'content' }}
-            >
+            <Col className="flex-grow-01">
               <b>Correct?</b>
             </Col>
             <Col><b>Prompt</b></Col>
@@ -106,10 +104,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
                 onBlur={(): void => setMoversVisible(idx, false)}
                 onMouseOut={(): void => setMoversVisible(idx, false)}
               >
-                <Col
-                  className="flex-grow-0"
-                  style={{ flexBasis: 'content' }}
-                >
+                <Col className="flex-grow-01">
                   <MoveItem
                     visible={moversVisible[idx]}
                     variant="dark"

@@ -16,6 +16,7 @@ import { FaCheck } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
+import './questions.scss';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;
@@ -116,10 +117,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
         <Form.Label column sm={2}>Answers</Form.Label>
         <Col sm={10}>
           <Row className="p-2">
-            <Col
-              className="flex-grow-0"
-              style={{ flexBasis: 'content' }}
-            >
+            <Col className="flex-grow-01">
               <b>Correct?</b>
             </Col>
             <Col><b>Prompt</b></Col>
@@ -137,10 +135,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
                 onBlur={(): void => setMoversVisible(idx, false)}
                 onMouseOut={(): void => setMoversVisible(idx, false)}
               >
-                <Col
-                  className="flex-grow-0"
-                  style={{ flexBasis: 'content' }}
-                >
+                <Col className="flex-grow-01">
                   <MoveItem
                     visible={moversVisible[idx]}
                     variant="dark"

@@ -2,12 +2,22 @@ cs2500student:
   registration: cs2500student
   answers: {
     scratch: "cs2500student scratch space!",
-    answers: <%= Exam.find(ActiveRecord::FixtureSet.identify(:cs2500midterm)).default_answers_for(Registration.find(ActiveRecord::FixtureSet.identify(:cs2500student))).to_json %>
+    answers: [
+      [
+        [{ NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }],
+        [{ NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }]
+        ],
+      [
+        [{ NO_ANS: true }, { NO_ANS: true }, { NO_ANS: true }],
+        [{ NO_ANS: true }],
+        [{ NO_ANS: true }, { NO_ANS: true }]
+      ]
+    ]
   }
 
 cs3500student:
   registration: cs3500student
   answers: {
     scratch: "cs3500student scratch space!",
-    answers: <%= Exam.find(ActiveRecord::FixtureSet.identify(:cs3500final)).default_answers_for(Registration.find(ActiveRecord::FixtureSet.identify(:cs3500student))).to_json %>
+    answers: [[[{ NO_ANS: true }]]]
   }

@@ -6,7 +6,6 @@ module Api
     class ExamsController < StudentController
       prepend_before_action :require_current_user_unique_session
       before_action :find_exam_and_course
-      before_action :require_exam_enabled
 
       before_action :require_student_reg
       before_action :check_anomaly, only: [:take]

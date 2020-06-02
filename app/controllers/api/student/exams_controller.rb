@@ -17,7 +17,7 @@ module Api
           railsExam: {
             id: @exam.id,
             name: @exam.name,
-            policies: @exam.info['policies']
+            policies: @registration.exam_version.policies
           },
           railsRegistration: {
             id: @registration.id,
@@ -86,14 +86,14 @@ module Api
 
       def exam_contents
         answers = @registration.current_answers
-        version = @exam.version_for(@registration)
+        version = @registration.exam_version
         {
           type: 'CONTENTS',
           exam: {
-            questions: version['contents']['questions'],
-            reference: version['contents']['reference'],
-            instructions: version['contents']['instructions'],
-            files: @exam.files
+            questions: version.contents['questions'],
+            reference: version.contents['reference'],
+            instructions: version.contents['instructions'],
+            files: version.files
           },
           answers: answers,
           messages: messages,

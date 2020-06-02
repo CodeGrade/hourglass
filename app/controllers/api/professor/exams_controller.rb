@@ -35,20 +35,21 @@ module Api
       end
 
       def show
+        version = @exam.exam_versions.first
         render json: {
           exam: {
             name: @exam.name,
-            policies: @exam.info['policies']
+            policies: version.policies
           },
           contents: {
             exam: {
-              questions: @exam.version(0)['contents']['questions'],
-              reference: @exam.version(0)['contents']['reference'],
-              instructions: @exam.version(0)['contents']['instructions'],
-              files: @exam.files
+              questions: version.contents['questions'],
+              reference: version.contents['reference'],
+              instructions: version.contents['instructions'],
+              files: version.files
             },
             answers: {
-              answers: @exam.version(0)['answers']
+              answers: version.answers
             }
           }
         }

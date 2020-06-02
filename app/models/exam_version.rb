@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# A single version of an exam.
 class ExamVersion < ApplicationRecord
   belongs_to :exam
 
@@ -21,4 +22,24 @@ class ExamVersion < ApplicationRecord
     schema: -> { FILES_SCHEMA },
     message: ->(errors) { errors }
   }
+
+  def policies
+    info['policies']
+  end
+
+  def contents
+    info['contents']
+  end
+
+  def answers
+    info['answers']
+  end
+
+  def default_answers
+    answers.map do |ans_q|
+      ans_q.map do |ans_p|
+        ans_p.map do |_| { "NO_ANS": true } end
+      end
+    end
+  end
 end

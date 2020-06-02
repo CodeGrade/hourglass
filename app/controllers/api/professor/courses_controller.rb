@@ -25,7 +25,7 @@ module Api
       end
 
       def sync
-        got = bottlenose_get('/api/courses/1/registrations')
+        got = bottlenose_get("/api/courses/#{@course.bottlenose_id}/registrations")
         got.each do |sec_id, sec_obj|
           sec = @course.sections.find_or_initialize_by(bottlenose_id: sec_id)
           sec.title = "#{sec_obj['type']} - #{sec_obj['meeting_time']}"

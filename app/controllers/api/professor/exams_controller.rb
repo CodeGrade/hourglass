@@ -35,12 +35,19 @@ module Api
       end
 
       def show
-        version = @exam.exam_versions.first
         render json: {
-          exam: {
-            name: @exam.name,
-            policies: version.policies
-          },
+          name: @exam.name,
+          versions: @exam.exam_versions.map {|v| serialize_version(v) }
+        }
+      end
+
+      private
+
+      def serialize_version(version)
+        {
+          id: version.id,
+          name: version.name,
+          policies: version.policies,
           contents: {
             exam: {
               questions: version.contents['questions'],
@@ -48,9 +55,7 @@ module Api
               instructions: version.contents['instructions'],
               files: version.files
             },
-            answers: {
-              answers: version.answers
-            }
+            answers: version.answers
           }
         }
       end

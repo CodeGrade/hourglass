@@ -9,8 +9,7 @@ gem 'rails', '~> 6.0.2'
 gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
 gem 'puma', '~> 4.1'
-# Use SCSS for stylesheets
-gem 'sass-rails', '>= 6'
+
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
 gem 'webpacker', '~> 4.0'
 
@@ -22,7 +21,6 @@ gem 'omniauth-oauth2', '~> 1.6.0'
 gem 'omniauth-bottlenose', git: 'https://github.com/CodeGrade/omniauth-bottlenose'
 
 gem "bootstrap_form", ">= 4.2.0"
-gem 'octicons_helper'
 
 gem 'headless' # needed to run Racket, and xvfb-run (the shell script) merges stdout and stderr
 
@@ -43,7 +41,6 @@ gem 'rubyzip'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'activerecord_json_validator'
-gem 'js-routes'
 
 group :development, :test do
   gem 'pry'

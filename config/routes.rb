@@ -1,39 +1,51 @@
 Rails.application.routes.draw do
-  root to: 'main#index'
+  namespace :api do
+    get :me
+
+    namespace :professor do
+      resources :courses, shallow: true, param: 'course_id', only: [:index, :show] do
+        member do
+          post :sync
+          resources :exams, param: 'exam_id', only: [:create, :index, :show] do
+            member do
+              resources :rooms, param: 'room_id', only: [:index] do
+                collection do
+                  post :update_all
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+    # namespace :proctor do
+    #   resources :exams, only: [:create] do
+    #     post :finalize
+    #   end
+    #   resources :rooms, only: [] do
+    #     post :finalize
+    #   end
+    #   resources :registrations, only: [:show] do
+    #     post :finalize
+    #     resources :anomalies, param: 'anomaly_id', only: [:index, :destroy]
+    #   end
+    # end
+
+    namespace :student do
+      resources :registrations, only: [:index]
+      resources :exams, param: 'exam_id', only: [:show] do
+        member do
+          post :take
+        end
+      end
+    end
+  end
 
   devise_for :users, skip: [:registrations, :passwords], controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks'
   }
 
-  namespace :professor do
-    resources :exams, only: [:show, :new, :create, :edit, :update]
-  end
-
-  namespace :proctor do
-    resources :exams, only: [:show] do
-      post :finalize
-      resources :anomalies, only: [:index, :destroy]
-
-      resources :registrations, only: [:index, :show] do
-        post :clear_anomalies
-        post :finalize
-      end
-
-      resources :rooms, only: [:show, :index] do
-        post :finalize
-      end
-    end
-  end
-
-  namespace :student do
-    resources :exams, only: [:show] do
-      get :start
-      post :submit
-
-      resources :anomalies, only: [:create]
-      post :save_snapshot
-
-      post :ask_question
-    end
-  end
+  root to: 'main#index'
+  get '*path', to: 'main#index'
 end

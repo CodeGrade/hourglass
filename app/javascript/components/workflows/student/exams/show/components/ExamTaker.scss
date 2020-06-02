@@ -1,0 +1,38 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
+#exam-taker {
+  --sidebar-small: calc(6em + 2px);
+  --sidebar-expanded: 500px;
+}
+
+#exam-taker .sidebar-small + .flex-fill {
+  width: calc(100% - var(--sidebar-small));
+}
+
+#exam-taker .sidebar-expanded + .flex-fill {
+  width: calc(100% - var(--sidebar-expanded));
+}
+
+.transition {
+  transition: 0.35s width ease-in-out;
+}
+
+.bg-pulse {
+  background-color: unset;
+  animation-name: bg-pulse;
+  animation-duration: 0.5s;
+  animation-iteration-count: 2;
+}
+
+@keyframes bg-pulse {
+  0% {
+    background-color: unset;
+  }
+  50% {
+    background-color: rgba(theme-color("info"), .2);
+  }
+  100% {
+    background-color: unset;
+  }
+}

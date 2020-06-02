@@ -1,22 +1,36 @@
-class User < ApplicationRecord
-  devise :omniauthable, :database_authenticatable, :session_limitable, omniauth_providers: [:bottlenose]
+# frozen_string_literal: true
 
-  has_many :registrations
-  has_many :exams, through: :registrations
+# An application user.
+# Login in production happens only through Bottlenose.
+class User < ApplicationRecord
+  devise :omniauthable,
+         :database_authenticatable,
+         :session_limitable,
+         omniauth_providers: [:bottlenose]
+
+  validates :username, presence: true
+  validates :display_name, presence: true
+  validates :email, presence: true
+
+  has_many :registrations, dependent: :destroy
+
+  has_many :sent_messages,
+           foreign_key: 'sender',
+           class_name: 'Message',
+           dependent: :destroy,
+           inverse_of: 'sender'
+
+  has_many :received_messages,
+           foreign_key: 'recipient',
+           class_name: 'Message',
+           dependent: :destroy,
+           inverse_of: 'recipient'
 
   def self.from_omniauth(auth)
     user = where(username: auth.uid).first_or_initialize
     user.display_name = auth.info.display_name
     user.nuid = auth.info.nuid
     user.email = auth.info.email
-    unless user.admin?
-      user.role =
-        if auth.info.prof
-          roles[:professor]
-        else
-          roles[:unprivileged]
-        end
-    end
     user.image_url = auth.info.image_url
     user.save!
     user
@@ -29,14 +43,7 @@ class User < ApplicationRecord
     )
   end
 
-  # professors can create exams
-  enum role: [:unprivileged, :professor, :admin]
-
-  def admin_or_prof?
-    self.admin? || self.professor?
-  end
-
   def reg_for(exam)
-    registrations.find_by(exam: exam)
+    registrations.find_by(room: exam.rooms)
   end
 end

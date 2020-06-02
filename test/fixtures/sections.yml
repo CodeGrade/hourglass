@@ -1,0 +1,19 @@
+cs2500lec:
+  course: cs2500
+  title: "Lecture (MWR 10:30am)"
+  bottlenose_id: 1
+
+cs2500lab:
+  course: cs2500
+  title: "Lab (F 1:35pm)"
+  bottlenose_id: 2
+
+cs3500lec:
+  course: cs3500
+  title: "Lecture (TF 11:45-1:25)"
+  bottlenose_id: 1000
+
+cs3500lab:
+  course: cs3500
+  title: "Lab (F 1:25-3:15)"
+  bottlenose_id: 1001

@@ -1,36 +1,10 @@
+# frozen_string_literal: true
+
+# Entry point for sign-in / React app.
 class MainController < ApplicationController
   def index
-    unless current_user
-      redirect_to new_user_session_path
-      return
-    end
+    return redirect_to new_user_session_path unless current_user
 
-    registrations = current_user.registrations
-    exams =
-      registrations
-      .map do |r|
-        e = r.exam
-        next unless e.enabled?
-
-        {
-          name: e.name,
-          id: e.id,
-          role: r.role,
-          courseId: e.course_id
-        }
-      end.compact
-    @exams = exams.group_by { |e| e[:courseId] }
-    @courses =
-      @exams.keys.map do |course_id|
-        bottlenose_token.get("/api/courses/#{course_id}").parsed
-      rescue StandardError
-        if Rails.env.development?
-          {
-            id: course_id,
-            name: "DEV COURSE (id: #{course_id})"
-          }
-        end
-      end.compact
-    @role = current_user.role
+    render component: 'workflows', prerender: false
   end
 end

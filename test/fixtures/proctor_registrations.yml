@@ -1,0 +1,7 @@
+cs2500proctor:
+  user: cs2500proctor
+  room: cs2500room1
+
+cs3500proctor:
+  user: cs3500proctor
+  room: cs3500room1

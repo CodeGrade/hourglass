@@ -1,6 +1,11 @@
-cs2500_room1:
+cs2500room1:
   exam: cs2500midterm
   name: "Richards 201"
-cs3500_room1:
+
+cs2500room2:
+  exam: cs2500midterm
+  name: "Richards 301"
+
+cs3500room1:
   exam: cs3500final
   name: "Robinson 411"

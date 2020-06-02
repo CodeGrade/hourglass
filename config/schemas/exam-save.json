@@ -105,7 +105,7 @@
       "required": ["type", "lang"],
       "properties": {
         "type": { "enum": ["Code"] },
-        "prompt": { "$ref": "#/definitions/HTMLs" },
+        "prompt": { "$ref": "#/definitions/HTML" },
         "lang": { "type": "string" },
         "initial": { "type": "string" }
       }
@@ -118,7 +118,7 @@
         "type": { "enum": ["YesNo"] },
         "yesLabel": { "type": "string" },
         "noLabel": { "type": "string" },
-        "prompt": { "$ref": "#/definitions/HTMLs" }
+        "prompt": { "$ref": "#/definitions/HTML" }
       }
     },
     "MultipleChoice": {
@@ -127,7 +127,7 @@
       "required": ["type", "options"],
       "properties": {
         "type": { "enum": ["MultipleChoice"] },
-        "prompt": { "$ref": "#/definitions/HTMLs" },
+        "prompt": { "$ref": "#/definitions/HTML" },
         "options": { "$ref": "#/definitions/Options" }
       }
     },
@@ -147,7 +147,7 @@
       "required": ["type", "options"],
       "properties": {
         "type": { "enum": ["AllThatApply"] },
-        "prompt": { "$ref": "#/definitions/HTMLs" },
+        "prompt": { "$ref": "#/definitions/HTML" },
         "options": { "$ref": "#/definitions/Options" }
       }
     },
@@ -158,7 +158,7 @@
       "properties": {
         "type": { "enum": ["CodeTag"] },
         "choices": { "$ref": "#/definitions/References" },
-        "prompt": { "$ref": "#/definitions/HTMLs" }
+        "prompt": { "$ref": "#/definitions/HTML" }
       }
     },
     "Text": {
@@ -167,7 +167,7 @@
       "required": ["type"],
       "properties": {
         "type": { "enum": ["Text"] },
-        "prompt": { "$ref": "#/definitions/HTMLs" }
+        "prompt": { "$ref": "#/definitions/HTML" }
       }
     },
     "Options": {
@@ -182,11 +182,6 @@
         "type": { "enum": [ "HTML" ] },
         "value": { "type": "string" }
       }
-    },
-    "HTMLs": {
-      "type": "array",
-      "items": { "type": "string" },
-      "minItems": 1
     },
     "References": {
       "type": "array",

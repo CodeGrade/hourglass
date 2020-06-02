@@ -1,5 +1,6 @@
 import React from 'react';
 import { AllThatApplyInfo, AllThatApplyState } from '@student/exams/show/types';
+import HTML from '@student/exams/show/components/HTML';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;
@@ -37,7 +38,7 @@ const DisplayAllThatApply: React.FC<AllThatApplyProps> = (props) => {
   }
   return (
     <div>
-      <div>{prompt}</div>
+      <div><HTML value={prompt} /></div>
       {theRest}
     </div>
   );

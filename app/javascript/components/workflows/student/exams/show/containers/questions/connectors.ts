@@ -3,6 +3,7 @@ import { updateAnswer } from '@student/exams/show/actions';
 import {
   ExamTakerState,
   AnswerState,
+  NoAnswerState,
   SnapshotStatus,
   MSTP,
   MDTP,
@@ -17,6 +18,10 @@ interface OwnProps {
   bnum: number;
 }
 
+const isNoAns = (answer: AnswerState): boolean => (
+  (answer instanceof Object) && (answer as NoAnswerState).NO_ANS
+);
+
 const mapStateToProps: MSTP<{
   value: AnswerState;
   disabled: boolean;
@@ -27,8 +32,9 @@ const mapStateToProps: MSTP<{
   const { snapshot } = state;
   const { status, message } = snapshot;
   const locked = status === SnapshotStatus.FAILURE;
+  const answer = state.contents.answers.answers[qnum][pnum][bnum];
   return {
-    value: state.contents.answers[qnum]?.[pnum]?.[bnum],
+    value: isNoAns(answer) ? undefined : answer,
     disabled: locked,
     locked,
     lockedMsg: message,

@@ -6,6 +6,7 @@ import {
   Select, FormControl, InputLabel, MenuItem,
 } from '@material-ui/core';
 import { MatchingInfo, MatchingState } from '@student/exams/show/types';
+import HTML from '../HTML';
 
 interface MatchingProps {
   info: MatchingInfo;
@@ -31,7 +32,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
           <thead>
             <tr>
               <th colSpan={3} className="text-center">
-                <p>{promptLabel ?? 'Column A'}</p>
+                <HTML value={promptLabel ?? 'Column A'} />
               </th>
             </tr>
           </thead>
@@ -52,7 +53,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
                     {String.fromCharCode(65 + i)}
                     .
                   </td>
-                  <td>{p}</td>
+                  <td><HTML value={p} /></td>
                   <td>
                     <FormControl variant="outlined">
                       <InputLabel>Match</InputLabel>
@@ -90,7 +91,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
           <thead>
             <tr>
               <th colSpan={2} className="text-center">
-                <p>{valuesLabel ?? 'Column B'}</p>
+                <HTML value={valuesLabel ?? 'Column B'} />
               </th>
             </tr>
           </thead>
@@ -103,7 +104,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
                   {i + 1}
                   .
                 </td>
-                <td>{v}</td>
+                <td><HTML value={v} /></td>
               </tr>
             ))}
           </tbody>

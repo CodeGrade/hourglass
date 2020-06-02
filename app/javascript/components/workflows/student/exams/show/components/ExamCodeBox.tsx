@@ -1,8 +1,21 @@
 import CM from 'codemirror';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/mdn-like';
+
 import 'codemirror/addon/runmode/runmode';
 import 'codemirror/addon/selection/active-line';
+
+import 'codemirror/mode/clike/clike';
+import 'codemirror/mode/mllike/mllike';
+import 'codemirror/mode/ebnf/ebnf';
 import 'codemirror/mode/javascript/javascript';
-import 'codemirror/theme/mdn-like';
+import 'codemirror/mode/markdown/markdown';
+import 'codemirror/mode/scheme/scheme';
+import 'codemirror/mode/python/python';
+import 'codemirror/mode/css/css';
+import 'codemirror/mode/xml/xml';
+import 'codemirror/mode/yaml/yaml';
+import 'codemirror/mode/htmlmixed/htmlmixed';
 import React, { useEffect, useState } from 'react';
 import { UnControlled as UnControlledCodeMirror, IUnControlledCodeMirror } from 'react-codemirror2';
 import { MarkDescription } from '@student/exams/show/types';
@@ -33,7 +46,7 @@ function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
 
 export interface EditorProps {
   value: string;
-  valueUpdate: React.DependencyList;
+  valueUpdate?: React.DependencyList;
   markDescriptions: MarkDescription[];
   readOnly?: boolean;
   language?: string;
@@ -43,6 +56,7 @@ export interface EditorProps {
   onCursor?: IUnControlledCodeMirror['onCursor'];
   onChange?: (text: string, marks: MarkDescription[]) => void;
   onFocus?: IUnControlledCodeMirror['onFocus'];
+  onSelection?: IUnControlledCodeMirror['onSelection'];
   refreshProps?: React.DependencyList;
   disabled?: boolean;
 }
@@ -51,7 +65,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
   const {
     value,
     markDescriptions,
-    valueUpdate,
+    valueUpdate = [],
     options,
     readOnly = false,
     language = '',
@@ -60,6 +74,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
     onGutterClick,
     onChange,
     onFocus,
+    onSelection,
     refreshProps = [],
     disabled = false,
   } = props;
@@ -82,9 +97,11 @@ export const Editor: React.FC<EditorProps> = (props) => {
   useEffect(() => {
     if (instance) {
       doSave = false;
+      const curCursor = instance.getCursor();
       appliedMarks.forEach((m) => m.clear());
       instance.setValue(value);
       setAppliedMarks(applyMarks(instance, markDescriptions));
+      instance.setCursor(curCursor);
       doSave = true;
     }
   }, [instance, ...valueUpdate]);
@@ -122,17 +139,20 @@ export const Editor: React.FC<EditorProps> = (props) => {
           onChange(newVal, appliedDescs);
         }
       }}
-      onGutterClick={onGutterClick}
+      onGutterClick={(...args): void => {
+        if (onGutterClick) onGutterClick(...args);
+      }}
       cursor={cursor}
       onCursor={(editor, data): void => {
-        // this callback always needs to be defined
         if (onCursor) {
           onCursor(editor, data);
         }
       }}
       onFocus={(...args): void => {
-        // this callback always needs to be defined
         if (onFocus) onFocus(...args);
+      }}
+      onSelection={(...args): void => {
+        if (onSelection) onSelection(...args);
       }}
       options={myOptions}
       editorDidMount={(editor): void => {

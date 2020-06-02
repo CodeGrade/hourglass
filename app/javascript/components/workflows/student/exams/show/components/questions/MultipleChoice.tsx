@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 import { MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
+import HTML from '../HTML';
 
 interface MultipleChoiceProps {
   info: MultipleChoiceInfo;
@@ -29,7 +30,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
   };
   return (
     <div>
-      <div>{prompt}</div>
+      <div><HTML value={prompt} /></div>
       <i>(Select one of the following responses)</i>
       <Form.Group>
         {options.map((option, idx) => (
@@ -37,7 +38,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
             disabled={disabled}
             type="radio"
             value={idx}
-            label={option}
+            label={<HTML value={option} />}
             onChange={handler}
             checked={value === idx}
             id={`opt-${qnum}-${pnum}-${bnum}-${idx}`}

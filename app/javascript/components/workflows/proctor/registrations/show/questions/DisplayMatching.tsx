@@ -3,6 +3,7 @@ import {
   Row, Col, Table,
 } from 'react-bootstrap';
 import { MatchingInfo, MatchingState } from '@student/exams/show/types';
+import HTML from '@student/exams/show/components/HTML';
 
 interface MatchingProps {
   info: MatchingInfo;
@@ -24,10 +25,10 @@ const Matching: React.FC<MatchingProps> = (props) => {
           <thead>
             <tr>
               <th colSpan={2}>
-                <p>{promptLabel ?? 'Column A'}</p>
+                <HTML value={promptLabel ?? 'Column A'} />
               </th>
               <th colSpan={2}>
-                <p>{valuesLabel ?? 'Answer'}</p>
+                <HTML value={valuesLabel ?? 'Answer'} />
               </th>
             </tr>
           </thead>

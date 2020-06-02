@@ -1,0 +1,52 @@
+.ql-container {
+  font-size: unset;
+}
+
+.ql-bubble .ql-tooltip {
+  z-index: 1;
+}
+
+.ql-snow .ql-picker:not(.ql-font) .ql-picker-label svg {
+  padding: 2px 4px;
+  position: inherit;
+  bottom: 2px;
+}
+
+.ql-snow .ql-picker:not(.ql-font):hover .ql-picker-label svg {
+  bottom: 3px;
+}
+
+
+.ql-snow .ql-font .ql-picker-label::before {
+  line-height: 18px;
+  padding: 1px !important;
+}
+
+.quill.bg-white {
+  border-radius: 4px;
+  background-color: unset !important;
+  color: initial !important;
+}
+
+.quill.bg-white .ql-snow.ql-toolbar {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.quill.bg-white .ql-container {
+  background-color: white !important;
+}
+
+.ql-snow.ql-toolbar {
+  padding: 4px;
+  border-radius: 4px 4px 0 0;
+}
+
+.ql-snow.ql-toolbar button {
+  padding: 3px;
+  width: 24px;
+}
+
+.ql-snow.ql-toolbar button:hover, .ql-snow.ql-toolbar .ql-picker:hover {
+  border: 1px solid gray;
+  border-radius: 2px;
+}

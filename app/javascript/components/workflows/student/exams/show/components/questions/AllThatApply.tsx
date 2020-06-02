@@ -1,6 +1,7 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 import { AllThatApplyInfo, AllThatApplyState } from '@student/exams/show/types';
+import HTML from '../HTML';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;
@@ -40,7 +41,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
             <Form.Check
               disabled={disabled}
               type="checkbox"
-              label={o}
+              label={<HTML value={o} />}
               checked={val}
               id={`ata-${qnum}-${pnum}-${bnum}-${i}`}
               onChange={handler(i)}
@@ -52,7 +53,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
   );
   return (
     <div>
-      <div>{prompt}</div>
+      <div><HTML value={prompt} /></div>
       {body}
     </div>
   );

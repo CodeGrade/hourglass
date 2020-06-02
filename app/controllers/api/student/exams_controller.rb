@@ -78,8 +78,7 @@ module Api
       end
 
       def submit
-        permitted = params.permit(:id, exam: {}, answers: {})
-        answers = permitted[:answers].to_h
+        answers = answer_params
         saved = @registration.save_answers(answers)
         @registration.update(final: true)
         { lockout: !saved }
@@ -103,9 +102,8 @@ module Api
       end
 
       def snapshot
-        permitted = params.permit(:lastMessageId, :exam_id, answers: {}, exam: {})
-        last_message_id = permitted.require(:lastMessageId)
-        answers = permitted.require(:answers).to_h
+        last_message_id = params.require(:lastMessageId)
+        answers = answer_params
         saved = @registration.save_answers(answers)
         {
           lockout: !saved,
@@ -145,6 +143,24 @@ module Api
       def messages
         msgs = @registration.all_messages_for(current_user).sort_by(&:id)
         msgs.map(&:serialize)
+      end
+
+      private
+      def answer_params
+        {
+          answers: params.require(:answers).require(:answers).map do |qans|
+            qans.map do |pans|
+              pans.map do |bans|
+                if bans.is_a? ActionController::Parameters
+                  bans.permit!.to_h
+                else
+                  bans
+                end
+              end
+            end
+          end,
+          scratch: params[:answers][:scratch]  
+        }.stringify_keys
       end
     end
   end

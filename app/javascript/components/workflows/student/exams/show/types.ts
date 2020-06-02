@@ -329,11 +329,8 @@ export interface SnapshotState {
 }
 
 export interface AnswersState {
-  [qnum: number]: {
-    [pnum: number]: {
-      [bnum: number]: AnswerState;
-    };
-  };
+  // indices are [qnum][pnum][bnum]
+  answers: AnswerState[][][];
 
   // The student's scratch space work.
   scratch: string;
@@ -341,7 +338,7 @@ export interface AnswersState {
 
 export interface CodeInfo {
   type: 'Code';
-  prompt: string[];
+  prompt: HTMLVal;
   lang: string;
   initial: string;
 }
@@ -357,10 +354,12 @@ export type CodeState = {
   marks: MarkDescription[];
 };
 
+export type HTMLVal = string;
+
 export interface AllThatApplyInfo {
   type: 'AllThatApply';
-  options: string[];
-  prompt: string[];
+  options: HTMLVal[];
+  prompt: HTMLVal;
 }
 
 export interface AllThatApplyState {
@@ -369,16 +368,16 @@ export interface AllThatApplyState {
 
 export interface YesNoInfo {
   type: 'YesNo';
-  yesLabel?: string;
-  noLabel?: string;
-  prompt: string[];
+  yesLabel?: HTMLVal;
+  noLabel?: HTMLVal;
+  prompt: HTMLVal;
 }
 
 export type YesNoState = boolean;
 
 export interface CodeTagInfo {
   type: 'CodeTag';
-  prompt: string[];
+  prompt: HTMLVal;
   choices: FileRef[];
 }
 
@@ -389,25 +388,25 @@ export interface CodeTagState {
 
 export interface MultipleChoiceInfo {
   type: 'MultipleChoice';
-  prompt: string[]; // (html)
-  options: string[]; // (html)
+  prompt: HTMLVal;
+  options: HTMLVal[];
 }
 
 export type MultipleChoiceState = number;
 
 export interface TextInfo {
   type: 'Text';
-  prompt: string[]; // (html)
+  prompt: HTMLVal;
 }
 
 export type TextState = string;
 
 export interface MatchingInfo {
   type: 'Matching';
-  promptLabel?: string; // (html)
-  prompts: string[]; // (html)
-  valuesLabel?: string;
-  values: string[];
+  promptLabel?: HTMLVal;
+  prompts: HTMLVal[];
+  valuesLabel?: HTMLVal;
+  values: HTMLVal[];
 }
 
 export interface MatchingState {
@@ -420,24 +419,29 @@ export type BodyItem =
 
 export type AnswerState =
   AllThatApplyState | CodeState | YesNoState |
-  CodeTagState | MultipleChoiceState | TextState | MatchingState;
+  CodeTagState | MultipleChoiceState | TextState | MatchingState |
+  NoAnswerState;
 
-type HTML = {
+export interface NoAnswerState {
+  NO_ANS: true;
+}
+
+export type HTML = {
   type: 'HTML';
   value: string;
 };
 
 export interface PartInfo {
-  name?: string;
-  description: string;
+  name?: HTMLVal;
+  description: HTMLVal;
   points: number;
   reference?: FileRef[];
   body: BodyItem[];
 }
 
 export interface QuestionInfo {
-  name?: string;
-  description: string;
+  name?: HTMLVal;
+  description: HTMLVal;
   separateSubparts: boolean;
   parts: PartInfo[];
   reference?: FileRef[];
@@ -446,7 +450,7 @@ export interface QuestionInfo {
 export interface Exam {
   questions: QuestionInfo[];
   reference?: FileRef[];
-  instructions: string;
+  instructions: HTMLVal;
   files: ExamFile[];
 }
 
@@ -473,13 +477,8 @@ export interface ExamSingleFile {
   // Label for the file.
   text: string;
 
-  // Path name of this file (no trailing slash)
-  path: string;
-
+  // path relative to root
   relPath: string;
-
-  // Sequential ID of this file.
-  id: number;
 
   // The contents of the file.
   contents: string;
@@ -497,13 +496,8 @@ export interface ExamDir {
   // Label for the directory (with trailing slash)
   text: string;
 
-  // Path name of this directory (no trailing slash)
-  path: string;
-
+  // path relative to root
   relPath: string;
-
-  // Sequential ID of this directory.
-  id: number;
 
   // Files within this directory.
   nodes: ExamFile[];

@@ -67,12 +67,17 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.references :course, null: false, foreign_key: true
 
       t.string :name, null: false
-      t.boolean :enabled, null: false, default: false
+      t.integer :bottlenose_assignment_id
 
+      t.timestamps
+    end
+
+    create_table :exam_versions do |t|
+      t.string :name, null: false
       t.jsonb :files, null: false
       t.jsonb :info, null: false
 
-      t.integer :bottlenose_assignment_id
+      t.references :exam, null: false, foreign_key: true
 
       t.timestamps
     end
@@ -87,10 +92,12 @@ class CreateSchema < ActiveRecord::Migration[6.0]
     create_table :registrations do |t|
       t.references :user, null: false, foreign_key: true
       t.references :room, null: false, foreign_key: true
+      t.references :exam_version, null: false, foreign_key: true
       t.index [:room_id, :user_id], unique: true
       t.index [:user_id, :room_id], unique: true
 
-      t.boolean :final, null: false, default: false
+      t.datetime :start_time
+      t.datetime :end_time
 
       t.timestamps
     end
@@ -111,8 +118,8 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
-    create_table :exam_announcements do |t|
-      t.references :exam, null: false, foreign_key: true
+    create_table :version_announcements do |t|
+      t.references :exam_version, null: false, foreign_key: true
       t.text :body, null: false
 
       t.timestamps

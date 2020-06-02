@@ -65,21 +65,18 @@ class Upload
       end
     properties = YAML.safe_load(File.read(file))
     JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
-    @info['policies'] = properties['policies'] || []
-    @info['versions'] =
-      properties['versions'].map do |version|
-        parse_single_version(version)
-      end
+    @info = parse_info(properties)
   end
 
-  def parse_single_version(version_info)
-    version_info['questions'].each do |q|
+  def parse_info(properties)
+    contents = properties['contents']
+    contents['questions'].each do |q|
       if q['parts'].length == 1 && q['separateSubparts']
         raise 'Cannot separateSubparts for a question with only one part'
       end
     end
 
-    answers = version_info['questions'].map do |q|
+    answers = contents['questions'].map do |q|
       q['parts'].map do |p|
         p['body'].map do |b|
           if b.is_a? String
@@ -120,8 +117,8 @@ class Upload
       end
     end
 
-    e_reference = version_info['reference']&.map{|r| map_reference r}
-    questions = version_info['questions'].map do |q|
+    e_reference = contents['reference']&.map{|r| map_reference r}
+    questions = contents['questions'].map do |q|
       q_reference = q['reference']&.map{|r| map_reference r}
       {
         name: q['name'],
@@ -232,10 +229,11 @@ class Upload
       }.compact
     end
     {
+      policies: properties['policies'] || [],
       contents: {
         questions: questions,
         reference: e_reference,
-        instructions: version_info['instructions']
+        instructions: contents['instructions']
       }.compact,
       answers: answers
     }

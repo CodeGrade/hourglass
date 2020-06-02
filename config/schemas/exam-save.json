@@ -4,28 +4,16 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "versions",
-    "policies"
+    "policies",
+    "answers",
+    "contents"
   ],
   "properties": {
-    "versions": { "$ref": "#/definitions/Versions" },
-    "policies": { "$ref": "#/definitions/Policies" }
+    "policies": { "$ref": "#/definitions/Policies" },
+    "answers": { "$ref": "#/definitions/ExamAnswers" },
+    "contents": { "$ref": "#/definitions/Contents" }
   },
   "definitions": {
-    "Versions": {
-      "type": "array",
-      "minItems": 1,
-      "items": { "$ref": "#/definitions/Version" }
-    },
-    "Version": {
-      "type": "object",
-      "required": ["contents", "answers"],
-      "additionalProperties": false,
-      "properties": {
-        "answers": { "$ref": "#/definitions/ExamAnswers" },
-        "contents": { "$ref": "#/definitions/Contents" }
-      }
-    },
     "ExamAnswers": {
       "type": "array",
       "items": { "$ref": "#/definitions/PartAnswers" }

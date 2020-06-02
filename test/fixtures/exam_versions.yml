@@ -1,0 +1,13 @@
+<% cs2500upload = fixture_zip "cs2500midterm" %>
+cs2500midterm_1:
+  exam: cs2500midterm
+  name: CS2500 Version 1
+  files: <%= cs2500upload.files.to_json %>
+  info: <%= cs2500upload.info.to_json %>
+
+<% cs3500upload = fixture_zip "cs3500final" %>
+cs3500final_1:
+  exam: cs3500final
+  name: CS3500 Version 1
+  files: <%= cs3500upload.files.to_json %>
+  info: <%= cs3500upload.info.to_json %>

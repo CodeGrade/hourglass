@@ -80,7 +80,7 @@ module Api
       def submit
         answers = answer_params
         saved = @registration.save_answers(answers)
-        @registration.update(final: true)
+        @registration.update(end_time: DateTime.now)
         { lockout: !saved }
       end
 

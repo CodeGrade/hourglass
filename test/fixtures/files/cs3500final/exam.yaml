@@ -2,13 +2,13 @@
 policies:
   - ignore-lockdown
   - tolerate-windowed
-versions:
-  - instructions: TODO
-    questions:
-      - description: "Something to answer."
-        separateSubparts: false
-        parts:
-          - description: "A part."
-            points: 1
-            body:
-              - "Some instructions here for the first part."
+contents:
+  instructions: TODO
+  questions:
+    - description: "Something to answer."
+      separateSubparts: false
+      parts:
+        - description: "A part."
+          points: 1
+          body:
+            - "Some instructions here for the first part."

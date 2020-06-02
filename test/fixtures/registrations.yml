@@ -1,9 +1,9 @@
 cs2500student:
   user: cs2500student
   room: cs2500room1
-  final: false
+  exam_version: cs2500midterm_1
 
 cs3500student:
   user: cs3500student
   room: cs3500room1
-  final: false
+  exam_version: cs3500final_1

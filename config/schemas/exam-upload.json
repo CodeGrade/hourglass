@@ -3,10 +3,13 @@
   "$id": "https://hourglass.ccs.neu.edu/schemas/exam-upload#",
   "type": "object",
   "additionalProperties": false,
-  "required": ["versions"],
+  "required": [
+    "policies",
+    "contents"
+  ],
   "properties": {
     "policies": { "$ref": "#/definitions/Policies" },
-    "versions": { "$ref": "#/definitions/Versions" }
+    "contents": { "$ref": "#/definitions/Version" }
   },
   "definitions": {
     "HTML": { "type": "string" },
@@ -17,11 +20,6 @@
     "Policy": {
       "type": "string",
       "enum": ["ignore-lockdown", "tolerate-windowed"]
-    },
-    "Versions": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/Version" },
-      "minItems": 1
     },
     "Version": {
       "type": "object",

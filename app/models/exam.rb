@@ -5,29 +5,12 @@ class Exam < ApplicationRecord
   belongs_to :course
 
   has_many :rooms, dependent: :destroy
-  has_many :exam_announcements, dependent: :destroy
-  has_many :room_announcements, dependent: :destroy
   has_many :messages, dependent: :destroy
   has_many :questions, dependent: :destroy
-
-  has_many :registrations, through: :rooms
-  has_many :users, through: :registrations
-  has_many :anomalies, through: :registrations
+  has_many :exam_versions, dependent: :destroy
 
   validates :course, presence: true
   validates :name, presence: true
-
-  EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save.json').to_s
-  validates :info, presence: true, json: {
-    schema: -> { EXAM_SAVE_SCHEMA },
-    message: ->(errors) { errors }
-  }
-
-  FILES_SCHEMA = Rails.root.join('config/schemas/files.json').to_s
-  validates :files, presence: true, allow_blank: true, json: {
-    schema: -> { FILES_SCHEMA },
-    message: ->(errors) { errors }
-  }
 
   def finalized?
     registrations.all?(&:final)
@@ -45,26 +28,9 @@ class Exam < ApplicationRecord
     registrations.includes(:user).where(role: 'student').map(&:user)
   end
 
-  def version(num)
-    info['versions'][num]
-  end
-
-  # Return the exam version for the given registration.
-  def version_for(_reg)
-    version(0)
-  end
-
   def unassigned_students
     course.students.reject do |s|
       registrations.exists? user: s
-    end
-  end
-
-  def default_answers_for(reg)
-    version_for(reg)["answers"].map do |ansQ|
-      ansQ.map do |ansP|
-        ansP.map do |_| { "NO_ANS": true} end
-      end
     end
   end
 end

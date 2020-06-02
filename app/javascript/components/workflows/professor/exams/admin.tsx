@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useResponse as examsShow } from '@hourglass/common/api/professor/exams/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { Collapse, Button, Form, InputGroup } from 'react-bootstrap';
+import { Collapse, Button, Form, InputGroup, ButtonGroup } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
 import { RailsExam, ContentsState } from '@student/exams/show/types';
 import { Editor as CodeMirrorEditor } from 'codemirror';
+import LinkButton from '@hourglass/common/linkbutton';
 
 const ExamAdmin: React.FC<{}> = () => {
   const { examId } = useParams();
@@ -60,13 +61,31 @@ const ShowVersion: React.FC<{
       <InputGroup>
         <h3 className="flex-grow-1">{version.name}</h3>
         <InputGroup.Append>
-          <Button
-            variant="outline-primary"
-            onClick={(): void => setPreview((o) => !o)}
-          >
-            Preview Version
-            {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
-          </Button>
+          <ButtonGroup>
+            <Button
+              variant="info"
+            >
+              Grade
+            </Button>
+            <Button
+              variant="info"
+            >
+              Join Proctoring
+            </Button>
+            <LinkButton
+              variant="info"
+              to={`/exams/${examId}/edit`}
+            >
+              Edit
+            </LinkButton>
+            <Button
+              variant="primary"
+              onClick={(): void => setPreview((o) => !o)}
+            >
+              Preview Version
+              {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+            </Button>
+          </ButtonGroup>
         </InputGroup.Append>
       </InputGroup>
       <PreviewVersion

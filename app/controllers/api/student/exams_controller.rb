@@ -31,7 +31,7 @@ module Api
 
       def take
         case params[:task]
-        when 'start' then render json: exam_contents
+        when 'start' then render json: start_exam!
         when 'snapshot' then render json: snapshot
         when 'submit' then render json: submit
         when 'anomaly' then render json: anomaly
@@ -83,7 +83,12 @@ module Api
         { lockout: !saved }
       end
 
-      def exam_contents
+      def start_exam!
+        if @registration.start_time.nil?
+          @registration.update(start_time: DateTime.now)
+        else
+          # TODO: post-anomaly log back in..
+        end
         answers = @registration.current_answers
         version = @registration.exam_version
         {
@@ -93,6 +98,10 @@ module Api
             reference: version.contents['reference'],
             instructions: version.contents['instructions'],
             files: version.files
+          },
+          time: {
+            began: @registration.accommodated_start_time,
+            ends: @registration.accommodated_end_time
           },
           answers: answers,
           messages: messages,

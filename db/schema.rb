@@ -15,6 +15,15 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "accommodations", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.datetime "new_start_time", null: false
+    t.integer "percent_time_expansion", default: 0, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_id"], name: "index_accommodations_on_registration_id"
+  end
+
   create_table "anomalies", force: :cascade do |t|
     t.bigint "registration_id", null: false
     t.string "reason", default: "", null: false
@@ -193,6 +202,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.index ["exam_version_id"], name: "index_version_announcements_on_exam_version_id"
   end
 
+  add_foreign_key "accommodations", "registrations"
   add_foreign_key "anomalies", "registrations"
   add_foreign_key "exam_versions", "exams"
   add_foreign_key "exams", "courses"

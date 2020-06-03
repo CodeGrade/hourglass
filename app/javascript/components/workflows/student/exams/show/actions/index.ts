@@ -34,6 +34,7 @@ import {
   ActivateWaypointsAction,
   Policy,
   RailsCourse,
+  TimeInfo,
 } from '@student/exams/show/types';
 import {
   getCSRFToken,
@@ -41,6 +42,7 @@ import {
   convertQs,
 } from '@student/exams/show/helpers';
 import lock from '@student/exams/show/lockdown/lock';
+import { DateTime } from 'luxon';
 
 export function questionAsked(id: number, body: string): QuestionAskedAction {
   return {
@@ -169,6 +171,7 @@ export function lockdownFailed(message: string): LockdownFailedAction {
 
 export function loadExam(
   exam: Exam,
+  time: TimeInfo,
   answers: AnswersState,
   messages: ExamMessage[],
   questions: ProfQuestion[],
@@ -176,6 +179,7 @@ export function loadExam(
   return {
     type: 'LOAD_EXAM',
     exam,
+    time,
     answers,
     messages,
     questions,
@@ -224,14 +228,19 @@ export function doLoad(courseID: number, examID: number): Thunk {
           dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
         } else {
           const {
+            time,
             exam,
             answers,
             messages,
             questions,
           } = result;
+          const newTime: TimeInfo = {
+            began: DateTime.fromISO(time.began),
+            ends: DateTime.fromISO(time.ends),
+          };
           const newMsgs = convertMsgs(messages);
           const newQs = convertQs(questions);
-          dispatch(loadExam(exam, answers, newMsgs, newQs));
+          dispatch(loadExam(exam, newTime, answers, newMsgs, newQs));
         }
       }).catch((err) => {
         // TODO: store a message to tell the user what went wrong

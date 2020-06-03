@@ -22,6 +22,8 @@ import Scratch from '@student/exams/show/containers/navbar/Scratch';
 import ExamMessages from '@student/exams/show/containers/navbar/ExamMessages';
 import AskQuestion from '@student/exams/show/containers/navbar/AskQuestion';
 import RenderIcon from '@student/exams/show/components/Icon';
+import { TimeInfo } from '@student/exams/show/types';
+import ReadableDate from '@hourglass/common/ReadableDate';
 
 interface NavAccordionItemProps {
   onSectionClick: (eventKey: string) => void;
@@ -147,7 +149,13 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
   );
 };
 
-const ExamNavbar: React.FC<{}> = () => {
+const ExamNavbar: React.FC<{
+  time: TimeInfo;
+}> = (props) => {
+  const {
+    time,
+  } = props;
+  const remaining = time.ends.toRelative();
   const { railsUser } = useContext(RailsContext);
   const [expanded, setExpanded] = useState(false);
   const [openSection, setOpenSection] = useState('');
@@ -246,7 +254,7 @@ const ExamNavbar: React.FC<{}> = () => {
           <NavAccordionItem
             expanded={expanded}
             Icon={MdTimer}
-            label="TODO: Time remaining"
+            label={remaining}
             eventKey="time"
             onSectionClick={(eventKey): void => {
               if (expanded) {
@@ -262,8 +270,20 @@ const ExamNavbar: React.FC<{}> = () => {
             }}
             direction="up"
           >
-            <p>Exam began: TODO</p>
-            <p className="m-0 p-0">Exam ends: TODO</p>
+            <p>
+              Exam began:
+              <ReadableDate
+                relative
+                value={time.began}
+              />
+            </p>
+            <p className="m-0 p-0">
+              Exam ends:
+              <ReadableDate
+                relative
+                value={time.ends}
+              />
+            </p>
           </NavAccordionItem>
         </Accordion>
       </div>

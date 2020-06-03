@@ -106,6 +106,14 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
+    create_table :accommodations do |t|
+      t.references :registration, null: false, foreign_key: true
+      t.datetime :new_start_time, null: false
+      t.integer :percent_time_expansion, null: false, default: 0
+
+      t.timestamps
+    end
+
     create_table :proctor_registrations do |t|
       t.references :user, null: false, foreign_key: true
       t.references :room, null: false, foreign_key: true

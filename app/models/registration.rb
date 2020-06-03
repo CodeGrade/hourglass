@@ -8,6 +8,7 @@ class Registration < ApplicationRecord
 
   has_many :anomalies, dependent: :destroy
   has_many :snapshots, dependent: :destroy
+  has_one :accommodation, dependent: :destroy
 
   validates :user, presence: true
   validates :room, presence: true
@@ -26,6 +27,52 @@ class Registration < ApplicationRecord
     other_user == user
   end
 
+  # TIMELINE EXPLANATION
+  #
+  # EXAM OVERALL:
+  # |                    +---------+                       |
+  # exam start           duration                      exam end
+  # my accommodation: new start?, time factor
+  # MY EXAM EXPERIENCE:
+  # |                   +----------------+                         |
+  # my exam start     my start         my end                  my exam end
+  # my-exam-start == new-start ?? exam-start
+  # my-duration = duration * time-factor
+  # my-exam-end == my-exam-start + (exam-end - exam-start) + (my-duration - duration)
+  # my-start >= my-exam-start
+  # my-end <= my-exam-end
+  # my-end <= my-start + my-duration
+
+  def accommodated_start_time
+    accommodation&.start_time || exam.start_time
+  end
+
+  def accommodated_duration
+    exam.duration * (accommodation&.factor || 1)
+  end
+
+  def accommodated_end_time
+    accommodated_start_time + (exam.end_time - exam.start_time) + (accommodated_duration - exam.duration)
+  end
+
+  # End time plus any applicable extensions
+  def effective_end_time
+    if start_time.nil?
+      accommodated_end_time
+    else
+      start_time + effective_duration
+    end
+  end
+
+  # Duration plus any applicable extensions
+  def effective_duration
+    [accommodated_duration, accommodated_end_time - DateTime.now].min
+  end
+
+  def over?
+    DateTime.now > effective_end_time
+  end
+
   def anomalous?
     anomalies.size.positive?
   end
@@ -35,7 +82,7 @@ class Registration < ApplicationRecord
   end
 
   def allow_submission?
-    !(final? || anomalous?)
+    !(final? || anomalous?) # TODO:  || over?) and add back :require_enabled_exam that checks over?
   end
 
   def current_answers

@@ -15,6 +15,7 @@ export default (state: ContentsState = {
       return {
         exam: action.exam,
         answers: action.answers,
+        time: action.time,
       };
     }
     case 'UPDATE_ANSWER': {

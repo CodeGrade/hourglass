@@ -48,6 +48,8 @@ export interface AnomalousReponse {
 export interface ContentsResponse {
   type: 'CONTENTS';
 
+  time: RailsTimeInfo;
+
   exam: Exam;
 
   answers: AnswersState;
@@ -137,6 +139,7 @@ export interface LockdownFailedAction {
 export interface LoadExamAction {
   type: 'LOAD_EXAM';
   exam: Exam;
+  time: TimeInfo;
   answers: AnswersState;
   messages: ExamMessage[];
   questions: ProfQuestion[];
@@ -213,6 +216,9 @@ export interface LockdownState {
 export interface ContentsState {
   // Exam information.
   exam?: Exam;
+
+  // Exam timing information.
+  time?: TimeInfo;
 
   // The student's current answers.
   answers?: AnswersState;
@@ -445,6 +451,16 @@ export interface QuestionInfo {
   separateSubparts: boolean;
   parts: PartInfo[];
   reference?: FileRef[];
+}
+
+export interface RailsTimeInfo {
+  began: string;
+  ends: string;
+}
+
+export interface TimeInfo {
+  began: DateTime;
+  ends: DateTime;
 }
 
 export interface Exam {

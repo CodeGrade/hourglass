@@ -267,10 +267,7 @@
           "properties": {
             "prompt": { "$ref": "#/definitions/HTML" },
             "correctAnswer": { "$ref": "#/definitions/TagAnswer" },
-            "choices": {
-              "type": "string",
-              "enum": ["all", "question", "part"]
-            }
+            "choices": { "enum": ["exam", "question", "part"] }
           }
         }
       }

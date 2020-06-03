@@ -7,6 +7,7 @@ import {
   RailsUser,
   RailsCourse,
   AnswersState,
+  FileRef,
 } from '@student/exams/show/types';
 
 interface ExamContext {
@@ -26,4 +27,21 @@ export const RailsContext = createContext<RailsContext>({} as RailsContext);
 interface ExamViewerContext {
   answers: AnswersState;
 }
-export const ExamViewerContext = createContext({} as ExamViewerContext);
+export const ExamViewerContext = createContext<ExamViewerContext>({} as ExamViewerContext);
+
+
+interface FilesContext {
+  references: FileRef[];
+}
+
+export const ExamFilesContext = createContext<FilesContext>({
+  references: [],
+});
+
+export const QuestionFilesContext = createContext<FilesContext>({
+  references: [],
+});
+
+export const PartFilesContext = createContext<FilesContext>({
+  references: [],
+});

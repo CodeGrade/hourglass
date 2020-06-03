@@ -9,7 +9,7 @@ import {
   BottomScrollspy,
 } from '@student/exams/show/containers/scrollspy/Question';
 import SubmitButton from '@student/exams/show/containers/SubmitButton';
-import { RailsContext } from '@student/exams/show/context';
+import { RailsContext, QuestionFilesContext } from '@student/exams/show/context';
 
 interface ShowQuestionProps {
   question: QuestionInfo;
@@ -52,62 +52,64 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
   return (
-    <div className={classes}>
-      <TopScrollspy
-        question={qnum}
-        separateSubparts={separateSubparts}
-      />
-      <h1 id={`question-${qnum}`}>
-        {title}
-        {singlePart && (
-          <small className="float-right text-muted">
-            {subtitle}
-          </small>
-        )}
-      </h1>
-      <HTML value={description} />
-      {reference && <FileViewer references={reference} />}
-      <BottomScrollspy
-        question={qnum}
-        separateSubparts={separateSubparts}
-      />
-      {parts.map((p, i) => {
-        const current = selectedPart === i;
-        const activePart = !split || current;
-        const activeClass = activePart ? '' : 'd-none';
-        const lastPart = i === parts.length - 1;
-        const showArrows = separateSubparts || lastPart;
-        const showSubmit = lastPart && lastQuestion;
-        return (
-          <div
-            // Part numbers are STATIC.
-            // eslint-disable-next-line react/no-array-index-key
-            key={i}
-            className={activeClass}
-          >
-            <Part
-              anonymous={singlePart}
-              part={p}
-              pnum={i}
-              qnum={qnum}
-              separateSubparts={separateSubparts}
-              spyQuestion={spyQuestion}
-            />
-            <div className={showArrows ? '' : 'd-none'}>
-              <PaginationArrows />
-            </div>
-            {showSubmit && (
-              <div className="text-center">
-                <SubmitButton
-                  courseID={railsCourse.id}
-                  examID={railsExam.id}
-                />
+    <QuestionFilesContext.Provider value={{ references: reference }}>
+      <div className={classes}>
+        <TopScrollspy
+          question={qnum}
+          separateSubparts={separateSubparts}
+        />
+        <h1 id={`question-${qnum}`}>
+          {title}
+          {singlePart && (
+            <small className="float-right text-muted">
+              {subtitle}
+            </small>
+          )}
+        </h1>
+        <HTML value={description} />
+        {reference && <FileViewer references={reference} />}
+        <BottomScrollspy
+          question={qnum}
+          separateSubparts={separateSubparts}
+        />
+        {parts.map((p, i) => {
+          const current = selectedPart === i;
+          const activePart = !split || current;
+          const activeClass = activePart ? '' : 'd-none';
+          const lastPart = i === parts.length - 1;
+          const showArrows = separateSubparts || lastPart;
+          const showSubmit = lastPart && lastQuestion;
+          return (
+            <div
+              // Part numbers are STATIC.
+              // eslint-disable-next-line react/no-array-index-key
+              key={i}
+              className={activeClass}
+            >
+              <Part
+                anonymous={singlePart}
+                part={p}
+                pnum={i}
+                qnum={qnum}
+                separateSubparts={separateSubparts}
+                spyQuestion={spyQuestion}
+              />
+              <div className={showArrows ? '' : 'd-none'}>
+                <PaginationArrows />
               </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
+              {showSubmit && (
+                <div className="text-center">
+                  <SubmitButton
+                    courseID={railsCourse.id}
+                    examID={railsExam.id}
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </QuestionFilesContext.Provider>
   );
 };
 export default ShowQuestion;

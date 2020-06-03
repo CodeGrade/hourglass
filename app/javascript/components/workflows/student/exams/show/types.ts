@@ -378,7 +378,7 @@ export type YesNoState = boolean;
 export interface CodeTagInfo {
   type: 'CodeTag';
   prompt: HTMLVal;
-  choices: FileRef[];
+  choices: 'exam' | 'question' | 'part';
 }
 
 export interface CodeTagState {

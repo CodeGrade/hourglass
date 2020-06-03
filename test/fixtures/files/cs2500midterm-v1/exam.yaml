@@ -48,7 +48,7 @@ contents:
                 correctAnswer:
                   filename: "q1/all/src/packageone/Example.java"
                   line: 5
-                choices: "all"
+                choices: "exam"
         - name: "Part B"
           points: 11
           body:

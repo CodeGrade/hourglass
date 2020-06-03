@@ -3,7 +3,7 @@ import {
   Exam,
 } from '@student/exams/show/types';
 import { createMap } from '@student/exams/show/files';
-import { ExamContext, RailsContext } from '@student/exams/show/context';
+import { ExamContext, RailsContext, ExamFilesContext } from '@student/exams/show/context';
 import useAnomalyListeners from '@student/exams/show/lockdown/anomaly';
 import HTML from '@student/exams/show/components/HTML';
 import { Row, Col } from 'react-bootstrap';
@@ -39,23 +39,25 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const { railsExam } = useContext(RailsContext);
   return (
     <ExamContext.Provider value={{ files, fmap }}>
-      <h1>{railsExam.name}</h1>
-      <HTML value={instructions} />
-      {reference && <FileViewer references={reference} />}
-      <Row>
-        <Col>
-          {questions.map((q, i) => (
-            <ShowQuestion
-              // Question numbers are STATIC.
-              // eslint-disable-next-line react/no-array-index-key
-              key={i}
-              question={q}
-              qnum={i}
-              lastQuestion={i === questions.length - 1}
-            />
-          ))}
-        </Col>
-      </Row>
+      <ExamFilesContext.Provider value={{ references: reference }}>
+        <h1>{railsExam.name}</h1>
+        <HTML value={instructions} />
+        {reference && <FileViewer references={reference} />}
+        <Row>
+          <Col>
+            {questions.map((q, i) => (
+              <ShowQuestion
+                // Question numbers are STATIC.
+                // eslint-disable-next-line react/no-array-index-key
+                key={i}
+                question={q}
+                qnum={i}
+                lastQuestion={i === questions.length - 1}
+              />
+            ))}
+          </Col>
+        </Row>
+      </ExamFilesContext.Provider>
     </ExamContext.Provider>
   );
 };

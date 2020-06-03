@@ -156,13 +156,13 @@ class Upload
                   referent =
                     if b['CodeTag']['choices'] == 'part'
                       raise 'No reference for part.' if p_reference.nil?
-                      p_reference
+                      'part'
                     elsif b['CodeTag']['choices'] == 'question'
                       raise 'No reference for question.' if q_reference.nil?
-                      q_reference
-                    elsif b['CodeTag']['choices'] == 'all'
+                      'question'
+                    elsif b['CodeTag']['choices'] == 'exam'
                       raise 'No reference for exam.' if e_reference.nil?
-                      e_reference
+                      'exam'
                     else
                       raise "CodeTag reference is invalid."
                     end

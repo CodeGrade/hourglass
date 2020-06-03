@@ -101,4 +101,4 @@ contents:
                 correctAnswer:
                   filename: "q1/all/src/packageone/Example.java"
                   line: 5
-                choices: "all"
+                choices: "exam"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { FileRef, CodeTagInfo, CodeTagState } from '@student/exams/show/types';
 import {
   Row, Col, Modal, Button,
@@ -6,6 +6,8 @@ import {
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import HTML from '@student/exams/show/components/HTML';
 import { CodeTagVal } from '@student/exams/show/components/questions/CodeTag';
+import { ExamFilesContext, QuestionFilesContext, PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 
 interface FileModalProps {
@@ -71,6 +73,23 @@ const DisplayCodeTag: React.FC<CodeTagProps> = (props) => {
   } = props;
   const { choices, prompt } = info;
   const [showModal, setShowModal] = useState(false);
+  const examReferences = useContext(ExamFilesContext);
+  const questionReferences = useContext(QuestionFilesContext);
+  const partReferences = useContext(PartFilesContext);
+  let references: FileRef[];
+  switch (choices) {
+    case 'exam':
+      references = examReferences.references;
+      break;
+    case 'question':
+      references = questionReferences.references;
+      break;
+    case 'part':
+      references = partReferences.references;
+      break;
+    default:
+      throw new ExhaustiveSwitchError(choices);
+  }
   let theRest;
   if (value) {
     theRest = (
@@ -84,7 +103,7 @@ const DisplayCodeTag: React.FC<CodeTagProps> = (props) => {
               Show line
             </Button>
             <FileModal
-              references={choices}
+              references={references}
               show={showModal}
               onClose={(): void => setShowModal(false)}
               value={value}

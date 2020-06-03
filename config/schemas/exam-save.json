@@ -145,7 +145,7 @@
       "required": ["type", "choices"],
       "properties": {
         "type": { "enum": ["CodeTag"] },
-        "choices": { "$ref": "#/definitions/References" },
+        "choices": { "enum": ["exam", "question", "part"] },
         "prompt": { "$ref": "#/definitions/HTML" }
       }
     },

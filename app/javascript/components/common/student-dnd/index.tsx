@@ -232,18 +232,18 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         };
         updateAll(examId, body).then((result) => {
           if (result.created === false) throw new Error(result.reason);
+          history.push(`/exams/${examId}/admin`);
           alert({
             variant: 'success',
             message: 'Room assignments successfully created.',
           });
-          history.push(`/exams/${examId}/admin`);
         }).catch((e) => {
+          history.push(`/exams/${examId}/admin`);
           alert({
             variant: 'danger',
             title: 'Room assignments not created.',
             message: e.message,
           });
-          history.push(`/exams/${examId}/admin`);
         });
       })}
     >

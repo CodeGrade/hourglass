@@ -56,8 +56,7 @@ module Api
               files: version.files
             },
             answers: {
-              answers: version.answers,
-              scratch: 'None needed'
+              answers: version.answers
             }
           }
         }

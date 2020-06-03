@@ -36,10 +36,13 @@ class ExamVersion < ApplicationRecord
   end
 
   def default_answers
-    answers.map do |ans_q|
-      ans_q.map do |ans_p|
-        ans_p.map do |_| { "NO_ANS": true } end
-      end
-    end
+    {
+      answers: answers.map do |ans_q|
+        ans_q.map do |ans_p|
+          ans_p.map { |_| { "NO_ANS": true } }
+        end
+      end,
+      scratch: ''
+    }
   end
 end

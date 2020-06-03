@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Switch, Route, Link, useParams } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { Switch, Route, Link, useParams, useHistory } from 'react-router-dom';
 import { useResponse as examsShow, Response as ShowResponse, Version } from '@hourglass/common/api/professor/exams/show';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, useRefresher } from '@hourglass/common/helpers';
 import {
   Card,
   Collapse,
@@ -19,53 +19,45 @@ import { RailsExam, ContentsState } from '@student/exams/show/types';
 import { Editor as CodeMirrorEditor } from 'codemirror';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
+import { hitApi } from '@hourglass/common/types/api';
+import { AlertContext } from '@hourglass/common/alerts';
 
 export const ExamAdmin: React.FC<{}> = () => {
   const { examId } = useParams();
-  const res = examsShow(examId);
-  switch (res.type) {
+  const [refresher, refresh] = useRefresher();
+  const response = examsShow(examId, [refresher]);
+  switch (response.type) {
     case 'ERROR':
       return (
         <span
           className="text-danger"
         >
-          {res.text}
+          {response.text}
         </span>
       );
     case 'LOADING':
       return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <Loaded response={res.response} examId={examId} />
+        <>
+          <Switch>
+            <Route path="/exams/:examId/admin/edit">
+              <ExamInfoEditor
+                response={response.response}
+                onSuccess={refresh}
+              />
+            </Route>
+            <Route path="/exams/:examId/admin">
+              <ExamInfoViewer response={response.response} />
+            </Route>
+          </Switch>
+          <VersionInfo versions={response.response.versions} examName={response.response.name} />
+          <ProctoringInfo examId={examId} />
+        </>
       );
     default:
-      throw new ExhaustiveSwitchError(res);
+      throw new ExhaustiveSwitchError(response);
   }
-};
-
-const Loaded: React.FC<{
-  response: ShowResponse;
-  examId: number;
-}> = (props) => {
-  const {
-    response,
-    examId,
-  } = props;
-  return (
-    <>
-      <h1>{response.name}</h1>
-      <Switch>
-        <Route path="/exams/:examId/admin/edit">
-          <ExamInfoEditor response={response} />
-        </Route>
-        <Route path="/exams/:examId/admin">
-          <ExamInfoViewer response={response} />
-        </Route>
-      </Switch>
-      <VersionInfo versions={response.versions} examName={response.name} />
-      <ProctoringInfo examId={examId} />
-    </>
-  );
 };
 
 const ProctoringInfo: React.FC<{
@@ -114,6 +106,7 @@ const ExamInfoViewer: React.FC<{
   } = response;
   return (
     <>
+      <h1>{response.name}</h1>
       <p>
         Starts&nbsp;
         <ReadableDate value={start} showTime />
@@ -133,36 +126,118 @@ const ExamInfoViewer: React.FC<{
 
 export const ExamInfoEditor: React.FC<{
   response: ShowResponse;
+  onSuccess: () => void;
 }> = (props) => {
   const {
     response,
+    onSuccess,
   } = props;
+  const {
+    examId,
+  } = useParams();
+  const history = useHistory();
+  const { alert } = useContext(AlertContext);
+  const [name, setName] = useState(response.name);
+  const [start, setStart] = useState(response.start.toISO());
+  const [end, setEnd] = useState(response.end.toISO());
+  const [duration, setDuration] = useState(response.duration);
+
+  const submitForm = (): void => {
+    const formInfo = {
+      exam: {
+        name,
+        start,
+        end,
+        duration,
+      },
+    };
+    hitApi<{
+      updated: boolean;
+    }>(`/api/professor/exams/${examId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(formInfo),
+    }).then(({ updated }) => {
+      history.push(`/exams/${examId}/admin`);
+      if (updated) {
+        alert({
+          variant: 'success',
+          message: 'Exam info saved.',
+        });
+        onSuccess();
+      } else {
+        throw new Error('API failure');
+      }
+    }).catch((err) => {
+      history.push(`/exams/${examId}/admin`);
+      alert({
+        variant: 'danger',
+        title: 'Error saving exam info.',
+        message: err.message,
+      });
+    });
+  };
+
+  const cancelEditing = (): void => {
+    history.push(`/exams/${examId}/admin`);
+  };
+
   return (
     <Card>
       <Card.Body>
         <Form.Group as={Row} controlId="examTitle">
           <Form.Label column sm={2}>Exam name:</Form.Label>
           <Col sm={10}>
-            <Form.Control type="input" defaultValue={response.name} />
+            <Form.Control
+              type="input"
+              value={name}
+              onChange={(e): void => setName(e.target.value)}
+            />
           </Col>
         </Form.Group>
         <Form.Group as={Row} controlId="examStartTime">
           <Form.Label column sm={2}>Start time:</Form.Label>
           <Col sm={10}>
-            <Form.Control type="input" defaultValue={response.start.toISO()} />
+            <Form.Control
+              type="input"
+              value={start}
+              onChange={(e): void => setStart(e.target.value)}
+            />
           </Col>
         </Form.Group>
         <Form.Group as={Row} controlId="examEndTime">
-          <Form.Label column sm={2}>Start time:</Form.Label>
+          <Form.Label column sm={2}>End time:</Form.Label>
           <Col sm={10}>
-            <Form.Control type="input" defaultValue={response.end.toISO()} />
+            <Form.Control
+              type="input"
+              value={end}
+              onChange={(e): void => setEnd(e.target.value)}
+            />
           </Col>
         </Form.Group>
         <Form.Group as={Row} controlId="examDuration">
           <Form.Label column sm={2}>Duration (minutes):</Form.Label>
           <Col sm={10}>
-            <Form.Control type="number" defaultValue={response.duration} />
+            <Form.Control
+              type="number"
+              value={duration}
+              onChange={(e): void => setDuration(Number(e.target.value))}
+            />
           </Col>
+        </Form.Group>
+        <Form.Group className="float-right">
+          <Button
+            variant="danger"
+            onClick={cancelEditing}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="success"
+            className="ml-2"
+            onClick={submitForm}
+          >
+            Save
+          </Button>
         </Form.Group>
       </Card.Body>
     </Card>

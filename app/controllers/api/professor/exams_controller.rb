@@ -3,7 +3,7 @@
 module Api
   module Professor
     class ExamsController < ProfessorController
-      before_action :find_exam_and_course, only: [:show]
+      before_action :find_exam_and_course, only: [:show, :update]
       before_action :find_course
       before_action :require_prof_reg
 
@@ -24,6 +24,18 @@ module Api
           name: 'Exam Room'
         )
         render json: { id: @exam.id }, status: :created
+      end
+
+      def update
+        body = params.require(:exam).permit(:name, :start, :end, :duration)
+        updated = @exam.update(
+          {
+            name: body[:name]
+          }
+        )
+        render json: {
+          updated: updated
+        }
       end
 
       def index

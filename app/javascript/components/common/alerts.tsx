@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Alert, AlertProps } from 'react-bootstrap';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 
 interface HGAlert {
   title?: string;
@@ -63,10 +63,10 @@ export const AllAlerts: React.FC<{}> = ({ children }) => {
       return [...a.slice(0, idx), ...a.slice(idx, a.length - 1)];
     });
   };
-  const location = useLocation();
-  useEffect(() => {
+  const history = useHistory();
+  useEffect(() => history.listen((_) => {
     setAlerts([]);
-  }, [location.pathname]);
+  }), [history]);
   return (
     <AlertContext.Provider
       value={{

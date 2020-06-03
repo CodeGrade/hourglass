@@ -27,13 +27,17 @@ export async function hitApi<T>(url: string, options?: RequestInit): Promise<T> 
     credentials: 'same-origin',
     ...options,
   })
-    .then((res) => res.json() as Promise<T>);
+    .then((res) => {
+      if (!res.ok) throw new Error(res.statusText);
+      return res.json() as Promise<T>;
+    });
 }
 
 export function useApiResponse<Server, Res = Server>(
   url: string,
   options?: RequestInit,
   transformSuccess?: (server: Server) => Res,
+  deps?: React.DependencyList,
 ): ApiResponse<Res> {
   const [response, setResponse] = useState<Server>(undefined);
   const [error, setError] = useState<ApiError>(undefined);
@@ -68,7 +72,7 @@ export function useApiResponse<Server, Res = Server>(
           });
         }
       });
-  }, [setResponse, setError]);
+  }, deps ?? []);
   if (error) {
     return error;
   }

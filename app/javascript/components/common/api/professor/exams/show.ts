@@ -25,10 +25,10 @@ export interface Version {
   contents: ContentsState;
 }
 
-export function useResponse(examId: number): ApiResponse<Response> {
+export function useResponse(examId: number, deps: React.DependencyList): ApiResponse<Response> {
   return useApiResponse<Server, Response>(`/api/professor/exams/${examId}`, {}, (res) => ({
     ...res,
     start: DateTime.fromISO(res.start),
     end: DateTime.fromISO(res.end),
-  }));
+  }), deps);
 }

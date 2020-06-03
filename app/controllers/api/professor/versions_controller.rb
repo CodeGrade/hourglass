@@ -17,7 +17,7 @@ module Api
             {
               id: section.id,
               title: section.title,
-              students: section.students.map do |student|
+              students: section.registered_students_for(@exam).map do |student|
                 serialize_student student
               end
             }

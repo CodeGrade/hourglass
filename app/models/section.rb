@@ -10,4 +10,8 @@ class Section < ApplicationRecord
   has_many :students, through: :student_registrations, source: :user
 
   validates :course, presence: true
+
+  def registered_students_for(exam)
+    exam.registrations.where(user: students).includes(:user).map(&:user)
+  end
 end

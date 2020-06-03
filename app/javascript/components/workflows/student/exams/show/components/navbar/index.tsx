@@ -155,7 +155,7 @@ const ExamNavbar: React.FC<{
   const {
     time,
   } = props;
-  const remaining = time.ends.toRelative();
+  const remaining = time.ends.diffNow().as('minutes');
   const { railsUser } = useContext(RailsContext);
   const [expanded, setExpanded] = useState(false);
   const [openSection, setOpenSection] = useState('');
@@ -254,7 +254,7 @@ const ExamNavbar: React.FC<{
           <NavAccordionItem
             expanded={expanded}
             Icon={MdTimer}
-            label={remaining}
+            label={`${remaining} minutes left`}
             eventKey="time"
             onSectionClick={(eventKey): void => {
               if (expanded) {

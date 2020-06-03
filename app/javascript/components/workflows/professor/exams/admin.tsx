@@ -3,11 +3,14 @@ import { Link, useParams } from 'react-router-dom';
 import { useResponse as examsShow, Version } from '@hourglass/common/api/professor/exams/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
+  Card,
   Collapse,
   Button,
   InputGroup,
   ButtonGroup,
   Form,
+  Row,
+  Col,
 } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
@@ -17,7 +20,7 @@ import { Editor as CodeMirrorEditor } from 'codemirror';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
 
-const ExamAdmin: React.FC<{}> = () => {
+export const ExamAdmin: React.FC<{}> = () => {
   const { examId } = useParams();
   const res = examsShow(examId);
   switch (res.type) {
@@ -44,6 +47,88 @@ const ExamAdmin: React.FC<{}> = () => {
             <ReadableDate value={res.response.end} showTime />
           </p>
           <p>{`Duration: ${res.response.duration} minutes`}</p>
+          <h2>Versions</h2>
+          <ul>
+            {res.response.versions.map((v) => (
+              <li key={v.id}>
+                <ShowVersion
+                  version={v}
+                  examName={res.response.name}
+                />
+              </li>
+            ))}
+          </ul>
+          <h2>Proctoring Arrangements</h2>
+          <Form.Group>
+            <Link to={`/exams/${examId}/seating`}>
+              <Button
+                variant="info"
+              >
+                Assign seating
+              </Button>
+            </Link>
+            <Link to={`/exams/${examId}/allocate-versions`}>
+              <Button
+                variant="info"
+                className="ml-2"
+              >
+                Allocate versions
+              </Button>
+            </Link>
+          </Form.Group>
+        </>
+      );
+    default:
+      throw new ExhaustiveSwitchError(res);
+  }
+};
+
+
+export const ExamAdminEditor: React.FC<{}> = () => {
+  const { examId } = useParams();
+  const res = examsShow(examId);
+  switch (res.type) {
+    case 'ERROR':
+      return (
+        <span
+          className="text-danger"
+        >
+          {res.text}
+        </span>
+      );
+    case 'LOADING':
+      return <p>Loading...</p>;
+    case 'RESULT':
+      return (
+        <>
+          <Card>
+            <Card.Body>
+              <Form.Group as={Row} controlId="examTitle">
+                <Form.Label column sm={2}>Exam name:</Form.Label>
+                <Col sm={10}>
+                  <Form.Control type="input" defaultValue={res.response.name} />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row} controlId="examStartTime">
+                <Form.Label column sm={2}>Start time:</Form.Label>
+                <Col sm={10}>
+                  <Form.Control type="input" defaultValue={res.response.start.toISO()} />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row} controlId="examEndTime">
+                <Form.Label column sm={2}>Start time:</Form.Label>
+                <Col sm={10}>
+                  <Form.Control type="input" defaultValue={res.response.end.toISO()} />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row} controlId="examDuration">
+                <Form.Label column sm={2}>Duration (minutes):</Form.Label>
+                <Col sm={10}>
+                  <Form.Control type="number" defaultValue={res.response.duration} />
+                </Col>
+              </Form.Group>
+            </Card.Body>
+          </Card>
           <h2>Versions</h2>
           <ul>
             {res.response.versions.map((v) => (
@@ -130,7 +215,7 @@ const ShowVersion: React.FC<{
   );
 };
 
-export default ExamAdmin;
+export default ExamAdminEditor;
 
 interface CodeMirroredElement extends Element {
   CodeMirror: CodeMirrorEditor;

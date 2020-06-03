@@ -21,8 +21,8 @@ const DoSync: React.FC<{}> = () => {
     case 'LOADING':
       return <p>Loading...</p>;
     case 'RESULT':
-      if (!res.response.synced) {
-        return <p>Bottlenose error.</p>;
+      if (res.response.synced === false) {
+        return <p className="text-danger">{res.response.reason}</p>;
       }
       return <p>Synced.</p>;
     default:

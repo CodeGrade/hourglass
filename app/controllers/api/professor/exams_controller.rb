@@ -55,7 +55,10 @@ module Api
               instructions: version.contents['instructions'],
               files: version.files
             },
-            answers: version.answers
+            answers: {
+              answers: version.answers,
+              scratch: 'None needed'
+            }
           }
         }
       end

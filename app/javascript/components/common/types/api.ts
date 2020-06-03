@@ -30,7 +30,7 @@ export async function hitApi<T>(url: string, options?: RequestInit): Promise<T> 
     .then((res) => res.json() as Promise<T>);
 }
 
-export function useApiResponse<Res, Server = Res>(
+export function useApiResponse<Server, Res = Server>(
   url: string,
   options?: RequestInit,
   transformSuccess?: (server: Server) => Res,

@@ -26,7 +26,7 @@ export interface Version {
 }
 
 export function useResponse(examId: number): ApiResponse<Response> {
-  return useApiResponse<Response, Server>(`/api/professor/exams/${examId}`, {}, (res) => ({
+  return useApiResponse<Server, Response>(`/api/professor/exams/${examId}`, {}, (res) => ({
     ...res,
     start: DateTime.fromISO(res.start),
     end: DateTime.fromISO(res.end),

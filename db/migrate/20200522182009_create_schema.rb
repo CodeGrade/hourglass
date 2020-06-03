@@ -69,6 +69,10 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.string :name, null: false
       t.integer :bottlenose_assignment_id
 
+      t.integer :duration, null: false
+      t.datetime :start_time, null: false
+      t.datetime :end_time, null: false
+
       t.timestamps
     end
 

@@ -46,6 +46,9 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.bigint "course_id", null: false
     t.string "name", null: false
     t.integer "bottlenose_assignment_id"
+    t.integer "duration", null: false
+    t.datetime "start_time", null: false
+    t.datetime "end_time", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["course_id"], name: "index_exams_on_course_id"

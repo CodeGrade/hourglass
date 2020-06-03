@@ -3,6 +3,11 @@ cs2500student:
   room: cs2500room1
   exam_version: cs2500midterm_1
 
+cs2500student2:
+  user: cs2500student2
+  room: cs2500room1
+  exam_version: cs2500midterm_2
+
 cs3500student:
   user: cs3500student
   room: cs3500room1

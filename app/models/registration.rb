@@ -39,7 +39,7 @@ class Registration < ApplicationRecord
   end
 
   def current_answers
-    snapshots.last&.answers || exam.default_answers_for(self)
+    snapshots.last&.answers || exam_version.default_answers
   end
 
   def timed_out?

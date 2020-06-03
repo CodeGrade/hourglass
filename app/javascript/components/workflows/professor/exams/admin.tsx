@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { useResponse as examsShow, Version } from '@hourglass/common/api/professor/exams/show';
+import { Switch, Route, Link, useParams } from 'react-router-dom';
+import { useResponse as examsShow, Response as ShowResponse, Version } from '@hourglass/common/api/professor/exams/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   Card,
@@ -36,133 +36,162 @@ export const ExamAdmin: React.FC<{}> = () => {
       return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <>
-          <h1>{res.response.name}</h1>
-          <p>
-            Starts&nbsp;
-            <ReadableDate value={res.response.start} showTime />
-          </p>
-          <p>
-            Ends&nbsp;
-            <ReadableDate value={res.response.end} showTime />
-          </p>
-          <p>{`Duration: ${res.response.duration} minutes`}</p>
-          <h2>Versions</h2>
-          <ul>
-            {res.response.versions.map((v) => (
-              <li key={v.id}>
-                <ShowVersion
-                  version={v}
-                  examName={res.response.name}
-                />
-              </li>
-            ))}
-          </ul>
-          <h2>Proctoring Arrangements</h2>
-          <Form.Group>
-            <Link to={`/exams/${examId}/seating`}>
-              <Button
-                variant="info"
-              >
-                Assign seating
-              </Button>
-            </Link>
-            <Link to={`/exams/${examId}/allocate-versions`}>
-              <Button
-                variant="info"
-                className="ml-2"
-              >
-                Allocate versions
-              </Button>
-            </Link>
-          </Form.Group>
-        </>
+        <Loaded response={res.response} examId={examId} />
       );
     default:
       throw new ExhaustiveSwitchError(res);
   }
 };
 
+const Loaded: React.FC<{
+  response: ShowResponse;
+  examId: number;
+}> = (props) => {
+  const {
+    response,
+    examId,
+  } = props;
+  return (
+    <>
+      <h1>{response.name}</h1>
+      <Switch>
+        <Route path="/exams/:examId/admin/edit">
+          <ExamInfoEditor response={response} />
+        </Route>
+        <Route path="/exams/:examId/admin">
+          <ExamInfoViewer response={response} />
+        </Route>
+      </Switch>
+      <VersionInfo versions={response.versions} examName={response.name} />
+      <ProctoringInfo examId={examId} />
+    </>
+  );
+};
 
-export const ExamAdminEditor: React.FC<{}> = () => {
-  const { examId } = useParams();
-  const res = examsShow(examId);
-  switch (res.type) {
-    case 'ERROR':
-      return (
-        <span
-          className="text-danger"
-        >
-          {res.text}
-        </span>
-      );
-    case 'LOADING':
-      return <p>Loading...</p>;
-    case 'RESULT':
-      return (
-        <>
-          <Card>
-            <Card.Body>
-              <Form.Group as={Row} controlId="examTitle">
-                <Form.Label column sm={2}>Exam name:</Form.Label>
-                <Col sm={10}>
-                  <Form.Control type="input" defaultValue={res.response.name} />
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row} controlId="examStartTime">
-                <Form.Label column sm={2}>Start time:</Form.Label>
-                <Col sm={10}>
-                  <Form.Control type="input" defaultValue={res.response.start.toISO()} />
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row} controlId="examEndTime">
-                <Form.Label column sm={2}>Start time:</Form.Label>
-                <Col sm={10}>
-                  <Form.Control type="input" defaultValue={res.response.end.toISO()} />
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row} controlId="examDuration">
-                <Form.Label column sm={2}>Duration (minutes):</Form.Label>
-                <Col sm={10}>
-                  <Form.Control type="number" defaultValue={res.response.duration} />
-                </Col>
-              </Form.Group>
-            </Card.Body>
-          </Card>
-          <h2>Versions</h2>
-          <ul>
-            {res.response.versions.map((v) => (
-              <li key={v.id}>
-                <ShowVersion
-                  version={v}
-                  examName={res.response.name}
-                />
-              </li>
-            ))}
-          </ul>
-          <h2>Proctoring Arrangements</h2>
-          <Form.Group>
-            <Link to={`/exams/${examId}/seating`}>
-              <Button
-                variant="info"
-              >
-                Assign seating
-              </Button>
-            </Link>
-            <Link to={`/exams/${examId}/allocate-versions`}>
-              <Button
-                variant="info"
-                className="ml-2"
-              >
-                Allocate versions
-              </Button>
-            </Link>
-          </Form.Group>
-        </>
-      );
-    default:
-      throw new ExhaustiveSwitchError(res);
-  }
+const ProctoringInfo: React.FC<{
+  examId: number;
+}> = (props) => {
+  const {
+    examId,
+  } = props;
+  return (
+    <>
+      <h2>Proctoring Arrangements</h2>
+      <Form.Group>
+        <Link to={`/exams/${examId}/seating`}>
+          <Button
+            variant="info"
+          >
+            Assign seating
+          </Button>
+        </Link>
+        <Link to={`/exams/${examId}/allocate-versions`}>
+          <Button
+            variant="info"
+            className="ml-2"
+          >
+            Allocate versions
+          </Button>
+        </Link>
+      </Form.Group>
+    </>
+  );
+};
+
+const ExamInfoViewer: React.FC<{
+  response: ShowResponse;
+}> = (props) => {
+  const {
+    examId,
+  } = useParams();
+  const {
+    response,
+  } = props;
+  const {
+    start,
+    end,
+    duration,
+  } = response;
+  return (
+    <>
+      <p>
+        Starts&nbsp;
+        <ReadableDate value={start} showTime />
+      </p>
+      <p>
+        Ends&nbsp;
+        <ReadableDate value={end} showTime />
+      </p>
+      <p>{`Duration: ${duration} minutes`}</p>
+      <LinkButton to={`/exams/${examId}/admin/edit`}>
+        Edit
+      </LinkButton>
+    </>
+  );
+};
+
+
+export const ExamInfoEditor: React.FC<{
+  response: ShowResponse;
+}> = (props) => {
+  const {
+    response,
+  } = props;
+  return (
+    <Card>
+      <Card.Body>
+        <Form.Group as={Row} controlId="examTitle">
+          <Form.Label column sm={2}>Exam name:</Form.Label>
+          <Col sm={10}>
+            <Form.Control type="input" defaultValue={response.name} />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row} controlId="examStartTime">
+          <Form.Label column sm={2}>Start time:</Form.Label>
+          <Col sm={10}>
+            <Form.Control type="input" defaultValue={response.start.toISO()} />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row} controlId="examEndTime">
+          <Form.Label column sm={2}>Start time:</Form.Label>
+          <Col sm={10}>
+            <Form.Control type="input" defaultValue={response.end.toISO()} />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row} controlId="examDuration">
+          <Form.Label column sm={2}>Duration (minutes):</Form.Label>
+          <Col sm={10}>
+            <Form.Control type="number" defaultValue={response.duration} />
+          </Col>
+        </Form.Group>
+      </Card.Body>
+    </Card>
+  );
+};
+
+const VersionInfo: React.FC<{
+  examName: string;
+  versions: Version[];
+}> = (props) => {
+  const {
+    examName,
+    versions,
+  } = props;
+  return (
+    <>
+      <h2>Versions</h2>
+      <ul>
+        {versions.map((v) => (
+          <li key={v.id}>
+            <ShowVersion
+              version={v}
+              examName={examName}
+            />
+          </li>
+        ))}
+      </ul>
+    </>
+  );
 };
 
 const ShowVersion: React.FC<{
@@ -215,7 +244,7 @@ const ShowVersion: React.FC<{
   );
 };
 
-export default ExamAdminEditor;
+export default ExamAdmin;
 
 interface CodeMirroredElement extends Element {
   CodeMirror: CodeMirrorEditor;

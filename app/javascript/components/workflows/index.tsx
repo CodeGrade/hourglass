@@ -173,7 +173,7 @@ const Entry: React.FC<{}> = () => {
                     <Route exact path="/dev">
                       <Archive />
                     </Route>
-                    <Route path="/exams/:examId/admin" exact>
+                    <Route path="/exams/:examId/admin">
                       <ExamAdmin />
                     </Route>
                     <Route path="/exams/:examId/versions/:versionId/edit" exact>

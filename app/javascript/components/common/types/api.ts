@@ -30,8 +30,12 @@ export async function hitApi<T>(url: string, options?: RequestInit): Promise<T> 
     .then((res) => res.json() as Promise<T>);
 }
 
-export function useApiResponse<T>(url: string, options?: RequestInit): ApiResponse<T> {
-  const [response, setResponse] = useState<T>(undefined);
+export function useApiResponse<Res, Server = Res>(
+  url: string,
+  options?: RequestInit,
+  transformSuccess?: (server: Server) => Res,
+): ApiResponse<Res> {
+  const [response, setResponse] = useState<Server>(undefined);
   const [error, setError] = useState<ApiError>(undefined);
   useEffect(() => {
     fetch(url, {
@@ -53,7 +57,7 @@ export function useApiResponse<T>(url: string, options?: RequestInit): ApiRespon
         }
         return res;
       })
-      .then((res) => res.json() as Promise<T>)
+      .then((res) => res.json() as Promise<Server>)
       .then(setResponse)
       .catch((e: Error) => {
         if (e.name === 'SyntaxError') {
@@ -73,8 +77,14 @@ export function useApiResponse<T>(url: string, options?: RequestInit): ApiRespon
       type: 'LOADING',
     };
   }
+  if (transformSuccess) {
+    return {
+      type: 'RESULT',
+      response: transformSuccess(response),
+    };
+  }
   return {
     type: 'RESULT',
-    response,
+    response: response as unknown as Res,
   };
 }

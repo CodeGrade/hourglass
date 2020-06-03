@@ -15,6 +15,7 @@ import ExamViewer from '@proctor/registrations/show';
 import { RailsExam, ContentsState } from '@student/exams/show/types';
 import { Editor as CodeMirrorEditor } from 'codemirror';
 import LinkButton from '@hourglass/common/linkbutton';
+import { DateTime } from 'luxon';
 
 const ExamAdmin: React.FC<{}> = () => {
   const { examId } = useParams();
@@ -34,6 +35,9 @@ const ExamAdmin: React.FC<{}> = () => {
       return (
         <>
           <h1>{res.response.name}</h1>
+          <p>{`Start: ${res.response.start.toLocaleString(DateTime.DATETIME_FULL)}`}</p>
+          <p>{`End: ${res.response.end.toLocaleString(DateTime.DATETIME_FULL)}`}</p>
+          <p>{`Duration: ${res.response.duration} minutes`}</p>
           <h2>Versions</h2>
           <ul>
             {res.response.versions.map((v) => (

@@ -37,6 +37,9 @@ module Api
       def show
         render json: {
           name: @exam.name,
+          start: @exam.start_time,
+          end: @exam.end_time,
+          duration: @exam.duration,
           versions: @exam.exam_versions.map {|v| serialize_version(v) }
         }
       end

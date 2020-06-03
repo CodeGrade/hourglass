@@ -38,15 +38,17 @@ module Api
           student_ids.each do |id|
             student_reg = @exam.registrations.find_or_initialize_by(user_id: id)
             student_reg.room_id = room_id
+            student_reg.exam_version ||= @exam.exam_versions.first
             student_reg.save!
           end
         end
         render json: {
           created: true
         }
-      rescue StandardError
+      rescue StandardError => e
         render json: {
-          created: false
+          created: false,
+          reason: e.message
         }
       end
 

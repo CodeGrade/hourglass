@@ -231,7 +231,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           rooms,
         };
         updateAll(examId, body).then((result) => {
-          if (!result.created) throw new Error('Server error.');
+          if (result.created === false) throw new Error(result.reason);
           alert({
             variant: 'success',
             message: 'Registrations successfully created.',

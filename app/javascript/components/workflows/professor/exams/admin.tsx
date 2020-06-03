@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useResponse as examsShow, Version } from '@hourglass/common/api/professor/exams/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
@@ -7,6 +7,7 @@ import {
   Button,
   InputGroup,
   ButtonGroup,
+  Form,
 } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
@@ -44,6 +45,16 @@ const ExamAdmin: React.FC<{}> = () => {
               </li>
             ))}
           </ul>
+          <h2>Proctoring Arrangements</h2>
+          <Form.Group>
+            <Link to={`/exams/${examId}/seating`}>
+              <Button
+                variant="info"
+              >
+                Assign seating
+              </Button>
+            </Link>
+          </Form.Group>
         </>
       );
     default:

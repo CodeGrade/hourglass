@@ -9,6 +9,8 @@ class Exam < ApplicationRecord
   has_many :questions, dependent: :destroy
   has_many :exam_versions, dependent: :destroy
 
+  has_many :registrations, through: :rooms
+
   validates :course, presence: true
   validates :name, presence: true
 

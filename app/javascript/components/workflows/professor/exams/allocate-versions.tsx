@@ -18,12 +18,12 @@ import {
 import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
 import {
-  useResponse as useRoomsIndex,
-  Student,
-  Room,
+  useResponse as useVersionsIndex,
+  Version,
   Section,
-} from '@hourglass/common/api/professor/rooms';
-import { updateAll } from '@hourglass/common/api/professor/rooms/updateAll';
+  Student,
+} from '@hourglass/common/api/professor/exams/versions';
+import { updateAll } from '@hourglass/common/api/professor/exams/versions/updateAll';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { useHistory, useParams } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
@@ -140,14 +140,14 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
   );
 };
 
-interface RoomsProps {
-  addSectionToRoom: (section: Section, roomId: number) => void;
+interface VersionsProps {
+  addSectionToVersion: (section: Section, roomId: number) => void;
 }
 
-const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
+const Versions: React.FC<WrappedFieldArrayProps<Version> & VersionsProps> = (props) => {
   const {
     fields,
-    addSectionToRoom,
+    addSectionToVersion,
   } = props;
   const { sections } = useContext(FormContext);
   return (
@@ -168,7 +168,7 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
                   <Dropdown.Item
                     key={s.id}
                     onClick={(): void => {
-                      addSectionToRoom(s, room.id);
+                      addSectionToVersion(s, room.id);
                     }}
                   >
                     {s.title}
@@ -195,23 +195,20 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
     change,
   } = props;
   const { examId } = useParams();
-  const addSectionToRoom = (section: Section, roomId: number): void => {
-    change('all', ({ unassigned, rooms }) => ({
-      unassigned: unassigned.filter((unassignedStudent: Student) => (
-        !section.students.find((student) => student.id === unassignedStudent.id)
-      )),
-      rooms: rooms.map((room: Room) => {
-        const filtered = room.students.filter((roomStudent) => (
-          !section.students.find((student) => student.id === roomStudent.id)
+  const addSectionToVersion = (section: Section, versionId: number): void => {
+    change('all', ({ versions }) => ({
+      versions: versions.map((version: Version) => {
+        const filtered = version.students.filter((versionStudent) => (
+          !section.students.find((student) => student.id === versionStudent.id)
         ));
-        if (room.id === roomId) {
+        if (version.id === versionId) {
           return {
-            ...room,
+            ...version,
             students: filtered.concat(section.students),
           };
         }
         return {
-          ...room,
+          ...version,
           students: filtered,
         };
       }),
@@ -222,25 +219,24 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   return (
     <form
       onSubmit={handleSubmit(({ all }) => {
-        const rooms = {};
-        all.rooms.forEach((room) => {
-          rooms[room.id] = room.students.map((s) => s.id);
+        const versions = {};
+        all.versions.forEach((version) => {
+          versions[version.id] = version.students.map((s) => s.id);
         });
         const body = {
-          unassigned: all.unassigned.map((s) => s.id),
-          rooms,
+          versions,
         };
         updateAll(examId, body).then((result) => {
           if (result.created === false) throw new Error(result.reason);
           alert({
             variant: 'success',
-            message: 'Room assignments successfully created.',
+            message: 'Versions successfully allocated.',
           });
           history.push(`/exams/${examId}/admin`);
         }).catch((e) => {
           alert({
             variant: 'danger',
-            title: 'Room assignments not created.',
+            title: 'Allocations not created.',
             message: e.message,
           });
           history.push(`/exams/${examId}/admin`);
@@ -249,15 +245,11 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
     >
       <FormSection name="all">
         <Form.Group>
-          <h2>Unassigned Students</h2>
-          <FieldArray name="unassigned" component={Students} />
-        </Form.Group>
-        <Form.Group>
           <FieldArray
-            name="rooms"
-            component={Rooms}
+            name="versions"
+            component={Versions}
             props={{
-              addSectionToRoom,
+              addSectionToVersion,
             }}
           />
         </Form.Group>
@@ -285,8 +277,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
 
 interface FormValues {
   all: {
-    unassigned: Student[];
-    rooms: Room[];
+    versions: Version[];
   };
 }
 
@@ -296,7 +287,7 @@ const DNDForm = reduxForm({
 
 const DND: React.FC<{}> = () => {
   const { examId } = useParams();
-  const response = useRoomsIndex(examId);
+  const response = useVersionsIndex(examId);
   switch (response.type) {
     case 'ERROR':
       return <p className="text-danger">{response.text}</p>;
@@ -313,8 +304,7 @@ const DND: React.FC<{}> = () => {
             <DNDForm
               initialValues={{
                 all: {
-                  unassigned: response.response.unassigned,
-                  rooms: response.response.rooms,
+                  versions: response.response.versions,
                 },
               }}
             />

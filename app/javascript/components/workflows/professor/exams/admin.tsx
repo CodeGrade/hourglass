@@ -54,6 +54,14 @@ const ExamAdmin: React.FC<{}> = () => {
                 Assign seating
               </Button>
             </Link>
+            <Link to={`/exams/${examId}/allocate-versions`}>
+              <Button
+                variant="info"
+                className="ml-2"
+              >
+                Allocate versions
+              </Button>
+            </Link>
           </Form.Group>
         </>
       );
@@ -82,11 +90,6 @@ const ShowVersion: React.FC<{
               variant="info"
             >
               Grade
-            </Button>
-            <Button
-              variant="info"
-            >
-              Join Proctoring
             </Button>
             <LinkButton
               variant="info"

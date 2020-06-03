@@ -24,6 +24,7 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Archive from '@hourglass/common/archive';
 import StudentDND from '@hourglass/common/student-dnd';
 import { AllAlerts } from '@hourglass/common/alerts';
+import AllocateVersions from '@professor/exams/allocate-versions';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -180,6 +181,9 @@ const Entry: React.FC<{}> = () => {
                     </Route>
                     <Route path="/exams/:examId/seating" exact>
                       <StudentDND />
+                    </Route>
+                    <Route path="/exams/:examId/allocate-versions" exact>
+                      <AllocateVersions />
                     </Route>
                     <Route path="/courses/:courseId">
                       <ShowCourse />

@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import {
   Form,
   Button,
-  Card,
-  CardDeck,
+  // Card,
+  // CardDeck,
 } from 'react-bootstrap';
 import { useParams, useHistory } from 'react-router-dom';
 import { getCSRFToken } from '@student/exams/show/helpers';
@@ -86,6 +86,7 @@ const NewExamForm: React.FC<{}> = () => {
   );
 };
 
+/*
 const AssocRooms: React.FC<{}> = () => {
   const [rooms, setRooms] = useState([{
     name: '',
@@ -150,12 +151,4 @@ const NewRoom: React.FC<NewRoomProps> = () => (
     </Button>
   </>
 );
-
-/*
-// import Editor from '@professor/exams/new/editor';
-      <Editor />
-
-<%= bootstrap_form_for Exam.new, url: professor_course_exams_path do |f| %>
-  <%= f.submit %>
-<% end %>
- */
+*/

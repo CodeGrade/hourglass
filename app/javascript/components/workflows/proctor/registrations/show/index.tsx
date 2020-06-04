@@ -1,7 +1,12 @@
 import React from 'react';
 import { RailsExam, ContentsState } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
-import { ExamContext, ExamViewerContext, RailsContext, ExamFilesContext } from '@student/exams/show/context';
+import {
+  ExamContext,
+  ExamViewerContext,
+  RailsContext,
+  ExamFilesContext,
+} from '@student/exams/show/context';
 import { createMap } from '@student/exams/show/files';
 import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';

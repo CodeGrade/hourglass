@@ -1,15 +1,21 @@
 import React from 'react';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 
-function makeReadableDate(dd: DateTime, showTime: boolean): string {
+function makeReadableDate(dd: DateTime, showTime: boolean, capitalize: boolean): string {
   const today = DateTime.local().startOf('day');
+  const yesterday = today.minus({ days: 1 });
   const tomorrow = today.plus({ days: 1 });
   const twodays = tomorrow.plus({ days: 1 });
-  if (today <= dd && dd < tomorrow) {
-    return `Today at ${dd.toLocaleString(DateTime.TIME_WITH_SECONDS)}`;
+  let relDay: string;
+  if (yesterday <= dd && dd < today) {
+    relDay = (capitalize ? 'Yesterday' : 'yesterday');
+  } else if (today <= dd && dd < tomorrow) {
+    relDay = (capitalize ? 'Today' : 'today');
+  } else if (tomorrow <= dd && dd < twodays) {
+    relDay = (capitalize ? 'Tomorrow' : 'tomorrow');
   }
-  if (tomorrow <= dd && dd < twodays) {
-    return `Tomorrow at ${dd.toLocaleString(DateTime.TIME_WITH_SECONDS)}`;
+  if (relDay !== undefined) {
+    return `${relDay} at ${dd.toLocaleString(DateTime.TIME_WITH_SECONDS)}`;
   }
   if (showTime) {
     return dd.toLocaleString(DateTime.DATETIME_MED);
@@ -18,9 +24,12 @@ function makeReadableDate(dd: DateTime, showTime: boolean): string {
 }
 
 interface ReadableDateProps {
+  className?: string;
   value: DateTime;
   relative?: boolean;
   showTime?: boolean;
+  threshold?: Duration;
+  capitalize?: boolean;
 }
 
 const ReadableDate: React.FC<ReadableDateProps> = (props) => {
@@ -28,10 +37,17 @@ const ReadableDate: React.FC<ReadableDateProps> = (props) => {
     value,
     relative = false,
     showTime = false,
+    className,
+    capitalize,
   } = props;
-  const str = relative ? value.toRelative() : makeReadableDate(value, showTime);
+  let str: string;
+  if (relative) {
+    str = value.toRelative();
+  } else {
+    str = makeReadableDate(value, showTime, capitalize);
+  }
   return (
-    <>{str}</>
+    <span className={className}>{str}</span>
   );
 };
 

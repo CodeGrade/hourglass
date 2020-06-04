@@ -5,98 +5,23 @@ import { RailsContext } from '@student/exams/show/context';
 import './index.css';
 import {
   Accordion,
-  Card,
   Button,
   Collapse,
 } from 'react-bootstrap';
 import {
   MdNoteAdd,
   MdLiveHelp,
-  MdTimer,
 } from 'react-icons/md';
 import { GiOpenBook } from 'react-icons/gi';
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
-import { IconType } from 'react-icons';
 import JumpTo from '@student/exams/show/containers/navbar/JumpTo';
 import Scratch from '@student/exams/show/containers/navbar/Scratch';
 import ExamMessages from '@student/exams/show/containers/navbar/ExamMessages';
 import AskQuestion from '@student/exams/show/containers/navbar/AskQuestion';
 import RenderIcon from '@student/exams/show/components/Icon';
 import { TimeInfo } from '@student/exams/show/types';
-import ReadableDate from '@hourglass/common/ReadableDate';
-
-interface NavAccordionItemProps {
-  onSectionClick: (eventKey: string) => void;
-  expanded: boolean;
-  Icon: IconType;
-  label: string;
-  className?: string;
-  eventKey: string;
-  direction?: 'up' | 'down';
-}
-
-export const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
-  const {
-    onSectionClick,
-    expanded,
-    Icon,
-    label,
-    eventKey,
-    children,
-    className = 'bg-secondary text-light',
-    direction = 'down',
-  } = props;
-  const toggle = (
-    <Accordion.Toggle
-      eventKey={eventKey}
-      as={Card.Header}
-      className={`${className} d-flex cursor-pointer`}
-      onClick={(): void => onSectionClick(eventKey)}
-    >
-      <RenderIcon I={Icon} className="" />
-      <span aria-hidden="true" className="width-0">&nbsp;</span>
-      <Collapse
-        in={expanded}
-        dimension="width"
-      >
-        <span className="align-self-center flex-fill">
-          <span className="mr-3" />
-          <span className="flex-fill">{label}</span>
-        </span>
-      </Collapse>
-    </Accordion.Toggle>
-  );
-  const collapse = (
-    <Accordion.Collapse eventKey={eventKey}>
-      <Card.Body className="bg-light text-dark">
-        <Collapse
-          in={expanded}
-          dimension="width"
-        >
-          <div className="w-100">{children}</div>
-        </Collapse>
-      </Card.Body>
-    </Accordion.Collapse>
-  );
-  const cardBody = direction === 'up'
-    ? (
-      <>
-        {collapse}
-        {toggle}
-      </>
-    )
-    : (
-      <>
-        {toggle}
-        {collapse}
-      </>
-    );
-  return (
-    <Card className="border-dark">
-      {cardBody}
-    </Card>
-  );
-};
+import TimeRemaining from '@student/exams/show/components/navbar/TimeRemaining';
+import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 
 interface NavAccordionProps {
   expanded: boolean;
@@ -155,7 +80,6 @@ const ExamNavbar: React.FC<{
   const {
     time,
   } = props;
-  const remaining = time.ends.diffNow().as('minutes');
   const { railsUser } = useContext(RailsContext);
   const [expanded, setExpanded] = useState(false);
   const [openSection, setOpenSection] = useState('');
@@ -247,45 +171,13 @@ const ExamNavbar: React.FC<{
         />
       </div>
       <div className="mb-2 mt-auto">
-        <Accordion
-          className="mt-4"
-          activeKey={openTimer}
-        >
-          <NavAccordionItem
-            expanded={expanded}
-            Icon={MdTimer}
-            label={`${remaining} minutes left`}
-            eventKey="time"
-            onSectionClick={(eventKey): void => {
-              if (expanded) {
-                if (openTimer === eventKey) {
-                  setOpenTimer('');
-                } else {
-                  setOpenTimer(eventKey);
-                }
-              } else {
-                setExpanded(true);
-                setOpenTimer(eventKey);
-              }
-            }}
-            direction="up"
-          >
-            <p>
-              Exam began:
-              <ReadableDate
-                relative
-                value={time.began}
-              />
-            </p>
-            <p className="m-0 p-0">
-              Exam ends:
-              <ReadableDate
-                relative
-                value={time.ends}
-              />
-            </p>
-          </NavAccordionItem>
-        </Accordion>
+        <TimeRemaining
+          time={time}
+          openTimer={openTimer}
+          setOpenTimer={setOpenTimer}
+          expanded={expanded}
+          setExpanded={setExpanded}
+        />
       </div>
     </div>
   );

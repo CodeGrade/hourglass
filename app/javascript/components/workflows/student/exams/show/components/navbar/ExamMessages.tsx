@@ -7,7 +7,7 @@ import { MdFeedback, MdMessage } from 'react-icons/md';
 import { GiBugleCall } from 'react-icons/gi';
 import Tooltip from '@student/exams/show/components/Tooltip';
 import Icon from '@student/exams/show/components/Icon';
-import { NavAccordionItem } from '@student/exams/show/components/navbar';
+import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 
 interface ExamMessagesProps {
   expanded: boolean;

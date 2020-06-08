@@ -1,0 +1,110 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/mixins";
+
+.DateTimeCustom {
+  display: flex;
+  align-items: stretch;
+
+  > div {
+    display: inline-block;
+  }
+  > div:first-child {
+    display: inline-flex;
+  }
+  .NestedDatePicker {
+    display: inline-flex;
+    border-radius: 0.3rem 0 0 0.3rem;
+    border-color: $input-border-color;
+    border-width: 0px 1px 0px 0px;
+    .react-datepicker__header {
+      text-align: center;
+      background-color: theme-color("light");
+      border-bottom: 1px solid $input-border-color;
+      border-top-left-radius: 0.3rem;
+      border-top-right-radius: 0rem;
+      padding-top: 0px;
+      padding-bottom: 0px;
+      height: 4.5rem;
+      position: relative;
+    }
+    .react-datepicker__current-month {
+      font-size: 1.44rem;
+      margin-top: 0;
+      color: #000;
+      font-weight: bold;
+    }
+    .react-datepicker__month-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .react-datepicker__month {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      vertical-align: middle;
+      justify-content: stretch;
+    }
+    .react-datepicker__week {
+      display: flex;
+      flex-direction: row;
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: auto;
+      vertical-align: middle;
+    }
+    .react-datepicker__day {
+      flex-grow: 1;
+      flex-shrink: 1;
+      flex-basis: 3rem;
+      width: 3rem;
+      align-self: center;
+    }
+    .react-datepicker__day--outside-month {
+      color: $input-border-color;
+    }
+
+    .react-datepicker__day--selected {
+      @include button-variant(theme-color("primary"), theme-color("primary"));
+    }
+  }
+
+  .react-timekeeper {
+    box-shadow: none;
+    border-width: 0px 1px 0px 0px;
+    border-color: $input-border-color;
+    border-radius: 0 0.3rem 0.3rem 0;
+    flex-shrink: 0;
+
+    * { color: black; }
+
+    .react-timekeeper__top-bar {
+      height: 4.5rem;
+      padding-top: 0px;
+      padding-bottom: 0px;
+      border-bottom: 1px solid $input-border-color;
+      border-top-right-radius: 0.3rem;
+    }
+
+    .react-timekeeper__clock-wrapper {
+      background-color: theme-color("light");
+      border-bottom-right-radius: 0.3rem;
+    }
+
+    .react-timekeeper__tb-hour--active, .react-timekeeper__tb-minute--active {
+      color: theme-color("primary");
+    }
+
+    .react-timekeeper__clock-hand * {
+      stroke: theme-color("primary");
+      stroke-width: 2px;
+      fill: color-yiq(theme-color("primary"));
+      color: color-yiq(theme-color("primary"));
+    }
+
+    .react-timekeeper__meridiem--active {
+      @include button-variant(theme-color("primary"), theme-color("primary"));
+    }
+  }
+}

@@ -27,6 +27,7 @@ import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { hitApi } from '@hourglass/common/types/api';
 import { AlertContext } from '@hourglass/common/alerts';
+import DateTimePicker from '@professor/exams/new/DateTimePicker';
 
 export const ExamAdmin: React.FC<{}> = () => {
   const { examId } = useParams();
@@ -203,20 +204,25 @@ export const ExamInfoEditor: React.FC<{
         <Form.Group as={Row} controlId="examStartTime">
           <Form.Label column sm={2}>Start time:</Form.Label>
           <Col sm={10}>
-            <Form.Control
-              type="input"
-              value={start}
-              onChange={(e): void => setStart(e.target.value)}
+            <p>{start}</p>
+            <DateTimePicker
+              maxIsoValue={end}
+              isoValue={start}
+              onChange={(newStart): void => {
+                console.log(start, newStart.toISO());
+                setStart(newStart.toISO());
+              }}
             />
           </Col>
         </Form.Group>
         <Form.Group as={Row} controlId="examEndTime">
           <Form.Label column sm={2}>End time:</Form.Label>
           <Col sm={10}>
-            <Form.Control
-              type="input"
-              value={end}
-              onChange={(e): void => setEnd(e.target.value)}
+            <p>{end}</p>
+            <DateTimePicker
+              isoValue={end}
+              minIsoValue={start}
+              onChange={(newEnd): void => setEnd(newEnd.toISO())}
             />
           </Col>
         </Form.Group>

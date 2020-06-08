@@ -209,7 +209,7 @@ export const ExamInfoEditor: React.FC<{
               maxIsoValue={end}
               isoValue={start}
               onChange={(newStart): void => {
-                console.log(start, newStart.toISO());
+                // console.log(start, newStart.toISO());
                 setStart(newStart.toISO());
               }}
             />

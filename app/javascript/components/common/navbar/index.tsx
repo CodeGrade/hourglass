@@ -25,7 +25,7 @@ function logOut(): void {
   });
 }
 
-const RegularNavbar: React.FC<{}> = () => {
+const RegularNavbar: React.FC = () => {
   const {
     railsUser,
   } = useContext(RailsContext);

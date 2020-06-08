@@ -58,7 +58,7 @@ export async function handleZip(file: File): Promise<ExamFile[]> {
   return files;
 }
 
-const Archive: React.FC<{}> = () => {
+const Archive: React.FC = () => {
   const [file, setFile] = useState<File>(undefined);
   const [allFiles, setAllFiles] = useState<ExamFile[]>([]);
   useEffect(() => {

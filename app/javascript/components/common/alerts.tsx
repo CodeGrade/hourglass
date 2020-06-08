@@ -62,7 +62,7 @@ interface AlertContext {
 
 export const AlertContext = React.createContext<AlertContext>({} as AlertContext);
 
-export const AllAlerts: React.FC<{}> = ({ children }) => {
+export const AllAlerts: React.FC = ({ children }) => {
   const [lastId, setLastId] = useState(0);
   const [alerts, setAlerts] = useState<HGAlertWithID[]>([]);
   const addAlert = React.useCallback((alert) => {

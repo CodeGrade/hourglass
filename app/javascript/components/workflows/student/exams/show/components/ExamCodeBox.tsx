@@ -50,7 +50,7 @@ export interface EditorProps {
   markDescriptions: MarkDescription[];
   readOnly?: boolean;
   language?: string;
-  options?: {};
+  options?: IUnControlledCodeMirror['options'];
   onGutterClick?: IUnControlledCodeMirror['onGutterClick'];
   cursor?: IUnControlledCodeMirror['cursor'];
   onCursor?: IUnControlledCodeMirror['onCursor'];

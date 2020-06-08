@@ -33,10 +33,10 @@ export type ExamTakerAction =
 export type Thunk = ThunkAction<void, ExamTakerState, unknown, ExamTakerAction>;
 export type ExamTakerDispatch = ThunkDispatch<ExamTakerState, unknown, ExamTakerAction>;
 
-export type MSTP<TStateProps, TOwnProps = {}> =
+export type MSTP<TStateProps, TOwnProps = Record<string, unknown>> =
   MapStateToProps<TStateProps, TOwnProps, ExamTakerState>;
 
-export type MDTP<TDispatchProps, TOwnProps = {}> =
+export type MDTP<TDispatchProps, TOwnProps = Record<string, unknown>> =
   (dispatch: ExamTakerDispatch, ownProps: TOwnProps) => TDispatchProps;
 
 export type StartExamResponse = AnomalousReponse | ContentsResponse;

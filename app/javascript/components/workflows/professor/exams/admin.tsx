@@ -29,7 +29,7 @@ import { hitApi } from '@hourglass/common/types/api';
 import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 
-export const ExamAdmin: React.FC<{}> = () => {
+export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
   const [refresher, refresh] = useRefresher();
   const response = examsShow(examId, [refresher]);

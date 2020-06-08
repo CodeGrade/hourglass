@@ -89,7 +89,7 @@ const ProfessorRegs: React.FC<ProfessorCoursesProps> = (props) => {
   );
 };
 
-const Exams: React.FC<{}> = () => {
+const Exams: React.FC = () => {
   const studentResponse = ApiStudentReg.useResponse();
   const profResponse = ApiProfessorCourses.useResponse();
   return (
@@ -109,7 +109,7 @@ const Exams: React.FC<{}> = () => {
   );
 };
 
-const Exam: React.FC<{}> = () => {
+const Exam: React.FC = () => {
   const { examId } = useParams();
   const { railsUser } = useContext(RailsContext);
   const showRes = ApiStudentExamsShow.useResponse(examId);
@@ -148,7 +148,7 @@ const Exam: React.FC<{}> = () => {
   }
 };
 
-const Entry: React.FC<{}> = () => {
+const Entry: React.FC = () => {
   const res = ApiMe.useResponse();
   const railsUser = res.type === 'RESULT' ? res.response.user : undefined;
   return (

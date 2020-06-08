@@ -18,10 +18,10 @@ import {
 export type Thunk = ThunkAction<void, ContentsState, unknown, ExamEditorAction>;
 export type ExamEditorDispatch = ThunkDispatch<ContentsState, unknown, ExamEditorAction>;
 
-export type MSTP<TStateProps, TOwnProps = {}> =
+export type MSTP<TStateProps, TOwnProps = Record<string, unknown>> =
   MapStateToProps<TStateProps, TOwnProps, ExamEditorState>;
 
-export type MDTP<TDispatchProps, TOwnProps = {}> =
+export type MDTP<TDispatchProps, TOwnProps = Record<string, unknown>> =
   (dispatch: ExamEditorDispatch, ownProps: TOwnProps) => TDispatchProps;
 
 

@@ -18,7 +18,7 @@ const mapStateToProps: MSTP<{
   railsExam: RailsExam;
   files: ExamFile[];
   answers: AnswersState;
-}, {}> = (state: ExamEditorState, _ownProps) => ({
+}> = (state: ExamEditorState) => ({
   exam: state.contents.exam,
   railsExam: state.railsExam,
   files: state.contents.exam.files,
@@ -27,7 +27,7 @@ const mapStateToProps: MSTP<{
 
 const mapDispatchToProps: MDTP<{
   onChange: (name: string) => void;
-}, {}> = (dispatch, _ownProps) => ({
+}> = (dispatch) => ({
   onChange: (name: string): void => {
     dispatch(
       updateTitle(

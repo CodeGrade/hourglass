@@ -285,7 +285,7 @@ const DNDForm = reduxForm({
   form: 'student-dnd',
 })(StudentDNDForm);
 
-const DND: React.FC<{}> = () => {
+const DND: React.FC = () => {
   const { examId } = useParams();
   const response = useVersionsIndex(examId);
   switch (response.type) {

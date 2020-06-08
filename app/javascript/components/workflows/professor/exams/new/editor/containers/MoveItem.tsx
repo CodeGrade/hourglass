@@ -1,12 +1,9 @@
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import { connect } from 'react-redux';
 import {
-  MSTP,
   MDTP,
   ExamEditorAction,
-  ExamEditorState,
 } from '@professor/exams/new/types';
-
 
 interface OwnProps {
   onUp: () => ExamEditorAction;
@@ -14,9 +11,11 @@ interface OwnProps {
   onDelete: () => ExamEditorAction;
 }
 
-const mapStateToProps: MSTP<{}, OwnProps> = (state: ExamEditorState, _ownProps) => state;
-
-const mapDispatchToProps: MDTP<{}, OwnProps> = (dispatch, ownProps) => {
+const mapDispatchToProps: MDTP<{
+  onUp: () => void;
+  onDown: () => void;
+  onDelete: () => void;
+}, OwnProps> = (dispatch, ownProps) => {
   const { onUp, onDown, onDelete } = ownProps;
   return {
     onUp: (): void => { if (onUp) dispatch(onUp()); },
@@ -25,4 +24,4 @@ const mapDispatchToProps: MDTP<{}, OwnProps> = (dispatch, ownProps) => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(MoveItem);
+export default connect(null, mapDispatchToProps)(MoveItem);

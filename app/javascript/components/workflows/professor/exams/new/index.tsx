@@ -8,7 +8,7 @@ import {
 import { useParams, useHistory } from 'react-router-dom';
 import { getCSRFToken } from '@student/exams/show/helpers';
 
-const NewExam: React.FC<{}> = () => (
+const NewExam: React.FC = () => (
   <div>
     <h2>New Exam</h2>
     <NewExamForm />
@@ -17,7 +17,7 @@ const NewExam: React.FC<{}> = () => (
 
 export default NewExam;
 
-const NewExamForm: React.FC<{}> = () => {
+const NewExamForm: React.FC = () => {
   const [name, setName] = useState('');
   const [file, setFile] = useState(undefined);
   const { courseId } = useParams();

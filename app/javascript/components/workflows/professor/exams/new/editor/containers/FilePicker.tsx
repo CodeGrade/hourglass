@@ -18,14 +18,14 @@ import {
 const mapStateToPropsExam: MSTP<{
   options: ExamFile[];
   selected: FileRef[];
-}, {}> = (state: ExamEditorState, _ownProps) => ({
+}> = (state: ExamEditorState) => ({
   options: state.contents.exam.files,
   selected: state.contents.exam.reference,
 });
 
 const mapDispatchToPropsExam: MDTP<{
   onChange: (fileRefs: FileRef[]) => void;
-}, {}> = (dispatch, _ownProps) => ({
+}> = (dispatch) => ({
   onChange: (fileRefs: FileRef[]): void => {
     dispatch(
       updateExamFileRefs(

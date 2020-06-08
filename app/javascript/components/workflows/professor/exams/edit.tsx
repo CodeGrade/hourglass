@@ -4,7 +4,7 @@ import { useResponse as showExam } from '@hourglass/common/api/professor/exams/s
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Editor from '@professor/exams/new/editor';
 
-const EditExam: React.FC<{}> = () => {
+const EditExam: React.FC = () => {
   const { examId, versionId } = useParams();
   const res = showExam(examId);
   switch (res.type) {

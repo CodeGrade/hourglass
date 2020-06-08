@@ -9,6 +9,7 @@ import {
   Button,
   Alert,
 } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
 import {
   Exam,
   RailsExam,
@@ -47,7 +48,7 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
   const noFiles = reference.length === 0;
   const fmap = createMap(files);
   const filteredFiles = getFilesForRefs(fmap, reference);
-
+  const history = useHistory();
   return (
     <Container fluid className="flex-fill">
       <Form>
@@ -94,6 +95,21 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
 
       </Alert>
       <ShowQuestions questions={questions} />
+
+      <div className="float-right">
+        <Button
+          variant="danger"
+          onClick={(): void => history.goBack()}
+        >
+          Cancel
+        </Button>
+        <Button
+          className="ml-2"
+          variant="success"
+        >
+          Save
+        </Button>
+      </div>
     </Container>
   );
 };

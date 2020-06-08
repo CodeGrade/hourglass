@@ -8,6 +8,7 @@ module Api
       before_action :find_exam_and_course
 
       before_action :require_student_reg
+      before_action :check_over, only: [:take]
       before_action :check_anomaly, only: [:take]
       before_action :check_final, only: [:take]
 
@@ -25,7 +26,7 @@ module Api
           railsCourse: {
             id: @course.id
           },
-          final: @registration.final?
+          final: @registration.final? || @registration.over?
         }
       end
 
@@ -117,6 +118,12 @@ module Api
           lockout: !saved,
           messages: messages_after(last_message_id)
         }
+      end
+
+      def check_over
+        return unless @registration.over?
+
+        head :forbidden
       end
 
       def check_anomaly

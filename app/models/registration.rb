@@ -82,7 +82,7 @@ class Registration < ApplicationRecord
   end
 
   def allow_submission?
-    !(final? || anomalous?) # TODO:  || over?) and add back :require_enabled_exam that checks over?
+    !(final? || anomalous? || over?)
   end
 
   def current_answers

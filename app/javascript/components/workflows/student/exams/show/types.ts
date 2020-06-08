@@ -360,7 +360,10 @@ export type CodeState = {
   marks: MarkDescription[];
 };
 
-export type HTMLVal = string;
+export interface HTMLVal {
+  type: 'HTML';
+  value: string;
+}
 
 export interface AllThatApplyInfo {
   type: 'AllThatApply';

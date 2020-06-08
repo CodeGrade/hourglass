@@ -80,7 +80,7 @@ const ShowCourse: React.FC = () => {
             <SyncCourse />
           </Route>
           <Route path="/courses/:courseId/new" exact>
-            <NewExam courseId={courseId} />
+            <NewExam />
           </Route>
         </>
       );

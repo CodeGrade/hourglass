@@ -21,10 +21,15 @@ const Instructions: React.FC<TextProps> = (props) => {
         <p>Exam instructions</p>
         <CustomEditor
           className="bg-white"
-          value={value}
+          value={value.value}
           placeholder="Give exam-wide instructions here"
           onChange={(newVal, _delta, source, _editor): void => {
-            if (source === 'user') onChange(newVal);
+            if (source === 'user') {
+              onChange({
+                type: 'HTML',
+                value: newVal,
+              });
+            }
           }}
         />
       </Col>

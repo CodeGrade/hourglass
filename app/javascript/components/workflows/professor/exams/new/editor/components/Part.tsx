@@ -79,10 +79,19 @@ const Part: React.FC<PartProps> = (props) => {
             <Col sm="10">
               <CustomEditor
                 className="bg-white"
-                value={name}
+                value={name.value}
                 placeholder="Give a short (optional) descriptive name for the part"
                 onChange={(newName, _delta, source, _editor): void => {
-                  if (source === 'user') onChange(newName, description, points);
+                  if (source === 'user') {
+                    onChange(
+                      {
+                        type: 'HTML',
+                        value: newName,
+                      },
+                      description,
+                      points,
+                    );
+                  }
                 }}
               />
             </Col>
@@ -92,10 +101,19 @@ const Part: React.FC<PartProps> = (props) => {
             <Col sm="10">
               <CustomEditor
                 className="bg-white"
-                value={description}
+                value={description.value}
                 placeholder="Give a longer description of the part"
                 onChange={(newDesc, _delta, source, _editor): void => {
-                  if (source === 'user') onChange(name, newDesc, points);
+                  if (source === 'user') {
+                    onChange(
+                      name,
+                      {
+                        type: 'HTML',
+                        value: newDesc,
+                      },
+                      points,
+                    );
+                  }
                 }}
               />
             </Col>

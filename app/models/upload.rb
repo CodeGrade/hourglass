@@ -68,6 +68,13 @@ class Upload
     @info = parse_info(properties)
   end
 
+  def make_html_val(str)
+    {
+      type: 'HTML',
+      value: str
+    }
+  end
+
   def parse_info(properties)
     contents = properties['contents']
     contents['questions'].each do |q|
@@ -142,13 +149,13 @@ class Upload
                 if b.key? 'AllThatApply'
                   {
                     type: 'AllThatApply',
-                    prompt: b['AllThatApply']['prompt'],
+                    prompt: make_html_val(b['AllThatApply']['prompt']),
                     options: b['AllThatApply']['options'].map(&:keys).flatten
                   }
                 elsif b.key? 'Code'
                   {
                     type: 'Code',
-                    prompt: b['Code']['prompt'],
+                    prompt: make_html_val(b['Code']['prompt']),
                     lang: b['Code']['lang'],
                     initial: b['Code']['initial'],
                   }.compact
@@ -169,7 +176,7 @@ class Upload
                   {
                     type: 'CodeTag',
                     choices: referent,
-                    prompt: b['CodeTag']['prompt'],
+                    prompt: make_html_val(b['CodeTag']['prompt']),
                   }
                 elsif b.key? 'Matching'
                   {
@@ -180,19 +187,19 @@ class Upload
                 elsif b.key? 'MultipleChoice'
                   {
                     type: 'MultipleChoice',
-                    prompt: b['MultipleChoice']['prompt'],
+                    prompt: make_html_val(b['MultipleChoice']['prompt']),
                     options: b['MultipleChoice']['options']
                   }
                 elsif b.key? 'Text'
                   if b['Text'].nil?
                     {
                       type: 'Text',
-                      prompt: []
+                      prompt: ''
                     }
                   else
                     {
                       type: 'Text',
-                      prompt: b['Text']['prompt']
+                      prompt: make_html_val(b['Text']['prompt'])
                     }
                   end
                 elsif b.key? 'TrueFalse'
@@ -202,9 +209,9 @@ class Upload
                     noLabel: 'False',
                     prompt:
                       if b['TrueFalse'] == !!b['TrueFalse']
-                        []
+                        ''
                       else
-                        b['TrueFalse']['prompt']
+                        make_html_val(b['TrueFalse']['prompt'])
                       end
                   }
                 elsif b.key? 'YesNo'
@@ -212,9 +219,9 @@ class Upload
                     type: 'YesNo',
                     prompt:
                       if b['YesNo'] == !!b['YesNo']
-                        []
+                        ''
                       else
-                        b['YesNo']['prompt']
+                        make_html_val(b['YesNo']['prompt'])
                       end
                   }
                 else

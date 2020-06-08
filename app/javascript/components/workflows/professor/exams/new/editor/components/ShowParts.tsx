@@ -31,8 +31,14 @@ const ShowParts: React.FC<PartsProps> = (props) => {
             variant="success"
             onClick={(): void => {
               addPart(numParts, {
-                name: '',
-                description: '',
+                name: {
+                  type: 'HTML',
+                  value: '',
+                },
+                description: {
+                  type: 'HTML',
+                  value: '',
+                },
                 points: 0,
                 body: [],
               });

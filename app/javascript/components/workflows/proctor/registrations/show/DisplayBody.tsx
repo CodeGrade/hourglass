@@ -28,7 +28,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
   const answer = answers.answers[qnum]?.[pnum]?.[bnum];
   switch (body.type) {
     case 'HTML':
-      return <HTML value={body.value} />;
+      return <HTML value={body} />;
     case 'Code':
       return <Code info={body} value={answer as CodeState} disabled />;
     case 'AllThatApply':

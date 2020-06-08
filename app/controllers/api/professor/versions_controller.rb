@@ -3,7 +3,9 @@
 module Api
   module Professor
     class VersionsController < ProfessorController
+      before_action :find_version, only: [:update]
       before_action :find_exam_and_course
+
       before_action :require_prof_reg
 
       def index
@@ -25,8 +27,26 @@ module Api
         }
       end
 
+      def update
+        version = params[:version].permit!.to_h
+        updated = @version.update!(
+          {
+            info: version[:info],
+            files: version[:files]
+          }
+        )
+        render json: {
+          updated: true
+        }
+      rescue StandardError => e
+        render json: {
+          updated: false,
+          reason: e.message
+        }
+      end
+
       def create
-        # TODO move from exams#create
+        # TODO: move from exams#create
       end
 
       def update_all

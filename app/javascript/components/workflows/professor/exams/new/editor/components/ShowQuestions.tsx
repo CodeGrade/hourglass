@@ -35,8 +35,14 @@ const ShowQuestions: React.FC<QuestionsProps> = (props) => {
             variant="primary"
             onClick={(): void => {
               addQuestion(numQuestions, {
-                name: '',
-                description: '',
+                name: {
+                  type: 'HTML',
+                  value: '',
+                },
+                description: {
+                  type: 'HTML',
+                  value: '',
+                },
                 parts: [],
                 separateSubparts: false,
               });

@@ -8,7 +8,7 @@ Rails.application.routes.draw do
           post :sync
           resources :exams, param: 'exam_id', only: [:create, :index, :show, :update] do
             member do
-              resources :versions, param: 'version_id', only: [:index, :create] do
+              resources :versions, param: 'version_id', only: [:index, :create, :update] do
                 collection do
                   post :update_all
                 end

@@ -81,10 +81,19 @@ const Question: React.FC<QuestionProps> = (props) => {
             <Col sm="10">
               <CustomEditor
                 className="bg-white"
-                value={name}
+                value={name.value}
                 placeholder="Give a short (optional) descriptive name for the question"
                 onChange={(newName, _delta, source, _editor): void => {
-                  if (source === 'user') onChange(newName, description, separateSubparts);
+                  if (source === 'user') {
+                    onChange(
+                      {
+                        type: 'HTML',
+                        value: newName,
+                      },
+                      description,
+                      separateSubparts,
+                    );
+                  }
                 }}
               />
             </Col>
@@ -94,10 +103,19 @@ const Question: React.FC<QuestionProps> = (props) => {
             <Col sm="10">
               <CustomEditor
                 className="bg-white"
-                value={description}
+                value={description.value}
                 placeholder="Give a longer description of the question"
                 onChange={(newDesc, _delta, source, _editor): void => {
-                  if (source === 'user') onChange(name, newDesc, separateSubparts);
+                  if (source === 'user') {
+                    onChange(
+                      name,
+                      {
+                        type: 'HTML',
+                        value: newDesc,
+                      },
+                      separateSubparts,
+                    );
+                  }
                 }}
               />
             </Col>
@@ -108,7 +126,13 @@ const Question: React.FC<QuestionProps> = (props) => {
               <YesNo
                 className="bg-white rounded"
                 value={!!separateSubparts}
-                info={{ type: 'YesNo', prompt: '' }}
+                info={{
+                  type: 'YesNo',
+                  prompt: {
+                    type: 'HTML',
+                    value: '',
+                  },
+                }}
                 onChange={(newVal): void => {
                   onChange(name, description, newVal);
                 }}

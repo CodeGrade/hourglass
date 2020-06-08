@@ -25,10 +25,20 @@ const Matching: React.FC<MatchingProps> = (props) => {
           <thead>
             <tr>
               <th colSpan={2}>
-                <HTML value={promptLabel ?? 'Column A'} />
+                <HTML
+                  value={promptLabel ?? {
+                    type: 'HTML',
+                    value: 'Column A',
+                  }}
+                />
               </th>
               <th colSpan={2}>
-                <HTML value={valuesLabel ?? 'Answer'} />
+                <HTML
+                  value={valuesLabel ?? {
+                    type: 'HTML',
+                    value: 'Answer',
+                  }}
+                />
               </th>
             </tr>
           </thead>

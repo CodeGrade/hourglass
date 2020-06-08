@@ -39,9 +39,9 @@ environment.config.merge({
   },
 });
 
-environment.loaders.prepend('typescript', {
+environment.loaders.prepend('babel', {
   test: /.(ts|tsx)$/,
-  loader: 'babel-loader',
+  loader: ['babel-loader', 'ts-loader'],
   exclude: [/node_modules/],
 });
 

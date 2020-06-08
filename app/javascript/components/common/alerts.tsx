@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 
 interface HGAlert {
   title?: string;
-  message?: string;
+  message?: string | JSX.Element;
   variant: AlertProps['variant'];
 }
 
@@ -38,7 +38,7 @@ const ShowAlert: React.FC<{
         <Alert.Heading>{title}</Alert.Heading>
       )}
       {message && (
-        <p className="mb-0">{message}</p>
+        <div className="mb-0">{message}</div>
       )}
     </Alert>
   );

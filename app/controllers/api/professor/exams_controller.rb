@@ -28,9 +28,11 @@ module Api
 
       def update
         body = params.require(:exam).permit(:name, :start, :end, :duration)
+        # TODO update start and end, add policies
         updated = @exam.update(
           {
-            name: body[:name]
+            name: body[:name],
+            duration: body[:duration]
           }
         )
         render json: {

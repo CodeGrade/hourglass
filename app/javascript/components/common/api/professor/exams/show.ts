@@ -1,6 +1,14 @@
+import React from 'react';
 import { ApiResponse, useApiResponse } from '@hourglass/common/types/api';
 import { ContentsState, Policy } from '@student/exams/show/types';
 import { DateTime } from 'luxon';
+
+export interface Version {
+  id: number;
+  name: string;
+  policies: Policy[];
+  contents: ContentsState;
+}
 
 interface Server {
   name: string;
@@ -16,13 +24,6 @@ export interface Response {
   start: DateTime;
   end: DateTime;
   versions: Version[];
-}
-
-export interface Version {
-  id: number;
-  name: string;
-  policies: Policy[];
-  contents: ContentsState;
 }
 
 export function useResponse(examId: number, deps: React.DependencyList): ApiResponse<Response> {

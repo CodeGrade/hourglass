@@ -9,7 +9,6 @@ import {
   Button,
   Alert,
 } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
 import {
   Exam,
   RailsExam,
@@ -23,7 +22,7 @@ import { FilePickerExam } from '@professor/exams/new/editor/containers/FilePicke
 import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { createMap, getFilesForRefs } from '@student/exams/show/files';
-
+import Submit from '@professor/exams/new/editor/containers/Submit';
 
 export interface ExamEditorProps {
   exam: Exam;
@@ -48,7 +47,6 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
   const noFiles = reference.length === 0;
   const fmap = createMap(files);
   const filteredFiles = getFilesForRefs(fmap, reference);
-  const history = useHistory();
   return (
     <Container fluid className="flex-fill">
       <Form>
@@ -97,18 +95,7 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
       <ShowQuestions questions={questions} />
 
       <div className="float-right">
-        <Button
-          variant="danger"
-          onClick={(): void => history.goBack()}
-        >
-          Cancel
-        </Button>
-        <Button
-          className="ml-2"
-          variant="success"
-        >
-          Save
-        </Button>
+        <Submit />
       </div>
     </Container>
   );

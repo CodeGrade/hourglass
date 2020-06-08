@@ -6,7 +6,7 @@ import Editor from '@professor/exams/new/editor';
 
 const EditExam: React.FC = () => {
   const { examId, versionId } = useParams();
-  const res = showExam(examId);
+  const res = showExam(examId, []);
   switch (res.type) {
     case 'ERROR':
     case 'LOADING':

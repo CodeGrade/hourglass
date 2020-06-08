@@ -91,25 +91,27 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
               }
             }}
           />
-          <div className="align-self-center">
-            <ListGroup as="ul" variant="flush">
-              {Object.keys(timeZones).map((tzName) => (
-                <ListGroup.Item
-                  as="li"
-                  key={tzName}
-                  active={timeZone === tzName}
-                  action
-                  onClick={(): void => {
-                    setTimeZone(tzName);
-                    if (onChange) {
-                      onChange(curValue.setZone(tzName, { keepLocalTime: true }));
-                    }
-                  }}
-                >
-                  {timeZones[tzName]}
-                </ListGroup.Item>
-              ))}
-            </ListGroup>
+          <div className="TimezonePicker">
+            <div>
+              <ListGroup as="ul" variant="flush">
+                {Object.keys(timeZones).map((tzName) => (
+                  <ListGroup.Item
+                    as="li"
+                    key={tzName}
+                    active={timeZone === tzName}
+                    action
+                    onClick={(): void => {
+                      setTimeZone(tzName);
+                      if (onChange) {
+                        onChange(curValue.setZone(tzName, { keepLocalTime: true }));
+                      }
+                    }}
+                  >
+                    {timeZones[tzName]}
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            </div>
           </div>
         </Dropdown.Menu>
       </Dropdown>

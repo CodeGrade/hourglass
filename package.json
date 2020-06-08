@@ -19,7 +19,7 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.45",
     "@rails/ujs": "^6.0.0",
-    "@rails/webpacker": "4.2.2",
+    "@rails/webpacker": "5.1.1",
     "@types/codemirror": "^0.0.93",
     "@types/luxon": "^1.24.0",
     "@types/mime": "^2.0.2",

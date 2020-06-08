@@ -3,7 +3,16 @@ const path = require('path')
 
 const webpack = require('webpack');
 
+environment.plugins.prepend('Provide',
+  new webpack.ProvidePlugin({
+    $: 'jquery/src/jquery',
+    jQuery: 'jquery/src/jquery',
+    Popper: ['popper.js', 'default'],
+  })
+);
+
 const aliasConfig = {
+  'jquery': 'jquery/src/jquery',
   '@hourglass': path.resolve(__dirname, '..', '..', 'app/javascript/components'),
   '@student': path.resolve(__dirname, '..', '..', 'app/javascript/components/workflows/student'),
   '@proctor': path.resolve(__dirname, '..', '..', 'app/javascript/components/workflows/proctor'),

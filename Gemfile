@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
@@ -16,11 +18,10 @@ gem 'webpacker', '~> 5.1'
 gem 'react-rails'
 
 gem 'devise'
+gem 'omniauth-bottlenose', git: 'https://github.com/CodeGrade/omniauth-bottlenose'
 gem 'omniauth-oauth2', '~> 1.6.0'
 
-gem 'omniauth-bottlenose', git: 'https://github.com/CodeGrade/omniauth-bottlenose'
-
-gem "bootstrap_form", ">= 4.2.0"
+gem 'bootstrap_form', '>= 4.2.0'
 
 gem 'headless' # needed to run Racket, and xvfb-run (the shell script) merges stdout and stderr
 
@@ -28,11 +29,6 @@ gem 'rubyzip'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.7'
-# Use Active Model has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
-
-# Use Active Storage variant
-# gem 'image_processing', '~> 1.2'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
@@ -43,21 +39,21 @@ gem 'bootsnap', '>= 1.4.2', require: false
 gem 'activerecord_json_validator'
 
 group :development, :test do
+  gem 'minitest-reporters'
   gem 'pry'
   gem 'pry-rails'
-  gem 'minitest-reporters'
 end
 
 group :development do
-  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
+  gem 'better_errors'
+  gem 'binding_of_caller'
   gem 'byebug'
-  gem 'web-console', '>= 3.3.0'
   gem 'listen', '>= 3.0.5', '< 3.2'
+  gem 'rubocop-rails'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
-  gem "better_errors"
-  gem "binding_of_caller"
-  gem 'rubocop-rails'
+  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
+  gem 'web-console', '>= 3.3.0'
 end
 
 group :test do

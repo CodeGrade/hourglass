@@ -27,6 +27,7 @@ const ShowAlert: React.FC<{
   const [show, setShow] = useState(true);
   return (
     <Alert
+      className="mt-2"
       key={id}
       variant={variant}
       dismissible

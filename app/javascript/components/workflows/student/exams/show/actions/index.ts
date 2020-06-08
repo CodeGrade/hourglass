@@ -314,7 +314,15 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
       }),
       credentials: 'same-origin',
     })
-      .then((result) => result.json() as Promise<SnapshotSaveResult>)
+      .then((result) => {
+        if (result.status === 403) {
+          return {
+            lockout: true,
+            messages: [],
+          };
+        }
+        return result.json() as Promise<SnapshotSaveResult>;
+      })
       .then((result) => {
         const {
           lockout,

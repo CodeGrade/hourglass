@@ -14,6 +14,10 @@ class Exam < ApplicationRecord
   validates :course, presence: true
   validates :name, presence: true
 
+  def duration
+    read_attribute(:duration).minutes
+  end
+
   def finalized?
     registrations.all?(&:final)
   end

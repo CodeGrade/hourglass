@@ -71,14 +71,13 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
   const remaining = describeRemainingTime(remainingTime);
   const warningIndex = cutoffs.findIndex((cutoff) => {
     const tMinusRemaining = cutoff.t.minus(remainingTime).shiftTo('seconds').seconds;
-    return tMinusRemaining > 0 && tMinusRemaining < 30;
+    return tMinusRemaining >= 0 && tMinusRemaining < 30;
   });
   const classes = warningIndex >= 0 ? cutoffs[warningIndex].c : undefined;
   const [relativeStart, showRelativeStart] = useState(true);
   const [relativeEnd, showRelativeEnd] = useState(true);
 
   useEffect(() => {
-    if (!(openTimer || expanded)) return undefined;
     setRemainingTime(time.ends.diffNow());
     const timer = setInterval(() => {
       setRemainingTime(time.ends.diffNow());

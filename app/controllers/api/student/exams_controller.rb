@@ -26,7 +26,8 @@ module Api
           railsCourse: {
             id: @course.id
           },
-          final: @registration.final? || @registration.over?
+          final: @registration.final? || @registration.over?,
+          lastSnapshot: @registration.snapshots.last&.created_at
         }
       end
 

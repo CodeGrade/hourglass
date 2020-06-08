@@ -140,6 +140,7 @@ const Exam: React.FC<{}> = () => {
           railsCourse={showRes.response.railsCourse}
           railsRegistration={showRes.response.railsRegistration}
           final={showRes.response.final}
+          lastSnapshot={showRes.response.lastSnapshot}
         />
       );
     default:

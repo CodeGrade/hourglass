@@ -111,19 +111,19 @@
   }
 
   .TimezonePicker {
-    //display: flex;
-    border-radius: 0 0.3rem 0.3rem 0;
     border: 0px;
     position: relative;
     overflow-y: auto;
   
     > div {
       width: 10em;
-      border-radius: 0 0.3rem 0.3rem 0;
       border: 0px;
 
       > ul {
         position: absolute;
+        > li {
+          margin-right: 1px;
+        }
       }
     }
   }

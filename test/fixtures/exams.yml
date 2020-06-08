@@ -3,7 +3,7 @@ cs2500midterm:
   name: "CS2500 Midterm"
   duration: 5
   start_time: <%= DateTime.now %>
-  end_time: <%= DateTime.now + 3.months %>
+  end_time: <%= DateTime.now + 5.minutes %>
 
 cs3500final:
   course: cs3500

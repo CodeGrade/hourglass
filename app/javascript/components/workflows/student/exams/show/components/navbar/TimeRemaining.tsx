@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Duration } from 'luxon';
 import { TimeInfo } from '@student/exams/show/types';
 import ReadableDate from '@hourglass/common/ReadableDate';
@@ -23,17 +23,23 @@ function pluralize(number: number, singular: string, plural: string): string {
 }
 
 function describeRemainingTime(remaining: Duration): string {
-  const left = remaining.shiftTo('weeks', 'days', 'hours', 'minutes', 'seconds').normalize();
+  const left = remaining.shiftTo('weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds').normalize();
   if (left.weeks > 0) {
-    return `${pluralize(left.weeks, 'week', 'weeks')}, ${pluralize(left.days, 'day', 'days')}`;
+    return `${pluralize(left.weeks, 'week', 'weeks')}, ${pluralize(left.days, 'day', 'days')} remaining`;
   }
   if (left.days > 0) {
-    return `${pluralize(left.days, 'day', 'days')}, ${pluralize(left.hours, 'hour', 'hours')}`;
+    return `${pluralize(left.days, 'day', 'days')}, ${pluralize(left.hours, 'hour', 'hours')} remaining`;
   }
   if (left.hours > 0) {
-    return `${pluralize(left.hours, 'hour', 'hours')}, ${pluralize(left.minutes, 'minute', 'minutes')}`;
+    return `${pluralize(left.hours, 'hour', 'hours')}, ${pluralize(left.minutes, 'minute', 'minutes')} remaining`;
   }
-  return pluralize(left.minutes, 'minute', 'minute');
+  if (left.minutes > 0) {
+    return `${pluralize(left.minutes, 'minute', 'minutes')}, ${pluralize(left.seconds, 'second', 'seconds')} remaining`;
+  }
+  if (left.valueOf() > 0) {
+    return `${pluralize(left.seconds, 'second', 'seconds')} remaining`;
+  }
+  return 'Exam over';
 }
 
 export interface TimeRemainingProps {
@@ -52,27 +58,36 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
     expanded,
     setExpanded,
   } = props;
+  const [remainingTime, setRemainingTime] = useState(time.ends.diffNow());
   const durationInMillisec = time.ends.diff(time.began).as('milliseconds');
   const cutoffs = [
-    { t: Duration.fromMillis(durationInMillisec * 0.50), c: 'bg-info' },
-    { t: Duration.fromMillis(durationInMillisec * 0.25), c: 'bg-info' },
-    { t: Duration.fromMillis(durationInMillisec * 0.05), c: 'bg-warning' },
-    { t: Duration.fromObject({ minutes: 30 }).shiftTo('milliseconds'), c: 'bg-info' },
-    { t: Duration.fromObject({ minutes: 5 }).shiftTo('milliseconds'), c: 'bg-warning' },
-    { t: Duration.fromObject({ minutes: 1 }).shiftTo('milliseconds'), c: 'bg-danger' },
+    { t: Duration.fromMillis(durationInMillisec * 0.50), c: 'bg-info text-light' },
+    { t: Duration.fromMillis(durationInMillisec * 0.25), c: 'bg-info text-light' },
+    { t: Duration.fromMillis(durationInMillisec * 0.05), c: 'bg-warning text-dark' },
+    { t: Duration.fromObject({ minutes: 30 }).shiftTo('milliseconds'), c: 'bg-info text-light' },
+    { t: Duration.fromObject({ minutes: 5 }).shiftTo('milliseconds'), c: 'bg-warning text-dark' },
+    { t: Duration.fromObject({ minutes: 1 }).shiftTo('milliseconds'), c: 'bg-danger text-light' },
   ].sort((d1, d2) => d1.t.milliseconds - d2.t.milliseconds);
-
-  const remainingTime = time.ends.diffNow();
   const remaining = describeRemainingTime(remainingTime);
   const warningIndex = cutoffs.findIndex((cutoff) => {
     const tMinusRemaining = cutoff.t.minus(remainingTime).shiftTo('seconds').seconds;
     return tMinusRemaining > 0 && tMinusRemaining < 30;
   });
-  const classes = warningIndex >= 0 ? `${cutoffs[warningIndex].c} text-dark` : undefined;
+  const classes = warningIndex >= 0 ? cutoffs[warningIndex].c : undefined;
   const [relativeStart, showRelativeStart] = useState(true);
-  const [relativeEnd, setExactEnd] = useState(true);
+  const [relativeEnd, showRelativeEnd] = useState(true);
 
-
+  useEffect(() => {
+    if (!(openTimer || expanded)) return undefined;
+    setRemainingTime(time.ends.diffNow());
+    const timer = setInterval(() => {
+      setRemainingTime(time.ends.diffNow());
+    }, 1000);
+    return (): void => {
+      clearInterval(timer);
+    };
+  }, [time, openTimer, expanded]);
+  const endsLabel = remainingTime.valueOf() > 0 ? 'ends' : 'ended';
   return (
     <Accordion
       className="mt-4"
@@ -82,7 +97,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
         className={classes}
         expanded={expanded}
         Icon={MdTimer}
-        label={`${remaining} remaining`}
+        label={remaining}
         eventKey="time"
         onSectionClick={(eventKey): void => {
           if (expanded) {
@@ -105,6 +120,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
               <td className="w-100 align-middle">
                 <ReadableDate
                   relative={relativeStart}
+                  showTime
                   value={time.began}
                 />
               </td>
@@ -120,7 +136,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
               </td>
             </tr>
             <tr>
-              <td className="align-middle">Exam ends:</td>
+              <td className="align-middle">{`Exam ${endsLabel}:`}</td>
               <td className="w-100 align-middle">
                 <ReadableDate
                   relative={relativeEnd}
@@ -133,7 +149,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
                   variant="outline-info"
                   size="sm"
                   className="ml-4"
-                  onClick={(): void => setExactEnd((b) => !b)}
+                  onClick={(): void => showRelativeEnd((b) => !b)}
                 >
                   <RenderIcon I={FaClock} />
                 </Button>

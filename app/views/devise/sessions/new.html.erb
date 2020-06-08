@@ -2,6 +2,21 @@
 
 <%= react_component 'common/navbar' %>
 <div class="container">
+  <% unless flash.empty? %>
+    <% flash.each do |key, value| %>
+      <div class="row flash">
+        <div class="col-12">
+          <div class="alert alert-<%= flash_class[key.to_sym] %> alert-dismissible fade show" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+              <span class="sr-only">Close</span>
+            </button>
+            <%= value.html_safe %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
   <h1>Welcome to Hourglass</h1>
   <p>Hourglass is a Web-based exam server for Computer Science courses.</p>
 

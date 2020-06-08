@@ -61,6 +61,7 @@ group :development do
 end
 
 group :test do
+  gem 'factory_bot_rails'
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '>= 2.15'
   gem 'capybara-webkit' # Needs qt5-default qt5-qmake libqt5webkit5-dev

@@ -42,8 +42,16 @@ module Api
           end
         end
         render json: { synced: true }
+      rescue Bottlenose::UnauthorizedError => e
+        render json: {
+          synced: false,
+          reason: e.message
+        }
       rescue StandardError
-        render json: { synced: false }
+        render json: {
+          synced: false,
+          reason: 'Unknown error occurred.'
+        }
       end
     end
   end

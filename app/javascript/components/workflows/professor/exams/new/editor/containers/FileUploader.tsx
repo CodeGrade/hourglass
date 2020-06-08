@@ -11,14 +11,14 @@ import { updateExamFiles } from '@professor/exams/new/actions';
 
 const mapStateToProps: MSTP<{
   files: ExamFile[];
-}, {}> = (state: ExamEditorState, _ownProps) => {
+}> = (state: ExamEditorState) => {
   const { files } = state.contents.exam;
   return { files };
 };
 
 const mapDispatchToProps: MDTP<{
   onChange: (files: ExamFile[]) => void;
-}, {}> = (dispatch, _ownProps) => (
+}> = (dispatch) => (
   {
     onChange: (files: ExamFile[]): void => { dispatch(updateExamFiles(files)); },
   }

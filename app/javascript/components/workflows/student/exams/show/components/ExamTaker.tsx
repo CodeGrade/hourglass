@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import ExamNavbar from '@student/exams/show/components/navbar';
+import ExamNavbar from '@student/exams/show/containers/navbar';
 import RegularNavbar from '@hourglass/common/navbar';
 import { Row, Col, Container } from 'react-bootstrap';
 import { RailsContext } from '@student/exams/show/context';

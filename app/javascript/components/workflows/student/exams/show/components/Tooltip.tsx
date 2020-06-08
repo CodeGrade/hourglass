@@ -29,7 +29,7 @@ const Tooltip: React.FC<TooltipProps> = (props) => {
         {message}
       </BSTooltip>
     )
-    : <span />;
+    : ((): JSX.Element => <span />);
   return (
     <OverlayTrigger
       overlay={tooltip}

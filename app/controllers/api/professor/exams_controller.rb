@@ -3,7 +3,7 @@
 module Api
   module Professor
     class ExamsController < ProfessorController
-      before_action :find_exam_and_course, only: [:show]
+      before_action :find_exam_and_course, only: [:show, :update]
       before_action :find_course
       before_action :require_prof_reg
 
@@ -26,6 +26,18 @@ module Api
         render json: { id: @exam.id }, status: :created
       end
 
+      def update
+        body = params.require(:exam).permit(:name, :start, :end, :duration)
+        updated = @exam.update(
+          {
+            name: body[:name]
+          }
+        )
+        render json: {
+          updated: updated
+        }
+      end
+
       def index
         render json: {
           exams: @course.exams.each do |exam|
@@ -36,19 +48,30 @@ module Api
 
       def show
         render json: {
-          exam: {
-            name: @exam.name,
-            policies: @exam.info['policies']
-          },
+          name: @exam.name,
+          start: @exam.start_time,
+          end: @exam.end_time,
+          duration: @exam.duration,
+          versions: @exam.exam_versions.map {|v| serialize_version(v) }
+        }
+      end
+
+      private
+
+      def serialize_version(version)
+        {
+          id: version.id,
+          name: version.name,
+          policies: version.policies,
           contents: {
             exam: {
-              questions: @exam.version(0)['contents']['questions'],
-              reference: @exam.version(0)['contents']['reference'],
-              instructions: @exam.version(0)['contents']['instructions'],
-              files: @exam.files
+              questions: version.contents['questions'],
+              reference: version.contents['reference'],
+              instructions: version.contents['instructions'],
+              files: version.files
             },
             answers: {
-              answers: @exam.version(0)['answers']
+              answers: version.answers
             }
           }
         }

@@ -1,0 +1,103 @@
+---
+policies:
+  - ignore-lockdown
+  - tolerate-windowed
+contents:
+  instructions: Instructions go here.
+  reference:
+    - file: "test.txt"
+    - dir: "q1/all/src/packageone"
+  questions:
+    - name: "The first one"
+      description: "First question in the exam. This text shows at the top of each page for this question."
+      separateSubparts: true
+      reference:
+        - dir: "q1/all"
+      parts:
+        - name: "Part A"
+          description: "This part will test basic Java syntax knowledge. This text is shown only on the page for part A."
+          points: 16
+          reference:
+            - dir: "q1/p1"
+          body:
+            - "Answer all of the following true/false questions."
+            - TrueFalse:
+                correctAnswer: true
+                prompt: "Java requires the use of semicolons to end statements."
+            - TrueFalse:
+                correctAnswer: false
+                prompt: "Racket requires the use of semicolons to end statements."
+            - "The next one is tricky! Be careful."
+            - TrueFalse:
+                correctAnswer: false
+                prompt: "Java does not require the use of semicolons to end statements."
+            - CodeTag:
+                prompt: "Tag line one of a file."
+                correctAnswer:
+                  filename: "q1/p1/anything.txt"
+                  line: 1
+                choices: "part"
+            - CodeTag:
+                prompt: "Tag line two of a file."
+                correctAnswer:
+                  filename: "q1/all/src/packagetwo/Example2.java"
+                  line: 7
+                choices: "question"
+            - CodeTag:
+                prompt: "Tag line three of a file."
+                correctAnswer:
+                  filename: "q1/all/src/packageone/Example.java"
+                  line: 5
+                choices: "exam"
+        - name: "Part B"
+          points: 11
+          body:
+            - Code:
+                prompt: "Type some code in the box."
+                initial: "q1/all/src/packagetwo/Example2.java"
+                lang: "text/x-java"
+            - "<p>This is an interlude of <b>HTML</b> content</p>"
+            - MultipleChoice:
+                prompt: "What does the code in PartB.java do?"
+                options:
+                  - "Nothing"
+                  - "Prints 4"
+                  - "Prints 5"
+                  - "Prints 4 and then prints 5"
+                correctAnswer: 2
+    - name: "second question name"
+      description: "Welcome to question 2. This is where the fun begins."
+      parts:
+        - body:
+            - "This matching section concerns import information."
+            - Matching:
+                prompts:
+                  - "favorite programming language"
+                  - "choose 5"
+                values:
+                  - "5"
+                  - "ISL w/λ"
+                correctAnswers:
+                  - 1
+                  - 0
+            - Code:
+                prompt: "Type some code"
+                lang: "text/x-java"
+          points: 2
+        - name: "The second part! Name is optional."
+          points: 6
+          body:
+            - AllThatApply:
+                prompt: "Which are true about Java?"
+                options:
+                  - "this one applies": true
+                  - "this one also applies": true
+                  - "this one applies not": false
+        - points: 30
+          body:
+            - YesNo:
+                prompt: "Did you choose no?"
+                correctAnswer: true # wrong
+            - Text:
+                prompt: "Explain your reasoning for taking this course."
+

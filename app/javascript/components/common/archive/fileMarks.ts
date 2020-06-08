@@ -1,5 +1,5 @@
 interface MarksInfo {
-  byLine: {}[];
+  byLine: unknown[];
   byNum: {
     [num: number]: {
       startLine: number;

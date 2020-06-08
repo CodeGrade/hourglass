@@ -6,7 +6,9 @@ interface LockedProps {
   locked: boolean;
 }
 
-const Locked = <P extends {}>(Child: React.ComponentType<P>): React.FC<P & LockedProps> => {
+const Locked = <P extends Record<string, unknown>>(
+  Child: React.ComponentType<P>,
+): React.FC<P & LockedProps> => {
   const WithLocked: React.FC<P & LockedProps> = (props) => {
     const { locked } = props;
     const lockedClass = locked ? '' : 'd-none';

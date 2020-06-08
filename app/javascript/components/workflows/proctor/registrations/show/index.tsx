@@ -1,7 +1,12 @@
 import React from 'react';
 import { RailsExam, ContentsState } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
-import { ExamContext, ExamViewerContext, RailsContext } from '@student/exams/show/context';
+import {
+  ExamContext,
+  ExamViewerContext,
+  RailsContext,
+  ExamFilesContext,
+} from '@student/exams/show/context';
 import { createMap } from '@student/exams/show/files';
 import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
@@ -32,24 +37,26 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     <ExamContext.Provider value={{ files, fmap }}>
       <ExamViewerContext.Provider value={{ answers }}>
         <RailsContext.Provider value={{ railsExam }}>
-          <div>
-            {answers.scratch && (
+          <ExamFilesContext.Provider value={{ references: reference }}>
+            <div>
+              {answers.scratch && (
+                <div>
+                  <span>Scratch space:</span>
+                  <Scratch
+                    value={answers.scratch}
+                    disabled
+                  />
+                </div>
+              )}
+              <HTML value={instructions} />
+              {reference && <FileViewer references={reference} />}
               <div>
-                <span>Scratch space:</span>
-                <Scratch
-                  value={answers.scratch}
-                  disabled
+                <DisplayQuestions
+                  questions={questions}
                 />
               </div>
-            )}
-            <HTML value={instructions} />
-            {reference && <FileViewer references={reference} />}
-            <div>
-              <DisplayQuestions
-                questions={questions}
-              />
             </div>
-          </div>
+          </ExamFilesContext.Provider>
         </RailsContext.Provider>
       </ExamViewerContext.Provider>
     </ExamContext.Provider>

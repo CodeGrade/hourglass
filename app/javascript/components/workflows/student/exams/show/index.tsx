@@ -10,6 +10,7 @@ import {
 import ExamTaker from '@student/exams/show/containers/ExamTaker';
 import ExamSubmitted from '@student/exams/show/components/ExamSubmitted';
 import { RailsContext } from '@student/exams/show/context';
+import { DateTime } from 'luxon';
 
 interface ShowExamProps {
   // The current logged-in user.
@@ -26,6 +27,8 @@ interface ShowExamProps {
 
   // Whether the exam is complete.
   final: boolean;
+
+  lastSnapshot?: DateTime;
 }
 
 const ShowExam: React.FC<ShowExamProps> = (props) => {
@@ -35,6 +38,7 @@ const ShowExam: React.FC<ShowExamProps> = (props) => {
     railsRegistration,
     railsCourse,
     final,
+    lastSnapshot,
   } = props;
   return (
     <RailsContext.Provider
@@ -46,7 +50,7 @@ const ShowExam: React.FC<ShowExamProps> = (props) => {
       }}
     >
       <Provider store={store}>
-        {final ? <ExamSubmitted /> : <ExamTaker />}
+        {final ? <ExamSubmitted lastSnapshot={lastSnapshot} /> : <ExamTaker />}
       </Provider>
     </RailsContext.Provider>
   );

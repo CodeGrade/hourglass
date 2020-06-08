@@ -9,7 +9,7 @@ import { updateInstructions } from '@professor/exams/new/actions';
 
 const mapStateToProps: MSTP<{
   value: string;
-}, {}> = (state: ExamEditorState, _ownProps) => {
+}> = (state: ExamEditorState) => {
   const { contents } = state;
   return {
     value: contents.exam.instructions,
@@ -18,7 +18,7 @@ const mapStateToProps: MSTP<{
 
 const mapDispatchToProps: MDTP<{
   onChange: (newState: string) => void;
-}, {}> = (dispatch, _ownProps) => ({
+}> = (dispatch) => ({
   onChange: (newState: string): void => {
     dispatch(
       updateInstructions(

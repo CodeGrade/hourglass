@@ -42,7 +42,7 @@ const CourseExams: React.FC<CourseExamsProps> = (props) => {
   }
 };
 
-const ShowCourse: React.FC<{}> = () => {
+const ShowCourse: React.FC = () => {
   const { courseId } = useParams();
   const res = showCourse(courseId);
   switch (res.type) {

@@ -1,13 +1,26 @@
 import { RailsExam, RailsRegistration, RailsCourse } from '@student/exams/show/types';
 import { ApiResponse, useApiResponse } from '@hourglass/common/types/api';
+import { DateTime } from 'luxon';
 
-export interface Response {
+export interface Server {
   railsExam: RailsExam;
   railsRegistration: RailsRegistration;
   railsCourse: RailsCourse;
   final: boolean;
+  lastSnapshot?: string;
 }
 
-export function useResponse(examId: number): ApiResponse<Response> {
-  return useApiResponse(`/api/student/exams/${examId}`);
+export interface Res {
+  railsExam: RailsExam;
+  railsRegistration: RailsRegistration;
+  railsCourse: RailsCourse;
+  final: boolean;
+  lastSnapshot?: DateTime;
+}
+
+export function useResponse(examId: number): ApiResponse<Res> {
+  return useApiResponse<Server, Res>(`/api/student/exams/${examId}`, {}, (res) => ({
+    ...res,
+    lastSnapshot: res.lastSnapshot ? DateTime.fromISO(res.lastSnapshot) : undefined,
+  }));
 }

@@ -8,6 +8,7 @@ import {
 } from '@student/exams/show/containers/scrollspy/Part';
 import './Part.css';
 import Body from '@student/exams/show/components/Body';
+import { PartFilesContext } from '../context';
 
 interface PartProps {
   part: PartInfo;
@@ -39,43 +40,45 @@ const Part: React.FC<PartProps> = (props) => {
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
   return (
-    <div
-      onFocus={(): void => {
-        spyQuestion(qnum, pnum);
-      }}
-    >
-      {anonymous || (
-        <TopScrollspy
-          question={qnum}
-          part={pnum}
-          separateSubparts={separateSubparts}
-        />
-      )}
-      {anonymous || (
-        <h3 id={`question-${qnum}-part-${pnum}`}>
-          {title}
-          <small className="float-right text-muted">
-            {subtitle}
-          </small>
-        </h3>
-      )}
-      <div><HTML value={description} /></div>
-      {reference && <FileViewer references={reference} />}
-      {body.map((b, i) => (
-        // Body numbers are STATIC.
-        // eslint-disable-next-line react/no-array-index-key
-        <div className="p-2 bodyitem" key={i}>
-          <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
-        </div>
-      ))}
-      {anonymous || (
-        <BottomScrollspy
-          question={qnum}
-          part={pnum}
-          separateSubparts={separateSubparts}
-        />
-      )}
-    </div>
+    <PartFilesContext.Provider value={{ references: reference }}>
+      <div
+        onFocus={(): void => {
+          spyQuestion(qnum, pnum);
+        }}
+      >
+        {anonymous || (
+          <TopScrollspy
+            question={qnum}
+            part={pnum}
+            separateSubparts={separateSubparts}
+          />
+        )}
+        {anonymous || (
+          <h3 id={`question-${qnum}-part-${pnum}`}>
+            {title}
+            <small className="float-right text-muted">
+              {subtitle}
+            </small>
+          </h3>
+        )}
+        <div><HTML value={description} /></div>
+        {reference && <FileViewer references={reference} />}
+        {body.map((b, i) => (
+          // Body numbers are STATIC.
+          // eslint-disable-next-line react/no-array-index-key
+          <div className="p-2 bodyitem" key={i}>
+            <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
+          </div>
+        ))}
+        {anonymous || (
+          <BottomScrollspy
+            question={qnum}
+            part={pnum}
+            separateSubparts={separateSubparts}
+          />
+        )}
+      </div>
+    </PartFilesContext.Provider>
   );
 };
 

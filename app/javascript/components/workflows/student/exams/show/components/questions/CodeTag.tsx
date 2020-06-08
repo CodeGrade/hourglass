@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { FileRef, CodeTagInfo, CodeTagState } from '@student/exams/show/types';
 import {
   Row, Col, Modal, Button,
@@ -6,6 +6,8 @@ import {
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import HTML from '@student/exams/show/components/HTML';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { ExamFilesContext, QuestionFilesContext, PartFilesContext } from '../../context';
 
 interface CodeTagValProps {
   value: CodeTagState;
@@ -140,6 +142,23 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
   } = props;
   const { choices, prompt } = info;
   const [showModal, setShowModal] = useState(false);
+  const examReferences = useContext(ExamFilesContext);
+  const questionReferences = useContext(QuestionFilesContext);
+  const partReferences = useContext(PartFilesContext);
+  let references: FileRef[];
+  switch (choices) {
+    case 'exam':
+      references = examReferences.references;
+      break;
+    case 'question':
+      references = questionReferences.references;
+      break;
+    case 'part':
+      references = partReferences.references;
+      break;
+    default:
+      throw new ExhaustiveSwitchError(choices);
+  }
   return (
     <Row>
       <Col>
@@ -164,7 +183,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
             </Button>
             <FileModal
               disabled={disabled}
-              references={choices}
+              references={references}
               show={showModal}
               onClose={(): void => setShowModal(false)}
               onSave={(newState): void => {

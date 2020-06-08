@@ -33,10 +33,10 @@ export type ExamTakerAction =
 export type Thunk = ThunkAction<void, ExamTakerState, unknown, ExamTakerAction>;
 export type ExamTakerDispatch = ThunkDispatch<ExamTakerState, unknown, ExamTakerAction>;
 
-export type MSTP<TStateProps, TOwnProps = {}> =
+export type MSTP<TStateProps, TOwnProps = Record<string, unknown>> =
   MapStateToProps<TStateProps, TOwnProps, ExamTakerState>;
 
-export type MDTP<TDispatchProps, TOwnProps = {}> =
+export type MDTP<TDispatchProps, TOwnProps = Record<string, unknown>> =
   (dispatch: ExamTakerDispatch, ownProps: TOwnProps) => TDispatchProps;
 
 export type StartExamResponse = AnomalousReponse | ContentsResponse;
@@ -47,6 +47,8 @@ export interface AnomalousReponse {
 
 export interface ContentsResponse {
   type: 'CONTENTS';
+
+  time: RailsTimeInfo;
 
   exam: Exam;
 
@@ -137,6 +139,7 @@ export interface LockdownFailedAction {
 export interface LoadExamAction {
   type: 'LOAD_EXAM';
   exam: Exam;
+  time: TimeInfo;
   answers: AnswersState;
   messages: ExamMessage[];
   questions: ProfQuestion[];
@@ -213,6 +216,9 @@ export interface LockdownState {
 export interface ContentsState {
   // Exam information.
   exam?: Exam;
+
+  // Exam timing information.
+  time?: TimeInfo;
 
   // The student's current answers.
   answers?: AnswersState;
@@ -378,7 +384,7 @@ export type YesNoState = boolean;
 export interface CodeTagInfo {
   type: 'CodeTag';
   prompt: HTMLVal;
-  choices: FileRef[];
+  choices: 'exam' | 'question' | 'part';
 }
 
 export interface CodeTagState {
@@ -445,6 +451,16 @@ export interface QuestionInfo {
   separateSubparts: boolean;
   parts: PartInfo[];
   reference?: FileRef[];
+}
+
+export interface RailsTimeInfo {
+  began: string;
+  ends: string;
+}
+
+export interface TimeInfo {
+  began: DateTime;
+  ends: DateTime;
 }
 
 export interface Exam {

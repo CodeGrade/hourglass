@@ -1,8 +1,15 @@
 import { hitApi } from '@hourglass/common/types/api';
 import { Student } from './index';
 
-export interface Response {
-  created: boolean;
+export type Response = Good | Bad;
+
+interface Good {
+  created: true;
+}
+
+interface Bad {
+  created: false;
+  reason: string;
 }
 
 interface Body {

@@ -24,6 +24,7 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Archive from '@hourglass/common/archive';
 import StudentDND from '@hourglass/common/student-dnd';
 import { AllAlerts } from '@hourglass/common/alerts';
+import AllocateVersions from '@professor/exams/allocate-versions';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -88,7 +89,7 @@ const ProfessorRegs: React.FC<ProfessorCoursesProps> = (props) => {
   );
 };
 
-const Exams: React.FC<{}> = () => {
+const Exams: React.FC = () => {
   const studentResponse = ApiStudentReg.useResponse();
   const profResponse = ApiProfessorCourses.useResponse();
   return (
@@ -108,7 +109,7 @@ const Exams: React.FC<{}> = () => {
   );
 };
 
-const Exam: React.FC<{}> = () => {
+const Exam: React.FC = () => {
   const { examId } = useParams();
   const { railsUser } = useContext(RailsContext);
   const showRes = ApiStudentExamsShow.useResponse(examId);
@@ -139,6 +140,7 @@ const Exam: React.FC<{}> = () => {
           railsCourse={showRes.response.railsCourse}
           railsRegistration={showRes.response.railsRegistration}
           final={showRes.response.final}
+          lastSnapshot={showRes.response.lastSnapshot}
         />
       );
     default:
@@ -146,7 +148,7 @@ const Exam: React.FC<{}> = () => {
   }
 };
 
-const Entry: React.FC<{}> = () => {
+const Entry: React.FC = () => {
   const res = ApiMe.useResponse();
   const railsUser = res.type === 'RESULT' ? res.response.user : undefined;
   return (
@@ -172,14 +174,17 @@ const Entry: React.FC<{}> = () => {
                     <Route exact path="/dev">
                       <Archive />
                     </Route>
-                    <Route path="/exams/:examId/admin" exact>
+                    <Route path="/exams/:examId/admin">
                       <ExamAdmin />
                     </Route>
-                    <Route path="/exams/:examId/edit" exact>
+                    <Route path="/exams/:examId/versions/:versionId/edit" exact>
                       <EditExam />
                     </Route>
-                    <Route path="/exams/:examId/register" exact>
+                    <Route path="/exams/:examId/seating" exact>
                       <StudentDND />
+                    </Route>
+                    <Route path="/exams/:examId/allocate-versions" exact>
+                      <AllocateVersions />
                     </Route>
                     <Route path="/courses/:courseId">
                       <ShowCourse />

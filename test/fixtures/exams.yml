@@ -1,26 +1,13 @@
-<%
-  # TODO abstract this into a test helper, and rescue, deleting zip
-  cs2500zip = Rails.root.join("test", "fixtures", "files", "cs2500midterm.zip")
-  ArchiveUtils.create_zip cs2500zip, Dir.glob(Rails.root.join("test", "fixtures", "files", "cs2500midterm", "**"))
-  cs2500upload = Upload.new(FakeUpload.new(cs2500zip))
-  FileUtils.remove_entry_secure cs2500zip
-%>
 cs2500midterm:
   course: cs2500
   name: "CS2500 Midterm"
-  enabled: true
-  files: <%= cs2500upload.files.to_json %>
-  info: <%= cs2500upload.info.to_json %>
+  duration: 5
+  start_time: <%= DateTime.now %>
+  end_time: <%= DateTime.now + 5.minutes %>
 
-<%
-  cs3500zip = Rails.root.join("test", "fixtures", "files", "cs3500final.zip")
-  ArchiveUtils.create_zip cs3500zip, Dir.glob(Rails.root.join("test", "fixtures", "files", "cs3500final", "**"))
-  cs3500upload = Upload.new(FakeUpload.new(cs3500zip))
-  FileUtils.remove_entry_secure cs3500zip
-%>
 cs3500final:
   course: cs3500
   name: "CS3500 Final"
-  enabled: true
-  files: <%= cs3500upload.files.to_json %>
-  info: <%= cs3500upload.info.to_json %>
+  duration: 120
+  start_time: <%= DateTime.now + 1.hour %>
+  end_time: <%= DateTime.now + 3.days %>

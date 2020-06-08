@@ -231,19 +231,19 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           rooms,
         };
         updateAll(examId, body).then((result) => {
-          if (!result.created) throw new Error('Server error.');
+          if (result.created === false) throw new Error(result.reason);
+          history.push(`/exams/${examId}/admin`);
           alert({
             variant: 'success',
-            message: 'Registrations successfully created.',
+            message: 'Room assignments successfully created.',
           });
-          history.push(`/exams/${examId}/admin`);
         }).catch((e) => {
+          history.push(`/exams/${examId}/admin`);
           alert({
             variant: 'danger',
-            title: 'Registrations not created.',
+            title: 'Room assignments not created.',
             message: e.message,
           });
-          history.push(`/exams/${examId}/admin`);
         });
       })}
     >
@@ -294,7 +294,7 @@ const DNDForm = reduxForm({
   form: 'student-dnd',
 })(StudentDNDForm);
 
-const DND: React.FC<{}> = () => {
+const DND: React.FC = () => {
   const { examId } = useParams();
   const response = useRoomsIndex(examId);
   switch (response.type) {

@@ -15,6 +15,15 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "accommodations", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.datetime "new_start_time", null: false
+    t.integer "percent_time_expansion", default: 0, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_id"], name: "index_accommodations_on_registration_id"
+  end
+
   create_table "anomalies", force: :cascade do |t|
     t.bigint "registration_id", null: false
     t.string "reason", default: "", null: false
@@ -32,21 +41,23 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "exam_announcements", force: :cascade do |t|
+  create_table "exam_versions", force: :cascade do |t|
+    t.string "name", null: false
+    t.jsonb "files", null: false
+    t.jsonb "info", null: false
     t.bigint "exam_id", null: false
-    t.text "body", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["exam_id"], name: "index_exam_announcements_on_exam_id"
+    t.index ["exam_id"], name: "index_exam_versions_on_exam_id"
   end
 
   create_table "exams", force: :cascade do |t|
     t.bigint "course_id", null: false
     t.string "name", null: false
-    t.boolean "enabled", default: false, null: false
-    t.jsonb "files", null: false
-    t.jsonb "info", null: false
     t.integer "bottlenose_assignment_id"
+    t.integer "duration", null: false
+    t.datetime "start_time", null: false
+    t.datetime "end_time", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["course_id"], name: "index_exams_on_course_id"
@@ -100,9 +111,12 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   create_table "registrations", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "room_id", null: false
-    t.boolean "final", default: false, null: false
+    t.bigint "exam_version_id", null: false
+    t.datetime "start_time"
+    t.datetime "end_time"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["exam_version_id"], name: "index_registrations_on_exam_version_id"
     t.index ["room_id", "user_id"], name: "index_registrations_on_room_id_and_user_id", unique: true
     t.index ["room_id"], name: "index_registrations_on_room_id"
     t.index ["user_id", "room_id"], name: "index_registrations_on_user_id_and_room_id", unique: true
@@ -180,8 +194,17 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  create_table "version_announcements", force: :cascade do |t|
+    t.bigint "exam_version_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["exam_version_id"], name: "index_version_announcements_on_exam_version_id"
+  end
+
+  add_foreign_key "accommodations", "registrations"
   add_foreign_key "anomalies", "registrations"
-  add_foreign_key "exam_announcements", "exams"
+  add_foreign_key "exam_versions", "exams"
   add_foreign_key "exams", "courses"
   add_foreign_key "messages", "exams"
   add_foreign_key "messages", "users", column: "recipient_id"
@@ -192,6 +215,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   add_foreign_key "professor_course_registrations", "users"
   add_foreign_key "questions", "exams"
   add_foreign_key "questions", "users", column: "sender_id"
+  add_foreign_key "registrations", "exam_versions"
   add_foreign_key "registrations", "rooms"
   add_foreign_key "registrations", "users"
   add_foreign_key "room_announcements", "rooms"
@@ -202,4 +226,5 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   add_foreign_key "staff_registrations", "users"
   add_foreign_key "student_registrations", "sections"
   add_foreign_key "student_registrations", "users"
+  add_foreign_key "version_announcements", "exam_versions"
 end

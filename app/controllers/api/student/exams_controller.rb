@@ -6,9 +6,9 @@ module Api
     class ExamsController < StudentController
       prepend_before_action :require_current_user_unique_session
       before_action :find_exam_and_course
-      before_action :require_exam_enabled
 
       before_action :require_student_reg
+      before_action :check_over, only: [:take]
       before_action :check_anomaly, only: [:take]
       before_action :check_final, only: [:take]
 
@@ -17,7 +17,7 @@ module Api
           railsExam: {
             id: @exam.id,
             name: @exam.name,
-            policies: @exam.info['policies']
+            policies: @registration.exam_version.policies
           },
           railsRegistration: {
             id: @registration.id,
@@ -26,13 +26,14 @@ module Api
           railsCourse: {
             id: @course.id
           },
-          final: @registration.final?
+          final: @registration.final? || @registration.over?,
+          lastSnapshot: @registration.snapshots.last&.created_at
         }
       end
 
       def take
         case params[:task]
-        when 'start' then render json: exam_contents
+        when 'start' then render json: start_exam!
         when 'snapshot' then render json: snapshot
         when 'submit' then render json: submit
         when 'anomaly' then render json: anomaly
@@ -80,20 +81,29 @@ module Api
       def submit
         answers = answer_params
         saved = @registration.save_answers(answers)
-        @registration.update(final: true)
+        @registration.update(end_time: DateTime.now)
         { lockout: !saved }
       end
 
-      def exam_contents
+      def start_exam!
+        if @registration.start_time.nil?
+          @registration.update(start_time: DateTime.now)
+        else
+          # TODO: post-anomaly log back in..
+        end
         answers = @registration.current_answers
-        version = @exam.version_for(@registration)
+        version = @registration.exam_version
         {
           type: 'CONTENTS',
           exam: {
-            questions: version['contents']['questions'],
-            reference: version['contents']['reference'],
-            instructions: version['contents']['instructions'],
-            files: @exam.files
+            questions: version.contents['questions'],
+            reference: version.contents['reference'],
+            instructions: version.contents['instructions'],
+            files: version.files
+          },
+          time: {
+            began: @registration.accommodated_start_time,
+            ends: @registration.accommodated_end_time
           },
           answers: answers,
           messages: messages,
@@ -109,6 +119,12 @@ module Api
           lockout: !saved,
           messages: messages_after(last_message_id)
         }
+      end
+
+      def check_over
+        return unless @registration.over?
+
+        head :forbidden
       end
 
       def check_anomaly

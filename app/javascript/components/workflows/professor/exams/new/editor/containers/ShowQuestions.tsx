@@ -11,7 +11,7 @@ import { QuestionInfo } from '@student/exams/show/types';
 
 const mapStateToProps: MSTP<{
   numQuestions: number;
-}, {}> = (state: ExamEditorState, _ownProps) => {
+}> = (state: ExamEditorState) => {
   const { contents } = state;
   return {
     numQuestions: contents.exam.questions.length,
@@ -20,7 +20,7 @@ const mapStateToProps: MSTP<{
 
 const mapDispatchToProps: MDTP<{
   addQuestion: (qnum: number, question: QuestionInfo) => void;
-}, {}> = (dispatch, _ownProps) => ({
+}> = (dispatch) => ({
   addQuestion: (qnum: number, question: QuestionInfo): void => {
     dispatch(addQuestion(qnum, question));
   },

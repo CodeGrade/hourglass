@@ -10,13 +10,13 @@ import { Policy } from '@student/exams/show/types';
 
 const mapStateToProps: MSTP<{
   policies: Policy[];
-}, {}> = (state: ExamEditorState, _ownProps) => ({
+}> = (state: ExamEditorState) => ({
   policies: state.railsExam.policies,
 });
 
 const mapDispatchToProps: MDTP<{
   onChange: (policies: Policy[]) => void;
-}, {}> = (dispatch, _ownProps) => ({
+}> = (dispatch) => ({
   onChange: (policies: Policy[]): void => {
     dispatch(
       updatePolicies(

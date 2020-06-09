@@ -13,7 +13,7 @@ const Submit: React.FC<SubmitProps> = (props) => {
     version,
   } = props;
   const history = useHistory();
-  const { versionId } = useParams();
+  const { examId, versionId } = useParams();
   const { alert } = useContext(AlertContext);
   return (
     <>
@@ -29,7 +29,6 @@ const Submit: React.FC<SubmitProps> = (props) => {
         variant="success"
         onClick={(): void => {
           versionUpdate(versionId, { version }).then((res) => {
-            history.goBack();
             if (res.updated === false) {
               alert({
                 variant: 'danger',
@@ -37,13 +36,13 @@ const Submit: React.FC<SubmitProps> = (props) => {
                 message: <pre>{res.reason}</pre>,
               });
             } else {
+              history.push(`/exams/${examId}/admin`);
               alert({
                 variant: 'danger',
                 message: 'Exam updated successfully.',
               });
             }
           });
-          history.goBack();
         }}
       >
         Submit

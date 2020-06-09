@@ -377,8 +377,8 @@ export interface AllThatApplyState {
 
 export interface YesNoInfo {
   type: 'YesNo';
-  yesLabel?: HTMLVal;
-  noLabel?: HTMLVal;
+  yesLabel?: string;
+  noLabel?: string;
   prompt: HTMLVal;
 }
 

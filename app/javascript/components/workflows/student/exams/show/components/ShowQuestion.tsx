@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { QuestionInfo } from '@student/exams/show/types';
+import { QuestionInfo, HTMLVal } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import Part from '@student/exams/show/components/Part';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
@@ -32,7 +32,10 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     lastQuestion = false,
   } = props;
   const {
-    name,
+    name = {
+      type: 'HTML',
+      value: `Question ${qnum + 1}`,
+    },
     reference,
     description,
     parts,
@@ -46,7 +49,6 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const isCurrent = selectedQuestion === qnum;
   const active = !paginated || isCurrent;
   const classes = active ? '' : 'd-none';
-  const title = name ? `Question ${qnum + 1}: ${name}` : `Question ${qnum + 1}`;
   const singlePart = parts.length === 1 && !parts[0].name;
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
@@ -59,7 +61,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           separateSubparts={separateSubparts}
         />
         <h1 id={`question-${qnum}`}>
-          {title}
+          <HTML value={name} />
           {singlePart && (
             <small className="float-right text-muted">
               {subtitle}

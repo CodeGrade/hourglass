@@ -56,9 +56,9 @@ const YesNo: React.FC<YesNoProps> = (props) => {
             value={isYesNo}
             onChange={(v): void => {
               if (v) {
-                onChange({ ...info, yesLabel: { type: 'HTML', value: 'Yes' }, noLabel: { type: 'HTML', value: 'No' } }, value);
+                onChange({ ...info, yesLabel: 'Yes', noLabel: 'No' }, value);
               } else {
-                onChange({ ...info, yesLabel: { type: 'HTML', value: 'True' }, noLabel: { type: 'HTML', value: 'False' } }, value);
+                onChange({ ...info, yesLabel: 'True', noLabel: 'False' }, value);
               }
             }}
           >

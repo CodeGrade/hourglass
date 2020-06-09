@@ -29,14 +29,15 @@ const Part: React.FC<PartProps> = (props) => {
     spyQuestion,
   } = props;
   const {
-    name,
+    name = {
+      type: 'HTML',
+      value: `Part ${pnum + 1}`,
+    },
     reference,
     description,
     points,
     body,
   } = part;
-  let title = `Part ${pnum + 1}`;
-  if (name) title += `: ${name}`;
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
   return (
@@ -55,7 +56,7 @@ const Part: React.FC<PartProps> = (props) => {
         )}
         {anonymous || (
           <h3 id={`question-${qnum}-part-${pnum}`}>
-            {title}
+            <HTML value={name} />
             <small className="float-right text-muted">
               {subtitle}
             </small>

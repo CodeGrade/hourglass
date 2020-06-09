@@ -130,14 +130,8 @@ const ShowBodyItems: React.FC<BodyItemsProps> = (props) => {
               onClick={(): void => {
                 addBodyItem(numBodyItems, {
                   type: 'YesNo',
-                  yesLabel: {
-                    type: 'HTML',
-                    value: 'Yes',
-                  },
-                  noLabel: {
-                    type: 'HTML',
-                    value: 'No',
-                  },
+                  yesLabel: 'Yes',
+                  noLabel: 'No',
                   prompt: {
                     type: 'HTML',
                     value: '',

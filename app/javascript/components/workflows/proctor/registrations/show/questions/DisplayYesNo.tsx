@@ -1,5 +1,6 @@
 import React from 'react';
 import { YesNoInfo } from '@student/exams/show/types';
+import HTML from '@hourglass/workflows/student/exams/show/components/HTML';
 
 export interface YesNoProps {
   info: YesNoInfo;
@@ -29,14 +30,16 @@ const DisplayYesNo: React.FC<YesNoProps> = (props) => {
       <>
         <b>Answer: </b>
         <span className="btn btn-sm btn-outline-dark disabled">
-          {value ? yesLabel : noLabel}
+          {value
+            ? yesLabel
+            : noLabel}
         </span>
       </>
     );
   }
   return (
     <div>
-      <div>{prompt}</div>
+      <div><HTML value={prompt} /></div>
       {theRest}
     </div>
   );

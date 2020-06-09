@@ -1,5 +1,6 @@
 import React from 'react';
 import { MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
+import HTML from '@hourglass/workflows/student/exams/show/components/HTML';
 
 interface MultipleChoiceProps {
   info: MultipleChoiceInfo;
@@ -32,7 +33,7 @@ const DisplayMultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
   }
   return (
     <div>
-      <div>{prompt}</div>
+      <div><HTML value={prompt} /></div>
       {theRest}
     </div>
   );

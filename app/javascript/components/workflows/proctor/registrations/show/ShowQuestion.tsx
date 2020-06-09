@@ -1,5 +1,5 @@
 import React from 'react';
-import { QuestionInfo } from '@student/exams/show/types';
+import { QuestionInfo, HTMLVal } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import Part from '@proctor/registrations/show/Part';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
@@ -16,12 +16,14 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     qnum,
   } = props;
   const {
-    name,
+    name = {
+      type: 'HTML',
+      value: `Question ${qnum + 1}`,
+    },
     reference,
     description,
     parts,
   } = question;
-  const title = name ? `Question ${qnum + 1}: ${name}` : `Question ${qnum + 1}`;
   const singlePart = parts.length === 1 && !parts[0].name;
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
@@ -30,7 +32,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     <QuestionFilesContext.Provider value={{ references: reference }}>
       <div>
         <h1>
-          {title}
+          <HTML value={name} />
           {singlePart && (
             <small className="float-right text-muted">
               {subtitle}

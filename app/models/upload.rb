@@ -69,6 +69,8 @@ class Upload
   end
 
   def make_html_val(str)
+    return nil if str.nil?
+
     {
       type: 'HTML',
       value: str
@@ -128,15 +130,15 @@ class Upload
     questions = contents['questions'].map do |q|
       q_reference = q['reference']&.map{|r| map_reference r}
       {
-        name: q['name'],
+        name: make_html_val(q['name']),
         separateSubparts: q['separateSubparts'],
-        description: q['description'],
+        description: make_html_val(q['description']),
         reference: q_reference,
         parts: q['parts'].map do |p|
           p_reference = p['reference']&.map{|r| map_reference r}
           {
-            name: p['name'],
-            description: p['description'],
+            name: make_html_val(p['name']),
+            description: make_html_val(p['description']),
             points: p['points'],
             reference: p_reference,
             body: p['body'].map do |b|
@@ -240,7 +242,7 @@ class Upload
       contents: {
         questions: questions,
         reference: e_reference,
-        instructions: contents['instructions']
+        instructions: make_html_val(contents['instructions'])
       }.compact,
       answers: answers
     }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { QuestionInfo, HTMLVal } from '@student/exams/show/types';
+import { QuestionInfo } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import Part from '@proctor/registrations/show/Part';
 import { FileViewer } from '@student/exams/show/components/FileViewer';

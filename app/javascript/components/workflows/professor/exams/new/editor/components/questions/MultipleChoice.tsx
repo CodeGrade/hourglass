@@ -42,10 +42,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
     newMovers[index] = visible;
     rawSetMoversVisible(newMovers);
   };
-  const setAnswer = (newVal): void => {
-    console.log('newval', newVal);
-    onChange(info, newVal);
-  };
+  const setAnswer = (newVal): void => onChange(info, newVal);
   const setPrompt = (index: number, newPrompt: HTMLVal): void => {
     const newOptions = [...info.options];
     newOptions[index] = newPrompt;

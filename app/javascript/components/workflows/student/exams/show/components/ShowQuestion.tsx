@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { QuestionInfo, HTMLVal } from '@student/exams/show/types';
+import { QuestionInfo } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import Part from '@student/exams/show/components/Part';
 import { FileViewer } from '@student/exams/show/components/FileViewer';

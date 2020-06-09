@@ -1,7 +1,12 @@
-import { applyMiddleware, createStore } from 'redux';
+import {
+  applyMiddleware,
+  createStore,
+  Store,
+} from 'redux';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 import ReduxThunk from 'redux-thunk';
 import rootReducer from '@professor/exams/new/reducers';
+import { ExamEditorState, ExamEditorAction } from '../types';
 
 const composeEnhancers = composeWithDevTools({
   trace: true,
@@ -13,4 +18,8 @@ const reduxEnhancers = composeEnhancers(
 );
 
 
-export default (start) => createStore(rootReducer, start, reduxEnhancers);
+const create = (
+  start,
+): Store<ExamEditorState, ExamEditorAction> => createStore(rootReducer, start, reduxEnhancers);
+
+export default create;

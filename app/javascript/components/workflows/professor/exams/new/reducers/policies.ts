@@ -1,9 +1,10 @@
-import { ExamEditorAction, ExamEditorState } from '@professor/exams/new/types';
+import { ExamEditorAction } from '@professor/exams/new/types';
+import { Policy } from '@hourglass/workflows/student/exams/show/types';
 
 export default (
-  state: ExamEditorState['policies'] = [],
+  state: Policy[] = [],
   action: ExamEditorAction,
-): ExamEditorState['policies'] => {
+): Policy[] => {
   switch (action.type) {
     case 'UPDATE_POLICIES':
       return action.policies;

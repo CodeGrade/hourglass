@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import store from '@professor/exams/new/store';
+import createStore from '@professor/exams/new/store';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext } from '@student/exams/show/context';
 import {
@@ -37,9 +37,11 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
     policies: railsExamVersion.policies,
   };
 
+  const store = createStore(init);
+
   return (
     <ExamContext.Provider value={{ files, fmap }}>
-      <Provider store={store(init)}>
+      <Provider store={store}>
         <ExamEditor />
       </Provider>
     </ExamContext.Provider>

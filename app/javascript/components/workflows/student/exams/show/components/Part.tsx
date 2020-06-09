@@ -8,8 +8,8 @@ import {
 } from '@student/exams/show/containers/scrollspy/Part';
 import './Part.css';
 import Body from '@student/exams/show/components/Body';
-import { PartFilesContext } from '../context';
 import { alphabetIdx } from '@hourglass/common/helpers';
+import { PartFilesContext } from '../context';
 
 interface PartProps {
   part: PartInfo;

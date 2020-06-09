@@ -12,6 +12,7 @@ import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
 import './questions.scss';
+import { alphabetIdx } from '@hourglass/common/helpers';
 
 
 interface MatchingProps {
@@ -208,7 +209,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
                   onDown={(): UpdateBodyItemAction => movePrompt(idx, idx + 1)}
                   onUp={(): UpdateBodyItemAction => movePrompt(idx - 1, idx)}
                 />
-                {`${String.fromCharCode(65 + idx)}.`}
+                {`${alphabetIdx(idx)}.`}
               </Col>
               <Col>
                 <CustomEditor

@@ -27,6 +27,7 @@ export function useRefresher(): [number, () => void] {
   ];
 }
 
-export function alphabetIdx(idx: number): string {
+export function alphabetIdx(idx: number, lowercase = false): string {
+  if (lowercase) return String.fromCharCode(97 + idx);
   return String.fromCharCode(65 + idx);
 }

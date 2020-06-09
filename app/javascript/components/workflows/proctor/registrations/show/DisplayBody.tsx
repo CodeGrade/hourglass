@@ -14,6 +14,7 @@ import {
   MatchingState, AllThatApplyState, CodeTagState,
 } from '@student/exams/show/types';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { isNoAns } from '@hourglass/workflows/student/exams/show/containers/questions/connectors';
 
 const DisplayBody: React.FC<BodyProps> = (props) => {
   const {
@@ -26,23 +27,25 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     answers,
   } = useContext(ExamViewerContext);
   const answer = answers.answers[qnum]?.[pnum]?.[bnum];
+  const value = isNoAns(answer) ? undefined : answer;
+
   switch (body.type) {
     case 'HTML':
       return <HTML value={body} />;
     case 'Code':
-      return <Code info={body} value={answer as CodeState} disabled />;
+      return <Code info={body} value={value as CodeState} disabled />;
     case 'AllThatApply':
-      return <DisplayAllThatApply info={body} value={answer as AllThatApplyState} />;
+      return <DisplayAllThatApply info={body} value={value as AllThatApplyState} />;
     case 'CodeTag':
-      return <DisplayCodeTag info={body} value={answer as CodeTagState} />;
+      return <DisplayCodeTag info={body} value={value as CodeTagState} />;
     case 'YesNo':
-      return <DisplayYesNoInput info={body} value={answer as YesNoState} />;
+      return <DisplayYesNoInput info={body} value={value as YesNoState} />;
     case 'MultipleChoice':
-      return <DisplayMultipleChoice info={body} value={answer as MultipleChoiceState} />;
+      return <DisplayMultipleChoice info={body} value={value as MultipleChoiceState} />;
     case 'Text':
-      return <DisplayText info={body} value={answer as TextState} />;
+      return <DisplayText info={body} value={value as TextState} />;
     case 'Matching':
-      return <DisplayMatching info={body} value={answer as MatchingState} />;
+      return <DisplayMatching info={body} value={value as MatchingState} />;
     default:
       throw new ExhaustiveSwitchError(body);
   }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { FileRef, CodeTagInfo, CodeTagState } from '@student/exams/show/types';
 import {
   Form,
@@ -11,6 +11,8 @@ import {
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
+import { ExamFilesContext, QuestionFilesContext, PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 interface CodeTagValProps {
   value: CodeTagState;
@@ -151,6 +153,23 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
   } = props;
   const { choices, prompt } = info;
   const [showModal, setShowModal] = useState(false);
+  const examReferences = useContext(ExamFilesContext);
+  const questionReferences = useContext(QuestionFilesContext);
+  const partReferences = useContext(PartFilesContext);
+  let references: FileRef[];
+  switch (choices) {
+    case 'exam':
+      references = examReferences.references;
+      break;
+    case 'question':
+      references = questionReferences.references;
+      break;
+    case 'part':
+      references = partReferences.references;
+      break;
+    default:
+      throw new ExhaustiveSwitchError(choices);
+  }
   return (
     <>
       <Prompted
@@ -172,7 +191,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
               variant={choices === 'exam' ? 'secondary' : 'outline-secondary'}
               active={choices === 'exam'}
               onClick={(): void => {
-                onChange({ ...info, choices: 'exam' }, value);
+                onChange({ ...info, choices: 'exam' }, undefined);
               }}
             >
               Files for full exam
@@ -181,7 +200,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
               variant={choices === 'question' ? 'secondary' : 'outline-secondary'}
               active={choices === 'question'}
               onClick={(): void => {
-                onChange({ ...info, choices: 'question' }, value);
+                onChange({ ...info, choices: 'question' }, undefined);
               }}
             >
               Files for current question
@@ -190,7 +209,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
               variant={choices === 'part' ? 'secondary' : 'outline-secondary'}
               active={choices === 'part'}
               onClick={(): void => {
-                onChange({ ...info, choices: 'part' }, value);
+                onChange({ ...info, choices: 'part' }, undefined);
               }}
             >
               Files for current part
@@ -212,7 +231,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
           </Button>
           <FileModal
             disabled={disabled}
-            references={[]} // TODO: files contexts and grab refs for `choices`
+            references={references}
             show={showModal}
             onClose={(): void => setShowModal(false)}
             onSave={(newState): void => {

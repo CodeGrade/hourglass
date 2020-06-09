@@ -19,6 +19,7 @@ import { VeryControlledFileViewer } from '@student/exams/show/components/FileVie
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { createMap, getFilesForRefs } from '@student/exams/show/files';
 import Submit from '@professor/exams/new/editor/containers/Submit';
+import { ExamFilesContext } from '@hourglass/workflows/student/exams/show/context';
 
 export interface ExamEditorProps {
   name: string;
@@ -42,56 +43,62 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
   const fmap = createMap(files);
   const filteredFiles = getFilesForRefs(fmap, reference);
   return (
-    <Container fluid className="flex-fill">
-      <Form>
-        <Form.Group as={Row} controlId="examTitle">
-          <Form.Label column sm="3"><h2>Version name:</h2></Form.Label>
-          <Col>
-            <Form.Control
-              size="lg"
-              type="text"
-              placeholder="Enter a name for this version"
-              value={name}
-              onChange={(e): void => onChange(e.target.value)}
-            />
-          </Col>
-        </Form.Group>
-        <Policies />
-      </Form>
-      <FileUploader />
+    <ExamFilesContext.Provider
+      value={{
+        references: reference,
+      }}
+    >
+      <Container fluid className="flex-fill">
+        <Form>
+          <Form.Group as={Row} controlId="examTitle">
+            <Form.Label column sm="3"><h2>Version name:</h2></Form.Label>
+            <Col>
+              <Form.Control
+                size="lg"
+                type="text"
+                placeholder="Enter a name for this version"
+                value={name}
+                onChange={(e): void => onChange(e.target.value)}
+              />
+            </Col>
+          </Form.Group>
+          <Policies />
+        </Form>
+        <FileUploader />
 
-      <Alert variant="info">
-        <h3>Exam-wide information</h3>
-        <Instructions />
-        <p>Choose files to be shown for the entire exam</p>
-        <InputGroup>
-          <div className="flex-grow-1">
-            <FilePickerExam />
-          </div>
-          <InputGroup.Append>
-            <Button
-              variant="info"
-              disabled={noFiles}
-              onClick={(): void => setOpen((o) => !o)}
-            >
-              Preview files
-              {open && !noFiles ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
-            </Button>
-          </InputGroup.Append>
-        </InputGroup>
-        <Collapse in={open && !noFiles}>
-          <div className="border">
-            <VeryControlledFileViewer files={filteredFiles} />
-          </div>
-        </Collapse>
+        <Alert variant="info">
+          <h3>Exam-wide information</h3>
+          <Instructions />
+          <p>Choose files to be shown for the entire exam</p>
+          <InputGroup>
+            <div className="flex-grow-1">
+              <FilePickerExam />
+            </div>
+            <InputGroup.Append>
+              <Button
+                variant="info"
+                disabled={noFiles}
+                onClick={(): void => setOpen((o) => !o)}
+              >
+                Preview files
+                {open && !noFiles ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+              </Button>
+            </InputGroup.Append>
+          </InputGroup>
+          <Collapse in={open && !noFiles}>
+            <div className="border">
+              <VeryControlledFileViewer files={filteredFiles} />
+            </div>
+          </Collapse>
 
-      </Alert>
-      <ShowQuestions questions={questions} />
+        </Alert>
+        <ShowQuestions questions={questions} />
 
-      <div className="float-right">
-        <Submit />
-      </div>
-    </Container>
+        <div className="float-right">
+          <Submit />
+        </div>
+      </Container>
+    </ExamFilesContext.Provider>
   );
 };
 

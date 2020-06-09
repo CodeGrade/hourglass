@@ -14,8 +14,7 @@ contents:
       reference:
         - dir: "q1/all"
       parts:
-        - name: "Part A"
-          description: "This part will test basic Java syntax knowledge. This text is shown only on the page for part A."
+        - description: "This part will test basic Java syntax knowledge. This text is shown only on the page for part A."
           points: 16
           reference:
             - dir: "q1/p1"
@@ -49,7 +48,7 @@ contents:
                   filename: "q1/all/src/packageone/Example.java"
                   line: 5
                 choices: "exam"
-        - name: "Part B"
+        - name: "Title of the Second Part"
           points: 11
           body:
             - Code:
@@ -65,7 +64,7 @@ contents:
                   - "Prints 5"
                   - "Prints 4 and then prints 5"
                 correctAnswer: 2
-    - name: "second question name"
+    - name: "Second Question Name"
       description: "Welcome to question 2. This is where the fun begins."
       parts:
         - body:

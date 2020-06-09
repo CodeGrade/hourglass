@@ -11,7 +11,7 @@ const HTML: React.FC<HTMLProps> = (props) => {
     <div
       className="no-hover"
       // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: value.value }}
+      dangerouslySetInnerHTML={{ __html: value?.value ?? '' }}
     />
   );
 };

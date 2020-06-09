@@ -188,7 +188,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
           </Button>
           <FileModal
             disabled={disabled}
-            references={choices}
+            references={[]} // TODO: files contexts and grab refs for `choices`
             show={showModal}
             onClose={(): void => setShowModal(false)}
             onSave={(newState): void => {

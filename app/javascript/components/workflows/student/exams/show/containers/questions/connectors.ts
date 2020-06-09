@@ -18,7 +18,7 @@ interface OwnProps {
   bnum: number;
 }
 
-const isNoAns = (answer: AnswerState): boolean => (
+export const isNoAns = (answer: AnswerState): boolean => (
   (answer instanceof Object) && (answer as NoAnswerState).NO_ANS
 );
 

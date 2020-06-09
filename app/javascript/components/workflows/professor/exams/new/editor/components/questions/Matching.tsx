@@ -24,7 +24,7 @@ interface MatchingProps {
 
 const ChooseRightAnswer: React.FC<{
   curValue: number;
-  choices: string[];
+  choices: HTMLVal[];
   onChange: (event: React.ChangeEvent<{ value: number }>) => void;
 }> = (props) => {
   const {
@@ -83,7 +83,10 @@ const Matching: React.FC<MatchingProps> = (props) => {
   };
   const addPrompt = (): void => {
     const newPrompts = [...prompts];
-    newPrompts.push('');
+    newPrompts.push({
+      type: 'HTML',
+      value: '',
+    });
     onChange({ ...info, prompts: newPrompts }, value);
   };
   const deletePrompt = (index: number): UpdateBodyItemAction => {
@@ -101,7 +104,10 @@ const Matching: React.FC<MatchingProps> = (props) => {
 
   const addValue = (): void => {
     const newValues = [...values];
-    newValues.push('');
+    newValues.push({
+      type: 'HTML',
+      value: '',
+    });
     onChange({ ...info, values: newValues }, value);
   };
   const deleteValue = (index: number): UpdateBodyItemAction => {
@@ -171,8 +177,11 @@ const Matching: React.FC<MatchingProps> = (props) => {
             <CustomEditor
               className="bg-white"
               theme="bubble"
-              value={promptLabel ?? 'Column A'}
-              onChange={setColA}
+              value={promptLabel?.value ?? 'Column A'}
+              onChange={(newVal) => setColA({
+                type: 'HTML',
+                value: newVal,
+              })}
             />
           </Col>
         </Row>
@@ -205,9 +214,12 @@ const Matching: React.FC<MatchingProps> = (props) => {
                 <CustomEditor
                   className="bg-white"
                   theme="bubble"
-                  value={p}
+                  value={p.value}
                   placeholder="Enter a new prompt"
-                  onChange={(newPrompt): void => updatePrompt(idx, newPrompt)}
+                  onChange={(newPrompt): void => updatePrompt(idx, {
+                    type: 'HTML',
+                    value: newPrompt,
+                  })}
                 />
               </Col>
               <Col sm={2}>
@@ -237,8 +249,11 @@ const Matching: React.FC<MatchingProps> = (props) => {
             <CustomEditor
               className="bg-white"
               theme="bubble"
-              value={valuesLabel ?? 'Column B'}
-              onChange={setColB}
+              value={valuesLabel?.value ?? 'Column B'}
+              onChange={(newVal) => setColB({
+                type: 'HTML',
+                value: newVal,
+              })}
             />
           </Col>
         </Row>
@@ -269,9 +284,12 @@ const Matching: React.FC<MatchingProps> = (props) => {
               <CustomEditor
                 className="bg-white pr-0"
                 theme="bubble"
-                value={v}
+                value={v.value}
                 placeholder="Enter a new choice"
-                onChange={(newValue): void => updateValue(idx, newValue)}
+                onChange={(newValue): void => updateValue(idx, {
+                  type: 'HTML',
+                  value: newValue,
+                })}
               />
             </Col>
           </Row>

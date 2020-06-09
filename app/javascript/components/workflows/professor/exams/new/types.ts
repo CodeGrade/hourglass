@@ -55,7 +55,7 @@ export interface UpdateTitleAction {
 
 export interface UpdateInstructionsAction {
   type: 'UPDATE_INSTRUCTIONS';
-  val: string;
+  val: HTMLVal;
 }
 
 export interface UpdateExamFilesAction {
@@ -100,8 +100,8 @@ export interface DeleteQuestionAction {
 export interface UpdateQuestionAction {
   type: 'UPDATE_QUESTION';
   qnum: number;
-  name: string;
-  description: string;
+  name: HTMLVal;
+  description: HTMLVal;
   separateSubparts: boolean;
 }
 
@@ -128,8 +128,8 @@ export interface UpdatePartAction {
   type: 'UPDATE_PART';
   qnum: number;
   pnum: number;
-  name: string;
-  description: string;
+  name: HTMLVal;
+  description: HTMLVal;
   points: number;
 }
 

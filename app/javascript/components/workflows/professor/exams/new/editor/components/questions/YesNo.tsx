@@ -41,9 +41,9 @@ const YesNo: React.FC<YesNoProps> = (props) => {
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
-        prompt={prompt}
+        prompt={prompt.value}
         onChange={(newPrompt): void => {
-          if (onChange) { onChange({ ...info, prompt: newPrompt }, value); }
+          if (onChange) { onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }, value); }
         }}
       />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-wording`}>
@@ -56,9 +56,9 @@ const YesNo: React.FC<YesNoProps> = (props) => {
             value={isYesNo}
             onChange={(v): void => {
               if (v) {
-                onChange({ ...info, yesLabel: 'Yes', noLabel: 'No' }, value);
+                onChange({ ...info, yesLabel: { type: 'HTML', value: 'Yes' }, noLabel: { type: 'HTML', value: 'No' } }, value);
               } else {
-                onChange({ ...info, yesLabel: 'True', noLabel: 'False' }, value);
+                onChange({ ...info, yesLabel: { type: 'HTML', value: 'True' }, noLabel: { type: 'HTML', value: 'False' } }, value);
               }
             }}
           >

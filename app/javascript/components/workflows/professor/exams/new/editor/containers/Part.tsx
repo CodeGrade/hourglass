@@ -6,7 +6,7 @@ import {
   ExamEditorState,
 } from '@professor/exams/new/types';
 import { updatePart } from '@professor/exams/new/actions';
-import { FileRef, ExamFile } from '@student/exams/show/types';
+import { FileRef, ExamFile, HTMLVal } from '@student/exams/show/types';
 
 interface OwnProps {
   qnum: number;
@@ -15,8 +15,8 @@ interface OwnProps {
 }
 
 const mapStateToProps: MSTP<{
-  name: string;
-  description: string;
+  name: HTMLVal;
+  description: HTMLVal;
   points: number;
   reference: FileRef[];
   files: ExamFile[];
@@ -25,8 +25,14 @@ const mapStateToProps: MSTP<{
   const { contents } = state;
   const p = contents.exam.questions[qnum].parts[pnum];
   return {
-    name: p.name ?? '',
-    description: p.description ?? '',
+    name: p.name ?? {
+      type: 'HTML',
+      value: '',
+    },
+    description: p.description ?? {
+      type: 'HTML',
+      value: '',
+    },
     points: p.points ?? 0,
     reference: p.reference,
     files: contents.exam?.files,
@@ -34,9 +40,9 @@ const mapStateToProps: MSTP<{
 };
 
 const mapDispatchToProps: MDTP<{
-  onChange: (name: string, description: string, points: number) => void;
+  onChange: (name: HTMLVal, description: HTMLVal, points: number) => void;
 }, OwnProps> = (dispatch, ownProps) => ({
-  onChange: (name: string, description: string, points: number): void => {
+  onChange: (name, description, points): void => {
     const { qnum, pnum } = ownProps;
     dispatch(
       updatePart(

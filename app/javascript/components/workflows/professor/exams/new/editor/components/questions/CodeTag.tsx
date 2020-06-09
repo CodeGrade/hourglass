@@ -157,9 +157,11 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
-        prompt={prompt}
+        prompt={prompt.value}
         onChange={(newPrompt): void => {
-          if (onChange) { onChange({ ...info, prompt: newPrompt }, value); }
+          if (onChange) {
+            onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }, value);
+          }
         }}
       />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-source`}>

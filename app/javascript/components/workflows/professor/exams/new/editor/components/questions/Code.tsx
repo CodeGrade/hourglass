@@ -69,9 +69,15 @@ const Code: React.FC<CodeProps> = (props) => {
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
-        prompt={prompt}
+        prompt={prompt.value}
         onChange={(newPrompt): void => {
-          onChange({ ...info, prompt: newPrompt }, value);
+          onChange({
+            ...info,
+            prompt: {
+              type: 'HTML',
+              value: newPrompt,
+            },
+          }, value);
         }}
       />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>

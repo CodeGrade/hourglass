@@ -6,9 +6,10 @@ import {
   ExamEditorState,
 } from '@professor/exams/new/types';
 import { updateInstructions } from '@professor/exams/new/actions';
+import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
 
 const mapStateToProps: MSTP<{
-  value: string;
+  value: HTMLVal;
 }> = (state: ExamEditorState) => {
   const { contents } = state;
   return {
@@ -17,9 +18,9 @@ const mapStateToProps: MSTP<{
 };
 
 const mapDispatchToProps: MDTP<{
-  onChange: (newState: string) => void;
+  onChange: (newState: HTMLVal) => void;
 }> = (dispatch) => ({
-  onChange: (newState: string): void => {
+  onChange: (newState): void => {
     dispatch(
       updateInstructions(
         newState,

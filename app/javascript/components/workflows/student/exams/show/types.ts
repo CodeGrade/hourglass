@@ -423,7 +423,7 @@ export interface MatchingState {
 }
 
 export type BodyItem =
-  HTML | AllThatApplyInfo | CodeInfo | YesNoInfo |
+  HTMLVal | AllThatApplyInfo | CodeInfo | YesNoInfo |
   CodeTagInfo | MultipleChoiceInfo | TextInfo | MatchingInfo;
 
 export type AnswerState =
@@ -434,11 +434,6 @@ export type AnswerState =
 export interface NoAnswerState {
   NO_ANS: true;
 }
-
-export type HTML = {
-  type: 'HTML';
-  value: string;
-};
 
 export interface PartInfo {
   name?: HTMLVal;

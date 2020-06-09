@@ -57,7 +57,7 @@ export function updateTitle(
 }
 
 export function updateInstructions(
-  val: string,
+  val: HTMLVal,
 ): UpdateInstructionsAction {
   return {
     type: 'UPDATE_INSTRUCTIONS',
@@ -96,8 +96,8 @@ export function addQuestion(
 
 export function updateQuestion(
   qnum: number,
-  name: string,
-  description: string,
+  name: HTMLVal,
+  description: HTMLVal,
   separateSubparts: boolean,
 ): UpdateQuestionAction {
   return {
@@ -156,8 +156,8 @@ export function addPart(
 export function updatePart(
   qnum: number,
   pnum: number,
-  name: string,
-  description: string,
+  name: HTMLVal,
+  description: HTMLVal,
   points: number,
 ): UpdatePartAction {
   return {

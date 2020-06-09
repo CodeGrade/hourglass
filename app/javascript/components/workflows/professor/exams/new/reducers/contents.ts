@@ -5,7 +5,10 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 export default (state: ContentsState = {
   exam: {
     questions: [],
-    instructions: '',
+    instructions: {
+      type: 'HTML',
+      value: '',
+    },
     files: [],
   },
   answers: {
@@ -312,7 +315,7 @@ export default (state: ContentsState = {
       ret.questions[qnum].parts = [...ret.questions[qnum].parts];
       ret.questions[qnum].parts[pnum] = { ...ret.questions[qnum].parts[pnum] };
       ret.questions[qnum].parts[pnum].body = [...ret.questions[qnum].parts[pnum].body];
-      ret.questions[qnum].parts[pnum].body[bnum] = { type: 'HTML', value };
+      ret.questions[qnum].parts[pnum].body[bnum] = value;
       return {
         ...state,
         exam: ret,

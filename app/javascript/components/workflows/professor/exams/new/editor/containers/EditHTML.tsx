@@ -5,7 +5,7 @@ import {
   MDTP,
   ExamEditorState,
 } from '@professor/exams/new/types';
-import { HTMLVal, HTML } from '@student/exams/show/types';
+import { HTMLVal } from '@student/exams/show/types';
 import { editHtmlBodyItem } from '@professor/exams/new/actions';
 
 interface OwnProps {
@@ -21,7 +21,7 @@ const mapStateToProps: MSTP<{
   const { contents } = state;
   const b = contents.exam.questions[qnum].parts[pnum].body[bnum];
   return {
-    value: (b as HTML).value,
+    value: (b as HTMLVal),
   };
 };
 

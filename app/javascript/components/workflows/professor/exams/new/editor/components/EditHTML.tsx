@@ -5,13 +5,14 @@ import {
   Col,
 } from 'react-bootstrap';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
 
 export interface HTMLProps {
   qnum: number;
   pnum: number;
   bnum: number;
-  value: string;
-  onChange: (content: string) => void;
+  value: HTMLVal;
+  onChange: (content: HTMLVal) => void;
 }
 
 const EditHTML: React.FC<HTMLProps> = (props) => {
@@ -29,10 +30,15 @@ const EditHTML: React.FC<HTMLProps> = (props) => {
         <Col sm={10}>
           <CustomEditor
             className="bg-white"
-            value={value}
+            value={value.value}
             placeholder="Body item..."
             onChange={(newVal, _delta, source, _editor): void => {
-              if (source === 'user') onChange(newVal);
+              if (source === 'user') {
+                onChange({
+                  type: 'HTML',
+                  value: newVal,
+                });
+              }
             }}
           />
         </Col>

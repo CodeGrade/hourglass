@@ -83,7 +83,10 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
   };
   const addOption = (): void => {
     const newOptions = [...options];
-    newOptions.push('');
+    newOptions.push({
+      type: 'HTML',
+      value: '',
+    });
     onChange({ ...info, options: newOptions }, value);
   };
   const deleteOption = (index: number): UpdateBodyItemAction => {
@@ -108,9 +111,20 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
-        prompt={prompt}
+        prompt={prompt.value}
         onChange={(newPrompt): void => {
-          if (onChange) { onChange({ ...info, prompt: newPrompt }, value); }
+          if (onChange) {
+            onChange(
+              {
+                ...info,
+                prompt: {
+                  type: 'HTML',
+                  value: newPrompt,
+                },
+              },
+              value,
+            );
+          }
         }}
       />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
@@ -156,8 +170,16 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
                   <CustomEditor
                     className="bg-white"
                     theme="bubble"
-                    value={option}
-                    onChange={(newPrompt): void => setPrompt(idx, newPrompt)}
+                    value={option.value}
+                    onChange={(newPrompt): void => {
+                      setPrompt(
+                        idx,
+                        {
+                          type: 'HTML',
+                          value: newPrompt,
+                        },
+                      );
+                    }}
                   />
                 </Col>
               </Row>

@@ -50,7 +50,10 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
   };
   const addOption = (): void => {
     const newOptions = [...options];
-    newOptions.push('');
+    newOptions.push({
+      type: 'HTML',
+      value: '',
+    });
     onChange({ ...info, options: newOptions }, value);
   };
   const deleteOption = (index: number): UpdateBodyItemAction => {
@@ -79,8 +82,8 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
-        prompt={prompt}
-        onChange={(newPrompt): void => onChange({ ...info, prompt: newPrompt }, value)}
+        prompt={prompt.value}
+        onChange={(newPrompt): void => onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }, value)}
       />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
         <Form.Label column sm={2}>Answers</Form.Label>
@@ -125,8 +128,11 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
                   <CustomEditor
                     className="bg-white"
                     theme="bubble"
-                    value={option}
-                    onChange={(newPrompt): void => setPrompt(idx, newPrompt)}
+                    value={option.value}
+                    onChange={(newPrompt): void => setPrompt(idx, {
+                      type: 'HTML',
+                      value: newPrompt,
+                    })}
                   />
                 </Col>
               </Row>

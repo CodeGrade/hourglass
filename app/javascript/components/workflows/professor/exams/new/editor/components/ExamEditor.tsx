@@ -9,11 +9,7 @@ import {
   Button,
   Alert,
 } from 'react-bootstrap';
-import {
-  ExamVersion,
-  RailsExamVersion,
-  AnswersState,
-} from '@student/exams/show/types';
+import { ExamVersion } from '@student/exams/show/types';
 import Instructions from '@professor/exams/new/editor/containers/Instructions';
 import FileUploader from '@professor/exams/new/editor/containers/FileUploader';
 import Policies from '@professor/exams/new/editor/containers/Policies';
@@ -25,16 +21,15 @@ import { createMap, getFilesForRefs } from '@student/exams/show/files';
 import Submit from '@professor/exams/new/editor/containers/Submit';
 
 export interface ExamEditorProps {
-  exam: ExamVersion;
-  railsExam: RailsExamVersion;
-  answers: AnswersState;
+  name: string;
+  version: ExamVersion;
   onChange: (newTitle: string) => void;
 }
 
 const Editor: React.FC<ExamEditorProps> = (props) => {
   const {
-    exam,
-    railsExam,
+    name,
+    version: exam,
     onChange,
   } = props;
   const {
@@ -42,7 +37,6 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
     reference = [],
     files = [],
   } = exam;
-  const { name } = railsExam;
   const [open, setOpen] = useState(false);
   const noFiles = reference.length === 0;
   const fmap = createMap(files);

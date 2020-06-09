@@ -7,13 +7,14 @@ const mapStateToProps: MSTP<{
   version: Version;
 }> = (state) => ({
   version: {
+    name: state.name,
     info: {
       contents: {
         instructions: state.contents.exam.instructions,
         questions: state.contents.exam.questions,
         reference: state.contents.exam.reference,
       },
-      policies: state.railsExam.policies,
+      policies: state.policies,
       answers: state.contents.answers.answers,
     },
     files: state.contents.exam.files,

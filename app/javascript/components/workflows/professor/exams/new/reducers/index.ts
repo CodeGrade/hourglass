@@ -1,10 +1,11 @@
 import { combineReducers } from 'redux';
 
 import contents from './contents';
-import railsExam from './metadata';
-
+import name from './name';
+import policies from './policies';
 
 export default combineReducers({
   contents,
-  railsExam,
+  name,
+  policies,
 });

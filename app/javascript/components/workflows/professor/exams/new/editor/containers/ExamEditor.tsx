@@ -6,23 +6,14 @@ import {
   ExamEditorState,
 } from '@professor/exams/new/types';
 import { updateTitle } from '@professor/exams/new/actions';
-import {
-  ExamVersion,
-  RailsExamVersion,
-  ExamFile,
-  AnswersState,
-} from '@student/exams/show/types';
+import { ExamVersion } from '@student/exams/show/types';
 
 const mapStateToProps: MSTP<{
-  exam: ExamVersion;
-  railsExam: RailsExamVersion;
-  files: ExamFile[];
-  answers: AnswersState;
+  name: string;
+  version: ExamVersion;
 }> = (state: ExamEditorState) => ({
-  exam: state.contents.exam,
-  railsExam: state.railsExam,
-  files: state.contents.exam.files,
-  answers: state.contents.answers,
+  name: state.name,
+  version: state.contents.exam,
 });
 
 const mapDispatchToProps: MDTP<{

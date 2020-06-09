@@ -3,13 +3,14 @@ import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
 
 export interface RailsExamVersion {
-  // The exam ID.
   id: number;
-
-  // The name of the exam.
   name: string;
-
   policies: Policy[];
+}
+
+export interface RailsExam {
+  id: number;
+  name: string;
 }
 
 export interface RailsCourse {

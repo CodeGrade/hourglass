@@ -19,7 +19,7 @@ import * as ApiProfessorCourses from '@hourglass/common/api/professor/courses';
 import ShowExam from '@student/exams/show';
 import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
-import EditExam from '@professor/exams/edit';
+import EditExamVersion from '@professor/exams/edit';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Archive from '@hourglass/common/archive';
 import StudentDND from '@hourglass/common/student-dnd';
@@ -178,7 +178,7 @@ const Entry: React.FC = () => {
                       <ExamAdmin />
                     </Route>
                     <Route path="/exams/:examId/versions/:versionId/edit" exact>
-                      <EditExam />
+                      <EditExamVersion />
                     </Route>
                     <Route path="/exams/:examId/seating" exact>
                       <StudentDND />

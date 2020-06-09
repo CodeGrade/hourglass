@@ -6,7 +6,6 @@ import {
   BodyItem,
   ContentsState,
   Policy,
-  RailsExamVersion,
   HTMLVal,
   AnswerState,
   ExamFile,
@@ -24,8 +23,9 @@ export type MDTP<TDispatchProps, TOwnProps = Record<string, unknown>> =
 
 
 export interface ExamEditorState {
+  name: string;
+  policies: Policy[];
   contents: ContentsState;
-  railsExam: RailsExamVersion;
 }
 
 export type ExamEditorAction = UpdateInstructionsAction | UpdatePoliciesAction | UpdateTitleAction

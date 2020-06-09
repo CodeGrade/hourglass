@@ -9,16 +9,17 @@ import {
   AnswersState,
 } from '@student/exams/show/types';
 import ExamEditor from '@professor/exams/new/editor/containers/ExamEditor';
+import { ExamEditorState } from '../types';
 
 export interface ExamEditorProps {
   exam: ExamVersion;
-  railsExam: RailsExamVersion;
+  railsExamVersion: RailsExamVersion;
   answers: AnswersState;
 }
 
 const Editor: React.FC<ExamEditorProps> = (props) => {
   const {
-    railsExam,
+    railsExamVersion,
     exam,
     answers,
   } = props;
@@ -27,17 +28,18 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
   } = exam;
   const fmap = createMap(files);
 
+  const init: ExamEditorState = {
+    contents: {
+      exam,
+      answers,
+    },
+    name: railsExamVersion.name,
+    policies: railsExamVersion.policies,
+  };
+
   return (
     <ExamContext.Provider value={{ files, fmap }}>
-      <Provider
-        store={store({
-          contents: {
-            exam,
-            answers,
-          },
-          railsExam,
-        })}
-      >
+      <Provider store={store(init)}>
         <ExamEditor />
       </Provider>
     </ExamContext.Provider>

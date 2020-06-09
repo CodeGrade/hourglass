@@ -3,10 +3,14 @@
 module Api
   module Professor
     class VersionsController < ProfessorController
-      before_action :find_version, only: [:update]
+      before_action :find_version, only: [:show, :update]
       before_action :find_exam_and_course
 
       before_action :require_prof_reg
+
+      def show
+        render json: serialize_version(@version)
+      end
 
       def index
         version_regs = @exam.registrations.group_by(&:exam_version)
@@ -86,6 +90,25 @@ module Api
           students: regs.map(&:user).map do |s|
             serialize_student s
           end
+        }
+      end
+
+      def serialize_version(version)
+        {
+          id: version.id,
+          name: version.name,
+          policies: version.policies,
+          contents: {
+            exam: {
+              questions: version.contents['questions'],
+              reference: version.contents['reference'],
+              instructions: version.contents['instructions'],
+              files: version.files
+            },
+            answers: {
+              answers: version.answers
+            }
+          }
         }
       end
     end

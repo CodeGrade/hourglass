@@ -11,7 +11,7 @@ import { Policy } from '@student/exams/show/types';
 const mapStateToProps: MSTP<{
   policies: Policy[];
 }> = (state: ExamEditorState) => ({
-  policies: state.railsExam.policies,
+  policies: state.policies,
 });
 
 const mapDispatchToProps: MDTP<{

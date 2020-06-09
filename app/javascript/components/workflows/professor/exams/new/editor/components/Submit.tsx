@@ -38,7 +38,7 @@ const Submit: React.FC<SubmitProps> = (props) => {
             } else {
               history.push(`/exams/${examId}/admin`);
               alert({
-                variant: 'danger',
+                variant: 'success',
                 message: 'Exam updated successfully.',
               });
             }

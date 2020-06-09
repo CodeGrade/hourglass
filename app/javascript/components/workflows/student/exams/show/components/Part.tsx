@@ -9,6 +9,7 @@ import {
 import './Part.css';
 import Body from '@student/exams/show/components/Body';
 import { PartFilesContext } from '../context';
+import { alphabetIdx } from '@hourglass/common/helpers';
 
 interface PartProps {
   part: PartInfo;
@@ -31,7 +32,7 @@ const Part: React.FC<PartProps> = (props) => {
   const {
     name = {
       type: 'HTML',
-      value: `Part ${pnum + 1}`,
+      value: `Part ${alphabetIdx(pnum)}`,
     },
     reference,
     description,

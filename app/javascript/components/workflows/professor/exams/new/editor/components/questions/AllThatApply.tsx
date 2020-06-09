@@ -76,14 +76,17 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
     newValue[index] = !newValue[index];
     onChange(info, newValue);
   };
-  const setPrompt = (index: number, newPrompt: string): void => {
+  const setPrompt = (index: number, newPrompt: HTMLVal): void => {
     const newOptions = [...info.options];
     newOptions[index] = newPrompt;
     onChange({ ...info, options: newOptions }, value);
   };
   const addOption = (): void => {
     const newOptions = [...options];
-    newOptions.push('');
+    newOptions.push({
+      type: 'HTML',
+      value: '',
+    });
     onChange({ ...info, options: newOptions }, value);
   };
   const deleteOption = (index: number): UpdateBodyItemAction => {
@@ -167,9 +170,15 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
                   <CustomEditor
                     className="bg-white"
                     theme="bubble"
-                    value={option}
+                    value={option.value}
                     onChange={(newPrompt): void => {
-                      setPrompt(idx, newPrompt);
+                      setPrompt(
+                        idx,
+                        {
+                          type: 'HTML',
+                          value: newPrompt,
+                        },
+                      );
                     }}
                   />
                 </Col>

@@ -31,19 +31,17 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
     ret[index] = val;
     onChange(ret);
   };
-
-  return (
-    <div>
-      <div><HTML value={prompt} /></div>
+  const body = (
+    <>
       <i>(Select all that apply)</i>
       {options.map((o, i) => {
         const val = !!value?.[i];
         return (
-          <Form.Group key={o}>
+          <Form.Group key={o.value}>
             <Form.Check
               disabled={disabled}
               type="checkbox"
-              label={o}
+              label={<HTML value={o} />}
               checked={val}
               id={`ata-${qnum}-${pnum}-${bnum}-${i}`}
               onChange={handler(i)}
@@ -51,6 +49,12 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
           </Form.Group>
         );
       })}
+    </>
+  );
+  return (
+    <div>
+      <div><HTML value={prompt} /></div>
+      {body}
     </div>
   );
 };

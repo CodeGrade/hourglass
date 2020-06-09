@@ -24,7 +24,7 @@ interface MatchingProps {
 
 const ChooseRightAnswer: React.FC<{
   curValue: number;
-  choices: string[];
+  choices: HTMLVal[];
   onChange: (event: React.ChangeEvent<{ value: number }>) => void;
 }> = (props) => {
   const {
@@ -83,7 +83,10 @@ const Matching: React.FC<MatchingProps> = (props) => {
   };
   const addPrompt = (): void => {
     const newPrompts = [...prompts];
-    newPrompts.push('');
+    newPrompts.push({
+      type: 'HTML',
+      value: '',
+    });
     onChange({ ...info, prompts: newPrompts }, value);
   };
   const deletePrompt = (index: number): UpdateBodyItemAction => {
@@ -101,7 +104,10 @@ const Matching: React.FC<MatchingProps> = (props) => {
 
   const addValue = (): void => {
     const newValues = [...values];
-    newValues.push('');
+    newValues.push({
+      type: 'HTML',
+      value: '',
+    });
     onChange({ ...info, values: newValues }, value);
   };
   const deleteValue = (index: number): UpdateBodyItemAction => {
@@ -152,12 +158,12 @@ const Matching: React.FC<MatchingProps> = (props) => {
     ret[index] = val;
     onChange(info, ret);
   };
-  const updatePrompt = (index: number, newPrompt: string): void => {
+  const updatePrompt = (index: number, newPrompt: HTMLVal): void => {
     const newPrompts = [...prompts];
     newPrompts[index] = newPrompt;
     onChange({ ...info, prompts: newPrompts }, value);
   };
-  const updateValue = (index: number, newValue: string): void => {
+  const updateValue = (index: number, newValue: HTMLVal): void => {
     const newValues = [...values];
     newValues[index] = newValue;
     onChange({ ...info, values: newValues }, value);
@@ -208,9 +214,12 @@ const Matching: React.FC<MatchingProps> = (props) => {
                 <CustomEditor
                   className="bg-white"
                   theme="bubble"
-                  value={p}
+                  value={p.value}
                   placeholder="Enter a new prompt"
-                  onChange={(newPrompt): void => updatePrompt(idx, newPrompt)}
+                  onChange={(newPrompt): void => updatePrompt(idx, {
+                    type: 'HTML',
+                    value: newPrompt,
+                  })}
                 />
               </Col>
               <Col sm={2}>
@@ -275,9 +284,12 @@ const Matching: React.FC<MatchingProps> = (props) => {
               <CustomEditor
                 className="bg-white pr-0"
                 theme="bubble"
-                value={v}
+                value={v.value}
                 placeholder="Enter a new choice"
-                onChange={(newValue): void => updateValue(idx, newValue)}
+                onChange={(newValue): void => updateValue(idx, {
+                  type: 'HTML',
+                  value: newValue,
+                })}
               />
             </Col>
           </Row>

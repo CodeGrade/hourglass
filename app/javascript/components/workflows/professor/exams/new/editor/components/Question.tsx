@@ -137,7 +137,7 @@ const Question: React.FC<QuestionProps> = (props) => {
                     prompt: {
                       type: 'HTML',
                       value: '',
-                  },
+                    },
                   }}
                   onChange={(newVal): void => {
                     onChange(name, description, newVal);

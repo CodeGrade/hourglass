@@ -77,9 +77,17 @@ const ProctoringInfo: React.FC<{
     <>
       <h2>Proctoring Arrangements</h2>
       <Form.Group>
+        <Link to={`/exams/${examId}/assign-staff`}>
+          <Button
+            variant="info"
+          >
+            Assign staff members
+          </Button>
+        </Link>
         <Link to={`/exams/${examId}/seating`}>
           <Button
             variant="info"
+            className="ml-2"
           >
             Assign seating
           </Button>

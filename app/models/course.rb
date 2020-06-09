@@ -6,6 +6,7 @@ class Course < ApplicationRecord
   has_many :sections, dependent: :destroy
 
   has_many :professor_course_registrations, dependent: :destroy
+  has_many :staff_registrations, through: :sections
   has_many :student_registrations, through: :sections
 
   validates :title, presence: true
@@ -13,5 +14,9 @@ class Course < ApplicationRecord
 
   def students
     student_registrations.select(:user_id).distinct.map(&:user)
+  end
+
+  def staff
+    staff_registrations.select(:user_id).distinct.map(&:user)
   end
 end

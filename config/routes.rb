@@ -15,6 +15,8 @@ Rails.application.routes.draw do
               end
               resources :rooms, param: 'room_id', only: [:index] do
                 collection do
+                  get :staff_regs
+                  post :update_all_staff
                   post :update_all
                 end
               end

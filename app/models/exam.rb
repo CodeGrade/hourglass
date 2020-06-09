@@ -10,6 +10,7 @@ class Exam < ApplicationRecord
   has_many :exam_versions, dependent: :destroy
 
   has_many :registrations, through: :rooms
+  has_many :proctor_registrations, through: :rooms
 
   validates :course, presence: true
   validates :name, presence: true
@@ -37,6 +38,12 @@ class Exam < ApplicationRecord
   def unassigned_students
     course.students.reject do |s|
       registrations.exists? user: s
+    end
+  end
+
+  def unassigned_staff
+    course.staff.reject do |s|
+      proctor_registrations.exists? user: s
     end
   end
 end

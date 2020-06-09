@@ -1,6 +1,6 @@
 import React, { useEffect, useContext } from 'react';
 import {
-  Exam,
+  ExamVersion,
 } from '@student/exams/show/types';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, RailsContext, ExamFilesContext } from '@student/exams/show/context';
@@ -11,7 +11,7 @@ import { FileViewer } from '@student/exams/show/components/FileViewer';
 import ShowQuestion from '@student/exams/show/containers/ShowQuestion';
 
 interface ExamShowContentsProps {
-  exam: Exam;
+  exam: ExamVersion;
   save: () => void;
 }
 

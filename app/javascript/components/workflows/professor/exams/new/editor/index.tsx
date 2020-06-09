@@ -4,14 +4,14 @@ import store from '@professor/exams/new/store';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext } from '@student/exams/show/context';
 import {
-  Exam,
+  ExamVersion,
   RailsExam,
   AnswersState,
 } from '@student/exams/show/types';
 import ExamEditor from '@professor/exams/new/editor/containers/ExamEditor';
 
 export interface ExamEditorProps {
-  exam: Exam;
+  exam: ExamVersion;
   railsExam: RailsExam;
   answers: AnswersState;
 }

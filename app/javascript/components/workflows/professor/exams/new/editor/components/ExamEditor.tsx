@@ -10,7 +10,7 @@ import {
   Alert,
 } from 'react-bootstrap';
 import {
-  Exam,
+  ExamVersion,
   RailsExam,
   AnswersState,
 } from '@student/exams/show/types';
@@ -25,7 +25,7 @@ import { createMap, getFilesForRefs } from '@student/exams/show/files';
 import Submit from '@professor/exams/new/editor/containers/Submit';
 
 export interface ExamEditorProps {
-  exam: Exam;
+  exam: ExamVersion;
   railsExam: RailsExam;
   answers: AnswersState;
   onChange: (newTitle: string) => void;

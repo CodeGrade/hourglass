@@ -7,14 +7,14 @@ import {
 } from '@professor/exams/new/types';
 import { updateTitle } from '@professor/exams/new/actions';
 import {
-  Exam,
+  ExamVersion,
   RailsExam,
   ExamFile,
   AnswersState,
 } from '@student/exams/show/types';
 
 const mapStateToProps: MSTP<{
-  exam: Exam;
+  exam: ExamVersion;
   railsExam: RailsExam;
   files: ExamFile[];
   answers: AnswersState;

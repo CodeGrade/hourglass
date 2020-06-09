@@ -50,7 +50,7 @@ export interface ContentsResponse {
 
   time: RailsTimeInfo;
 
-  exam: Exam;
+  exam: ExamVersion;
 
   answers: AnswersState;
 
@@ -138,7 +138,7 @@ export interface LockdownFailedAction {
 
 export interface LoadExamAction {
   type: 'LOAD_EXAM';
-  exam: Exam;
+  exam: ExamVersion;
   time: TimeInfo;
   answers: AnswersState;
   messages: ExamMessage[];
@@ -215,7 +215,7 @@ export interface LockdownState {
 
 export interface ContentsState {
   // Exam information.
-  exam?: Exam;
+  exam?: ExamVersion;
 
   // Exam timing information.
   time?: TimeInfo;
@@ -461,7 +461,7 @@ export interface TimeInfo {
   ends: DateTime;
 }
 
-export interface Exam {
+export interface ExamVersion {
   questions: QuestionInfo[];
   reference?: FileRef[];
   instructions: HTMLVal;

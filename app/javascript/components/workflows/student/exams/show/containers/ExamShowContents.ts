@@ -2,7 +2,7 @@ import ExamShowContents from '@student/exams/show/components/ExamShowContents';
 import { connect } from 'react-redux';
 import { saveSnapshot } from '@student/exams/show/actions';
 import {
-  Exam,
+  ExamVersion,
   MSTP,
   MDTP,
   RailsExam,
@@ -14,7 +14,7 @@ interface OwnProps {
   railsExam: RailsExam;
 }
 
-const mapStateToProps: MSTP<{exam: Exam}, OwnProps> = (state) => ({
+const mapStateToProps: MSTP<{exam: ExamVersion}, OwnProps> = (state) => ({
   exam: state.contents.exam,
 });
 

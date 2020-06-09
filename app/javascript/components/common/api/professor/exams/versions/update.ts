@@ -1,5 +1,5 @@
 import {
-  Exam,
+  ExamVersion,
   RailsExam,
   AnswersState,
 } from '@student/exams/show/types';
@@ -11,12 +11,12 @@ export interface Version {
     policies: RailsExam['policies'];
     answers: AnswersState['answers'];
     contents: {
-      instructions: Exam['instructions'];
-      questions: Exam['questions'];
-      reference: Exam['reference'];
+      instructions: ExamVersion['instructions'];
+      questions: ExamVersion['questions'];
+      reference: ExamVersion['reference'];
     };
   };
-  files: Exam['files'];
+  files: ExamVersion['files'];
 }
 
 export interface Request {

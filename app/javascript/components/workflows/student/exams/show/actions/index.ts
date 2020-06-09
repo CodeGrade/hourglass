@@ -22,7 +22,7 @@ import {
   MessageReceivedAction,
   MessagesOpenedAction,
   AnswersState,
-  Exam,
+  ExamVersion,
   QuestionAskedAction,
   QuestionFailedAction,
   QuestionSucceededAction,
@@ -170,7 +170,7 @@ export function lockdownFailed(message: string): LockdownFailedAction {
 }
 
 export function loadExam(
-  exam: Exam,
+  exam: ExamVersion,
   time: TimeInfo,
   answers: AnswersState,
   messages: ExamMessage[],

@@ -22,10 +22,10 @@ contents:
             - "Answer all of the following true/false questions."
             - TrueFalse:
                 correctAnswer: true
-                prompt: "Java requires the use of semicolons (<pre>;</pre>) to end statements."
+                prompt: "Java requires the use of semicolons (<code>;</code>) to end statements."
             - TrueFalse:
                 correctAnswer: false
-                prompt: "Racket requires the use of semicolons (<pre>;</pre>) to end statements."
+                prompt: "Racket requires the use of semicolons (<code>;</code>) to end statements."
             - "The next one is tricky! Be careful."
             - TrueFalse:
                 correctAnswer: false

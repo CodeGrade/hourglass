@@ -14,8 +14,8 @@ class Exam < ApplicationRecord
   validates :course, presence: true
   validates :name, presence: true
 
-  def duration
-    read_attribute(:duration).minutes
+  def duration_minutes
+    duration.minutes
   end
 
   def finalized?

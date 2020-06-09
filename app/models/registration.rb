@@ -48,11 +48,11 @@ class Registration < ApplicationRecord
   end
 
   def accommodated_duration
-    exam.duration * (accommodation&.factor || 1)
+    exam.duration_minutes * (accommodation&.factor || 1)
   end
 
   def accommodated_end_time
-    accommodated_start_time + (exam.end_time - exam.start_time) + (accommodated_duration - exam.duration)
+    accommodated_start_time + (exam.end_time - exam.start_time) + (accommodated_duration - exam.duration_minutes)
   end
 
   # End time plus any applicable extensions

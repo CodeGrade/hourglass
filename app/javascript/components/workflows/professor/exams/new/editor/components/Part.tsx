@@ -9,6 +9,7 @@ import {
   Collapse,
   Button,
 } from 'react-bootstrap';
+import { alphabetIdx } from '@hourglass/common/helpers';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import { HTMLVal, FileRef, ExamFile } from '@student/exams/show/types';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
@@ -71,7 +72,7 @@ const Part: React.FC<PartProps> = (props) => {
       />
       <Alert variant="success">
         <Card.Title>
-          {`Part ${String.fromCharCode(65 + pnum)}`}
+          {`Part ${alphabetIdx(pnum)}`}
         </Card.Title>
         <Card.Subtitle>
           <Form.Group as={Row} controlId={`${qnum}-${pnum}-name`}>

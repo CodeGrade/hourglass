@@ -26,3 +26,7 @@ export function useRefresher(): [number, () => void] {
     (): void => setRefresher((a) => a + 1),
   ];
 }
+
+export function alphabetIdx(idx: number): string {
+  return String.fromCharCode(65 + idx);
+}

@@ -10,6 +10,7 @@ import {
 import {
   scrollToQuestion,
 } from '@student/exams/show/helpers';
+import { alphabetIdx } from '@hourglass/common/helpers';
 
 interface JumpToProps {
   pagination: PaginationState;
@@ -81,7 +82,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
           // solo or anonymous parts
           const selectedPart = c.part === selectedCoords.part;
           const active = selectedQuestion && selectedPart;
-          const plabel = `Part ${c.part + 1}`;
+          const plabel = `Part ${alphabetIdx(c.part)}`;
           return (
             <Nav.Item
               // Part indices are STATIC

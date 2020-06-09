@@ -5,6 +5,7 @@ import { FileViewer } from '@student/exams/show/components/FileViewer';
 import DisplayBody from '@proctor/registrations/show/DisplayBody';
 import '@student/exams/show/components/Part.css';
 import { PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import { alphabetIdx } from '@hourglass/common/helpers';
 
 interface PartProps {
   part: PartInfo;
@@ -23,7 +24,7 @@ const Part: React.FC<PartProps> = (props) => {
   const {
     name = {
       type: 'HTML',
-      value: `Part ${pnum + 1}`,
+      value: `Part ${alphabetIdx(pnum)}`,
     },
     reference,
     description,

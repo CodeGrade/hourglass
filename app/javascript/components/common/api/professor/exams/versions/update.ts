@@ -6,6 +6,7 @@ import {
 import { hitApi } from '@hourglass/common/types/api';
 
 export interface Version {
+  // TODO: name: string;
   info: {
     policies: RailsExam['policies'];
     answers: AnswersState['answers'];

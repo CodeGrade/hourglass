@@ -17,7 +17,6 @@ export interface ExamEditorProps {
   answers: AnswersState;
 }
 
-
 const Editor: React.FC<ExamEditorProps> = (props) => {
   const {
     railsExam,
@@ -29,12 +28,17 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
   } = exam;
   const fmap = createMap(files);
 
-  useEffect(() => {
-    store.dispatch(loadExam(railsExam, exam, answers));
-  }, []);
   return (
     <ExamContext.Provider value={{ files, fmap }}>
-      <Provider store={store}>
+      <Provider
+        store={store({
+          contents: {
+            exam,
+            answers,
+          },
+          railsExam,
+        })}
+      >
         <ExamEditor />
       </Provider>
     </ExamContext.Provider>

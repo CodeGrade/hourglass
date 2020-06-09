@@ -13,4 +13,4 @@ const reduxEnhancers = composeEnhancers(
 );
 
 
-export default createStore(rootReducer, reduxEnhancers);
+export default (start) => createStore(rootReducer, start, reduxEnhancers);

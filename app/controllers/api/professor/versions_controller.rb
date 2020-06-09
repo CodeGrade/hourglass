@@ -31,6 +31,7 @@ module Api
         version = params[:version].permit!.to_h
         updated = @version.update!(
           {
+            name: version[:name],
             info: version[:info],
             files: version[:files]
           }

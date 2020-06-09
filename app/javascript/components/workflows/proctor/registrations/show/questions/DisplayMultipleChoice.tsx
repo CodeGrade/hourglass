@@ -26,7 +26,7 @@ const DisplayMultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
       <>
         <b>Answer: </b>
         <span className="btn btn-sm btn-outline-dark disabled">
-          {options[value]}
+          <HTML value={options[value]} />
         </span>
       </>
     );

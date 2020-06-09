@@ -29,7 +29,7 @@ const DisplayAllThatApply: React.FC<AllThatApplyProps> = (props) => {
           {options.map((o, i) => {
             // options array is STATIC
             // eslint-disable-next-line react/no-array-index-key
-            if (value?.[i]) { return <li key={i}>{o}</li>; }
+            if (value?.[i]) { return <li key={i}><HTML value={o} /></li>; }
             return null;
           })}
         </ul>

@@ -11,13 +11,16 @@ interface MatchingProps {
   value: MatchingState;
 }
 
-const Matching: React.FC<MatchingProps> = (props) => {
+const DisplayMatching: React.FC<MatchingProps> = (props) => {
   const {
     info,
     value,
   } = props;
   const {
-    promptLabel, prompts, valuesLabel, values,
+    promptLabel,
+    prompts,
+    valuesLabel,
+    values,
   } = info;
   return (
     <Row>
@@ -54,12 +57,12 @@ const Matching: React.FC<MatchingProps> = (props) => {
                     {alphabetIdx(i)}
                     .
                   </td>
-                  <td>{p}</td>
+                  <td><HTML value={p} /></td>
                   <td>
                     {valueI === -1 ? 'None' : `Option ${valueI + 1}`}
                   </td>
                   <td>
-                    {valueI === -1 ? '' : values[valueI]}
+                    {valueI === -1 ? '' : <HTML value={values[valueI]} />}
                   </td>
                 </tr>
               );
@@ -71,4 +74,4 @@ const Matching: React.FC<MatchingProps> = (props) => {
   );
 };
 
-export default Matching;
+export default DisplayMatching;

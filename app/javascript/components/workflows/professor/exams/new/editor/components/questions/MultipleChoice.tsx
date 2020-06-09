@@ -43,17 +43,14 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
     rawSetMoversVisible(newMovers);
   };
   const setAnswer = (newVal): void => onChange(info, newVal);
-  const setPrompt = (index: number, newPrompt: HTMLVal): void => {
+  const setPrompt = (index: number, newPrompt: string): void => {
     const newOptions = [...info.options];
     newOptions[index] = newPrompt;
     onChange({ ...info, options: newOptions }, value);
   };
   const addOption = (): void => {
     const newOptions = [...options];
-    newOptions.push({
-      type: 'HTML',
-      value: '',
-    });
+    newOptions.push('');
     onChange({ ...info, options: newOptions }, value);
   };
   const deleteOption = (index: number): UpdateBodyItemAction => {
@@ -128,11 +125,8 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
                   <CustomEditor
                     className="bg-white"
                     theme="bubble"
-                    value={option.value}
-                    onChange={(newPrompt): void => setPrompt(idx, {
-                      type: 'HTML',
-                      value: newPrompt,
-                    })}
+                    value={option}
+                    onChange={(newPrompt): void => setPrompt(idx, newPrompt)}
                   />
                 </Col>
               </Row>

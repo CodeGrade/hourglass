@@ -58,7 +58,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
                     {String.fromCharCode(65 + i)}
                     .
                   </td>
-                  <td><HTML value={p} /></td>
+                  <td>{p}</td>
                   <td>
                     <FormControl variant="outlined">
                       <InputLabel>Match</InputLabel>
@@ -114,7 +114,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
                   {i + 1}
                   .
                 </td>
-                <td><HTML value={v} /></td>
+                <td>{v}</td>
               </tr>
             ))}
           </tbody>

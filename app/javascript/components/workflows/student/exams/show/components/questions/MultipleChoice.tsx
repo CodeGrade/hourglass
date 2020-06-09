@@ -38,7 +38,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
             disabled={disabled}
             type="radio"
             value={idx}
-            label={<HTML value={option} />}
+            label={option}
             onChange={handler}
             checked={value === idx}
             id={`opt-${qnum}-${pnum}-${bnum}-${idx}`}

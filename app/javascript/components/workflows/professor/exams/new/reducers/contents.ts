@@ -356,7 +356,7 @@ export default (state: ContentsState = {
           throw new ExhaustiveSwitchError(bodyItem);
       }
       questions[qnum].parts[pnum].body[bnum] = bodyItem;
-      ansPnum[bnum] = answer;
+      ansPnum[bnum] = answer ?? { NO_ANS: true };
       ansQnum[pnum] = ansPnum;
       answers[qnum] = ansQnum;
       return {

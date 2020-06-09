@@ -95,12 +95,12 @@ class Upload
       q['parts'].map do |p|
         p['body'].map do |b|
           if b.is_a? String
-            nil
+            { NO_ANS: true }
           elsif b.is_a? Hash
             if b.key? 'AllThatApply'
               b['AllThatApply']['options'].map(&:values).flatten
             elsif b.key? 'Code'
-              nil
+              { NO_ANS: true }
             elsif b.key? 'CodeTag'
               {
                 selectedFile: b['CodeTag']['correctAnswer']['filename'],
@@ -111,7 +111,7 @@ class Upload
             elsif b.key? 'MultipleChoice'
               b['MultipleChoice']['correctAnswer']
             elsif b.key? 'Text'
-              nil
+              { NO_ANS: true }
             elsif b.key? 'TrueFalse'
               if b['TrueFalse'] == !! b['YesNo']
                 b['TrueFalse']

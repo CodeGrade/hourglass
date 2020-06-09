@@ -197,7 +197,7 @@
     },
     "BodyItemAnswer": {
       "oneOf": [
-        { "type": "null" },
+        { "$ref": "#/definitions/NoAnswer" },
         {
           "type": "boolean",
           "$comment": "YesNo / TrueFalse"
@@ -207,6 +207,14 @@
         { "$ref": "#/definitions/ATAAnswer" },
         { "$ref": "#/definitions/CodeTagAnswer" }
       ]
+    },
+    "NoAnswer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["NO_ANS"],
+      "properties": {
+        "NO_ANS": { "enum": [true] }
+      }
     },
     "ATAAnswer": {
       "type": "array",

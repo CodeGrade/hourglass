@@ -171,18 +171,27 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
             <Button
               variant={choices === 'exam' ? 'secondary' : 'outline-secondary'}
               active={choices === 'exam'}
+              onClick={(): void => {
+                onChange({ ...info, choices: 'exam' }, value);
+              }}
             >
               Files for full exam
             </Button>
             <Button
               variant={choices === 'question' ? 'secondary' : 'outline-secondary'}
               active={choices === 'question'}
+              onClick={(): void => {
+                onChange({ ...info, choices: 'question' }, value);
+              }}
             >
               Files for current question
             </Button>
             <Button
               variant={choices === 'part' ? 'secondary' : 'outline-secondary'}
               active={choices === 'part'}
+              onClick={(): void => {
+                onChange({ ...info, choices: 'part' }, value);
+              }}
             >
               Files for current part
             </Button>

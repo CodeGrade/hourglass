@@ -17,7 +17,7 @@ const DisplayMatching: React.FC<MatchingProps> = (props) => {
     value,
   } = props;
   const {
-    promptLabel,
+    promptsLabel,
     prompts,
     valuesLabel,
     values,
@@ -30,7 +30,7 @@ const DisplayMatching: React.FC<MatchingProps> = (props) => {
             <tr>
               <th colSpan={2}>
                 <HTML
-                  value={promptLabel ?? {
+                  value={promptsLabel ?? {
                     type: 'HTML',
                     value: 'Column A',
                   }}

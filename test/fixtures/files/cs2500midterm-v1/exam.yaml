@@ -70,6 +70,8 @@ contents:
         - body:
             - "This matching section concerns import information."
             - Matching:
+                promptsLabel: "Match <i>from here</i>.."
+                valuesLabel: "across <i>to here</i>."
                 prompts:
                   - "<i>favorite</i> programming language"
                   - "choose 5"

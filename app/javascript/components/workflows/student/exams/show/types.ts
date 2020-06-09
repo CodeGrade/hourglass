@@ -412,7 +412,7 @@ export type TextState = string;
 
 export interface MatchingInfo {
   type: 'Matching';
-  promptLabel?: HTMLVal;
+  promptsLabel?: HTMLVal;
   prompts: HTMLVal[];
   valuesLabel?: HTMLVal;
   values: HTMLVal[];

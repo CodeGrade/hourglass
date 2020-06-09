@@ -125,6 +125,8 @@
       "required": ["type", "prompts", "values"],
       "properties": {
         "type": { "enum": ["Matching"] },
+        "promptsLabel": { "$ref": "#/definitions/HTML" },
+        "valuesLabel": { "$ref": "#/definitions/HTML" },
         "prompts": { "$ref": "#/definitions/Options" },
         "values": { "$ref": "#/definitions/Options" }
       }

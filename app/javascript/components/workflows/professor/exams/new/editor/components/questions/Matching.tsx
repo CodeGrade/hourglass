@@ -68,7 +68,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
     makeChangeAction,
   } = props;
   const {
-    promptLabel, prompts, valuesLabel, values,
+    promptsLabel, prompts, valuesLabel, values,
   } = info;
   const [promptMoversVisible, rawSetPromptMoversVisible] = useState([]);
   const setPromptMoversVisible = (index: number, visible: boolean): void => {
@@ -144,7 +144,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
   const setColA = (newColA: HTMLVal): void => {
     onChange({
       ...info,
-      promptLabel: newColA,
+      promptsLabel: newColA,
     }, value);
   };
   const setColB = (newColB: HTMLVal): void => {
@@ -178,7 +178,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
             <CustomEditor
               className="bg-white"
               theme="bubble"
-              value={promptLabel?.value ?? 'Column A'}
+              value={promptsLabel?.value ?? 'Column A'}
               onChange={(newVal) => setColA({
                 type: 'HTML',
                 value: newVal,

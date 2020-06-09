@@ -24,7 +24,10 @@ const Matching: React.FC<MatchingProps> = (props) => {
     disabled,
   } = props;
   const {
-    promptLabel, prompts, valuesLabel, values,
+    promptsLabel,
+    prompts,
+    valuesLabel,
+    values,
   } = info;
   return (
     <Row>
@@ -34,7 +37,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
             <tr>
               <th colSpan={3} className="text-center">
                 <HTML
-                  value={promptLabel ?? {
+                  value={promptsLabel ?? {
                     type: 'HTML',
                     value: 'Column A',
                   }}

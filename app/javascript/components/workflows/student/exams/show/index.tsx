@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import store from '@student/exams/show/store';
 import {
-  RailsExam,
+  RailsExamVersion,
   RailsUser,
   RailsRegistration,
   RailsCourse,
@@ -17,7 +17,7 @@ interface ShowExamProps {
   railsUser: RailsUser;
 
   // Information about the exam.
-  railsExam: RailsExam;
+  railsExam: RailsExamVersion;
 
   // Information about the registration.
   railsRegistration: RailsRegistration;

@@ -1,11 +1,11 @@
 import { ExamEditorAction } from '@professor/exams/new/types';
-import { RailsExam } from '@student/exams/show/types';
+import { RailsExamVersion } from '@student/exams/show/types';
 
-export default (state: RailsExam = {
+export default (state: RailsExamVersion = {
   id: undefined,
   name: '',
   policies: [],
-}, action: ExamEditorAction): RailsExam => {
+}, action: ExamEditorAction): RailsExamVersion => {
   switch (action.type) {
     case 'UPDATE_POLICIES': {
       return {

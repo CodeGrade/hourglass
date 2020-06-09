@@ -8,14 +8,14 @@ import {
 import { updateTitle } from '@professor/exams/new/actions';
 import {
   ExamVersion,
-  RailsExam,
+  RailsExamVersion,
   ExamFile,
   AnswersState,
 } from '@student/exams/show/types';
 
 const mapStateToProps: MSTP<{
   exam: ExamVersion;
-  railsExam: RailsExam;
+  railsExam: RailsExamVersion;
   files: ExamFile[];
   answers: AnswersState;
 }> = (state: ExamEditorState) => ({

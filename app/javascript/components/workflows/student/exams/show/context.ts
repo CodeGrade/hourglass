@@ -2,7 +2,7 @@ import { createContext } from 'react';
 import {
   FileMap,
   ExamFile,
-  RailsExam,
+  RailsExamVersion,
   RailsRegistration,
   RailsUser,
   RailsCourse,
@@ -17,7 +17,7 @@ interface ExamContext {
 export const ExamContext = createContext<ExamContext>({} as ExamContext);
 
 interface RailsContext {
-  railsExam?: RailsExam;
+  railsExam?: RailsExamVersion;
   railsRegistration?: RailsRegistration;
   railsUser?: RailsUser;
   railsCourse?: RailsCourse;

@@ -5,13 +5,13 @@ import {
   ExamVersion,
   MSTP,
   MDTP,
-  RailsExam,
+  RailsExamVersion,
   RailsCourse,
 } from '@student/exams/show/types';
 
 interface OwnProps {
   railsCourse: RailsCourse;
-  railsExam: RailsExam;
+  railsExam: RailsExamVersion;
 }
 
 const mapStateToProps: MSTP<{exam: ExamVersion}, OwnProps> = (state) => ({

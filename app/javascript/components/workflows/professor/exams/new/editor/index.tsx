@@ -5,14 +5,14 @@ import { createMap } from '@student/exams/show/files';
 import { ExamContext } from '@student/exams/show/context';
 import {
   ExamVersion,
-  RailsExam,
+  RailsExamVersion,
   AnswersState,
 } from '@student/exams/show/types';
 import ExamEditor from '@professor/exams/new/editor/containers/ExamEditor';
 
 export interface ExamEditorProps {
   exam: ExamVersion;
-  railsExam: RailsExam;
+  railsExam: RailsExamVersion;
   answers: AnswersState;
 }
 

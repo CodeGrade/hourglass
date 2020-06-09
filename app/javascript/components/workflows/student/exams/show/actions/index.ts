@@ -13,7 +13,7 @@ import {
   UpdateAnswerAction,
   StartExamResponse,
   LoadExamAction,
-  RailsExam,
+  RailsExamVersion,
   LockdownFailedAction,
   Thunk,
   policyPermits,
@@ -251,7 +251,7 @@ export function doLoad(courseID: number, examID: number): Thunk {
 
 export function doTryLockdown(
   course: RailsCourse,
-  exam: RailsExam,
+  exam: RailsExamVersion,
 ): Thunk {
   return (dispatch): void => {
     lock(exam.policies).then(() => {

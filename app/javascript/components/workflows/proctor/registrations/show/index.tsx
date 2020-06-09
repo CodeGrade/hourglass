@@ -1,5 +1,5 @@
 import React from 'react';
-import { RailsExam, ContentsState } from '@student/exams/show/types';
+import { RailsExamVersion, ContentsState } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import {
   ExamContext,
@@ -13,7 +13,7 @@ import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
 
 interface ExamViewerProps {
-  railsExam: RailsExam;
+  railsExam: RailsExamVersion;
   contents: ContentsState;
 }
 

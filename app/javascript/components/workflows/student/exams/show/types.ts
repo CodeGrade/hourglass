@@ -2,7 +2,7 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
 
-export interface RailsExam {
+export interface RailsExamVersion {
   // The exam ID.
   id: number;
 

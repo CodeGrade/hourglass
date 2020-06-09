@@ -4,14 +4,14 @@ import {
   LockdownStatus,
   ExamTakerState,
   MDTP,
-  RailsExam,
+  RailsExamVersion,
   MSTP,
   RailsCourse,
 } from '@student/exams/show/types';
 import { doTryLockdown } from '@student/exams/show/actions';
 
 interface OwnProps {
-  railsExam: RailsExam;
+  railsExam: RailsExamVersion;
   railsCourse: RailsCourse;
 }
 

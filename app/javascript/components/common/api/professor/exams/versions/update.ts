@@ -1,6 +1,6 @@
 import {
   ExamVersion,
-  RailsExam,
+  RailsExamVersion,
   AnswersState,
 } from '@student/exams/show/types';
 import { hitApi } from '@hourglass/common/types/api';
@@ -8,7 +8,7 @@ import { hitApi } from '@hourglass/common/types/api';
 export interface Version {
   // TODO: name: string;
   info: {
-    policies: RailsExam['policies'];
+    policies: RailsExamVersion['policies'];
     answers: AnswersState['answers'];
     contents: {
       instructions: ExamVersion['instructions'];

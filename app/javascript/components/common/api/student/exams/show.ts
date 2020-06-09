@@ -1,9 +1,9 @@
-import { RailsExam, RailsRegistration, RailsCourse } from '@student/exams/show/types';
+import { RailsExamVersion, RailsRegistration, RailsCourse } from '@student/exams/show/types';
 import { ApiResponse, useApiResponse } from '@hourglass/common/types/api';
 import { DateTime } from 'luxon';
 
 export interface Server {
-  railsExam: RailsExam;
+  railsExam: RailsExamVersion;
   railsRegistration: RailsRegistration;
   railsCourse: RailsCourse;
   final: boolean;
@@ -11,7 +11,7 @@ export interface Server {
 }
 
 export interface Res {
-  railsExam: RailsExam;
+  railsExam: RailsExamVersion;
   railsRegistration: RailsRegistration;
   railsCourse: RailsCourse;
   final: boolean;

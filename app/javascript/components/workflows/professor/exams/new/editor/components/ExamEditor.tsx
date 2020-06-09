@@ -11,7 +11,7 @@ import {
 } from 'react-bootstrap';
 import {
   ExamVersion,
-  RailsExam,
+  RailsExamVersion,
   AnswersState,
 } from '@student/exams/show/types';
 import Instructions from '@professor/exams/new/editor/containers/Instructions';
@@ -26,7 +26,7 @@ import Submit from '@professor/exams/new/editor/containers/Submit';
 
 export interface ExamEditorProps {
   exam: ExamVersion;
-  railsExam: RailsExam;
+  railsExam: RailsExamVersion;
   answers: AnswersState;
   onChange: (newTitle: string) => void;
 }

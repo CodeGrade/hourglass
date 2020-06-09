@@ -21,7 +21,7 @@ import {
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
-import { RailsExam, ContentsState } from '@student/exams/show/types';
+import { RailsExamVersion, ContentsState } from '@student/exams/show/types';
 import { Editor as CodeMirrorEditor } from 'codemirror';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
@@ -340,7 +340,7 @@ interface CodeMirroredElement extends Element {
 const PreviewVersion: React.FC<{
   open: boolean;
   contents: ContentsState;
-  railsExam: RailsExam;
+  railsExam: RailsExamVersion;
 }> = (props) => {
   const {
     open,

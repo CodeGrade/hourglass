@@ -51,12 +51,12 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
     <Container fluid className="flex-fill">
       <Form>
         <Form.Group as={Row} controlId="examTitle">
-          <Form.Label column sm="3"><h2>Exam name:</h2></Form.Label>
+          <Form.Label column sm="3"><h2>Version name:</h2></Form.Label>
           <Col>
             <Form.Control
               size="lg"
               type="text"
-              placeholder="Enter an exam name"
+              placeholder="Enter a name for this version"
               value={name}
               onChange={(e): void => onChange(e.target.value)}
             />

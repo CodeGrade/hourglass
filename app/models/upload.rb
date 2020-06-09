@@ -77,6 +77,12 @@ class Upload
     }
   end
 
+  def make_html_vals(arr)
+    return nil if arr.nil?
+
+    arr.map { |i| make_html_val(i) }
+  end
+
   def parse_info(properties)
     contents = properties['contents']
     contents['questions'].each do |q|
@@ -152,7 +158,7 @@ class Upload
                   {
                     type: 'AllThatApply',
                     prompt: make_html_val(b['AllThatApply']['prompt']),
-                    options: b['AllThatApply']['options'].map(&:keys).flatten
+                    options: make_html_vals(b['AllThatApply']['options'].map(&:keys).flatten)
                   }
                 elsif b.key? 'Code'
                   {
@@ -183,14 +189,14 @@ class Upload
                 elsif b.key? 'Matching'
                   {
                     type: 'Matching',
-                    prompts: b['Matching']['prompts'],
-                    values: b['Matching']['values']
+                    prompts: make_html_vals(b['Matching']['prompts']),
+                    values: make_html_vals(b['Matching']['values'])
                   }
                 elsif b.key? 'MultipleChoice'
                   {
                     type: 'MultipleChoice',
                     prompt: make_html_val(b['MultipleChoice']['prompt']),
-                    options: b['MultipleChoice']['options']
+                    options: make_html_vals(b['MultipleChoice']['options'])
                   }
                 elsif b.key? 'Text'
                   if b['Text'].nil?

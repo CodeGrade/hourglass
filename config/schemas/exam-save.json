@@ -160,7 +160,7 @@
     },
     "Options": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": { "$ref": "#/definitions/HTML" }
     },
     "HTML": {
       "type": "object",

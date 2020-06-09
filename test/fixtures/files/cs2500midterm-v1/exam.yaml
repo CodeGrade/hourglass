@@ -22,10 +22,10 @@ contents:
             - "Answer all of the following true/false questions."
             - TrueFalse:
                 correctAnswer: true
-                prompt: "Java requires the use of semicolons to end statements."
+                prompt: "Java requires the use of semicolons (<pre>;</pre>) to end statements."
             - TrueFalse:
                 correctAnswer: false
-                prompt: "Racket requires the use of semicolons to end statements."
+                prompt: "Racket requires the use of semicolons (<pre>;</pre>) to end statements."
             - "The next one is tricky! Be careful."
             - TrueFalse:
                 correctAnswer: false
@@ -71,7 +71,7 @@ contents:
             - "This matching section concerns import information."
             - Matching:
                 prompts:
-                  - "favorite programming language"
+                  - "<i>favorite</i> programming language"
                   - "choose 5"
                 values:
                   - "5"

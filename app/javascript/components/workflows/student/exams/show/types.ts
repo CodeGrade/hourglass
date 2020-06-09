@@ -367,7 +367,7 @@ export interface HTMLVal {
 
 export interface AllThatApplyInfo {
   type: 'AllThatApply';
-  options: string[];
+  options: HTMLVal[];
   prompt: HTMLVal;
 }
 
@@ -398,7 +398,7 @@ export interface CodeTagState {
 export interface MultipleChoiceInfo {
   type: 'MultipleChoice';
   prompt: HTMLVal;
-  options: string[];
+  options: HTMLVal[];
 }
 
 export type MultipleChoiceState = number;
@@ -413,9 +413,9 @@ export type TextState = string;
 export interface MatchingInfo {
   type: 'Matching';
   promptLabel?: HTMLVal;
-  prompts: string[];
+  prompts: HTMLVal[];
   valuesLabel?: HTMLVal;
-  values: string[];
+  values: HTMLVal[];
 }
 
 export interface MatchingState {

@@ -1,8 +1,6 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
 import {
-  Exam,
-  AnswersState,
   QuestionInfo,
   PartInfo,
   BodyItem,
@@ -30,8 +28,7 @@ export interface ExamEditorState {
   railsExam: RailsExam;
 }
 
-export type ExamEditorAction = LoadExamAction
-| UpdateInstructionsAction | UpdatePoliciesAction | UpdateTitleAction
+export type ExamEditorAction = UpdateInstructionsAction | UpdatePoliciesAction | UpdateTitleAction
 | UpdateExamFilesAction | UpdateExamFileRefsAction
 | AddQuestionAction | DeleteQuestionAction | MoveQuestionAction
 | UpdateQuestionAction | UpdateQuestionFileRefsAction
@@ -39,14 +36,6 @@ export type ExamEditorAction = LoadExamAction
 | UpdatePartAction | UpdatePartFileRefsAction
 | AddBodyItemAction | DeleteBodyItemAction | UpdateBodyItemAction | MoveBodyItemAction
 | UpdateHTMLBodyItemAction;
-
-
-export interface LoadExamAction {
-  type: 'LOAD_EXAM';
-  railsExam: RailsExam;
-  exam: Exam;
-  answers: AnswersState;
-}
 
 export interface UpdateTitleAction {
   type: 'UPDATE_TITLE';

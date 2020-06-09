@@ -17,11 +17,6 @@ export default (state: ContentsState = {
   },
 }, action: ExamEditorAction): ContentsState => {
   switch (action.type) {
-    case 'LOAD_EXAM':
-      return {
-        exam: action.exam,
-        answers: action.answers,
-      };
     case 'UPDATE_INSTRUCTIONS': {
       const { exam } = state;
       return {

@@ -7,13 +7,6 @@ export default (state: RailsExam = {
   policies: [],
 }, action: ExamEditorAction): RailsExam => {
   switch (action.type) {
-    case 'LOAD_EXAM': {
-      return {
-        ...state,
-        name: action.railsExam.name,
-        policies: action.railsExam.policies,
-      };
-    }
     case 'UPDATE_POLICIES': {
       return {
         ...state,

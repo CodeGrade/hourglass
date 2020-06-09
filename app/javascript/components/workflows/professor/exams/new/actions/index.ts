@@ -1,8 +1,5 @@
 import {
-  Exam,
-  AnswersState,
   Policy,
-  RailsExam,
   HTMLVal,
   FileRef,
   ExamFile,
@@ -11,7 +8,6 @@ import {
   BodyItem,
 } from '@student/exams/show/types';
 import {
-  LoadExamAction,
   UpdateExamFilesAction,
   UpdateExamFileRefsAction,
   UpdateInstructionsAction,
@@ -32,20 +28,6 @@ import {
   UpdateHTMLBodyItemAction,
   DeleteBodyItemAction,
 } from '@professor/exams/new/types';
-
-
-export function loadExam(
-  railsExam: RailsExam,
-  exam: Exam,
-  answers: AnswersState,
-): LoadExamAction {
-  return {
-    type: 'LOAD_EXAM',
-    exam,
-    answers,
-    railsExam,
-  };
-}
 
 export function updateTitle(
   title: string,

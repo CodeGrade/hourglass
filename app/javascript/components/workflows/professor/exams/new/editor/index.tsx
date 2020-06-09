@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Provider } from 'react-redux';
 import store from '@professor/exams/new/store';
 import { createMap } from '@student/exams/show/files';
@@ -9,7 +9,6 @@ import {
   AnswersState,
 } from '@student/exams/show/types';
 import ExamEditor from '@professor/exams/new/editor/containers/ExamEditor';
-import { loadExam } from '@professor/exams/new/actions';
 
 export interface ExamEditorProps {
   exam: Exam;

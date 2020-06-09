@@ -168,9 +168,24 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
         <Form.Label column sm={2}>Files source</Form.Label>
         <Col sm={10}>
           <ButtonGroup>
-            <Button variant="secondary">Files for full exam</Button>
-            <Button variant="secondary">Files for current question</Button>
-            <Button variant="secondary">Files for current part</Button>
+            <Button
+              variant={choices === 'exam' ? 'secondary' : 'outline-secondary'}
+              active={choices === 'exam'}
+            >
+              Files for full exam
+            </Button>
+            <Button
+              variant={choices === 'question' ? 'secondary' : 'outline-secondary'}
+              active={choices === 'question'}
+            >
+              Files for current question
+            </Button>
+            <Button
+              variant={choices === 'part' ? 'secondary' : 'outline-secondary'}
+              active={choices === 'part'}
+            >
+              Files for current part
+            </Button>
           </ButtonGroup>
         </Col>
       </Form.Group>

@@ -20,7 +20,7 @@ Hourglass expects postgresql.
 
 Databases can be created with `rails db:create` and the schema is loaded with `rails db:schema:load`.
 
-To setup the database with our test models, run `rails db:fixtures:load`.
+To setup the database with our development records, run `rails db:populate`.
 
 [bottlenose]: https://github.com/CodeGrade/bottlenose
 [nix]: https://nixos.org/nix/

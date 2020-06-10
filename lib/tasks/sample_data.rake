@@ -20,7 +20,7 @@ def make_sample_data
   cs2500 = create(:course, title: 'CS 2500')
   cs2500lec = create(:section, :lecture, course: cs2500)
   cs2500lab = create(:section, :lab, course: cs2500)
-  cs2500midterm = create(:exam, course: cs2500, duration: 5)
+  cs2500midterm = create(:exam, name: 'CS2500 Midterm', course: cs2500, duration: 5)
 
   cs2500_v1 = create(:exam_version, :cs2500_v1, exam: cs2500midterm)
   create(:version_announcement, exam_version: cs2500_v1)
@@ -35,7 +35,7 @@ def make_sample_data
   create(:room_announcement, room: cs2500_room2)
 
   cs2500prof = create(:user, username: 'cs2500prof')
-  create(:professor_course_registration, course: cs2500, user: cs2500prof)
+  cs2500prof_reg = create(:professor_course_registration, course: cs2500, user: cs2500prof)
 
   cs2500proctor = create(:user, username: 'cs2500proctor')
   create(:staff_registration, user: cs2500proctor, section: cs2500lec)
@@ -44,7 +44,10 @@ def make_sample_data
   cs2500student = create(:user, username: 'cs2500student')
   create(:student_registration, user: cs2500student, section: cs2500lec)
   create(:student_registration, user: cs2500student, section: cs2500lab)
-  create(:registration, user: cs2500student, room: cs2500_room1, exam_version: cs2500_v1)
+  cs2500student_reg = create(:registration, user: cs2500student, room: cs2500_room1, exam_version: cs2500_v1)
+
+  create(:question, reg: cs2500student_reg)
+  create(:message, prof_reg: cs2500prof_reg, exam: cs2500midterm, recipient: cs2500student)
 
   cs2500student2 = create(:user, username: 'cs2500student2')
   create(:student_registration, user: cs2500student2, section: cs2500lec)
@@ -57,7 +60,7 @@ def make_sample_data
   cs3500 = create(:course, title: 'CS 3500')
   cs3500lec = create(:section, :lecture, course: cs3500)
   cs3500lab = create(:section, :lab, course: cs3500)
-  cs3500final = create(:exam, course: cs3500, duration: 15)
+  cs3500final = create(:exam, name: 'CS3500 Final', course: cs3500, duration: 15)
 
   cs3500_v1 = create(:exam_version, :cs3500_v1, exam: cs3500final)
   create(:version_announcement, exam_version: cs3500_v1)

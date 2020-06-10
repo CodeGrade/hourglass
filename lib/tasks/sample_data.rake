@@ -41,10 +41,12 @@ def make_sample_data
   cs2500student = create(:user, username: 'cs2500student')
   create(:student_registration, user: cs2500student, section: cs2500lec)
   create(:student_registration, user: cs2500student, section: cs2500lab)
+  create(:registration, user: cs2500student, room: cs2500_room1, exam_version: cs2500_v1)
 
   cs2500student2 = create(:user, username: 'cs2500student2')
   create(:student_registration, user: cs2500student2, section: cs2500lec)
   create(:student_registration, user: cs2500student2, section: cs2500lab)
+  create(:registration, user: cs2500student2, room: cs2500_room1, exam_version: cs2500_v2)
 
   cs2500student_no_room = create(:user, username: 'cs2500student_no_room')
   create(:student_registration, user: cs2500student_no_room, section: cs2500lec)
@@ -69,4 +71,5 @@ def make_sample_data
   cs3500student = create(:user, username: 'cs3500student')
   create(:student_registration, user: cs3500student, section: cs3500lec)
   create(:student_registration, user: cs3500student, section: cs3500lab)
+  create(:registration, user: cs3500student, room: cs3500_room1, exam_version: cs3500_v1)
 end

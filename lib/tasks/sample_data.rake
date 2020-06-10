@@ -15,8 +15,12 @@ if Rails.env.development? || Rails.env.test?
 end
 
 def make_sample_data
-  admin = create(:admin, username: 'admin')
+  create(:admin, username: 'admin')
+  make_cs2500
+  make_cs3500
+end
 
+def make_cs2500
   cs2500 = create(:course, title: 'CS 2500')
   cs2500lec = create(:section, :lecture, course: cs2500)
   cs2500lab = create(:section, :lab, course: cs2500)
@@ -56,7 +60,9 @@ def make_sample_data
 
   cs2500student_no_room = create(:user, username: 'cs2500student_no_room')
   create(:student_registration, user: cs2500student_no_room, section: cs2500lec)
+end
 
+def make_cs3500
   cs3500 = create(:course, title: 'CS 3500')
   cs3500lec = create(:section, :lecture, course: cs3500)
   cs3500lab = create(:section, :lab, course: cs3500)

@@ -54,4 +54,21 @@ class AccommodationTest < ActiveSupport::TestCase
     assert_equal exam.duration + extra_duration, reg.accommodated_duration
     assert_equal reg.accommodated_duration, reg.effective_time_remaining
   end
+
+  test 'eighth time remaining for a late start even with accommodation' do
+    reg = build(:registration, :late_start)
+    exam = reg.exam
+    acc = build(:accommodation, registration: reg, percent_time_expansion: 50)
+    extra_duration = exam.duration / 2.0
+
+    assert_equal (exam.end_time + extra_duration).to_i, reg.accommodated_end_time.to_i
+    assert_equal exam.duration + extra_duration, reg.accommodated_duration
+    assert_equal reg.accommodated_end_time, reg.effective_end_time
+
+    # The student has 1/8 of their time left in their window.
+    assert_equal reg.accommodated_duration / 8.0, reg.effective_time_remaining
+
+    # # The student has a 50% larger window, and 50% more time.
+    assert_equal reg.accommodated_duration / 2.0, reg.effective_time_remaining
+  end
 end

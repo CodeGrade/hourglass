@@ -56,7 +56,7 @@ class Registration < ApplicationRecord
   end
 
   def accommodated_end_time
-    accommodated_start_time + exam.time_window + accommodated_extra_duration
+    exam.end_time + accommodated_extra_duration
   end
 
   # End time plus any applicable extensions
@@ -73,6 +73,7 @@ class Registration < ApplicationRecord
     if start_time.nil?
       [[accommodated_duration, accommodated_end_time - DateTime.now].min, 0].max
     else
+      # [[accommodated_duration, accommodated_end_time - start_time].min, 0].max
       effective_end_time - start_time
     end
   end

@@ -31,6 +31,7 @@ def make_sample_data
   create(:professor_course_registration, course: cs2500, user: cs2500prof)
 
   cs2500proctor = create(:user, username: 'cs2500proctor')
+  create(:staff_registration, user: cs2500proctor, section: cs2500lec)
   create(:proctor_registration, user: cs2500proctor, room: cs2500_room1)
 
   cs2500student = create(:user, username: 'cs2500student')
@@ -56,6 +57,7 @@ def make_sample_data
   create(:professor_course_registration, course: cs3500, user: cs3500prof)
 
   cs3500proctor = create(:user, username: 'cs3500proctor')
+  create(:staff_registration, user: cs3500proctor, section: cs3500lec)
   create(:proctor_registration, user: cs3500proctor, room: cs3500_room1)
 
   cs3500student = create(:user, username: 'cs3500student')

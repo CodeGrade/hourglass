@@ -11,27 +11,36 @@ import {
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
-import { ExamFilesContext, QuestionFilesContext, PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import {
+  ExamContext,
+  ExamFilesContext,
+  QuestionFilesContext,
+  PartFilesContext,
+} from '@student/exams/show/context';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { getFilesForRefs, countFiles } from '@student/exams/show/files';
 
 interface CodeTagValProps {
   value: CodeTagState;
+  hideFile?: boolean;
 }
 
 const CodeTagVal: React.FC<CodeTagValProps> = (props) => {
-  const { value } = props;
+  const { value, hideFile = false } = props;
   return (
     <div>
-      <span className="mr-2">
-        <b className="mr-2">File:</b>
-        {value?.selectedFile
-          ? (
-            <Button disabled size="sm" variant="outline-dark">
-              {value.selectedFile}
-            </Button>
-        )
-          : <i>Unanswered</i>}
-      </span>
+      {hideFile || (
+        <span className="mr-2">
+          <b className="mr-2">File:</b>
+          {value?.selectedFile
+            ? (
+              <Button disabled size="sm" variant="outline-dark">
+                {value.selectedFile}
+              </Button>
+          )
+            : <i>Unanswered</i>}
+        </span>
+      )}
       <span>
         <b className="mr-2">Line:</b>
         {value?.lineNumber
@@ -66,6 +75,8 @@ const FileModal: React.FC<FileModalProps> = (props) => {
     startValue,
     disabled,
   } = props;
+  const { fmap } = useContext(ExamContext);
+  const filteredFiles = getFilesForRefs(fmap, references);
   // Modal has its own state so the user can manipulate it before saving.
   const [selected, setSelected] = useState(startValue);
   const [refresher, setRefresher] = useState(false);
@@ -113,7 +124,7 @@ const FileModal: React.FC<FileModalProps> = (props) => {
       </Modal.Body>
       <Modal.Footer>
         <div className="mr-auto">
-          <CodeTagVal value={selected} />
+          <CodeTagVal value={selected} hideFile={countFiles(filteredFiles) === 1} />
         </div>
         <Button variant="secondary" onClick={onClose}>
           Close
@@ -170,6 +181,8 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
     default:
       throw new ExhaustiveSwitchError(choices);
   }
+  const { fmap } = useContext(ExamContext);
+  const filteredFiles = getFilesForRefs(fmap, references);
   return (
     <>
       <Prompted
@@ -217,10 +230,14 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
           </ButtonGroup>
         </Col>
       </Form.Group>
-      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
+      <Form.Group
+        as={Row}
+        controlId={`${qnum}-${pnum}-${bnum}-answer`}
+        className="align-items-baseline"
+      >
         <Form.Label column sm={2}>Correct answer</Form.Label>
         <Col sm={6}>
-          <CodeTagVal value={value} />
+          <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />
         </Col>
         <Col sm={4}>
           <Button

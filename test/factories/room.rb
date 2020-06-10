@@ -2,7 +2,11 @@
 
 FactoryBot.define do
   factory :room do
+    transient do
+      sequence(:room_number, 200)
+    end
+
     exam
-    name { 'Richards 201' }
+    name { "Richards #{room_number}" }
   end
 end

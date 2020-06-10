@@ -23,6 +23,8 @@ def make_sample_data
   cs2500_v2 = create(:exam_version, :cs2500_v2, exam: cs2500midterm)
 
   cs2500prof = create(:user, username: 'cs2500prof')
+  create(:professor_course_registration, course: cs2500, user: cs2500prof)
+
   cs2500proctor = create(:user, username: 'cs2500proctor')
   cs2500student = create(:user, username: 'cs2500student')
   cs2500student2 = create(:user, username: 'cs2500student2')
@@ -33,6 +35,8 @@ def make_sample_data
   cs3500_v1 = create(:exam_version, :cs3500_v1, exam: cs3500midterm)
 
   cs3500prof = create(:user, username: 'cs3500prof')
+  create(:professor_course_registration, course: cs3500, user: cs3500prof)
+
   cs3500proctor = create(:user, username: 'cs3500proctor')
   cs3500student = create(:user, username: 'cs3500student')
 end

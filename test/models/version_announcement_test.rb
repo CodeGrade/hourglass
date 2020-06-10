@@ -4,7 +4,7 @@ require 'test_helper'
 
 class VersionAnnouncementTest < ActiveSupport::TestCase
   test 'factory creates valid version announcement' do
-    assert create(:version_announcement).valid?
+    assert build(:version_announcement).valid?
   end
 
   test 'should save valid announcement' do

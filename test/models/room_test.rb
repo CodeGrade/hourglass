@@ -4,6 +4,6 @@ require 'test_helper'
  
 class RoomTest < ActiveSupport::TestCase
   test 'factory creates valid room' do
-    assert create(:room).valid?
+    assert build(:room).valid?
   end
 end

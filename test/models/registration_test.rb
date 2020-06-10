@@ -2,6 +2,6 @@ require 'test_helper'
 
 class RegistrationTest < ActiveSupport::TestCase
   test 'factory creates valid registration' do
-    assert create(:registration).valid?
+    assert build(:registration).valid?
   end
 end

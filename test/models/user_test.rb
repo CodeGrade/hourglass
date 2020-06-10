@@ -5,7 +5,7 @@ class UserTest < ActiveSupport::TestCase
     assert_not build(:user).admin?
   end
 
-  test 'admin factory builds admins' do
-    assert build(:admin).admin?
+  test 'user factory builds admins' do
+    assert build(:user, :admin).admin?
   end
 end

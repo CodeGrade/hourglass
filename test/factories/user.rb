@@ -6,8 +6,9 @@ FactoryBot.define do
     display_name { 'John Doe' }
     email { "#{username}@localhost.localdomain" }
 
-    factory :admin do
+    trait :admin do
       admin { true }
+      display_name { 'Admin' }
     end
   end
 end

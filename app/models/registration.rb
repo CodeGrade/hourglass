@@ -44,7 +44,7 @@ class Registration < ApplicationRecord
   # my-end <= my-start + my-duration
 
   def accommodated_start_time
-    accommodation&.start_time || exam.start_time
+    accommodation&.new_start_time || exam.start_time
   end
 
   def accommodated_duration

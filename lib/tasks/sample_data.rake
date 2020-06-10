@@ -49,6 +49,7 @@ def make_cs2500
   create(:student_registration, user: cs2500student, section: cs2500lec)
   create(:student_registration, user: cs2500student, section: cs2500lab)
   cs2500student_reg = create(:registration, user: cs2500student, room: cs2500_room1, exam_version: cs2500_v1)
+  create(:snapshot, registration: cs2500student_reg)
 
   create(:question, reg: cs2500student_reg)
   create(:message, prof_reg: cs2500prof_reg, exam: cs2500midterm, recipient: cs2500student)
@@ -84,5 +85,6 @@ def make_cs3500
   cs3500student = create(:user, username: 'cs3500student')
   create(:student_registration, user: cs3500student, section: cs3500lec)
   create(:student_registration, user: cs3500student, section: cs3500lab)
-  create(:registration, user: cs3500student, room: cs3500_room1, exam_version: cs3500_v1)
+  cs3500student_reg = create(:registration, user: cs3500student, room: cs3500_room1, exam_version: cs3500_v1)
+  create(:snapshot, registration: cs3500student_reg)
 end

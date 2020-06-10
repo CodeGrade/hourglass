@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :registration do
     transient do
-      exam { build(:exam) }
+      exam { create(:exam) }
     end
 
     user

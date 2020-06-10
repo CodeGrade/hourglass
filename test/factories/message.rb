@@ -7,7 +7,7 @@ FactoryBot.define do
     end
 
     sender { prof_reg.user }
-    association :recipient, factory: :user
+    recipient { create(:user) }
     exam { create(:exam, course: prof_reg.course) }
     body { 'Read the directions for that question more carefully..' }
   end

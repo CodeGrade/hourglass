@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-if Rails.env.development? || Rails.env.test?
-  require 'factory_bot_rails'
+require 'factory_bot_rails'
 
-  namespace :db do
-    desc 'Fill database with sample data'
-    task populate: :environment do
-      include FactoryBot::Syntax::Methods
+namespace :db do
+  desc 'Fill database with sample data'
+  task populate: :environment do
+    include FactoryBot::Syntax::Methods
 
+    if Rails.env.development?
       Rake::Task['db:reset'].invoke
       make_sample_data
     end

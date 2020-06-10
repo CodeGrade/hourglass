@@ -13,6 +13,10 @@ class User < ApplicationRecord
   validates :email, presence: true
 
   has_many :registrations, dependent: :destroy
+  has_many :professor_course_registrations, dependent: :destroy
+  has_many :student_registrations, dependent: :destroy
+  has_many :staff_registrations, dependent: :destroy
+  has_many :proctor_registrations, dependent: :destroy
 
   has_many :sent_messages,
            foreign_key: 'sender',

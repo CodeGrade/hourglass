@@ -1,7 +1,11 @@
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  test 'standard user not an admin' do
+    assert_not build(:user).admin?
+  end
+
+  test 'admin factory builds admins' do
+    assert build(:admin).admin?
+  end
 end

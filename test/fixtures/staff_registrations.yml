@@ -1,7 +1,0 @@
-cs2500proctorlec:
-  user: cs2500proctor
-  section: cs2500lec
-
-cs3500proctorlab:
-  user: cs3500proctor
-  section: cs3500lab

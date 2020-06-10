@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class CourseTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  test 'course factory builds valid course' do
+    assert build(:course).valid?
+  end
 end

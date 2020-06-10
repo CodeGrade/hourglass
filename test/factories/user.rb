@@ -7,6 +7,7 @@ FactoryBot.define do
     end
 
     username { "user#{num}" }
+    encrypted_password { Devise::Encryptor.digest(User, username) }
     display_name { "User ##{num}" }
     email { "#{username}@localhost.localdomain" }
 

@@ -39,6 +39,7 @@ gem 'bootsnap', '>= 1.4.2', require: false
 gem 'activerecord_json_validator'
 
 group :development, :test do
+  gem 'byebug'
   gem 'minitest-reporters'
   gem 'pry'
   gem 'pry-rails'
@@ -47,7 +48,6 @@ end
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
-  gem 'byebug'
   gem 'listen', '~> 3.2'
   gem 'rubocop-rails'
   gem 'spring'

@@ -21,8 +21,12 @@ def make_sample_data
   cs2500lec = create(:section, :lecture, course: cs2500)
   cs2500lab = create(:section, :lab, course: cs2500)
   cs2500midterm = create(:exam, course: cs2500, duration: 5)
+
   cs2500_v1 = create(:exam_version, :cs2500_v1, exam: cs2500midterm)
+  create(:version_announcement, exam_version: cs2500_v1)
+
   cs2500_v2 = create(:exam_version, :cs2500_v2, exam: cs2500midterm)
+  create(:version_announcement, exam_version: cs2500_v2)
 
   cs2500_room1 = create(:room, exam: cs2500midterm)
   cs2500_room2 = create(:room, exam: cs2500midterm)
@@ -49,7 +53,9 @@ def make_sample_data
   cs3500lec = create(:section, :lecture, course: cs3500)
   cs3500lab = create(:section, :lab, course: cs3500)
   cs3500final = create(:exam, course: cs3500, duration: 15)
+
   cs3500_v1 = create(:exam_version, :cs3500_v1, exam: cs3500final)
+  create(:version_announcement, exam_version: cs3500_v1)
 
   cs3500_room1 = create(:room, exam: cs3500final)
 

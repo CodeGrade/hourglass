@@ -20,10 +20,6 @@ class Exam < ApplicationRecord
 
   validate :time_checks
 
-  def duration_minutes
-    duration.minutes
-  end
-
   def finalized?
     registrations.all?(&:final)
   end
@@ -52,8 +48,12 @@ class Exam < ApplicationRecord
     end
   end
 
+  def time_window
+    end_time - start_time
+  end
+
   def time_window_minutes
-    (end_time - start_time) / 60.0
+    time_window / 60.0
   end
 
   private

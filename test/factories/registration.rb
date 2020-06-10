@@ -9,5 +9,17 @@ FactoryBot.define do
     user
     room { create(:room, exam: exam) }
     exam_version { create(:exam_version, exam: exam) }
+
+    trait :early_start do
+      start_time { accommodated_start_time }
+    end
+
+    trait :normal_start do
+      start_time { accommodated_start_time + (accommodated_duration / 0.25).minutes }
+    end
+
+    trait :late_start do
+      start_time { accommodated_end_time - (accommodated_duration / 0.25).minutes }
+    end
   end
 end

@@ -47,12 +47,16 @@ class Registration < ApplicationRecord
     accommodation&.start_time || exam.start_time
   end
 
-  def accommodated_duration
-    exam.duration_minutes * (accommodation&.factor || 1)
+  def accommodated_duration_minutes
+    exam.duration * (accommodation&.factor || 1)
+  end
+
+  def accommodated_extra_duration
+    accommodated_duration_minutes - exam.duration
   end
 
   def accommodated_end_time
-    accommodated_start_time + exam.time_window_minutes + (accommodated_duration - exam.duration_minutes)
+    accommodated_start_time + exam.time_window + accommodated_extra_duration
   end
 
   # End time plus any applicable extensions
@@ -60,16 +64,16 @@ class Registration < ApplicationRecord
     if start_time.nil?
       accommodated_end_time
     else
-      start_time + effective_duration
+      start_time + effective_duration_minutes
     end
   end
 
   # Duration plus any applicable extensions
-  def effective_duration
+  def effective_duration_minutes
     if start_time.nil?
-      [[accommodated_duration, accommodated_end_time - DateTime.now].min, 0].max
+      [[accommodated_duration_minutes, accommodated_end_time - DateTime.now].min, 0].max
     else
-      [[accommodated_duration, accommodated_end_time - start_time].min, 0].max
+      [[accommodated_duration_minutes, accommodated_end_time - start_time].min, 0].max
     end
   end
 

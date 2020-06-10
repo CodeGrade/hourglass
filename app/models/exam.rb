@@ -48,12 +48,12 @@ class Exam < ApplicationRecord
     end
   end
 
-  def time_window
+  def time_window_seconds
     end_time - start_time
   end
 
   def time_window_minutes
-    time_window / 60.0
+    time_window_seconds / 60.0
   end
 
   private

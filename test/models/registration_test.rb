@@ -21,8 +21,7 @@ class RegistrationTest < ActiveSupport::TestCase
 
   test 'accommodated_extra_duration with no accommodation' do
     reg = build(:registration)
-    exam = reg.exam
-    assert_equal reg.accommodated_extra_duration, 0
+    assert_equal reg.accommodated_extra_duration_minutes, 0
   end
 
   test 'accommodated_end_time with no accommodation' do
@@ -33,7 +32,6 @@ class RegistrationTest < ActiveSupport::TestCase
 
   test 'effective_end_time with no accommodation and no start time' do
     reg = build(:registration)
-    exam = reg.exam
     assert_equal reg.effective_end_time, reg.accommodated_end_time
   end
 
@@ -55,10 +53,11 @@ class RegistrationTest < ActiveSupport::TestCase
     assert_equal reg.effective_duration_minutes, reg.accommodated_duration_minutes
   end
 
-  # test 'late start times' do
-  #   reg = build(:registration, :late_start)
-  #   assert reg.start_time > reg.accommodated_start_time
-  #   assert reg.start_time < reg.accommodated_end_time
-  #   assert reg.effective_duration_minutes < reg.accommodated_duration_minutes
-  # end
+  test 'late start times' do
+    reg = build(:registration, :late_start)
+    assert reg.start_time > reg.accommodated_start_time
+    assert reg.start_time < reg.accommodated_end_time
+    assert_equal reg.exam.end_time, reg.effective_end_time
+    assert reg.effective_duration_minutes < reg.accommodated_duration_minutes
+  end
 end

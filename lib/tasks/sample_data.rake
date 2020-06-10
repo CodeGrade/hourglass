@@ -48,4 +48,10 @@ def make_sample_data
   create(:proctor_registration, user: cs3500proctor, room: cs3500_room1)
 
   cs3500student = create(:user, username: 'cs3500student')
+
+  cs2500lec = create(:section, :lecture, course: cs2500)
+  cs2500lab = create(:section, :lab, course: cs2500)
+
+  cs2500lec = create(:section, :lecture, course: cs3500)
+  cs2500lab = create(:section, :lab, course: cs3500)
 end

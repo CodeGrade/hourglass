@@ -38,11 +38,9 @@ gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'activerecord_json_validator'
 
-# for db:populate
-gem 'factory_bot'
-
 group :development, :test do
   gem 'byebug'
+  gem 'factory_bot_rails'
   gem 'minitest-reporters'
   gem 'pry'
   gem 'pry-rails'
@@ -60,7 +58,6 @@ group :development do
 end
 
 group :test do
-  gem 'factory_bot_rails'
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '>= 2.15'
   gem 'capybara-webkit' # Needs qt5-default qt5-qmake libqt5webkit5-dev

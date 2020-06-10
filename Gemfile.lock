@@ -305,7 +305,6 @@ DEPENDENCIES
   capybara (>= 2.15)
   capybara-webkit
   devise
-  factory_bot
   factory_bot_rails
   headless
   listen (~> 3.2)

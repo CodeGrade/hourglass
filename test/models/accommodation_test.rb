@@ -45,4 +45,13 @@ class AccommodationTest < ActiveSupport::TestCase
     assert_equal exam.start_time.to_i, reg.accommodated_start_time.to_i
     assert_equal (exam.end_time + extra_duration).to_i, reg.accommodated_end_time.to_i
   end
+
+  test 'full time remaining for an early start' do
+    reg = build(:registration, :early_start)
+    exam = reg.exam
+    acc = build(:accommodation, registration: reg, percent_time_expansion: 25)
+    extra_duration = exam.duration / 4.0
+    assert_equal exam.duration + extra_duration, reg.accommodated_duration
+    assert_equal reg.accommodated_duration, reg.effective_time_remaining
+  end
 end

@@ -14,6 +14,11 @@ class Exam < ApplicationRecord
 
   validates :course, presence: true
   validates :name, presence: true
+  validates :duration, presence: true, numericality: {
+    only_integer: true
+  }
+
+  validate :time_checks
 
   def duration_minutes
     duration.minutes
@@ -45,5 +50,17 @@ class Exam < ApplicationRecord
     course.staff.reject do |s|
       proctor_registrations.exists? user: s
     end
+  end
+
+  def time_window_minutes
+    (end_time - start_time) / 60.0
+  end
+
+  private
+
+  def time_checks
+    return unless duration > time_window_minutes
+
+    errors.add(:duration, "can't be longer than the duration between start and end times")
   end
 end

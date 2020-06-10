@@ -6,6 +6,7 @@ class MessageTest < ActiveSupport::TestCase
   test 'factory creates valid messages' do
     msg = build(:message)
     assert msg.valid?
+    assert msg.save
     assert msg.sender.sent_messages.include? msg
     assert msg.recipient.received_messages.include? msg
   end

@@ -29,7 +29,10 @@ def make_sample_data
   create(:version_announcement, exam_version: cs2500_v2)
 
   cs2500_room1 = create(:room, exam: cs2500midterm)
+  create(:room_announcement, room: cs2500_room1)
+
   cs2500_room2 = create(:room, exam: cs2500midterm)
+  create(:room_announcement, room: cs2500_room2)
 
   cs2500prof = create(:user, username: 'cs2500prof')
   create(:professor_course_registration, course: cs2500, user: cs2500prof)
@@ -60,6 +63,7 @@ def make_sample_data
   create(:version_announcement, exam_version: cs3500_v1)
 
   cs3500_room1 = create(:room, exam: cs3500final)
+  create(:room_announcement, room: cs3500_room1)
 
   cs3500prof = create(:user, username: 'cs3500prof')
   create(:professor_course_registration, course: cs3500, user: cs3500prof)

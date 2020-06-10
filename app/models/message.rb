@@ -15,7 +15,7 @@ class Message < ApplicationRecord
   def sent_by_prof
     return if exam.course.professors.include? sender
 
-    errors.add(:base, 'Must be prof to send a message.')
+    errors.add(:sender, 'must be a professor')
   end
 
   def serialize

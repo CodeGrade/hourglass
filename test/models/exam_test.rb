@@ -5,6 +5,17 @@ class ExamTest < ActiveSupport::TestCase
     assert build(:exam).valid?
   end
 
+  test 'exam time_window calculation' do
+    start = DateTime.now
+    exam = create(
+      :exam,
+      start_time: start,
+      end_time: start + 30.minutes,
+      duration: 29
+    )
+    assert_equal 30.minutes, exam.time_window
+  end
+
   test 'exam with duration shorter than time period is valid' do
     start = DateTime.now
     exam = create(
@@ -24,7 +35,7 @@ class ExamTest < ActiveSupport::TestCase
       end_time: start + 30.minutes,
       duration: 31
     )
-    assert_equal bad_exam.time_window_minutes, 30
+    assert_equal 30.minutes, bad_exam.time_window
     assert_not bad_exam.valid?
     assert_match(/longer than/, bad_exam.errors[:duration].first)
   end

@@ -10,7 +10,7 @@ class RegistrationTest < ActiveSupport::TestCase
   test 'accommodated_duration_minutes with no accommodation' do
     reg = build(:registration)
     exam = reg.exam
-    assert_equal reg.accommodated_duration_minutes, exam.duration
+    assert_equal exam.duration, reg.accommodated_duration
   end
 
   test 'accommodated_start_time with no accommodation' do
@@ -21,7 +21,7 @@ class RegistrationTest < ActiveSupport::TestCase
 
   test 'accommodated_extra_duration with no accommodation' do
     reg = build(:registration)
-    assert_equal reg.accommodated_extra_duration_minutes, 0
+    assert_equal reg.accommodated_extra_duration, 0
   end
 
   test 'accommodated_end_time with no accommodation' do
@@ -38,7 +38,7 @@ class RegistrationTest < ActiveSupport::TestCase
   test 'effective_end_time with no accommodation and early start' do
     reg = build(:registration, :early_start)
     exam = reg.exam
-    assert_equal reg.effective_end_time, reg.start_time + reg.effective_duration_minutes
+    assert_equal reg.effective_end_time, reg.start_time + reg.effective_time_remaining
   end
 
   test 'early bird start times' do
@@ -50,7 +50,7 @@ class RegistrationTest < ActiveSupport::TestCase
     reg = build(:registration, :normal_start)
     assert reg.start_time > reg.accommodated_start_time
     assert reg.start_time < reg.accommodated_end_time
-    assert_equal reg.effective_duration_minutes, reg.accommodated_duration_minutes
+    assert_equal reg.accommodated_duration, reg.effective_time_remaining
   end
 
   test 'late start times' do
@@ -58,7 +58,7 @@ class RegistrationTest < ActiveSupport::TestCase
     assert reg.start_time > reg.accommodated_start_time
     assert reg.start_time < reg.accommodated_end_time
     assert_equal reg.exam.end_time.to_i, reg.accommodated_end_time.to_i
-    assert_equal reg.exam.end_time, reg.effective_end_time
-    assert reg.effective_duration_minutes < reg.accommodated_duration_minutes
+    assert_equal reg.exam.end_time.to_i, reg.effective_end_time.to_i
+    assert reg.effective_time_remaining < reg.accommodated_duration
   end
 end

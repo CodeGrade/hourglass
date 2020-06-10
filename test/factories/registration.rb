@@ -15,11 +15,11 @@ FactoryBot.define do
     end
 
     trait :normal_start do
-      start_time { accommodated_start_time + (accommodated_duration_minutes / 4).minutes }
+      start_time { accommodated_start_time + (accommodated_duration / 4.0) }
     end
 
     trait :late_start do
-      start_time { accommodated_end_time - (accommodated_duration_minutes / 4).minutes }
+      start_time { accommodated_end_time - (accommodated_duration / 4.0) }
     end
   end
 end

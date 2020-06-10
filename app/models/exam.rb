@@ -20,6 +20,10 @@ class Exam < ApplicationRecord
 
   validate :time_checks
 
+  def duration
+    self[:duration].minutes
+  end
+
   def finalized?
     registrations.all?(&:final)
   end
@@ -48,18 +52,14 @@ class Exam < ApplicationRecord
     end
   end
 
-  def time_window_seconds
-    end_time - start_time
-  end
-
-  def time_window_minutes
-    time_window_seconds / 60.0
+  def time_window
+    (end_time - start_time).seconds
   end
 
   private
 
   def time_checks
-    return unless duration > time_window_minutes
+    return unless duration > time_window
 
     errors.add(:duration, "can't be longer than the duration between start and end times")
   end

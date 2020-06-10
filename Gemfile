@@ -38,6 +38,9 @@ gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'activerecord_json_validator'
 
+# for db:populate
+gem 'factory_bot'
+
 group :development, :test do
   gem 'byebug'
   gem 'minitest-reporters'

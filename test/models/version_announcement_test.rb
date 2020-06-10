@@ -3,19 +3,17 @@
 require 'test_helper'
 
 class VersionAnnouncementTest < ActiveSupport::TestCase
+  test 'factory creates valid version announcement' do
+    assert create(:version_announcement).valid?
+  end
+
   test 'should save valid announcement' do
-    announcement = VersionAnnouncement.new(
-      exam_version: exam_versions(:cs2500midterm_1),
-      body: 'This is a valid announcement'
-    )
+    announcement = build(:version_announcement)
     assert announcement.save
   end
 
   test 'should not save announcement without body' do
-    announcement = VersionAnnouncement.new(
-      exam_version: exam_versions(:cs2500midterm_1),
-      body: ''
-    )
+    announcement = build(:version_announcement, body: '')
     assert_not announcement.save
   end
 end

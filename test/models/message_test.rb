@@ -3,7 +3,15 @@
 require 'test_helper'
 
 class MessageTest < ActiveSupport::TestCase
+  test 'factory creates valid messages' do
+    msg = create(:message)
+    assert msg.valid?
+    assert msg.sender.sent_messages.include? msg
+    assert msg.recipient.received_messages.include? msg
+  end
+
   test 'should not save message without sender' do
+    # msg = build(:message, sender: nil)
     msg = Message.new(
       exam: exams(:cs2500midterm),
       recipient: users(:cs2500student),

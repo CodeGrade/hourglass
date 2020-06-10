@@ -19,4 +19,8 @@ class Course < ApplicationRecord
   def staff
     staff_registrations.select(:user_id).distinct.map(&:user)
   end
+
+  def professors
+    professor_course_registrations.select(:user_id).distinct.map(&:user)
+  end
 end

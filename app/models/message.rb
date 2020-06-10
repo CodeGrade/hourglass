@@ -13,9 +13,9 @@ class Message < ApplicationRecord
   validate :sent_by_prof
 
   def sent_by_prof
-    # TODO return true if prof
+    return if exam.course.professors.include? sender
+
     errors.add(:base, 'Must be prof to send a message.')
-    false
   end
 
   def serialize

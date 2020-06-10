@@ -2,11 +2,15 @@
 
 FactoryBot.define do
   factory :user do
-    username { 'johndoe' }
-    display_name { 'John Doe' }
+    transient do
+      sequence :num
+    end
+
+    username { "user#{num}" }
+    display_name { "User ##{num}" }
     email { "#{username}@localhost.localdomain" }
 
-    trait :admin do
+    factory :admin do
       admin { true }
       display_name { 'Admin' }
     end

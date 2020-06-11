@@ -37,13 +37,39 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
           },
           'files' => []
         },
-        'answers' => {
-          'answers' => []
-        }
+        'answers' => { 'answers' => [] }
       }
     }
     assert_equal expected, parsed.except('id')
     assert parsed['id'].integer?
+  end
+
+  test 'should update exam version' do
+    ver = create(:exam_version)
+    reg = create(:professor_course_registration, course: ver.exam.course)
+    sign_in reg.user
+    new_name = 'New Version Name'
+    patch api_professor_version_path(ver), as: :json, params: {
+      'version' => {
+        'name' => new_name,
+        'info' => {
+          'policies' => [],
+          'answers' => [],
+          'contents' => {
+            'questions' => [],
+            'reference' => [],
+            'instructions' => { 'type' => 'HTML', 'value' => '' }
+          }
+        },
+        'files' => []
+      }
+    }
+    assert_response :success
+    parsed = JSON.parse(response.body)
+    expected = { 'updated' => true }
+    ver.reload
+    assert_equal expected, parsed
+    assert_equal new_name, ver.name
   end
 
   test 'should destroy exam version' do

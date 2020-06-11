@@ -11,7 +11,7 @@ class ExamTest < ActiveSupport::TestCase
       :exam,
       start_time: start,
       end_time: start + 30.minutes,
-      duration: 29
+      duration: 29.minutes
     )
     assert_equal 30.minutes, exam.time_window
   end
@@ -22,7 +22,7 @@ class ExamTest < ActiveSupport::TestCase
       :exam,
       start_time: start,
       end_time: start + 30.minutes,
-      duration: 29
+      duration: 29.minutes
     )
     assert exam.valid?
   end
@@ -33,7 +33,7 @@ class ExamTest < ActiveSupport::TestCase
       :exam,
       start_time: start,
       end_time: start + 30.minutes,
-      duration: 31
+      duration: 31.minutes
     )
     assert_equal 30.minutes, bad_exam.time_window
     assert_not bad_exam.valid?

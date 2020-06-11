@@ -21,7 +21,7 @@ class Exam < ApplicationRecord
   validate :time_checks
 
   def duration
-    self[:duration].minutes
+    self[:duration].seconds
   end
 
   def finalized?

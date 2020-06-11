@@ -51,7 +51,21 @@ module Api
       end
 
       def create
-        # TODO: move from exams#create
+        n = @exam.exam_versions.length + 1
+        @version = ExamVersion.create(
+          exam: @exam,
+          name: "#{@exam.name} Version #{n}",
+          files: [],
+          info: {
+            policies: [],
+            answers: [],
+            contents: {
+              questions: []
+            }
+          }
+        )
+        @version.save!
+        render json: serialize_version(@version)
       end
 
       def update_all
@@ -101,8 +115,8 @@ module Api
           contents: {
             exam: {
               questions: version.contents['questions'],
-              reference: version.contents['reference'],
-              instructions: version.contents['instructions'],
+              reference: version.contents['reference'] || [],
+              instructions: version.contents['instructions'] || { type: 'HTML', value: '' },
               files: version.files
             },
             answers: {

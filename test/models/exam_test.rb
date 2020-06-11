@@ -5,6 +5,13 @@ class ExamTest < ActiveSupport::TestCase
     assert build(:exam).valid?
   end
 
+  test 'build exam with finished students' do
+    exam = build(:exam, :with_finished_submissions, submissions_count: 10)
+    assert exam.valid?
+    assert 10, exam.registrations.count
+    assert exam.registrations.all?(&:finished)
+  end
+
   test 'exam time_window calculation' do
     start = DateTime.now
     exam = create(

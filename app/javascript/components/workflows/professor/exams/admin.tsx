@@ -28,6 +28,7 @@ import ReadableDate from '@hourglass/common/ReadableDate';
 import { hitApi } from '@hourglass/common/types/api';
 import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
+import createVersion from '@hourglass/common/api/professor/exams/versions/create';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -272,6 +273,8 @@ const VersionInfo: React.FC<{
     examName,
     versions,
   } = props;
+  const { examId } = useParams();
+  const history = useHistory();
   return (
     <>
       <h2>
@@ -279,6 +282,11 @@ const VersionInfo: React.FC<{
         <Button
           variant="success"
           className="float-right"
+          onClick={(): void => {
+            createVersion(examId).then((res) => {
+              history.push(`/exams/${examId}/versions/${res.id}/edit`);
+            });
+          }}
         >
           New Version
         </Button>

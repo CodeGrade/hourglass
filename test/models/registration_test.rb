@@ -7,7 +7,7 @@ class RegistrationTest < ActiveSupport::TestCase
     assert build(:registration).valid?
   end
 
-  test 'accommodated_duration_minutes with no accommodation' do
+  test 'accommodated_duration with no accommodation' do
     reg = build(:registration)
     exam = reg.exam
     assert_equal exam.duration, reg.accommodated_duration

@@ -85,46 +85,29 @@ class Registration < ApplicationRecord
     !end_time.nil?
   end
 
-  def allow_submission?
-    !(final? || anomalous? || over?)
-  end
-
   def current_answers
     snapshots.last&.answers || exam_version.default_answers
   end
 
-  def timed_out?
-    # TODO
-    false
-  end
-
   def save_answers(answers)
-    return false unless allow_submission?
-
-    if timed_out?
-      update(end_time: DateTime.now)
-      return false
-    end
+    return false if final? || anomalous? || over?
 
     json = current_answers
     return true if json == answers
 
-    Snapshot.create(
-      registration: self,
-      answers: answers
-    )
+    Snapshot.create(registration: self, answers: answers)
   end
 
   def my_questions
     exam.questions.where(sender: user)
   end
 
-  def private_messages_for(user)
+  def private_messages
     exam.messages.where(recipient: user)
   end
 
-  def all_messages_for(user)
-    private_messages_for(user) +
+  def all_messages
+    private_messages +
       room.room_announcements +
       exam_version.version_announcements
   end

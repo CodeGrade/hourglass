@@ -6,8 +6,14 @@ import {
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import HTML from '@student/exams/show/components/HTML';
 import { CodeTagVal } from '@student/exams/show/components/questions/CodeTag';
-import { ExamFilesContext, QuestionFilesContext, PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import {
+  ExamFilesContext,
+  QuestionFilesContext,
+  PartFilesContext,
+  ExamContext,
+} from '@hourglass/workflows/student/exams/show/context';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { getFilesForRefs, countFiles } from '@student/exams/show/files';
 
 
 interface FileModalProps {
@@ -24,6 +30,8 @@ const FileModal: React.FC<FileModalProps> = (props) => {
     value,
     onClose,
   } = props;
+  const { fmap } = useContext(ExamContext);
+  const filteredFiles = getFilesForRefs(fmap, references);
   const [refresher, setRefresher] = useState(false);
   const refreshCodeMirror = (): void => setRefresher((b) => !b);
   return (
@@ -49,9 +57,9 @@ const FileModal: React.FC<FileModalProps> = (props) => {
           }}
         />
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer className="align-items-baseline">
         <div className="mr-auto">
-          <CodeTagVal value={value} />
+          <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />
         </div>
         <Button variant="secondary" onClick={onClose}>
           Close
@@ -90,13 +98,15 @@ const DisplayCodeTag: React.FC<CodeTagProps> = (props) => {
     default:
       throw new ExhaustiveSwitchError(choices);
   }
+  const { fmap } = useContext(ExamContext);
+  const filteredFiles = getFilesForRefs(fmap, references);
   let theRest;
   if (value) {
     theRest = (
       <>
-        <Row className="mt-2">
+        <Row className="mt-2 align-items-baseline">
           <Col>
-            <CodeTagVal value={value} />
+            <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />
           </Col>
           <Col>
             <Button size="sm" onClick={(): void => setShowModal(true)} variant="outline-info">

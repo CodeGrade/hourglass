@@ -55,7 +55,11 @@ export interface ContentsResponse {
 
   answers: AnswersState;
 
-  messages: RailsExamMessage[];
+  messages: {
+    personal: RailsExamMessage[];
+    room: RailsExamMessage[];
+    version: RailsExamMessage[];
+  };
 
   questions: RailsExamQuestion[];
 }
@@ -66,10 +70,12 @@ export interface RailsExamQuestion {
   id: number;
 }
 
+export type ExamMessageType = 'personal' | 'room' | 'version';
+
 export interface RailsExamMessage {
   time: string;
   body: string;
-  personal: boolean;
+  type: ExamMessageType;
   id: number;
 }
 
@@ -142,7 +148,11 @@ export interface LoadExamAction {
   exam: ExamVersion;
   time: TimeInfo;
   answers: AnswersState;
-  messages: ExamMessage[];
+  messages: {
+    personal: ExamMessage[];
+    room: ExamMessage[];
+    version: ExamMessage[];
+  };
   questions: ProfQuestion[];
 }
 
@@ -184,7 +194,11 @@ export interface SnapshotFailure {
 
 export interface SnapshotSaveResult {
   lockout: boolean;
-  messages: RailsExamMessage[];
+  messages: {
+    personal: RailsExamMessage[];
+    room: RailsExamMessage[];
+    version: RailsExamMessage[];
+  };
 }
 
 export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure;
@@ -285,8 +299,11 @@ export interface MessagesState {
   // Whether there are unread messages.
   unread: boolean;
 
-  // All messages for the current exam.
-  messages: ExamMessage[];
+  messages: {
+    personal: ExamMessage[];
+    room: ExamMessage[];
+    version: ExamMessage[];
+  };
 }
 
 export interface ExamMessage {
@@ -294,8 +311,7 @@ export interface ExamMessage {
 
   time: DateTime;
 
-  // Whether the message was sent directly to the current user.
-  personal: boolean;
+  type: ExamMessageType;
 
   // Rails ID of the message.
   id: number;

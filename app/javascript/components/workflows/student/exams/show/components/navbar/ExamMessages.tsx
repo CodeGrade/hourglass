@@ -56,10 +56,10 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   } = props;
   const msgs = messages.map((msg) => (
     <ShowMessage
-      key={`${msg.personal ? 'personal' : 'announcement'}${msg.id}`}
+      key={`${msg.type}${msg.id}`}
       body={msg.body}
-      icon={msg.personal ? MdMessage : GiBugleCall}
-      tooltip={msg.personal ? 'Sent only to you' : 'Announcement'}
+      icon={msg.type === 'personal' ? MdMessage : GiBugleCall}
+      tooltip={msg.type === 'personal' ? 'Sent only to you' : 'Announcement'}
       time={msg.time}
     />
   ));

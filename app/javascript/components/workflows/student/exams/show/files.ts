@@ -40,3 +40,9 @@ export function firstFile(files: ExamFile[]): ExamFile {
 export function getFilesForRefs(map: FileMap, refs: FileRef[]): ExamFile[] {
   return refs ? refs.map((r) => map[r.path]).filter((a) => a) : [];
 }
+
+export function countFiles(files: ExamFile[]): number {
+  return files.reduce((acc, f) => (
+    (f.filedir === 'file') ? acc + 1 : acc + countFiles(f.nodes)
+  ), 0);
+}

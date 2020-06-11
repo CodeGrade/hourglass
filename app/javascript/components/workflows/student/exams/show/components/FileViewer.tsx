@@ -7,7 +7,12 @@ import {
   CodeTagState, FileRef, ExamFile, FileMap,
 } from '@student/exams/show/types';
 import { ExamContext } from '@student/exams/show/context';
-import { firstFile, getFilesForRefs, createMap } from '@student/exams/show/files';
+import {
+  firstFile,
+  getFilesForRefs,
+  createMap,
+  countFiles,
+} from '@student/exams/show/files';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Editor } from './ExamCodeBox';
 import './FileViewer.scss';
@@ -135,26 +140,30 @@ const FileTree: React.FC<FileTreeProps> = (props) => {
 
 interface FileViewerProps {
   references: FileRef[];
+  alwaysShowTreeView?: boolean;
 }
 
 export const FileViewer: React.FC<FileViewerProps> = (props) => {
-  const { references } = props;
+  const { references, alwaysShowTreeView = false } = props;
   const { fmap } = useContext(ExamContext);
   const filteredFiles = getFilesForRefs(fmap, references);
   const first = firstFile(filteredFiles);
   const firstID = first?.relPath;
   const [selectedID, setSelectedID] = useState(firstID);
+  const showTreeView = alwaysShowTreeView || countFiles(filteredFiles) > 1;
   return (
     <Row>
-      <Col sm={3}>
-        <FileTree
-          files={filteredFiles}
-          selectedFile={selectedID}
-          onChangeFile={setSelectedID}
-          fmap={fmap}
-        />
-      </Col>
-      <Col sm={9}>
+      {showTreeView && (
+        <Col sm={3}>
+          <FileTree
+            files={filteredFiles}
+            selectedFile={selectedID}
+            onChangeFile={setSelectedID}
+            fmap={fmap}
+          />
+        </Col>
+      )}
+      <Col sm={showTreeView ? 9 : 12}>
         <FileContents
           fmap={fmap}
           selectedFile={selectedID}
@@ -167,6 +176,7 @@ export const FileViewer: React.FC<FileViewerProps> = (props) => {
 
 interface ControlledFileViewerProps {
   references: FileRef[];
+  alwaysShowTreeView?: boolean;
   selection?: CodeTagState;
   onChangeLine: (lineNumber: number) => void;
   onChangeFile: (file: string) => void;
@@ -175,23 +185,38 @@ interface ControlledFileViewerProps {
 
 export const ControlledFileViewer: React.FC<ControlledFileViewerProps> = (props) => {
   const {
-    references, selection, onChangeFile, onChangeLine, refreshProps,
+    references,
+    alwaysShowTreeView = false,
+    selection,
+    onChangeFile,
+    onChangeLine,
+    refreshProps,
   } = props;
   const { fmap } = useContext(ExamContext);
   const filteredFiles = getFilesForRefs(fmap, references);
+  const first = firstFile(filteredFiles);
+  const firstID = first?.relPath;
+  const showTreeView = alwaysShowTreeView || countFiles(filteredFiles) > 1;
+  useEffect(() => {
+    if (!showTreeView) {
+      onChangeFile(firstID);
+    }
+  }, []);
   return (
     <Row>
-      <Col sm={3} className="overflow-scroll-x">
-        <FileTree
-          files={filteredFiles}
-          selectedFile={selection?.selectedFile ?? ''}
-          onChangeFile={onChangeFile}
-          fmap={fmap}
-        />
-      </Col>
-      <Col sm={9}>
+      {showTreeView && (
+        <Col sm={3} className="overflow-scroll-x">
+          <FileTree
+            files={filteredFiles}
+            selectedFile={selection?.selectedFile ?? firstID}
+            onChangeFile={onChangeFile}
+            fmap={fmap}
+          />
+        </Col>
+      )}
+      <Col sm={showTreeView ? 9 : 12}>
         <FileContents
-          selectedFile={selection?.selectedFile}
+          selectedFile={selection?.selectedFile ?? firstID}
           selectedLine={selection?.lineNumber}
           onChangeLine={onChangeLine}
           refreshProps={refreshProps}

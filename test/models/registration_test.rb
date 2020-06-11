@@ -38,7 +38,7 @@ class RegistrationTest < ActiveSupport::TestCase
   test 'effective_end_time with no accommodation and early start' do
     reg = build(:registration, :early_start)
     exam = reg.exam
-    assert_equal reg.effective_end_time, reg.start_time + reg.effective_time_remaining
+    assert_equal reg.effective_end_time, reg.start_time + reg.effective_duration
   end
 
   test 'early bird start times' do
@@ -50,7 +50,7 @@ class RegistrationTest < ActiveSupport::TestCase
     reg = build(:registration, :normal_start)
     assert reg.start_time > reg.accommodated_start_time
     assert reg.start_time < reg.accommodated_end_time
-    assert_equal reg.accommodated_duration, reg.effective_time_remaining
+    assert_equal reg.accommodated_duration, reg.effective_duration
   end
 
   test 'late start times' do
@@ -59,6 +59,6 @@ class RegistrationTest < ActiveSupport::TestCase
     assert reg.start_time < reg.accommodated_end_time
     assert_equal reg.exam.end_time.to_i, reg.accommodated_end_time.to_i
     assert_equal reg.exam.end_time.to_i, reg.effective_end_time.to_i
-    assert reg.effective_time_remaining < reg.accommodated_duration
+    assert reg.effective_duration < reg.accommodated_duration
   end
 end

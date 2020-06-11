@@ -29,6 +29,23 @@ class AccommodationTest < ActiveSupport::TestCase
     assert_equal acc.factor, 2
   end
 
+  test 'accommodated duration with expansion' do
+    acc = build(:accommodation, percent_time_expansion: 25)
+    reg = acc.registration
+    exam = reg.exam
+    extra_duration = exam.duration / 4.0
+    assert_equal extra_duration, reg.accommodated_extra_duration
+    assert_equal exam.duration + extra_duration, reg.accommodated_duration
+  end
+
+  test 'accommodated end time with expansion' do
+    acc = build(:accommodation, percent_time_expansion: 25)
+    reg = acc.registration
+    exam = reg.exam
+    extra_duration = exam.duration / 4.0
+    assert_equal exam.end_time + extra_duration, reg.accommodated_end_time
+  end
+
   test 'start time is updated to accommodated start time' do
     reg = build(:registration)
     exam = reg.exam
@@ -52,23 +69,28 @@ class AccommodationTest < ActiveSupport::TestCase
     acc = build(:accommodation, registration: reg, percent_time_expansion: 25)
     extra_duration = exam.duration / 4.0
     assert_equal exam.duration + extra_duration, reg.accommodated_duration
-    assert_equal reg.accommodated_duration, reg.effective_time_remaining
+    assert_equal reg.accommodated_duration, reg.effective_duration
   end
 
-  test 'eighth time remaining for a late start even with accommodation' do
+  test 'more time remaining for a late start with accommodation' do
     reg = build(:registration, :late_start)
     exam = reg.exam
     acc = build(:accommodation, registration: reg, percent_time_expansion: 50)
-    extra_duration = exam.duration / 2.0
-
-    assert_equal (exam.end_time + extra_duration).to_i, reg.accommodated_end_time.to_i
-    assert_equal exam.duration + extra_duration, reg.accommodated_duration
-    assert_equal reg.accommodated_end_time, reg.effective_end_time
-
-    # The student has 1/8 of their time left in their window.
-    assert_equal reg.accommodated_duration / 8.0, reg.effective_time_remaining
+    acc.save
 
     # # The student has a 50% larger window, and 50% more time.
-    assert_equal reg.accommodated_duration / 2.0, reg.effective_time_remaining
+    extra_duration = exam.duration / 2.0
+
+    assert_equal exam.duration + extra_duration, reg.accommodated_duration
+    assert_equal exam.end_time + extra_duration, reg.accommodated_end_time
+
+    assert_equal reg.accommodated_end_time - (reg.accommodated_duration / 2.0), reg.start_time
+
+    assert_equal (exam.end_time + extra_duration).to_i, reg.accommodated_end_time.to_i
+    assert_equal reg.accommodated_end_time, reg.effective_end_time
+
+    # The student has 1/2 of their total time to take the exam.
+    # Regular late start has 1/4 of their time, but this student has 50% more time.
+    assert_equal reg.accommodated_duration / 2.0, reg.effective_duration
   end
 end

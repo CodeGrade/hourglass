@@ -68,12 +68,11 @@ class Registration < ApplicationRecord
     end
   end
 
-  # Duration plus any applicable extensions
-  def effective_time_remaining
+  # duration plus any applicable extensions
+  def effective_duration
     if start_time.nil?
-      [[accommodated_duration, accommodated_end_time - DateTime.now].min, 0].max
+      accommodated_duration
     else
-      # [[accommodated_duration, accommodated_end_time - start_time].min, 0].max
       effective_end_time - start_time
     end
   end

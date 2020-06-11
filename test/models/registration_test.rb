@@ -46,6 +46,24 @@ class RegistrationTest < ActiveSupport::TestCase
     assert_equal reg.start_time, reg.accommodated_start_time
   end
 
+  test 'early bird start time over' do
+    start_time = DateTime.now
+    end_time = start_time + 20.minutes
+    exam = build(:exam, duration: 8.minutes, start_time: start_time, end_time: end_time)
+    reg = build(:registration, :early_start, exam: exam)
+    assert_equal 0, reg.accommodated_extra_duration
+    assert_equal 8.minutes, reg.accommodated_duration
+
+    travel_to start_time + 6.minutes
+    assert_not reg.over?
+
+    travel_to start_time + 8.minutes - 1.second
+    assert_not reg.over?
+
+    travel_to start_time + 8.minutes + 1.second
+    assert reg.over?
+  end
+
   test 'normal start times' do
     reg = build(:registration, :normal_start)
     assert reg.start_time > reg.accommodated_start_time

@@ -38,6 +38,26 @@ class AccommodationTest < ActiveSupport::TestCase
     assert_equal exam.duration + extra_duration, reg.accommodated_duration
   end
 
+  test 'accommodated duration with expansion and real values' do
+    start_time = DateTime.now
+    end_time = start_time + 20.minutes
+    exam = build(:exam, duration: 8.minutes, start_time: start_time, end_time: end_time)
+    reg = build(:registration, :early_start, exam: exam)
+    acc = build(:accommodation, registration: reg, percent_time_expansion: 25)
+    extra_duration = 2.minutes
+    assert_equal extra_duration, reg.accommodated_extra_duration
+    assert_equal 10.minutes, reg.accommodated_duration
+
+    travel_to start_time + 6.minutes
+    assert_not reg.over?
+
+    travel_to start_time + 9.minutes
+    assert_not reg.over?
+
+    travel_to start_time + 10.minutes + 1.second
+    assert reg.over?
+  end
+
   test 'accommodated end time with expansion' do
     acc = build(:accommodation, percent_time_expansion: 25)
     reg = acc.registration

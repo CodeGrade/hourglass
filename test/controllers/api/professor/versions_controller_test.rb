@@ -3,6 +3,30 @@
 require 'test_helper'
 
 class VersionsControllerTest < ActionDispatch::IntegrationTest
+  def assert_updatable(ver)
+    new_name = 'New Version Name'
+    patch api_professor_version_path(ver), as: :json, params: {
+      'version' => {
+        'name' => new_name,
+        'info' => {
+          'policies' => [],
+          'answers' => [],
+          'contents' => {
+            'questions' => [],
+            'reference' => [],
+            'instructions' => { 'type' => 'HTML', 'value' => '' }
+          }
+        },
+        'files' => []
+      }
+    }
+    assert_response :success
+    expected = { 'updated' => true }
+    ver.reload
+    assert_equal expected, JSON.parse(response.body)
+    assert_equal new_name, ver.name
+  end
+
   test 'cannot create exam version without being logged in' do
     reg = create(:professor_course_registration)
     exam = create(:exam, course: reg.course)
@@ -48,28 +72,15 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     ver = create(:exam_version)
     reg = create(:professor_course_registration, course: ver.exam.course)
     sign_in reg.user
-    new_name = 'New Version Name'
-    patch api_professor_version_path(ver), as: :json, params: {
-      'version' => {
-        'name' => new_name,
-        'info' => {
-          'policies' => [],
-          'answers' => [],
-          'contents' => {
-            'questions' => [],
-            'reference' => [],
-            'instructions' => { 'type' => 'HTML', 'value' => '' }
-          }
-        },
-        'files' => []
-      }
-    }
-    assert_response :success
-    parsed = JSON.parse(response.body)
-    expected = { 'updated' => true }
-    ver.reload
-    assert_equal expected, parsed
-    assert_equal new_name, ver.name
+    assert_updatable ver
+  end
+
+  test 'should update exam version with finished submissions' do
+    exam = create(:exam, :with_finished_submissions)
+    ver = exam.exam_versions.first
+    reg = create(:professor_course_registration, course: ver.exam.course)
+    sign_in reg.user
+    assert_updatable ver
   end
 
   test 'should destroy exam version' do

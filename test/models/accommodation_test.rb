@@ -98,7 +98,7 @@ class AccommodationTest < ActiveSupport::TestCase
     acc = build(:accommodation, registration: reg, percent_time_expansion: 50)
     acc.save
 
-    # # The student has 50% more time, and that same amount of extra time added to their window.
+    # The student has 50% more time, and that same amount of extra time added to their window.
     extra_duration = exam.duration / 2.0
 
     assert_equal exam.duration + extra_duration, reg.accommodated_duration

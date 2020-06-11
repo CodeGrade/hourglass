@@ -333,6 +333,11 @@ const ShowVersion: React.FC<{
               Edit
             </LinkButton>
             <Button
+              variant="danger"
+            >
+              Delete
+            </Button>
+            <Button
               variant="primary"
               onClick={(): void => setPreview((o) => !o)}
             >

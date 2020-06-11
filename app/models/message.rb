@@ -21,9 +21,10 @@ class Message < ApplicationRecord
   def serialize
     # TODO
     {
+      id: id,
       body: body,
       time: created_at,
-      personal: true
+      type: 'personal'
     }
   end
 end

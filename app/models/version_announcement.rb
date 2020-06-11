@@ -10,9 +10,10 @@ class VersionAnnouncement < ApplicationRecord
   def serialize
     # TODO
     {
+      id: id,
       body: body,
       time: created_at,
-      personal: false
+      type: 'room'
     }
   end
 end

@@ -66,10 +66,12 @@ export interface RailsExamQuestion {
   id: number;
 }
 
+export type ExamMessageType = 'personal' | 'room' | 'version';
+
 export interface RailsExamMessage {
   time: string;
   body: string;
-  personal: boolean;
+  type: ExamMessageType;
   id: number;
 }
 
@@ -294,8 +296,7 @@ export interface ExamMessage {
 
   time: DateTime;
 
-  // Whether the message was sent directly to the current user.
-  personal: boolean;
+  type: ExamMessageType;
 
   // Rails ID of the message.
   id: number;

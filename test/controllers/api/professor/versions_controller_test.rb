@@ -45,4 +45,15 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal expected, parsed.except('id')
     assert parsed['id'].integer?
   end
+
+  test 'should destroy exam version' do
+    ver = create(:exam_version)
+    exam = ver.exam
+    reg = create(:professor_course_registration, course: exam.course)
+    prof = reg.user
+    sign_in prof
+    delete api_professor_version_path(ver)
+    assert_response :success
+    assert_equal 0, exam.exam_versions.length
+  end
 end

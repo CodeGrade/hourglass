@@ -3,7 +3,7 @@
 module Api
   module Professor
     class VersionsController < ProfessorController
-      before_action :find_version, only: [:show, :update]
+      before_action :find_version, only: [:show, :update, :destroy]
       before_action :find_exam_and_course
 
       before_action :require_prof_reg
@@ -66,6 +66,10 @@ module Api
         )
         @version.save!
         render json: serialize_version(@version)
+      end
+
+      def destroy
+        @version.destroy!
       end
 
       def update_all

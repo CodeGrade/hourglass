@@ -29,6 +29,7 @@ import { hitApi } from '@hourglass/common/types/api';
 import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import createVersion from '@hourglass/common/api/professor/exams/versions/create';
+import deleteVersion from '@hourglass/common/api/professor/exams/versions/delete';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -59,7 +60,11 @@ export const ExamAdmin: React.FC = () => {
               <ExamInfoViewer response={response.response} />
             </Route>
           </Switch>
-          <VersionInfo versions={response.response.versions} examName={response.response.name} />
+          <VersionInfo
+            versions={response.response.versions}
+            examName={response.response.name}
+            refresh={refresh}
+          />
           <ProctoringInfo examId={examId} />
         </>
       );
@@ -268,10 +273,12 @@ export const ExamInfoEditor: React.FC<{
 const VersionInfo: React.FC<{
   examName: string;
   versions: Version[];
+  refresh: () => void;
 }> = (props) => {
   const {
     examName,
     versions,
+    refresh,
   } = props;
   const { examId } = useParams();
   const history = useHistory();
@@ -297,6 +304,7 @@ const VersionInfo: React.FC<{
             <ShowVersion
               version={v}
               examName={examName}
+              refresh={refresh}
             />
           </li>
         ))}
@@ -308,10 +316,12 @@ const VersionInfo: React.FC<{
 const ShowVersion: React.FC<{
   version: Version;
   examName: string;
+  refresh: () => void;
 }> = (props) => {
   const {
     version,
     examName,
+    refresh,
   } = props;
   const { examId } = useParams();
   const [preview, setPreview] = useState(false);
@@ -334,6 +344,11 @@ const ShowVersion: React.FC<{
             </LinkButton>
             <Button
               variant="danger"
+              onClick={(): void => {
+                deleteVersion(version.id).then(() => {
+                  refresh();
+                });
+              }}
             >
               Delete
             </Button>

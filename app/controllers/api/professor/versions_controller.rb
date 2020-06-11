@@ -70,6 +70,7 @@ module Api
 
       def destroy
         @version.destroy!
+        render json: {}
       end
 
       def update_all

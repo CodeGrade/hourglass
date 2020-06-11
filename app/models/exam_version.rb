@@ -4,10 +4,11 @@
 class ExamVersion < ApplicationRecord
   belongs_to :exam
 
-  has_many :registrations, through: :rooms
+  has_many :registrations, dependent: :destroy
+  has_many :version_announcements, dependent: :destroy
+
   has_many :users, through: :registrations
   has_many :anomalies, through: :registrations
-  has_many :version_announcements, dependent: :destroy
 
   validates :exam, presence: true
 

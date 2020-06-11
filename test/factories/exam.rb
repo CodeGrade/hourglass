@@ -13,7 +13,7 @@ FactoryBot.define do
         submissions_count { 5 }
       end
       after(:create) do |exam, context|
-        create_list(:registration, context.submissions_count, :finished, exam: exam)
+        create_list(:registration, context.submissions_count, :done, exam: exam)
       end
     end
   end

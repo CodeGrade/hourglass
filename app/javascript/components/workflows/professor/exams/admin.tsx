@@ -274,7 +274,15 @@ const VersionInfo: React.FC<{
   } = props;
   return (
     <>
-      <h2>Versions</h2>
+      <h2>
+        Versions
+        <Button
+          variant="success"
+          className="float-right"
+        >
+          New Version
+        </Button>
+      </h2>
       <ul>
         {versions.map((v) => (
           <li key={v.id}>

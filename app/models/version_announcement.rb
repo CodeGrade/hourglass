@@ -8,7 +8,6 @@ class VersionAnnouncement < ApplicationRecord
   validates :body, presence: true
 
   def serialize
-    # TODO
     {
       id: id,
       body: body,

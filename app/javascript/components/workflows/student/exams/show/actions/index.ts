@@ -173,7 +173,11 @@ export function loadExam(
   exam: ExamVersion,
   time: TimeInfo,
   answers: AnswersState,
-  messages: ExamMessage[],
+  messages: {
+    personal: ExamMessage[];
+    room: ExamMessage[];
+    version: ExamMessage[];
+  },
   questions: ProfQuestion[],
 ): LoadExamAction {
   return {
@@ -238,7 +242,11 @@ export function doLoad(courseID: number, examID: number): Thunk {
             began: DateTime.fromISO(time.began),
             ends: DateTime.fromISO(time.ends),
           };
-          const newMsgs = convertMsgs(messages);
+          const newMsgs = {
+            personal: convertMsgs(messages.personal),
+            room: convertMsgs(messages.room),
+            version: convertMsgs(messages.version),
+          };
           const newQs = convertQs(questions);
           dispatch(loadExam(exam, newTime, answers, newMsgs, newQs));
         }
@@ -299,7 +307,12 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
     }
     const { answers } = state.contents;
     // The messages list is sorted from newest to oldest.
-    const lastMessageId = state.messages.messages[0]?.id ?? 0;
+    const lastMessageIds = {
+      personal: state.messages.messages.personal[0]?.id ?? 0,
+      room: state.messages.messages.room[0]?.id ?? 0,
+      version: state.messages.messages.version[0]?.id ?? 0,
+    };
+
     const url = `/api/student/exams/${examID}/take`;
     fetch(url, {
       method: 'POST',
@@ -310,16 +323,13 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
       body: JSON.stringify({
         task: 'snapshot',
         answers,
-        lastMessageId,
+        lastMessageIds,
       }),
       credentials: 'same-origin',
     })
       .then((result) => {
         if (result.status === 403) {
-          return {
-            lockout: true,
-            messages: [],
-          };
+          throw new Error('forbidden');
         }
         return result.json() as Promise<SnapshotSaveResult>;
       })
@@ -333,9 +343,17 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
           dispatch(snapshotFailure(error));
           window.location.href = '/';
         } else {
-          const newMsgs = convertMsgs(messages);
+          const newMsgs = {
+            personal: convertMsgs(messages.personal),
+            room: convertMsgs(messages.room),
+            version: convertMsgs(messages.version),
+          };
           dispatch(snapshotSuccess());
-          newMsgs.forEach((msg) => {
+          [
+            ...newMsgs.personal,
+            ...newMsgs.room,
+            ...newMsgs.version,
+          ].forEach((msg) => {
             dispatch(messageReceived(msg));
           });
         }

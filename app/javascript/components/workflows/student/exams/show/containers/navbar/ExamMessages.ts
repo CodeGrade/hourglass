@@ -7,7 +7,11 @@ const mapStateToProps: MSTP<{
   messages: ExamMessage[];
   unread: boolean;
 }> = (state) => ({
-  messages: state.messages.messages,
+  messages: [
+    ...state.messages.messages.personal,
+    ...state.messages.messages.room,
+    ...state.messages.messages.version,
+  ],
   unread: state.messages.unread,
 });
 

@@ -19,7 +19,6 @@ class Message < ApplicationRecord
   end
 
   def serialize
-    # TODO
     {
       id: id,
       body: body,

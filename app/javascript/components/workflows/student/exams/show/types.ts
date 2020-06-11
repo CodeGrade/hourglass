@@ -55,7 +55,11 @@ export interface ContentsResponse {
 
   answers: AnswersState;
 
-  messages: RailsExamMessage[];
+  messages: {
+    personal: RailsExamMessage[];
+    room: RailsExamMessage[];
+    version: RailsExamMessage[];
+  };
 
   questions: RailsExamQuestion[];
 }
@@ -144,7 +148,11 @@ export interface LoadExamAction {
   exam: ExamVersion;
   time: TimeInfo;
   answers: AnswersState;
-  messages: ExamMessage[];
+  messages: {
+    personal: ExamMessage[];
+    room: ExamMessage[];
+    version: ExamMessage[];
+  };
   questions: ProfQuestion[];
 }
 
@@ -186,7 +194,11 @@ export interface SnapshotFailure {
 
 export interface SnapshotSaveResult {
   lockout: boolean;
-  messages: RailsExamMessage[];
+  messages: {
+    personal: RailsExamMessage[];
+    room: RailsExamMessage[];
+    version: RailsExamMessage[];
+  };
 }
 
 export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure;
@@ -287,8 +299,11 @@ export interface MessagesState {
   // Whether there are unread messages.
   unread: boolean;
 
-  // All messages for the current exam.
-  messages: ExamMessage[];
+  messages: {
+    personal: ExamMessage[];
+    room: ExamMessage[];
+    version: ExamMessage[];
+  };
 }
 
 export interface ExamMessage {

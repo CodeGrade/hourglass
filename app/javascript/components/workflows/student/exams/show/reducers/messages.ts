@@ -5,22 +5,33 @@ import {
 
 export default (state: MessagesState = {
   unread: false,
-  messages: [],
+  messages: {
+    personal: [],
+    room: [],
+    version: [],
+  },
 }, action: ExamTakerAction): MessagesState => {
   switch (action.type) {
-    case 'MESSAGE_RECEIVED':
+    case 'MESSAGE_RECEIVED': {
+      const messages = { ...state.messages };
+      messages[action.msg.type] = [
+        ...messages[action.msg.type],
+        action.msg,
+      ];
       return {
         ...state,
         unread: true,
-        messages: [
-          action.msg,
-          ...state.messages,
-        ],
+        messages,
       };
+    }
     case 'LOAD_EXAM':
       return {
         messages: action.messages,
-        unread: action.messages.length !== 0,
+        unread: (
+          action.messages.personal.length !== 0
+          || action.messages.room.length !== 0
+          || action.messages.version.length !== 0
+        ),
       };
     case 'MESSAGES_OPENED':
       return {

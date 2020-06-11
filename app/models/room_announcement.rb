@@ -10,7 +10,6 @@ class RoomAnnouncement < ApplicationRecord
   delegate :exam, to: :room
 
   def serialize
-    # TODO
     {
       id: id,
       body: body,

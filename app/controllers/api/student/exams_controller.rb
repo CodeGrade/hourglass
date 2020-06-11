@@ -106,19 +106,32 @@ module Api
             ends: @registration.accommodated_end_time
           },
           answers: answers,
-          messages: messages,
+          messages: {
+            personal: @registration.private_messages.map(&:serialize),
+            room: @registration.room.room_announcements.map(&:serialize),
+            version: version.version_announcements.map(&:serialize)
+          },
           questions: questions
         }
       end
 
       def snapshot
-        last_message_id = params.require(:lastMessageId)
+        last_message_ids = params.require(:lastMessageIds).permit(:personal, :room, :version)
         answers = answer_params
         saved = @registration.save_answers(answers)
+        version = @registration.exam_version
         {
           lockout: !saved,
-          messages: messages_after(last_message_id)
+          messages: {
+            personal: after(@registration.private_messages, last_message_ids[:personal]).map(&:serialize),
+            room: after(@registration.room.room_announcements, last_message_ids[:room]).map(&:serialize),
+            version: after(version.version_announcements, last_message_ids[:version]).map(&:serialize)
+          }
         }
+      end
+
+      def after(arr, last_id)
+        arr.where('id > ?', last_id)
       end
 
       def check_over
@@ -139,14 +152,8 @@ module Api
         head :locked
       end
 
-      def messages_after(last_message_id)
-        # TODO
-        []
-        # msgs = @registration
-        #        .all_messages_for(current_user)
-        #        .where('id > ?', last_message_id)
-        #        .order(:created_at)
-        # msgs.map(&:serialize)
+      def messages_after(last_personal_id, last_room_id, last_exam_id)
+        messages.select { |msg| msg.created_at > last_message_time }
       end
 
       # Returns all of the questions the current user has asked for this exam.
@@ -157,8 +164,10 @@ module Api
 
       # Returns the announcements and messages for the current registration.
       def messages
-        msgs = @registration.all_messages_for(current_user).sort_by(&:id)
-        msgs.map(&:serialize)
+        @registration
+          .all_messages
+          .sort_by { |msg| msg[:created_at] }
+          .reverse
       end
 
       private

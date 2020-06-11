@@ -130,7 +130,7 @@ const ExamInfoViewer: React.FC<{
         Ends&nbsp;
         <ReadableDate value={end} showTime />
       </p>
-      <p>{`Duration: ${duration} minutes`}</p>
+      <p>{`Duration: ${duration} seconds`}</p>
       <LinkButton to={`/exams/${examId}/admin/edit`}>
         Edit
       </LinkButton>
@@ -235,7 +235,7 @@ export const ExamInfoEditor: React.FC<{
           </Col>
         </Form.Group>
         <Form.Group as={Row} controlId="examDuration">
-          <Form.Label column sm={2}>Duration (minutes):</Form.Label>
+          <Form.Label column sm={2}>Duration (seconds):</Form.Label>
           <Col sm={10}>
             <Form.Control
               type="number"

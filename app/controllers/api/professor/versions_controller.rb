@@ -8,6 +8,8 @@ module Api
 
       before_action :require_prof_reg
 
+      before_action :no_completed_regs, only: [:destroy]
+
       def show
         render json: serialize_version(@version)
       end
@@ -93,6 +95,10 @@ module Api
       end
 
       private
+
+      def no_completed_regs
+        head :conflict if @version.registrations.any?(&:final?)
+      end
 
       def serialize_student(user)
         {

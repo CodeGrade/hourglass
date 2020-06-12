@@ -330,8 +330,14 @@ const ShowVersion: React.FC<{
   return (
     <>
       <h3 className="flex-grow-1">
-        <span>
+        <span
+          role="button"
+          onClick={(): void => setPreview((o) => !o)}
+          onKeyPress={(): void => setPreview((o) => !o)}
+          tabIndex={0}
+        >
           {version.name}
+          {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
         </span>
         <div className="float-right">
           <LinkButton
@@ -360,13 +366,6 @@ const ShowVersion: React.FC<{
           >
             Delete
           </TooltipButton>
-          <Button
-            variant="primary"
-            onClick={(): void => setPreview((o) => !o)}
-          >
-            Preview Version
-            {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
-          </Button>
         </div>
       </h3>
       <PreviewVersion

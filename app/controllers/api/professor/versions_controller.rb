@@ -97,7 +97,7 @@ module Api
       private
 
       def no_completed_regs
-        head :conflict if @version.registrations.any?(&:final?)
+        head :conflict if @version.any_finalized?
       end
 
       def serialize_student(user)

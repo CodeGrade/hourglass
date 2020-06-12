@@ -46,4 +46,8 @@ class ExamVersion < ApplicationRecord
       scratch: ''
     }
   end
+
+  def any_finalized?
+    registrations.any?(&:final?)
+  end
 end

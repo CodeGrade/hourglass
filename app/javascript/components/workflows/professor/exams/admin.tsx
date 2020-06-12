@@ -345,6 +345,7 @@ const ShowVersion: React.FC<{
             </LinkButton>
             <Button
               variant="danger"
+              disabled={version.anyFinalized}
               onClick={(): void => {
                 deleteVersion(version.id).then(() => {
                   refresh();

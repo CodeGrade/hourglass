@@ -133,7 +133,8 @@ module Api
             answers: {
               answers: version.answers
             }
-          }
+          },
+          anyFinalized: version.any_finalized?
         }
       end
     end

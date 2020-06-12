@@ -342,15 +342,6 @@ const ShowVersion: React.FC<{
             variant="info"
             to={`/exams/${examId}/versions/${version.id}/edit`}
             className="mr-2"
-            afterNavigate={() => {
-              if (version.anyFinalized) {
-                alert({
-                  variant: 'warning',
-                  title: 'Version has finalized students.',
-                  message: 'Changing structure of the version will likely result in unexpected behavior.',
-                });
-              }
-            }}
           >
             Edit
           </LinkButton>

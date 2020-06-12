@@ -3,10 +3,20 @@ import { useParams } from 'react-router-dom';
 import { useResponse as showVersion } from '@hourglass/common/api/professor/exams/versions/show';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Editor from '@professor/exams/new/editor';
+import { useAlert } from '@hourglass/common/alerts';
 
 const EditExamVersion: React.FC = () => {
   const { versionId } = useParams();
   const res = showVersion(versionId);
+  useAlert(
+    {
+      variant: 'warning',
+      title: 'Version has finalized students.',
+      message: 'Changing structure of the version will likely result in unexpected behavior.',
+    },
+    res.type === 'RESULT' && res.response.anyFinalized,
+    [res.type],
+  );
   switch (res.type) {
     case 'ERROR':
     case 'LOADING':

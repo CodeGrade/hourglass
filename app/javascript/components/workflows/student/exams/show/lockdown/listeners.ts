@@ -43,9 +43,13 @@ const listeners: {
   {
     event: 'beforeunload',
     handler: (detected) => (e: Event): void => {
-      e.preventDefault();
-      e.stopPropagation();
       detected('tried to navigate away', e);
+    },
+  },
+  {
+    event: 'popstate',
+    handler: (detected) => (e: Event): void => {
+      detected('tried to change pages', e);
     },
   },
 ];

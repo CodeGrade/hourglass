@@ -324,6 +324,7 @@ const ShowVersion: React.FC<{
     refresh,
   } = props;
   const { examId } = useParams();
+  const { alert } = useContext(AlertContext);
   const [preview, setPreview] = useState(false);
   return (
     <>
@@ -347,6 +348,12 @@ const ShowVersion: React.FC<{
               onClick={(): void => {
                 deleteVersion(version.id).then(() => {
                   refresh();
+                }).catch((err) => {
+                  alert({
+                    variant: 'danger',
+                    title: 'Error deleting version.',
+                    message: err.message,
+                  });
                 });
               }}
             >

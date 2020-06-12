@@ -329,49 +329,46 @@ const ShowVersion: React.FC<{
   const [preview, setPreview] = useState(false);
   return (
     <>
-      <InputGroup>
-        <h3 className="flex-grow-1">{version.name}</h3>
-        <InputGroup.Append>
-          <ButtonGroup>
-            <Button
-              variant="info"
-            >
-              Grade
-            </Button>
-            <LinkButton
-              variant="info"
-              to={`/exams/${examId}/versions/${version.id}/edit`}
-            >
-              Edit
-            </LinkButton>
-            <TooltipButton
-              variant="danger"
-              disabled={version.anyFinalized}
-              disabledMessage="Version has finalized students."
-              onClick={(): void => {
-                deleteVersion(version.id).then(() => {
-                  refresh();
-                }).catch((err) => {
-                  alert({
-                    variant: 'danger',
-                    title: 'Error deleting version.',
-                    message: err.message,
-                  });
+      <h3 className="flex-grow-1">
+        <span>
+          {version.name}
+        </span>
+        <div className="float-right">
+          <LinkButton
+            variant="info"
+            to={`/exams/${examId}/versions/${version.id}/edit`}
+            className="mr-2"
+          >
+            Edit
+          </LinkButton>
+          <TooltipButton
+            variant="danger"
+            disabled={version.anyFinalized}
+            disabledMessage="Version has finalized students."
+            className="mr-2"
+            onClick={(): void => {
+              deleteVersion(version.id).then(() => {
+                refresh();
+              }).catch((err) => {
+                alert({
+                  variant: 'danger',
+                  title: 'Error deleting version.',
+                  message: err.message,
                 });
-              }}
-            >
-              Delete
-            </TooltipButton>
-            <Button
-              variant="primary"
-              onClick={(): void => setPreview((o) => !o)}
-            >
-              Preview Version
-              {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
-            </Button>
-          </ButtonGroup>
-        </InputGroup.Append>
-      </InputGroup>
+              });
+            }}
+          >
+            Delete
+          </TooltipButton>
+          <Button
+            variant="primary"
+            onClick={(): void => setPreview((o) => !o)}
+          >
+            Preview Version
+            {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+          </Button>
+        </div>
+      </h3>
       <PreviewVersion
         open={preview}
         railsExam={{

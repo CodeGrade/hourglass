@@ -11,6 +11,7 @@ interface TooltipButtonProps {
   placement?: OverlayTriggerProps['placement'];
   onClick?: () => void;
   variant?: ButtonProps['variant'];
+  className?: React.HTMLAttributes<HTMLButtonElement>['className'];
 }
 
 const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
@@ -21,6 +22,7 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
     variant = 'primary',
     placement = 'bottom',
     children,
+    className,
   } = props;
   return (
     <Tooltip
@@ -35,7 +37,7 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
           variant={variant}
           onClick={onClick}
           disabled={disabled}
-          className={disabled && 'pointer-events-none'}
+          className={`${className} ${disabled ? 'pointer-events-none' : ''}`}
         >
           {children}
         </Button>

@@ -40,6 +40,18 @@ const listeners: {
       detected('tried context menu', e);
     },
   },
+  {
+    event: 'beforeunload',
+    handler: (detected) => (e: Event): void => {
+      detected('tried to navigate away', e);
+    },
+  },
+  {
+    event: 'popstate',
+    handler: (detected) => (e: Event): void => {
+      detected('tried to change pages', e);
+    },
+  },
 ];
 
 export function installListeners(policies: Policy[], detected: AnomalyDetected): AnomalyListener[] {

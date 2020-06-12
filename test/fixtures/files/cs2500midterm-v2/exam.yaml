@@ -1,7 +1,5 @@
 ---
-policies:
-  - ignore-lockdown
-  - tolerate-windowed
+policies: []
 contents:
   instructions: Instructions go here.
   reference:

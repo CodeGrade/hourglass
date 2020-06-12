@@ -76,7 +76,7 @@ module Api
               answers: version.answers
             }
           },
-          anyFinalized: version.any_finalized?
+          anyStarted: version.any_started?
         }
       end
     end

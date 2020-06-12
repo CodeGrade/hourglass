@@ -8,7 +8,7 @@ export interface Version {
   name: string;
   policies: Policy[];
   contents: ContentsState;
-  anyFinalized: boolean;
+  anyStarted: boolean;
 }
 
 interface Server {

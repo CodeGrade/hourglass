@@ -8,7 +8,7 @@ export default async function del(versionId: number): Promise<unknown> {
     return res;
   } catch (e) {
     if (e.status === 409) {
-      throw new Error('You cannot delete a version with registrations that have been completed.');
+      throw new Error('You cannot delete a version that students have started taking.');
     }
     throw e;
   }

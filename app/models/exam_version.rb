@@ -47,6 +47,10 @@ class ExamVersion < ApplicationRecord
     }
   end
 
+  def any_started?
+    registrations.any?(&:started?)
+  end
+
   def any_finalized?
     registrations.any?(&:final?)
   end

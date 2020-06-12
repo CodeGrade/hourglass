@@ -347,8 +347,8 @@ const ShowVersion: React.FC<{
           </LinkButton>
           <TooltipButton
             variant="danger"
-            disabled={version.anyFinalized}
-            disabledMessage="Version has finalized students."
+            disabled={version.anyStarted}
+            disabledMessage="Version has started students."
             onClick={(): void => {
               deleteVersion(version.id).then(() => {
                 refresh();

@@ -8,7 +8,7 @@ module Api
 
       before_action :require_prof_reg
 
-      before_action :no_completed_regs, only: [:destroy]
+      before_action :no_started_regs, only: [:destroy]
 
       def show
         render json: serialize_version(@version)
@@ -96,8 +96,8 @@ module Api
 
       private
 
-      def no_completed_regs
-        head :conflict if @version.any_finalized?
+      def no_started_regs
+        head :conflict if @version.any_started?
       end
 
       def serialize_student(user)
@@ -134,7 +134,7 @@ module Api
               answers: version.answers
             }
           },
-          anyFinalized: version.any_finalized?
+          anyStarted: version.any_started?
         }
       end
     end

@@ -11,10 +11,10 @@ const EditExamVersion: React.FC = () => {
   useAlert(
     {
       variant: 'warning',
-      title: 'Version has finalized students.',
+      title: 'Version has started students.',
       message: 'Changing structure of the version will likely result in unexpected behavior.',
     },
-    res.type === 'RESULT' && res.response.anyFinalized,
+    res.type === 'RESULT' && res.response.anyStarted,
     [res.type],
   );
   switch (res.type) {

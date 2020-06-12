@@ -62,7 +62,8 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
           'files' => []
         },
         'answers' => { 'answers' => [] }
-      }
+      },
+      'anyStarted' => false
     }
     assert_equal expected, parsed.except('id')
     assert parsed['id'].integer?
@@ -70,6 +71,14 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should update exam version' do
     ver = create(:exam_version)
+    reg = create(:professor_course_registration, course: ver.exam.course)
+    sign_in reg.user
+    assert_updatable ver
+  end
+
+  test 'should update exam version with started submissions' do
+    exam = create(:exam, :with_started_submissions)
+    ver = exam.exam_versions.first
     reg = create(:professor_course_registration, course: ver.exam.course)
     sign_in reg.user
     assert_updatable ver
@@ -97,7 +106,19 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 0, exam.exam_versions.length
   end
 
-  test 'should not destroy exam with submissions' do
+  test 'should not destroy exam version with started registrations' do
+    exam = create(:exam, :with_started_submissions)
+    ver = exam.exam_versions.first
+    reg = create(:professor_course_registration, course: exam.course)
+    prof = reg.user
+    sign_in prof
+    delete api_professor_version_path(ver)
+    assert_response :conflict
+    ver.reload
+    assert_not ver.destroyed?
+  end
+
+  test 'should not destroy exam version with final registrations' do
     exam = create(:exam, :with_finished_submissions)
     ver = exam.exam_versions.first
     reg = create(:professor_course_registration, course: exam.course)

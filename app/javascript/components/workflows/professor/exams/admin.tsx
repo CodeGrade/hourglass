@@ -28,7 +28,7 @@ import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import createVersion from '@hourglass/common/api/professor/exams/versions/create';
 import deleteVersion from '@hourglass/common/api/professor/exams/versions/delete';
-import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
+import TooltipButton from '@student/exams/show/components/TooltipButton';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();

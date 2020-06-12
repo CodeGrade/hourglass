@@ -41,6 +41,20 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  test 'student cannot edit exam version' do
+    reg = create(:registration)
+    sign_in reg.user
+    patch api_professor_version_path(reg.exam_version)
+    assert_response :forbidden
+  end
+
+  test 'student cannot destroy exam version' do
+    reg = create(:registration)
+    sign_in reg.user
+    delete api_professor_version_path(reg.exam_version)
+    assert_response :forbidden
+  end
+
   test 'should create new exam version' do
     reg = create(:professor_course_registration)
     exam = create(:exam, course: reg.course)

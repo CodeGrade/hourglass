@@ -49,7 +49,13 @@ const listeners: {
   {
     event: 'popstate',
     handler: (detected) => (e: Event): void => {
-      detected('tried to change pages', e);
+      detected('tried to navigate back', e);
+    },
+  },
+  {
+    event: 'pushstate',
+    handler: (detected) => (e: Event): void => {
+      detected('tried to navigate forward', e);
     },
   },
 ];

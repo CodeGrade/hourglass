@@ -30,6 +30,7 @@ import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import createVersion from '@hourglass/common/api/professor/exams/versions/create';
 import deleteVersion from '@hourglass/common/api/professor/exams/versions/delete';
+import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -343,9 +344,10 @@ const ShowVersion: React.FC<{
             >
               Edit
             </LinkButton>
-            <Button
+            <TooltipButton
               variant="danger"
               disabled={version.anyFinalized}
+              disabledMessage="Version has finalized students."
               onClick={(): void => {
                 deleteVersion(version.id).then(() => {
                   refresh();
@@ -359,7 +361,7 @@ const ShowVersion: React.FC<{
               }}
             >
               Delete
-            </Button>
+            </TooltipButton>
             <Button
               variant="primary"
               onClick={(): void => setPreview((o) => !o)}

@@ -349,6 +349,7 @@ const ShowVersion: React.FC<{
             variant="danger"
             disabled={version.anyStarted}
             disabledMessage="Version has started students."
+            cursorClass="cursor-not-allowed"
             onClick={(): void => {
               deleteVersion(version.id).then(() => {
                 refresh();

@@ -351,7 +351,6 @@ const ShowVersion: React.FC<{
             variant="danger"
             disabled={version.anyFinalized}
             disabledMessage="Version has finalized students."
-            className="mr-2"
             onClick={(): void => {
               deleteVersion(version.id).then(() => {
                 refresh();

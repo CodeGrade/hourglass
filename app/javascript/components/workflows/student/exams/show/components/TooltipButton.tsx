@@ -27,16 +27,19 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
       showTooltip={disabled}
       message={disabledMessage}
       placement={placement}
-      className={`d-inline-block ${disabled && 'cursor-help'}`}
     >
-      <Button
-        variant={variant}
-        onClick={onClick}
-        disabled={disabled}
-        className={disabled && 'pointer-events-none'}
+      <span
+        className={`d-inline-block ${disabled && 'cursor-help'}`}
       >
-        {children}
-      </Button>
+        <Button
+          variant={variant}
+          onClick={onClick}
+          disabled={disabled}
+          className={disabled && 'pointer-events-none'}
+        >
+          {children}
+        </Button>
+      </span>
     </Tooltip>
   );
 };

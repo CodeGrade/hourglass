@@ -12,8 +12,6 @@ import {
   Card,
   Collapse,
   Button,
-  InputGroup,
-  ButtonGroup,
   Form,
   Row,
   Col,
@@ -28,6 +26,9 @@ import ReadableDate from '@hourglass/common/ReadableDate';
 import { hitApi } from '@hourglass/common/types/api';
 import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
+import createVersion from '@hourglass/common/api/professor/exams/versions/create';
+import deleteVersion from '@hourglass/common/api/professor/exams/versions/delete';
+import TooltipButton from '@student/exams/show/components/TooltipButton';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -58,7 +59,11 @@ export const ExamAdmin: React.FC = () => {
               <ExamInfoViewer response={response.response} />
             </Route>
           </Switch>
-          <VersionInfo versions={response.response.versions} examName={response.response.name} />
+          <VersionInfo
+            versions={response.response.versions}
+            examName={response.response.name}
+            refresh={refresh}
+          />
           <ProctoringInfo examId={examId} />
         </>
       );
@@ -267,20 +272,38 @@ export const ExamInfoEditor: React.FC<{
 const VersionInfo: React.FC<{
   examName: string;
   versions: Version[];
+  refresh: () => void;
 }> = (props) => {
   const {
     examName,
     versions,
+    refresh,
   } = props;
+  const { examId } = useParams();
+  const history = useHistory();
   return (
     <>
-      <h2>Versions</h2>
+      <h2>
+        Versions
+        <Button
+          variant="success"
+          className="float-right"
+          onClick={(): void => {
+            createVersion(examId).then((res) => {
+              history.push(`/exams/${examId}/versions/${res.id}/edit`);
+            });
+          }}
+        >
+          New Version
+        </Button>
+      </h2>
       <ul>
         {versions.map((v) => (
           <li key={v.id}>
             <ShowVersion
               version={v}
               examName={examName}
+              refresh={refresh}
             />
           </li>
         ))}
@@ -292,40 +315,57 @@ const VersionInfo: React.FC<{
 const ShowVersion: React.FC<{
   version: Version;
   examName: string;
+  refresh: () => void;
 }> = (props) => {
   const {
     version,
     examName,
+    refresh,
   } = props;
   const { examId } = useParams();
+  const { alert } = useContext(AlertContext);
   const [preview, setPreview] = useState(false);
   return (
     <>
-      <InputGroup>
-        <h3 className="flex-grow-1">{version.name}</h3>
-        <InputGroup.Append>
-          <ButtonGroup>
-            <Button
-              variant="info"
-            >
-              Grade
-            </Button>
-            <LinkButton
-              variant="info"
-              to={`/exams/${examId}/versions/${version.id}/edit`}
-            >
-              Edit
-            </LinkButton>
-            <Button
-              variant="primary"
-              onClick={(): void => setPreview((o) => !o)}
-            >
-              Preview Version
-              {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
-            </Button>
-          </ButtonGroup>
-        </InputGroup.Append>
-      </InputGroup>
+      <h3 className="flex-grow-1">
+        <span
+          role="button"
+          onClick={(): void => setPreview((o) => !o)}
+          onKeyPress={(): void => setPreview((o) => !o)}
+          tabIndex={0}
+        >
+          {version.name}
+          {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+        </span>
+        <div className="float-right">
+          <LinkButton
+            variant="info"
+            to={`/exams/${examId}/versions/${version.id}/edit`}
+            className="mr-2"
+          >
+            Edit
+          </LinkButton>
+          <TooltipButton
+            variant="danger"
+            disabled={version.anyStarted}
+            disabledMessage="Students have already started taking this exam version"
+            cursorClass="cursor-not-allowed"
+            onClick={(): void => {
+              deleteVersion(version.id).then(() => {
+                refresh();
+              }).catch((err) => {
+                alert({
+                  variant: 'danger',
+                  title: 'Error deleting version.',
+                  message: err.message,
+                });
+              });
+            }}
+          >
+            Delete
+          </TooltipButton>
+        </div>
+      </h3>
       <PreviewVersion
         open={preview}
         railsExam={{

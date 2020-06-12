@@ -6,6 +6,7 @@ export interface Response {
   name: string;
   policies: Policy[];
   contents: ContentsState;
+  anyStarted: boolean;
 }
 
 export function useResponse(versionId: number): ApiResponse<Response> {

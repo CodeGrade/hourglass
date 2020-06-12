@@ -32,14 +32,14 @@ const Submit: React.FC<SubmitProps> = (props) => {
             if (res.updated === false) {
               alert({
                 variant: 'danger',
-                title: 'Exam not updated',
+                title: 'Exam version not updated.',
                 message: <pre>{res.reason}</pre>,
               });
             } else {
               history.push(`/exams/${examId}/admin`);
               alert({
                 variant: 'success',
-                message: 'Exam updated successfully.',
+                message: 'Exam version updated successfully.',
               });
             }
           });

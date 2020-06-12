@@ -75,7 +75,8 @@ module Api
             answers: {
               answers: version.answers
             }
-          }
+          },
+          anyStarted: version.any_started?
         }
       end
     end

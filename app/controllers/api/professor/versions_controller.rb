@@ -3,10 +3,12 @@
 module Api
   module Professor
     class VersionsController < ProfessorController
-      before_action :find_version, only: [:show, :update]
+      before_action :find_version, only: [:show, :update, :destroy]
       before_action :find_exam_and_course
 
       before_action :require_prof_reg
+
+      before_action :no_started_regs, only: [:destroy]
 
       def show
         render json: serialize_version(@version)
@@ -51,7 +53,26 @@ module Api
       end
 
       def create
-        # TODO: move from exams#create
+        n = @exam.exam_versions.length + 1
+        @version = ExamVersion.create(
+          exam: @exam,
+          name: "#{@exam.name} Version #{n}",
+          files: [],
+          info: {
+            policies: [],
+            answers: [],
+            contents: {
+              questions: []
+            }
+          }
+        )
+        @version.save!
+        render json: serialize_version(@version)
+      end
+
+      def destroy
+        @version.destroy!
+        render json: {}
       end
 
       def update_all
@@ -74,6 +95,10 @@ module Api
       end
 
       private
+
+      def no_started_regs
+        head :conflict if @version.any_started?
+      end
 
       def serialize_student(user)
         {
@@ -101,14 +126,15 @@ module Api
           contents: {
             exam: {
               questions: version.contents['questions'],
-              reference: version.contents['reference'],
-              instructions: version.contents['instructions'],
+              reference: version.contents['reference'] || [],
+              instructions: version.contents['instructions'] || { type: 'HTML', value: '' },
               files: version.files
             },
             answers: {
               answers: version.answers
             }
-          }
+          },
+          anyStarted: version.any_started?
         }
       end
     end

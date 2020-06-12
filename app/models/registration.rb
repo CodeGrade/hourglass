@@ -77,6 +77,10 @@ class Registration < ApplicationRecord
     end
   end
 
+  def started?
+    !start_time.nil?
+  end
+
   def over?
     DateTime.now > effective_end_time
   end

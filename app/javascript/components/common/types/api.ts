@@ -18,6 +18,18 @@ export interface ApiError {
   text: string;
 }
 
+/**
+ * Error that is thrown for error responses from the API.
+ */
+export class HitApiError extends Error {
+  status = -1;
+
+  constructor(err: ApiError) {
+    super(err.text);
+    this.status = err.status;
+  }
+}
+
 export async function hitApi<T>(url: string, options?: RequestInit): Promise<T> {
   return fetch(url, {
     headers: {
@@ -27,8 +39,21 @@ export async function hitApi<T>(url: string, options?: RequestInit): Promise<T> 
     credentials: 'same-origin',
     ...options,
   })
+    .catch((err) => {
+      throw new HitApiError({
+        type: 'ERROR',
+        status: -1,
+        text: err.message,
+      });
+    })
     .then((res) => {
-      if (!res.ok) throw new Error(res.statusText);
+      if (!res.ok) {
+        throw new HitApiError({
+          type: 'ERROR',
+          status: res.status,
+          text: res.statusText,
+        });
+      }
       return res.json() as Promise<T>;
     });
 }

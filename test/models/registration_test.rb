@@ -7,6 +7,12 @@ class RegistrationTest < ActiveSupport::TestCase
     assert build(:registration).valid?
   end
 
+  test 'create finished registration' do
+    reg = build(:registration, :done)
+    assert reg.valid?
+    assert reg.final?
+  end
+
   test 'accommodated_duration with no accommodation' do
     reg = build(:registration)
     exam = reg.exam

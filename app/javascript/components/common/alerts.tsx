@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Alert, AlertProps } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 
@@ -87,4 +87,15 @@ export const AllAlerts: React.FC = ({ children }) => {
       {children}
     </AlertContext.Provider>
   );
+};
+
+export const useAlert = (
+  msg: HGAlert,
+  condition: boolean,
+  deps?: React.DependencyList,
+): void => {
+  const { alert } = useContext(AlertContext);
+  useEffect(() => {
+    if (condition) alert(msg);
+  }, [condition, ...(deps ?? [])]);
 };

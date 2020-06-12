@@ -24,5 +24,10 @@ FactoryBot.define do
     trait :late_start do
       start_time { accommodated_end_time - (accommodated_duration / 4.0) }
     end
+
+    trait :done do
+      early_start
+      end_time { start_time + effective_duration }
+    end
   end
 end

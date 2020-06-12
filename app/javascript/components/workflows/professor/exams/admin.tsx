@@ -348,7 +348,7 @@ const ShowVersion: React.FC<{
           <TooltipButton
             variant="danger"
             disabled={version.anyStarted}
-            disabledMessage="Version has started students."
+            disabledMessage="Students have already started taking this exam version"
             cursorClass="cursor-not-allowed"
             onClick={(): void => {
               deleteVersion(version.id).then(() => {

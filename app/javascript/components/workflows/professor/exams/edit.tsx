@@ -11,8 +11,8 @@ const EditExamVersion: React.FC = () => {
   useAlert(
     {
       variant: 'warning',
-      title: 'Version has started students.',
-      message: 'Changing structure of the version will likely result in unexpected behavior.',
+      title: 'Students have already started taking this version',
+      message: 'Changing the questions will likely result in nonsensical answers, and changing the structure of this version will result in undefined behavior. Be careful!',
     },
     res.type === 'RESULT' && res.response.anyStarted,
     [res.type],

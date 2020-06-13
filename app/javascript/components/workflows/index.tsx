@@ -21,7 +21,6 @@ import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
 import EditExamVersion from '@professor/exams/edit';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import Archive from '@hourglass/common/archive';
 import StudentDND from '@hourglass/common/student-dnd';
 import { AllAlerts } from '@hourglass/common/alerts';
 import AllocateVersions from '@professor/exams/allocate-versions';
@@ -172,9 +171,6 @@ const Entry: React.FC = () => {
                   <Switch>
                     <Route exact path="/">
                       <Exams />
-                    </Route>
-                    <Route exact path="/dev">
-                      <Archive />
                     </Route>
                     <Route path="/exams/:examId/admin">
                       <ExamAdmin />

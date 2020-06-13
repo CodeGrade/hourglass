@@ -12,6 +12,11 @@ class ExamVersionTest < ActiveSupport::TestCase
     assert JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, ev.info)
   end
 
+  test 'cs3500_v1 exam info validates' do
+    ev = build(:exam_version, :cs3500_v1)
+    assert JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, ev.info)
+  end
+
   # test 'build exam version with upload containing upload-schema' do
   #   upload = ...
   #   ev = build(:exam_version, upload: upload)

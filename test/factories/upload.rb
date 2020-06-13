@@ -31,7 +31,7 @@ FactoryBot.define do
 
     trait :cs3500_v1 do
       transient do
-        file_name { 'cs3500final' }
+        file_name { 'cs3500final-v1' }
       end
     end
 

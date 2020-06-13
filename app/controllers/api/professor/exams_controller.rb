@@ -30,10 +30,12 @@ module Api
 
       def update
         body = params.require(:exam).permit(:name, :start, :end, :duration)
-        # TODO update start and end, add policies
+        # TODO: add policies
         updated = @exam.update(
           {
             name: body[:name],
+            start_time: DateTime.parse(body[:start]),
+            end_time: DateTime.parse(body[:end]),
             duration: body[:duration]
           }
         )

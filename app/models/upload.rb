@@ -64,8 +64,13 @@ class Upload
         @dir.join('exam.yaml')
       end
     properties = YAML.safe_load(File.read(file))
-    JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
-    @info = parse_info(properties)
+    begin
+      JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties)
+      @info = properties
+    rescue JSON::Schema::ValidationError
+      JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
+      @info = parse_info(properties)
+    end
   end
 
   def make_html_val(str)

@@ -25,6 +25,13 @@ FactoryBot.define do
       end
     end
 
+    trait :cs3500_v2 do
+      name { 'CS3500 Final Version 2' }
+      transient do
+        upload { create(:upload, :cs3500_v2) }
+      end
+    end
+
     exam
     files { upload.files }
     info { upload.info }

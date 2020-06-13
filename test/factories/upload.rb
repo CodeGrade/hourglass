@@ -35,6 +35,12 @@ FactoryBot.define do
       end
     end
 
+    trait :cs3500_v2 do
+      transient do
+        file_name { 'cs3500final-v2' }
+      end
+    end
+
     initialize_with { fixture_zip(file_name) }
     to_create {}
   end

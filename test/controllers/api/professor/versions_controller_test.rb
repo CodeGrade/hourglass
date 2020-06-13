@@ -149,7 +149,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     reg = create(:professor_course_registration, course: exam.course)
     assert_equal 0, exam.exam_versions.length
     sign_in reg.user
-    UploadTestHelper.with_test_uploaded_file 'cs3500final-v1' do |upload|
+    UploadTestHelper.with_test_uploaded_zip 'cs3500final-v1' do |upload|
       post import_api_professor_versions_path(exam), params: {
         upload: upload
       }

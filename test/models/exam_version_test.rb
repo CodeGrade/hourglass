@@ -3,7 +3,11 @@
 require 'test_helper'
 
 class ExamVersionTest < ActiveSupport::TestCase
-  def yaml_contents(name)
+  def condense_yaml(name)
+    parse_yaml(name).to_json
+  end
+
+  def parse_yaml(name)
     yaml_path = Rails.root.join('test', 'fixtures', 'files', name, 'exam.yaml')
     YAML.safe_load(File.read(yaml_path))
   end
@@ -31,15 +35,21 @@ class ExamVersionTest < ActiveSupport::TestCase
   end
 
   test 'cs3500_v2 file validates against save-schema' do
-    parsed = yaml_contents 'cs3500final-v2'
+    parsed = parse_yaml 'cs3500final-v2'
     assert JSON::Validator.validate(ExamVersion::EXAM_SAVE_SCHEMA, parsed['info'])
     assert JSON::Validator.validate(ExamVersion::FILES_SCHEMA, parsed['files'])
   end
 
   test 'cs3500_v2 info is the same as its input' do
     ev = build(:exam_version, :cs3500_v2)
-    parsed = yaml_contents 'cs3500final-v2'
+    parsed = parse_yaml 'cs3500final-v2'
     assert_equal parsed['info'], ev.info
     assert_equal parsed['files'], ev.files
+  end
+
+  test 'cs3500_v2 output_json' do
+    ev = build(:exam_version, :cs3500_v2)
+    json = condense_yaml 'cs3500final-v2'
+    assert_equal json, ev.export_json
   end
 end

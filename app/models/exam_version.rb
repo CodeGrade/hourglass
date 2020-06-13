@@ -54,4 +54,11 @@ class ExamVersion < ApplicationRecord
   def any_finalized?
     registrations.any?(&:final?)
   end
+
+  def export_json
+    {
+      info: info,
+      files: files
+    }.to_json
+  end
 end

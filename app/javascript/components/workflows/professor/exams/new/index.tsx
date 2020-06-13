@@ -1,8 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { getCSRFToken } from '@student/exams/show/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
-import { ExamInfoEditor } from '../admin';
+import { ExamInfoEditor } from '@professor/exams/admin';
 import createExam from '@hourglass/common/api/professor/exams/create';
 
 const NewExam: React.FC = () => (
@@ -31,7 +30,13 @@ const NewExamForm: React.FC = () => {
             }
             return res;
           })
-          .then(({ id }) => history.push(`/exams/${id}/admin`))
+          .then(({ id }) => {
+            history.push(`/exams/${id}/admin`);
+            alert({
+              variant: 'success',
+              message: 'Exam created successfully.',
+            });
+          })
           .catch((err) => {
             alert({
               variant: 'danger',

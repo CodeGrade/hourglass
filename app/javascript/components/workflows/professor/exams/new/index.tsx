@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
-import {
-  Form,
-  Button,
-  // Card,
-  // CardDeck,
-} from 'react-bootstrap';
+import React, { useState, useContext } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { getCSRFToken } from '@student/exams/show/helpers';
+import { AlertContext } from '@hourglass/common/alerts';
+import { ExamInfoEditor } from '../admin';
+import createExam from '@hourglass/common/api/professor/exams/create';
 
 const NewExam: React.FC = () => (
   <div>
@@ -18,137 +15,31 @@ const NewExam: React.FC = () => (
 export default NewExam;
 
 const NewExamForm: React.FC = () => {
-  const [name, setName] = useState('');
-  const [file, setFile] = useState(undefined);
   const { courseId } = useParams();
+  const { alert } = useContext(AlertContext);
   const history = useHistory();
   return (
-    <Form
-      onSubmit={(e): void => {
-        e.preventDefault();
-        if (!file) {
-          // Form validated with no file.
-          return;
-        }
-        const data = new FormData();
-        data.append('file', file);
-        data.append('name', name);
-        fetch(`/api/professor/courses/${courseId}/exams`, {
-          method: 'POST',
-          headers: {
-            // 'Content-Type': 'multipart/form-data',
-            'X-CSRF-Token': getCSRFToken(),
-          },
-          credentials: 'same-origin',
-          body: data,
-        })
+    <ExamInfoEditor
+      onCancel={(): void => {
+        history.push(`/courses/${courseId}`);
+      }}
+      onSubmit={(info): void => {
+        createExam(courseId, info)
           .then((res) => {
-            if (res.status !== 201) {
-              throw new Error('Not created');
+            if (res.created === false) {
+              throw new Error(res.reason);
             }
             return res;
           })
-          .then((res) => res.json() as Promise<{ id: number }>)
-          .then(({ id }) => history.push(`/exams/${id}/admin`));
+          .then(({ id }) => history.push(`/exams/${id}/admin`))
+          .catch((err) => {
+            alert({
+              variant: 'danger',
+              title: 'Error creating exam.',
+              message: err.message,
+            });
+          });
       }}
-    >
-      <Form.Group>
-        <Form.Label>Exam Name</Form.Label>
-        <Form.Control
-          required
-          value={name}
-          onChange={(e): void => setName(e.target.value)}
-          placeholder="Enter a name"
-        />
-      </Form.Group>
-      <Form.Group>
-        <Form.Label>Exam upload (editor WIP)</Form.Label>
-        <Form.File
-          required
-          onChange={(e): void => {
-            const { files } = e.target;
-            const upload = files[0];
-            if (upload) setFile(upload);
-          }}
-          label={file?.name ?? 'Choose a file'}
-          accept="application/zip,.yaml,.yml"
-          custom
-        />
-      </Form.Group>
-      {/* <AssocRooms /> */}
-      <Button
-        variant="success"
-        type="submit"
-      >
-        Submit
-      </Button>
-    </Form>
+    />
   );
 };
-
-/*
-const AssocRooms: React.FC<{}> = () => {
-  const [rooms, setRooms] = useState([{
-    name: '',
-  }]);
-  const addRoom = (): void => setRooms((old) => [...old, {
-    name: '',
-  }]);
-  return (
-    <div>
-      <h2>Rooms</h2>
-      <Form.Group>
-        <Button
-          variant="primary"
-          onClick={(): void => {
-            addRoom();
-          }}
-        >
-          Add exam room
-        </Button>
-      </Form.Group>
-      <Form.Group>
-        <CardDeck>
-          {rooms.map((room, index) => (
-            <Card
-              // eslint-disable-next-line react/no-array-index-key
-              key={index}
-            >
-              <Card.Body>
-                <NewRoom room={room} />
-              </Card.Body>
-            </Card>
-          ))}
-        </CardDeck>
-      </Form.Group>
-    </div>
-  );
-};
-
-interface Room {
-  name: string;
-}
-
-interface NewRoomProps {
-  room: Room;
-}
-
-const NewRoom: React.FC<NewRoomProps> = () => (
-  <>
-    <Form.Group>
-      <Form.Label>Name</Form.Label>
-      <Form.Control
-        required
-        // value={room.name}
-        // onChange={(e): void => setName(e.target.value)}
-        placeholder="Enter a name"
-      />
-    </Form.Group>
-    <Button
-      variant="danger"
-    >
-      Remove room
-    </Button>
-  </>
-);
-*/

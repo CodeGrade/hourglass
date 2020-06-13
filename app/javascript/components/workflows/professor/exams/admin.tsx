@@ -29,10 +29,17 @@ import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import createVersion from '@hourglass/common/api/professor/exams/versions/create';
 import deleteVersion from '@hourglass/common/api/professor/exams/versions/delete';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
+import {
+  ExamUpdateInfo,
+  updateExam,
+} from '@hourglass/common/api/professor/exams/update';
+import { DateTime } from 'luxon';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
   const [refresher, refresh] = useRefresher();
+  const history = useHistory();
+  const { alert } = useContext(AlertContext);
   const response = examsShow(examId, [refresher]);
   switch (response.type) {
     case 'ERROR':
@@ -52,7 +59,31 @@ export const ExamAdmin: React.FC = () => {
             <Route path="/exams/:examId/admin/edit">
               <ExamInfoEditor
                 response={response.response}
-                onSuccess={refresh}
+                onCancel={(): void => {
+                  history.push(`/exams/${examId}/admin`);
+                }}
+                onSubmit={(info) => {
+                  updateExam(examId, info)
+                    .then(({ updated }) => {
+                      history.push(`/exams/${examId}/admin`);
+                      if (updated) {
+                        alert({
+                          variant: 'success',
+                          message: 'Exam info saved.',
+                        });
+                        refresh();
+                      } else {
+                        throw new Error('API failure');
+                      }
+                    }).catch((err) => {
+                      history.push(`/exams/${examId}/admin`);
+                      alert({
+                        variant: 'danger',
+                        title: 'Error saving exam info.',
+                        message: err.message,
+                      });
+                    });
+                }}
               />
             </Route>
             <Route path="/exams/:examId/admin">
@@ -66,7 +97,7 @@ export const ExamAdmin: React.FC = () => {
           />
           <ProctoringInfo examId={examId} />
         </>
-      );
+    );
     default:
       throw new ExhaustiveSwitchError(response);
   }
@@ -145,61 +176,21 @@ const ExamInfoViewer: React.FC<{
 
 
 export const ExamInfoEditor: React.FC<{
-  response: ShowResponse;
-  onSuccess: () => void;
+  response?: ShowResponse;
+  onSubmit: (info: ExamUpdateInfo) => void;
+  onCancel: () => void;
 }> = (props) => {
   const {
     response,
-    onSuccess,
+    onSubmit,
+    onCancel,
   } = props;
-  const {
-    examId,
-  } = useParams();
-  const history = useHistory();
-  const { alert } = useContext(AlertContext);
-  const [name, setName] = useState(response.name);
-  const [start, setStart] = useState(response.start.toISO());
-  const [end, setEnd] = useState(response.end.toISO());
-  const [duration, setDuration] = useState(response.duration);
-
-  const submitForm = (): void => {
-    const formInfo = {
-      exam: {
-        name,
-        start,
-        end,
-        duration,
-      },
-    };
-    hitApi<{
-      updated: boolean;
-    }>(`/api/professor/exams/${examId}`, {
-      method: 'PATCH',
-      body: JSON.stringify(formInfo),
-    }).then(({ updated }) => {
-      history.push(`/exams/${examId}/admin`);
-      if (updated) {
-        alert({
-          variant: 'success',
-          message: 'Exam info saved.',
-        });
-        onSuccess();
-      } else {
-        throw new Error('API failure');
-      }
-    }).catch((err) => {
-      history.push(`/exams/${examId}/admin`);
-      alert({
-        variant: 'danger',
-        title: 'Error saving exam info.',
-        message: err.message,
-      });
-    });
-  };
-
-  const cancelEditing = (): void => {
-    history.push(`/exams/${examId}/admin`);
-  };
+  const now = DateTime.local().toISO();
+  const threeHours = DateTime.local().plus({ hours: 3 }).toISO();
+  const [name, setName] = useState(response?.name ?? '');
+  const [start, setStart] = useState(response?.start.toISO() ?? now);
+  const [end, setEnd] = useState(response?.end.toISO() ?? threeHours);
+  const [duration, setDuration] = useState(response?.duration ?? 90);
 
   return (
     <Card>
@@ -252,14 +243,21 @@ export const ExamInfoEditor: React.FC<{
         <Form.Group className="float-right">
           <Button
             variant="danger"
-            onClick={cancelEditing}
+            onClick={(): void => onCancel()}
           >
             Cancel
           </Button>
           <Button
             variant="success"
             className="ml-2"
-            onClick={submitForm}
+            onClick={(): void => {
+              onSubmit({
+                name,
+                duration,
+                start,
+                end,
+              });
+            }}
           >
             Save
           </Button>

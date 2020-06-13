@@ -174,6 +174,7 @@ const ExamInfoViewer: React.FC<{
   );
 };
 
+const NINETY_MINUTES = 5400;
 
 export const ExamInfoEditor: React.FC<{
   response?: ShowResponse;
@@ -190,7 +191,7 @@ export const ExamInfoEditor: React.FC<{
   const [name, setName] = useState(response?.name ?? '');
   const [start, setStart] = useState(response?.start.toISO() ?? now);
   const [end, setEnd] = useState(response?.end.toISO() ?? threeHours);
-  const [duration, setDuration] = useState(response?.duration ?? 90);
+  const [duration, setDuration] = useState(response?.duration ?? NINETY_MINUTES);
 
   return (
     <Card>

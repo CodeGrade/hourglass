@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'helpers/upload'
-
 FactoryBot.define do
   factory :upload do
     cs2500_v1
@@ -31,7 +29,7 @@ FactoryBot.define do
     end
 
     initialize_with do
-      with_fixture_zip_upload file_name do |real_upload|
+      UploadTestHelper.with_fixture_zip_upload file_name do |real_upload|
         Upload.new(real_upload)
       end
     end

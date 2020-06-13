@@ -6,7 +6,10 @@ def fixture_zip(name)
     zip = dir.join("#{name}.zip")
     exam_path = Rails.root.join('test', 'fixtures', 'files', name, '**')
     ArchiveUtils.create_zip zip, Dir.glob(exam_path)
-    Upload.new(FakeUpload.new(zip))
+    real_upload = ActionDispatch::Http::UploadedFile.new(
+      tempfile: File.new(zip)
+    )
+    Upload.new(real_upload)
   end
 end
 

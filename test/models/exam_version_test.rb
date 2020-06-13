@@ -13,7 +13,8 @@ class ExamVersionTest < ActiveSupport::TestCase
   end
 
   # test 'build exam version with upload containing upload-schema' do
-  #   ev = build(:exam_version, upload: )
+  #   upload = ...
+  #   ev = build(:exam_version, upload: upload)
   #   assert ev.valid?
   # end
 

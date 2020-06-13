@@ -143,4 +143,24 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     ver.reload
     assert_not ver.destroyed?
   end
+
+  test 'should import exam version' do
+    exam = create(:exam)
+    reg = create(:professor_course_registration, course: exam.course)
+    assert_equal 0, exam.exam_versions.length
+    sign_in reg.user
+    UploadTestHelper.with_test_uploaded_file 'cs3500final-v1' do |upload|
+      post import_api_professor_versions_path(exam), params: {
+        upload: upload
+      }
+    end
+    assert_response :created
+    exam.reload
+    assert_equal 1, exam.exam_versions.length
+
+    created = exam.exam_versions.first
+    ev = create(:exam_version, :cs3500_v1)
+    assert_equal ev.info, exam.exam_versions.first.info
+    assert_equal ev.files, exam.exam_versions.first.files
+  end
 end

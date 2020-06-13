@@ -14,7 +14,7 @@ module UploadTestHelper
 
   def self.with_test_uploaded_file(name, mime_type = nil)
     with_temp_fixture_zip name do |f|
-      Rack::Test::UploadedFile.new(f.path, mime_type, false)
+      yield Rack::Test::UploadedFile.new(f.path, mime_type, false)
     end
   end
 

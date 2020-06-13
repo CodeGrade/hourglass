@@ -52,6 +52,20 @@ module Api
         }
       end
 
+      def import
+        uploaded_file = params.require(:upload)
+        n = @exam.exam_versions.length + 1
+        upload = Upload.new(uploaded_file)
+        @version = ExamVersion.create(
+          exam: @exam,
+          name: "#{@exam.name} Version #{n}",
+          files: upload.files,
+          info: upload.info
+        )
+        @version.save!
+        head :created
+      end
+
       def create
         n = @exam.exam_versions.length + 1
         @version = ExamVersion.create(

@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Form } from 'react-bootstrap';
-import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import { ExamFile, ExamDir, ExamSingleFile } from '@student/exams/show/types';
 import JSZip, { loadAsync } from 'jszip';
 import mime from '@hourglass/common/mime';
 import { extractMarks } from '@hourglass/common/archive/fileMarks';
 
-
-async function handleDir(root: JSZip): Promise<ExamFile[]> {
+export async function handleDir(root: JSZip): Promise<ExamFile[]> {
   const ret = [];
   const promises = [];
   root.forEach((path, file) => {
@@ -57,34 +53,3 @@ export async function handleZip(file: File): Promise<ExamFile[]> {
   const files = await handleDir(unzipped);
   return files;
 }
-
-const Archive: React.FC = () => {
-  const [file, setFile] = useState<File>(undefined);
-  const [allFiles, setAllFiles] = useState<ExamFile[]>([]);
-  useEffect(() => {
-    if (!file) return;
-    handleZip(file).then(setAllFiles);
-  }, [file]);
-  return (
-    <Form>
-      <Form.Group>
-        <Form.File
-          required
-          onChange={(e): void => {
-            const { files } = e.target;
-            const upload = files[0];
-            if (upload) setFile(upload);
-          }}
-          label={file?.name ?? 'Choose a file'}
-          accept="application/zip,.yaml,.yml"
-          custom
-        />
-      </Form.Group>
-      <Form.Group>
-        <VeryControlledFileViewer files={allFiles} />
-      </Form.Group>
-    </Form>
-  );
-};
-
-export default Archive;

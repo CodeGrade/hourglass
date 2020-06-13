@@ -64,8 +64,11 @@ class Upload
         @dir.join('exam.yaml')
       end
     properties = YAML.safe_load(File.read(file))
-    if JSON::Validator.validate(ExamVersion::EXAM_SAVE_SCHEMA, properties)
-      @info = properties
+    if properties.key? 'files'
+      JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties['info'])
+      JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, properties['files'])
+      @info = properties['info']
+      @files = properties['files']
     else
       JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
       @info = parse_info(properties)

@@ -94,7 +94,7 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
         </Alert>
         <ShowQuestions questions={questions} />
 
-        <div className="float-right">
+        <div className="my-2 float-right">
           <Submit />
         </div>
       </Container>

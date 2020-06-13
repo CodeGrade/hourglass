@@ -26,6 +26,7 @@ const Submit: React.FC<SubmitProps> = (props) => {
         Cancel
       </Button>
       <Button
+        className="ml-2"
         variant="success"
         onClick={(): void => {
           versionUpdate(versionId, { version }).then((res) => {
@@ -45,7 +46,7 @@ const Submit: React.FC<SubmitProps> = (props) => {
           });
         }}
       >
-        Submit
+        Finished
       </Button>
     </>
   );

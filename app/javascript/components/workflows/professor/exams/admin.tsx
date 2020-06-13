@@ -23,7 +23,6 @@ import { RailsExamVersion, ContentsState } from '@student/exams/show/types';
 import { Editor as CodeMirrorEditor } from 'codemirror';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
-import { hitApi } from '@hourglass/common/types/api';
 import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import createVersion from '@hourglass/common/api/professor/exams/versions/create';
@@ -97,7 +96,7 @@ export const ExamAdmin: React.FC = () => {
           />
           <ProctoringInfo examId={examId} />
         </>
-    );
+      );
     default:
       throw new ExhaustiveSwitchError(response);
   }

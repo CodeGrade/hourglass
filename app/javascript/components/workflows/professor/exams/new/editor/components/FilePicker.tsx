@@ -9,7 +9,6 @@ import { Files } from '@student/exams/show/components/FileViewer';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { createMap } from '@student/exams/show/files';
-import '@professor/exams/new/editor/Select.css';
 
 export interface FilePickerProps {
   options: ExamFile[];

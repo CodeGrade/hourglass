@@ -15,7 +15,6 @@ import {
 } from '@student/exams/show/files';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Editor } from './ExamCodeBox';
-import './FileViewer.scss';
 
 interface FilesProps {
   files: ExamFile[];

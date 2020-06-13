@@ -3,7 +3,6 @@ import {
   Button, ButtonProps, OverlayTriggerProps,
 } from 'react-bootstrap';
 import Tooltip from '@student/exams/show/components/Tooltip';
-import './TooltipButton.css';
 
 interface TooltipButtonProps {
   disabled: boolean;

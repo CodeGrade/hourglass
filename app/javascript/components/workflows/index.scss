@@ -1,0 +1,79 @@
+.z-1000 {
+  position: relative;
+  z-index: 1000;
+}
+
+.size-0 {
+  width: 0;
+  height: 0;
+}
+
+.overhang-left-100 {
+  left: -100%;
+}
+
+.flex-grow-01 {
+  flex-grow: 0.1 !important;
+}
+
+.overflow-scroll-x {
+  overflow-x: scroll;
+}
+
+.overflow-scroll-y {
+  overflow-y: scroll;
+}
+
+.t-0 {
+  top: 0;
+}
+
+.b-0 {
+  bottom: 0;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.transition {
+  transition: 0.35s width ease-in-out;
+}
+
+.width-0 {
+  width: 0;
+}
+
+.cursor-help {
+  cursor: help;
+}
+
+.cursor-not-allowed {
+  cursor: not-allowed;
+}
+
+.pointer-events-none {
+  pointer-events: none;
+}
+
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
+.bg-pulse {
+  background-color: unset;
+  animation-name: bg-pulse;
+  animation-duration: 0.5s;
+  animation-iteration-count: 2;
+}
+
+@keyframes bg-pulse {
+  0% {
+    background-color: unset;
+  }
+  50% {
+    background-color: rgba(theme-color("info"), .2);
+  }
+  100% {
+    background-color: unset;
+  }
+}

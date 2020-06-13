@@ -1,29 +1,9 @@
-.t-0 {
-  top: 0;
-}
-
-.b-0 {
-  bottom: 0;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.transition {
-  transition: 0.35s width ease-in-out;
-}
-
 .sidebar-small {
   width: var(--sidebar-small);
 }
 
 .sidebar-expanded {
   width: var(--sidebar-expanded);
-}
-
-.width-0 {
-  width: 0;
 }
 
 .collapse:not(.width):not(.show) {

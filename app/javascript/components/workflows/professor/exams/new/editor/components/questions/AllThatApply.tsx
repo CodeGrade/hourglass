@@ -16,7 +16,6 @@ import { FaCheck } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
-import './questions.scss';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;

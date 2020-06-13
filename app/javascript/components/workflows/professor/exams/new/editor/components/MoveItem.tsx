@@ -5,7 +5,6 @@ import {
   ButtonProps,
 } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown, FaTrashAlt } from 'react-icons/fa';
-import './MoveItem.scss';
 
 export interface MoveProps {
   enableUp?: boolean;

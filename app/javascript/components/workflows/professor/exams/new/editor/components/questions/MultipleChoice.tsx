@@ -12,7 +12,6 @@ import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { FaCircle } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
-import './questions.scss';
 
 interface MultipleChoiceProps {
   info: MultipleChoiceInfo;

@@ -11,9 +11,7 @@ import { MatchingInfo, MatchingState, HTMLVal } from '@student/exams/show/types'
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
-import './questions.scss';
 import { alphabetIdx } from '@hourglass/common/helpers';
-
 
 interface MatchingProps {
   info: MatchingInfo;

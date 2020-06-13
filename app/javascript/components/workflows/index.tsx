@@ -26,6 +26,7 @@ import StudentDND from '@hourglass/common/student-dnd';
 import { AllAlerts } from '@hourglass/common/alerts';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
+import './index.scss';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];

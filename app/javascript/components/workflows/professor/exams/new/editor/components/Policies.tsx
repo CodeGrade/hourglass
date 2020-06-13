@@ -3,7 +3,6 @@ import { Form, Row, Col } from 'react-bootstrap';
 import { Policy } from '@student/exams/show/types';
 import Select from 'react-select';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import '@professor/exams/new/editor/Select.css';
 
 export interface PoliciesProps {
   policies: Policy[];

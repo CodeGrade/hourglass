@@ -1,17 +1,6 @@
 # frozen_string_literal: true
 
-def fixture_zip(name)
-  Dir.mktmpdir do |path|
-    dir = Pathname.new path
-    zip = dir.join("#{name}.zip")
-    exam_path = Rails.root.join('test', 'fixtures', 'files', name, '**')
-    ArchiveUtils.create_zip zip, Dir.glob(exam_path)
-    real_upload = ActionDispatch::Http::UploadedFile.new(
-      tempfile: File.new(zip)
-    )
-    Upload.new(real_upload)
-  end
-end
+require 'helpers/upload'
 
 FactoryBot.define do
   factory :upload do
@@ -41,7 +30,12 @@ FactoryBot.define do
       end
     end
 
-    initialize_with { fixture_zip(file_name) }
+    initialize_with do
+      with_fixture_zip_upload file_name do |real_upload|
+        Upload.new(real_upload)
+      end
+    end
+
     to_create {}
   end
 end

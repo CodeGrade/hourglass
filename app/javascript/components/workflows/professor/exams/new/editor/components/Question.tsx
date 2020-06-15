@@ -9,7 +9,7 @@ import {
   // Collapse,
   // Button,
 } from 'react-bootstrap';
-// import YesNo from '@student/exams/show/components/questions/YesNo';
+import YesNo from '@student/exams/show/components/questions/YesNo';
 // import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 // import ShowParts from '@professor/exams/new/editor/containers/ShowParts';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
@@ -77,6 +77,37 @@ const QuestionDesc: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
+  const {
+    input,
+  } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <>
+      <Form.Label column sm="2">Separate subparts?</Form.Label>
+      <Col sm="10">
+        <YesNo
+          className="bg-white rounded"
+          value={!!value}
+          info={{
+            type: 'YesNo',
+            prompt: {
+              type: 'HTML',
+              value: '',
+            },
+          }}
+          onChange={(newVal): void => {
+            onChange(newVal);
+          }}
+        />
+      </Col>
+    </>
+  );
+};
+
 const Question: React.FC<{
   memberName: string;
   qnum: number;
@@ -99,6 +130,9 @@ const Question: React.FC<{
           </Form.Group>
           <Form.Group as={Row} controlId={`${qnum}-desc`}>
             <Field name={`${memberName}.description`} component={QuestionDesc} />
+          </Form.Group>
+          <Form.Group as={Row} controlId={`${qnum}-separate`}>
+            <Field name={`${memberName}.seperateSubparts`} component={QuestionSepSubParts} />
           </Form.Group>
         </Card.Subtitle>
       </Alert>
@@ -163,25 +197,6 @@ const Question: React.FC<{
 //             {`Question ${qnum + 1}`}
 //           </Card.Title>
 //           <Card.Subtitle>
-//             <Form.Group as={Row} controlId={`${qnum}-separate`}>
-//               <Form.Label column sm="2">Separate subparts?</Form.Label>
-//               <Col sm="10">
-//                 <YesNo
-//                   className="bg-white rounded"
-//                   value={!!separateSubparts}
-//                   info={{
-//                     type: 'YesNo',
-//                     prompt: {
-//                       type: 'HTML',
-//                       value: '',
-//                     },
-//                   }}
-//                   onChange={(newVal): void => {
-//                     onChange(name, description, newVal);
-//                   }}
-//                 />
-//               </Col>
-//             </Form.Group>
 //             <Form.Group as={Row} controlId={`${qnum}-files`}>
 //               <Form.Label column sm="2">Files to be shown for this question:</Form.Label>
 //               <Col sm={10}>

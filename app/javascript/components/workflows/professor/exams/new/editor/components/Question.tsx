@@ -173,10 +173,16 @@ const QuestionFilesProvider: React.FC<{
 const Question: React.FC<{
   memberName: string;
   qnum: number;
+  enableDown: boolean;
+  moveDown: () => void;
+  moveUp: () => void;
 }> = (props) => {
   const {
     memberName,
     qnum,
+    enableDown,
+    moveDown,
+    moveUp,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
   const ReferenceProvider = connect((state) => ({
@@ -196,13 +202,9 @@ const Question: React.FC<{
         variant="primary"
         enableUp={qnum > 0}
         // enableDown={qnum + 1 < numQuestions}
-        enableDown={false}
-        onUp={(): void => {
-          // TODO
-        }}
-        onDown={(): void => {
-          // TODO
-        }}
+        enableDown={enableDown}
+        onUp={moveUp}
+        onDown={moveDown}
         onDelete={(): void => {
           // TODO
         }}

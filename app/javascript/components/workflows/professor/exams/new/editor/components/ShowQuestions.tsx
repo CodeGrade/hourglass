@@ -17,8 +17,19 @@ const ShowQuestions: React.FC<WrappedFieldArrayProps<QuestionInfo>> = (props) =>
       <Row className="py-3">
         <Col>
           {fields.map((member, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <Question key={index} qnum={index} memberName={member} />
+            <Question
+              // eslint-disable-next-line react/no-array-index-key
+              key={index}
+              qnum={index}
+              memberName={member}
+              enableDown={index + 1 < fields.length}
+              moveDown={(): void => {
+                fields.move(index, index + 1);
+              }}
+              moveUp={(): void => {
+                fields.move(index, index - 1);
+              }}
+            />
           ))}
         </Col>
       </Row>

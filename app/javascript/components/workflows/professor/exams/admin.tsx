@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, createRef } from 'react';
 import {
   Switch,
   Route,
@@ -35,6 +35,7 @@ import {
   updateExam,
 } from '@hourglass/common/api/professor/exams/update';
 import { DateTime } from 'luxon';
+import { importVersion } from '@hourglass/common/api/professor/exams/versions/import';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -279,23 +280,58 @@ const VersionInfo: React.FC<{
     versions,
     refresh,
   } = props;
+  const { alert } = useContext(AlertContext);
   const { examId } = useParams();
   const history = useHistory();
+  const fileInputRef = createRef<HTMLInputElement>();
   return (
     <>
       <h2>
         Versions
-        <Button
-          variant="success"
-          className="float-right"
-          onClick={(): void => {
-            createVersion(examId).then((res) => {
-              history.push(`/exams/${examId}/versions/${res.id}/edit`);
-            });
-          }}
-        >
-          New Version
-        </Button>
+        <div className="float-right">
+          <input
+            type="file"
+            ref={fileInputRef}
+            hidden
+            onChange={(event) => {
+              const { files } = event.target;
+              const [f] = files;
+              if (!f) return;
+              importVersion(examId, f).then((res) => {
+                history.push(`/exams/${examId}/versions/${res.id}/edit`);
+                alert({
+                  variant: 'success',
+                  message: 'Exam version successfully imported.',
+                });
+              }).catch((err) => {
+                alert({
+                  variant: 'danger',
+                  title: 'Exam version not imported.',
+                  message: err.message,
+                });
+              });
+            }}
+          />
+          <Button
+            className="mr-2"
+            variant="success"
+            onClick={(): void => {
+              fileInputRef.current.click();
+            }}
+          >
+            Import Version
+          </Button>
+          <Button
+            variant="success"
+            onClick={(): void => {
+              createVersion(examId).then((res) => {
+                history.push(`/exams/${examId}/versions/${res.id}/edit`);
+              });
+            }}
+          >
+            New Version
+          </Button>
+        </div>
       </h2>
       <ul>
         {versions.map((v) => (

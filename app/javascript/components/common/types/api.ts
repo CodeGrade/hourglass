@@ -30,14 +30,20 @@ export class HitApiError extends Error {
   }
 }
 
-export async function hitApi<T>(url: string, options?: RequestInit): Promise<T> {
+export async function hitApi<T>(url: string, options?: RequestInit, isJson = true): Promise<T> {
+  const {
+    headers = {},
+    ...otherOptions
+  } = options;
+  const fetchHeaders = {
+    'X-CSRF-Token': getCSRFToken(),
+    ...headers,
+  };
+  if (isJson) fetchHeaders['Content-Type'] = 'application/json';
   return fetch(url, {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-Token': getCSRFToken(),
-    },
+    headers: fetchHeaders,
     credentials: 'same-origin',
-    ...options,
+    ...otherOptions,
   })
     .catch((err) => {
       throw new HitApiError({

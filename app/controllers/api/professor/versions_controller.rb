@@ -63,7 +63,9 @@ module Api
           info: upload.info
         )
         @version.save!
-        head :created
+        render json: {
+          id: @version.id
+        }, status: :created
       end
 
       def create

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../helpers/upload'
+
 FactoryBot.define do
   factory :upload do
     cs2500_v1

@@ -18,8 +18,10 @@ import { VeryControlledFileViewer } from '@student/exams/show/components/FileVie
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { WrappedFieldProps, Field } from 'redux-form';
 import { FileRef } from '@hourglass/workflows/student/exams/show/types';
-import { ExamContext } from '@hourglass/workflows/student/exams/show/context';
+import { ExamContext, QuestionFilesContext } from '@hourglass/workflows/student/exams/show/context';
 import { getFilesForRefs } from '@hourglass/workflows/student/exams/show/files';
+import { connect } from 'react-redux';
+import { formSelector } from '..';
 
 const QuestionName: React.FC<WrappedFieldProps> = (props) => {
   const {
@@ -150,6 +152,24 @@ const QuestionReference: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const QuestionFilesProvider: React.FC<{
+  reference: FileRef[];
+}> = (props) => {
+  const {
+    reference,
+    children,
+  } = props;
+  return (
+    <QuestionFilesContext.Provider
+      value={{
+        references: reference,
+      }}
+    >
+      {children}
+    </QuestionFilesContext.Provider>
+  );
+};
+
 const Question: React.FC<{
   memberName: string;
   qnum: number;
@@ -158,9 +178,18 @@ const Question: React.FC<{
     memberName,
     qnum,
   } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
+  const ReferenceProvider = connect((state) => ({
+    reference: formSelector(state, `${memberName}.reference`),
+  }))(QuestionFilesProvider);
   return (
     <Card
       className="mb-3"
+      border="primary"
+      onMouseOver={(): void => setMoversVisible(true)}
+      onFocus={(): void => setMoversVisible(true)}
+      onBlur={(): void => setMoversVisible(false)}
+      onMouseOut={(): void => setMoversVisible(false)}
     >
       <Alert variant="primary">
         <Card.Title>
@@ -180,54 +209,16 @@ const Question: React.FC<{
             <Field name={`${memberName}.reference`} component={QuestionReference} />
           </Form.Group>
         </Card.Subtitle>
+        <Card.Body>
+          <ReferenceProvider>
+            TODO
+          </ReferenceProvider>
+        </Card.Body>
       </Alert>
     </Card>
   );
 };
 
-
-// export interface QuestionProps {
-//   name: HTMLVal;
-//   description: HTMLVal;
-//   separateSubparts: boolean;
-//   parts: PartInfo[];
-//   reference: FileRef[];
-//   files: ExamFile[];
-//   onChange: (name: HTMLVal, description: HTMLVal, separateSubparts: boolean) => void;
-// }
-//
-//
-// const Question: React.FC<QuestionProps> = (props) => {
-//   const {
-//     qnum,
-//     numQuestions,
-//     name,
-//     description,
-//     separateSubparts,
-//     onChange,
-//     files = [],
-//     reference = [],
-//   } = props;
-//   const [moversVisible, setMoversVisible] = useState(false);
-//   const [open, setOpen] = useState(false);
-//   const noFiles = reference.length === 0;
-//   const fmap = createMap(files);
-//   const filteredFiles = getFilesForRefs(fmap, reference);
-//
-//   return (
-//     <QuestionFilesContext.Provider
-//       value={{
-//         references: reference,
-//       }}
-//     >
-//       <Card
-//         className="mb-3"
-//         border="primary"
-//         onMouseOver={(): void => setMoversVisible(true)}
-//         onFocus={(): void => setMoversVisible(true)}
-//         onBlur={(): void => setMoversVisible(false)}
-//         onMouseOut={(): void => setMoversVisible(false)}
-//       >
 //         <MoveItem
 //           visible={moversVisible}
 //           variant="primary"
@@ -242,9 +233,5 @@ const Question: React.FC<{
 //         <Card.Body>
 //           <ShowParts qnum={qnum} />
 //         </Card.Body>
-//       </Card>
-//     </QuestionFilesContext.Provider>
-//   );
-// };
 
 export default Question;

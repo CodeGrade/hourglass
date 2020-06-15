@@ -176,6 +176,7 @@ const Question: React.FC<{
   enableDown: boolean;
   moveDown: () => void;
   moveUp: () => void;
+  remove: () => void;
 }> = (props) => {
   const {
     memberName,
@@ -183,6 +184,7 @@ const Question: React.FC<{
     enableDown,
     moveDown,
     moveUp,
+    remove,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
   const ReferenceProvider = connect((state) => ({
@@ -201,16 +203,10 @@ const Question: React.FC<{
         visible={moversVisible}
         variant="primary"
         enableUp={qnum > 0}
-        // enableDown={qnum + 1 < numQuestions}
         enableDown={enableDown}
         onUp={moveUp}
         onDown={moveDown}
-        onDelete={(): void => {
-          // TODO
-        }}
-        // onUp={(): MoveQuestionAction => moveQuestion(qnum, qnum - 1)}
-        // onDown={(): MoveQuestionAction => moveQuestion(qnum, qnum + 1)}
-        // onDelete={(): DeleteQuestionAction => deleteQuestion(qnum)}
+        onDelete={remove}
       />
       <Alert variant="primary">
         <Card.Title>

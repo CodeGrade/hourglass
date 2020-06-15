@@ -29,6 +29,9 @@ const ShowQuestions: React.FC<WrappedFieldArrayProps<QuestionInfo>> = (props) =>
               moveUp={(): void => {
                 fields.move(index, index - 1);
               }}
+              remove={(): void => {
+                fields.remove(index);
+              }}
             />
           ))}
         </Col>

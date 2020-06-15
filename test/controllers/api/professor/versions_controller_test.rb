@@ -174,4 +174,14 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal ev.info, parsed['info']
     assert_equal ev.files, parsed['files']
   end
+
+  test 'should not export exam version single file for student' do
+    ev = create(:exam_version)
+    reg = create(:registration, exam: ev.exam)
+    sign_in reg.user
+
+    get export_file_api_professor_version_path(ev)
+    assert_response :forbidden
+    assert_empty response.body
+  end
 end

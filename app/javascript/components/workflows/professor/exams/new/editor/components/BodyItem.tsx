@@ -11,7 +11,7 @@ import { BodyItem } from '@student/exams/show/types';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { MoveBodyItemAction, DeleteBodyItemAction } from '@professor/exams/new/types';
 import { moveBodyItem, deleteBodyItem } from '@professor/exams/new/actions';
-import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
+// import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { Card } from 'react-bootstrap';
 
 
@@ -65,15 +65,15 @@ const WrappedBody: React.FC<BodyProps> = (props) => {
       onMouseOut={(): void => setMoversVisible(false)}
       onBlur={(): void => setMoversVisible(false)}
     >
-      <MoveItem
-        visible={moversVisible}
-        variant="secondary"
-        enableUp={bnum > 0}
-        enableDown={bnum + 1 < numBodyItems}
-        onUp={(): MoveBodyItemAction => moveBodyItem(qnum, pnum, bnum, bnum - 1)}
-        onDown={(): MoveBodyItemAction => moveBodyItem(qnum, pnum, bnum, bnum + 1)}
-        onDelete={(): DeleteBodyItemAction => deleteBodyItem(qnum, pnum, bnum)}
-      />
+      {/* <MoveItem */}
+      {/*   visible={moversVisible} */}
+      {/*   variant="secondary" */}
+      {/*   enableUp={bnum > 0} */}
+      {/*   enableDown={bnum + 1 < numBodyItems} */}
+      {/*   onUp={(): MoveBodyItemAction => moveBodyItem(qnum, pnum, bnum, bnum - 1)} */}
+      {/*   onDown={(): MoveBodyItemAction => moveBodyItem(qnum, pnum, bnum, bnum + 1)} */}
+      {/*   onDelete={(): DeleteBodyItemAction => deleteBodyItem(qnum, pnum, bnum)} */}
+      {/* /> */}
       <Card.Body>{Body(props)}</Card.Body>
     </Card>
   );

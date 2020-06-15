@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import { MatchingInfo, MatchingState, HTMLVal } from '@student/exams/show/types';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
-import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
+// import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
 import { alphabetIdx } from '@hourglass/common/helpers';
 
@@ -198,15 +198,15 @@ const Matching: React.FC<MatchingProps> = (props) => {
               onMouseOut={(): void => setPromptMoversVisible(idx, false)}
             >
               <Col className="flex-grow-01 pl-0">
-                <MoveItem
-                  visible={promptMoversVisible[idx]}
-                  variant="dark"
-                  enableUp={idx > 0}
-                  enableDown={idx + 1 < prompts.length}
-                  onDelete={(): UpdateBodyItemAction => deletePrompt(idx)}
-                  onDown={(): UpdateBodyItemAction => movePrompt(idx, idx + 1)}
-                  onUp={(): UpdateBodyItemAction => movePrompt(idx - 1, idx)}
-                />
+                {/* <MoveItem */}
+                {/*   visible={promptMoversVisible[idx]} */}
+                {/*   variant="dark" */}
+                {/*   enableUp={idx > 0} */}
+                {/*   enableDown={idx + 1 < prompts.length} */}
+                {/*   onDelete={(): UpdateBodyItemAction => deletePrompt(idx)} */}
+                {/*   onDown={(): UpdateBodyItemAction => movePrompt(idx, idx + 1)} */}
+                {/*   onUp={(): UpdateBodyItemAction => movePrompt(idx - 1, idx)} */}
+                {/* /> */}
                 {`${alphabetIdx(idx)}.`}
               </Col>
               <Col>
@@ -268,15 +268,15 @@ const Matching: React.FC<MatchingProps> = (props) => {
             onMouseOut={(): void => setValueMoversVisible(idx, false)}
           >
             <Col className="flex-grow-01 pl-0">
-              <MoveItem
-                visible={valueMoversVisible[idx]}
-                variant="dark"
-                enableUp={idx > 0}
-                enableDown={idx + 1 < prompts.length}
-                onDelete={(): UpdateBodyItemAction => deleteValue(idx)}
-                onDown={(): UpdateBodyItemAction => moveValue(idx, idx + 1)}
-                onUp={(): UpdateBodyItemAction => moveValue(idx - 1, idx)}
-              />
+              {/* <MoveItem */}
+              {/*   visible={valueMoversVisible[idx]} */}
+              {/*   variant="dark" */}
+              {/*   enableUp={idx > 0} */}
+              {/*   enableDown={idx + 1 < prompts.length} */}
+              {/*   onDelete={(): UpdateBodyItemAction => deleteValue(idx)} */}
+              {/*   onDown={(): UpdateBodyItemAction => moveValue(idx, idx + 1)} */}
+              {/*   onUp={(): UpdateBodyItemAction => moveValue(idx - 1, idx)} */}
+              {/* /> */}
               {`${idx + 1}.`}
             </Col>
             <Col className="pr-0">

@@ -20,17 +20,19 @@ import {
   Field,
   WrappedFieldProps,
   formValueSelector,
+  FieldArray,
 } from 'redux-form';
 import { Provider, connect } from 'react-redux';
 import { Version, versionUpdate } from '@hourglass/common/api/professor/exams/versions/update';
 import { useParams, useHistory } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import store from './store';
-import Name from './components/Name';
-import Policies from './components/Policies';
-import Instructions from './components/Instructions';
-import Reference from './components/Reference';
-import FileUploader from './components/FileUploader';
+import store from '@professor/exams/new/editor/store';
+import Name from '@professor/exams/new/editor/components/Name';
+import Policies from '@professor/exams/new/editor/components/Policies';
+import Instructions from '@professor/exams/new/editor/components/Instructions';
+import Reference from '@professor/exams/new/editor/components/Reference';
+import FileUploader from '@professor/exams/new/editor/components/FileUploader';
+import ShowQuestions from '@professor/exams/new/editor/components/ShowQuestions';
 
 export interface ExamEditorProps {
   exam: ExamVersion;
@@ -160,7 +162,7 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
               <Field name="instructions" component={wrapInput(Instructions)} />
             </Alert>
             <Field name="reference" component={wrapInput(Reference)} />
-            {/* <ShowQuestions questions={questions} /> */}
+            <FieldArray name="questions" component={ShowQuestions} />
           </FormContextProviderConnected>
         </FormSection>
         <div className="my-2 float-right">

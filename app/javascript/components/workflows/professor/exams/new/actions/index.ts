@@ -25,7 +25,6 @@ import {
   DeletePartAction,
   AddBodyItemAction,
   MoveBodyItemAction,
-  UpdateHTMLBodyItemAction,
   DeleteBodyItemAction,
 } from '@professor/exams/new/types';
 
@@ -229,21 +228,6 @@ export function deleteBodyItem(
     qnum,
     pnum,
     bnum,
-  };
-}
-
-export function editHtmlBodyItem(
-  qnum: number,
-  pnum: number,
-  bnum: number,
-  value: HTMLVal,
-): UpdateHTMLBodyItemAction {
-  return {
-    type: 'UPDATE_HTML_BODY_ITEM',
-    qnum,
-    pnum,
-    bnum,
-    value,
   };
 }
 

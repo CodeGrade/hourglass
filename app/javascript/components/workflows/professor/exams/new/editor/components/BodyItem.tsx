@@ -29,7 +29,7 @@ const Body: React.FC<BodyProps> = (props) => {
   } = props;
   switch (body.type) {
     case 'HTML':
-      return <EditHTML qnum={qnum} pnum={pnum} bnum={bnum} />;
+      return <EditHTML info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'Code':
       return <Code info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'AllThatApply':

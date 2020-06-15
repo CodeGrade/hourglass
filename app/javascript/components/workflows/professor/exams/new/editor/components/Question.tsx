@@ -16,7 +16,7 @@ import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import FilePickerSelect from '@professor/exams/new/editor/components/FilePicker';
 import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-import { WrappedFieldProps, Field } from 'redux-form';
+import { WrappedFieldProps, Field, FieldArray, FormSection } from 'redux-form';
 import { FileRef } from '@hourglass/workflows/student/exams/show/types';
 import { ExamContext, QuestionFilesContext } from '@hourglass/workflows/student/exams/show/context';
 import { getFilesForRefs } from '@hourglass/workflows/student/exams/show/files';
@@ -209,29 +209,30 @@ const Question: React.FC<{
         onDelete={remove}
       />
       <Alert variant="primary">
-        <Card.Title>
-          {`Question ${qnum + 1}`}
-        </Card.Title>
-        <Card.Subtitle>
-          <Form.Group as={Row} controlId={`${qnum}-name`}>
-            <Field name={`${memberName}.name`} component={QuestionName} />
-          </Form.Group>
-          <Form.Group as={Row} controlId={`${qnum}-desc`}>
-            <Field name={`${memberName}.description`} component={QuestionDesc} />
-          </Form.Group>
-          <Form.Group as={Row} controlId={`${qnum}-separate`}>
-            <Field name={`${memberName}.seperateSubparts`} component={QuestionSepSubParts} />
-          </Form.Group>
-          <Form.Group as={Row} controlId={`${qnum}-files`}>
-            <Field name={`${memberName}.reference`} component={QuestionReference} />
-          </Form.Group>
-        </Card.Subtitle>
-        <Card.Body>
-          <ReferenceProvider>
-            TODO
-            {/* <ShowParts qnum={qnum} /> */}
-          </ReferenceProvider>
-        </Card.Body>
+        <FormSection name={memberName}>
+          <Card.Title>
+            {`Question ${qnum + 1}`}
+          </Card.Title>
+          <Card.Subtitle>
+            <Form.Group as={Row} controlId={`${qnum}-name`}>
+              <Field name="name" component={QuestionName} />
+            </Form.Group>
+            <Form.Group as={Row} controlId={`${qnum}-desc`}>
+              <Field name="description" component={QuestionDesc} />
+            </Form.Group>
+            <Form.Group as={Row} controlId={`${qnum}-separate`}>
+              <Field name="seperateSubparts" component={QuestionSepSubParts} />
+            </Form.Group>
+            <Form.Group as={Row} controlId={`${qnum}-files`}>
+              <Field name="reference" component={QuestionReference} />
+            </Form.Group>
+          </Card.Subtitle>
+          <Card.Body>
+            <ReferenceProvider>
+              <FieldArray name="parts" component={ShowParts} />
+            </ReferenceProvider>
+          </Card.Body>
+        </FormSection>
       </Alert>
     </Card>
   );

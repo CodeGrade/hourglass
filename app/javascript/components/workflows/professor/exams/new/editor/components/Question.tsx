@@ -50,6 +50,33 @@ const QuestionName: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const QuestionDesc: React.FC<WrappedFieldProps> = (props) => {
+  const {
+    input,
+  } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <>
+      <Form.Label column sm="2">Description:</Form.Label>
+      <Col sm="10">
+        <CustomEditor
+          className="bg-white"
+          value={value.value}
+          placeholder="Give a longer description of the question"
+          onChange={(newDesc, _delta, source, _editor): void => {
+            if (source === 'user') {
+              onChange({ type: 'HTML', value: newDesc });
+            }
+          }}
+        />
+      </Col>
+    </>
+  );
+};
+
 const Question: React.FC<{
   memberName: string;
   qnum: number;
@@ -69,6 +96,9 @@ const Question: React.FC<{
         <Card.Subtitle>
           <Form.Group as={Row} controlId={`${qnum}-name`}>
             <Field name={`${memberName}.name`} component={QuestionName} />
+          </Form.Group>
+          <Form.Group as={Row} controlId={`${qnum}-desc`}>
+            <Field name={`${memberName}.description`} component={QuestionDesc} />
           </Form.Group>
         </Card.Subtitle>
       </Alert>
@@ -133,50 +163,6 @@ const Question: React.FC<{
 //             {`Question ${qnum + 1}`}
 //           </Card.Title>
 //           <Card.Subtitle>
-//             <Form.Group as={Row} controlId={`${qnum}-name`}>
-//               <Form.Label column sm="2">Question name</Form.Label>
-//               <Col sm="10">
-//                 <CustomEditor
-//                   className="bg-white"
-//                   value={name.value}
-//                   placeholder="Give a short (optional) descriptive name for the question"
-//                   onChange={(newName, _delta, source, _editor): void => {
-//                     if (source === 'user') {
-//                       onChange(
-//                         {
-//                           type: 'HTML',
-//                           value: newName,
-//                         },
-//                         description,
-//                         separateSubparts,
-//                       );
-//                     }
-//                   }}
-//                 />
-//               </Col>
-//             </Form.Group>
-//             <Form.Group as={Row} controlId={`${qnum}-desc`}>
-//               <Form.Label column sm="2">Description:</Form.Label>
-//               <Col sm="10">
-//                 <CustomEditor
-//                   className="bg-white"
-//                   value={description.value}
-//                   placeholder="Give a longer description of the question"
-//                   onChange={(newDesc, _delta, source, _editor): void => {
-//                     if (source === 'user') {
-//                       onChange(
-//                         name,
-//                         {
-//                           type: 'HTML',
-//                           value: newDesc,
-//                         },
-//                         separateSubparts,
-//                       );
-//                     }
-//                   }}
-//                 />
-//               </Col>
-//             </Form.Group>
 //             <Form.Group as={Row} controlId={`${qnum}-separate`}>
 //               <Form.Label column sm="2">Separate subparts?</Form.Label>
 //               <Col sm="10">

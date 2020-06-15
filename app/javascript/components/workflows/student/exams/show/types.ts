@@ -456,7 +456,7 @@ export interface PartInfo {
   name?: HTMLVal;
   description: HTMLVal;
   points: number;
-  reference?: FileRef[];
+  reference: FileRef[];
   body: BodyItem[];
 }
 

@@ -5,6 +5,7 @@ import {
   ExamVersion,
   RailsExamVersion,
   AnswersState,
+  Policy,
 } from '@student/exams/show/types';
 import {
   reduxForm,
@@ -22,6 +23,8 @@ export interface ExamEditorProps {
 const Editor: React.FC<ExamEditorProps> = (props) => {
   const {
     exam,
+    answers,
+    railsExamVersion,
   } = props;
   const {
     files,
@@ -31,7 +34,16 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
   return (
     <ExamContext.Provider value={{ files, fmap }}>
       <Provider store={store}>
-        <ExamEditorForm />
+        <ExamEditorForm
+          initialValues={{
+            all: {
+              name: railsExamVersion.name,
+              policies: railsExamVersion.policies,
+              exam,
+              answers,
+            },
+          }}
+        />
       </Provider>
     </ExamContext.Provider>
   );
@@ -39,7 +51,12 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
 export default Editor;
 
 interface FormValues {
-  // TODO
+  all: {
+    name: string;
+    policies: Policy[];
+    exam: ExamVersion;
+    answers: AnswersState;
+  };
 }
 
 const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {

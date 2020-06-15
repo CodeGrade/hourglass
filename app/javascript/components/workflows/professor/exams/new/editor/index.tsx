@@ -1,6 +1,4 @@
 import React from 'react';
-import { Provider } from 'react-redux';
-import createStore from '@professor/exams/new/store';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext } from '@student/exams/show/context';
 import {
@@ -8,8 +6,12 @@ import {
   RailsExamVersion,
   AnswersState,
 } from '@student/exams/show/types';
-import ExamEditor from '@professor/exams/new/editor/containers/ExamEditor';
-import { ExamEditorState } from '../types';
+import {
+  reduxForm,
+  InjectedFormProps,
+} from 'redux-form';
+import { Provider } from 'react-redux';
+import store from './store';
 
 export interface ExamEditorProps {
   exam: ExamVersion;
@@ -19,32 +21,36 @@ export interface ExamEditorProps {
 
 const Editor: React.FC<ExamEditorProps> = (props) => {
   const {
-    railsExamVersion,
     exam,
-    answers,
   } = props;
   const {
     files,
   } = exam;
   const fmap = createMap(files);
 
-  const init: ExamEditorState = {
-    contents: {
-      exam,
-      answers,
-    },
-    name: railsExamVersion.name,
-    policies: railsExamVersion.policies,
-  };
-
-  const store = createStore(init);
-
   return (
     <ExamContext.Provider value={{ files, fmap }}>
       <Provider store={store}>
-        <ExamEditor />
+        <ExamEditorForm />
       </Provider>
     </ExamContext.Provider>
   );
 };
 export default Editor;
+
+interface FormValues {
+  // TODO
+}
+
+const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
+  console.log(props);
+  return (
+    <p>
+      Exam Editor here
+    </p>
+  );
+};
+
+const ExamEditorForm = reduxForm({
+  form: 'version-editor',
+})(ExamEditor);

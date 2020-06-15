@@ -465,7 +465,7 @@ export interface QuestionInfo {
   description: HTMLVal;
   separateSubparts: boolean;
   parts: PartInfo[];
-  reference?: FileRef[];
+  reference: FileRef[];
 }
 
 export interface RailsTimeInfo {

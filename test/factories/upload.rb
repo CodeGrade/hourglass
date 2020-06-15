@@ -31,7 +31,7 @@ FactoryBot.define do
     end
 
     initialize_with do
-      UploadTestHelper.with_test_uploaded_zip file_name do |real_upload|
+      UploadTestHelper.with_test_uploaded_fixture_zip file_name do |real_upload|
         Upload.new(real_upload)
       end
     end

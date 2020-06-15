@@ -149,7 +149,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     reg = create(:professor_course_registration, course: exam.course)
     assert_equal 0, exam.exam_versions.length
     sign_in reg.user
-    UploadTestHelper.with_test_uploaded_zip 'cs3500final-v1' do |upload|
+    UploadTestHelper.with_test_uploaded_fixture_zip 'cs3500final-v1' do |upload|
       post import_api_professor_versions_path(exam), params: {
         upload: upload
       }
@@ -181,6 +181,38 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     sign_in reg.user
 
     get export_file_api_professor_version_path(ev)
+    assert_response :forbidden
+    assert_empty response.body
+  end
+
+  test 'should export exam version archive' do
+    ev = create(:exam_version)
+    exam = ev.exam
+    assert_equal 1, exam.exam_versions.length
+    reg = create(:professor_course_registration, course: ev.exam.course)
+    sign_in reg.user
+
+    get export_archive_api_professor_version_path(ev)
+    assert_response :success
+    assert_not_empty response.body
+
+    Tempfile.create do |zip|
+      zip.write response.body
+      zip.rewind
+      up = Upload.new(Rack::Test::UploadedFile.new(zip, 'application/zip'))
+      new_ev = create(:exam_version, :cs2500_v1, upload: up)
+      assert_equal ev.info, new_ev.info
+      assert_equal ev.files, new_ev.files
+    end
+  end
+
+  test 'should not export exam version archive for student' do
+    ev = create(:exam_version)
+    exam = ev.exam
+    reg = create(:registration, exam: exam)
+    sign_in reg.user
+
+    get export_archive_api_professor_version_path(ev)
     assert_response :forbidden
     assert_empty response.body
   end

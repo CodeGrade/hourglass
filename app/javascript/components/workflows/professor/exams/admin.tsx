@@ -349,9 +349,7 @@ const ShowVersion: React.FC<{
               Export as single file
             </Dropdown.Item>
             <Dropdown.Item
-              onClick={(): void => {
-                window.alert('TODO');
-              }}
+              href={`/api/professor/versions/${version.id}/export_archive`}
             >
               Export as archive
             </Dropdown.Item>

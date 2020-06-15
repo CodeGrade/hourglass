@@ -60,4 +60,30 @@ class MarksProcessor
       marks: marks[:byNum].values,
     }
   end
+
+  def self.process_marks_reverse(contents, marks)
+    inserted_marks =
+      marks
+      .each_with_index.map do |mark, idx|
+        a = {
+          key: "~ro:#{idx + 1}:s~",
+          location: mark['from']
+        }
+        b = {
+          key: "~ro:#{idx + 1}:e~",
+          location: mark['to']
+        }
+        [a, b]
+      end
+      .flatten
+      .sort_by do |m1|
+        [m1[:location]['line'], m1[:location]['ch']]
+      end.reverse
+
+    lines = contents.lines
+    inserted_marks.each do |m|
+      lines[m[:location]['line']].insert(m[:location]['ch'], m[:key])
+    end
+    lines.join
+  end
 end

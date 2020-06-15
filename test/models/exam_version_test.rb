@@ -52,4 +52,17 @@ class ExamVersionTest < ActiveSupport::TestCase
     json = condense_yaml 'cs3500final-v2'
     assert_equal json, ev.export_json
   end
+
+  test 'cs2500 is the same when exported and reimported' do
+    ev = build(:exam_version, :cs2500_v1)
+    Dir.mktmpdir do |path|
+      ev.export_all(path)
+      UploadTestHelper.with_temp_zip(Pathname.new(path).join('**')) do |zip|
+        up = Upload.new(Rack::Test::UploadedFile.new(zip))
+        new_ev = create(:exam_version, :cs2500_v1, upload: up)
+        assert_equal ev.info, new_ev.info
+        assert_equal ev.files, new_ev.files
+      end
+    end
+  end
 end

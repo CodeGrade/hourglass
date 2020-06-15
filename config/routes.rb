@@ -15,6 +15,7 @@ Rails.application.routes.draw do
                 end
                 member do
                   get :export_file
+                  get :export_archive
                 end
               end
               resources :rooms, param: 'room_id', only: [:index] do

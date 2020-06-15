@@ -25,6 +25,7 @@ import Name from './components/Name';
 import Policies from './components/Policies';
 import Instructions from './components/Instructions';
 import Reference from './components/Reference';
+import FileUploader from './components/FileUploader';
 
 export interface ExamEditorProps {
   exam: ExamVersion;
@@ -38,26 +39,19 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
     answers,
     railsExamVersion,
   } = props;
-  const {
-    files,
-  } = exam;
-  const fmap = createMap(files);
-
   return (
-    <ExamContext.Provider value={{ files, fmap }}>
-      <Provider store={store}>
-        <ExamEditorForm
-          initialValues={{
-            all: {
-              name: railsExamVersion.name,
-              policies: railsExamVersion.policies,
-              exam,
-              answers,
-            },
-          }}
-        />
-      </Provider>
-    </ExamContext.Provider>
+    <Provider store={store}>
+      <ExamEditorForm
+        initialValues={{
+          all: {
+            name: railsExamVersion.name,
+            policies: railsExamVersion.policies,
+            exam,
+            answers,
+          },
+        }}
+      />
+    </Provider>
   );
 };
 export default Editor;
@@ -87,33 +81,37 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
     pristine,
     reset,
   } = props;
+  const files = [];
+  const fmap = createMap(files);
   return (
     <form
       onSubmit={() => {
         console.log('TODO');
       }}
     >
-      <FormSection name="all">
-        <Field name="name" component={wrapInput(Name)} />
-        <Field name="policies" component={wrapInput(Policies)} />
-        <FormSection name="exam">
-          <Alert variant="info">
-            <h3>Exam-wide information</h3>
-            <Field name="instructions" component={wrapInput(Instructions)} />
-          </Alert>
-          <Field name="reference" component={wrapInput(Reference)} />
-          {/* <Field name="files" component={EditPolicies} /> */}
+      <ExamContext.Provider value={{ files, fmap }}>
+        <FormSection name="all">
+          <Field name="name" component={wrapInput(Name)} />
+          <Field name="policies" component={wrapInput(Policies)} />
+          <FormSection name="exam">
+            <Alert variant="info">
+              <h3>Exam-wide information</h3>
+              <Field name="files" component={wrapInput(FileUploader)} />
+              <Field name="instructions" component={wrapInput(Instructions)} />
+            </Alert>
+            <Field name="reference" component={wrapInput(Reference)} />
+          </FormSection>
+          <Form.Group>
+            <Button
+              variant="danger"
+              className={pristine && 'd-none'}
+              onClick={reset}
+            >
+              Reset
+            </Button>
+          </Form.Group>
         </FormSection>
-        <Form.Group>
-          <Button
-            variant="danger"
-            className={pristine && 'd-none'}
-            onClick={reset}
-          >
-            Reset
-          </Button>
-        </Form.Group>
-      </FormSection>
+      </ExamContext.Provider>
     </form>
   );
 };

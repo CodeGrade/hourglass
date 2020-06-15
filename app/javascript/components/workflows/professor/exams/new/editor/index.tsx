@@ -2,6 +2,12 @@ import React from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext } from '@student/exams/show/context';
 import {
+  Form,
+  Button,
+  Row,
+  Col,
+} from 'react-bootstrap';
+import {
   ExamVersion,
   RailsExamVersion,
   AnswersState,
@@ -10,6 +16,9 @@ import {
 import {
   reduxForm,
   InjectedFormProps,
+  FormSection,
+  Field,
+  WrappedFieldProps,
 } from 'redux-form';
 import { Provider } from 'react-redux';
 import store from './store';
@@ -59,12 +68,54 @@ interface FormValues {
   };
 }
 
-const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
-  console.log(props);
+const ExamName: React.FC<WrappedFieldProps> = (props) => {
+  const {
+    input,
+  } = props;
+  const {
+    onChange,
+    value,
+  } = input;
   return (
-    <p>
-      Exam Editor here
-    </p>
+    <Form.Group as={Row} controlId="examTitle">
+      <Form.Label column sm="3"><h2>Version name:</h2></Form.Label>
+      <Col>
+        <Form.Control
+          size="lg"
+          type="text"
+          placeholder="Enter a name for this version"
+          value={value}
+          onChange={onChange}
+        />
+      </Col>
+    </Form.Group>
+  );
+};
+
+const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
+  const {
+    pristine,
+    reset,
+  } = props;
+  return (
+    <form
+      onSubmit={() => {
+        console.log('TODO');
+      }}
+    >
+      <FormSection name="all">
+        <Field name="name" component={ExamName} />
+        <Form.Group>
+          <Button
+            variant="danger"
+            className={pristine && 'd-none'}
+            onClick={reset}
+          >
+            Reset
+          </Button>
+        </Form.Group>
+      </FormSection>
+    </form>
   );
 };
 

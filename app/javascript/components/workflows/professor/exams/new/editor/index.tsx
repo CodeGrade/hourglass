@@ -168,7 +168,7 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
         <div className="my-2 float-right">
           <Button
             variant="danger"
-            className={pristine && 'd-none'}
+            className={pristine ? 'd-none' : 'mr-2'}
             onClick={reset}
           >
             Reset

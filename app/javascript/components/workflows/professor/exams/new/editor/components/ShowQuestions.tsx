@@ -6,9 +6,9 @@ import {
   Button,
 } from 'react-bootstrap';
 import { QuestionInfo } from '@student/exams/show/types';
-// import Question from '@professor/exams/new/editor/containers/Question';
+import Question from '@professor/exams/new/editor/components/Question';
 
-const ShowQuestions: React.FC<WrappedFieldArrayProps> = (props) => {
+const ShowQuestions: React.FC<WrappedFieldArrayProps<QuestionInfo>> = (props) => {
   const {
     fields,
   } = props;
@@ -16,11 +16,10 @@ const ShowQuestions: React.FC<WrappedFieldArrayProps> = (props) => {
     <>
       <Row className="py-3">
         <Col>
-          TODO
-          {/* {questions.map((_q, i) => ( */}
-          {/*   // eslint-disable-next-line react/no-array-index-key */}
-          {/*   <Question key={i} qnum={i} numQuestions={questions.length} /> */}
-          {/* ))} */}
+          {fields.map((member, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Question key={index} qnum={index} memberName={member} />
+          ))}
         </Col>
       </Row>
       <Row className="text-center">

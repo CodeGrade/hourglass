@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  createRef,
+} from 'react';
 import {
   Switch,
   Route,
@@ -15,6 +20,8 @@ import {
   Form,
   Row,
   Col,
+  DropdownButton,
+  Dropdown,
 } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
@@ -23,16 +30,23 @@ import { RailsExamVersion, ContentsState } from '@student/exams/show/types';
 import { Editor as CodeMirrorEditor } from 'codemirror';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
-import { hitApi } from '@hourglass/common/types/api';
 import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import createVersion from '@hourglass/common/api/professor/exams/versions/create';
 import deleteVersion from '@hourglass/common/api/professor/exams/versions/delete';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
+import {
+  ExamUpdateInfo,
+  updateExam,
+} from '@hourglass/common/api/professor/exams/update';
+import { DateTime } from 'luxon';
+import { importVersion } from '@hourglass/common/api/professor/exams/versions/import';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
   const [refresher, refresh] = useRefresher();
+  const history = useHistory();
+  const { alert } = useContext(AlertContext);
   const response = examsShow(examId, [refresher]);
   switch (response.type) {
     case 'ERROR':
@@ -52,7 +66,31 @@ export const ExamAdmin: React.FC = () => {
             <Route path="/exams/:examId/admin/edit">
               <ExamInfoEditor
                 response={response.response}
-                onSuccess={refresh}
+                onCancel={(): void => {
+                  history.push(`/exams/${examId}/admin`);
+                }}
+                onSubmit={(info) => {
+                  updateExam(examId, info)
+                    .then(({ updated }) => {
+                      history.push(`/exams/${examId}/admin`);
+                      if (updated) {
+                        alert({
+                          variant: 'success',
+                          message: 'Exam info saved.',
+                        });
+                        refresh();
+                      } else {
+                        throw new Error('API failure');
+                      }
+                    }).catch((err) => {
+                      history.push(`/exams/${examId}/admin`);
+                      alert({
+                        variant: 'danger',
+                        title: 'Error saving exam info.',
+                        message: err.message,
+                      });
+                    });
+                }}
               />
             </Route>
             <Route path="/exams/:examId/admin">
@@ -143,63 +181,24 @@ const ExamInfoViewer: React.FC<{
   );
 };
 
+const NINETY_MINUTES = 5400;
 
 export const ExamInfoEditor: React.FC<{
-  response: ShowResponse;
-  onSuccess: () => void;
+  response?: ShowResponse;
+  onSubmit: (info: ExamUpdateInfo) => void;
+  onCancel: () => void;
 }> = (props) => {
   const {
     response,
-    onSuccess,
+    onSubmit,
+    onCancel,
   } = props;
-  const {
-    examId,
-  } = useParams();
-  const history = useHistory();
-  const { alert } = useContext(AlertContext);
-  const [name, setName] = useState(response.name);
-  const [start, setStart] = useState(response.start.toISO());
-  const [end, setEnd] = useState(response.end.toISO());
-  const [duration, setDuration] = useState(response.duration);
-
-  const submitForm = (): void => {
-    const formInfo = {
-      exam: {
-        name,
-        start,
-        end,
-        duration,
-      },
-    };
-    hitApi<{
-      updated: boolean;
-    }>(`/api/professor/exams/${examId}`, {
-      method: 'PATCH',
-      body: JSON.stringify(formInfo),
-    }).then(({ updated }) => {
-      history.push(`/exams/${examId}/admin`);
-      if (updated) {
-        alert({
-          variant: 'success',
-          message: 'Exam info saved.',
-        });
-        onSuccess();
-      } else {
-        throw new Error('API failure');
-      }
-    }).catch((err) => {
-      history.push(`/exams/${examId}/admin`);
-      alert({
-        variant: 'danger',
-        title: 'Error saving exam info.',
-        message: err.message,
-      });
-    });
-  };
-
-  const cancelEditing = (): void => {
-    history.push(`/exams/${examId}/admin`);
-  };
+  const now = DateTime.local().toISO();
+  const threeHours = DateTime.local().plus({ hours: 3 }).toISO();
+  const [name, setName] = useState(response?.name ?? '');
+  const [start, setStart] = useState(response?.start.toISO() ?? now);
+  const [end, setEnd] = useState(response?.end.toISO() ?? threeHours);
+  const [duration, setDuration] = useState(response?.duration ?? NINETY_MINUTES);
 
   return (
     <Card>
@@ -252,14 +251,21 @@ export const ExamInfoEditor: React.FC<{
         <Form.Group className="float-right">
           <Button
             variant="danger"
-            onClick={cancelEditing}
+            onClick={(): void => onCancel()}
           >
             Cancel
           </Button>
           <Button
             variant="success"
             className="ml-2"
-            onClick={submitForm}
+            onClick={(): void => {
+              onSubmit({
+                name,
+                duration,
+                start,
+                end,
+              });
+            }}
           >
             Save
           </Button>
@@ -279,23 +285,58 @@ const VersionInfo: React.FC<{
     versions,
     refresh,
   } = props;
+  const { alert } = useContext(AlertContext);
   const { examId } = useParams();
   const history = useHistory();
+  const fileInputRef = createRef<HTMLInputElement>();
   return (
     <>
       <h2>
         Versions
-        <Button
-          variant="success"
-          className="float-right"
-          onClick={(): void => {
-            createVersion(examId).then((res) => {
-              history.push(`/exams/${examId}/versions/${res.id}/edit`);
-            });
-          }}
-        >
-          New Version
-        </Button>
+        <div className="float-right">
+          <input
+            type="file"
+            ref={fileInputRef}
+            hidden
+            onChange={(event) => {
+              const { files } = event.target;
+              const [f] = files;
+              if (!f) return;
+              importVersion(examId, f).then((res) => {
+                history.push(`/exams/${examId}/versions/${res.id}/edit`);
+                alert({
+                  variant: 'success',
+                  message: 'Exam version successfully imported.',
+                });
+              }).catch((err) => {
+                alert({
+                  variant: 'danger',
+                  title: 'Exam version not imported.',
+                  message: err.message,
+                });
+              });
+            }}
+          />
+          <Button
+            className="mr-2"
+            variant="success"
+            onClick={(): void => {
+              fileInputRef.current.click();
+            }}
+          >
+            Import Version
+          </Button>
+          <Button
+            variant="success"
+            onClick={(): void => {
+              createVersion(examId).then((res) => {
+                history.push(`/exams/${examId}/versions/${res.id}/edit`);
+              });
+            }}
+          >
+            New Version
+          </Button>
+        </div>
       </h2>
       <ul>
         {versions.map((v) => (
@@ -338,6 +379,22 @@ const ShowVersion: React.FC<{
           {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
         </span>
         <div className="float-right">
+          <DropdownButton
+            id={`version-${version.id}-export-button`}
+            className="d-inline-block mr-2"
+            title="Export"
+          >
+            <Dropdown.Item
+              href={`/api/professor/versions/${version.id}/export_file`}
+            >
+              Export as single file
+            </Dropdown.Item>
+            <Dropdown.Item
+              href={`/api/professor/versions/${version.id}/export_archive`}
+            >
+              Export as archive
+            </Dropdown.Item>
+          </DropdownButton>
           <LinkButton
             variant="info"
             to={`/exams/${examId}/versions/${version.id}/edit`}

@@ -10,7 +10,12 @@ Rails.application.routes.draw do
             member do
               resources :versions, param: 'version_id', only: [:index, :show, :create, :update, :destroy] do
                 collection do
+                  post :import
                   post :update_all
+                end
+                member do
+                  get :export_file
+                  get :export_archive
                 end
               end
               resources :rooms, param: 'room_id', only: [:index] do

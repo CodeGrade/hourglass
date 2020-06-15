@@ -34,8 +34,7 @@ export type ExamEditorAction = UpdateInstructionsAction | UpdatePoliciesAction |
 | UpdateQuestionAction | UpdateQuestionFileRefsAction
 | AddPartAction | DeletePartAction | MovePartAction
 | UpdatePartAction | UpdatePartFileRefsAction
-| AddBodyItemAction | DeleteBodyItemAction | UpdateBodyItemAction | MoveBodyItemAction
-| UpdateHTMLBodyItemAction;
+| AddBodyItemAction | DeleteBodyItemAction | UpdateBodyItemAction | MoveBodyItemAction;
 
 export interface UpdateTitleAction {
   type: 'UPDATE_TITLE';
@@ -152,15 +151,6 @@ export interface UpdateBodyItemAction {
   info: BodyItem;
   answer: AnswerState;
 }
-
-export interface UpdateHTMLBodyItemAction {
-  type: 'UPDATE_HTML_BODY_ITEM';
-  qnum: number;
-  pnum: number;
-  bnum: number;
-  value: HTMLVal;
-}
-
 
 export interface MoveBodyItemAction {
   type: 'MOVE_BODY_ITEM';

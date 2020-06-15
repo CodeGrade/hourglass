@@ -8,30 +8,34 @@ module Api
       before_action :require_prof_reg
 
       def create
-        exam_params = params.permit(:name, :file)
-        file = exam_params[:file]
-        upload = Upload.new(file)
-        Audit.log("Uploaded file #{file.original_filename} for #{current_user.username} (#{current_user.id})")
+        exam_params = params.require(:exam).permit(:name, :duration, :start, :end)
         @exam = Exam.new(
           name: exam_params[:name],
           course: @course,
-          info: upload.info,
-          files: upload.files
+          start_time: DateTime.parse(exam_params[:start]),
+          end_time: DateTime.parse(exam_params[:end]),
+          duration: exam_params[:duration]
         )
         @exam.save!
-        Room.create!(
-          exam: @exam,
-          name: 'Exam Room'
-        )
-        render json: { id: @exam.id }, status: :created
+        render json: {
+          created: true,
+          id: @exam.id
+        }
+      rescue StandardError => e
+        render json: {
+          created: false,
+          reason: e.message
+        }
       end
 
       def update
         body = params.require(:exam).permit(:name, :start, :end, :duration)
-        # TODO update start and end, add policies
+        # TODO: add policies
         updated = @exam.update(
           {
             name: body[:name],
+            start_time: DateTime.parse(body[:start]),
+            end_time: DateTime.parse(body[:end]),
             duration: body[:duration]
           }
         )

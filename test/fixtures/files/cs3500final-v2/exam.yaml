@@ -1,0 +1,48 @@
+{
+  "info": {
+    "policies": [
+      "ignore-lockdown",
+      "tolerate-windowed"
+    ],
+    "answers": [
+      [
+        [
+          {
+            "NO_ANS": true
+          }
+        ]
+      ]
+    ],
+    "contents": {
+      "instructions": {
+        "type": "HTML",
+        "value": "TODO"
+      },
+      "questions": [
+        {
+          "description": {
+            "type": "HTML",
+            "value": "Something to answer."
+          },
+          "parts": [
+            {
+              "body": [
+                {
+                  "type": "HTML",
+                  "value": "Some instructions here for the first part."
+                }
+              ],
+              "description": {
+                "type": "HTML",
+                "value": "A part."
+              },
+              "points": 1
+            }
+          ],
+          "separateSubparts": false
+        }
+      ]
+    }
+  },
+  "files": []
+}

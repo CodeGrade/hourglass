@@ -3,7 +3,7 @@
 module Api
   module Professor
     class VersionsController < ProfessorController
-      before_action :find_version, only: [:show, :update, :destroy]
+      before_action :find_version, only: [:show, :update, :destroy, :export_file]
       before_action :find_exam_and_course
 
       before_action :require_prof_reg
@@ -106,6 +106,11 @@ module Api
           created: false,
           reason: e.message
         }
+      end
+
+      def export_file
+        fname = @version.name.gsub(/ /, '-') + '.json'
+        send_data @version.export_json, type: :json, disposition: 'attachment', filename: fname
       end
 
       private

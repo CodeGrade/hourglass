@@ -163,4 +163,15 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal ev.info, exam.exam_versions.first.info
     assert_equal ev.files, exam.exam_versions.first.files
   end
+
+  test 'should export exam version single file' do
+    ev = create(:exam_version)
+    reg = create(:professor_course_registration, course: ev.exam.course)
+    sign_in reg.user
+
+    get export_file_api_professor_version_path(ev)
+    parsed = JSON.parse(response.body)
+    assert_equal ev.info, parsed['info']
+    assert_equal ev.files, parsed['files']
+  end
 end

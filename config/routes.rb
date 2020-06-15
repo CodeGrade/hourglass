@@ -13,6 +13,9 @@ Rails.application.routes.draw do
                   post :import
                   post :update_all
                 end
+                member do
+                  get :export_file
+                end
               end
               resources :rooms, param: 'room_id', only: [:index] do
                 collection do

@@ -344,12 +344,14 @@ const ShowVersion: React.FC<{
             title="Export"
           >
             <Dropdown.Item
-              onClick={(): void => console.log('file')}
+              href={`/api/professor/versions/${version.id}/export_file`}
             >
               Export as single file
             </Dropdown.Item>
             <Dropdown.Item
-              onClick={(): void => console.log('archive')}
+              onClick={(): void => {
+                window.alert('TODO');
+              }}
             >
               Export as archive
             </Dropdown.Item>

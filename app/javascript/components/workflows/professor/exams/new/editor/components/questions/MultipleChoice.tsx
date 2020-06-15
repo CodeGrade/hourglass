@@ -8,7 +8,7 @@ import {
 import { MultipleChoiceInfo, MultipleChoiceState, HTMLVal } from '@student/exams/show/types';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
-import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
+// import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { FaCircle } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
@@ -107,15 +107,15 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
                 onMouseOut={(): void => setMoversVisible(idx, false)}
               >
                 <Col className="flex-grow-01">
-                  <MoveItem
-                    visible={moversVisible[idx]}
-                    variant="dark"
-                    enableUp={idx > 0}
-                    enableDown={idx + 1 < options.length}
-                    onDelete={(): UpdateBodyItemAction => deleteOption(idx)}
-                    onDown={(): UpdateBodyItemAction => moveOption(idx, idx + 1)}
-                    onUp={(): UpdateBodyItemAction => moveOption(idx - 1, idx)}
-                  />
+                  {/* <MoveItem */}
+                  {/*   visible={moversVisible[idx]} */}
+                  {/*   variant="dark" */}
+                  {/*   enableUp={idx > 0} */}
+                  {/*   enableDown={idx + 1 < options.length} */}
+                  {/*   onDelete={(): UpdateBodyItemAction => deleteOption(idx)} */}
+                  {/*   onDown={(): UpdateBodyItemAction => moveOption(idx, idx + 1)} */}
+                  {/*   onUp={(): UpdateBodyItemAction => moveOption(idx - 1, idx)} */}
+                  {/* /> */}
                   <Button
                     variant={selected ? 'dark' : 'outline-dark'}
                     onClick={(): void => setAnswer(idx)}

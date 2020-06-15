@@ -12,7 +12,7 @@ import {
 import { alphabetIdx } from '@hourglass/common/helpers';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import { HTMLVal, FileRef, ExamFile } from '@student/exams/show/types';
-import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
+// import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/containers/ShowBodyItems';
 import { FilePickerPart } from '@professor/exams/new/editor/containers/FilePicker';
 import { MovePartAction, DeletePartAction } from '@professor/exams/new/types';
@@ -67,15 +67,15 @@ const Part: React.FC<PartProps> = (props) => {
         onBlur={(): void => setMoversVisible(false)}
         onMouseOut={(): void => setMoversVisible(false)}
       >
-        <MoveItem
-          visible={moversVisible}
-          variant="success"
-          enableUp={pnum > 0}
-          enableDown={pnum + 1 < numParts}
-          onUp={(): MovePartAction => movePart(qnum, pnum, pnum - 1)}
-          onDown={(): MovePartAction => movePart(qnum, pnum, pnum + 1)}
-          onDelete={(): DeletePartAction => deletePart(qnum, pnum)}
-        />
+        {/* <MoveItem */}
+        {/*   visible={moversVisible} */}
+        {/*   variant="success" */}
+        {/*   enableUp={pnum > 0} */}
+        {/*   enableDown={pnum + 1 < numParts} */}
+        {/*   onUp={(): MovePartAction => movePart(qnum, pnum, pnum - 1)} */}
+        {/*   onDown={(): MovePartAction => movePart(qnum, pnum, pnum + 1)} */}
+        {/*   onDelete={(): DeletePartAction => deletePart(qnum, pnum)} */}
+        {/* /> */}
         <Alert variant="success">
           <Card.Title>
             {`Part ${alphabetIdx(pnum)}`}

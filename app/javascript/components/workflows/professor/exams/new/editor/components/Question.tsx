@@ -10,8 +10,8 @@ import {
   Button,
 } from 'react-bootstrap';
 import YesNo from '@student/exams/show/components/questions/YesNo';
-// import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
-// import ShowParts from '@professor/exams/new/editor/containers/ShowParts';
+import MoveItem from '@professor/exams/new/editor/components/MoveItem';
+import ShowParts from '@professor/exams/new/editor/components/ShowParts';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import FilePickerSelect from '@professor/exams/new/editor/components/FilePicker';
 import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
@@ -191,6 +191,25 @@ const Question: React.FC<{
       onBlur={(): void => setMoversVisible(false)}
       onMouseOut={(): void => setMoversVisible(false)}
     >
+      <MoveItem
+        visible={moversVisible}
+        variant="primary"
+        enableUp={qnum > 0}
+        // enableDown={qnum + 1 < numQuestions}
+        enableDown={false}
+        onUp={(): void => {
+          // TODO
+        }}
+        onDown={(): void => {
+          // TODO
+        }}
+        onDelete={(): void => {
+          // TODO
+        }}
+        // onUp={(): MoveQuestionAction => moveQuestion(qnum, qnum - 1)}
+        // onDown={(): MoveQuestionAction => moveQuestion(qnum, qnum + 1)}
+        // onDelete={(): DeleteQuestionAction => deleteQuestion(qnum)}
+      />
       <Alert variant="primary">
         <Card.Title>
           {`Question ${qnum + 1}`}
@@ -212,26 +231,12 @@ const Question: React.FC<{
         <Card.Body>
           <ReferenceProvider>
             TODO
+            {/* <ShowParts qnum={qnum} /> */}
           </ReferenceProvider>
         </Card.Body>
       </Alert>
     </Card>
   );
 };
-
-//         <MoveItem
-//           visible={moversVisible}
-//           variant="primary"
-//           enableUp={qnum > 0}
-//           enableDown={qnum + 1 < numQuestions}
-//           onUp={(): MoveQuestionAction => moveQuestion(qnum, qnum - 1)}
-//           onDown={(): MoveQuestionAction => moveQuestion(qnum, qnum + 1)}
-//           onDelete={(): DeleteQuestionAction => deleteQuestion(qnum)}
-//         />
-//         <Alert variant="primary">
-//         </Alert>
-//         <Card.Body>
-//           <ShowParts qnum={qnum} />
-//         </Card.Body>
 
 export default Question;

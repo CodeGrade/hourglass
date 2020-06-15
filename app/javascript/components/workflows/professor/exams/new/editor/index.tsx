@@ -68,16 +68,16 @@ interface FormValues {
   };
 }
 
-interface WrapInputProps extends WrappedFieldProps {
-  Wrappee: React.ComponentType<{ value: any; onChange: (a: any) => void; }>;
-}
+type WrappedInput<T> = React.ComponentType<{ value: T; onChange: (a: T) => void; }>;
 
-const wrapInput = (Wrappee) => (props) => {
-  const { input } = props;
-  return (
-    <Wrappee value={input.value} onChange={input.onChange} />
-  );
-};
+function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
+  return (props) => {
+    const { input } = props;
+    return (
+      <Wrappee value={input.value} onChange={input.onChange} />
+    );
+  };
+}
 
 const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const {

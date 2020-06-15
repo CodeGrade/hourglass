@@ -22,6 +22,7 @@ import {
 } from 'redux-form';
 import { Provider } from 'react-redux';
 import store from './store';
+import Policies from './components/Policies';
 
 export interface ExamEditorProps {
   exam: ExamVersion;
@@ -68,6 +69,19 @@ interface FormValues {
   };
 }
 
+const EditPolicies: React.FC<WrappedFieldProps> = (props) => {
+  const {
+    input,
+  } = props;
+  const {
+    onChange,
+    value,
+  } = input;
+  return (
+    <Policies policies={value} onChange={onChange} />
+  );
+};
+
 const ExamName: React.FC<WrappedFieldProps> = (props) => {
   const {
     input,
@@ -105,6 +119,7 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
     >
       <FormSection name="all">
         <Field name="name" component={ExamName} />
+        <Field name="policies" component={EditPolicies} />
         <Form.Group>
           <Button
             variant="danger"

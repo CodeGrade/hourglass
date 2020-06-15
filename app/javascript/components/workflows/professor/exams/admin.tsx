@@ -15,6 +15,8 @@ import {
   Form,
   Row,
   Col,
+  DropdownButton,
+  Dropdown,
 } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
@@ -336,6 +338,22 @@ const ShowVersion: React.FC<{
           {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
         </span>
         <div className="float-right">
+          <DropdownButton
+            id={`version-${version.id}-export-button`}
+            className="d-inline-block mr-2"
+            title="Export"
+          >
+            <Dropdown.Item
+              onClick={(): void => console.log('file')}
+            >
+              Export as single file
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(): void => console.log('archive')}
+            >
+              Export as archive
+            </Dropdown.Item>
+          </DropdownButton>
           <LinkButton
             variant="info"
             to={`/exams/${examId}/versions/${version.id}/edit`}

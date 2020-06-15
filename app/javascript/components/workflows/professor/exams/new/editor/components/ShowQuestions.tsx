@@ -28,6 +28,7 @@ const ShowQuestions: React.FC<WrappedFieldArrayProps<QuestionInfo>> = (props) =>
             variant="primary"
             onClick={(): void => {
               const q: QuestionInfo = {
+                reference: [],
                 name: {
                   type: 'HTML',
                   value: '',

@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Row,
-  Col,
   Container,
-  Form,
   InputGroup,
   Collapse,
   Button,
@@ -12,7 +9,6 @@ import {
 import { ExamVersion } from '@student/exams/show/types';
 import Instructions from '@professor/exams/new/editor/containers/Instructions';
 import FileUploader from '@professor/exams/new/editor/containers/FileUploader';
-import Policies from '@professor/exams/new/editor/containers/Policies';
 import ShowQuestions from '@professor/exams/new/editor/containers/ShowQuestions';
 import { FilePickerExam } from '@professor/exams/new/editor/containers/FilePicker';
 import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
@@ -24,14 +20,11 @@ import { ExamFilesContext } from '@hourglass/workflows/student/exams/show/contex
 export interface ExamEditorProps {
   name: string;
   version: ExamVersion;
-  onChange: (newTitle: string) => void;
 }
 
 const Editor: React.FC<ExamEditorProps> = (props) => {
   const {
-    name,
     version: exam,
-    onChange,
   } = props;
   const {
     questions,
@@ -49,21 +42,6 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
       }}
     >
       <Container fluid className="flex-fill">
-        <Form>
-          <Form.Group as={Row} controlId="examTitle">
-            <Form.Label column sm="3"><h2>Version name:</h2></Form.Label>
-            <Col>
-              <Form.Control
-                size="lg"
-                type="text"
-                placeholder="Enter a name for this version"
-                value={name}
-                onChange={(e): void => onChange(e.target.value)}
-              />
-            </Col>
-          </Form.Group>
-          <Policies />
-        </Form>
         <FileUploader />
 
         <Alert variant="info">

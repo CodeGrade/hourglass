@@ -11,6 +11,7 @@ import {
   RailsExamVersion,
   AnswersState,
   Policy,
+  ExamFile,
 } from '@student/exams/show/types';
 import {
   reduxForm,
@@ -18,8 +19,9 @@ import {
   FormSection,
   Field,
   WrappedFieldProps,
+  formValueSelector,
 } from 'redux-form';
-import { Provider } from 'react-redux';
+import { Provider, connect } from 'react-redux';
 import store from './store';
 import Name from './components/Name';
 import Policies from './components/Policies';
@@ -76,42 +78,66 @@ function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
   };
 }
 
+const formSelector = formValueSelector('version-editor');
+
+const FormContextProvider: React.FC<{
+  files: ExamFile[];
+}> = (props) => {
+  const {
+    files,
+    children,
+  } = props;
+  const fmap = createMap(files);
+  return (
+    <ExamContext.Provider
+      value={{
+        files,
+        fmap,
+      }}
+    >
+      {children}
+    </ExamContext.Provider>
+  );
+};
+
+const FormContextProviderConnected = connect((state) => ({
+  files: formSelector(state, 'all.exam.files'),
+}))(FormContextProvider);
+
 const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const {
     pristine,
     reset,
   } = props;
-  const files = [];
-  const fmap = createMap(files);
   return (
     <form
       onSubmit={() => {
         console.log('TODO');
       }}
     >
-      <ExamContext.Provider value={{ files, fmap }}>
-        <FormSection name="all">
-          <Field name="name" component={wrapInput(Name)} />
-          <Field name="policies" component={wrapInput(Policies)} />
-          <FormSection name="exam">
+      <FormSection name="all">
+        <Field name="name" component={wrapInput(Name)} />
+        <Field name="policies" component={wrapInput(Policies)} />
+        <FormSection name="exam">
+          <FormContextProviderConnected>
             <Alert variant="info">
               <h3>Exam-wide information</h3>
               <Field name="files" component={wrapInput(FileUploader)} />
               <Field name="instructions" component={wrapInput(Instructions)} />
             </Alert>
             <Field name="reference" component={wrapInput(Reference)} />
-          </FormSection>
-          <Form.Group>
-            <Button
-              variant="danger"
-              className={pristine && 'd-none'}
-              onClick={reset}
-            >
-              Reset
-            </Button>
-          </Form.Group>
+          </FormContextProviderConnected>
         </FormSection>
-      </ExamContext.Provider>
+        <Form.Group>
+          <Button
+            variant="danger"
+            className={pristine && 'd-none'}
+            onClick={reset}
+          >
+            Reset
+          </Button>
+        </Form.Group>
+      </FormSection>
     </form>
   );
 };

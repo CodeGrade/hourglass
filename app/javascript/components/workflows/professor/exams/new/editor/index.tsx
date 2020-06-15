@@ -4,6 +4,7 @@ import { ExamContext } from '@student/exams/show/context';
 import {
   Form,
   Button,
+  Alert,
 } from 'react-bootstrap';
 import {
   ExamVersion,
@@ -22,6 +23,7 @@ import { Provider } from 'react-redux';
 import store from './store';
 import Name from './components/Name';
 import Policies from './components/Policies';
+import Instructions from './components/Instructions';
 
 export interface ExamEditorProps {
   exam: ExamVersion;
@@ -94,7 +96,10 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
         <Field name="name" component={wrapInput(Name)} />
         <Field name="policies" component={wrapInput(Policies)} />
         <FormSection name="exam">
-          {/* <Field name="instructions" component={EditPolicies} /> */}
+          <Alert variant="info">
+            <h3>Exam-wide information</h3>
+            <Field name="instructions" component={wrapInput(Instructions)} />
+          </Alert>
           {/* <Field name="reference" component={EditPolicies} /> */}
           {/* <Field name="files" component={EditPolicies} /> */}
         </FormSection>

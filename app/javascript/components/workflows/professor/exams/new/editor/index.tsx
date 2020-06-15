@@ -1,8 +1,7 @@
 import React, { useContext } from 'react';
 import { createMap } from '@student/exams/show/files';
-import { ExamContext } from '@student/exams/show/context';
+import { ExamContext, ExamFilesContext } from '@student/exams/show/context';
 import {
-  Form,
   Button,
   Alert,
 } from 'react-bootstrap';
@@ -12,6 +11,7 @@ import {
   AnswersState,
   Policy,
   ExamFile,
+  FileRef,
 } from '@student/exams/show/types';
 import {
   reduxForm,
@@ -89,13 +89,15 @@ const WrappedFileUploader = wrapInput(FileUploader);
 const WrappedInstructions = wrapInput(Instructions);
 const WrappedReference = wrapInput(Reference);
 
-const formSelector = formValueSelector('version-editor');
+export const formSelector = formValueSelector('version-editor');
 
 const FormContextProvider: React.FC<{
   files: ExamFile[];
+  examRef: FileRef[];
 }> = (props) => {
   const {
     files,
+    examRef,
     children,
   } = props;
   const fmap = createMap(files);
@@ -106,13 +108,20 @@ const FormContextProvider: React.FC<{
         fmap,
       }}
     >
-      {children}
+      <ExamFilesContext.Provider
+        value={{
+          references: examRef,
+        }}
+      >
+        {children}
+      </ExamFilesContext.Provider>
     </ExamContext.Provider>
   );
 };
 
 const FormContextProviderConnected = connect((state) => ({
   files: formSelector(state, 'all.exam.files'),
+  examRef: formSelector(state, 'all.exam.reference'),
 }))(FormContextProvider);
 
 const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {

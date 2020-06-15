@@ -83,6 +83,12 @@ function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
   };
 }
 
+const WrappedName = wrapInput(Name);
+const WrappedPolicies = wrapInput(Policies);
+const WrappedFileUploader = wrapInput(FileUploader);
+const WrappedInstructions = wrapInput(Instructions);
+const WrappedReference = wrapInput(Reference);
+
 const formSelector = formValueSelector('version-editor');
 
 const FormContextProvider: React.FC<{
@@ -152,16 +158,16 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
       })}
     >
       <FormSection name="all">
-        <Field name="name" component={wrapInput(Name)} />
-        <Field name="policies" component={wrapInput(Policies)} />
+        <Field name="name" component={WrappedName} />
+        <Field name="policies" component={WrappedPolicies} />
         <FormSection name="exam">
           <FormContextProviderConnected>
             <Alert variant="info">
               <h3>Exam-wide information</h3>
-              <Field name="files" component={wrapInput(FileUploader)} />
-              <Field name="instructions" component={wrapInput(Instructions)} />
+              <Field name="files" component={WrappedFileUploader} />
+              <Field name="instructions" component={WrappedInstructions} />
             </Alert>
-            <Field name="reference" component={wrapInput(Reference)} />
+            <Field name="reference" component={WrappedReference} />
             <FieldArray name="questions" component={ShowQuestions} />
           </FormContextProviderConnected>
         </FormSection>

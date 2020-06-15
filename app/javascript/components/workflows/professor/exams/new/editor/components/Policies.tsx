@@ -5,7 +5,7 @@ import Select from 'react-select';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 
 export interface PoliciesProps {
-  policies: Policy[];
+  value: Policy[];
   onChange: (newPolicies: Policy[]) => void;
 }
 
@@ -27,10 +27,10 @@ const policyValues: PolicyOption[] = Object.keys(Policy).map((policy) => ({
 
 const Policies: React.FC<PoliciesProps> = (props) => {
   const {
-    policies,
+    value,
     onChange,
   } = props;
-  const curPolicyValues = policies.map((p) => policyValues.find((pv) => pv.value === p));
+  const curPolicyValues = value.map((p) => policyValues.find((pv) => pv.value === p));
   return (
     <Form.Group as={Row} controlId="examPolicies">
       <Form.Label column sm="3">Policies:</Form.Label>

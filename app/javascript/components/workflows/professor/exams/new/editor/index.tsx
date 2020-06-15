@@ -4,8 +4,6 @@ import { ExamContext } from '@student/exams/show/context';
 import {
   Form,
   Button,
-  Row,
-  Col,
 } from 'react-bootstrap';
 import {
   ExamVersion,
@@ -22,6 +20,7 @@ import {
 } from 'redux-form';
 import { Provider } from 'react-redux';
 import store from './store';
+import Name from './components/Name';
 import Policies from './components/Policies';
 
 export interface ExamEditorProps {
@@ -69,40 +68,14 @@ interface FormValues {
   };
 }
 
-const EditPolicies: React.FC<WrappedFieldProps> = (props) => {
-  const {
-    input,
-  } = props;
-  const {
-    onChange,
-    value,
-  } = input;
-  return (
-    <Policies policies={value} onChange={onChange} />
-  );
-};
+interface WrapInputProps extends WrappedFieldProps {
+  Wrappee: React.ComponentType<{ value: any; onChange: (a: any) => void; }>;
+}
 
-const ExamName: React.FC<WrappedFieldProps> = (props) => {
-  const {
-    input,
-  } = props;
-  const {
-    onChange,
-    value,
-  } = input;
+const wrapInput = (Wrappee) => (props) => {
+  const { input } = props;
   return (
-    <Form.Group as={Row} controlId="examTitle">
-      <Form.Label column sm="3"><h2>Version name:</h2></Form.Label>
-      <Col>
-        <Form.Control
-          size="lg"
-          type="text"
-          placeholder="Enter a name for this version"
-          value={value}
-          onChange={onChange}
-        />
-      </Col>
-    </Form.Group>
+    <Wrappee value={input.value} onChange={input.onChange} />
   );
 };
 
@@ -118,8 +91,13 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
       }}
     >
       <FormSection name="all">
-        <Field name="name" component={ExamName} />
-        <Field name="policies" component={EditPolicies} />
+        <Field name="name" component={wrapInput(Name)} />
+        <Field name="policies" component={wrapInput(Policies)} />
+        <FormSection name="exam">
+          {/* <Field name="instructions" component={EditPolicies} /> */}
+          {/* <Field name="reference" component={EditPolicies} /> */}
+          {/* <Field name="files" component={EditPolicies} /> */}
+        </FormSection>
         <Form.Group>
           <Button
             variant="danger"

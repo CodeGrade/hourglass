@@ -20,12 +20,14 @@
       },
       "questions": [
         {
+          "reference": [],
           "description": {
             "type": "HTML",
             "value": "Something to answer."
           },
           "parts": [
             {
+              "reference": [],
               "body": [
                 {
                   "type": "HTML",

@@ -35,7 +35,7 @@
     "Question": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["parts"],
+      "required": ["parts", "reference"],
       "properties": {
         "name": { "$ref": "#/definitions/HTML" },
         "description": { "$ref": "#/definitions/HTML" },
@@ -51,7 +51,7 @@
     "Part": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["body", "points"],
+      "required": ["body", "points", "reference"],
       "properties": {
         "name": { "$ref": "#/definitions/HTML" },
         "description": { "$ref": "#/definitions/HTML" },

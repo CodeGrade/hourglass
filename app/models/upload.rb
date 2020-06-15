@@ -144,16 +144,16 @@ class Upload
       end
     end
 
-    e_reference = contents['reference']&.map{|r| map_reference r}
+    e_reference = contents['reference']&.map{|r| map_reference r} || []
     questions = contents['questions'].map do |q|
-      q_reference = q['reference']&.map{|r| map_reference r}
+      q_reference = q['reference']&.map{|r| map_reference r} || []
       {
         name: make_html_val(q['name']),
         separateSubparts: q['separateSubparts'],
         description: make_html_val(q['description']),
         reference: q_reference,
         parts: q['parts'].map do |p|
-          p_reference = p['reference']&.map{|r| map_reference r}
+          p_reference = p['reference']&.map{|r| map_reference r} || []
           {
             name: make_html_val(p['name']),
             description: make_html_val(p['description']),

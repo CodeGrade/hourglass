@@ -1,27 +1,25 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Form,
   Card,
   Alert,
   Row,
   Col,
-  // InputGroup,
-  // Collapse,
-  // Button,
+  InputGroup,
+  Collapse,
+  Button,
 } from 'react-bootstrap';
 import YesNo from '@student/exams/show/components/questions/YesNo';
 // import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 // import ShowParts from '@professor/exams/new/editor/containers/ShowParts';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
-// import { FilePickerQuestion } from '@professor/exams/new/editor/containers/FilePicker';
-// import {
-//   PartInfo, HTMLVal, FileRef, ExamFile,
-// } from '@student/exams/show/types';
-// import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
-// import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-// import { createMap, getFilesForRefs } from '@student/exams/show/files';
-// import { QuestionFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import FilePickerSelect from '@professor/exams/new/editor/components/FilePicker';
+import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { WrappedFieldProps, Field } from 'redux-form';
+import { FileRef } from '@hourglass/workflows/student/exams/show/types';
+import { ExamContext } from '@hourglass/workflows/student/exams/show/context';
+import { getFilesForRefs } from '@hourglass/workflows/student/exams/show/files';
 
 const QuestionName: React.FC<WrappedFieldProps> = (props) => {
   const {
@@ -108,6 +106,50 @@ const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const QuestionReference: React.FC<WrappedFieldProps> = (props) => {
+  const {
+    input,
+  } = props;
+  const {
+    value,
+    onChange,
+  }: {
+    value: FileRef[];
+    onChange: (newVal: FileRef[]) => void;
+  } = input;
+  const [open, setOpen] = useState(false);
+  const noFiles = value.length === 0;
+  const { files, fmap } = useContext(ExamContext);
+  const filteredFiles = getFilesForRefs(fmap, value);
+  return (
+    <>
+      <Form.Label column sm="2">Files to be shown for this question:</Form.Label>
+      <Col sm={10}>
+        <InputGroup>
+          <div className="flex-grow-1">
+            <FilePickerSelect options={files} selected={value} onChange={onChange} />
+          </div>
+          <InputGroup.Append>
+            <Button
+              variant="info"
+              disabled={noFiles}
+              onClick={(): void => setOpen((o) => !o)}
+            >
+              Preview files
+              {open && !files ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+            </Button>
+          </InputGroup.Append>
+        </InputGroup>
+        <Collapse in={open && !noFiles}>
+          <div className="border">
+            <VeryControlledFileViewer files={filteredFiles} />
+          </div>
+        </Collapse>
+      </Col>
+    </>
+  );
+};
+
 const Question: React.FC<{
   memberName: string;
   qnum: number;
@@ -133,6 +175,9 @@ const Question: React.FC<{
           </Form.Group>
           <Form.Group as={Row} controlId={`${qnum}-separate`}>
             <Field name={`${memberName}.seperateSubparts`} component={QuestionSepSubParts} />
+          </Form.Group>
+          <Form.Group as={Row} controlId={`${qnum}-files`}>
+            <Field name={`${memberName}.reference`} component={QuestionReference} />
           </Form.Group>
         </Card.Subtitle>
       </Alert>
@@ -193,36 +238,6 @@ const Question: React.FC<{
 //           onDelete={(): DeleteQuestionAction => deleteQuestion(qnum)}
 //         />
 //         <Alert variant="primary">
-//           <Card.Title>
-//             {`Question ${qnum + 1}`}
-//           </Card.Title>
-//           <Card.Subtitle>
-//             <Form.Group as={Row} controlId={`${qnum}-files`}>
-//               <Form.Label column sm="2">Files to be shown for this question:</Form.Label>
-//               <Col sm={10}>
-//                 <InputGroup>
-//                   <div className="flex-grow-1">
-//                     <FilePickerQuestion qnum={qnum} />
-//                   </div>
-//                   <InputGroup.Append>
-//                     <Button
-//                       variant="info"
-//                       disabled={noFiles}
-//                       onClick={(): void => setOpen((o) => !o)}
-//                     >
-//                       Preview files
-//                       {open && !noFiles ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
-//                     </Button>
-//                   </InputGroup.Append>
-//                 </InputGroup>
-//                 <Collapse in={open && !noFiles}>
-//                   <div className="border">
-//                     <VeryControlledFileViewer files={filteredFiles} />
-//                   </div>
-//                 </Collapse>
-//               </Col>
-//             </Form.Group>
-//           </Card.Subtitle>
 //         </Alert>
 //         <Card.Body>
 //           <ShowParts qnum={qnum} />

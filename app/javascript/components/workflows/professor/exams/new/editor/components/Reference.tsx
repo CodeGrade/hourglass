@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Collapse,
   InputGroup,
@@ -7,6 +7,8 @@ import {
 import { FileRef } from '@hourglass/workflows/student/exams/show/types';
 import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { ExamContext } from '@hourglass/workflows/student/exams/show/context';
+import { getFilesForRefs } from '@hourglass/workflows/student/exams/show/files';
 import FilePickerSelect from './FilePicker';
 
 const ExamReference: React.FC<{
@@ -19,14 +21,14 @@ const ExamReference: React.FC<{
   } = props;
   const [open, setOpen] = useState(false);
   const noFiles = value.length === 0;
-  const examFiles = [];
-  const filteredFiles = [];
+  const { files, fmap } = useContext(ExamContext);
+  const filteredFiles = getFilesForRefs(fmap, value);
   return (
     <>
       <p>Choose files to be shown for the entire exam</p>
       <InputGroup>
         <div className="flex-grow-1">
-          <FilePickerSelect options={examFiles} selected={value} onChange={onChange} />
+          <FilePickerSelect options={files} selected={value} onChange={onChange} />
         </div>
         <InputGroup.Append>
           <Button

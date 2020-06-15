@@ -24,6 +24,7 @@ import store from './store';
 import Name from './components/Name';
 import Policies from './components/Policies';
 import Instructions from './components/Instructions';
+import Reference from './components/Reference';
 
 export interface ExamEditorProps {
   exam: ExamVersion;
@@ -100,7 +101,7 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
             <h3>Exam-wide information</h3>
             <Field name="instructions" component={wrapInput(Instructions)} />
           </Alert>
-          {/* <Field name="reference" component={EditPolicies} /> */}
+          <Field name="reference" component={wrapInput(Reference)} />
           {/* <Field name="files" component={EditPolicies} /> */}
         </FormSection>
         <Form.Group>

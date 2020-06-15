@@ -35,7 +35,7 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
         <p>All exam files</p>
         <InputGroup>
           <Form.File
-            required
+            // TODO: required
             onChange={(e): void => {
               const { files: uploaded } = e.target;
               const upload = uploaded[0];

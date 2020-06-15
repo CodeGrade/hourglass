@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext } from '@student/exams/show/context';
 import {
@@ -22,6 +22,9 @@ import {
   formValueSelector,
 } from 'redux-form';
 import { Provider, connect } from 'react-redux';
+import { Version, versionUpdate } from '@hourglass/common/api/professor/exams/versions/update';
+import { useParams, useHistory } from 'react-router-dom';
+import { AlertContext } from '@hourglass/common/alerts';
 import store from './store';
 import Name from './components/Name';
 import Policies from './components/Policies';
@@ -108,12 +111,43 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const {
     pristine,
     reset,
+    handleSubmit,
   } = props;
+  const { alert } = useContext(AlertContext);
+  const history = useHistory();
+  const { examId, versionId } = useParams();
   return (
     <form
-      onSubmit={() => {
-        console.log('TODO');
-      }}
+      onSubmit={handleSubmit(({ all }) => {
+        const version: Version = {
+          name: all.name,
+          info: {
+            policies: all.policies,
+            answers: all.answers.answers,
+            contents: {
+              instructions: all.exam.instructions,
+              questions: all.exam.questions,
+              reference: all.exam.reference ?? [],
+            },
+          },
+          files: all.exam.files,
+        };
+        versionUpdate(versionId, { version }).then((res) => {
+          if (res.updated === false) {
+            alert({
+              variant: 'danger',
+              title: 'Exam version not updated.',
+              message: <pre>{res.reason}</pre>,
+            });
+          } else {
+            history.push(`/exams/${examId}/admin`);
+            alert({
+              variant: 'success',
+              message: 'Exam version updated successfully.',
+            });
+          }
+        });
+      })}
     >
       <FormSection name="all">
         <Field name="name" component={wrapInput(Name)} />
@@ -126,9 +160,10 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
               <Field name="instructions" component={wrapInput(Instructions)} />
             </Alert>
             <Field name="reference" component={wrapInput(Reference)} />
+            {/* <ShowQuestions questions={questions} /> */}
           </FormContextProviderConnected>
         </FormSection>
-        <Form.Group>
+        <div className="my-2 float-right">
           <Button
             variant="danger"
             className={pristine && 'd-none'}
@@ -136,7 +171,13 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
           >
             Reset
           </Button>
-        </Form.Group>
+          <Button
+            variant="success"
+            type="submit"
+          >
+            Submit
+          </Button>
+        </div>
       </FormSection>
     </form>
   );

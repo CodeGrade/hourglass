@@ -1,40 +1,18 @@
 import React from 'react';
-import { Card } from 'react-bootstrap';
-
-const Question: React.FC<{
-  qnum: number;
-  memberName: string;
-}> = (props) => {
-  const {
-    qnum,
-  } = props;
-  return (
-    <Card
-      className="mb-3"
-    >
-      <Card.Title>
-        {`Question ${qnum + 1}`}
-      </Card.Title>
-    </Card>
-  );
-};
-
-// import {
-//   Form,
-//   Card,
-//   Alert,
-//   Row,
-//   Col,
-//   InputGroup,
-//   Collapse,
-//   Button,
-// } from 'react-bootstrap';
-// import { MoveQuestionAction, DeleteQuestionAction } from '@professor/exams/new/types';
-// import { moveQuestion, deleteQuestion } from '@professor/exams/new/actions';
+import {
+  Form,
+  Card,
+  Alert,
+  Row,
+  Col,
+  // InputGroup,
+  // Collapse,
+  // Button,
+} from 'react-bootstrap';
 // import YesNo from '@student/exams/show/components/questions/YesNo';
 // import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 // import ShowParts from '@professor/exams/new/editor/containers/ShowParts';
-// import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 // import { FilePickerQuestion } from '@professor/exams/new/editor/containers/FilePicker';
 // import {
 //   PartInfo, HTMLVal, FileRef, ExamFile,
@@ -43,10 +21,63 @@ const Question: React.FC<{
 // import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 // import { createMap, getFilesForRefs } from '@student/exams/show/files';
 // import { QuestionFilesContext } from '@hourglass/workflows/student/exams/show/context';
-//
+import { WrappedFieldProps, Field } from 'redux-form';
+
+const QuestionName: React.FC<WrappedFieldProps> = (props) => {
+  const {
+    input,
+  } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <>
+      <Form.Label column sm="2">Question name</Form.Label>
+      <Col sm="10">
+        <CustomEditor
+          className="bg-white"
+          value={value.value}
+          placeholder="Give a short (optional) descriptive name for the question"
+          onChange={(newName, _delta, source, _editor): void => {
+            if (source === 'user') {
+              onChange({ type: 'HTML', value: newName });
+            }
+          }}
+        />
+      </Col>
+    </>
+  );
+};
+
+const Question: React.FC<{
+  memberName: string;
+  qnum: number;
+}> = (props) => {
+  const {
+    memberName,
+    qnum,
+  } = props;
+  return (
+    <Card
+      className="mb-3"
+    >
+      <Alert variant="primary">
+        <Card.Title>
+          {`Question ${qnum + 1}`}
+        </Card.Title>
+        <Card.Subtitle>
+          <Form.Group as={Row} controlId={`${qnum}-name`}>
+            <Field name={`${memberName}.name`} component={QuestionName} />
+          </Form.Group>
+        </Card.Subtitle>
+      </Alert>
+    </Card>
+  );
+};
+
+
 // export interface QuestionProps {
-//   qnum: number;
-//   numQuestions: number;
 //   name: HTMLVal;
 //   description: HTMLVal;
 //   separateSubparts: boolean;

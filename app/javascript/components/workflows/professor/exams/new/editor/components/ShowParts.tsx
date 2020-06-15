@@ -6,7 +6,7 @@ import {
 } from 'react-bootstrap';
 import { WrappedFieldArrayProps } from 'redux-form';
 import { PartInfo } from '@hourglass/workflows/student/exams/show/types';
-import Part from '@professor/exams/new/editor/containers/Part';
+import Part from '@professor/exams/new/editor/components/Part';
 
 const ShowParts: React.FC<WrappedFieldArrayProps<PartInfo>> = (props) => {
   const {
@@ -17,7 +17,8 @@ const ShowParts: React.FC<WrappedFieldArrayProps<PartInfo>> = (props) => {
       <Row>
         <Col>
           {fields.map((member, index) => (
-            <p key={index}>TODO: {member}</p>
+            // eslint-disable-next-line react/no-array-index-key
+            <Part key={index} memberName={member} />
           ))}
         </Col>
       </Row>

@@ -20,42 +20,42 @@ interface MatchingProps {
   bnum: number;
 }
 
-// const ChooseRightAnswer: React.FC<{
-//   curValue: number;
-//   choices: HTMLVal[];
-//   onChange: (event: React.ChangeEvent<{ value: number }>) => void;
-// }> = (props) => {
-//   const {
-//     curValue,
-//     choices,
-//     onChange,
-//   } = props;
-//   return (
-//     <FormControl variant="outlined">
-//       <InputLabel>Match</InputLabel>
-//       <Select
-//         margin="dense"
-//         value={curValue}
-//         onChange={onChange}
-//         label="Match"
-//       >
-//         <MenuItem value={-1}>
-//           <em>None</em>
-//         </MenuItem>
-//         {(choices.map((_v, j) => (
-//           <MenuItem
-//             // Question choices are STATIC.
-//             // eslint-disable-next-line react/no-array-index-key
-//             key={j}
-//             value={j}
-//           >
-//             {j + 1}
-//           </MenuItem>
-//         )))}
-//       </Select>
-//     </FormControl>
-//   );
-// };
+const ChooseRightAnswer: React.FC<{
+  curValue: number;
+  numChoices: number;
+  onChange: (event: React.ChangeEvent<{ value: number }>) => void;
+}> = (props) => {
+  const {
+    curValue,
+    numChoices,
+    onChange,
+  } = props;
+  // const valueI = value?.[idx] ?? -1;
+  return (
+    <FormControl variant="outlined">
+      <InputLabel>Match</InputLabel>
+      <Select
+        margin="dense"
+        value={curValue}
+        onChange={onChange}
+        label="Match"
+      >
+        <MenuItem value={-1}>
+          <em>None</em>
+        </MenuItem>
+        {(new Array(numChoices).fill(0).map((_v, j) => (
+          <MenuItem
+            // eslint-disable-next-line react/no-array-index-key
+            key={j}
+            value={j}
+          >
+            {j + 1}
+          </MenuItem>
+        )))}
+      </Select>
+    </FormControl>
+  );
+};
 
 const OneValue: React.FC<{
   memberName: string;
@@ -125,58 +125,80 @@ const renderValue = (member, index, fields) => (
   />
 );
 
+const OnePrompt: React.FC<{
+  memberName: string;
+  valueNum: number;
+  enableDown: boolean;
+  moveDown: () => void;
+  moveUp: () => void;
+  remove: () => void;
+}> = (props) => {
+  const {
+    memberName,
+    valueNum,
+    enableDown,
+    moveDown,
+    moveUp,
+    remove,
+  } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
+  return (
+    <Row
+      className="p-2"
+      onMouseOver={(): void => setMoversVisible(true)}
+      onFocus={(): void => setMoversVisible(true)}
+      onBlur={(): void => setMoversVisible(false)}
+      onMouseOut={(): void => setMoversVisible(false)}
+    >
+      <Col className="flex-grow-01 pl-0">
+        <MoveItem
+          visible={moversVisible}
+          variant="dark"
+          enableUp={valueNum > 0}
+          enableDown={enableDown}
+          onUp={moveUp}
+          onDown={moveDown}
+          onDelete={remove}
+        />
+        {`${alphabetIdx(valueNum)}.`}
+      </Col>
+      <Col className="pr-0">
+        <Field
+          name={memberName}
+          component={EditHTMLField}
+          theme="bubble"
+          placeholder="Enter a new prompt"
+        />
+      </Col>
+      {/* <Col sm={2}> */}
+      {/*   <ChooseRightAnswer */}
+      {/*     curValue={valueI} */}
+      {/*     choices={values} */}
+      {/*     onChange={(e): void => updateAnswer(idx, e)} */}
+      {/*   /> */}
+      {/* </Col> */}
+    </Row>
+  );
+};
 
 const renderPrompt = (member, index, fields) => (
-  <p key={index}>{member}: {JSON.stringify(fields.get(index))}</p>
+  <OnePrompt
+    // eslint-disable-next-line react/no-array-index-key
+    key={index}
+    valueNum={index}
+    memberName={member}
+    enableDown={index + 1 < fields.length}
+    moveDown={(): void => {
+      fields.move(index, index + 1);
+    }}
+    moveUp={(): void => {
+      fields.move(index, index - 1);
+    }}
+    remove={(): void => {
+      fields.remove(index);
+    }}
+  />
 );
-
-// {prompts.map((p, idx) => {
-//   const valueI = value?.[idx] ?? -1;
-//   return (
-//     <Row
-//       className="p-2"
-//       // We don't have a better option than this index right now.
-//       // eslint-disable-next-line react/no-array-index-key
-//       key={idx}
-//       onMouseOver={(): void => setPromptMoversVisible(idx, true)}
-//       onFocus={(): void => setPromptMoversVisible(idx, true)}
-//       onBlur={(): void => setPromptMoversVisible(idx, false)}
-//       onMouseOut={(): void => setPromptMoversVisible(idx, false)}
-//     >
-//       <Col className="flex-grow-01 pl-0">
-//         {/* <MoveItem */}
-//         {/*   visible={promptMoversVisible[idx]} */}
-//         {/*   variant="dark" */}
-//         {/*   enableUp={idx > 0} */}
-//         {/*   enableDown={idx + 1 < prompts.length} */}
-//         {/*   onDelete={(): UpdateBodyItemAction => deletePrompt(idx)} */}
-//         {/*   onDown={(): UpdateBodyItemAction => movePrompt(idx, idx + 1)} */}
-//         {/*   onUp={(): UpdateBodyItemAction => movePrompt(idx - 1, idx)} */}
-//         {/* /> */}
-//         {`${alphabetIdx(idx)}.`}
-//       </Col>
-//       <Col>
-//         <CustomEditor
-//           className="bg-white"
-//           theme="bubble"
-//           value={p.value}
-//           placeholder="Enter a new prompt"
-//           onChange={(newPrompt): void => updatePrompt(idx, {
-//             type: 'HTML',
-//             value: newPrompt,
-//           })}
-//         />
-//       </Col>
-//       <Col sm={2}>
-//         <ChooseRightAnswer
-//           curValue={valueI}
-//           choices={values}
-//           onChange={(e): void => updateAnswer(idx, e)}
-//         />
-//       </Col>
-//     </Row>
-//   );
-// })}
 
 const EditColName: React.FC<WrappedFieldProps & {
   defaultLabel: string;

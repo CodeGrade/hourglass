@@ -10,7 +10,6 @@ import {
 import { MatchingInfo, MatchingState, HTMLVal } from '@student/exams/show/types';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 // import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
-import { UpdateBodyItemAction } from '@professor/exams/new/types';
 import { alphabetIdx } from '@hourglass/common/helpers';
 import { Field, WrappedFieldProps } from 'redux-form';
 

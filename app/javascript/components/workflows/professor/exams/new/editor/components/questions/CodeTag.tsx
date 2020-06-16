@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { FileRef, CodeTagInfo, CodeTagState } from '@student/exams/show/types';
+import { FileRef, CodeTagState, CodeTagInfoWithAnswer } from '@student/exams/show/types';
 import {
   Form,
   Row,
@@ -146,9 +146,8 @@ interface CodeTagProps {
   qnum: number;
   pnum: number;
   bnum: number;
-  info: CodeTagInfo;
-  value?: CodeTagState;
-  onChange: (newInfo: CodeTagInfo, newVal: CodeTagState) => void;
+  info: CodeTagInfoWithAnswer;
+  onChange: (newInfo: CodeTagInfoWithAnswer) => void;
   disabled?: boolean;
 }
 
@@ -158,7 +157,6 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
     pnum,
     bnum,
     info,
-    value,
     onChange,
     disabled = false,
   } = props;
@@ -192,7 +190,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
         prompt={prompt.value}
         onChange={(newPrompt): void => {
           if (onChange) {
-            onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }, value);
+            onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } });
           }
         }}
       />
@@ -204,7 +202,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
               variant={choices === 'exam' ? 'secondary' : 'outline-secondary'}
               active={choices === 'exam'}
               onClick={(): void => {
-                onChange({ ...info, choices: 'exam' }, undefined);
+                onChange({ ...info, choices: 'exam', answer: undefined });
               }}
             >
               Files for full exam
@@ -213,7 +211,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
               variant={choices === 'question' ? 'secondary' : 'outline-secondary'}
               active={choices === 'question'}
               onClick={(): void => {
-                onChange({ ...info, choices: 'question' }, undefined);
+                onChange({ ...info, choices: 'question', answer: undefined });
               }}
             >
               Files for current question
@@ -222,7 +220,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
               variant={choices === 'part' ? 'secondary' : 'outline-secondary'}
               active={choices === 'part'}
               onClick={(): void => {
-                onChange({ ...info, choices: 'part' }, undefined);
+                onChange({ ...info, choices: 'part', answer: undefined });
               }}
             >
               Files for current part
@@ -237,7 +235,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
       >
         <Form.Label column sm={2}>Correct answer</Form.Label>
         <Col sm={6}>
-          <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />
+          <CodeTagVal value={info.answer} hideFile={countFiles(filteredFiles) === 1} />
         </Col>
         <Col sm={4}>
           <Button
@@ -253,9 +251,9 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
             onClose={(): void => setShowModal(false)}
             onSave={(newState): void => {
               setShowModal(false);
-              onChange(info, newState);
+              onChange({ ...info, answer: newState });
             }}
-            startValue={value}
+            startValue={info.answer}
           />
         </Col>
       </Form.Group>

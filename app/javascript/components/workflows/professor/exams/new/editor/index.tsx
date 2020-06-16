@@ -41,6 +41,7 @@ import Instructions from '@professor/exams/new/editor/components/Instructions';
 import Reference from '@professor/exams/new/editor/components/Reference';
 import FileUploader from '@professor/exams/new/editor/components/FileUploader';
 import ShowQuestions from '@professor/exams/new/editor/components/ShowQuestions';
+import { isNoAns } from '@hourglass/workflows/student/exams/show/containers/questions/connectors';
 
 export interface ExamEditorProps {
   exam: ExamVersion;
@@ -67,9 +68,10 @@ function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): E
       } = p;
       const newBody: BodyItemWithAnswer[] = [];
       body.forEach((b, bnum) => {
+        const ans = answers[qnum][pnum][bnum];
         const newBodyItem: BodyItemWithAnswer = {
           ...b,
-          answer: answers[qnum][pnum][bnum] ?? { NO_ANS: true },
+          answer: isNoAns(ans) ? undefined : ans,
         } as BodyItemWithAnswer;
         newBody.push(newBodyItem);
       });

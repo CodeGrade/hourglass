@@ -203,7 +203,8 @@
         { "$ref": "exam-upload.json#/definitions/MultipleChoiceAnswer" },
         { "$ref": "exam-upload.json#/definitions/MatchingAnswers" },
         { "$ref": "#/definitions/ATAAnswer" },
-        { "$ref": "#/definitions/CodeTagAnswer" }
+        { "$ref": "#/definitions/CodeTagAnswer" },
+        { "$ref": "#/definitions/TextAnswer" }
       ]
     },
     "NoAnswer": {
@@ -235,6 +236,7 @@
         "selectedFile": { "type": "string" },
         "lineNumber": { "type": "number" }
       }
-    }
+    },
+    "TextAnswer": { "type": "string" }
   }
 }

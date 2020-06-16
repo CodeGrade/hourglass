@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Code from '@professor/exams/new/editor/components/questions/Code';
-import YesNoInput from '@professor/exams/new/editor/components/questions/YesNo';
+import YesNo from '@professor/exams/new/editor/components/questions/YesNo';
 import CodeTag from '@professor/exams/new/editor/components/questions/CodeTag';
 import Text from '@professor/exams/new/editor/components/questions/Text';
 import Matching from '@professor/exams/new/editor/components/questions/Matching';
@@ -67,8 +67,8 @@ const OneItem: React.FC<WrappedFieldProps & Nums> = (props) => {
     //   return <AllThatApply info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'CodeTag':
     //   return <CodeTag info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
-    // case 'YesNo':
-    //   return <YesNoInput info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    case 'YesNo':
+      return <YesNo qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'MultipleChoice':
     //   return <MultipleChoice info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'Text':

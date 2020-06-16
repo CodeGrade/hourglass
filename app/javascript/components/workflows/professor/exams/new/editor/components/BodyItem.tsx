@@ -69,8 +69,8 @@ const OneItem: React.FC<WrappedFieldProps & Nums> = (props) => {
       return <CodeTag qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'YesNo':
       return <YesNo qnum={qnum} pnum={pnum} bnum={bnum} />;
-    // case 'MultipleChoice':
-    //   return <MultipleChoice info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    case 'MultipleChoice':
+      return <MultipleChoice qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'Text':
       return <Text qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'Matching':

@@ -6,8 +6,6 @@ import {
   Button,
 } from 'react-bootstrap';
 import {
-  AllThatApplyInfo,
-  AllThatApplyState,
   HTMLVal,
 } from '@student/exams/show/types';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
@@ -15,7 +13,13 @@ import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import { FaCheck } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
-import { FieldArray, WrappedFieldArrayProps } from 'redux-form';
+import {
+  FieldArray,
+  WrappedFieldArrayProps,
+  FormSection,
+  Field,
+  WrappedFieldProps,
+} from 'redux-form';
 
 interface AllThatApplyProps {
   qnum: number;
@@ -23,85 +27,111 @@ interface AllThatApplyProps {
   bnum: number;
 }
 
-// function cutAndShiftDown(obj: AllThatApplyState, cutoff: number): AllThatApplyState {
-//   const ans = {};
-//   Object.keys(obj).forEach((key) => {
-//     if (Number(key) < cutoff) {
-//       ans[key] = obj[key];
-//     } else if (Number(key) === cutoff) {
-//       // do nothing, and delete the key
-//     } else {
-//       ans[Number(key) - 1] = obj[key];
-//     }
-//   });
-//   return ans;
-// }
-// function shiftUp(obj: AllThatApplyState, cutoff: number): AllThatApplyState {
-//   const ans = {};
-//   Object.keys(obj).forEach((key) => {
-//     if (Number(key) < cutoff) {
-//       ans[key] = obj[key];
-//     } else {
-//       ans[Number(key) + 1] = obj[key];
-//     }
-//   });
-//   return ans;
-// }
+const EditOption: React.FC<WrappedFieldProps> = (props) => {
+  const { input } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <CustomEditor
+      className="bg-white"
+      theme="bubble"
+      value={value}
+      onChange={(newName, _delta, source, _editor): void => {
+        if (source === 'user') {
+          onChange({
+            type: 'HTML',
+            value: newName,
+          });
+        }
+      }}
+    />
+  );
+};
+
+const EditAnswer: React.FC<WrappedFieldProps & {
+  current: number;
+}> = (props) => {
+  const {
+    input,
+    current,
+  } = props;
+  const selected = input.value === current;
+  return (
+    <Button
+      variant={selected ? 'dark' : 'outline-dark'}
+      onClick={(): void => input.onChange(current)}
+    >
+      <Icon I={FaCheck} className={selected ? '' : 'invisible'} />
+    </Button>
+  );
+};
 
 const OneOption: React.FC<{
   memberName: string;
+  optionNum: number;
+  enableDown: boolean;
+  moveDown: () => void;
+  moveUp: () => void;
+  remove: () => void;
 }> = (props) => {
+  const {
+    memberName,
+    optionNum,
+    enableDown,
+    moveDown,
+    moveUp,
+    remove,
+  } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
   return (
-    <p>SINGLE OPTION</p>
+    <Row
+      className="p-2"
+      onMouseOver={(): void => setMoversVisible(true)}
+      onFocus={(): void => setMoversVisible(true)}
+      onBlur={(): void => setMoversVisible(false)}
+      onMouseOut={(): void => setMoversVisible(false)}
+    >
+      <Col className="flex-grow-01">
+        <MoveItem
+          visible={moversVisible}
+          variant="dark"
+          enableUp={optionNum > 0}
+          enableDown={enableDown}
+          onUp={moveUp}
+          onDown={moveDown}
+          onDelete={remove}
+        />
+        <Field name="answer" component={EditAnswer} current={optionNum} />
+      </Col>
+      <Col className="pr-0">
+        <FormSection name={memberName}>
+          <Field name="value" component={EditOption} />
+        </FormSection>
+      </Col>
+    </Row>
   );
-}
-// const selected = value?.[idx];
-// return (
-//   <Row
-//     className="p-2"
-//     // We don't have a better option than this index right now.
-//     // eslint-disable-next-line react/no-array-index-key
-//     key={idx}
-//     onMouseOver={(): void => setMoversVisible(idx, true)}
-//     onFocus={(): void => setMoversVisible(idx, true)}
-//     onBlur={(): void => setMoversVisible(idx, false)}
-//     onMouseOut={(): void => setMoversVisible(idx, false)}
-//   >
-//     <Col className="flex-grow-01">
-//       {/* <MoveItem */}
-//       {/*   visible={moversVisible[idx]} */}
-//       {/*   variant="dark" */}
-//       {/*   enableUp={idx > 0} */}
-//       {/*   enableDown={idx + 1 < options.length} */}
-//       {/*   onDelete={(): UpdateBodyItemAction => deleteOption(idx)} */}
-//       {/*   onDown={(): UpdateBodyItemAction => moveOption(idx, idx + 1)} */}
-//       {/*   onUp={(): UpdateBodyItemAction => moveOption(idx - 1, idx)} */}
-//       {/* /> */}
-//       <Button
-//         variant={selected ? 'dark' : 'outline-dark'}
-//         onClick={(): void => toggleAnswer(idx)}
-//       >
-//         <Icon I={FaCheck} className={selected ? '' : 'invisible'} />
-//       </Button>
-//     </Col>
-//     <Col className="pr-0">
-//       <CustomEditor
-//         className="bg-white"
-//         theme="bubble"
-//         value={option.value}
-//         onChange={(newPrompt): void => {
-//           setPrompt(
-//             idx,
-//             {
-//               type: 'HTML',
-//               value: newPrompt,
-//             },
-//           );
-//         }}
-//       />
-//     </Col>
-//   </Row>
-// );
+};
+
+const renderOptions = (member, index, fields) => (
+  <OneOption
+    // eslint-disable-next-line react/no-array-index-key
+    key={index}
+    optionNum={index}
+    memberName={member}
+    enableDown={index + 1 < fields.length}
+    moveDown={(): void => {
+      fields.move(index, index + 1);
+    }}
+    moveUp={(): void => {
+      fields.move(index, index - 1);
+    }}
+    remove={(): void => {
+      fields.remove(index);
+    }}
+  />
+);
 
 const ShowOptions: React.FC<WrappedFieldArrayProps<HTMLVal>> = (props) => {
   const {
@@ -117,13 +147,7 @@ const ShowOptions: React.FC<WrappedFieldArrayProps<HTMLVal>> = (props) => {
           </Col>
           <Col><b>Prompt</b></Col>
         </Row>
-        {fields.map((member, index) => (
-          <OneOption
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
-            memberName={member}
-          />
-        ))}
+        {fields.map(renderOptions)}
         <Row className="p-2">
           <Col className="text-center p-0">
             <Button
@@ -157,45 +181,11 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
         pnum={pnum}
         bnum={bnum}
       />
-      <p>ATA</p>
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
         <FieldArray name="options" component={ShowOptions} />
       </Form.Group>
     </>
   );
 };
-
-//   const [moversVisible, rawSetMoversVisible] = useState([]);
-//   const setMoversVisible = (index: number, visible: boolean): void => {
-//     const newMovers = [...moversVisible];
-//     newMovers[index] = visible;
-//     rawSetMoversVisible(newMovers);
-//   };
-//   const toggleAnswer = (index: number): void => {
-//     const newValue = { ...value };
-//     newValue[index] = !newValue[index];
-//     onChange(info, newValue);
-//   };
-//   const setPrompt = (index: number, newPrompt: HTMLVal): void => {
-//     const newOptions = [...info.options];
-//     newOptions[index] = newPrompt;
-//     onChange({ ...info, options: newOptions }, value);
-//   };
-//   const deleteOption = (index: number): UpdateBodyItemAction => {
-//     const newOptions = [...options];
-//     newOptions.splice(index, 1);
-//     const newValue = cutAndShiftDown(value, index);
-//     return makeChangeAction({ ...info, options: newOptions }, newValue);
-//   };
-//   const moveOption = (from: number, to: number): UpdateBodyItemAction => {
-//     const newOptions = [...options];
-//     const fromOpt = newOptions[from];
-//     newOptions.splice(from, 1);
-//     newOptions.splice(to, 0, fromOpt);
-//     const cutFromValue = cutAndShiftDown(value, from);
-//     const newValue = shiftUp(cutFromValue, to);
-//     newValue[to] = value[from];
-//     return makeChangeAction({ ...info, options: newOptions }, newValue);
-//   };
 
 export default AllThatApply;

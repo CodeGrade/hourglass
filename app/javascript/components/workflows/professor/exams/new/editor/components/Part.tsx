@@ -81,6 +81,47 @@ const PartDesc: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const PartPoints: React.FC<WrappedFieldProps> = (props) => {
+  const { input } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <>
+      <Form.Label column sm="2">Points</Form.Label>
+      <Col sm="10">
+        <Form.Control
+          type="number"
+          value={value}
+          placeholder="Points for this part"
+          min={0}
+          max={100}
+          step={0.5}
+          onChange={(e): void => {
+            if (e.target.value === '') {
+              onChange(0);
+            } else {
+              const newVal = Number.parseFloat(e.target.value);
+              const actual = (Number.isFinite(newVal) ? newVal : value);
+              onChange(actual);
+            }
+          }}
+        />
+        {/* <NumberPicker
+            placeholder="Points for this part"
+            value={points}
+            onChange={(newVal): void => onChange(name, description, newVal)}
+            min={0}
+            max={100}
+            step={0.5}
+            format="#.#"
+            /> */}
+      </Col>
+    </>
+  );
+};
+
 const Part: React.FC<{
   memberName: string;
   qnum: number;
@@ -107,6 +148,9 @@ const Part: React.FC<{
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-${pnum}-desc`}>
               <Field name="description" component={PartDesc} />
+            </Form.Group>
+            <Form.Group as={Row} controlId={`${qnum}-${pnum}-points`}>
+              <Field name="points" component={PartPoints} />
             </Form.Group>
           </Card.Subtitle>
         </FormSection>
@@ -170,37 +214,6 @@ const Part: React.FC<{
 //           <Card.Title>
 //           </Card.Title>
 //           <Card.Subtitle>
-//             <Form.Group as={Row} controlId={`${qnum}-${pnum}-points`}>
-//               <Form.Label column sm="2">Points</Form.Label>
-//               <Col sm="10">
-//                 <Form.Control
-//                   type="number"
-//                   value={points}
-//                   placeholder="Points for this part"
-//                   min={0}
-//                   max={100}
-//                   step={0.5}
-//                   onChange={(e): void => {
-//                     if (e.target.value === '') {
-//                       onChange(name, description, 0);
-//                     } else {
-//                       const newVal = Number.parseFloat(e.target.value);
-//                       const actual = (Number.isFinite(newVal) ? newVal : points);
-//                       onChange(name, description, actual);
-//                     }
-//                   }}
-//                 />
-//                 {/* <NumberPicker
-//                     placeholder="Points for this part"
-//                     value={points}
-//                     onChange={(newVal): void => onChange(name, description, newVal)}
-//                     min={0}
-//                     max={100}
-//                     step={0.5}
-//                     format="#.#"
-//                     /> */}
-//               </Col>
-//             </Form.Group>
 //             <Form.Group as={Row} controlId={`${qnum}-${pnum}-files`}>
 //               <Form.Label column sm="2">Files to be shown for this question part:</Form.Label>
 //               <Col sm={10}>

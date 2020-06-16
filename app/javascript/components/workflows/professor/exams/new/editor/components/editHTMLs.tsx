@@ -45,39 +45,32 @@ export const EditHTMLField: React.FC<WrappedFieldProps & {
 };
 
 const EditHTMLs: React.FC<WrappedFieldArrayProps<HTMLVal> & {
+  prompt?: string;
   renderOptions: FieldIterate<HTMLVal, JSX.Element>;
 }> = (props) => {
   const {
     renderOptions,
     fields,
+    prompt = 'Add new option',
   } = props;
   return (
     <>
-      <Form.Label column sm={2}>Answers</Form.Label>
-      <Col sm={10}>
-        <Row className="p-2">
-          <Col className="flex-grow-01">
-            <b>Correct?</b>
-          </Col>
-          <Col><b>Prompt</b></Col>
-        </Row>
-        {fields.map(renderOptions)}
-        <Row className="p-2">
-          <Col className="text-center p-0">
-            <Button
-              variant="dark"
-              onClick={(): void => {
-                fields.push({
-                  type: 'HTML',
-                  value: '',
-                });
-              }}
-            >
-              Add new option
-            </Button>
-          </Col>
-        </Row>
-      </Col>
+      {fields.map(renderOptions)}
+      <Row className="p-2">
+        <Col className="text-center p-0">
+          <Button
+            variant="dark"
+            onClick={(): void => {
+              fields.push({
+                type: 'HTML',
+                value: '',
+              });
+            }}
+          >
+            {prompt}
+          </Button>
+        </Col>
+      </Row>
     </>
   );
 };

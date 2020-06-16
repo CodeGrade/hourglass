@@ -71,8 +71,8 @@ const OneItem: React.FC<WrappedFieldProps & Nums> = (props) => {
     //   return <YesNoInput info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'MultipleChoice':
     //   return <MultipleChoice info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
-    // case 'Text':
-    //   return <Text info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    case 'Text':
+      return <Text qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'Matching':
     //   return <Matching info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
     default:

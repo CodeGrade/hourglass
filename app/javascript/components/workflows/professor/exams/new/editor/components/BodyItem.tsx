@@ -32,31 +32,27 @@ const OneItem: React.FC<{
     value: BodyItem;
     onChange: (newVal: BodyItem) => void;
   } = input;
-  return (
-    <p>
-      TODO: body ({value.type})
-    </p>
-  );
-  // switch (value.type) {
-  //   case 'HTML':
-  //     return <EditHTML value={{ NO_ANS: true }} info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
-  //   case 'Code':
-  //     return <Code info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
-  //   case 'AllThatApply':
-  //     return <AllThatApply info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
-  //   case 'CodeTag':
-  //     return <CodeTag info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
-  //   case 'YesNo':
-  //     return <YesNoInput info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
-  //   case 'MultipleChoice':
-  //     return <MultipleChoice info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
-  //   case 'Text':
-  //     return <Text info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
-  //   case 'Matching':
-  //     return <Matching info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
-  //   default:
-  //     throw new ExhaustiveSwitchError(value);
-  // }
+  switch (value.type) {
+    case 'HTML':
+      return <EditHTML value={{ NO_ANS: true }} info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'Code':
+    //   return <Code info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'AllThatApply':
+    //   return <AllThatApply info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'CodeTag':
+    //   return <CodeTag info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'YesNo':
+    //   return <YesNoInput info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'MultipleChoice':
+    //   return <MultipleChoice info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'Text':
+    //   return <Text info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'Matching':
+    //   return <Matching info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    default:
+      return <p>TODO: body ({value.type})</p>;
+      // throw new ExhaustiveSwitchError(value);
+  }
 };
 
 export interface BodyProps {

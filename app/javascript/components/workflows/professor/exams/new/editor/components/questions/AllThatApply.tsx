@@ -133,7 +133,7 @@ const renderOptions = (member, index, fields) => (
   />
 );
 
-const ShowOptions: React.FC<WrappedFieldArrayProps<HTMLVal>> = (props) => {
+export const ShowOptions: React.FC<WrappedFieldArrayProps<HTMLVal>> = (props) => {
   const {
     fields,
   } = props;

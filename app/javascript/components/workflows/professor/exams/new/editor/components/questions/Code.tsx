@@ -20,6 +20,23 @@ import { ExamContext } from '@student/exams/show/context';
 import { firstFile } from '@student/exams/show/files';
 import { FilePickerSelectWithPreview } from '../FilePicker';
 
+
+const languages = {
+  scheme: 'Racket',
+  'text/x-java': 'Java',
+  'text/x-python': 'Python',
+  'text/x-javascript': 'Javascript',
+  mllike: 'ML',
+  'text/x-ebnf': 'ML Yacc',
+  'text/x-csrc': 'C',
+  'text/x-c++src': 'C++',
+  // pyret: 'Pyret',
+  'text/html': 'HTML',
+  'text/css': 'CSS',
+  'application/xml': 'XML',
+};
+
+
 const EditLang: React.FC<{
   value: CodeInfo['lang'];
   onChange: (newLang: CodeInfo['lang']) => void;
@@ -37,8 +54,7 @@ const EditLang: React.FC<{
       value={value}
       onChange={(e): void => onChange(e.target.value)}
     >
-      <option value="scheme">Racket</option>
-      <option value="text/x-java">Java</option>
+      {Object.keys(languages).map((k) => <option key={k} value={k}>{languages[k]}</option>)}
     </Form.Control>
   );
 };

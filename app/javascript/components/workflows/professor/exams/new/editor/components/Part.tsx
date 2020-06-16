@@ -19,6 +19,8 @@ import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { createMap, getFilesForRefs } from '@student/exams/show/files';
 import { PartFilesContext, ExamContext } from '@hourglass/workflows/student/exams/show/context';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
+import { connect } from 'react-redux';
+import { formSelector } from '..';
 // import ShowBodyItems from '@professor/exams/new/editor/containers/ShowBodyItems';
 
 const PartName: React.FC<WrappedFieldProps> = (props) => {
@@ -159,6 +161,24 @@ const PartReference: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const PartFilesProvider: React.FC<{
+  reference: FileRef[];
+}> = (props) => {
+  const {
+    reference,
+    children,
+  } = props;
+  return (
+    <PartFilesContext.Provider
+      value={{
+        references: reference,
+      }}
+    >
+      {children}
+    </PartFilesContext.Provider>
+  );
+};
+
 const Part: React.FC<{
   memberName: string;
   qnum: number;
@@ -178,6 +198,9 @@ const Part: React.FC<{
     remove,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
+  const ReferenceProvider = connect((state) => ({
+    reference: formSelector(state, `${memberName}.reference`),
+  }))(PartFilesProvider);
   return (
     <Card
       className="mb-3"
@@ -218,20 +241,13 @@ const Part: React.FC<{
         </FormSection>
       </Alert>
       <Card.Body>
-        TODO
-        {/* <ShowBodyItems qnum={qnum} pnum={pnum} /> */}
+        <ReferenceProvider>
+          TODO
+          {/* <ShowBodyItems qnum={qnum} pnum={pnum} /> */}
+        </ReferenceProvider>
       </Card.Body>
     </Card>
   );
 };
-
-//     <PartFilesContext.Provider
-//       value={{
-//         references: reference,
-//       }}
-//     >
-//       <Card>
-//       </Card>
-//     </PartFilesContext.Provider>
 
 export default Part;

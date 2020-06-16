@@ -6,103 +6,111 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import { YesNoInfoWithAnswer } from '@student/exams/show/types';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
+import { Fields, WrappedFieldsProps } from 'redux-form';
+
+const EditLabels: React.FC<WrappedFieldsProps> = (props) => {
+  const {
+    yesLabel,
+    noLabel,
+  } = props;
+  const isYesNo = (yesLabel.input.value === 'Yes');
+  return (
+    <>
+      <Form.Label column sm={2}>Answer format</Form.Label>
+      <Col sm={10}>
+        <ToggleButtonGroup
+          className="bg-white rounded"
+          name="wording"
+          type="radio"
+          value={isYesNo}
+          onChange={(v): void => {
+            if (v) {
+              yesLabel.input.onChange('Yes');
+              noLabel.input.onChange('No');
+            } else {
+              yesLabel.input.onChange('True');
+              noLabel.input.onChange('False');
+            }
+          }}
+        >
+          <ToggleButton
+            variant={isYesNo ? 'primary' : 'outline-primary'}
+            value
+          >
+            Yes/No
+          </ToggleButton>
+          <ToggleButton
+            variant={(isYesNo === false) ? 'primary' : 'outline-primary'}
+            value={false}
+          >
+            True/False
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Col>
+    </>
+  );
+};
+
+const EditAnswer: React.FC<WrappedFieldsProps> = (props) => {
+  const {
+    answer,
+    yesLabel,
+    noLabel,
+  } = props;
+  return (
+    <>
+      <Form.Label column sm={2}>Correct answer</Form.Label>
+      <Col sm={10}>
+        <ToggleButtonGroup
+          className="bg-white rounded"
+          name="tbg"
+          type="radio"
+          value={answer.input.value}
+          onChange={answer.input.onChange}
+        >
+          <ToggleButton
+            variant={answer.input.value ? 'primary' : 'outline-primary'}
+            value
+          >
+            {yesLabel.input.value}
+          </ToggleButton>
+          <ToggleButton
+            variant={(answer.input.value === false) ? 'primary' : 'outline-primary'}
+            value={false}
+          >
+            {noLabel.input.value}
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Col>
+    </>
+  );
+};
 
 export interface YesNoProps {
-  info: YesNoInfoWithAnswer;
   qnum: number;
   pnum: number;
   bnum: number;
-  onChange: (newInfo: YesNoInfoWithAnswer) => void;
-  disabled?: boolean;
 }
 
 const YesNo: React.FC<YesNoProps> = (props) => {
   const {
-    info,
     qnum,
     pnum,
     bnum,
-    onChange,
-    disabled = false,
   } = props;
-  const {
-    prompt,
-    yesLabel = 'Yes',
-    noLabel = 'No',
-  } = info;
-  const isYesNo = (yesLabel === 'Yes');
   return (
     <>
-      {/* <Prompted */}
-      {/*   qnum={qnum} */}
-      {/*   pnum={pnum} */}
-      {/*   bnum={bnum} */}
-      {/*   prompt={prompt.value} */}
-      {/*   onChange={(newPrompt): void => { */}
-      {/*     if (onChange) { onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }); } */}
-      {/*   }} */}
-      {/* /> */}
+      <Prompted
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+      />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-wording`}>
-        <Form.Label column sm={2}>Answer format</Form.Label>
-        <Col sm={10}>
-          <ToggleButtonGroup
-            className="bg-white rounded"
-            name="wording"
-            type="radio"
-            value={isYesNo}
-            onChange={(v): void => {
-              if (v) {
-                onChange({ ...info, yesLabel: 'Yes', noLabel: 'No' });
-              } else {
-                onChange({ ...info, yesLabel: 'True', noLabel: 'False' });
-              }
-            }}
-          >
-            <ToggleButton
-              disabled={disabled}
-              variant={isYesNo ? 'primary' : 'outline-primary'}
-              value
-            >
-              Yes/No
-            </ToggleButton>
-            <ToggleButton
-              disabled={disabled}
-              variant={(isYesNo === false) ? 'primary' : 'outline-primary'}
-              value={false}
-            >
-              True/False
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Col>
+        <Fields names={['yesLabel', 'noLabel']} component={EditLabels} />
       </Form.Group>
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-answer`}>
-        <Form.Label column sm={2}>Correct answer</Form.Label>
-        <Col sm={10}>
-          <ToggleButtonGroup
-            className="bg-white rounded"
-            name="tbg"
-            type="radio"
-            value={info.answer}
-            onChange={(v): void => onChange({ ...info, answer: !!v })}
-          >
-            <ToggleButton
-              disabled={disabled}
-              variant={info.answer ? 'primary' : 'outline-primary'}
-              value
-            >
-              {yesLabel}
-            </ToggleButton>
-            <ToggleButton
-              disabled={disabled}
-              variant={(info.answer === false) ? 'primary' : 'outline-primary'}
-              value={false}
-            >
-              {noLabel}
-            </ToggleButton>
-          </ToggleButtonGroup>
-        </Col>
+        <Fields names={['yesLabel', 'noLabel', 'answer']} component={EditAnswer} />
       </Form.Group>
     </>
   );

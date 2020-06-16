@@ -53,6 +53,34 @@ const PartName: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const PartDesc: React.FC<WrappedFieldProps> = (props) => {
+  const { input } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <>
+      <Form.Label column sm="2">Description:</Form.Label>
+      <Col sm="10">
+        <CustomEditor
+          className="bg-white"
+          value={value.value}
+          placeholder="Give a longer description of the part"
+          onChange={(newDesc, _delta, source, _editor): void => {
+            if (source === 'user') {
+              onChange({
+                type: 'HTML',
+                value: newDesc,
+              });
+            }
+          }}
+        />
+      </Col>
+    </>
+  );
+};
+
 const Part: React.FC<{
   memberName: string;
   qnum: number;
@@ -77,15 +105,16 @@ const Part: React.FC<{
             <Form.Group as={Row} controlId={`${qnum}-${pnum}-name`}>
               <Field name="name" component={PartName} />
             </Form.Group>
+            <Form.Group as={Row} controlId={`${qnum}-${pnum}-desc`}>
+              <Field name="description" component={PartDesc} />
+            </Form.Group>
           </Card.Subtitle>
         </FormSection>
       </Alert>
     </Card>
   );
-}
+};
 
-// 
-// 
 // export interface PartProps {
 //   qnum: number;
 //   pnum: number;
@@ -97,7 +126,7 @@ const Part: React.FC<{
 //   files: ExamFile[];
 //   onChange: (name: HTMLVal, description: HTMLVal, points: number) => void;
 // }
-// 
+//
 // const Part: React.FC<PartProps> = (props) => {
 //   const {
 //     qnum,
@@ -115,7 +144,7 @@ const Part: React.FC<{
 //   const noFiles = reference.length === 0;
 //   const fmap = createMap(files);
 //   const filteredFiles = getFilesForRefs(fmap, reference);
-// 
+//
 //   return (
 //     <PartFilesContext.Provider
 //       value={{
@@ -141,28 +170,6 @@ const Part: React.FC<{
 //           <Card.Title>
 //           </Card.Title>
 //           <Card.Subtitle>
-//             <Form.Group as={Row} controlId={`${qnum}-${pnum}-desc`}>
-//               <Form.Label column sm="2">Description:</Form.Label>
-//               <Col sm="10">
-//                 <CustomEditor
-//                   className="bg-white"
-//                   value={description.value}
-//                   placeholder="Give a longer description of the part"
-//                   onChange={(newDesc, _delta, source, _editor): void => {
-//                     if (source === 'user') {
-//                       onChange(
-//                         name,
-//                         {
-//                           type: 'HTML',
-//                           value: newDesc,
-//                         },
-//                         points,
-//                       );
-//                     }
-//                   }}
-//                 />
-//               </Col>
-//             </Form.Group>
 //             <Form.Group as={Row} controlId={`${qnum}-${pnum}-points`}>
 //               <Form.Label column sm="2">Points</Form.Label>
 //               <Col sm="10">

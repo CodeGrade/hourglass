@@ -191,17 +191,17 @@ const Part: React.FC<{
       onBlur={(): void => setMoversVisible(false)}
       onMouseOut={(): void => setMoversVisible(false)}
     >
-      <MoveItem
-        visible={moversVisible}
-        variant="success"
-        enableUp={pnum > 0}
-        enableDown={enableDown}
-        onUp={moveUp}
-        onDown={moveDown}
-        onDelete={remove}
-      />
-      <Alert variant="success">
-        <FormSection name={memberName}>
+      <FormSection name={memberName}>
+        <MoveItem
+          visible={moversVisible}
+          variant="success"
+          enableUp={pnum > 0}
+          enableDown={enableDown}
+          onUp={moveUp}
+          onDown={moveDown}
+          onDelete={remove}
+        />
+        <Alert variant="success">
           <Card.Title>
             {`Part ${alphabetIdx(pnum)}`}
           </Card.Title>
@@ -219,11 +219,11 @@ const Part: React.FC<{
               <Field name="reference" component={PartReference} />
             </Form.Group>
           </Card.Subtitle>
-        </FormSection>
-      </Alert>
-      <Card.Body>
-        <FieldArray name="body" component={ShowBodyItems} props={{ qnum, pnum }} />
-      </Card.Body>
+        </Alert>
+        <Card.Body>
+          <FieldArray name="body" component={ShowBodyItems} props={{ qnum, pnum }} />
+        </Card.Body>
+      </FormSection>
     </Card>
   );
 };

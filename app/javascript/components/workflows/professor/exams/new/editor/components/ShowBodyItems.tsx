@@ -49,109 +49,107 @@ const ShowBodyItems: React.FC<{
             >
               Text instructions
             </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(): void => {
+                fields.push({
+                  type: 'AllThatApply',
+                  prompt: {
+                    type: 'HTML',
+                    value: '',
+                  },
+                  options: [],
+                });
+              }}
+            >
+              All that apply
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(): void => {
+                fields.push({
+                  type: 'Code',
+                  initial: '',
+                  lang: 'text/plain',
+                  prompt: {
+                    type: 'HTML',
+                    value: '',
+                  },
+                });
+              }}
+            >
+              Code
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(): void => {
+                fields.push({
+                  type: 'CodeTag',
+                  choices: 'exam',
+                  prompt: {
+                    type: 'HTML',
+                    value: '',
+                  },
+                });
+              }}
+            >
+              Code tag
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(): void => {
+                fields.push({
+                  type: 'Matching',
+                  prompts: [],
+                  values: [],
+                });
+              }}
+            >
+              Matching
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(): void => {
+                fields.push({
+                  type: 'MultipleChoice',
+                  prompt: {
+                    type: 'HTML',
+                    value: '',
+                  },
+                  options: [],
+                });
+              }}
+            >
+              Multiple choice
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(): void => {
+                fields.push({
+                  type: 'Text',
+                  prompt: {
+                    type: 'HTML',
+                    value: '',
+                  },
+                });
+              }}
+            >
+              Free-response
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(): void => {
+                fields.push({
+                  type: 'YesNo',
+                  yesLabel: 'Yes',
+                  noLabel: 'No',
+                  prompt: {
+                    type: 'HTML',
+                    value: '',
+                  },
+                });
+              }}
+            >
+              Yes/No or True/False
+            </Dropdown.Item>
           </DropdownButton>
         </Col>
       </Row>
     </>
   );
 };
-
-//             <Dropdown.Item
-//               onClick={(): void => {
-//                 addBodyItem(numBodyItems, {
-//                   type: 'AllThatApply',
-//                   prompt: {
-//                     type: 'HTML',
-//                     value: '',
-//                   },
-//                   options: [],
-//                 });
-//               }}
-//             >
-//               All that apply
-//             </Dropdown.Item>
-//             <Dropdown.Item
-//               onClick={(): void => {
-//                 addBodyItem(numBodyItems, {
-//                   type: 'Code',
-//                   initial: '',
-//                   lang: 'text/plain',
-//                   prompt: {
-//                     type: 'HTML',
-//                     value: '',
-//                   },
-//                 });
-//               }}
-//             >
-//               Code
-//             </Dropdown.Item>
-//             <Dropdown.Item
-//               onClick={(): void => {
-//                 addBodyItem(numBodyItems, {
-//                   type: 'CodeTag',
-//                   choices: 'exam',
-//                   prompt: {
-//                     type: 'HTML',
-//                     value: '',
-//                   },
-//                 });
-//               }}
-//             >
-//               Code tag
-//             </Dropdown.Item>
-//             <Dropdown.Item
-//               onClick={(): void => {
-//                 addBodyItem(numBodyItems, {
-//                   type: 'Matching',
-//                   prompts: [],
-//                   values: [],
-//                 });
-//               }}
-//             >
-//               Matching
-//             </Dropdown.Item>
-//             <Dropdown.Item
-//               onClick={(): void => {
-//                 addBodyItem(numBodyItems, {
-//                   type: 'MultipleChoice',
-//                   prompt: {
-//                     type: 'HTML',
-//                     value: '',
-//                   },
-//                   options: [],
-//                 });
-//               }}
-//             >
-//               Multiple choice
-//             </Dropdown.Item>
-//             <Dropdown.Item
-//               onClick={(): void => {
-//                 addBodyItem(numBodyItems, {
-//                   type: 'Text',
-//                   prompt: {
-//                     type: 'HTML',
-//                     value: '',
-//                   },
-//                 });
-//               }}
-//             >
-//               Free-response
-//             </Dropdown.Item>
-//             <Dropdown.Item
-//               onClick={(): void => {
-//                 addBodyItem(numBodyItems, {
-//                   type: 'YesNo',
-//                   yesLabel: 'Yes',
-//                   noLabel: 'No',
-//                   prompt: {
-//                     type: 'HTML',
-//                     value: '',
-//                   },
-//                 });
-//               }}
-//             >
-//               Yes/No or True/False
-//             </Dropdown.Item>
-//           </DropdownButton>
 
 export default ShowBodyItems;

@@ -73,11 +73,10 @@ const OneItem: React.FC<WrappedFieldProps & Nums> = (props) => {
       return <MultipleChoice qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'Text':
       return <Text qnum={qnum} pnum={pnum} bnum={bnum} />;
-    // case 'Matching':
-    //   return <Matching info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    case 'Matching':
+      return <Matching qnum={qnum} pnum={pnum} bnum={bnum} />;
     default:
-      return <p>TODO: body ({value})</p>;
-      // throw new ExhaustiveSwitchError(value);
+      throw new ExhaustiveSwitchError(value);
   }
 };
 

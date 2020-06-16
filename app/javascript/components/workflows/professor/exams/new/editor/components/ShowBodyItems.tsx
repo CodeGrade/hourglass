@@ -7,7 +7,7 @@ import {
 } from 'react-bootstrap';
 import { BodyItem as BodyItemInfo } from '@student/exams/show/types';
 import { WrappedFieldArrayProps } from 'redux-form';
-// import BodyItem from '@professor/exams/new/editor/containers/BodyItem';
+import BodyItem from '@professor/exams/new/editor/components/BodyItem';
 
 const ShowBodyItems: React.FC<{
   qnum: number;
@@ -23,12 +23,24 @@ const ShowBodyItems: React.FC<{
       <Row>
         <Col>
           {fields.map((member, index) => (
-            <p
+            <BodyItem
               // eslint-disable-next-line react/no-array-index-key
               key={index}
-            >
-              TODO: BodyItem ({member})
-            </p>
+              memberName={member}
+              qnum={qnum}
+              pnum={pnum}
+              bnum={index}
+              enableDown={index + 1 < fields.length}
+              moveDown={(): void => {
+                fields.move(index, index + 1);
+              }}
+              moveUp={(): void => {
+                fields.move(index, index - 1);
+              }}
+              remove={(): void => {
+                fields.remove(index);
+              }}
+            />
           ))}
         </Col>
       </Row>

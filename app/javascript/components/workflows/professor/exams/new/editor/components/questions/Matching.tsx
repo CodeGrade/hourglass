@@ -12,6 +12,7 @@ import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 // import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { UpdateBodyItemAction } from '@professor/exams/new/types';
 import { alphabetIdx } from '@hourglass/common/helpers';
+import { Field, WrappedFieldProps } from 'redux-form';
 
 interface MatchingProps {
   qnum: number;
@@ -56,9 +57,48 @@ interface MatchingProps {
 //   );
 // };
 
+const EditColName: React.FC<WrappedFieldProps & {
+  defaultLabel: string;
+}> = (props) => {
+  const {
+    input,
+    defaultLabel,
+  } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <CustomEditor
+      className="bg-white"
+      theme="bubble"
+      value={value.value ?? defaultLabel}
+      onChange={(newVal) => onChange({
+        type: 'HTML',
+        value: newVal,
+      })}
+    />
+  );
+};
+
 const Matching: React.FC<MatchingProps> = (props) => {
   return (
-    <p>TODO</p>
+    <Row>
+      <Col sm={6}>
+        <Row className="p-2">
+          <Col className="text-center p-0">
+            <Field name="promptsLabel" component={EditColName} defaultLabel="Column A" />
+          </Col>
+        </Row>
+      </Col>
+      <Col sm={6}>
+        <Row className="p-2">
+          <Col className="text-center p-0">
+            <Field name="valuesLabel" component={EditColName} defaultLabel="Column B" />
+          </Col>
+        </Row>
+      </Col>
+    </Row>
   );
 };
 
@@ -104,7 +144,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
 //     newPrompts.splice(to, 0, fromOpt);
 //     return makeChangeAction({ ...info, prompts: newPrompts }, value);
 //   };
-// 
+//
 //   const addValue = (): void => {
 //     const newValues = [...values];
 //     newValues.push({
@@ -141,20 +181,8 @@ const Matching: React.FC<MatchingProps> = (props) => {
 //     });
 //     return makeChangeAction({ ...info, values: newValues }, newValue);
 //   };
-// 
-// 
-//   const setColA = (newColA: HTMLVal): void => {
-//     onChange({
-//       ...info,
-//       promptsLabel: newColA,
-//     }, value);
-//   };
-//   const setColB = (newColB: HTMLVal): void => {
-//     onChange({
-//       ...info,
-//       valuesLabel: newColB,
-//     }, value);
-//   };
+//
+//
 //   const updateAnswer = (index: number, event: React.ChangeEvent<{ value: number }>): void => {
 //     const val = event.target.value;
 //     const ret = { ...value };
@@ -171,22 +199,12 @@ const Matching: React.FC<MatchingProps> = (props) => {
 //     newValues[index] = newValue;
 //     onChange({ ...info, values: newValues }, value);
 //   };
-// 
+//
 //   return (
 //     <Row>
 //       <Col sm={6}>
 //         <Row className="p-2">
-//           <Col className="text-center p-0">
-//             <CustomEditor
-//               className="bg-white"
-//               theme="bubble"
-//               value={promptsLabel?.value ?? 'Column A'}
-//               onChange={(newVal) => setColA({
-//                 type: 'HTML',
-//                 value: newVal,
-//               })}
-//             />
-//           </Col>
+//           ...
 //         </Row>
 //         {prompts.map((p, idx) => {
 //           const valueI = value?.[idx] ?? -1;
@@ -248,17 +266,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
 //       </Col>
 //       <Col sm={6}>
 //         <Row className="p-2">
-//           <Col className="text-center p-0">
-//             <CustomEditor
-//               className="bg-white"
-//               theme="bubble"
-//               value={valuesLabel?.value ?? 'Column B'}
-//               onChange={(newVal) => setColB({
-//                 type: 'HTML',
-//                 value: newVal,
-//               })}
-//             />
-//           </Col>
+//           ...
 //         </Row>
 //         {values.map((v, idx) => (
 //           <Row

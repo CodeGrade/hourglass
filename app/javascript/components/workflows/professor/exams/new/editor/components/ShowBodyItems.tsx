@@ -61,6 +61,7 @@ const ShowBodyItems: React.FC<{
             >
               Text instructions
             </Dropdown.Item>
+            <Dropdown.Divider />
             <Dropdown.Item
               onClick={(): void => {
                 fields.push({

@@ -152,24 +152,6 @@ const QuestionReference: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
-const QuestionFilesProvider: React.FC<{
-  reference: FileRef[];
-}> = (props) => {
-  const {
-    reference,
-    children,
-  } = props;
-  return (
-    <QuestionFilesContext.Provider
-      value={{
-        references: reference,
-      }}
-    >
-      {children}
-    </QuestionFilesContext.Provider>
-  );
-};
-
 const Question: React.FC<{
   memberName: string;
   qnum: number;
@@ -187,9 +169,6 @@ const Question: React.FC<{
     remove,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
-  const ReferenceProvider = connect((state) => ({
-    reference: formSelector(state, `${memberName}.reference`),
-  }))(QuestionFilesProvider);
   return (
     <Card
       className="mb-3"
@@ -228,9 +207,7 @@ const Question: React.FC<{
             </Form.Group>
           </Card.Subtitle>
           <Card.Body>
-            <ReferenceProvider>
-              <FieldArray name="parts" component={ShowParts} props={{ qnum }} />
-            </ReferenceProvider>
+            <FieldArray name="parts" component={ShowParts} props={{ qnum }} />
           </Card.Body>
         </FormSection>
       </Alert>

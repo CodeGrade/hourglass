@@ -20,23 +20,24 @@ interface MatchingProps {
   bnum: number;
 }
 
-const ChooseRightAnswer: React.FC<{
-  curValue: number;
+const ChooseRightAnswer: React.FC<WrappedFieldProps & {
   numChoices: number;
-  onChange: (event: React.ChangeEvent<{ value: number }>) => void;
 }> = (props) => {
   const {
-    curValue,
+    input,
     numChoices,
-    onChange,
   } = props;
-  // const valueI = value?.[idx] ?? -1;
+  const {
+    value,
+    onChange,
+  } = input;
+  const valueI = value ?? -1;
   return (
     <FormControl variant="outlined">
       <InputLabel>Match</InputLabel>
       <Select
         margin="dense"
-        value={curValue}
+        value={valueI}
         onChange={onChange}
         label="Match"
       >
@@ -170,13 +171,13 @@ const OnePrompt: React.FC<{
           placeholder="Enter a new prompt"
         />
       </Col>
-      {/* <Col sm={2}> */}
-      {/*   <ChooseRightAnswer */}
-      {/*     curValue={valueI} */}
-      {/*     choices={values} */}
-      {/*     onChange={(e): void => updateAnswer(idx, e)} */}
-      {/*   /> */}
-      {/* </Col> */}
+      <Col sm={2}>
+        <Field
+          name={`answer[${valueNum}]`}
+          component={ChooseRightAnswer}
+          numChoices={10} // TODO
+        />
+      </Col>
     </Row>
   );
 };

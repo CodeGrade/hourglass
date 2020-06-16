@@ -204,4 +204,5 @@ const Entry: React.FC = () => {
   );
 };
 
+// ts-prune-ignore-next
 export default hot(module)(Entry);

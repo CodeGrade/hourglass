@@ -1,17 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Row,
-  Col,
   Form,
-  Button,
 } from 'react-bootstrap';
-import { MultipleChoiceInfo, MultipleChoiceState, HTMLVal } from '@student/exams/show/types';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
-import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
-// import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
-import { FaCircle } from 'react-icons/fa';
-import Icon from '@student/exams/show/components/Icon';
-import { UpdateBodyItemAction } from '@professor/exams/new/types';
+// TODO: import { FaCircle } from 'react-icons/fa';
 import { FieldArray } from 'redux-form';
 import { ShowOptions } from './AllThatApply';
 

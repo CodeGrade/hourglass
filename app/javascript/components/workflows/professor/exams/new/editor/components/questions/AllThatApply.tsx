@@ -106,26 +106,26 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
   };
   return (
     <>
-      <Prompted
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
-        prompt={prompt.value}
-        onChange={(newPrompt): void => {
-          if (onChange) {
-            onChange(
-              {
-                ...info,
-                prompt: {
-                  type: 'HTML',
-                  value: newPrompt,
-                },
-              },
-              value,
-            );
-          }
-        }}
-      />
+      {/* <Prompted */}
+      {/*   qnum={qnum} */}
+      {/*   pnum={pnum} */}
+      {/*   bnum={bnum} */}
+      {/*   prompt={prompt.value} */}
+      {/*   onChange={(newPrompt): void => { */}
+      {/*     if (onChange) { */}
+      {/*       onChange( */}
+      {/*         { */}
+      {/*           ...info, */}
+      {/*           prompt: { */}
+      {/*             type: 'HTML', */}
+      {/*             value: newPrompt, */}
+      {/*           }, */}
+      {/*         }, */}
+      {/*         value, */}
+      {/*       ); */}
+      {/*     } */}
+      {/*   }} */}
+      {/* /> */}
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
         <Form.Label column sm={2}>Answers</Form.Label>
         <Col sm={10}>

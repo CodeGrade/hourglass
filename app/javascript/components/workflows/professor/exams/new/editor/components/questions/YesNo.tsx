@@ -35,15 +35,15 @@ const YesNo: React.FC<YesNoProps> = (props) => {
   const isYesNo = (yesLabel === 'Yes');
   return (
     <>
-      <Prompted
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
-        prompt={prompt.value}
-        onChange={(newPrompt): void => {
-          if (onChange) { onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }); }
-        }}
-      />
+      {/* <Prompted */}
+      {/*   qnum={qnum} */}
+      {/*   pnum={pnum} */}
+      {/*   bnum={bnum} */}
+      {/*   prompt={prompt.value} */}
+      {/*   onChange={(newPrompt): void => { */}
+      {/*     if (onChange) { onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }); } */}
+      {/*   }} */}
+      {/* /> */}
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-wording`}>
         <Form.Label column sm={2}>Answer format</Form.Label>
         <Col sm={10}>

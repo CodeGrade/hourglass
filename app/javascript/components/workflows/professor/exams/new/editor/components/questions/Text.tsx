@@ -26,15 +26,15 @@ const Text: React.FC<TextProps> = (props) => {
   const { prompt } = info;
   return (
     <>
-      <Prompted
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
-        prompt={prompt.value}
-        onChange={(newPrompt): void => {
-          if (onChange) { onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }); }
-        }}
-      />
+      {/* <Prompted */}
+      {/*   qnum={qnum} */}
+      {/*   pnum={pnum} */}
+      {/*   bnum={bnum} */}
+      {/*   prompt={prompt.value} */}
+      {/*   onChange={(newPrompt): void => { */}
+      {/*     if (onChange) { onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }); } */}
+      {/*   }} */}
+      {/* /> */}
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-prompt`}>
         <Form.Label column sm={2}>Correct answer</Form.Label>
         <Col sm={10}>

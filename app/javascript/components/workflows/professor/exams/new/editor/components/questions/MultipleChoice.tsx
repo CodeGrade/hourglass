@@ -1,12 +1,128 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  Row,
   Form,
+  Row,
+  Col,
+  Button,
 } from 'react-bootstrap';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
-// TODO: import { FaCircle } from 'react-icons/fa';
-import { FieldArray } from 'redux-form';
-import { ShowOptions } from './AllThatApply';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import Icon from '@student/exams/show/components/Icon';
+import MoveItem from '@professor/exams/new/editor/components/MoveItem';
+import {
+  FieldArray,
+  FormSection,
+  Field,
+  WrappedFieldProps,
+} from 'redux-form';
+import { FaCircle } from 'react-icons/fa';
+import EditHTMLs from '../editHTMLs';
+
+const EditOption: React.FC<WrappedFieldProps> = (props) => {
+  const { input } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <CustomEditor
+      className="bg-white"
+      theme="bubble"
+      value={value}
+      onChange={(newName, _delta, source, _editor): void => {
+        if (source === 'user') {
+          onChange({
+            type: 'HTML',
+            value: newName,
+          });
+        }
+      }}
+    />
+  );
+};
+
+const EditAnswer: React.FC<WrappedFieldProps & {
+  current: number;
+}> = (props) => {
+  const {
+    input,
+    current,
+  } = props;
+  const selected = input.value === current;
+  return (
+    <Button
+      variant={selected ? 'dark' : 'outline-dark'}
+      onClick={(): void => input.onChange(current)}
+    >
+      <Icon I={FaCircle} className={selected ? '' : 'invisible'} />
+    </Button>
+  );
+};
+
+const OneOption: React.FC<{
+  memberName: string;
+  optionNum: number;
+  enableDown: boolean;
+  moveDown: () => void;
+  moveUp: () => void;
+  remove: () => void;
+}> = (props) => {
+  const {
+    memberName,
+    optionNum,
+    enableDown,
+    moveDown,
+    moveUp,
+    remove,
+  } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
+  return (
+    <Row
+      className="p-2"
+      onMouseOver={(): void => setMoversVisible(true)}
+      onFocus={(): void => setMoversVisible(true)}
+      onBlur={(): void => setMoversVisible(false)}
+      onMouseOut={(): void => setMoversVisible(false)}
+    >
+      <Col className="flex-grow-01">
+        <MoveItem
+          visible={moversVisible}
+          variant="dark"
+          enableUp={optionNum > 0}
+          enableDown={enableDown}
+          onUp={moveUp}
+          onDown={moveDown}
+          onDelete={remove}
+        />
+        <Field name="answer" component={EditAnswer} current={optionNum} />
+      </Col>
+      <Col className="pr-0">
+        <FormSection name={memberName}>
+          <Field name="value" component={EditOption} />
+        </FormSection>
+      </Col>
+    </Row>
+  );
+};
+
+export const renderOptionsMultipleChoice = (member, index, fields) => (
+  <OneOption
+    // eslint-disable-next-line react/no-array-index-key
+    key={index}
+    optionNum={index}
+    memberName={member}
+    enableDown={index + 1 < fields.length}
+    moveDown={(): void => {
+      fields.move(index, index + 1);
+    }}
+    moveUp={(): void => {
+      fields.move(index, index - 1);
+    }}
+    remove={(): void => {
+      fields.remove(index);
+    }}
+  />
+);
 
 interface MultipleChoiceProps {
   qnum: number;
@@ -28,7 +144,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
         bnum={bnum}
       />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
-        <FieldArray name="options" component={ShowOptions} />
+        <FieldArray name="options" component={EditHTMLs} renderOptions={renderOptionsMultipleChoice} />
       </Form.Group>
     </>
   );

@@ -183,17 +183,17 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
   const filteredFiles = getFilesForRefs(fmap, references);
   return (
     <>
-      <Prompted
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
-        prompt={prompt.value}
-        onChange={(newPrompt): void => {
-          if (onChange) {
-            onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } });
-          }
-        }}
-      />
+      {/* <Prompted */}
+      {/*   qnum={qnum} */}
+      {/*   pnum={pnum} */}
+      {/*   bnum={bnum} */}
+      {/*   prompt={prompt.value} */}
+      {/*   onChange={(newPrompt): void => { */}
+      {/*     if (onChange) { */}
+      {/*       onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }); */}
+      {/*     } */}
+      {/*   }} */}
+      {/* /> */}
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-source`}>
         <Form.Label column sm={2}>Files source</Form.Label>
         <Col sm={10}>

@@ -1,23 +1,26 @@
 import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import { WrappedFieldProps, Field } from 'redux-form';
 
-interface PromptProps {
+const EditPrompt: React.FC<WrappedFieldProps & {
   qnum: number;
   pnum: number;
   bnum: number;
-  prompt: string;
-  onChange?: (newPrompt: string) => void;
-}
-
-const Prompted: React.FC<PromptProps> = (props) => {
+}> = (props) => {
   const {
     qnum,
     pnum,
     bnum,
-    prompt,
-    onChange,
+    input,
   } = props;
+  const {
+    value,
+    onChange,
+  }: {
+    value: string;
+    onChange: (newVal: string) => void;
+  } = input;
   return (
     <>
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-prompt`}>
@@ -25,10 +28,10 @@ const Prompted: React.FC<PromptProps> = (props) => {
         <Col sm={10}>
           <CustomEditor
             className="bg-white"
-            value={prompt}
+            value={value}
             placeholder="Body item..."
             onChange={(newVal, _delta, source, _editor): void => {
-              if (onChange && source === 'user') {
+              if (source === 'user') {
                 onChange(newVal);
               }
             }}
@@ -36,6 +39,23 @@ const Prompted: React.FC<PromptProps> = (props) => {
         </Col>
       </Form.Group>
     </>
+  );
+};
+
+interface PromptProps {
+  qnum: number;
+  pnum: number;
+  bnum: number;
+}
+
+const Prompted: React.FC<PromptProps> = (props) => {
+  const {
+    qnum,
+    pnum,
+    bnum,
+  } = props;
+  return (
+    <Field name="prompt.value" component={EditPrompt} qnum={qnum} pnum={pnum} bnum={bnum} />
   );
 };
 

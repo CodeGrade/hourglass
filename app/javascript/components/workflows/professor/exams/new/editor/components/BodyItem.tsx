@@ -34,13 +34,13 @@ const OneItem: React.FC<{
   } = input;
   switch (value.type) {
     case 'HTML':
-      return <EditHTML value={{ NO_ANS: true }} info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
-    // case 'Code':
-    //   return <Code info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+      return <EditHTML info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    case 'Code':
+      return <Code info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'AllThatApply':
     //   return <AllThatApply info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'CodeTag':
-    //   return <CodeTag info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    //   return <CodeTag info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'YesNo':
     //   return <YesNoInput info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'MultipleChoice':

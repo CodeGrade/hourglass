@@ -21,7 +21,7 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { getFilesForRefs, countFiles } from '@student/exams/show/files';
 
 interface CodeTagValProps {
-  value: CodeTagState;
+  value?: CodeTagState;
   hideFile?: boolean;
 }
 
@@ -147,9 +147,9 @@ interface CodeTagProps {
   pnum: number;
   bnum: number;
   info: CodeTagInfo;
-  value: CodeTagState;
+  value?: CodeTagState;
   onChange: (newInfo: CodeTagInfo, newVal: CodeTagState) => void;
-  disabled: boolean;
+  disabled?: boolean;
 }
 
 const CodeTag: React.FC<CodeTagProps> = (props) => {
@@ -160,7 +160,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
     info,
     value,
     onChange,
-    disabled,
+    disabled = false,
   } = props;
   const { choices, prompt } = info;
   const [showModal, setShowModal] = useState(false);

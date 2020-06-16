@@ -366,6 +366,10 @@ export interface CodeInfo {
   initial: string;
 }
 
+export interface CodeInfoWithAnswer extends CodeInfo {
+  answer?: CodeState;
+}
+
 export interface MarkDescription {
   from: CodeMirror.Position;
   to: CodeMirror.Position;
@@ -382,10 +386,18 @@ export interface HTMLVal {
   value: string;
 }
 
+export interface HTMLValWithAnswer extends HTMLVal {
+  answer: NoAnswerState;
+}
+
 export interface AllThatApplyInfo {
   type: 'AllThatApply';
   options: HTMLVal[];
   prompt: HTMLVal;
+}
+
+export interface AllThatApplyInfoWithAnswer extends AllThatApplyInfo {
+  answer?: AllThatApplyState;
 }
 
 export interface AllThatApplyState {
@@ -399,12 +411,20 @@ export interface YesNoInfo {
   prompt: HTMLVal;
 }
 
+export interface YesNoInfoWithAnswer extends YesNoInfo {
+  answer?: YesNoState;
+}
+
 export type YesNoState = boolean;
 
 export interface CodeTagInfo {
   type: 'CodeTag';
   prompt: HTMLVal;
   choices: 'exam' | 'question' | 'part';
+}
+
+export interface CodeTagInfoWithAnswer extends CodeTagInfo {
+  answer?: CodeTagState;
 }
 
 export interface CodeTagState {
@@ -420,12 +440,20 @@ export interface MultipleChoiceInfo {
 
 export type MultipleChoiceState = number;
 
+export interface MultipleChoiceInfoWithAnswer extends MultipleChoiceInfo {
+  answer?: MultipleChoiceState;
+}
+
 export interface TextInfo {
   type: 'Text';
   prompt: HTMLVal;
 }
 
 export type TextState = string;
+
+export interface TextInfoWithAnswer extends TextInfo {
+  answer?: TextState;
+}
 
 export interface MatchingInfo {
   type: 'Matching';
@@ -439,9 +467,19 @@ export interface MatchingState {
   [index: number]: number;
 }
 
+export interface MatchingInfoWithAnswer extends MatchingInfo {
+  answer?: MatchingState;
+}
+
 export type BodyItem =
   HTMLVal | AllThatApplyInfo | CodeInfo | YesNoInfo |
-  CodeTagInfo | MultipleChoiceInfo | TextInfo | MatchingInfo;
+  CodeTagInfo | MultipleChoiceInfo |
+  TextInfo | MatchingInfo;
+
+export type BodyItemWithAnswer =
+  HTMLValWithAnswer | AllThatApplyInfoWithAnswer | CodeInfoWithAnswer | YesNoInfoWithAnswer |
+  CodeTagInfoWithAnswer | MultipleChoiceInfoWithAnswer |
+  TextInfoWithAnswer | MatchingInfoWithAnswer;
 
 export type AnswerState =
   AllThatApplyState | CodeState | YesNoState |
@@ -460,12 +498,20 @@ export interface PartInfo {
   body: BodyItem[];
 }
 
+export interface PartInfoWithAnswers extends Omit<PartInfo, 'body'> {
+  body: BodyItemWithAnswer[];
+}
+
 export interface QuestionInfo {
   name?: HTMLVal;
   description: HTMLVal;
   separateSubparts: boolean;
   parts: PartInfo[];
   reference: FileRef[];
+}
+
+export interface QuestionInfoWithAnswers extends Omit<QuestionInfo, 'parts'> {
+  parts: PartInfoWithAnswers[];
 }
 
 export interface RailsTimeInfo {
@@ -483,6 +529,10 @@ export interface ExamVersion {
   reference?: FileRef[];
   instructions: HTMLVal;
   files: ExamFile[];
+}
+
+export interface ExamVersionWithAnswers extends Omit<ExamVersion, 'questions'> {
+  questions: QuestionInfoWithAnswers[];
 }
 
 export type FileRef = SingleFileRef | DirRef;

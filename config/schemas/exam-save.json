@@ -195,6 +195,7 @@
     "BodyItemAnswer": {
       "oneOf": [
         { "$ref": "#/definitions/NoAnswer" },
+        { "$ref": "#/definitions/CodeAnswer" },
         {
           "type": "boolean",
           "$comment": "YesNo / TrueFalse"
@@ -211,6 +212,15 @@
       "required": ["NO_ANS"],
       "properties": {
         "NO_ANS": { "enum": [true] }
+      }
+    },
+    "CodeAnswer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "marks"],
+      "properties": {
+        "text": { "type": "string" },
+        "marks": { "$ref": "files.json#/definitions/Marks" }
       }
     },
     "ATAAnswer": {

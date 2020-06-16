@@ -11,17 +11,19 @@ import {
 } from 'react-bootstrap';
 import { alphabetIdx } from '@hourglass/common/helpers';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
-import { HTMLVal, FileRef, ExamFile } from '@student/exams/show/types';
-import { Field, WrappedFieldProps, FormSection } from 'redux-form';
+import {
+  Field,
+  WrappedFieldProps,
+  FormSection,
+  FieldArray,
+} from 'redux-form';
 import FilePickerSelect from '@professor/exams/new/editor/components/FilePicker';
 import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-import { createMap, getFilesForRefs } from '@student/exams/show/files';
-import { PartFilesContext, ExamContext } from '@hourglass/workflows/student/exams/show/context';
+import { getFilesForRefs } from '@student/exams/show/files';
+import { ExamContext } from '@hourglass/workflows/student/exams/show/context';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
-import { connect } from 'react-redux';
-import { formSelector } from '..';
-// import ShowBodyItems from '@professor/exams/new/editor/containers/ShowBodyItems';
+import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
 
 const PartName: React.FC<WrappedFieldProps> = (props) => {
   const {
@@ -220,8 +222,7 @@ const Part: React.FC<{
         </FormSection>
       </Alert>
       <Card.Body>
-        TODO
-        {/* <ShowBodyItems qnum={qnum} pnum={pnum} /> */}
+        <FieldArray name="body" component={ShowBodyItems} props={{ qnum, pnum }} />
       </Card.Body>
     </Card>
   );

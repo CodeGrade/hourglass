@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { FileRef, CodeTagState, CodeTagInfoWithAnswer } from '@student/exams/show/types';
+import { FileRef, CodeTagState, CodeTagInfo } from '@student/exams/show/types';
 import {
   Form,
   Row,
@@ -19,6 +19,7 @@ import {
 } from '@student/exams/show/context';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { getFilesForRefs, countFiles } from '@student/exams/show/files';
+import { WrappedFieldProps, Field, Fields, WrappedFieldsProps } from 'redux-form';
 
 interface CodeTagValProps {
   value?: CodeTagState;
@@ -142,31 +143,77 @@ const FileModal: React.FC<FileModalProps> = (props) => {
   );
 };
 
-interface CodeTagProps {
-  qnum: number;
-  pnum: number;
-  bnum: number;
-  info: CodeTagInfoWithAnswer;
-  onChange: (newInfo: CodeTagInfoWithAnswer) => void;
-  disabled?: boolean;
-}
-
-const CodeTag: React.FC<CodeTagProps> = (props) => {
+const EditChoices: React.FC<WrappedFieldsProps> = (props) => {
   const {
-    qnum,
-    pnum,
-    bnum,
-    info,
-    onChange,
-    disabled = false,
+    choices,
+    answer,
   } = props;
-  const { choices, prompt } = info;
+  const { input } = choices;
+  const {
+    value,
+    onChange,
+  }: {
+    value: CodeTagInfo['choices'];
+    onChange: (newVal: CodeTagInfo['choices']) => void;
+  } = input;
+  return (
+    <>
+      <Form.Label column sm={2}>Files source</Form.Label>
+      <Col sm={10}>
+        <ButtonGroup>
+          <Button
+            variant={value === 'exam' ? 'secondary' : 'outline-secondary'}
+            active={value === 'exam'}
+            onClick={(): void => {
+              onChange('exam');
+              answer.input.onChange({ NO_ANS: true });
+            }}
+          >
+            Files for full exam
+          </Button>
+          <Button
+            variant={value === 'question' ? 'secondary' : 'outline-secondary'}
+            active={value === 'question'}
+            onClick={(): void => {
+              onChange('question');
+              answer.input.onChange({ NO_ANS: true });
+            }}
+          >
+            Files for current question
+          </Button>
+          <Button
+            variant={value === 'part' ? 'secondary' : 'outline-secondary'}
+            active={value === 'part'}
+            onClick={(): void => {
+              onChange('part');
+              answer.input.onChange({ NO_ANS: true });
+            }}
+          >
+            Files for current part
+          </Button>
+        </ButtonGroup>
+      </Col>
+    </>
+  );
+};
+
+const EditAnswer: React.FC<WrappedFieldsProps> = (props) => {
+  const {
+    answer,
+    choices,
+  } = props;
+  const { input } = answer;
+  const {
+    value,
+    onChange,
+  } = input;
   const [showModal, setShowModal] = useState(false);
   const examReferences = useContext(ExamFilesContext);
   const questionReferences = useContext(QuestionFilesContext);
   const partReferences = useContext(PartFilesContext);
   let references: FileRef[];
-  switch (choices) {
+  const choice: CodeTagInfo['choices'] = choices.input.value;
+  switch (choice) {
     case 'exam':
       references = examReferences.references;
       break;
@@ -177,85 +224,66 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
       references = partReferences.references;
       break;
     default:
-      throw new ExhaustiveSwitchError(choices);
+      throw new ExhaustiveSwitchError(choice);
   }
   const { fmap } = useContext(ExamContext);
   const filteredFiles = getFilesForRefs(fmap, references);
   return (
     <>
-      {/* <Prompted */}
-      {/*   qnum={qnum} */}
-      {/*   pnum={pnum} */}
-      {/*   bnum={bnum} */}
-      {/*   prompt={prompt.value} */}
-      {/*   onChange={(newPrompt): void => { */}
-      {/*     if (onChange) { */}
-      {/*       onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }); */}
-      {/*     } */}
-      {/*   }} */}
-      {/* /> */}
+      <Form.Label column sm={2}>Correct answer</Form.Label>
+      <Col sm={6}>
+        <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />
+      </Col>
+      <Col sm={4}>
+        <Button
+          onClick={(): void => setShowModal(true)}
+        >
+          Choose line
+        </Button>
+        <FileModal
+          disabled={false}
+          references={references}
+          show={showModal}
+          onClose={(): void => setShowModal(false)}
+          onSave={(newState): void => {
+            setShowModal(false);
+            onChange(newState);
+          }}
+          startValue={value}
+        />
+      </Col>
+    </>
+  );
+};
+
+interface CodeTagProps {
+  qnum: number;
+  pnum: number;
+  bnum: number;
+}
+
+const CodeTag: React.FC<CodeTagProps> = (props) => {
+  const {
+    qnum,
+    pnum,
+    bnum,
+  } = props;
+  return (
+    <>
+      <Prompted
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+      />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-source`}>
-        <Form.Label column sm={2}>Files source</Form.Label>
-        <Col sm={10}>
-          <ButtonGroup>
-            <Button
-              variant={choices === 'exam' ? 'secondary' : 'outline-secondary'}
-              active={choices === 'exam'}
-              onClick={(): void => {
-                onChange({ ...info, choices: 'exam', answer: undefined });
-              }}
-            >
-              Files for full exam
-            </Button>
-            <Button
-              variant={choices === 'question' ? 'secondary' : 'outline-secondary'}
-              active={choices === 'question'}
-              onClick={(): void => {
-                onChange({ ...info, choices: 'question', answer: undefined });
-              }}
-            >
-              Files for current question
-            </Button>
-            <Button
-              variant={choices === 'part' ? 'secondary' : 'outline-secondary'}
-              active={choices === 'part'}
-              onClick={(): void => {
-                onChange({ ...info, choices: 'part', answer: undefined });
-              }}
-            >
-              Files for current part
-            </Button>
-          </ButtonGroup>
-        </Col>
+        <Fields names={['answer', 'choices']} component={EditChoices} />
       </Form.Group>
       <Form.Group
         as={Row}
         controlId={`${qnum}-${pnum}-${bnum}-answer`}
         className="align-items-baseline"
       >
-        <Form.Label column sm={2}>Correct answer</Form.Label>
-        <Col sm={6}>
-          <CodeTagVal value={info.answer} hideFile={countFiles(filteredFiles) === 1} />
-        </Col>
-        <Col sm={4}>
-          <Button
-            disabled={disabled}
-            onClick={(): void => setShowModal(true)}
-          >
-            Choose line
-          </Button>
-          <FileModal
-            disabled={disabled}
-            references={references}
-            show={showModal}
-            onClose={(): void => setShowModal(false)}
-            onSave={(newState): void => {
-              setShowModal(false);
-              onChange({ ...info, answer: newState });
-            }}
-            startValue={info.answer}
-          />
-        </Col>
+        <Fields names={['answer', 'choices']} component={EditAnswer} />
       </Form.Group>
     </>
   );

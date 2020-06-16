@@ -6,41 +6,22 @@ import Text from '@professor/exams/new/editor/components/questions/Text';
 import Matching from '@professor/exams/new/editor/components/questions/Matching';
 import MultipleChoice from '@professor/exams/new/editor/components/questions/MultipleChoice';
 import AllThatApply from '@professor/exams/new/editor/components/questions/AllThatApply';
-import EditHTML from '@professor/exams/new/editor/components/EditHTML';
-import { BodyItem, HTMLVal } from '@student/exams/show/types';
+import { BodyItem } from '@student/exams/show/types';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Card } from 'react-bootstrap';
-import { Field, WrappedFieldProps, FormSection, Fields } from 'redux-form';
+import { Field, WrappedFieldProps, FormSection } from 'redux-form';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
+import { EditHTMLField } from './editHTMLs';
 
-interface Nums {
+const OneItem: React.FC<WrappedFieldProps & {
+  memberName: string;
   qnum: number;
   pnum: number;
   bnum: number;
-}
-
-const BodyHTML: React.FC<WrappedFieldProps & Nums> = (props) => {
+}> = (props) => {
   const {
     input,
-    qnum,
-    pnum,
-    bnum,
-  } = props;
-  const {
-    value,
-    onChange,
-  }: {
-    value: HTMLVal['value'];
-    onChange: (newVal: HTMLVal['value']) => void;
-  } = input;
-  return (
-    <EditHTML val={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />
-  );
-};
-
-const OneItem: React.FC<WrappedFieldProps & Nums> = (props) => {
-  const {
-    input,
+    memberName,
     qnum,
     pnum,
     bnum,
@@ -50,34 +31,46 @@ const OneItem: React.FC<WrappedFieldProps & Nums> = (props) => {
   }: {
     value: BodyItem['type'];
   } = input;
+  if (value === 'HTML') {
+    return (
+      <Field
+        name={memberName}
+        component={EditHTMLField}
+        placeholder="Body item..."
+      />
+    );
+  }
+  let body;
   switch (value) {
-    case 'HTML':
-      return (
-        <Field
-          name="value"
-          component={BodyHTML}
-          qnum={qnum}
-          pnum={pnum}
-          bnum={bnum}
-        />
-      );
     case 'Code':
-      return <Code qnum={qnum} pnum={pnum} bnum={bnum} />;
+      body = <Code qnum={qnum} pnum={pnum} bnum={bnum} />;
+      break;
     case 'AllThatApply':
-      return <AllThatApply qnum={qnum} pnum={pnum} bnum={bnum} />;
+      body = <AllThatApply qnum={qnum} pnum={pnum} bnum={bnum} />;
+      break;
     case 'CodeTag':
-      return <CodeTag qnum={qnum} pnum={pnum} bnum={bnum} />;
+      body = <CodeTag qnum={qnum} pnum={pnum} bnum={bnum} />;
+      break;
     case 'YesNo':
-      return <YesNo qnum={qnum} pnum={pnum} bnum={bnum} />;
+      body = <YesNo qnum={qnum} pnum={pnum} bnum={bnum} />;
+      break;
     case 'MultipleChoice':
-      return <MultipleChoice qnum={qnum} pnum={pnum} bnum={bnum} />;
+      body = <MultipleChoice qnum={qnum} pnum={pnum} bnum={bnum} />;
+      break;
     case 'Text':
-      return <Text qnum={qnum} pnum={pnum} bnum={bnum} />;
+      body = <Text qnum={qnum} pnum={pnum} bnum={bnum} />;
+      break;
     case 'Matching':
-      return <Matching qnum={qnum} pnum={pnum} bnum={bnum} />;
+      body = <Matching qnum={qnum} pnum={pnum} bnum={bnum} />;
+      break;
     default:
       throw new ExhaustiveSwitchError(value);
   }
+  return (
+    <FormSection name={memberName}>
+      {body}
+    </FormSection>
+  );
 };
 
 export interface BodyProps {
@@ -121,9 +114,16 @@ const Body: React.FC<BodyProps> = (props) => {
         onDelete={remove}
       />
       <Card.Body>
-        <FormSection name={memberName}>
-          <Field name="type" component={OneItem} props={{ qnum, pnum, bnum }} />
-        </FormSection>
+        <Field
+          name={`${memberName}.type`}
+          component={OneItem}
+          props={{
+            qnum,
+            pnum,
+            bnum,
+            memberName,
+          }}
+        />
       </Card.Body>
     </Card>
   );

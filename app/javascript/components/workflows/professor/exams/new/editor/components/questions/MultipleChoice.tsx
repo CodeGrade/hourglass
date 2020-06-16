@@ -74,9 +74,7 @@ const OneOption: React.FC<{
         <Field name="answer" component={EditAnswer} current={optionNum} />
       </Col>
       <Col className="pr-0">
-        <FormSection name={memberName}>
-          <Field name="value" component={EditHTMLField} theme="bubble" />
-        </FormSection>
+        <Field name={memberName} component={EditHTMLField} theme="bubble" />
       </Col>
     </Row>
   );

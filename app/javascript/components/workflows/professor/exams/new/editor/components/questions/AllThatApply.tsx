@@ -10,6 +10,7 @@ import {
 import EditHTMLs from '../editHTMLs';
 import { renderOptionsMultipleChoice } from './MultipleChoice';
 // TODO: import { FaCheck } from 'react-icons/fa';
+// and make this answer an array of numbers
 
 interface AllThatApplyProps {
   qnum: number;

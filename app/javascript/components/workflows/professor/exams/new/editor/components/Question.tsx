@@ -229,7 +229,7 @@ const Question: React.FC<{
           </Card.Subtitle>
           <Card.Body>
             <ReferenceProvider>
-              <FieldArray name="parts" component={ShowParts} />
+              <FieldArray name="parts" component={ShowParts} props={{ qnum }} />
             </ReferenceProvider>
           </Card.Body>
         </FormSection>

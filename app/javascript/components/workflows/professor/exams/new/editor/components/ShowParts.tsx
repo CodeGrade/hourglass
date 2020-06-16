@@ -8,8 +8,11 @@ import { WrappedFieldArrayProps } from 'redux-form';
 import { PartInfo } from '@hourglass/workflows/student/exams/show/types';
 import Part from '@professor/exams/new/editor/components/Part';
 
-const ShowParts: React.FC<WrappedFieldArrayProps<PartInfo>> = (props) => {
+const ShowParts: React.FC<{
+  qnum: number;
+} & WrappedFieldArrayProps<PartInfo>> = (props) => {
   const {
+    qnum,
     fields,
   } = props;
   return (
@@ -18,7 +21,7 @@ const ShowParts: React.FC<WrappedFieldArrayProps<PartInfo>> = (props) => {
         <Col>
           {fields.map((member, index) => (
             // eslint-disable-next-line react/no-array-index-key
-            <Part key={index} memberName={member} />
+            <Part key={index} qnum={qnum} pnum={index} memberName={member} />
           ))}
         </Col>
       </Row>

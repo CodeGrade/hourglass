@@ -1,29 +1,18 @@
 import React, { useState } from 'react';
-
-const Part: React.FC<{
-  memberName: string;
-}> = (props) => {
-  const {
-    memberName,
-  } = props;
-  return (
-    <p>TODO: a part ({memberName})</p>
-  );
-}
-
-// import {
-//   Form,
-//   Card,
-//   Alert,
-//   Row,
-//   Col,
-//   InputGroup,
-//   Collapse,
-//   Button,
-// } from 'react-bootstrap';
-// import { alphabetIdx } from '@hourglass/common/helpers';
-// import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
-// import { HTMLVal, FileRef, ExamFile } from '@student/exams/show/types';
+import {
+  Form,
+  Card,
+  Alert,
+  Row,
+  Col,
+  InputGroup,
+  Collapse,
+  Button,
+} from 'react-bootstrap';
+import { alphabetIdx } from '@hourglass/common/helpers';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import { HTMLVal, FileRef, ExamFile } from '@student/exams/show/types';
+import { Field, WrappedFieldProps, FormSection } from 'redux-form';
 // // import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 // import ShowBodyItems from '@professor/exams/new/editor/containers/ShowBodyItems';
 // import { FilePickerPart } from '@professor/exams/new/editor/containers/FilePicker';
@@ -33,6 +22,68 @@ const Part: React.FC<{
 // import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 // import { createMap, getFilesForRefs } from '@student/exams/show/files';
 // import { PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
+
+const PartName: React.FC<WrappedFieldProps> = (props) => {
+  const {
+    input,
+  } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <>
+      <Form.Label column sm="2">Part name</Form.Label>
+      <Col sm="10">
+        <CustomEditor
+          className="bg-white"
+          value={value.value}
+          placeholder="Give a short (optional) descriptive name for the part"
+          onChange={(newName, _delta, source, _editor): void => {
+            if (source === 'user') {
+              onChange({
+                type: 'HTML',
+                value: newName,
+              });
+            }
+          }}
+        />
+      </Col>
+    </>
+  );
+};
+
+const Part: React.FC<{
+  memberName: string;
+  qnum: number;
+  pnum: number;
+}> = (props) => {
+  const {
+    memberName,
+    qnum,
+    pnum,
+  } = props;
+  return (
+    <Card
+      className="mb-3"
+      border="success"
+    >
+      <Alert variant="success">
+        <FormSection name={memberName}>
+          <Card.Title>
+            {`Part ${alphabetIdx(pnum)}`}
+          </Card.Title>
+          <Card.Subtitle>
+            <Form.Group as={Row} controlId={`${qnum}-${pnum}-name`}>
+              <Field name="name" component={PartName} />
+            </Form.Group>
+          </Card.Subtitle>
+        </FormSection>
+      </Alert>
+    </Card>
+  );
+}
+
 // 
 // 
 // export interface PartProps {
@@ -72,8 +123,6 @@ const Part: React.FC<{
 //       }}
 //     >
 //       <Card
-//         className="mb-3"
-//         border="success"
 //         onMouseOver={(): void => setMoversVisible(true)}
 //         onFocus={(): void => setMoversVisible(true)}
 //         onBlur={(): void => setMoversVisible(false)}
@@ -90,31 +139,8 @@ const Part: React.FC<{
 //         {/* /> */}
 //         <Alert variant="success">
 //           <Card.Title>
-//             {`Part ${alphabetIdx(pnum)}`}
 //           </Card.Title>
 //           <Card.Subtitle>
-//             <Form.Group as={Row} controlId={`${qnum}-${pnum}-name`}>
-//               <Form.Label column sm="2">Part name</Form.Label>
-//               <Col sm="10">
-//                 <CustomEditor
-//                   className="bg-white"
-//                   value={name.value}
-//                   placeholder="Give a short (optional) descriptive name for the part"
-//                   onChange={(newName, _delta, source, _editor): void => {
-//                     if (source === 'user') {
-//                       onChange(
-//                         {
-//                           type: 'HTML',
-//                           value: newName,
-//                         },
-//                         description,
-//                         points,
-//                       );
-//                     }
-//                   }}
-//                 />
-//               </Col>
-//             </Form.Group>
 //             <Form.Group as={Row} controlId={`${qnum}-${pnum}-desc`}>
 //               <Form.Label column sm="2">Description:</Form.Label>
 //               <Col sm="10">

@@ -12,6 +12,7 @@ import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 // import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
 import { alphabetIdx } from '@hourglass/common/helpers';
 import { Field, WrappedFieldProps, FieldArray, WrappedFieldArrayProps } from 'redux-form';
+import EditHTMLs from '../editHTMLs';
 
 interface MatchingProps {
   qnum: number;
@@ -56,22 +57,10 @@ interface MatchingProps {
 //   );
 // };
 
-const EditValues: React.FC<{}> = (props) => {
-  return (
-    <>
-      <p>TODO</p>
-      <Row className="p-2">
-        <Col className="text-center">
-          <Button
-            variant="dark"
-            // TODO: onClick={addValue}
-          >
-            Add new choice
-          </Button>
-        </Col>
-      </Row>
-    </>
-  );
+const renderValue = (member, index, fields) => (
+  <p>{member}: {JSON.stringify(fields.get(index))}</p>
+);
+
 //         {values.map((v, idx) => (
 //           <Row
 //             className="p-2"
@@ -109,84 +98,58 @@ const EditValues: React.FC<{}> = (props) => {
 //             </Col>
 //           </Row>
 //         ))}
-};
 
 const renderPrompt = (member, index, fields) => (
-  <p>{member}</p>
+  <p>{member}: {JSON.stringify(fields.get(index))}</p>
 );
 
-const EditPrompts: React.FC<WrappedFieldArrayProps<HTMLVal>> = (props) => {
-  const {
-    fields,
-  } = props;
-  return (
-    <>
-      {fields.map(renderPrompt)}
-      {/* {prompts.map((p, idx) => { */}
-      {/*   const valueI = value?.[idx] ?? -1; */}
-      {/*   return ( */}
-      {/*     <Row */}
-      {/*       className="p-2" */}
-      {/*       // We don't have a better option than this index right now. */}
-      {/*       // eslint-disable-next-line react/no-array-index-key */}
-      {/*       key={idx} */}
-      {/*       onMouseOver={(): void => setPromptMoversVisible(idx, true)} */}
-      {/*       onFocus={(): void => setPromptMoversVisible(idx, true)} */}
-      {/*       onBlur={(): void => setPromptMoversVisible(idx, false)} */}
-      {/*       onMouseOut={(): void => setPromptMoversVisible(idx, false)} */}
-      {/*     > */}
-      {/*       <Col className="flex-grow-01 pl-0"> */}
-      {/*         {/1* <MoveItem *1/} */}
-      {/*         {/1*   visible={promptMoversVisible[idx]} *1/} */}
-      {/*         {/1*   variant="dark" *1/} */}
-      {/*         {/1*   enableUp={idx > 0} *1/} */}
-      {/*         {/1*   enableDown={idx + 1 < prompts.length} *1/} */}
-      {/*         {/1*   onDelete={(): UpdateBodyItemAction => deletePrompt(idx)} *1/} */}
-      {/*         {/1*   onDown={(): UpdateBodyItemAction => movePrompt(idx, idx + 1)} *1/} */}
-      {/*         {/1*   onUp={(): UpdateBodyItemAction => movePrompt(idx - 1, idx)} *1/} */}
-      {/*         {/1* /> *1/} */}
-      {/*         {`${alphabetIdx(idx)}.`} */}
-      {/*       </Col> */}
-      {/*       <Col> */}
-      {/*         <CustomEditor */}
-      {/*           className="bg-white" */}
-      {/*           theme="bubble" */}
-      {/*           value={p.value} */}
-      {/*           placeholder="Enter a new prompt" */}
-      {/*           onChange={(newPrompt): void => updatePrompt(idx, { */}
-      {/*             type: 'HTML', */}
-      {/*             value: newPrompt, */}
-      {/*           })} */}
-      {/*         /> */}
-      {/*       </Col> */}
-      {/*       <Col sm={2}> */}
-      {/*         <ChooseRightAnswer */}
-      {/*           curValue={valueI} */}
-      {/*           choices={values} */}
-      {/*           onChange={(e): void => updateAnswer(idx, e)} */}
-      {/*         /> */}
-      {/*       </Col> */}
-      {/*     </Row> */}
-      {/*   ); */}
-      {/* })} */}
-      <Row className="p-2">
-        <Col className="text-center">
-          <Button
-            variant="dark"
-            onClick={(): void => {
-              fields.push({
-                type: 'HTML',
-                value: '',
-              });
-            }}
-          >
-            Add new prompt
-          </Button>
-        </Col>
-      </Row>
-    </>
-  );
-};
+// {prompts.map((p, idx) => {
+//   const valueI = value?.[idx] ?? -1;
+//   return (
+//     <Row
+//       className="p-2"
+//       // We don't have a better option than this index right now.
+//       // eslint-disable-next-line react/no-array-index-key
+//       key={idx}
+//       onMouseOver={(): void => setPromptMoversVisible(idx, true)}
+//       onFocus={(): void => setPromptMoversVisible(idx, true)}
+//       onBlur={(): void => setPromptMoversVisible(idx, false)}
+//       onMouseOut={(): void => setPromptMoversVisible(idx, false)}
+//     >
+//       <Col className="flex-grow-01 pl-0">
+//         {/* <MoveItem */}
+//         {/*   visible={promptMoversVisible[idx]} */}
+//         {/*   variant="dark" */}
+//         {/*   enableUp={idx > 0} */}
+//         {/*   enableDown={idx + 1 < prompts.length} */}
+//         {/*   onDelete={(): UpdateBodyItemAction => deletePrompt(idx)} */}
+//         {/*   onDown={(): UpdateBodyItemAction => movePrompt(idx, idx + 1)} */}
+//         {/*   onUp={(): UpdateBodyItemAction => movePrompt(idx - 1, idx)} */}
+//         {/* /> */}
+//         {`${alphabetIdx(idx)}.`}
+//       </Col>
+//       <Col>
+//         <CustomEditor
+//           className="bg-white"
+//           theme="bubble"
+//           value={p.value}
+//           placeholder="Enter a new prompt"
+//           onChange={(newPrompt): void => updatePrompt(idx, {
+//             type: 'HTML',
+//             value: newPrompt,
+//           })}
+//         />
+//       </Col>
+//       <Col sm={2}>
+//         <ChooseRightAnswer
+//           curValue={valueI}
+//           choices={values}
+//           onChange={(e): void => updateAnswer(idx, e)}
+//         />
+//       </Col>
+//     </Row>
+//   );
+// })}
 
 const EditColName: React.FC<WrappedFieldProps & {
   defaultLabel: string;
@@ -226,7 +189,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
             <Field name="promptsLabel" component={EditColName} defaultLabel="Column A" />
           </Col>
         </Row>
-        <FieldArray name="prompts" component={EditPrompts} />
+        <FieldArray name="prompts" component={EditHTMLs} renderOptions={renderPrompt} />
       </Col>
       <Col sm={6}>
         <Row className="p-2">
@@ -234,7 +197,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
             <Field name="valuesLabel" component={EditColName} defaultLabel="Column B" />
           </Col>
         </Row>
-        <EditValues />
+        <FieldArray name="values" component={EditHTMLs} renderOptions={renderValue} prompt="Add new choice" />
       </Col>
     </Row>
   );

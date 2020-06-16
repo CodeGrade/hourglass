@@ -12,6 +12,14 @@ import {
   Policy,
   ExamFile,
   FileRef,
+  ExamVersionWithAnswers,
+  AnswerState,
+  QuestionInfo,
+  PartInfo,
+  BodyItem,
+  QuestionInfoWithAnswers,
+  PartInfoWithAnswers,
+  BodyItemWithAnswer,
 } from '@student/exams/show/types';
 import {
   reduxForm,
@@ -40,6 +48,47 @@ export interface ExamEditorProps {
   answers: AnswersState;
 }
 
+function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): ExamVersionWithAnswers {
+  const {
+    questions,
+    ...restOfE
+  } = exam;
+  const newQuestions: QuestionInfoWithAnswers[] = [];
+  questions.forEach((q, qnum) => {
+    const {
+      parts,
+      ...restOfQ
+    } = q;
+    const newParts: PartInfoWithAnswers[] = [];
+    parts.forEach((p, pnum) => {
+      const {
+        body,
+        ...restOfP
+      } = p;
+      const newBody: BodyItemWithAnswer[] = [];
+      body.forEach((b, bnum) => {
+        const newBodyItem: BodyItemWithAnswer = {
+          ...b,
+          answer: answers[qnum][pnum][bnum] ?? { NO_ANS: true },
+        } as BodyItemWithAnswer;
+        newBody.push(newBodyItem);
+      });
+      newParts.push({
+        ...restOfP,
+        body: newBody,
+      });
+    });
+    newQuestions.push({
+      ...restOfQ,
+      parts: newParts,
+    });
+  });
+  return {
+    ...restOfE,
+    questions: newQuestions,
+  };
+}
+
 const Editor: React.FC<ExamEditorProps> = (props) => {
   const {
     exam,
@@ -53,8 +102,7 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
           all: {
             name: railsExamVersion.name,
             policies: railsExamVersion.policies,
-            exam,
-            answers,
+            exam: examWithAnswers(exam, answers.answers),
           },
         }}
       />
@@ -67,8 +115,7 @@ interface FormValues {
   all: {
     name: string;
     policies: Policy[];
-    exam: ExamVersion;
-    answers: AnswersState;
+    exam: ExamVersionWithAnswers;
   };
 }
 
@@ -124,6 +171,60 @@ const FormContextProviderConnected = connect((state) => ({
   examRef: formSelector(state, 'all.exam.reference'),
 }))(FormContextProvider);
 
+function transformForSubmit(values: FormValues): Version {
+  const { all } = values;
+  const questions: QuestionInfo[] = [];
+  const answers: AnswersState['answers'] = [];
+  all.exam.questions.forEach((q, qnum) => {
+    answers[qnum] = [];
+    const {
+      parts,
+      ...restOfQ
+    } = q;
+    const newParts: PartInfo[] = [];
+    parts.forEach((p, pnum) => {
+      answers[qnum][pnum] = [];
+      const {
+        body,
+        ...restOfP
+      } = p;
+      const newBody: BodyItem[] = [];
+      body.forEach((b, bnum) => {
+        const {
+          answer,
+          ...restOfB
+        } = b;
+        answers[qnum][pnum][bnum] = answer ?? { NO_ANS: true };
+        newBody.push({
+          ...restOfB,
+        });
+      });
+      newParts.push({
+        ...restOfP,
+        body: newBody,
+      });
+    });
+    questions.push({
+      ...restOfQ,
+      parts: newParts,
+    });
+  });
+
+  return {
+    name: all.name,
+    info: {
+      policies: all.policies,
+      answers,
+      contents: {
+        instructions: all.exam.instructions,
+        questions,
+        reference: all.exam.reference ?? [],
+      },
+    },
+    files: all.exam.files,
+  };
+}
+
 const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const {
     pristine,
@@ -135,20 +236,8 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const { examId, versionId } = useParams();
   return (
     <form
-      onSubmit={handleSubmit(({ all }) => {
-        const version: Version = {
-          name: all.name,
-          info: {
-            policies: all.policies,
-            answers: all.answers.answers,
-            contents: {
-              instructions: all.exam.instructions,
-              questions: all.exam.questions,
-              reference: all.exam.reference ?? [],
-            },
-          },
-          files: all.exam.files,
-        };
+      onSubmit={handleSubmit((values) => {
+        const version = transformForSubmit(values);
         versionUpdate(versionId, { version }).then((res) => {
           if (res.updated === false) {
             alert({

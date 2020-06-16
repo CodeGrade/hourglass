@@ -5,7 +5,7 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
-import { CodeInfo, CodeState, MarkDescription } from '@student/exams/show/types';
+import { CodeInfoWithAnswer, MarkDescription } from '@student/exams/show/types';
 import { ExamContext } from '@student/exams/show/context';
 import { Editor } from '@student/exams/show/components/ExamCodeBox';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
@@ -15,9 +15,8 @@ interface CodeProps {
   qnum: number;
   pnum: number;
   bnum: number;
-  info: CodeInfo;
-  value: CodeState;
-  onChange?: (newInfo: CodeInfo, newVal: CodeState) => void;
+  info: CodeInfoWithAnswer;
+  onChange: (newVal: CodeInfoWithAnswer) => void;
 }
 
 interface CMRange {
@@ -33,12 +32,13 @@ interface LockStateInfo {
 }
 
 const Code: React.FC<CodeProps> = (props) => {
+  // TODO: starter should be a filepicker that saves a filename,
+  // right now it just modifies "answer", which is wrong
   const {
     info,
     qnum,
     pnum,
     bnum,
-    value,
     onChange,
   } = props;
   const { prompt, lang, initial } = info;
@@ -47,8 +47,11 @@ const Code: React.FC<CodeProps> = (props) => {
   if (f?.filedir === 'dir') {
     throw new Error('Code initial cannot be a directory.');
   }
-  const text = value?.text ?? f?.contents ?? '';
-  const marks = value?.marks ?? f?.marks ?? [];
+  const answerText = info.answer?.text ?? '';
+  const answerMarks = info.answer?.marks ?? [];
+
+  const fileText = f?.contents ?? '';
+  const fileMarks = f?.marks ?? [];
   const [lockState, setLockState] = useState<LockStateInfo>({
     enabled: false,
     active: false,
@@ -77,11 +80,11 @@ const Code: React.FC<CodeProps> = (props) => {
               type: 'HTML',
               value: newPrompt,
             },
-          }, value);
+          });
         }}
       />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
-        <Form.Label column sm={2}>Starter</Form.Label>
+        <Form.Label column sm={2}>Answer</Form.Label>
         <Col sm={10}>
           <div className="quill bg-white">
             <div className="ql-toolbar ql-snow">
@@ -92,7 +95,7 @@ const Code: React.FC<CodeProps> = (props) => {
                 className="col-sm-2"
                 value={lang}
                 onChange={(e): void => {
-                  onChange({ ...info, lang: e.target.value }, value);
+                  onChange({ ...info, lang: e.target.value });
                 }}
               >
                 <option value="scheme">Racket</option>
@@ -106,10 +109,10 @@ const Code: React.FC<CodeProps> = (props) => {
                 active={lockState.active}
                 title={title}
                 onClick={(): void => {
-                  const newMarks = [...marks];
+                  const newMarks = [...answerMarks];
                   const { curRange, finalPos } = lockState;
                   if (lockState.active) {
-                    const markId = marks.findIndex((m) => (
+                    const markId = answerMarks.findIndex((m) => (
                       m.from.ch === curRange.from.ch
                       && m.from.line === curRange.from.line
                       && m.to.ch === curRange.to.ch
@@ -129,7 +132,7 @@ const Code: React.FC<CodeProps> = (props) => {
                     };
                     newMarks.push(newMark);
                   }
-                  onChange(info, { text, marks: newMarks });
+                  onChange({ ...info, answer: { text: answerText, marks: newMarks } });
                 }}
               >
                 <FaLock />
@@ -140,16 +143,16 @@ const Code: React.FC<CodeProps> = (props) => {
                 size="sm"
                 title="Clear all locked regions"
                 onClick={(): void => {
-                  onChange(info, { text, marks: [] });
+                  onChange({ ...info, answer: { text: answerText, marks: [] } });
                 }}
               >
                 <FaBan />
               </Button>
             </div>
             <Editor
-              value={text}
-              markDescriptions={marks}
-              valueUpdate={[marks]}
+              value={answerText}
+              markDescriptions={answerMarks}
+              valueUpdate={[answerMarks]}
               language={lang}
               onSelection={(editor, data): void => {
                 const { ranges, origin } = data;
@@ -178,7 +181,7 @@ const Code: React.FC<CodeProps> = (props) => {
                 }
               }}
               onChange={(newText, newMarks): void => {
-                onChange(info, { text: newText, marks: newMarks });
+                onChange({ ...info, answer: { text: newText, marks: newMarks } });
               }}
             />
           </div>

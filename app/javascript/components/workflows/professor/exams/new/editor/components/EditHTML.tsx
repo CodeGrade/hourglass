@@ -11,7 +11,6 @@ export interface HTMLProps {
   qnum: number;
   pnum: number;
   bnum: number;
-  value: AnswerState;
   info: HTMLVal;
   onChange: (newInfo: HTMLVal, newState: AnswerState) => void;
 }
@@ -22,7 +21,6 @@ const EditHTML: React.FC<HTMLProps> = (props) => {
     pnum,
     bnum,
     info,
-    value,
     onChange,
   } = props;
   return (
@@ -39,7 +37,7 @@ const EditHTML: React.FC<HTMLProps> = (props) => {
                 onChange({
                   type: 'HTML',
                   value: newVal,
-                }, value);
+                }, { NO_ANS: true });
               }
             }}
           />

@@ -9,7 +9,8 @@
     "dev": "./bin/webpack-dev-server",
     "lint": "eslint 'app/javascript' --ext 'js,ts,jsx,tsx'",
     "typecheck": "tsc --noEmit --noErrorTruncation --pretty false --incremental false -p .",
-    "uml": "tplant -C --input app/javascript/types.ts --output types.svg"
+    "uml": "tplant -C --input app/javascript/types.ts --output types.svg",
+    "unused": "ts-prune"
   },
   "dependencies": {
     "@babel/core": "^7.9.0",
@@ -81,6 +82,7 @@
     "eslint-plugin-react-hooks": "^2.5.1",
     "tplant": "^2.3.3",
     "ts-loader": "^7.0.5",
+    "ts-prune": "^0.6.4",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
   }

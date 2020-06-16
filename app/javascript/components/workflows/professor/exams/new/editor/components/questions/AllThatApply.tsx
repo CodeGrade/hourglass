@@ -48,6 +48,61 @@ interface AllThatApplyProps {
 //   return ans;
 // }
 
+const OneOption: React.FC<{
+  memberName: string;
+}> = (props) => {
+  return (
+    <p>SINGLE OPTION</p>
+  );
+}
+// const selected = value?.[idx];
+// return (
+//   <Row
+//     className="p-2"
+//     // We don't have a better option than this index right now.
+//     // eslint-disable-next-line react/no-array-index-key
+//     key={idx}
+//     onMouseOver={(): void => setMoversVisible(idx, true)}
+//     onFocus={(): void => setMoversVisible(idx, true)}
+//     onBlur={(): void => setMoversVisible(idx, false)}
+//     onMouseOut={(): void => setMoversVisible(idx, false)}
+//   >
+//     <Col className="flex-grow-01">
+//       {/* <MoveItem */}
+//       {/*   visible={moversVisible[idx]} */}
+//       {/*   variant="dark" */}
+//       {/*   enableUp={idx > 0} */}
+//       {/*   enableDown={idx + 1 < options.length} */}
+//       {/*   onDelete={(): UpdateBodyItemAction => deleteOption(idx)} */}
+//       {/*   onDown={(): UpdateBodyItemAction => moveOption(idx, idx + 1)} */}
+//       {/*   onUp={(): UpdateBodyItemAction => moveOption(idx - 1, idx)} */}
+//       {/* /> */}
+//       <Button
+//         variant={selected ? 'dark' : 'outline-dark'}
+//         onClick={(): void => toggleAnswer(idx)}
+//       >
+//         <Icon I={FaCheck} className={selected ? '' : 'invisible'} />
+//       </Button>
+//     </Col>
+//     <Col className="pr-0">
+//       <CustomEditor
+//         className="bg-white"
+//         theme="bubble"
+//         value={option.value}
+//         onChange={(newPrompt): void => {
+//           setPrompt(
+//             idx,
+//             {
+//               type: 'HTML',
+//               value: newPrompt,
+//             },
+//           );
+//         }}
+//       />
+//     </Col>
+//   </Row>
+// );
+
 const ShowOptions: React.FC<WrappedFieldArrayProps<HTMLVal>> = (props) => {
   const {
     fields,
@@ -63,57 +118,12 @@ const ShowOptions: React.FC<WrappedFieldArrayProps<HTMLVal>> = (props) => {
           <Col><b>Prompt</b></Col>
         </Row>
         {fields.map((member, index) => (
-          <p key={index}>TODO: {member}</p>
+          <OneOption
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+            memberName={member}
+          />
         ))}
-        {/* {options.map((option, idx) => { */}
-        {/*   const selected = value?.[idx]; */}
-        {/*   return ( */}
-        {/*     <Row */}
-        {/*       className="p-2" */}
-        {/*       // We don't have a better option than this index right now. */}
-        {/*       // eslint-disable-next-line react/no-array-index-key */}
-        {/*       key={idx} */}
-        {/*       onMouseOver={(): void => setMoversVisible(idx, true)} */}
-        {/*       onFocus={(): void => setMoversVisible(idx, true)} */}
-        {/*       onBlur={(): void => setMoversVisible(idx, false)} */}
-        {/*       onMouseOut={(): void => setMoversVisible(idx, false)} */}
-        {/*     > */}
-        {/*       <Col className="flex-grow-01"> */}
-        {/*         {/1* <MoveItem *1/} */}
-        {/*         {/1*   visible={moversVisible[idx]} *1/} */}
-        {/*         {/1*   variant="dark" *1/} */}
-        {/*         {/1*   enableUp={idx > 0} *1/} */}
-        {/*         {/1*   enableDown={idx + 1 < options.length} *1/} */}
-        {/*         {/1*   onDelete={(): UpdateBodyItemAction => deleteOption(idx)} *1/} */}
-        {/*         {/1*   onDown={(): UpdateBodyItemAction => moveOption(idx, idx + 1)} *1/} */}
-        {/*         {/1*   onUp={(): UpdateBodyItemAction => moveOption(idx - 1, idx)} *1/} */}
-        {/*         {/1* /> *1/} */}
-        {/*         <Button */}
-        {/*           variant={selected ? 'dark' : 'outline-dark'} */}
-        {/*           onClick={(): void => toggleAnswer(idx)} */}
-        {/*         > */}
-        {/*           <Icon I={FaCheck} className={selected ? '' : 'invisible'} /> */}
-        {/*         </Button> */}
-        {/*       </Col> */}
-        {/*       <Col className="pr-0"> */}
-        {/*         <CustomEditor */}
-        {/*           className="bg-white" */}
-        {/*           theme="bubble" */}
-        {/*           value={option.value} */}
-        {/*           onChange={(newPrompt): void => { */}
-        {/*             setPrompt( */}
-        {/*               idx, */}
-        {/*               { */}
-        {/*                 type: 'HTML', */}
-        {/*                 value: newPrompt, */}
-        {/*               }, */}
-        {/*             ); */}
-        {/*           }} */}
-        {/*         /> */}
-        {/*       </Col> */}
-        {/*     </Row> */}
-        {/*   ); */}
-        {/* })} */}
         <Row className="p-2">
           <Col className="text-center p-0">
             <Button

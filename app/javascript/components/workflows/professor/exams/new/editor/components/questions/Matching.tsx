@@ -9,10 +9,10 @@ import {
 } from '@material-ui/core';
 import { MatchingInfo, MatchingState, HTMLVal } from '@student/exams/show/types';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
-// import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
+import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import { alphabetIdx } from '@hourglass/common/helpers';
 import { Field, WrappedFieldProps, FieldArray, WrappedFieldArrayProps } from 'redux-form';
-import EditHTMLs from '../editHTMLs';
+import EditHTMLs, { EditHTMLField } from '../editHTMLs';
 
 interface MatchingProps {
   qnum: number;
@@ -57,50 +57,77 @@ interface MatchingProps {
 //   );
 // };
 
+const OneValue: React.FC<{
+  memberName: string;
+  valueNum: number;
+  enableDown: boolean;
+  moveDown: () => void;
+  moveUp: () => void;
+  remove: () => void;
+}> = (props) => {
+  const {
+    memberName,
+    valueNum,
+    enableDown,
+    moveDown,
+    moveUp,
+    remove,
+  } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
+  return (
+    <Row
+      className="p-2"
+      onMouseOver={(): void => setMoversVisible(true)}
+      onFocus={(): void => setMoversVisible(true)}
+      onBlur={(): void => setMoversVisible(false)}
+      onMouseOut={(): void => setMoversVisible(false)}
+    >
+      <Col className="flex-grow-01 pl-0">
+        <MoveItem
+          visible={moversVisible}
+          variant="dark"
+          enableUp={valueNum > 0}
+          enableDown={enableDown}
+          onUp={moveUp}
+          onDown={moveDown}
+          onDelete={remove}
+        />
+        {`${valueNum + 1}.`}
+      </Col>
+      <Col className="pr-0">
+        <Field
+          name={memberName}
+          component={EditHTMLField}
+          theme="bubble"
+          placeholder="Enter a new choice"
+        />
+      </Col>
+    </Row>
+  );
+};
+
 const renderValue = (member, index, fields) => (
-  <p>{member}: {JSON.stringify(fields.get(index))}</p>
+  <OneValue
+    // eslint-disable-next-line react/no-array-index-key
+    key={index}
+    valueNum={index}
+    memberName={member}
+    enableDown={index + 1 < fields.length}
+    moveDown={(): void => {
+      fields.move(index, index + 1);
+    }}
+    moveUp={(): void => {
+      fields.move(index, index - 1);
+    }}
+    remove={(): void => {
+      fields.remove(index);
+    }}
+  />
 );
 
-//         {values.map((v, idx) => (
-//           <Row
-//             className="p-2"
-//             // We don't have a better option than this index right now.
-//             // eslint-disable-next-line react/no-array-index-key
-//             key={idx}
-//             onMouseOver={(): void => setValueMoversVisible(idx, true)}
-//             onFocus={(): void => setValueMoversVisible(idx, true)}
-//             onBlur={(): void => setValueMoversVisible(idx, false)}
-//             onMouseOut={(): void => setValueMoversVisible(idx, false)}
-//           >
-//             <Col className="flex-grow-01 pl-0">
-//               {/* <MoveItem */}
-//               {/*   visible={valueMoversVisible[idx]} */}
-//               {/*   variant="dark" */}
-//               {/*   enableUp={idx > 0} */}
-//               {/*   enableDown={idx + 1 < prompts.length} */}
-//               {/*   onDelete={(): UpdateBodyItemAction => deleteValue(idx)} */}
-//               {/*   onDown={(): UpdateBodyItemAction => moveValue(idx, idx + 1)} */}
-//               {/*   onUp={(): UpdateBodyItemAction => moveValue(idx - 1, idx)} */}
-//               {/* /> */}
-//               {`${idx + 1}.`}
-//             </Col>
-//             <Col className="pr-0">
-//               <CustomEditor
-//                 className="bg-white pr-0"
-//                 theme="bubble"
-//                 value={v.value}
-//                 placeholder="Enter a new choice"
-//                 onChange={(newValue): void => updateValue(idx, {
-//                   type: 'HTML',
-//                   value: newValue,
-//                 })}
-//               />
-//             </Col>
-//           </Row>
-//         ))}
 
 const renderPrompt = (member, index, fields) => (
-  <p>{member}: {JSON.stringify(fields.get(index))}</p>
+  <p key={index}>{member}: {JSON.stringify(fields.get(index))}</p>
 );
 
 // {prompts.map((p, idx) => {

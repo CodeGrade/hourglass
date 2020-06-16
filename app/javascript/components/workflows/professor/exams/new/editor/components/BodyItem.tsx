@@ -41,8 +41,8 @@ const OneItem: React.FC<{
     //   return <AllThatApply info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'CodeTag':
       return <CodeTag info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
-    // case 'YesNo':
-    //   return <YesNoInput info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
+    case 'YesNo':
+      return <YesNoInput info={value} onChange={onChange} qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'MultipleChoice':
     //   return <MultipleChoice info={value} qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'Text':

@@ -6,28 +6,26 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import { YesNoInfo, YesNoState } from '@student/exams/show/types';
+import { YesNoInfoWithAnswer } from '@student/exams/show/types';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 
 export interface YesNoProps {
-  info: YesNoInfo;
-  value: boolean;
+  info: YesNoInfoWithAnswer;
   qnum: number;
   pnum: number;
   bnum: number;
-  onChange: (newInfo: YesNoInfo, newState: YesNoState) => void;
-  disabled: boolean;
+  onChange: (newInfo: YesNoInfoWithAnswer) => void;
+  disabled?: boolean;
 }
 
 const YesNo: React.FC<YesNoProps> = (props) => {
   const {
     info,
-    value,
     qnum,
     pnum,
     bnum,
     onChange,
-    disabled,
+    disabled = false,
   } = props;
   const {
     prompt,
@@ -43,7 +41,7 @@ const YesNo: React.FC<YesNoProps> = (props) => {
         bnum={bnum}
         prompt={prompt.value}
         onChange={(newPrompt): void => {
-          if (onChange) { onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }, value); }
+          if (onChange) { onChange({ ...info, prompt: { type: 'HTML', value: newPrompt } }); }
         }}
       />
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-wording`}>
@@ -56,9 +54,9 @@ const YesNo: React.FC<YesNoProps> = (props) => {
             value={isYesNo}
             onChange={(v): void => {
               if (v) {
-                onChange({ ...info, yesLabel: 'Yes', noLabel: 'No' }, value);
+                onChange({ ...info, yesLabel: 'Yes', noLabel: 'No' });
               } else {
-                onChange({ ...info, yesLabel: 'True', noLabel: 'False' }, value);
+                onChange({ ...info, yesLabel: 'True', noLabel: 'False' });
               }
             }}
           >
@@ -86,19 +84,19 @@ const YesNo: React.FC<YesNoProps> = (props) => {
             className="bg-white rounded"
             name="tbg"
             type="radio"
-            value={value}
-            onChange={(v): void => onChange(info, !!v)}
+            value={info.answer}
+            onChange={(v): void => onChange({ ...info, answer: !!v })}
           >
             <ToggleButton
               disabled={disabled}
-              variant={value ? 'primary' : 'outline-primary'}
+              variant={info.answer ? 'primary' : 'outline-primary'}
               value
             >
               {yesLabel}
             </ToggleButton>
             <ToggleButton
               disabled={disabled}
-              variant={(value === false) ? 'primary' : 'outline-primary'}
+              variant={(info.answer === false) ? 'primary' : 'outline-primary'}
               value={false}
             >
               {noLabel}

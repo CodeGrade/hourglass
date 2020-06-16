@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Form,
   Card,
@@ -13,15 +13,13 @@ import { alphabetIdx } from '@hourglass/common/helpers';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import { HTMLVal, FileRef, ExamFile } from '@student/exams/show/types';
 import { Field, WrappedFieldProps, FormSection } from 'redux-form';
-// // import MoveItem from '@professor/exams/new/editor/containers/MoveItem';
+import FilePickerSelect from '@professor/exams/new/editor/components/FilePicker';
+import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { createMap, getFilesForRefs } from '@student/exams/show/files';
+import { PartFilesContext, ExamContext } from '@hourglass/workflows/student/exams/show/context';
+import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 // import ShowBodyItems from '@professor/exams/new/editor/containers/ShowBodyItems';
-// import { FilePickerPart } from '@professor/exams/new/editor/containers/FilePicker';
-// import { MovePartAction, DeletePartAction } from '@professor/exams/new/types';
-// import { movePart, deletePart } from '@professor/exams/new/actions';
-// import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
-// import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-// import { createMap, getFilesForRefs } from '@student/exams/show/files';
-// import { PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
 
 const PartName: React.FC<WrappedFieldProps> = (props) => {
   const {
@@ -122,21 +120,82 @@ const PartPoints: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const PartReference: React.FC<WrappedFieldProps> = (props) => {
+  const { input } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  const [open, setOpen] = useState(false);
+  const noFiles = value.length === 0;
+  const { files, fmap } = useContext(ExamContext);
+  const filteredFiles = getFilesForRefs(fmap, value);
+  return (
+    <>
+      <Form.Label column sm="2">Files to be shown for this question part:</Form.Label>
+      <Col sm={10}>
+        <InputGroup>
+          <div className="flex-grow-1">
+            <FilePickerSelect options={files} selected={value} onChange={onChange} />
+          </div>
+          <InputGroup.Append>
+            <Button
+              variant="info"
+              disabled={noFiles}
+              onClick={(): void => setOpen((o) => !o)}
+            >
+              Preview files
+              {open && !noFiles ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+            </Button>
+          </InputGroup.Append>
+        </InputGroup>
+        <Collapse in={open && !noFiles}>
+          <div className="border">
+            <VeryControlledFileViewer files={filteredFiles} />
+          </div>
+        </Collapse>
+      </Col>
+    </>
+  );
+};
+
 const Part: React.FC<{
   memberName: string;
   qnum: number;
   pnum: number;
+  enableDown: boolean;
+  moveDown: () => void;
+  moveUp: () => void;
+  remove: () => void;
 }> = (props) => {
   const {
     memberName,
     qnum,
     pnum,
+    enableDown,
+    moveDown,
+    moveUp,
+    remove,
   } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
   return (
     <Card
       className="mb-3"
       border="success"
+      onMouseOver={(): void => setMoversVisible(true)}
+      onFocus={(): void => setMoversVisible(true)}
+      onBlur={(): void => setMoversVisible(false)}
+      onMouseOut={(): void => setMoversVisible(false)}
     >
+      <MoveItem
+        visible={moversVisible}
+        variant="success"
+        enableUp={pnum > 0}
+        enableDown={enableDown}
+        onUp={moveUp}
+        onDown={moveDown}
+        onDelete={remove}
+      />
       <Alert variant="success">
         <FormSection name={memberName}>
           <Card.Title>
@@ -152,101 +211,27 @@ const Part: React.FC<{
             <Form.Group as={Row} controlId={`${qnum}-${pnum}-points`}>
               <Field name="points" component={PartPoints} />
             </Form.Group>
+            <Form.Group as={Row} controlId={`${qnum}-${pnum}-files`}>
+              <Field name="reference" component={PartReference} />
+            </Form.Group>
           </Card.Subtitle>
         </FormSection>
       </Alert>
+      <Card.Body>
+        TODO
+        {/* <ShowBodyItems qnum={qnum} pnum={pnum} /> */}
+      </Card.Body>
     </Card>
   );
 };
 
-// export interface PartProps {
-//   qnum: number;
-//   pnum: number;
-//   numParts: number;
-//   name: HTMLVal;
-//   description: HTMLVal;
-//   points: number;
-//   reference: FileRef[];
-//   files: ExamFile[];
-//   onChange: (name: HTMLVal, description: HTMLVal, points: number) => void;
-// }
-//
-// const Part: React.FC<PartProps> = (props) => {
-//   const {
-//     qnum,
-//     pnum,
-//     numParts,
-//     name,
-//     description,
-//     points,
-//     onChange,
-//     files = [],
-//     reference = [],
-//   } = props;
-//   const [moversVisible, setMoversVisible] = useState(false);
-//   const [open, setOpen] = useState(false);
-//   const noFiles = reference.length === 0;
-//   const fmap = createMap(files);
-//   const filteredFiles = getFilesForRefs(fmap, reference);
-//
-//   return (
 //     <PartFilesContext.Provider
 //       value={{
 //         references: reference,
 //       }}
 //     >
-//       <Card
-//         onMouseOver={(): void => setMoversVisible(true)}
-//         onFocus={(): void => setMoversVisible(true)}
-//         onBlur={(): void => setMoversVisible(false)}
-//         onMouseOut={(): void => setMoversVisible(false)}
-//       >
-//         {/* <MoveItem */}
-//         {/*   visible={moversVisible} */}
-//         {/*   variant="success" */}
-//         {/*   enableUp={pnum > 0} */}
-//         {/*   enableDown={pnum + 1 < numParts} */}
-//         {/*   onUp={(): MovePartAction => movePart(qnum, pnum, pnum - 1)} */}
-//         {/*   onDown={(): MovePartAction => movePart(qnum, pnum, pnum + 1)} */}
-//         {/*   onDelete={(): DeletePartAction => deletePart(qnum, pnum)} */}
-//         {/* /> */}
-//         <Alert variant="success">
-//           <Card.Title>
-//           </Card.Title>
-//           <Card.Subtitle>
-//             <Form.Group as={Row} controlId={`${qnum}-${pnum}-files`}>
-//               <Form.Label column sm="2">Files to be shown for this question part:</Form.Label>
-//               <Col sm={10}>
-//                 <InputGroup>
-//                   <div className="flex-grow-1">
-//                     <FilePickerPart qnum={qnum} pnum={pnum} />
-//                   </div>
-//                   <InputGroup.Append>
-//                     <Button
-//                       variant="info"
-//                       disabled={noFiles}
-//                       onClick={(): void => setOpen((o) => !o)}
-//                     >
-//                       Preview files
-//                       {open && !noFiles ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
-//                     </Button>
-//                   </InputGroup.Append>
-//                 </InputGroup>
-//                 <Collapse in={open && !noFiles}>
-//                   <div className="border">
-//                     <VeryControlledFileViewer files={filteredFiles} />
-//                   </div>
-//                 </Collapse>
-//               </Col>
-//             </Form.Group>
-//           </Card.Subtitle>
-//         </Alert>
-//         <Card.Body>
-//           <ShowBodyItems qnum={qnum} pnum={pnum} />
-//         </Card.Body>
+//       <Card>
 //       </Card>
 //     </PartFilesContext.Provider>
-//   );
-// };
 
 export default Part;

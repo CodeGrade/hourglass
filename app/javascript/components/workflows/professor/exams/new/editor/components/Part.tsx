@@ -24,64 +24,7 @@ import { getFilesForRefs } from '@student/exams/show/files';
 import { ExamContext } from '@hourglass/workflows/student/exams/show/context';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
-
-const PartName: React.FC<WrappedFieldProps> = (props) => {
-  const {
-    input,
-  } = props;
-  const {
-    value,
-    onChange,
-  } = input;
-  return (
-    <>
-      <Form.Label column sm="2">Part name</Form.Label>
-      <Col sm="10">
-        <CustomEditor
-          className="bg-white"
-          value={value.value}
-          placeholder="Give a short (optional) descriptive name for the part"
-          onChange={(newName, _delta, source, _editor): void => {
-            if (source === 'user') {
-              onChange({
-                type: 'HTML',
-                value: newName,
-              });
-            }
-          }}
-        />
-      </Col>
-    </>
-  );
-};
-
-const PartDesc: React.FC<WrappedFieldProps> = (props) => {
-  const { input } = props;
-  const {
-    value,
-    onChange,
-  } = input;
-  return (
-    <>
-      <Form.Label column sm="2">Description:</Form.Label>
-      <Col sm="10">
-        <CustomEditor
-          className="bg-white"
-          value={value.value}
-          placeholder="Give a longer description of the part"
-          onChange={(newDesc, _delta, source, _editor): void => {
-            if (source === 'user') {
-              onChange({
-                type: 'HTML',
-                value: newDesc,
-              });
-            }
-          }}
-        />
-      </Col>
-    </>
-  );
-};
+import { EditHTMLField } from './editHTMLs';
 
 const PartPoints: React.FC<WrappedFieldProps> = (props) => {
   const { input } = props;
@@ -207,10 +150,24 @@ const Part: React.FC<{
           </Card.Title>
           <Card.Subtitle>
             <Form.Group as={Row} controlId={`${qnum}-${pnum}-name`}>
-              <Field name="name" component={PartName} />
+              <Form.Label column sm="2">Part name</Form.Label>
+              <Col sm="10">
+                <Field
+                  name="name"
+                  component={EditHTMLField}
+                  placeholder="Give a short (optional) descriptive name for the part"
+                />
+              </Col>
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-${pnum}-desc`}>
-              <Field name="description" component={PartDesc} />
+              <Form.Label column sm="2">Description:</Form.Label>
+              <Col sm="10">
+                <Field
+                  name="description"
+                  component={EditHTMLField}
+                  placeholder="Give a longer description of the part"
+                />
+              </Col>
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-${pnum}-points`}>
               <Field name="points" component={PartPoints} />

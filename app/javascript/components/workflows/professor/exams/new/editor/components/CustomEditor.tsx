@@ -8,7 +8,7 @@ import './CustomEditor.css';
 
 ReactQuill.Quill.register('modules/clipboard', QuillPasteSmart, true);
 
-interface HTMLValProps {
+export interface CustomEditorProps {
   value: string;
   placeholder?: string;
   className?: string;
@@ -49,7 +49,7 @@ const formatOptions = [
   // NO 'video'
 ];
 
-const CustomEditor: React.FC<HTMLValProps> = (props) => {
+const CustomEditor: React.FC<CustomEditorProps> = (props) => {
   const {
     value,
     placeholder,

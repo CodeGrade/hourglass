@@ -20,8 +20,23 @@ const ShowParts: React.FC<{
       <Row>
         <Col>
           {fields.map((member, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <Part key={index} qnum={qnum} pnum={index} memberName={member} />
+            <Part
+              // eslint-disable-next-line react/no-array-index-key
+              key={index}
+              qnum={qnum}
+              pnum={index}
+              memberName={member}
+              enableDown={index + 1 < fields.length}
+              moveDown={(): void => {
+                fields.move(index, index + 1);
+              }}
+              moveUp={(): void => {
+                fields.move(index, index - 1);
+              }}
+              remove={(): void => {
+                fields.remove(index);
+              }}
+            />
           ))}
         </Col>
       </Row>

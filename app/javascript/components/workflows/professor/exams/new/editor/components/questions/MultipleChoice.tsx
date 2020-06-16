@@ -16,30 +16,7 @@ import {
   WrappedFieldProps,
 } from 'redux-form';
 import { FaCircle } from 'react-icons/fa';
-import EditHTMLs from '../editHTMLs';
-
-const EditOption: React.FC<WrappedFieldProps> = (props) => {
-  const { input } = props;
-  const {
-    value,
-    onChange,
-  } = input;
-  return (
-    <CustomEditor
-      className="bg-white"
-      theme="bubble"
-      value={value}
-      onChange={(newName, _delta, source, _editor): void => {
-        if (source === 'user') {
-          onChange({
-            type: 'HTML',
-            value: newName,
-          });
-        }
-      }}
-    />
-  );
-};
+import EditHTMLs, { EditHTMLField } from '../editHTMLs';
 
 const EditAnswer: React.FC<WrappedFieldProps & {
   current: number;
@@ -98,7 +75,7 @@ const OneOption: React.FC<{
       </Col>
       <Col className="pr-0">
         <FormSection name={memberName}>
-          <Field name="value" component={EditOption} />
+          <Field name="value" component={EditHTMLField} theme="bubble" />
         </FormSection>
       </Col>
     </Row>

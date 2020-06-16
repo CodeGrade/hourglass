@@ -8,8 +8,41 @@ import {
 import {
   WrappedFieldArrayProps,
   FieldIterate,
+  WrappedFieldProps,
 } from 'redux-form';
 import { HTMLVal } from '@student/exams/show/types';
+import CustomEditor, { CustomEditorProps } from './CustomEditor';
+
+export const EditHTMLField: React.FC<WrappedFieldProps & {
+  theme?: CustomEditorProps['theme'];
+  placeholder?: CustomEditorProps['placeholder'];
+}> = (props) => {
+  const {
+    input,
+    theme,
+    placeholder,
+  } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <CustomEditor
+      className="bg-white"
+      theme={theme}
+      value={value.value}
+      placeholder={placeholder}
+      onChange={(newName, _delta, source, _editor): void => {
+        if (source === 'user') {
+          onChange({
+            type: 'HTML',
+            value: newName,
+          });
+        }
+      }}
+    />
+  );
+};
 
 const EditHTMLs: React.FC<WrappedFieldArrayProps<HTMLVal> & {
   renderOptions: FieldIterate<HTMLVal, JSX.Element>;

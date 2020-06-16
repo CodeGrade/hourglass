@@ -12,70 +12,19 @@ import {
 import YesNo from '@student/exams/show/components/questions/YesNo';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowParts from '@professor/exams/new/editor/components/ShowParts';
-import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import FilePickerSelect from '@professor/exams/new/editor/components/FilePicker';
 import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-import { WrappedFieldProps, Field, FieldArray, FormSection } from 'redux-form';
+import {
+  WrappedFieldProps,
+  Field,
+  FieldArray,
+  FormSection,
+} from 'redux-form';
 import { FileRef } from '@hourglass/workflows/student/exams/show/types';
-import { ExamContext, QuestionFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import { ExamContext } from '@hourglass/workflows/student/exams/show/context';
 import { getFilesForRefs } from '@hourglass/workflows/student/exams/show/files';
-import { connect } from 'react-redux';
-import { formSelector } from '..';
-
-const QuestionName: React.FC<WrappedFieldProps> = (props) => {
-  const {
-    input,
-  } = props;
-  const {
-    value,
-    onChange,
-  } = input;
-  return (
-    <>
-      <Form.Label column sm="2">Question name</Form.Label>
-      <Col sm="10">
-        <CustomEditor
-          className="bg-white"
-          value={value.value}
-          placeholder="Give a short (optional) descriptive name for the question"
-          onChange={(newName, _delta, source, _editor): void => {
-            if (source === 'user') {
-              onChange({ type: 'HTML', value: newName });
-            }
-          }}
-        />
-      </Col>
-    </>
-  );
-};
-
-const QuestionDesc: React.FC<WrappedFieldProps> = (props) => {
-  const {
-    input,
-  } = props;
-  const {
-    value,
-    onChange,
-  } = input;
-  return (
-    <>
-      <Form.Label column sm="2">Description:</Form.Label>
-      <Col sm="10">
-        <CustomEditor
-          className="bg-white"
-          value={value.value}
-          placeholder="Give a longer description of the question"
-          onChange={(newDesc, _delta, source, _editor): void => {
-            if (source === 'user') {
-              onChange({ type: 'HTML', value: newDesc });
-            }
-          }}
-        />
-      </Col>
-    </>
-  );
-};
+import { EditHTMLField } from './editHTMLs';
 
 const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
   const {
@@ -194,10 +143,24 @@ const Question: React.FC<{
           </Card.Title>
           <Card.Subtitle>
             <Form.Group as={Row} controlId={`${qnum}-name`}>
-              <Field name="name" component={QuestionName} />
+              <Form.Label column sm="2">Question name</Form.Label>
+              <Col sm="10">
+                <Field
+                  name="name"
+                  component={EditHTMLField}
+                  placeholder="Give a short (optional) descriptive name for the question"
+                />
+              </Col>
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-desc`}>
-              <Field name="description" component={QuestionDesc} />
+              <Form.Label column sm="2">Description:</Form.Label>
+              <Col sm="10">
+                <Field
+                  name="description"
+                  component={EditHTMLField}
+                  placeholder="Give a longer description of the question"
+                />
+              </Col>
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-separate`}>
               <Field name="seperateSubparts" component={QuestionSepSubParts} />

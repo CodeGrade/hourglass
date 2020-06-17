@@ -52,8 +52,17 @@ contents:
           points: 11
           body:
             - Code:
-                prompt: "Type some code in the box."
-                initial: "q1/all/src/packagetwo/Example2.java"
+                prompt: "Code with a file starter."
+                initial:
+                  file: "q1/all/src/packagetwo/Example2.java"
+                lang: "text/x-java"
+            - Code:
+                prompt: "Code with direct starter."
+                initial:
+                  code: |
+                    This text should be visible! Empty line below.
+
+                    Empty line above.
                 lang: "text/x-java"
             - "<p>This is an interlude of <b>HTML</b> content</p>"
             - MultipleChoice:

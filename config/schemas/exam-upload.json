@@ -125,10 +125,23 @@
           "properties": {
             "prompt": { "$ref": "#/definitions/HTML" },
             "lang": { "type": "string" },
-            "initial": { "type": "string" }
+            "initial": { "$ref": "#/definitions/CodeInitial" }
           }
         }
       }
+    },
+    "CodeInitial": {
+      "oneOf": [
+        { "$ref": "#/definitions/File" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["code"],
+          "properties": {
+            "code": { "type": "string" }
+          }
+        }
+      ]
     },
     "YesNo": {
       "type": "object",

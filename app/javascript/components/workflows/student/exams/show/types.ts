@@ -363,7 +363,20 @@ export interface CodeInfo {
   type: 'Code';
   prompt: HTMLVal;
   lang: string;
-  initial: string;
+  initial?: CodeInitial;
+}
+
+export type CodeInitial = CodeInitialFile | CodeInitialContents;
+
+export interface CodeInitialFile {
+  file: string;
+}
+
+export interface CodeInitialContents {
+  text: string;
+
+  // CodeMirror marks to apply
+  marks: MarkDescription[];
 }
 
 export interface CodeInfoWithAnswer extends CodeInfo {

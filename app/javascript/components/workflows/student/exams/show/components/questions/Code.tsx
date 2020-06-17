@@ -21,13 +21,23 @@ const Code: React.FC<CodeProps> = (props) => {
   } = props;
   const { prompt, lang, initial } = info;
   const { fmap } = useContext(ExamContext);
-  const f = fmap[initial];
-  if (f?.filedir === 'dir') {
-    throw new Error('Code initial cannot be a directory.');
+  let text = state?.text ?? undefined;
+  let marks = state?.marks ?? undefined;
+  if (initial) {
+    if ('file' in initial) {
+      const f = fmap[initial.file];
+      if (f?.filedir === 'dir') {
+        throw new Error('Code initial cannot be a directory.');
+      }
+      text = text ?? f?.contents;
+      marks = marks ?? f?.marks;
+    } else if ('text' in initial) {
+      text = text ?? initial.text;
+      marks = marks ?? initial.marks;
+    }
   }
-  const text = state?.text ?? f?.contents ?? '';
-  const marks = state?.marks ?? f?.marks ?? [];
-
+  text = text ?? '';
+  marks = marks ?? [];
   return (
     <>
       <Row>

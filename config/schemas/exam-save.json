@@ -92,8 +92,29 @@
         "type": { "enum": ["Code"] },
         "prompt": { "$ref": "#/definitions/HTML" },
         "lang": { "type": "string" },
-        "initial": { "type": "string" }
+        "initial": { "$ref": "#/definitions/CodeInitial" }
       }
+    },
+    "CodeInitial": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["file"],
+          "properties": {
+            "file": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text", "marks"],
+          "properties": {
+            "text": { "type": "string" },
+            "marks": { "$ref": "files.json#/definitions/Marks" }
+          }
+        }
+      ]
     },
     "YesNo": {
       "type": "object",

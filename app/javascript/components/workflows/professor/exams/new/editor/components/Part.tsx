@@ -24,6 +24,7 @@ import { ExamContext, PartFilesContext } from '@hourglass/workflows/student/exam
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
 import { EditHTMLField } from './editHTMLs';
+import EditReference from './Reference';
 
 const PartPoints: React.FC<WrappedFieldProps> = (props) => {
   const { input } = props;
@@ -61,27 +62,6 @@ const PartPoints: React.FC<WrappedFieldProps> = (props) => {
             step={0.5}
             format="#.#"
             /> */}
-      </Col>
-    </>
-  );
-};
-
-const PartReference: React.FC<WrappedFieldProps> = (props) => {
-  const { input } = props;
-  const {
-    value,
-    onChange,
-  } = input;
-  const { files } = useContext(ExamContext);
-  return (
-    <>
-      <Form.Label column sm="2">Files to be shown for this question part:</Form.Label>
-      <Col sm={10}>
-        <FilePickerSelectWithPreview
-          options={files}
-          selected={value}
-          onChange={onChange}
-        />
       </Col>
     </>
   );
@@ -164,7 +144,11 @@ const Part: React.FC<{
               <Field name="points" component={PartPoints} />
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-${pnum}-files`}>
-              <Field name="reference" component={PartReference} />
+              <Field
+                name="reference"
+                component={EditReference}
+                label="this question part"
+              />
             </Form.Group>
           </Card.Subtitle>
         </Alert>

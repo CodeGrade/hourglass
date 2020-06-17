@@ -4,8 +4,9 @@ import {
   Row,
   Col,
   Button,
+  ButtonGroup,
 } from 'react-bootstrap';
-import { MarkDescription, CodeState } from '@student/exams/show/types';
+import { MarkDescription, CodeState, CodeInfo } from '@student/exams/show/types';
 import { Editor } from '@student/exams/show/components/ExamCodeBox';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 import { FaLock, FaBan } from 'react-icons/fa';
@@ -207,6 +208,54 @@ interface LockStateInfo {
   finalPos?: CodeMirror.Position;
 }
 
+const SetInitial: React.FC<WrappedFieldProps> = (props) => {
+  const { input } = props;
+  const {
+    value,
+    onChange,
+  }: {
+    value: CodeInfo['initial'];
+    onChange: (newVal: CodeInfo['initial']) => void;
+  } = input;
+  const isFile = value && 'file' in value;
+  const isText = value && 'text' in value;
+  const isNone = !value;
+  return (
+    <ButtonGroup>
+      <Button
+        disabled
+        variant={isNone ? 'secondary' : 'outline-secondary'}
+        active={isNone}
+        onClick={(): void => {
+          onChange(null);
+        }}
+      >
+        None
+      </Button>
+      <Button
+        disabled
+        variant={isText ? 'secondary' : 'outline-secondary'}
+        active={isText}
+        onClick={(): void => {
+          onChange({ text: '', marks: [] });
+        }}
+      >
+        Supply code
+      </Button>
+      <Button
+        disabled
+        variant={isFile ? 'secondary' : 'outline-secondary'}
+        active={isFile}
+        onClick={(): void => {
+          onChange(null);
+        }}
+      >
+        Choose a file
+      </Button>
+    </ButtonGroup>
+  );
+};
+
 const Code: React.FC<CodeProps> = (props) => {
   const {
     qnum,
@@ -222,9 +271,9 @@ const Code: React.FC<CodeProps> = (props) => {
         bnum={bnum}
       />
       <Form.Group as={Row}>
-        <Form.Label column sm={2}>Starter (TODO)</Form.Label>
+        <Form.Label column sm={2}>Starter</Form.Label>
         <Col sm={10}>
-          <Field name="initial" component={({ input }) => <Form.Control disabled value={input.value} onChange={input.onChange} />} />
+          <Field name="initial" component={SetInitial} />
         </Col>
       </Form.Group>
       <Fields names={['lang', 'answer']} component={EditCodeAnswer} qnum={qnum} pnum={pnum} bnum={bnum} />

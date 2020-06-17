@@ -79,7 +79,6 @@ const ShowBodyItems: React.FC<{
               onClick={(): void => {
                 fields.push({
                   type: 'Code',
-                  initial: '',
                   lang: 'text/plain',
                   prompt: {
                     type: 'HTML',

@@ -16,8 +16,14 @@ class ExamVersionTest < ActiveSupport::TestCase
     assert build(:exam_version).valid?
   end
 
-  test 'exam info validates' do
-    ev = build(:exam_version)
+  test 'cs2500_v1 info validates' do
+    ev = build(:exam_version, :cs2500_v1)
+    assert JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, ev.info)
+    assert JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, ev.files)
+  end
+
+  test 'cs2500_v2 info validates' do
+    ev = build(:exam_version, :cs2500_v2)
     assert JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, ev.info)
     assert JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, ev.files)
   end

@@ -95,6 +95,9 @@ class Upload
     arr.map { |i| make_html_val(i) }
   end
 
+  def map_code(code_info)
+  end
+
   def parse_info(properties)
     contents = properties['contents']
     contents['questions'].each do |q|
@@ -173,11 +176,26 @@ class Upload
                     options: make_html_vals(b['AllThatApply']['options'].map(&:keys).flatten)
                   }
                 elsif b.key? 'Code'
+                  initial = b['Code']['initial']
+                  unless initial.nil?
+                    # TODO check file ref validity
+                    if initial.key? 'file'
+                    #   filename = initial['file']
+                    #   file = files[filename]
+                    #   raise "Invalid file for Code initial: #{filename}" if file.nil?
+                    else
+                      processed = MarksProcessor.process_marks(ensure_utf8(initial['code'], 'text/plain'))
+                      initial = {
+                        text: processed[:text],
+                        marks: processed[:marks]
+                      }
+                    end
+                  end
                   {
                     type: 'Code',
                     prompt: make_html_val(b['Code']['prompt']),
                     lang: b['Code']['lang'],
-                    initial: b['Code']['initial'],
+                    initial: initial
                   }.compact
                 elsif b.key? 'CodeTag'
                   referent =

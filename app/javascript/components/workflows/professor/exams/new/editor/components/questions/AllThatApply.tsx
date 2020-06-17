@@ -32,24 +32,6 @@ declare module 'redux-form' {
   }
 }
 
-const EditAnswer: React.FC<{
-  myIdx: number;
-} & WrappedFieldArrayProps<boolean>> = (props) => {
-  const {
-    myIdx,
-    fields,
-  } = props;
-  const value = fields.get(myIdx);
-  return (
-    <Button
-      variant={value ? 'dark' : 'outline-dark'}
-      onClick={(): void => fields.splice(myIdx, 1, !value)}
-    >
-      <Icon I={FaCheck} className={value ? '' : 'invisible'} />
-    </Button>
-  );
-};
-
 const OneOption: React.FC<{
   memberName: string;
   optionNum: number;
@@ -57,6 +39,8 @@ const OneOption: React.FC<{
   moveDown: () => void;
   moveUp: () => void;
   remove: () => void;
+  value: boolean;
+  toggleValue: () => void;
 }> = (props) => {
   const {
     memberName,
@@ -65,6 +49,8 @@ const OneOption: React.FC<{
     moveDown,
     moveUp,
     remove,
+    value,
+    toggleValue,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
   return (
@@ -85,7 +71,12 @@ const OneOption: React.FC<{
           onDown={moveDown}
           onDelete={remove}
         />
-        <FieldArray name="answer" component={EditAnswer} myIdx={optionNum} />
+        <Button
+          variant={value ? 'dark' : 'outline-dark'}
+          onClick={toggleValue}
+        >
+          <Icon I={FaCheck} className={value ? '' : 'invisible'} />
+        </Button>
       </Col>
       <Col className="pr-0">
         <Field name={memberName} component={EditHTMLField} theme="bubble" />
@@ -94,7 +85,19 @@ const OneOption: React.FC<{
   );
 };
 
-export const renderOptionsATA = (
+export const renderOptionsATA = ({
+  moveDown,
+  moveUp,
+  remove,
+  val,
+  toggle,
+}: {
+  moveDown: (idx: number) => void;
+  moveUp: (idx: number) => void;
+  remove: (idx: number) => void;
+  val: (idx: number) => boolean;
+  toggle: (idx: number) => void;
+}) => (
   member: string,
   index: number,
   fields: FieldArrayFieldsProps<HTMLVal>,
@@ -107,16 +110,44 @@ export const renderOptionsATA = (
     enableDown={index + 1 < fields.length}
     moveDown={(): void => {
       fields.move(index, index + 1);
+      moveDown(index);
     }}
     moveUp={(): void => {
       fields.move(index, index - 1);
+      moveUp(index);
     }}
     remove={(): void => {
       fields.remove(index);
+      remove(index);
     }}
+    value={val(index)}
+    toggleValue={() => toggle(index)}
   />
 );
 
+const EditAns: React.FC<WrappedFieldArrayProps<boolean>> = (props) => {
+  const {
+    fields,
+  } = props;
+  const val = (idx: number) => fields.get(idx);
+  const moveDown = (idx: number) => fields.swap(idx, idx + 1);
+  const moveUp = (idx: number) => fields.swap(idx, idx - 1);
+  const remove = (idx: number) => fields.remove(idx);
+  const toggle = (idx: number) => fields.splice(idx, 1, !val);
+  return (
+    <FieldArray
+      name="options"
+      component={EditHTMLs}
+      renderOptions={renderOptionsATA({
+        val,
+        toggle,
+        moveDown,
+        moveUp,
+        remove,
+      })}
+    />
+  );
+};
 
 const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
   const {
@@ -140,7 +171,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
             </Col>
             <Col><b>Prompt</b></Col>
           </Row>
-          <FieldArray name="options" component={EditHTMLs} renderOptions={renderOptionsATA} />
+          <FieldArray name="answer" component={EditAns} />
         </Col>
       </Form.Group>
     </>

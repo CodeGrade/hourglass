@@ -21,7 +21,7 @@ const EditReference: React.FC<{
   } = input;
   const { files } = useContext(ExamContext);
   return (
-    <Row>
+    <>
       <Form.Label column sm={2}>
         {`Files to be shown for ${label}:`}
       </Form.Label>
@@ -32,7 +32,7 @@ const EditReference: React.FC<{
           onChange={onChange}
         />
       </Col>
-    </Row>
+    </>
   );
 };
 

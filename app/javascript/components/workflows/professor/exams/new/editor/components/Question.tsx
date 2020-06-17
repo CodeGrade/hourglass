@@ -25,6 +25,7 @@ import { FileRef } from '@hourglass/workflows/student/exams/show/types';
 import { ExamContext, QuestionFilesContext } from '@hourglass/workflows/student/exams/show/context';
 import { getFilesForRefs } from '@hourglass/workflows/student/exams/show/files';
 import { EditHTMLField } from './editHTMLs';
+import EditReference from './Reference';
 
 const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
   const {
@@ -52,50 +53,6 @@ const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
             onChange(newVal);
           }}
         />
-      </Col>
-    </>
-  );
-};
-
-const QuestionReference: React.FC<WrappedFieldProps> = (props) => {
-  const {
-    input,
-  } = props;
-  const {
-    value,
-    onChange,
-  }: {
-    value: FileRef[];
-    onChange: (newVal: FileRef[]) => void;
-  } = input;
-  const [open, setOpen] = useState(false);
-  const noFiles = value.length === 0;
-  const { files, fmap } = useContext(ExamContext);
-  const filteredFiles = getFilesForRefs(fmap, value);
-  return (
-    <>
-      <Form.Label column sm="2">Files to be shown for this question:</Form.Label>
-      <Col sm={10}>
-        <InputGroup>
-          <div className="flex-grow-1">
-            <FilePickerSelect options={files} selected={value} onChange={onChange} />
-          </div>
-          <InputGroup.Append>
-            <Button
-              variant="info"
-              disabled={noFiles}
-              onClick={(): void => setOpen((o) => !o)}
-            >
-              Preview files
-              {open && !files ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
-            </Button>
-          </InputGroup.Append>
-        </InputGroup>
-        <Collapse in={open && !noFiles}>
-          <div className="border">
-            <VeryControlledFileViewer files={filteredFiles} />
-          </div>
-        </Collapse>
       </Col>
     </>
   );
@@ -176,7 +133,11 @@ const Question: React.FC<{
               <Field name="seperateSubparts" component={QuestionSepSubParts} />
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-files`}>
-              <Field name="reference" component={QuestionReference} />
+              <Field
+                name="reference"
+                component={EditReference}
+                label="this question"
+              />
             </Form.Group>
           </Card.Subtitle>
           <Card.Body>

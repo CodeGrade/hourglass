@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import {
   FileRef,
   ExamFile,
 } from '@student/exams/show/types';
 import Select, { GroupProps } from 'react-select';
 import { TreeView } from '@material-ui/lab';
-import { Files } from '@student/exams/show/components/FileViewer';
+import { Files, VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
-import { createMap } from '@student/exams/show/files';
+import { createMap, getFilesForRefs } from '@student/exams/show/files';
+import { ExamContext } from '@hourglass/workflows/student/exams/show/context';
+import { InputGroup, Button, Collapse } from 'react-bootstrap';
+import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 
 export interface FilePickerProps {
   options: ExamFile[];
@@ -148,3 +151,40 @@ const FilePickerSelect: React.FC<FilePickerProps> = (props) => {
 };
 
 export default FilePickerSelect;
+
+export const FilePickerSelectWithPreview: React.FC<FilePickerProps> = (props) => {
+  const {
+    options,
+    selected,
+    onChange,
+  } = props;
+  const [open, setOpen] = useState(false);
+  const { fmap } = useContext(ExamContext);
+  const noFiles = selected.length === 0;
+  const oneFile = selected.length === 1;
+  const filteredFiles = getFilesForRefs(fmap, selected);
+  return (
+    <>
+      <InputGroup>
+        <div className="flex-grow-1">
+          <FilePickerSelect options={options} selected={selected} onChange={onChange} />
+        </div>
+        <InputGroup.Append>
+          <Button
+            variant="info"
+            disabled={noFiles}
+            onClick={(): void => setOpen((o) => !o)}
+          >
+            {`Preview file${oneFile ? '' : 's'}`}
+            {open && !noFiles ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
+          </Button>
+        </InputGroup.Append>
+      </InputGroup>
+      <Collapse in={open && !noFiles}>
+        <div className="border">
+          <VeryControlledFileViewer files={filteredFiles} />
+        </div>
+      </Collapse>
+    </>
+  );
+};

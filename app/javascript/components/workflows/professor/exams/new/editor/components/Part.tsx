@@ -1,13 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import {
   Form,
   Card,
   Alert,
   Row,
   Col,
-  InputGroup,
-  Collapse,
-  Button,
 } from 'react-bootstrap';
 import { alphabetIdx } from '@hourglass/common/helpers';
 import {
@@ -16,11 +13,7 @@ import {
   FormSection,
   FieldArray,
 } from 'redux-form';
-import FilePickerSelect, { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
-import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
-import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-import { getFilesForRefs } from '@student/exams/show/files';
-import { ExamContext, PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import { PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
 import { EditHTMLField } from './editHTMLs';

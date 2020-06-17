@@ -4,6 +4,8 @@ import { ExamContext, ExamFilesContext } from '@student/exams/show/context';
 import {
   Button,
   Alert,
+  Form,
+  Row,
 } from 'react-bootstrap';
 import {
   ExamVersion,
@@ -265,11 +267,13 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
               <Field name="files" component={WrappedFileUploader} />
               <Field name="instructions" component={WrappedInstructions} />
             </Alert>
-            <Field
-              name="reference"
-              component={EditReference}
-              label="the entire exam"
-            />
+            <Form.Group as={Row}>
+              <Field
+                name="reference"
+                component={EditReference}
+                label="the entire exam"
+              />
+            </Form.Group>
             <FieldArray name="questions" component={ShowQuestions} />
           </FormContextProviderConnected>
         </FormSection>

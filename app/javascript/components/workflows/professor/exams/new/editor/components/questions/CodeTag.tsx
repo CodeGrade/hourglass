@@ -19,7 +19,7 @@ import {
 } from '@student/exams/show/context';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { getFilesForRefs, countFiles } from '@student/exams/show/files';
-import { WrappedFieldProps, Field, Fields, WrappedFieldsProps } from 'redux-form';
+import { Fields, WrappedFieldsProps } from 'redux-form';
 
 interface CodeTagValProps {
   value?: CodeTagState;

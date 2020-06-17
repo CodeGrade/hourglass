@@ -13,7 +13,6 @@ import {
   ExamFile,
   FileRef,
   ExamVersionWithAnswers,
-  AnswerState,
   QuestionInfo,
   PartInfo,
   BodyItem,

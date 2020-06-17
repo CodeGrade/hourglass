@@ -10,7 +10,6 @@ import {
   Button,
 } from 'react-bootstrap';
 import { alphabetIdx } from '@hourglass/common/helpers';
-import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import {
   Field,
   WrappedFieldProps,

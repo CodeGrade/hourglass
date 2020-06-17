@@ -241,11 +241,12 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
     return versionUpdate(versionId, { version });
   }), [handleSubmit]);
   useEffect(() => {
+    doSubmit();
     const timer = setInterval(doSubmit, 20000);
     return () => {
       clearInterval(timer);
     };
-  }, [doSubmit]);
+  }, [doSubmit, pristine]);
   return (
     <form
       onSubmit={(): void => {

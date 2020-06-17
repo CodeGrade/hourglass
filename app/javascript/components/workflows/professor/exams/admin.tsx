@@ -410,6 +410,10 @@ const ShowVersion: React.FC<{
             onClick={(): void => {
               deleteVersion(version.id).then(() => {
                 refresh();
+                alert({
+                  variant: 'success',
+                  message: 'Version deleted successfully.',
+                });
               }).catch((err) => {
                 alert({
                   variant: 'danger',

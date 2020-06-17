@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Alert, AlertProps } from 'react-bootstrap';
+import { AlertProps, Toast } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
+import './alerts.scss';
 
 interface HGAlert {
   title?: string;
   message?: string | JSX.Element;
   variant: AlertProps['variant'];
+  autohide?: boolean;
 }
 
 interface HGAlertWithID extends HGAlert {
@@ -19,42 +21,43 @@ const ShowAlert: React.FC<{
     alert,
   } = props;
   const {
-    id,
+    autohide = false,
     title,
     message,
     variant,
   } = alert;
   const [show, setShow] = useState(true);
   return (
-    <Alert
-      className="mt-2"
-      key={id}
-      variant={variant}
-      dismissible
+    <Toast
+      className={`border-${variant}`}
       show={show}
       onClose={(): void => setShow(false)}
+      autohide={autohide}
+      delay={5000}
     >
-      {title && (
-        <Alert.Heading>{title}</Alert.Heading>
-      )}
+      <Toast.Header>
+        <img src="holder.js/20x20?text=%20" className="rounded mr-2" alt="" />
+        <strong className="mr-auto">{title}</strong>
+        <small>just now</small>
+      </Toast.Header>
       {message && (
-        <div className="mb-0">{message}</div>
+        <Toast.Body>{message}</Toast.Body>
       )}
-    </Alert>
+    </Toast>
   );
 };
 
 const ShowAlerts: React.FC<{
   alerts: HGAlertWithID[];
 }> = ({ alerts }) => (
-  <>
+  <div id="allAlerts">
     {alerts.map((alert) => (
       <ShowAlert
         key={alert.id}
         alert={alert}
       />
     ))}
-  </>
+  </div>
 );
 
 interface AlertContext {

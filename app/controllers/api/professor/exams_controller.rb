@@ -30,7 +30,6 @@ module Api
 
       def update
         body = params.require(:exam).permit(:name, :start, :end, :duration)
-        # TODO: add policies
         updated = @exam.update(
           {
             name: body[:name],
@@ -40,7 +39,8 @@ module Api
           }
         )
         render json: {
-          updated: updated
+          updated: updated,
+          reason: @exam.errors.full_messages.to_sentence
         }
       end
 

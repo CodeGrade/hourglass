@@ -33,6 +33,7 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
     spyCoords,
     spy,
   } = pagination;
+  if (spyCoords.length === 0) return null;
   const selectedCoords = spyCoords[spy];
   const justQuestion = selectedCoords.part === undefined;
   return (

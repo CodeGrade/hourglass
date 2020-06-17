@@ -39,12 +39,14 @@ class ExamVersion < ApplicationRecord
   end
 
   def default_answers
+    def_answers = answers.map do |ans_q|
+      ans_q.map do |ans_p|
+        ans_p.map { |_| { "NO_ANS": true } }
+      end
+    end
+    def_answers = [[[]]] if def_answers.empty?
     {
-      answers: answers.map do |ans_q|
-        ans_q.map do |ans_p|
-          ans_p.map { |_| { "NO_ANS": true } }
-        end
-      end,
+      answers: def_answers,
       scratch: ''
     }
   end

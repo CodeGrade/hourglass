@@ -254,7 +254,7 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
         alert({
           variant: 'danger',
           title: 'Not Autosaved',
-          message: res.reason,
+          message: <pre>{res.reason}</pre>,
           autohide: true,
         });
       }

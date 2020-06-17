@@ -1,6 +1,28 @@
 #allAlerts {
   position: fixed;
-  bottom: 15px;
+  margin-top: 15px;
   right: 15px;
   z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap-reverse;
+  max-width: 50%;
+}
+
+.toast-body {
+  overflow: auto;
+  max-height: 30vh;
+}
+
+.toast-body, .toast-header {
+  right: 15px;
+  direction: ltr;
+}
+
+.toast {
+  width: 350px;
+  max-width: 100%;
+  right: 0;
+  resize: horizontal;
+  direction: rtl;
 }

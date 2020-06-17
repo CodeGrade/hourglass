@@ -21,7 +21,7 @@ import FilePickerSelect from '@professor/exams/new/editor/components/FilePicker'
 import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { getFilesForRefs } from '@student/exams/show/files';
-import { ExamContext } from '@hourglass/workflows/student/exams/show/context';
+import { ExamContext, PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
 import { EditHTMLField } from './editHTMLs';
@@ -106,6 +106,16 @@ const PartReference: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const PartReferenceProvider: React.FC<WrappedFieldProps> = (props) => {
+  const { input, children } = props;
+  const { value: references } = input;
+  return (
+    <PartFilesContext.Provider value={{ references }}>
+      {children}
+    </PartFilesContext.Provider>
+  );
+};
+
 const Part: React.FC<{
   memberName: string;
   qnum: number;
@@ -178,7 +188,12 @@ const Part: React.FC<{
           </Card.Subtitle>
         </Alert>
         <Card.Body>
-          <FieldArray name="body" component={ShowBodyItems} props={{ qnum, pnum }} />
+          <Field
+            name="reference"
+            component={PartReferenceProvider}
+          >
+            <FieldArray name="body" component={ShowBodyItems} props={{ qnum, pnum }} />
+          </Field>
         </Card.Body>
       </FormSection>
     </Card>

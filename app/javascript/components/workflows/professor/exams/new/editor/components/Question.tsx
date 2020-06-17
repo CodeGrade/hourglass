@@ -22,7 +22,7 @@ import {
   FormSection,
 } from 'redux-form';
 import { FileRef } from '@hourglass/workflows/student/exams/show/types';
-import { ExamContext } from '@hourglass/workflows/student/exams/show/context';
+import { ExamContext, QuestionFilesContext } from '@hourglass/workflows/student/exams/show/context';
 import { getFilesForRefs } from '@hourglass/workflows/student/exams/show/files';
 import { EditHTMLField } from './editHTMLs';
 
@@ -101,6 +101,16 @@ const QuestionReference: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const QuestionReferenceProvider: React.FC<WrappedFieldProps> = (props) => {
+  const { input, children } = props;
+  const { value: references } = input;
+  return (
+    <QuestionFilesContext.Provider value={{ references }}>
+      {children}
+    </QuestionFilesContext.Provider>
+  );
+};
+
 const Question: React.FC<{
   memberName: string;
   qnum: number;
@@ -170,7 +180,12 @@ const Question: React.FC<{
             </Form.Group>
           </Card.Subtitle>
           <Card.Body>
-            <FieldArray name="parts" component={ShowParts} props={{ qnum }} />
+            <Field
+              name="reference"
+              component={QuestionReferenceProvider}
+            >
+              <FieldArray name="parts" component={ShowParts} props={{ qnum }} />
+            </Field>
           </Card.Body>
         </FormSection>
       </Alert>

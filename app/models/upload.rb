@@ -257,6 +257,8 @@ class Upload
                 elsif b.key? 'YesNo'
                   {
                     type: 'YesNo',
+                    yesLabel: 'Yes',
+                    noLabel: 'No',
                     prompt:
                       if b['YesNo'] == !!b['YesNo']
                         ''

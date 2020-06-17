@@ -14,8 +14,8 @@ const DisplayYesNo: React.FC<YesNoProps> = (props) => {
   } = props;
   const {
     prompt,
-    yesLabel = 'Yes',
-    noLabel = 'No',
+    yesLabel,
+    noLabel,
   } = info;
   let theRest;
   if (value === undefined) {

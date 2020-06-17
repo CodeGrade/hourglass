@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@student/exams/show/context';
 import {
@@ -32,7 +32,7 @@ import {
   FieldArray,
 } from 'redux-form';
 import { Provider, connect } from 'react-redux';
-import { Version, versionUpdate } from '@hourglass/common/api/professor/exams/versions/update';
+import { Version, versionUpdate, Response } from '@hourglass/common/api/professor/exams/versions/update';
 import { useParams, useHistory } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import store from '@professor/exams/new/editor/store';
@@ -236,11 +236,20 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const { alert } = useContext(AlertContext);
   const history = useHistory();
   const { examId, versionId } = useParams();
+  const doSubmit: () => Promise<Response> = React.useCallback(handleSubmit((values) => {
+    const version = transformForSubmit(values);
+    return versionUpdate(versionId, { version });
+  }), [handleSubmit]);
+  useEffect(() => {
+    const timer = setInterval(doSubmit, 20000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [doSubmit]);
   return (
     <form
-      onSubmit={handleSubmit((values) => {
-        const version = transformForSubmit(values);
-        versionUpdate(versionId, { version }).then((res) => {
+      onSubmit={(): void => {
+        doSubmit().then((res) => {
           if (res.updated === false) {
             alert({
               variant: 'danger',
@@ -255,7 +264,7 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
             });
           }
         });
-      })}
+      }}
     >
       <FormSection name="all">
         <Field name="name" component={WrappedName} />

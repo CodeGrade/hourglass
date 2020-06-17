@@ -2,16 +2,14 @@ import React, { useState } from 'react';
 import {
   Row,
   Col,
-  Button,
 } from 'react-bootstrap';
 import {
   Select, FormControl, InputLabel, MenuItem,
 } from '@material-ui/core';
-import { MatchingInfo, MatchingState, HTMLVal } from '@student/exams/show/types';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import { alphabetIdx } from '@hourglass/common/helpers';
-import { Field, WrappedFieldProps, FieldArray, WrappedFieldArrayProps } from 'redux-form';
+import { Field, WrappedFieldProps, FieldArray } from 'redux-form';
 import EditHTMLs, { EditHTMLField } from '../editHTMLs';
 
 interface MatchingProps {
@@ -241,33 +239,26 @@ const RenderPrompts: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
-const Matching: React.FC<MatchingProps> = (props) => {
-  const {
-    qnum,
-    pnum,
-    bnum,
-  } = props;
-  return (
-    <Row>
-      <Col sm={6}>
-        <Row className="p-2">
-          <Col className="text-center p-0">
-            <Field name="promptsLabel" component={EditColName} defaultLabel="Column A" />
-          </Col>
-        </Row>
-        <Field name="values" component={RenderPrompts} />
-      </Col>
-      <Col sm={6}>
-        <Row className="p-2">
-          <Col className="text-center p-0">
-            <Field name="valuesLabel" component={EditColName} defaultLabel="Column B" />
-          </Col>
-        </Row>
-        <FieldArray name="values" component={EditHTMLs} renderOptions={renderValue} prompt="Add new choice" />
-      </Col>
-    </Row>
-  );
-};
+const Matching: React.FC<MatchingProps> = (_props) => (
+  <Row>
+    <Col sm={6}>
+      <Row className="p-2">
+        <Col className="text-center p-0">
+          <Field name="promptsLabel" component={EditColName} defaultLabel="Column A" />
+        </Col>
+      </Row>
+      <Field name="values" component={RenderPrompts} />
+    </Col>
+    <Col sm={6}>
+      <Row className="p-2">
+        <Col className="text-center p-0">
+          <Field name="valuesLabel" component={EditColName} defaultLabel="Column B" />
+        </Col>
+      </Row>
+      <FieldArray name="values" component={EditHTMLs} renderOptions={renderValue} prompt="Add new choice" />
+    </Col>
+  </Row>
+);
 
 //   const [promptMoversVisible, rawSetPromptMoversVisible] = useState([]);
 //   const setPromptMoversVisible = (index: number, visible: boolean): void => {

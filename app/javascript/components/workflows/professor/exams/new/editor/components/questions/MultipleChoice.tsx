@@ -6,16 +6,16 @@ import {
   Button,
 } from 'react-bootstrap';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
-import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import Icon from '@student/exams/show/components/Icon';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import {
   FieldArray,
-  FormSection,
   Field,
   WrappedFieldProps,
+  FieldArrayFieldsProps,
 } from 'redux-form';
 import { FaCircle } from 'react-icons/fa';
+import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
 import EditHTMLs, { EditHTMLField } from '../editHTMLs';
 
 const EditAnswer: React.FC<WrappedFieldProps & {
@@ -80,7 +80,11 @@ const OneOption: React.FC<{
   );
 };
 
-export const renderOptionsMultipleChoice = (member, index, fields) => (
+export const renderOptionsMultipleChoice = (
+  member: string,
+  index: number,
+  fields: FieldArrayFieldsProps<HTMLVal>,
+): JSX.Element => (
   <OneOption
     // eslint-disable-next-line react/no-array-index-key
     key={index}

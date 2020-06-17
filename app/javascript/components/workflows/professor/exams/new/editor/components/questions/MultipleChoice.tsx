@@ -18,25 +18,9 @@ import { FaCircle } from 'react-icons/fa';
 import { HTMLVal } from '@student/exams/show/types';
 import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
 
-const EditAnswer: React.FC<WrappedFieldProps & {
-  current: number;
-}> = (props) => {
-  const {
-    input,
-    current,
-  } = props;
-  const selected = input.value === current;
-  return (
-    <Button
-      variant={selected ? 'dark' : 'outline-dark'}
-      onClick={(): void => input.onChange(current)}
-    >
-      <Icon I={FaCircle} className={selected ? '' : 'invisible'} />
-    </Button>
-  );
-};
-
 const OneOption: React.FC<{
+  selected: boolean;
+  onSelect: () => void;
   memberName: string;
   optionNum: number;
   enableDown: boolean;
@@ -45,6 +29,8 @@ const OneOption: React.FC<{
   remove: () => void;
 }> = (props) => {
   const {
+    selected,
+    onSelect,
     memberName,
     optionNum,
     enableDown,
@@ -71,7 +57,12 @@ const OneOption: React.FC<{
           onDown={moveDown}
           onDelete={remove}
         />
-        <Field name="answer" component={EditAnswer} current={optionNum} />
+        <Button
+          variant={selected ? 'dark' : 'outline-dark'}
+          onClick={onSelect}
+        >
+          <Icon I={FaCircle} className={selected ? '' : 'invisible'} />
+        </Button>
       </Col>
       <Col className="pr-0">
         <Field name={memberName} component={EditHTMLField} theme="bubble" />
@@ -80,7 +71,19 @@ const OneOption: React.FC<{
   );
 };
 
-export const renderOptionsMultipleChoice = (
+export const renderOptionsMultipleChoice = ({
+  selected,
+  onChange,
+  moveDown,
+  moveUp,
+  remove,
+}: {
+  selected: number;
+  onChange: (idx: number) => void;
+  moveDown: () => void;
+  moveUp: () => void;
+  remove: () => void;
+}) => (
   member: string,
   index: number,
   fields: FieldArrayFieldsProps<HTMLVal>,
@@ -88,20 +91,51 @@ export const renderOptionsMultipleChoice = (
   <OneOption
     // eslint-disable-next-line react/no-array-index-key
     key={index}
+    selected={selected === index}
+    onSelect={() => onChange(index)}
     optionNum={index}
     memberName={member}
     enableDown={index + 1 < fields.length}
     moveDown={(): void => {
       fields.move(index, index + 1);
+      moveDown();
     }}
     moveUp={(): void => {
       fields.move(index, index - 1);
+      moveUp();
     }}
     remove={(): void => {
       fields.remove(index);
+      remove();
     }}
   />
 );
+
+const EditAns: React.FC<WrappedFieldProps> = (props) => {
+  const {
+    input,
+  } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  const moveDown = () => onChange(value + 1);
+  const moveUp = () => onChange(value - 1);
+  const remove = () => onChange(0);
+  return (
+    <FieldArray
+      name="options"
+      component={EditHTMLs}
+      renderOptions={renderOptionsMultipleChoice({
+        selected: value,
+        onChange,
+        moveDown,
+        moveUp,
+        remove,
+      })}
+    />
+  );
+};
 
 interface MultipleChoiceProps {
   qnum: number;
@@ -131,7 +165,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
             </Col>
             <Col><b>Prompt</b></Col>
           </Row>
-          <FieldArray name="options" component={EditHTMLs} renderOptions={renderOptionsMultipleChoice} />
+          <Field name="answer" component={EditAns} />
         </Col>
       </Form.Group>
     </>

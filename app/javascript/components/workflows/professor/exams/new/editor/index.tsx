@@ -37,7 +37,7 @@ import store from '@professor/exams/new/editor/store';
 import Name from '@professor/exams/new/editor/components/Name';
 import Policies from '@professor/exams/new/editor/components/Policies';
 import Instructions from '@professor/exams/new/editor/components/Instructions';
-import Reference from '@professor/exams/new/editor/components/Reference';
+import EditReference from '@professor/exams/new/editor/components/Reference';
 import FileUploader from '@professor/exams/new/editor/components/FileUploader';
 import ShowQuestions from '@professor/exams/new/editor/components/ShowQuestions';
 import { isNoAns } from '@hourglass/workflows/student/exams/show/containers/questions/connectors';
@@ -135,7 +135,6 @@ const WrappedName = wrapInput(Name);
 const WrappedPolicies = wrapInput(Policies);
 const WrappedFileUploader = wrapInput(FileUploader);
 const WrappedInstructions = wrapInput(Instructions);
-const WrappedReference = wrapInput(Reference);
 
 export const formSelector = formValueSelector('version-editor');
 
@@ -266,7 +265,11 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
               <Field name="files" component={WrappedFileUploader} />
               <Field name="instructions" component={WrappedInstructions} />
             </Alert>
-            <Field name="reference" component={WrappedReference} />
+            <Field
+              name="reference"
+              component={EditReference}
+              label="the entire exam"
+            />
             <FieldArray name="questions" component={ShowQuestions} />
           </FormContextProviderConnected>
         </FormSection>

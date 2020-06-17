@@ -18,6 +18,7 @@ import {
 } from 'redux-form';
 import { ExamFilesContext, ExamContext } from '@hourglass/workflows/student/exams/show/context';
 import { firstFile } from '@hourglass/workflows/student/exams/show/files';
+import FilePickerSelect from '../FilePicker';
 
 // TODO: starter should be a filepicker that saves a filename
 // const { fmap } = useContext(ExamContext);
@@ -284,11 +285,19 @@ const SetInitial: React.FC<WrappedFieldProps & {
           controlId={controlId}
         />
       )}
-      {isFile && (
-        <>
-          <p>TODO: filepicker</p>
-          <p>{`current: ${first.relPath}`}</p>
-        </>
+      {value && 'file' in value && (
+        <FilePickerSelect
+          options={files}
+          selected={[{
+            type: 'file',
+            path: value.file,
+          }]}
+          onChange={(arr): void => {
+            const lastSelected = arr[arr.length - 1];
+            if (!lastSelected) return;
+            onChange({ file: lastSelected.path });
+          }}
+        />
       )}
     </>
   );

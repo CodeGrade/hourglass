@@ -258,6 +258,12 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
           autohide: true,
         });
       }
+    }).catch((err) => {
+      alert({
+        variant: 'danger',
+        title: 'Error saving.',
+        message: err.message,
+      });
     });
     const timer = setInterval(f, 20000);
     return () => {
@@ -282,6 +288,12 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
               message: 'Exam version updated successfully.',
             });
           }
+        }).catch((err) => {
+          alert({
+            variant: 'danger',
+            title: 'Error autosaving.',
+            message: err.message,
+          });
         });
       }}
     >

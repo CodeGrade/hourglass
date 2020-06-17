@@ -574,6 +574,9 @@ export interface ExamSingleFile {
   // path relative to root
   relPath: string;
 
+  // Filename
+  path: string;
+
   // The contents of the file.
   contents: string;
 
@@ -589,6 +592,9 @@ export interface ExamDir {
 
   // Label for the directory (with trailing slash)
   text: string;
+
+  // Dirname
+  path: string;
 
   // path relative to root
   relPath: string;

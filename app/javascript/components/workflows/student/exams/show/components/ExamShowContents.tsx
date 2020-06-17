@@ -42,7 +42,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
       <ExamFilesContext.Provider value={{ references: reference }}>
         <h1>{railsExam.name}</h1>
         <HTML value={instructions} />
-        {reference && <FileViewer references={reference} />}
+        {reference.length !== 0 && <FileViewer references={reference} />}
         <Row>
           <Col>
             {questions.map((q, i) => (

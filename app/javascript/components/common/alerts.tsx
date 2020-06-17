@@ -37,7 +37,7 @@ const ShowAlert: React.FC<{
     >
       <Toast.Header>
         <strong className="mr-auto">{title}</strong>
-        <small>just now</small>
+        {/* <small>just now</small> */}
       </Toast.Header>
       {message && (
         <Toast.Body>{message}</Toast.Body>

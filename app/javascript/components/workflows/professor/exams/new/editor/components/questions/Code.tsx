@@ -286,6 +286,7 @@ const SetInitial: React.FC<WrappedFieldProps & {
             onChange={(arr): void => {
               const lastSelected = arr[arr.length - 1];
               if (!lastSelected) return;
+              if (lastSelected.type === 'dir') return;
               onChange({ file: lastSelected.path });
             }}
           />

@@ -33,7 +33,7 @@ const ShowAlert: React.FC<{
       show={show}
       onClose={(): void => setShow(false)}
       autohide={autohide}
-      delay={5000}
+      delay={10000}
     >
       <Toast.Header>
         <img src="holder.js/20x20?text=%20" className="rounded mr-2" alt="" />

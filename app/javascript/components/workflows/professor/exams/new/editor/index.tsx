@@ -236,20 +236,38 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const { alert } = useContext(AlertContext);
   const history = useHistory();
   const { examId, versionId } = useParams();
-  const doSubmit: () => Promise<Response> = React.useCallback(handleSubmit((values) => {
+  const doSubmit: () => Promise<Response> = handleSubmit((values) => {
+    if (!values) return new Promise((resolve) => resolve());
     const version = transformForSubmit(values);
     return versionUpdate(versionId, { version });
-  }), [handleSubmit]);
+  });
   useEffect(() => {
-    doSubmit();
-    const timer = setInterval(doSubmit, 20000);
+    const f = () => doSubmit().then((res) => {
+      if (res.updated === true) {
+        alert({
+          variant: 'success',
+          title: 'Autosaved',
+          message: 'Exam version saved automatically.',
+          autohide: true,
+        });
+      } else {
+        alert({
+          variant: 'danger',
+          title: 'Not Autosaved',
+          message: res.reason,
+          autohide: true,
+        });
+      }
+    });
+    const timer = setInterval(f, 20000);
     return () => {
       clearInterval(timer);
     };
-  }, [doSubmit, pristine]);
+  }, [alert, doSubmit, pristine]);
   return (
     <form
-      onSubmit={(): void => {
+      onSubmit={(e): void => {
+        e.preventDefault();
         doSubmit().then((res) => {
           if (res.updated === false) {
             alert({

@@ -7,7 +7,18 @@ export interface ExamUpdateInfo {
   duration: number;
 }
 
-export function updateExam(examId: number, info: ExamUpdateInfo): Promise<unknown> {
+type Response = Good | Bad;
+
+interface Good {
+  updated: true;
+}
+
+interface Bad {
+  updated: false;
+  reason: string;
+}
+
+export function updateExam(examId: number, info: ExamUpdateInfo): Promise<Response> {
   return hitApi(`/api/professor/exams/${examId}`, {
     method: 'PATCH',
     body: JSON.stringify({

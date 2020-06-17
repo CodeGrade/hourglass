@@ -71,19 +71,18 @@ export const ExamAdmin: React.FC = () => {
                 }}
                 onSubmit={(info) => {
                   updateExam(examId, info)
-                    .then(({ updated }) => {
-                      history.push(`/exams/${examId}/admin`);
-                      if (updated) {
+                    .then((res) => {
+                      if (res.updated === true) {
+                        history.push(`/exams/${examId}/admin`);
                         alert({
                           variant: 'success',
                           message: 'Exam info saved.',
                         });
                         refresh();
                       } else {
-                        throw new Error('API failure');
+                        throw new Error(res.reason);
                       }
                     }).catch((err) => {
-                      history.push(`/exams/${examId}/admin`);
                       alert({
                         variant: 'danger',
                         title: 'Error saving exam info.',

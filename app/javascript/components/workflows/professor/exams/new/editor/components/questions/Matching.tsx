@@ -128,6 +128,7 @@ const renderValue = (member, index, fields) => (
 
 const OnePrompt: React.FC<{
   memberName: string;
+  numChoices: number;
   valueNum: number;
   enableDown: boolean;
   moveDown: () => void;
@@ -136,6 +137,7 @@ const OnePrompt: React.FC<{
 }> = (props) => {
   const {
     memberName,
+    numChoices,
     valueNum,
     enableDown,
     moveDown,
@@ -175,18 +177,19 @@ const OnePrompt: React.FC<{
         <Field
           name={`answer[${valueNum}]`}
           component={ChooseRightAnswer}
-          numChoices={10} // TODO
+          numChoices={numChoices} // TODO
         />
       </Col>
     </Row>
   );
 };
 
-const renderPrompt = (member, index, fields) => (
+const renderPrompt = ({ numChoices }) => (member, index, fields) => (
   <OnePrompt
     // eslint-disable-next-line react/no-array-index-key
     key={index}
     valueNum={index}
+    numChoices={numChoices}
     memberName={member}
     enableDown={index + 1 < fields.length}
     moveDown={(): void => {
@@ -225,6 +228,19 @@ const EditColName: React.FC<WrappedFieldProps & {
   );
 };
 
+const RenderPrompts: React.FC<WrappedFieldProps> = (props) => {
+  const { input } = props;
+  const { length } = input.value;
+  const renderPrompts = React.useCallback(renderPrompt({ numChoices: length }), [length]);
+  return (
+    <FieldArray
+      name="prompts"
+      component={EditHTMLs}
+      renderOptions={renderPrompts}
+    />
+  );
+};
+
 const Matching: React.FC<MatchingProps> = (props) => {
   const {
     qnum,
@@ -239,7 +255,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
             <Field name="promptsLabel" component={EditColName} defaultLabel="Column A" />
           </Col>
         </Row>
-        <FieldArray name="prompts" component={EditHTMLs} renderOptions={renderPrompt} />
+        <Field name="values" component={RenderPrompts} />
       </Col>
       <Col sm={6}>
         <Row className="p-2">

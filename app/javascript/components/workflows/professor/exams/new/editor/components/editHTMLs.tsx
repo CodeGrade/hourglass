@@ -44,10 +44,12 @@ export const EditHTMLField: React.FC<WrappedFieldProps & {
   );
 };
 
-const EditHTMLs: React.FC<WrappedFieldArrayProps<HTMLVal> & {
+interface EditHTMLsProps {
   prompt?: string;
   renderOptions: FieldIterate<HTMLVal, JSX.Element>;
-}> = (props) => {
+}
+
+const EditHTMLs: React.FC<WrappedFieldArrayProps<HTMLVal> & EditHTMLsProps> = (props) => {
   const {
     renderOptions,
     fields,

@@ -15,8 +15,8 @@ import {
   FieldArrayFieldsProps,
 } from 'redux-form';
 import { FaCircle } from 'react-icons/fa';
-import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
-import EditHTMLs, { EditHTMLField } from '../editHTMLs';
+import { HTMLVal } from '@student/exams/show/types';
+import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
 
 const EditAnswer: React.FC<WrappedFieldProps & {
   current: number;

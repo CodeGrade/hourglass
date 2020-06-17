@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@student/exams/show/context';
 import {
@@ -236,40 +236,53 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const { alert } = useContext(AlertContext);
   const history = useHistory();
   const { examId, versionId } = useParams();
-  const doSubmit: () => Promise<Response> = handleSubmit((values) => {
-    if (!values) return new Promise((resolve) => resolve());
-    const version = transformForSubmit(values);
-    return versionUpdate(versionId, { version });
+  const doSubmit: () => Promise<Response> = async () => new Promise((resolve, reject) => {
+    handleSubmit((values) => {
+      const version = transformForSubmit(values);
+      versionUpdate(versionId, { version }).then(resolve).catch(reject);
+    })();
   });
+  const [changedEver, setChangedEver] = useState(false);
   useEffect(() => {
-    const f = () => doSubmit().then((res) => {
-      if (res.updated === true) {
-        alert({
-          variant: 'success',
-          title: 'Autosaved',
-          message: 'Exam version saved automatically.',
-          autohide: true,
-        });
-      } else {
+    const autosave = () => {
+      // debugger;
+      doSubmit().then((res) => {
+        if (res.updated === true) {
+          alert({
+            variant: 'success',
+            title: 'Autosaved',
+            message: 'Exam version saved automatically.',
+            autohide: true,
+          });
+        } else {
+          alert({
+            variant: 'danger',
+            title: 'Not Autosaved',
+            message: <pre>{res.reason}</pre>,
+            autohide: true,
+          });
+        }
+      }).catch((err) => {
         alert({
           variant: 'danger',
-          title: 'Not Autosaved',
-          message: <pre>{res.reason}</pre>,
-          autohide: true,
+          title: 'Error saving.',
+          message: err.message,
         });
-      }
-    }).catch((err) => {
-      alert({
-        variant: 'danger',
-        title: 'Error saving.',
-        message: err.message,
       });
-    });
-    const timer = setInterval(f, 20000);
+    };
+    if (pristine) {
+      if (changedEver) {
+        autosave(); // Autosave original value
+        setChangedEver(false);
+      }
+      return (): void => undefined;
+    }
+    setChangedEver(true);
+    const timer = setInterval(autosave, 20000);
     return () => {
       clearInterval(timer);
     };
-  }, [alert, doSubmit, pristine]);
+  }, [alert, doSubmit, changedEver, pristine]);
   return (
     <form
       onSubmit={(e): void => {

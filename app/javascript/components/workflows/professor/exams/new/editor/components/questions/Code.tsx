@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   Form,
   Row,
@@ -16,6 +16,8 @@ import {
   Fields,
   WrappedFieldsProps,
 } from 'redux-form';
+import { ExamFilesContext, ExamContext } from '@hourglass/workflows/student/exams/show/context';
+import { firstFile } from '@hourglass/workflows/student/exams/show/files';
 
 // TODO: starter should be a filepicker that saves a filename
 // const { fmap } = useContext(ExamContext);
@@ -242,6 +244,8 @@ const SetInitial: React.FC<WrappedFieldProps & {
   const isFile = value && 'file' in value;
   const isText = value && 'text' in value;
   const isNone = !value;
+  const { files } = useContext(ExamContext);
+  const first = firstFile(files);
   return (
     <>
       <ButtonGroup>
@@ -267,7 +271,7 @@ const SetInitial: React.FC<WrappedFieldProps & {
           variant={isFile ? 'secondary' : 'outline-secondary'}
           active={isFile}
           onClick={(): void => {
-            onChange(null);
+            onChange({ file: first.relPath });
           }}
         >
           Choose a file
@@ -279,6 +283,12 @@ const SetInitial: React.FC<WrappedFieldProps & {
           component={EditSuppliedCode}
           controlId={controlId}
         />
+      )}
+      {isFile && (
+        <>
+          <p>TODO: filepicker</p>
+          <p>{`current: ${first.relPath}`}</p>
+        </>
       )}
     </>
   );

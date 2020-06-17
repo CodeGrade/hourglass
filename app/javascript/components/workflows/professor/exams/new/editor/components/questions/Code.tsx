@@ -16,19 +16,9 @@ import {
   Fields,
   WrappedFieldsProps,
 } from 'redux-form';
-import { ExamFilesContext, ExamContext } from '@hourglass/workflows/student/exams/show/context';
-import { firstFile } from '@hourglass/workflows/student/exams/show/files';
-import FilePickerSelect, { FilePickerSelectWithPreview } from '../FilePicker';
-
-// TODO: starter should be a filepicker that saves a filename
-// const { fmap } = useContext(ExamContext);
-// const f = fmap[initial];
-// if (f?.filedir === 'dir') {
-//   throw new Error('Code initial cannot be a directory.');
-// }
-// const fileText = f?.contents ?? '';
-// const fileMarks = f?.marks ?? [];
-
+import { ExamContext } from '@student/exams/show/context';
+import { firstFile } from '@student/exams/show/files';
+import { FilePickerSelectWithPreview } from '../FilePicker';
 
 const EditLang: React.FC<{
   value: CodeInfo['lang'];

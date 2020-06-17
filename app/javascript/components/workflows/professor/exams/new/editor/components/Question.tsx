@@ -1,31 +1,23 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Form,
   Card,
   Alert,
   Row,
   Col,
-  InputGroup,
-  Collapse,
-  Button,
 } from 'react-bootstrap';
 import YesNo from '@student/exams/show/components/questions/YesNo';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowParts from '@professor/exams/new/editor/components/ShowParts';
-import FilePickerSelect from '@professor/exams/new/editor/components/FilePicker';
-import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
-import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import {
   WrappedFieldProps,
   Field,
   FieldArray,
   FormSection,
 } from 'redux-form';
-import { FileRef } from '@hourglass/workflows/student/exams/show/types';
-import { ExamContext, QuestionFilesContext } from '@hourglass/workflows/student/exams/show/context';
-import { getFilesForRefs } from '@hourglass/workflows/student/exams/show/files';
-import { EditHTMLField } from './editHTMLs';
-import EditReference from './Reference';
+import { QuestionFilesContext } from '@student/exams/show/context';
+import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
+import EditReference from '@professor/exams/new/editor/components/Reference';
 
 const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
   const {

@@ -16,7 +16,7 @@ import {
   FormSection,
   FieldArray,
 } from 'redux-form';
-import FilePickerSelect from '@professor/exams/new/editor/components/FilePicker';
+import FilePickerSelect, { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
 import { VeryControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { getFilesForRefs } from '@student/exams/show/files';
@@ -72,34 +72,16 @@ const PartReference: React.FC<WrappedFieldProps> = (props) => {
     value,
     onChange,
   } = input;
-  const [open, setOpen] = useState(false);
-  const noFiles = value.length === 0;
-  const { files, fmap } = useContext(ExamContext);
-  const filteredFiles = getFilesForRefs(fmap, value);
+  const { files } = useContext(ExamContext);
   return (
     <>
       <Form.Label column sm="2">Files to be shown for this question part:</Form.Label>
       <Col sm={10}>
-        <InputGroup>
-          <div className="flex-grow-1">
-            <FilePickerSelect options={files} selected={value} onChange={onChange} />
-          </div>
-          <InputGroup.Append>
-            <Button
-              variant="info"
-              disabled={noFiles}
-              onClick={(): void => setOpen((o) => !o)}
-            >
-              Preview files
-              {open && !noFiles ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
-            </Button>
-          </InputGroup.Append>
-        </InputGroup>
-        <Collapse in={open && !noFiles}>
-          <div className="border">
-            <VeryControlledFileViewer files={filteredFiles} />
-          </div>
-        </Collapse>
+        <FilePickerSelectWithPreview
+          options={files}
+          selected={value}
+          onChange={onChange}
+        />
       </Col>
     </>
   );

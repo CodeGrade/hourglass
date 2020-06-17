@@ -49,7 +49,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
                 </div>
               )}
               <HTML value={instructions} />
-              {reference && <FileViewer references={reference} />}
+              {reference.length !== 0 && <FileViewer references={reference} />}
               <div>
                 <DisplayQuestions
                   questions={questions}

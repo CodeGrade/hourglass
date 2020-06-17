@@ -119,7 +119,7 @@
     "YesNo": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["type"],
+      "required": ["type", "yesLabel", "noLabel"],
       "properties": {
         "type": { "enum": ["YesNo"] },
         "yesLabel": { "type": "string" },

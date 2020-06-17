@@ -36,6 +36,8 @@ const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
           value={!!value}
           info={{
             type: 'YesNo',
+            yesLabel: 'Yes',
+            noLabel: 'No',
             prompt: {
               type: 'HTML',
               value: '',
@@ -122,7 +124,7 @@ const Question: React.FC<{
               </Col>
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-separate`}>
-              <Field name="seperateSubparts" component={QuestionSepSubParts} />
+              <Field name="separateSubparts" component={QuestionSepSubParts} />
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-files`}>
               <Field

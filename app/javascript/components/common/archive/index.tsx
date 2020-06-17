@@ -21,6 +21,7 @@ export async function handleDir(root: JSZip): Promise<ExamFile[]> {
         const examDir: ExamDir = {
           filedir: 'dir',
           text: `${segment}/`,
+          path: segment,
           relPath: pathSoFar.join('/'),
           nodes: [],
         };
@@ -34,6 +35,7 @@ export async function handleDir(root: JSZip): Promise<ExamFile[]> {
         const examFile: ExamSingleFile = {
           filedir: 'file',
           text: fileName,
+          path: fileName,
           relPath: path,
           marks,
           type: mime(fileName),

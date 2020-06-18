@@ -88,17 +88,17 @@ const Question: React.FC<{
       onBlur={(): void => setMoversVisible(false)}
       onMouseOut={(): void => setMoversVisible(false)}
     >
-      <MoveItem
-        visible={moversVisible}
-        variant="primary"
-        enableUp={qnum > 0}
-        enableDown={enableDown}
-        onUp={moveUp}
-        onDown={moveDown}
-        onDelete={remove}
-      />
-      <Alert variant="primary">
-        <FormSection name={memberName}>
+      <FormSection name={memberName}>
+        <MoveItem
+          visible={moversVisible}
+          variant="primary"
+          enableUp={qnum > 0}
+          enableDown={enableDown}
+          onUp={moveUp}
+          onDown={moveDown}
+          onDelete={remove}
+        />
+        <Alert variant="primary">
           <Card.Title>
             {`Question ${qnum + 1}`}
           </Card.Title>
@@ -134,16 +134,16 @@ const Question: React.FC<{
               />
             </Form.Group>
           </Card.Subtitle>
-          <Card.Body>
-            <Field
-              name="reference"
-              component={QuestionReferenceProvider}
-            >
-              <FieldArray name="parts" component={ShowParts} props={{ qnum }} />
-            </Field>
-          </Card.Body>
-        </FormSection>
-      </Alert>
+        </Alert>
+        <Card.Body>
+          <Field
+            name="reference"
+            component={QuestionReferenceProvider}
+          >
+            <FieldArray name="parts" component={ShowParts} props={{ qnum }} />
+          </Field>
+        </Card.Body>
+      </FormSection>
     </Card>
   );
 };

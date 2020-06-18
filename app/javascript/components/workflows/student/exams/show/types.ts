@@ -486,8 +486,13 @@ export interface MatchingState {
   [index: number]: number;
 }
 
-export interface MatchingInfoWithAnswer extends MatchingInfo {
-  answer: MatchingState;
+export interface MatchingPromptWithAnswer {
+  html: HTMLVal;
+  answer: number;
+}
+
+export interface MatchingInfoWithAnswer extends Omit<MatchingInfo, 'prompts'> {
+  prompts: MatchingPromptWithAnswer[];
 }
 
 export type BodyItem =

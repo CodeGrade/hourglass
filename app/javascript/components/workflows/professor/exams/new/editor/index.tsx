@@ -25,6 +25,9 @@ import {
   AllThatApplyInfo,
   AllThatApplyInfoWithAnswer,
   AnswerState,
+  MatchingInfoWithAnswer,
+  MatchingInfo,
+  MatchingState,
 } from '@student/exams/show/types';
 import {
   reduxForm,
@@ -72,6 +75,25 @@ function transformATAReverse(
   };
 }
 
+function transformMatchingReverse(
+  matching: MatchingInfo,
+  answer: MatchingState,
+): MatchingInfoWithAnswer {
+  const {
+    prompts,
+    ...rest
+  } = matching;
+  const newPrompts = prompts.map((o, idx) => ({
+    html: o,
+    answer: answer[idx],
+  }));
+  return {
+    ...rest,
+    prompts: newPrompts,
+  };
+}
+
+
 function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): ExamVersionWithAnswers {
   const {
     questions,
@@ -96,6 +118,10 @@ function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): E
         switch (b.type) {
           case 'AllThatApply': {
             newItem = transformATAReverse(b, ans as AllThatApplyState);
+            break;
+          }
+          case 'Matching': {
+            newItem = transformMatchingReverse(b, ans as MatchingState);
             break;
           }
           default:
@@ -228,6 +254,31 @@ function transformATA(
   };
 }
 
+function transformMatching(
+  matching: MatchingInfoWithAnswer,
+): {
+  info: MatchingInfo,
+  answer: MatchingState,
+} {
+  const {
+    prompts,
+    ...rest
+  } = matching;
+  const answer = [];
+  const newPrompts = [];
+  prompts.forEach((o) => {
+    answer.push(o.answer);
+    newPrompts.push(o.html);
+  });
+  return {
+    info: {
+      ...rest,
+      prompts: newPrompts,
+    },
+    answer,
+  };
+}
+
 function transformForSubmit(values: FormValues): Version {
   const { all } = values;
   const questions: QuestionInfo[] = [];
@@ -254,8 +305,14 @@ function transformForSubmit(values: FormValues): Version {
             const res = transformATA(b);
             itemAnswer = res.answer;
             bodyItem = res.info;
-          }
             break;
+          }
+          case 'Matching': {
+            const res = transformMatching(b);
+            itemAnswer = res.answer;
+            bodyItem = res.info;
+            break;
+          }
           default: {
             const {
               answer,

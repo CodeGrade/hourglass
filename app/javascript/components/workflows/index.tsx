@@ -1,10 +1,10 @@
 import { hot } from 'react-hot-loader';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { RailsContext } from '@student/exams/show/context';
 import RegularNavbar from '@hourglass/common/navbar';
-import { Container } from 'react-bootstrap';
+import { Container, Modal, Button } from 'react-bootstrap';
 import {
   BrowserRouter,
   Link,
@@ -26,6 +26,7 @@ import { AllAlerts } from '@hourglass/common/alerts';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
 import './index.scss';
+import ReactDOM from 'react-dom';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -152,6 +153,10 @@ const Exam: React.FC = () => {
 const Entry: React.FC = () => {
   const res = ApiMe.useResponse();
   const railsUser = res.type === 'RESULT' ? res.response.user : undefined;
+
+  const [transitioning, setTransitioning] = useState(false);
+  const [transitionMessage, setTransitionMessage] = useState('');
+  const [transitionCallback, setTransitionCallback] = useState(() => (_) => undefined);
   return (
     <RailsContext.Provider
       value={{
@@ -159,7 +164,47 @@ const Entry: React.FC = () => {
       }}
     >
       <DndProvider backend={HTML5Backend}>
-        <BrowserRouter>
+        <BrowserRouter
+          getUserConfirmation={(message, callback) => {
+            setTransitioning(true);
+            setTransitionMessage(message);
+            setTransitionCallback(() => callback);
+          }}
+        >
+          <Modal
+            show={transitioning}
+            onHide={() => {
+              setTransitioning(false);
+              transitionCallback(false);
+            }}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Are you sure you want to navigate?</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {transitionMessage}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setTransitioning(false);
+                  transitionCallback(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  setTransitioning(false);
+                  transitionCallback(true);
+                }}
+              >
+                Leave
+              </Button>
+            </Modal.Footer>
+          </Modal>
           <Switch>
             <Route path="/exams/:examId" exact>
               <Exam />

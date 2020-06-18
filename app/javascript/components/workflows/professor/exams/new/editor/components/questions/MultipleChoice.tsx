@@ -98,15 +98,17 @@ export const renderOptionsMultipleChoice = ({
     enableDown={index + 1 < fields.length}
     moveDown={(): void => {
       fields.move(index, index + 1);
-      moveDown();
+      if (index === selected) moveDown();
+      if (index + 1 === selected) moveUp();
     }}
     moveUp={(): void => {
       fields.move(index, index - 1);
-      moveUp();
+      if (index === selected) moveUp();
+      if (index - 1 === selected) moveDown();
     }}
     remove={(): void => {
       fields.remove(index);
-      remove();
+      if (index === selected) remove();
     }}
   />
 );

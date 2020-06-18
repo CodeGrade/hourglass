@@ -380,7 +380,7 @@ export interface CodeInitialContents {
 }
 
 export interface CodeInfoWithAnswer extends CodeInfo {
-  answer?: CodeState;
+  answer: CodeState;
 }
 
 export interface MarkDescription {
@@ -413,12 +413,10 @@ export interface AllThatApplyInfo {
 }
 
 export interface AllThatApplyInfoWithAnswer extends AllThatApplyInfo {
-  answer?: AllThatApplyState;
+  answer: AllThatApplyState;
 }
 
-export interface AllThatApplyState {
-  [index: number]: boolean;
-}
+export type AllThatApplyState = boolean[];
 
 export interface YesNoInfo {
   type: 'YesNo';
@@ -468,7 +466,7 @@ export interface TextInfo {
 export type TextState = string;
 
 export interface TextInfoWithAnswer extends TextInfo {
-  answer?: TextState;
+  answer: TextState;
 }
 
 export interface MatchingInfo {
@@ -484,7 +482,7 @@ export interface MatchingState {
 }
 
 export interface MatchingInfoWithAnswer extends MatchingInfo {
-  answer?: MatchingState;
+  answer: MatchingState;
 }
 
 export type BodyItem =

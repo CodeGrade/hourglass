@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext } from 'react';
 import ExamNavbar from '@student/exams/show/containers/navbar';
 import RegularNavbar from '@hourglass/common/navbar';
 import { Row, Col, Container } from 'react-bootstrap';

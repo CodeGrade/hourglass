@@ -72,7 +72,6 @@ const ShowBodyItems: React.FC<{
                     value: '',
                   },
                   options: [],
-                  answer: [],
                 });
               }}
             >

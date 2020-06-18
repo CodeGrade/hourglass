@@ -12,9 +12,11 @@ import {
   FieldArray,
   FieldArrayFieldsProps,
   WrappedFieldArrayProps,
+  WrappedFieldProps,
+  FormSection,
 } from 'redux-form';
 import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
-import { HTMLVal } from '@student/exams/show/types';
+import { HTMLVal, AllThatApplyOptionWithAnswer } from '@student/exams/show/types';
 import Icon from '@student/exams/show/components/Icon';
 import { FaCheck } from 'react-icons/fa';
 
@@ -32,6 +34,22 @@ declare module 'redux-form' {
   }
 }
 
+const EditAnswer: React.FC<WrappedFieldProps> = (props) => {
+  const { input } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <Button
+      variant={value ? 'dark' : 'outline-dark'}
+      onClick={() => onChange(!value)}
+    >
+      <Icon I={FaCheck} className={value ? '' : 'invisible'} />
+    </Button>
+  );
+};
+
 const OneOption: React.FC<{
   memberName: string;
   optionNum: number;
@@ -39,8 +57,6 @@ const OneOption: React.FC<{
   moveDown: () => void;
   moveUp: () => void;
   remove: () => void;
-  value: boolean;
-  toggleValue: () => void;
 }> = (props) => {
   const {
     memberName,
@@ -49,58 +65,41 @@ const OneOption: React.FC<{
     moveDown,
     moveUp,
     remove,
-    value,
-    toggleValue,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
   return (
-    <Row
-      className="p-2"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onBlur={(): void => setMoversVisible(false)}
-      onMouseOut={(): void => setMoversVisible(false)}
-    >
-      <Col className="flex-grow-01">
-        <MoveItem
-          visible={moversVisible}
-          variant="dark"
-          enableUp={optionNum > 0}
-          enableDown={enableDown}
-          onUp={moveUp}
-          onDown={moveDown}
-          onDelete={remove}
-        />
-        <Button
-          variant={value ? 'dark' : 'outline-dark'}
-          onClick={toggleValue}
-        >
-          <Icon I={FaCheck} className={value ? '' : 'invisible'} />
-        </Button>
-      </Col>
-      <Col className="pr-0">
-        <Field name={memberName} component={EditHTMLField} theme="bubble" />
-      </Col>
-    </Row>
+    <FormSection name={memberName}>
+      <Row
+        className="p-2"
+        onMouseOver={(): void => setMoversVisible(true)}
+        onFocus={(): void => setMoversVisible(true)}
+        onBlur={(): void => setMoversVisible(false)}
+        onMouseOut={(): void => setMoversVisible(false)}
+      >
+        <Col className="flex-grow-01">
+          <MoveItem
+            visible={moversVisible}
+            variant="dark"
+            enableUp={optionNum > 0}
+            enableDown={enableDown}
+            onUp={moveUp}
+            onDown={moveDown}
+            onDelete={remove}
+          />
+          <Field name="answer" component={EditAnswer} />
+        </Col>
+        <Col className="pr-0">
+          <Field name="html" component={EditHTMLField} theme="bubble" />
+        </Col>
+      </Row>
+    </FormSection>
   );
 };
 
-export const renderOptionsATA = ({
-  moveDown,
-  moveUp,
-  remove,
-  val,
-  toggle,
-}: {
-  moveDown: (idx: number) => void;
-  moveUp: (idx: number) => void;
-  remove: (idx: number) => void;
-  val: (idx: number) => boolean;
-  toggle: (idx: number) => void;
-}) => (
+export const renderOptionsATA = (
   member: string,
   index: number,
-  fields: FieldArrayFieldsProps<HTMLVal>,
+  fields: FieldArrayFieldsProps<AllThatApplyOptionWithAnswer>,
 ): JSX.Element => (
   <OneOption
     // eslint-disable-next-line react/no-array-index-key
@@ -110,42 +109,42 @@ export const renderOptionsATA = ({
     enableDown={index + 1 < fields.length}
     moveDown={(): void => {
       fields.move(index, index + 1);
-      moveDown(index);
     }}
     moveUp={(): void => {
       fields.move(index, index - 1);
-      moveUp(index);
     }}
     remove={(): void => {
       fields.remove(index);
-      remove(index);
     }}
-    value={val(index)}
-    toggleValue={() => toggle(index)}
   />
 );
 
-const EditAns: React.FC<WrappedFieldArrayProps<boolean>> = (props) => {
+const EditOption: React.FC<WrappedFieldArrayProps<AllThatApplyOptionWithAnswer>> = (props) => {
   const {
     fields,
   } = props;
-  const val = (idx: number) => fields.get(idx);
-  const moveDown = (idx: number) => fields.swap(idx, idx + 1);
-  const moveUp = (idx: number) => fields.swap(idx, idx - 1);
-  const remove = (idx: number) => fields.remove(idx);
-  const toggle = (idx: number) => fields.splice(idx, 1, !val);
   return (
-    <FieldArray
-      name="options"
-      component={EditHTMLs}
-      renderOptions={renderOptionsATA({
-        val,
-        toggle,
-        moveDown,
-        moveUp,
-        remove,
-      })}
-    />
+    <>
+      {fields.map(renderOptionsATA)}
+      <Row className="p-2">
+        <Col className="text-center p-0">
+          <Button
+            variant="dark"
+            onClick={(): void => {
+              fields.push({
+                html: {
+                  type: 'HTML',
+                  value: '',
+                },
+                answer: false,
+              });
+            }}
+          >
+            Add new option
+          </Button>
+        </Col>
+      </Row>
+    </>
   );
 };
 
@@ -171,7 +170,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
             </Col>
             <Col><b>Prompt</b></Col>
           </Row>
-          <FieldArray name="answer" component={EditAns} />
+          <FieldArray name="options" component={EditOption} />
         </Col>
       </Form.Group>
     </>

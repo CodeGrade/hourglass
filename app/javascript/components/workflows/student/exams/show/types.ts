@@ -412,8 +412,13 @@ export interface AllThatApplyInfo {
   prompt: HTMLVal;
 }
 
-export interface AllThatApplyInfoWithAnswer extends AllThatApplyInfo {
-  answer: AllThatApplyState;
+export interface AllThatApplyOptionWithAnswer {
+  html: HTMLVal;
+  answer: boolean;
+}
+
+export interface AllThatApplyInfoWithAnswer extends Omit<AllThatApplyInfo, 'options'> {
+  options: AllThatApplyOptionWithAnswer[];
 }
 
 export type AllThatApplyState = boolean[];

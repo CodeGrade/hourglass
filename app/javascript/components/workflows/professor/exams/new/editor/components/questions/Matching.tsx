@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   Row,
   Col,
@@ -9,9 +9,15 @@ import {
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import { alphabetIdx } from '@hourglass/common/helpers';
-import { Field, WrappedFieldProps, FieldArray, FieldArrayFieldsProps, FormSection } from 'redux-form';
-import EditHTMLs, { EditHTMLField } from '../editHTMLs';
-import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
+import {
+  Field,
+  WrappedFieldProps,
+  FieldArray,
+  FieldArrayFieldsProps,
+  FormSection,
+} from 'redux-form';
+import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
+import { HTMLVal } from '@student/exams/show/types';
 
 interface MatchingProps {
   qnum: number;

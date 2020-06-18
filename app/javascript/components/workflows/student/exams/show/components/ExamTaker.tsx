@@ -6,7 +6,6 @@ import { RailsContext } from '@student/exams/show/context';
 import ExamShowContents from '@student/exams/show/containers/ExamShowContents';
 import PreStart from '@student/exams/show/containers/PreStart';
 import './ExamTaker.scss';
-import { Prompt } from 'react-router-dom';
 import { BlockNav } from '@hourglass/workflows';
 
 interface ExamTakerProps {

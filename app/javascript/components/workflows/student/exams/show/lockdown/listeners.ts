@@ -46,18 +46,6 @@ const listeners: {
       detected('tried to navigate away', e);
     },
   },
-  {
-    event: 'popstate',
-    handler: (detected) => (e: Event): void => {
-      detected('tried to navigate back', e);
-    },
-  },
-  {
-    event: 'pushstate',
-    handler: (detected) => (e: Event): void => {
-      detected('tried to navigate forward', e);
-    },
-  },
 ];
 
 export function installListeners(policies: Policy[], detected: AnomalyDetected): AnomalyListener[] {

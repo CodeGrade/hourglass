@@ -236,7 +236,7 @@
       "type": "array",
       "items": {
         "type": "integer",
-        "minimum": 0,
+        "minimum": -1,
         "$comment": "can't enforce the max-range constraint here"
       }
     },

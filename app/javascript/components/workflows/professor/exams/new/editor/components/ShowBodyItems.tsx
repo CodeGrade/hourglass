@@ -115,7 +115,6 @@ const ShowBodyItems: React.FC<{
                   type: 'Matching',
                   prompts: [],
                   values: [],
-                  answer: [],
                 });
               }}
             >

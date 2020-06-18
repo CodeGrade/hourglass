@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Row,
   Col,
@@ -9,8 +9,9 @@ import {
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import { alphabetIdx } from '@hourglass/common/helpers';
-import { Field, WrappedFieldProps, FieldArray } from 'redux-form';
+import { Field, WrappedFieldProps, FieldArray, FieldArrayFieldsProps, FormSection } from 'redux-form';
 import EditHTMLs, { EditHTMLField } from '../editHTMLs';
+import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
 
 interface MatchingProps {
   qnum: number;
@@ -105,7 +106,11 @@ const OneValue: React.FC<{
   );
 };
 
-const renderValue = (member, index, fields) => (
+const renderValue = (
+  member,
+  index,
+  fields,
+) => (
   <OneValue
     // eslint-disable-next-line react/no-array-index-key
     key={index}
@@ -144,45 +149,53 @@ const OnePrompt: React.FC<{
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
   return (
-    <Row
-      className="p-2"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onBlur={(): void => setMoversVisible(false)}
-      onMouseOut={(): void => setMoversVisible(false)}
-    >
-      <Col className="flex-grow-01 pl-0">
-        <MoveItem
-          visible={moversVisible}
-          variant="dark"
-          enableUp={valueNum > 0}
-          enableDown={enableDown}
-          onUp={moveUp}
-          onDown={moveDown}
-          onDelete={remove}
-        />
-        {`${alphabetIdx(valueNum)}.`}
-      </Col>
-      <Col className="pr-0">
-        <Field
-          name={memberName}
-          component={EditHTMLField}
-          theme="bubble"
-          placeholder="Enter a new prompt"
-        />
-      </Col>
-      <Col sm={2}>
-        <Field
-          name={`answer[${valueNum}]`}
-          component={ChooseRightAnswer}
-          numChoices={numChoices} // TODO
-        />
-      </Col>
-    </Row>
+    <FormSection name={memberName}>
+      <Row
+        className="p-2"
+        onMouseOver={(): void => setMoversVisible(true)}
+        onFocus={(): void => setMoversVisible(true)}
+        onBlur={(): void => setMoversVisible(false)}
+        onMouseOut={(): void => setMoversVisible(false)}
+      >
+        <Col className="flex-grow-01 pl-0">
+          <MoveItem
+            visible={moversVisible}
+            variant="dark"
+            enableUp={valueNum > 0}
+            enableDown={enableDown}
+            onUp={moveUp}
+            onDown={moveDown}
+            onDelete={remove}
+          />
+          {`${alphabetIdx(valueNum)}.`}
+        </Col>
+        <Col className="pr-0">
+          <Field
+            name="html"
+            component={EditHTMLField}
+            theme="bubble"
+            placeholder="Enter a new prompt"
+          />
+        </Col>
+        <Col sm={2}>
+          <Field
+            name="answer"
+            component={ChooseRightAnswer}
+            numChoices={numChoices}
+          />
+        </Col>
+      </Row>
+    </FormSection>
   );
 };
 
-const renderPrompt = ({ numChoices }) => (member, index, fields) => (
+const renderPrompt = ({
+  numChoices,
+}) => (
+  member: string,
+  index: number,
+  fields: FieldArrayFieldsProps<HTMLVal>,
+) => (
   <OnePrompt
     // eslint-disable-next-line react/no-array-index-key
     key={index}
@@ -229,7 +242,9 @@ const EditColName: React.FC<WrappedFieldProps & {
 const RenderPrompts: React.FC<WrappedFieldProps> = (props) => {
   const { input } = props;
   const { length } = input.value;
-  const renderPrompts = React.useCallback(renderPrompt({ numChoices: length }), [length]);
+  const renderPrompts = React.useCallback(renderPrompt({
+    numChoices: length,
+  }), [length]);
   return (
     <FieldArray
       name="prompts"
@@ -247,7 +262,7 @@ const Matching: React.FC<MatchingProps> = (_props) => (
           <Field name="promptsLabel" component={EditColName} defaultLabel="Column A" />
         </Col>
       </Row>
-      <Field name="values" component={RenderPrompts} />
+      <Field name="prompts" component={RenderPrompts} />
     </Col>
     <Col sm={6}>
       <Row className="p-2">
@@ -255,94 +270,9 @@ const Matching: React.FC<MatchingProps> = (_props) => (
           <Field name="valuesLabel" component={EditColName} defaultLabel="Column B" />
         </Col>
       </Row>
-      <FieldArray name="values" component={EditHTMLs} renderOptions={renderValue} prompt="Add new choice" />
+      <FieldArray name="values" component={EditHTMLs} renderOptions={renderValue} />
     </Col>
   </Row>
 );
-
-//   const [promptMoversVisible, rawSetPromptMoversVisible] = useState([]);
-//   const setPromptMoversVisible = (index: number, visible: boolean): void => {
-//     const newMovers = [...promptMoversVisible];
-//     newMovers[index] = visible;
-//     rawSetPromptMoversVisible(newMovers);
-//   };
-//   const [valueMoversVisible, rawSetValueMoversVisible] = useState([]);
-//   const setValueMoversVisible = (index: number, visible: boolean): void => {
-//     const newMovers = [...valueMoversVisible];
-//     newMovers[index] = visible;
-//     rawSetValueMoversVisible(newMovers);
-//   };
-//   const addPrompt = (): void => {
-//     const newPrompts = [...prompts];
-//     newPrompts.push({
-//       type: 'HTML',
-//       value: '',
-//     });
-//     onChange({ ...info, prompts: newPrompts }, value);
-//   };
-//   const deletePrompt = (index: number): UpdateBodyItemAction => {
-//     const newPrompts = [...prompts];
-//     newPrompts.splice(index, 1);
-//     return makeChangeAction({ ...info, prompts: newPrompts }, value);
-//   };
-//   const movePrompt = (from: number, to: number): UpdateBodyItemAction => {
-//     const newPrompts = [...prompts];
-//     const fromOpt = newPrompts[from];
-//     newPrompts.splice(from, 1);
-//     newPrompts.splice(to, 0, fromOpt);
-//     return makeChangeAction({ ...info, prompts: newPrompts }, value);
-//   };
-//   const addValue = (): void => {
-//     const newValues = [...values];
-//     newValues.push({
-//       type: 'HTML',
-//       value: '',
-//     });
-//     onChange({ ...info, values: newValues }, value);
-//   };
-//   const deleteValue = (index: number): UpdateBodyItemAction => {
-//     const newValues = [...values];
-//     newValues.splice(index, 1);
-//     const newValue = { ...value };
-//     Object.keys(newValue).forEach((key) => {
-//       if (newValue[key] > index) {
-//         newValue[key] -= 1;
-//       } else if (newValue[key] === index) {
-//         delete newValue[key];
-//       }
-//     });
-//     return makeChangeAction({ ...info, values: newValues }, newValue);
-//   };
-//   const moveValue = (from: number, to: number): UpdateBodyItemAction => {
-//     const newValues = [...values];
-//     const fromOpt = newValues[from];
-//     newValues.splice(from, 1);
-//     newValues.splice(to, 0, fromOpt);
-//     const newValue = { ...value };
-//     Object.keys(newValue).forEach((key) => {
-//       if (newValue[key] === from) {
-//         newValue[key] = to;
-//       } else if (newValue[key] === to) {
-//         newValue[key] = to - 1;
-//       }
-//     });
-//     return makeChangeAction({ ...info, values: newValues }, newValue);
-//   };
-//   const updateAnswer = (index: number, event: React.ChangeEvent<{ value: number }>): void => {
-//     const val = event.target.value;
-//     const ret = { ...value };
-//     ret[index] = val;
-//     onChange(info, ret);
-//   };
-//   const updatePrompt = (index: number, newPrompt: HTMLVal): void => {
-//     const newPrompts = [...prompts];
-//     newPrompts[index] = newPrompt;
-//     onChange({ ...info, prompts: newPrompts }, value);
-//   };
-//   const updateValue = (index: number, newValue: HTMLVal): void => {
-//     const newValues = [...values];
-//     newValues[index] = newValue;
-//     onChange({ ...info, values: newValues }, value);
-//   };
 
 export default Matching;

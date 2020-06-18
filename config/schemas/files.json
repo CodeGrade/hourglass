@@ -61,11 +61,7 @@
       "required": ["ch", "line"],
       "properties": {
         "ch": { "type": "number" },
-        "line": { "type": "number" },
-        "sticky": {
-          "type": "null",
-          "$comment": "CodeMirror inserts these automatically"
-        }
+        "line": { "type": "number" }
       }
     },
     "MarkOptions": {
@@ -73,10 +69,6 @@
       "additionalProperties": false,
       "required": ["inclusiveLeft", "inclusiveRight"],
       "properties": {
-        "readOnly": {
-          "type": "boolean",
-          "$comment": "CodeMirror inserts these automatically"
-        },
         "inclusiveLeft": { "type": "boolean" },
         "inclusiveRight": { "type": "boolean" }
       }

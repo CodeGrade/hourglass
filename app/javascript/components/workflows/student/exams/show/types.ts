@@ -386,7 +386,10 @@ export interface CodeInfoWithAnswer extends CodeInfo {
 export interface MarkDescription {
   from: CodeMirror.Position;
   to: CodeMirror.Position;
-  options: CodeMirror.TextMarkerOptions;
+  options: {
+    inclusiveLeft: CodeMirror.TextMarkerOptions['inclusiveLeft'];
+    inclusiveRight: CodeMirror.TextMarkerOptions['inclusiveRight'];
+  };
 }
 
 export type CodeState = {

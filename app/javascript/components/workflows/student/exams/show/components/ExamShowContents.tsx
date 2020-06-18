@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useCallback } from 'react';
 import {
   ExamVersion,
 } from '@student/exams/show/types';
@@ -9,10 +9,12 @@ import HTML from '@student/exams/show/components/HTML';
 import { Row, Col } from 'react-bootstrap';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import ShowQuestion from '@student/exams/show/containers/ShowQuestion';
+import { BlockNav } from '@hourglass/workflows';
 
 interface ExamShowContentsProps {
   exam: ExamVersion;
   save: () => void;
+  submit: () => void;
 }
 
 const INTERVAL = 10000;
@@ -21,7 +23,11 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const {
     exam,
     save,
+    submit,
   } = props;
+  const leave = useCallback(() => {
+    submit();
+  }, []);
   useEffect(() => {
     const timer: number = window.setInterval(() => save(), INTERVAL);
     return (): void => {
@@ -39,6 +45,10 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const { railsExam } = useContext(RailsContext);
   return (
     <ExamContext.Provider value={{ files, fmap }}>
+      <BlockNav
+        onLeave={leave}
+        message="Are you sure you want to navigate away? Your exam will be submitted."
+      />
       <ExamFilesContext.Provider value={{ references: reference }}>
         <h1>{railsExam.name}</h1>
         <HTML value={instructions} />

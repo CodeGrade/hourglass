@@ -161,8 +161,8 @@ const BlockerContext = React.createContext({} as BlockerContext);
 export const BlockNav: React.FC<{
   when?: boolean;
   message: string;
-  onStay: () => void;
-  onLeave: () => void;
+  onStay?: () => void;
+  onLeave?: () => void;
 }> = (props) => {
   const {
     when = true,
@@ -173,11 +173,8 @@ export const BlockNav: React.FC<{
   const { setCustomHandler } = useContext(BlockerContext);
   useEffect(() => {
     setCustomHandler(() => (b) => {
-      if (b) {
-        onLeave();
-      } else {
-        onStay();
-      }
+      if (b && onLeave) onLeave();
+      if (!b && onStay) onStay();
     });
   }, [onStay, onLeave]);
   return (

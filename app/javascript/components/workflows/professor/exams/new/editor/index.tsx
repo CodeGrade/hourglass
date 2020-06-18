@@ -21,6 +21,10 @@ import {
   QuestionInfoWithAnswers,
   PartInfoWithAnswers,
   BodyItemWithAnswer,
+  AllThatApplyState,
+  AllThatApplyInfo,
+  AllThatApplyInfoWithAnswer,
+  AnswerState,
 } from '@student/exams/show/types';
 import {
   reduxForm,
@@ -50,6 +54,24 @@ export interface ExamEditorProps {
   answers: AnswersState;
 }
 
+function transformATAReverse(
+  ata: AllThatApplyInfo,
+  answer: AllThatApplyState,
+): AllThatApplyInfoWithAnswer {
+  const {
+    options,
+    ...rest
+  } = ata;
+  const newOptions = options.map((o, idx) => ({
+    html: o,
+    answer: answer[idx],
+  }));
+  return {
+    ...rest,
+    options: newOptions,
+  };
+}
+
 function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): ExamVersionWithAnswers {
   const {
     questions,
@@ -70,11 +92,19 @@ function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): E
       const newBody: BodyItemWithAnswer[] = [];
       body.forEach((b, bnum) => {
         const ans = answers[qnum][pnum][bnum];
-        const newBodyItem: BodyItemWithAnswer = {
-          ...b,
-          answer: isNoAns(ans) ? undefined : ans,
-        } as BodyItemWithAnswer;
-        newBody.push(newBodyItem);
+        let newItem: BodyItemWithAnswer;
+        switch (b.type) {
+          case 'AllThatApply': {
+            newItem = transformATAReverse(b, ans as AllThatApplyState);
+            break;
+          }
+          default:
+            newItem = {
+              ...b,
+              answer: isNoAns(ans) ? undefined : ans,
+            } as BodyItemWithAnswer;
+        }
+        newBody.push(newItem);
       });
       newParts.push({
         ...restOfP,
@@ -173,6 +203,31 @@ const FormContextProviderConnected = connect((state) => ({
   examRef: formSelector(state, 'all.exam.reference'),
 }))(FormContextProvider);
 
+function transformATA(
+  ata: AllThatApplyInfoWithAnswer,
+): {
+  info: AllThatApplyInfo,
+  answer: AllThatApplyState,
+} {
+  const {
+    options,
+    ...rest
+  } = ata;
+  const answer = [];
+  const newOptions = [];
+  options.forEach((o) => {
+    answer.push(o.answer);
+    newOptions.push(o.html);
+  });
+  return {
+    info: {
+      ...rest,
+      options: newOptions,
+    },
+    answer,
+  };
+}
+
 function transformForSubmit(values: FormValues): Version {
   const { all } = values;
   const questions: QuestionInfo[] = [];
@@ -192,14 +247,26 @@ function transformForSubmit(values: FormValues): Version {
       } = p;
       const newBody: BodyItem[] = [];
       body.forEach((b, bnum) => {
-        const {
-          answer,
-          ...restOfB
-        } = b;
-        answers[qnum][pnum][bnum] = answer ?? { NO_ANS: true };
-        newBody.push({
-          ...restOfB,
-        });
+        let itemAnswer: AnswerState;
+        let bodyItem: BodyItem;
+        switch (b.type) {
+          case 'AllThatApply': {
+            const res = transformATA(b);
+            itemAnswer = res.answer;
+            bodyItem = res.info;
+          }
+            break;
+          default: {
+            const {
+              answer,
+              ...restOfB
+            } = b;
+            itemAnswer = answer;
+            bodyItem = restOfB;
+          }
+        }
+        answers[qnum][pnum][bnum] = itemAnswer ?? { NO_ANS: true };
+        newBody.push(bodyItem);
       });
       newParts.push({
         ...restOfP,

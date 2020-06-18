@@ -40,7 +40,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           )}
         </h1>
         <HTML value={description} />
-        {reference && <FileViewer references={reference} />}
+        {reference.length !== 0 && <FileViewer references={reference} />}
         {parts.map((p, i) => (
           <Part
             // Part numbers are STATIC.

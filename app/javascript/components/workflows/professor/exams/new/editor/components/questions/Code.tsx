@@ -111,13 +111,23 @@ const EditCodeAnswerValues: React.FC<{
               newMarks.splice(markId, 1);
             } else {
               const newMark: MarkDescription = {
-                from: curRange.from,
-                to: curRange.to,
+                from: {
+                  ch: curRange.from.ch,
+                  line: curRange.from.line,
+                },
+                to: {
+                  ch: curRange.to.ch,
+                  line: curRange.to.line,
+                },
                 options: {
-                  inclusiveLeft: curRange.from.line === 0 && curRange.from.ch === 0,
-                  inclusiveRight:
+                  inclusiveLeft: (
+                    curRange.from.line === 0
+                    && curRange.from.ch === 0
+                  ),
+                  inclusiveRight: (
                     curRange.to.line === finalPos.line
-                  && curRange.to.ch === finalPos.ch,
+                    && curRange.to.ch === finalPos.ch
+                  ),
                 },
               };
               newMarks.push(newMark);

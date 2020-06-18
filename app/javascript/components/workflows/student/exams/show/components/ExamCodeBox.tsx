@@ -34,7 +34,14 @@ function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
     const { readOnly, inclusiveLeft, inclusiveRight } = m;
     const found = m.find();
     return {
-      ...found,
+      from: {
+        ch: found.from.ch,
+        line: found.from.line,
+      },
+      to: {
+        ch: found.to.ch,
+        line: found.to.line,
+      },
       options: {
         readOnly,
         inclusiveLeft,

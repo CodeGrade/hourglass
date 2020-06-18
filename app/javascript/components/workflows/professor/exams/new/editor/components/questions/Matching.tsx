@@ -277,7 +277,6 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
     onChange: (newVal: MatchingPromptWithAnswer[]) => void;
   } = input;
   const changeAllAnswers = useCallback((oldVal: number, newVal: number, swap = true): void => {
-    console.log('changeall', value, oldVal, newVal);
     onChange(value.map((v) => {
       const ret = {
         ...v,

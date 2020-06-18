@@ -69,7 +69,9 @@ class ExamVersion < ApplicationRecord
   def export_all(dir)
     path = Pathname.new(dir)
     export_info_file(path)
-    export_files(path.join('files'), files)
+    files_path = path.join('files')
+    FileUtils.mkdir_p files_path
+    export_files(files_path, files)
   end
 
   def export_info_file(path)

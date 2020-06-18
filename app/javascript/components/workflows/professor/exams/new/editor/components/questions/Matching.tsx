@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Row,
   Col,
@@ -17,7 +17,7 @@ import {
   FormSection,
 } from 'redux-form';
 import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
-import { HTMLVal } from '@student/exams/show/types';
+import { HTMLVal, MatchingPromptWithAnswer } from '@student/exams/show/types';
 
 interface MatchingProps {
   qnum: number;
@@ -112,7 +112,11 @@ const OneValue: React.FC<{
   );
 };
 
-const renderValue = (
+const renderValue = ({
+  changeAllAnswers,
+}: {
+  changeAllAnswers: (oldVal: number, newVal: number, swap?: boolean) => void;
+}) => (
   member,
   index,
   fields,
@@ -125,12 +129,15 @@ const renderValue = (
     enableDown={index + 1 < fields.length}
     moveDown={(): void => {
       fields.move(index, index + 1);
+      changeAllAnswers(index, index + 1);
     }}
     moveUp={(): void => {
       fields.move(index, index - 1);
+      changeAllAnswers(index, index - 1);
     }}
     remove={(): void => {
       fields.remove(index);
+      changeAllAnswers(index, -1, false);
     }}
   />
 );
@@ -260,6 +267,36 @@ const RenderPrompts: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const RenderValues: React.FC<WrappedFieldProps> = (props) => {
+  const { input } = props;
+  const {
+    value,
+    onChange,
+  }: {
+    value: MatchingPromptWithAnswer[],
+    onChange: (newVal: MatchingPromptWithAnswer[]) => void;
+  } = input;
+  const changeAllAnswers = useCallback((oldVal: number, newVal: number, swap = true): void => {
+    console.log('changeall', value, oldVal, newVal);
+    onChange(value.map((v) => {
+      const ret = {
+        ...v,
+      };
+      if (v.answer === oldVal) ret.answer = newVal;
+      if (swap && v.answer === newVal) ret.answer = oldVal;
+      return ret;
+    }));
+  }, [value, onChange]);
+  const renderValues = useCallback(renderValue({ changeAllAnswers }), [changeAllAnswers]);
+  return (
+    <FieldArray
+      name="values"
+      component={EditHTMLs}
+      renderOptions={renderValues}
+    />
+  );
+};
+
 const Matching: React.FC<MatchingProps> = (_props) => (
   <Row>
     <Col sm={6}>
@@ -276,7 +313,7 @@ const Matching: React.FC<MatchingProps> = (_props) => (
           <Field name="valuesLabel" component={EditColName} defaultLabel="Column B" />
         </Col>
       </Row>
-      <FieldArray name="values" component={EditHTMLs} renderOptions={renderValue} />
+      <Field name="prompts" component={RenderValues} />
     </Col>
   </Row>
 );

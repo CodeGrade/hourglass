@@ -214,7 +214,7 @@
       "items": { "$ref": "#/definitions/BodyItemAnswer" }
     },
     "BodyItemAnswer": {
-      "oneOf": [
+      "anyOf": [
         { "$ref": "#/definitions/NoAnswer" },
         { "$ref": "#/definitions/CodeAnswer" },
         {

@@ -5,14 +5,14 @@ import {
   Dropdown,
   DropdownButton,
 } from 'react-bootstrap';
-import { BodyItem as BodyItemInfo } from '@student/exams/show/types';
+import { BodyItemWithAnswer } from '@student/exams/show/types';
 import { WrappedFieldArrayProps } from 'redux-form';
 import BodyItem from '@professor/exams/new/editor/components/BodyItem';
 
 const ShowBodyItems: React.FC<{
   qnum: number;
   pnum: number;
-} & WrappedFieldArrayProps<BodyItemInfo>> = (props) => {
+} & WrappedFieldArrayProps<BodyItemWithAnswer>> = (props) => {
   const {
     qnum,
     pnum,
@@ -56,6 +56,7 @@ const ShowBodyItems: React.FC<{
                 fields.push({
                   type: 'HTML',
                   value: '',
+                  answer: { NO_ANS: true },
                 });
               }}
             >
@@ -71,6 +72,7 @@ const ShowBodyItems: React.FC<{
                     value: '',
                   },
                   options: [],
+                  answer: [],
                 });
               }}
             >
@@ -84,6 +86,10 @@ const ShowBodyItems: React.FC<{
                   prompt: {
                     type: 'HTML',
                     value: '',
+                  },
+                  answer: {
+                    text: '',
+                    marks: [],
                   },
                 });
               }}
@@ -110,6 +116,7 @@ const ShowBodyItems: React.FC<{
                   type: 'Matching',
                   prompts: [],
                   values: [],
+                  answer: [],
                 });
               }}
             >
@@ -137,6 +144,7 @@ const ShowBodyItems: React.FC<{
                     type: 'HTML',
                     value: '',
                   },
+                  answer: '',
                 });
               }}
             >

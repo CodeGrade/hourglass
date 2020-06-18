@@ -283,6 +283,9 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
       };
       if (v.answer === oldVal) ret.answer = newVal;
       if (swap && v.answer === newVal) ret.answer = oldVal;
+
+      // Shift up values below the removed one.
+      if (newVal === -1 && v.answer > oldVal) ret.answer -= 1;
       return ret;
     }));
   }, [value, onChange]);
@@ -304,7 +307,7 @@ const Matching: React.FC<MatchingProps> = (_props) => (
           <Field name="promptsLabel" component={EditColName} defaultLabel="Column A" />
         </Col>
       </Row>
-      <Field name="prompts" component={RenderPrompts} />
+      <Field name="values" component={RenderPrompts} />
     </Col>
     <Col sm={6}>
       <Row className="p-2">

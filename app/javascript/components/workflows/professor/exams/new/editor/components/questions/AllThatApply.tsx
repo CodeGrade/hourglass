@@ -15,8 +15,8 @@ import {
   WrappedFieldProps,
   FormSection,
 } from 'redux-form';
-import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
-import { HTMLVal, AllThatApplyOptionWithAnswer } from '@student/exams/show/types';
+import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
+import { AllThatApplyOptionWithAnswer } from '@student/exams/show/types';
 import Icon from '@student/exams/show/components/Icon';
 import { FaCheck } from 'react-icons/fa';
 

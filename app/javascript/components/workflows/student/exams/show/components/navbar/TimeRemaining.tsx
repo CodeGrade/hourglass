@@ -11,16 +11,7 @@ import {
   Table,
 } from 'react-bootstrap';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
-
-function pluralize(number: number, singular: string, plural: string): string {
-  if (number === 0) {
-    return `${number} ${plural}`;
-  }
-  if (number === 1) {
-    return `${number} ${singular}`;
-  }
-  return `${number} ${plural}`;
-}
+import { pluralize } from '@hourglass/common/helpers';
 
 function describeRemainingTime(remaining: Duration): string {
   const left = remaining.shiftTo('weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds').normalize();

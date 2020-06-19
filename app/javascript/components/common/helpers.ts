@@ -31,3 +31,13 @@ export function alphabetIdx(idx: number, lowercase = false): string {
   if (lowercase) return String.fromCharCode(97 + idx);
   return String.fromCharCode(65 + idx);
 }
+
+export function pluralize(number: number, singular: string, plural: string): string {
+  if (number === 0) {
+    return `${number} ${plural}`;
+  }
+  if (number === 1) {
+    return `${number} ${singular}`;
+  }
+  return `${number} ${plural}`;
+}

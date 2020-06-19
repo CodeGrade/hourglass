@@ -275,11 +275,18 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
     value: MatchingPromptWithAnswer[],
     onChange: (newVal: MatchingPromptWithAnswer[]) => void;
   } = input;
+
+  /**
+   * Change all matching answers that used to have value `oldVal` to have value `newVal`.
+   * @param swap whether to also change all `newVal` answers to have value `oldVal`
+   */
   const changeAllAnswers = useCallback((oldVal: number, newVal: number, swap = true): void => {
+    // Trigger onChange with a new value
     onChange(value.map((v) => {
       const ret = {
         ...v,
       };
+      // Update the current item if it is the oldVal, or if `swap` and it is the newVal.
       if (v.answer === oldVal) ret.answer = newVal;
       if (swap && v.answer === newVal) ret.answer = oldVal;
 

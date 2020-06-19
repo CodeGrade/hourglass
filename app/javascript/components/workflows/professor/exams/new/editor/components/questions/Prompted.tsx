@@ -29,7 +29,7 @@ const EditPrompt: React.FC<WrappedFieldProps & {
           <CustomEditor
             className="bg-white"
             value={value}
-            placeholder="Body item..."
+            placeholder="Provide any instructions for this specific item..."
             onChange={(newVal, _delta, source, _editor): void => {
               if (source === 'user') {
                 onChange(newVal);

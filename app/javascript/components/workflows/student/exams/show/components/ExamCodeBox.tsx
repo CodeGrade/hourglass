@@ -4,7 +4,6 @@ import 'codemirror/theme/mdn-like';
 
 import 'codemirror/addon/runmode/runmode';
 import 'codemirror/addon/selection/active-line';
-import 'codemirror/addon/edit/matchbrackets';
 
 import 'codemirror/mode/clike/clike';
 import 'codemirror/mode/mllike/mllike';
@@ -137,7 +136,6 @@ export const Editor: React.FC<EditorProps> = (props) => {
     }),
     readOnly: readOnly || disableCursor,
     cursorBlinkRate: readOnly ? -1 : 500,
-    matchBrackets: true,
     ...options,
   };
   return (

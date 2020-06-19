@@ -4,7 +4,7 @@ import HTML from '@student/exams/show/components/HTML';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import DisplayBody from '@proctor/registrations/show/DisplayBody';
 import '@student/exams/show/components/Part.css';
-import { PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import { PartFilesContext } from '@student/exams/show/context';
 import { alphabetIdx } from '@hourglass/common/helpers';
 
 interface PartProps {

@@ -3,7 +3,7 @@ import { QuestionInfo } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import Part from '@proctor/registrations/show/Part';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
-import { QuestionFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import { QuestionFilesContext } from '@student/exams/show/context';
 
 interface ShowQuestionProps {
   question: QuestionInfo;

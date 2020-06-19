@@ -1,6 +1,6 @@
 import React from 'react';
 import { YesNoInfo } from '@student/exams/show/types';
-import HTML from '@hourglass/workflows/student/exams/show/components/HTML';
+import HTML from '@student/exams/show/components/HTML';
 
 export interface YesNoProps {
   info: YesNoInfo;

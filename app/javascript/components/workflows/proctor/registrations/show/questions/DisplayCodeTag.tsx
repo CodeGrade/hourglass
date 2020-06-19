@@ -11,7 +11,7 @@ import {
   QuestionFilesContext,
   PartFilesContext,
   ExamContext,
-} from '@hourglass/workflows/student/exams/show/context';
+} from '@student/exams/show/context';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { getFilesForRefs, countFiles } from '@student/exams/show/files';
 

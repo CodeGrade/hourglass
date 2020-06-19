@@ -5,7 +5,7 @@ import {
   Button,
 } from 'react-bootstrap';
 import { WrappedFieldArrayProps } from 'redux-form';
-import { PartInfo } from '@hourglass/workflows/student/exams/show/types';
+import { PartInfo } from '@student/exams/show/types';
 import Part from '@professor/exams/new/editor/components/Part';
 
 const ShowParts: React.FC<{

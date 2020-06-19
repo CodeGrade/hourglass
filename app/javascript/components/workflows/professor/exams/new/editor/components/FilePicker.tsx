@@ -9,7 +9,7 @@ import { Files, VeryControlledFileViewer } from '@student/exams/show/components/
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { createMap, getFilesForRefs } from '@student/exams/show/files';
-import { ExamContext } from '@hourglass/workflows/student/exams/show/context';
+import { ExamContext } from '@student/exams/show/context';
 import { InputGroup, Button, Collapse } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 

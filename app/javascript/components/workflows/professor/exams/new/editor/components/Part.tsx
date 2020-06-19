@@ -13,7 +13,7 @@ import {
   FormSection,
   FieldArray,
 } from 'redux-form';
-import { PartFilesContext } from '@hourglass/workflows/student/exams/show/context';
+import { PartFilesContext } from '@student/exams/show/context';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
 import { EditHTMLField } from './editHTMLs';

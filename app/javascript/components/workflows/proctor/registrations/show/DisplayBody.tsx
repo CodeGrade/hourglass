@@ -14,7 +14,7 @@ import {
   MatchingState, AllThatApplyState, CodeTagState,
 } from '@student/exams/show/types';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { isNoAns } from '@hourglass/workflows/student/exams/show/containers/questions/connectors';
+import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 
 const DisplayBody: React.FC<BodyProps> = (props) => {
   const {

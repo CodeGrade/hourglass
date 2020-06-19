@@ -1,6 +1,6 @@
 import React from 'react';
 import { MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
-import HTML from '@hourglass/workflows/student/exams/show/components/HTML';
+import HTML from '@student/exams/show/components/HTML';
 
 interface MultipleChoiceProps {
   info: MultipleChoiceInfo;

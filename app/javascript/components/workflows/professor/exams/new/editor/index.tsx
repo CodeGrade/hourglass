@@ -49,7 +49,7 @@ import Instructions from '@professor/exams/new/editor/components/Instructions';
 import EditReference from '@professor/exams/new/editor/components/Reference';
 import FileUploader from '@professor/exams/new/editor/components/FileUploader';
 import ShowQuestions from '@professor/exams/new/editor/components/ShowQuestions';
-import { isNoAns } from '@hourglass/workflows/student/exams/show/containers/questions/connectors';
+import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 
 export interface ExamEditorProps {
   exam: ExamVersion;

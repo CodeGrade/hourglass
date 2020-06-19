@@ -12,6 +12,7 @@ import { createMap, getFilesForRefs } from '@student/exams/show/files';
 import { ExamContext } from '@student/exams/show/context';
 import { InputGroup, Button, Collapse } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { pluralize } from '@hourglass/common/helpers';
 
 export interface FilePickerProps {
   options: ExamFile[];
@@ -161,7 +162,6 @@ export const FilePickerSelectWithPreview: React.FC<FilePickerProps> = (props) =>
   const [open, setOpen] = useState(false);
   const { fmap } = useContext(ExamContext);
   const noFiles = selected.length === 0;
-  const oneFile = selected.length === 1;
   const filteredFiles = getFilesForRefs(fmap, selected);
   return (
     <>
@@ -175,7 +175,7 @@ export const FilePickerSelectWithPreview: React.FC<FilePickerProps> = (props) =>
             disabled={noFiles}
             onClick={(): void => setOpen((o) => !o)}
           >
-            {`Preview file${oneFile ? '' : 's'}`}
+            {`Preview ${pluralize(selected.length, 'file', 'files')}`}
             {open && !noFiles ? <FaChevronUp className="ml-2" /> : <FaChevronDown className="ml-2" />}
           </Button>
         </InputGroup.Append>

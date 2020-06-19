@@ -46,7 +46,7 @@ export const ShowMessage: React.FC<MessageProps> = (props) => {
   );
 };
 
-const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
+const ExamMessages: React.FC<ExamMessagesProps> = React.memo((props) => {
   const {
     expanded,
     messages,
@@ -83,13 +83,22 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
         <Button
           variant="success"
           className="float-right"
-          onClick={(): void => onMessagesOpened()}
+          onClick={onMessagesOpened}
         >
           Acknowledge unread messages
         </Button>
       )}
     </NavAccordionItem>
   );
-};
+}, (prev, next) => (
+  prev.unread === next.unread
+  && prev.messages.reduce((acc, current, idx) => {
+    const currentEqual = current === next.messages[idx];
+    return acc && currentEqual;
+  }, true)
+  && prev.expanded === next.expanded
+  && prev.onMessagesOpened === next.onMessagesOpened
+  && prev.onSectionClick === next.onSectionClick
+));
 
 export default ExamMessages;

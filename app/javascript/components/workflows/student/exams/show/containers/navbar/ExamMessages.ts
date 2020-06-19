@@ -24,3 +24,4 @@ const mapDispatchToProps: MDTP<{
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExamMessages);
+ExamMessages.whyDidYouRender = true;

@@ -48,10 +48,10 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
       >
         <JumpTo />
       </NavAccordionItem>
-      {/* <ExamMessages */}
-      {/*   expanded={expanded} */}
-      {/*   onSectionClick={onSectionClick} */}
-      {/* /> */}
+      <ExamMessages
+        expanded={expanded}
+        onSectionClick={onSectionClick}
+      />
       <NavAccordionItem
         expanded={expanded}
         Icon={MdNoteAdd}

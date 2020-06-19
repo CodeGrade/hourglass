@@ -4,6 +4,7 @@ require 'application_system_test_case'
 
 class AnomaliesTest < ApplicationSystemTestCase
   def setup
+    Webpacker.compile
     @registration = create(:registration)
     @student = @registration.user
     @exam = @registration.exam

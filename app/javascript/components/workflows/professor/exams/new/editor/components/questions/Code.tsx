@@ -244,12 +244,9 @@ const EditSuppliedCode: React.FC<WrappedFieldsProps> = (props) => {
   );
 };
 
-const SetInitial: React.FC<WrappedFieldProps & {
-  controlId: string;
-}> = (props) => {
+const SetInitial: React.FC<WrappedFieldProps> = (props) => {
   const {
     input,
-    controlId,
   } = props;
   const {
     value,
@@ -298,7 +295,6 @@ const SetInitial: React.FC<WrappedFieldProps & {
         <Fields
           names={['lang', 'initial']}
           component={EditSuppliedCode}
-          controlId={controlId}
         />
       )}
       {value && 'file' in value && (
@@ -335,13 +331,12 @@ const Code: React.FC<CodeProps> = (props) => {
         pnum={pnum}
         bnum={bnum}
       />
-      <Form.Group as={Row}>
+      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-starter`}>
         <Form.Label column sm={2}>Starter</Form.Label>
         <Col sm={10}>
           <Field
             name="initial"
             component={SetInitial}
-            controlId={`${qnum}-${pnum}-${bnum}-initial`}
           />
         </Col>
       </Form.Group>

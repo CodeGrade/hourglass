@@ -53,11 +53,11 @@ in mkShell {
     yarn
     start_postgres
     stop_postgres
-    nodePackages.typescript
-    nodePackages.eslint_d
     racket
     chromedriver
     chromium
+    which
+    lzma
   ];
 
   shellHook = ''

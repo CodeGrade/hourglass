@@ -309,7 +309,10 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
       return ret;
     }));
   }, [value, onChange]);
-  const renderValues = useCallback(renderValue({ removeAnswer, swapAnswers }), [removeAnswer, swapAnswers]);
+  const renderValues = useCallback(
+    renderValue({ removeAnswer, swapAnswers }),
+    [removeAnswer, swapAnswers],
+  );
   return (
     <FieldArray
       name="values"

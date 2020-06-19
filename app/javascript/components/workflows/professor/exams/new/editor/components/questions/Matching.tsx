@@ -112,9 +112,11 @@ const OneValue: React.FC<{
 };
 
 const renderValue = ({
-  changeAllAnswers,
+  removeAnswer,
+  swapAnswers,
 }: {
-  changeAllAnswers: (oldVal: number, newVal: number, swap?: boolean) => void;
+  removeAnswer: (oldVal: number) => void;
+  swapAnswers: (valA: number, valB: number) => void;
 }) => (
   member,
   index,
@@ -128,15 +130,15 @@ const renderValue = ({
     enableDown={index + 1 < fields.length}
     moveDown={(): void => {
       fields.move(index, index + 1);
-      changeAllAnswers(index, index + 1);
+      swapAnswers(index, index + 1);
     }}
     moveUp={(): void => {
       fields.move(index, index - 1);
-      changeAllAnswers(index, index - 1);
+      swapAnswers(index, index - 1);
     }}
     remove={(): void => {
       fields.remove(index);
-      changeAllAnswers(index, -1, false);
+      removeAnswer(index);
     }}
   />
 );
@@ -277,25 +279,37 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
   } = input;
 
   /**
-   * Change all matching answers that used to have value `oldVal` to have value `newVal`.
-   * @param swap whether to also change all `newVal` answers to have value `oldVal`
+   * Set all answers that used to have oldVal to -1, and shift answers below it up.
    */
-  const changeAllAnswers = useCallback((oldVal: number, newVal: number, swap = true): void => {
+  const removeAnswer = useCallback((oldVal: number): void => {
+    onChange(value.map((v) => {
+      const ret = {
+        ...v,
+      };
+      // Set answer to -1
+      if (v.answer === oldVal) ret.answer = -1;
+
+      // Shift up values below the removed one.
+      if (v.answer > oldVal) ret.answer -= 1;
+      return ret;
+    }));
+  }, [value, onChange]);
+
+  /**
+   * Swap all answers with valA to be valB and vice-versa.
+   */
+  const swapAnswers = useCallback((valA: number, valB: number): void => {
     // Trigger onChange with a new value
     onChange(value.map((v) => {
       const ret = {
         ...v,
       };
-      // Update the current item if it is the oldVal, or if `swap` and it is the newVal.
-      if (v.answer === oldVal) ret.answer = newVal;
-      if (swap && v.answer === newVal) ret.answer = oldVal;
-
-      // Shift up values below the removed one.
-      if (newVal === -1 && v.answer > oldVal) ret.answer -= 1;
+      if (v.answer === valA) ret.answer = valB;
+      if (v.answer === valB) ret.answer = valA;
       return ret;
     }));
   }, [value, onChange]);
-  const renderValues = useCallback(renderValue({ changeAllAnswers }), [changeAllAnswers]);
+  const renderValues = useCallback(renderValue({ removeAnswer, swapAnswers }), [removeAnswer, swapAnswers]);
   return (
     <FieldArray
       name="values"

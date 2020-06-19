@@ -11,4 +11,7 @@ const mapStateToProps: MSTP<{ status: LockdownStatus; message: string }> = (stat
   };
 };
 
-export default connect(mapStateToProps)(LockdownInfo);
+const LockdownInfoConnected = connect(mapStateToProps)(LockdownInfo);
+LockdownInfoConnected.displayName = 'LockdownInfoConnected';
+export default LockdownInfoConnected;
+LockdownInfo.whyDidYouRender = true;

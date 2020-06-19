@@ -10,4 +10,7 @@ const mapStateToProps: MSTP<{
   message: state.snapshot.message,
 });
 
-export default connect(mapStateToProps)(SnapshotInfo);
+const SnapshotInfoConnected = connect(mapStateToProps)(SnapshotInfo);
+SnapshotInfoConnected.displayName = 'SnapshotInfoConnected';
+export default SnapshotInfoConnected;
+SnapshotInfo.whyDidYouRender = true;

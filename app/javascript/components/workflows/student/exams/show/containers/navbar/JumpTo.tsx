@@ -44,5 +44,7 @@ const mapDispatchToProps: MDTP<{
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(JumpTo);
+const JumpToConnected = connect(mapStateToProps, mapDispatchToProps)(JumpTo);
+JumpToConnected.displayName = 'JumpToConnected';
+export default JumpToConnected;
 JumpTo.whyDidYouRender = true;

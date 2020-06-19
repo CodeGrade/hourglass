@@ -31,4 +31,7 @@ const mapStateToProps: MSTP<{
   errorMsg: state.lockdown.message,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(PreStart);
+const PreStartConnected = connect(mapStateToProps, mapDispatchToProps)(PreStart);
+PreStartConnected.displayName = 'PreStartConnected';
+export default PreStartConnected;
+PreStart.whyDidYouRender = true;

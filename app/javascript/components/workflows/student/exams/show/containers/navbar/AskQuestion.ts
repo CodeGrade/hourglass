@@ -21,4 +21,7 @@ const mapDispatchToProps: MDTP<{
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AskQuestion);
+const AskQuestionConnected = connect(mapStateToProps, mapDispatchToProps)(AskQuestion);
+AskQuestionConnected.displayName = 'AskQuestionConnected';
+export default AskQuestionConnected;
+AskQuestion.whyDidYouRender = true;

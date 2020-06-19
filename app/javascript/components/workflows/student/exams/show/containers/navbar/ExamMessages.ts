@@ -23,5 +23,7 @@ const mapDispatchToProps: MDTP<{
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ExamMessages);
+const ExamMessagesConnected = connect(mapStateToProps, mapDispatchToProps)(ExamMessages);
+ExamMessagesConnected.displayName = 'ExamMessagesConnected';
+export default ExamMessagesConnected;
 ExamMessages.whyDidYouRender = true;

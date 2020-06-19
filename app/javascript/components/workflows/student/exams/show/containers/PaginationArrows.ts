@@ -28,4 +28,7 @@ const mapDispatchToProps: MDTP<{
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(PaginationArrows);
+const PaginationArrowsConnected = connect(mapStateToProps, mapDispatchToProps)(PaginationArrows);
+PaginationArrowsConnected.displayName = 'PaginationArrowsConnected';
+export default PaginationArrowsConnected;
+PaginationArrows.whyDidYouRender = true;

@@ -11,4 +11,7 @@ const examTakerStateToProps: MSTP<{ ready: boolean }> = (state) => ({
          && !!state.lockdown.loaded,
 });
 
-export default connect(examTakerStateToProps)(ExamTaker);
+const ExamTakerConnected = connect(examTakerStateToProps)(ExamTaker);
+ExamTakerConnected.displayName = 'ExamTakerConnected';
+export default ExamTakerConnected;
+ExamTaker.whyDidYouRender = true;

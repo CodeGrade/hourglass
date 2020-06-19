@@ -14,4 +14,7 @@ const mapDispatchToProps: MDTP<{
   submit: (): void => dispatch(submitExam(ownProps.courseID, ownProps.examID)),
 });
 
-export default connect(null, mapDispatchToProps)(SubmitButton);
+const SubmitButtonConnected = connect(null, mapDispatchToProps)(SubmitButton);
+SubmitButtonConnected.displayName = 'SubmitButtonConnected';
+export default SubmitButtonConnected;
+SubmitButton.whyDidYouRender = true;

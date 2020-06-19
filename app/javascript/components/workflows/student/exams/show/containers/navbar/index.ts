@@ -8,4 +8,7 @@ const mapStateToProps: MSTP<{
   time: state.contents.time,
 });
 
-export default connect(mapStateToProps)(ExamNavbar);
+const ExamNavbarConnected = connect(mapStateToProps)(ExamNavbar);
+ExamNavbarConnected.displayName = 'ExamNavbarConnected';
+export default ExamNavbarConnected;
+ExamNavbar.whyDidYouRender = true;

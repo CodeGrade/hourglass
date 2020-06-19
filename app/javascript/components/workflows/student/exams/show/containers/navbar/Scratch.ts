@@ -17,4 +17,7 @@ const mapDispatchToProps: MDTP<{
   },
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Scratch);
+const ScratchConnected = connect(mapStateToProps, mapDispatchToProps)(Scratch);
+ScratchConnected.displayName = 'ScratchConnected';
+export default ScratchConnected;
+Scratch.whyDidYouRender = true;

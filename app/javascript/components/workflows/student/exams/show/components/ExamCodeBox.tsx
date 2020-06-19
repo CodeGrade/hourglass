@@ -31,7 +31,7 @@ function applyMarks(cm: CM.Editor, marks: MarkDescription[]): CM.TextMarker[] {
 
 function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
   return marks.map((m) => {
-    const { readOnly, inclusiveLeft, inclusiveRight } = m;
+    const { inclusiveLeft, inclusiveRight } = m;
     const found = m.find();
     return {
       from: {
@@ -43,7 +43,6 @@ function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
         line: found.to.line,
       },
       options: {
-        readOnly,
         inclusiveLeft,
         inclusiveRight,
       },

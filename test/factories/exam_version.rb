@@ -11,6 +11,10 @@ FactoryBot.define do
       end
     end
 
+    trait :with_lockdown do
+      cs2500_v2
+    end
+
     trait :cs2500_v2 do
       name { 'CS2500 Midterm Version 2' }
       transient do

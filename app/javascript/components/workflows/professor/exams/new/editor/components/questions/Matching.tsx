@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import {
   Row,
   Col,
+  Button,
 } from 'react-bootstrap';
 import {
   Select, FormControl, InputLabel, MenuItem,
@@ -15,9 +16,10 @@ import {
   FieldArray,
   FieldArrayFieldsProps,
   FormSection,
+  WrappedFieldArrayProps,
 } from 'redux-form';
 import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
-import { HTMLVal, MatchingPromptWithAnswer } from '@student/exams/show/types';
+import { MatchingPromptWithAnswer } from '@student/exams/show/types';
 
 interface MatchingProps {
   qnum: number;
@@ -146,7 +148,7 @@ const renderValue = ({
 
 const OnePrompt: React.FC<{
   memberName: string;
-  numChoices: number;
+  numAnswers: number;
   valueNum: number;
   enableDown: boolean;
   moveDown: () => void;
@@ -155,7 +157,7 @@ const OnePrompt: React.FC<{
 }> = (props) => {
   const {
     memberName,
-    numChoices,
+    numAnswers,
     valueNum,
     enableDown,
     moveDown,
@@ -196,7 +198,7 @@ const OnePrompt: React.FC<{
           <Field
             name="answer"
             component={ChooseRightAnswer}
-            numChoices={numChoices}
+            numChoices={numAnswers}
           />
         </div>
       </Row>
@@ -205,17 +207,17 @@ const OnePrompt: React.FC<{
 };
 
 const renderPrompt = ({
-  numChoices,
+  numAnswers,
 }) => (
   member: string,
   index: number,
-  fields: FieldArrayFieldsProps<HTMLVal>,
+  fields: FieldArrayFieldsProps<MatchingPromptWithAnswer>,
 ) => (
   <OnePrompt
     // eslint-disable-next-line react/no-array-index-key
     key={index}
     valueNum={index}
-    numChoices={numChoices}
+    numAnswers={numAnswers}
     memberName={member}
     enableDown={index + 1 < fields.length}
     moveDown={(): void => {
@@ -254,17 +256,49 @@ const EditColName: React.FC<WrappedFieldProps & {
   );
 };
 
+const EditPrompts: React.FC<{
+  numAnswers: number;
+} & WrappedFieldArrayProps<MatchingPromptWithAnswer>> = (props) => {
+  const {
+    fields,
+    numAnswers,
+  } = props;
+  const renderPrompts = React.useCallback(renderPrompt({
+    numAnswers,
+  }), [numAnswers]);
+  return (
+    <>
+      {fields.map(renderPrompts)}
+      <Row className="p-2">
+        <Col className="text-center p-0">
+          <Button
+            variant="dark"
+            onClick={(): void => {
+              fields.push({
+                html: {
+                  type: 'HTML',
+                  value: '',
+                },
+                answer: -1,
+              });
+            }}
+          >
+            Add new option
+          </Button>
+        </Col>
+      </Row>
+    </>
+  );
+};
+
 const RenderPrompts: React.FC<WrappedFieldProps> = (props) => {
   const { input } = props;
   const { length } = input.value;
-  const renderPrompts = React.useCallback(renderPrompt({
-    numChoices: length,
-  }), [length]);
   return (
     <FieldArray
       name="prompts"
-      component={EditHTMLs}
-      renderOptions={renderPrompts}
+      component={EditPrompts}
+      numAnswers={length}
     />
   );
 };

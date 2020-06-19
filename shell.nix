@@ -56,6 +56,8 @@ in mkShell {
     nodePackages.typescript
     nodePackages.eslint_d
     racket
+    chromedriver
+    chromium
   ];
 
   shellHook = ''

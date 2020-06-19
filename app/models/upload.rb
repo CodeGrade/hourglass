@@ -95,9 +95,6 @@ class Upload
     arr.map { |i| make_html_val(i) }
   end
 
-  def map_code(code_info)
-  end
-
   def parse_info(properties)
     contents = properties['contents']
     contents['questions'].each do |q|

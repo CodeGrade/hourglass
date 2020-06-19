@@ -81,25 +81,25 @@ const OneValue: React.FC<{
     moveUp,
     remove,
   } = props;
-  const [moversVisible, setMoversVisible] = useState(false);
+  // const [moversVisible, setMoversVisible] = useState(false);
   return (
     <Row
       className="p-2"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onBlur={(): void => setMoversVisible(false)}
-      onMouseOut={(): void => setMoversVisible(false)}
+      // onMouseOver={(): void => setMoversVisible(true)}
+      // onFocus={(): void => setMoversVisible(true)}
+      // onBlur={(): void => setMoversVisible(false)}
+      // onMouseOut={(): void => setMoversVisible(false)}
     >
       <Col className="flex-grow-01 pl-0">
-        <MoveItem
-          visible={moversVisible}
-          variant="dark"
-          enableUp={valueNum > 0}
-          enableDown={enableDown}
-          onUp={moveUp}
-          onDown={moveDown}
-          onDelete={remove}
-        />
+        {/* <MoveItem */}
+        {/*   visible={moversVisible} */}
+        {/*   variant="dark" */}
+        {/*   enableUp={valueNum > 0} */}
+        {/*   enableDown={enableDown} */}
+        {/*   onUp={moveUp} */}
+        {/*   onDown={moveDown} */}
+        {/*   onDelete={remove} */}
+        {/* /> */}
         {`${valueNum + 1}.`}
       </Col>
       <Col className="pr-0">
@@ -164,26 +164,26 @@ const OnePrompt: React.FC<{
     moveUp,
     remove,
   } = props;
-  const [moversVisible, setMoversVisible] = useState(false);
+  // const [moversVisible, setMoversVisible] = useState(false);
   return (
     <FormSection name={memberName}>
       <Row
         className="p-2"
-        onMouseOver={(): void => setMoversVisible(true)}
-        onFocus={(): void => setMoversVisible(true)}
-        onBlur={(): void => setMoversVisible(false)}
-        onMouseOut={(): void => setMoversVisible(false)}
+        // onMouseOver={(): void => setMoversVisible(true)}
+        // onFocus={(): void => setMoversVisible(true)}
+        // onBlur={(): void => setMoversVisible(false)}
+        // onMouseOut={(): void => setMoversVisible(false)}
       >
         <div className="float-left pl-0">
-          <MoveItem
-            visible={moversVisible}
-            variant="dark"
-            enableUp={valueNum > 0}
-            enableDown={enableDown}
-            onUp={moveUp}
-            onDown={moveDown}
-            onDelete={remove}
-          />
+          {/* <MoveItem */}
+          {/*   visible={moversVisible} */}
+          {/*   variant="dark" */}
+          {/*   enableUp={valueNum > 0} */}
+          {/*   enableDown={enableDown} */}
+          {/*   onUp={moveUp} */}
+          {/*   onDown={moveDown} */}
+          {/*   onDelete={remove} */}
+          {/* /> */}
           {`${alphabetIdx(valueNum)}.`}
         </div>
         <Col>

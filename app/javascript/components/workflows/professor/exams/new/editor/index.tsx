@@ -199,7 +199,7 @@ export const formSelector = formValueSelector('version-editor');
 const FormContextProvider: React.FC<{
   files: ExamFile[];
   examRef: FileRef[];
-}> = (props) => {
+}> = React.memo((props) => {
   const {
     files,
     examRef,
@@ -222,12 +222,17 @@ const FormContextProvider: React.FC<{
       </ExamFilesContext.Provider>
     </ExamContext.Provider>
   );
-};
+}, (prev, next) => (
+  prev.files === next.files
+  && prev.examRef === next.files
+));
 
 const FormContextProviderConnected = connect((state) => ({
   files: formSelector(state, 'all.exam.files'),
   examRef: formSelector(state, 'all.exam.reference'),
 }))(FormContextProvider);
+
+FormContextProvider.whyDidYouRender = true;
 
 function transformATA(
   ata: AllThatApplyInfoWithAnswer,
@@ -351,7 +356,7 @@ function transformForSubmit(values: FormValues): Version {
   };
 }
 
-const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
+const ExamEditor: React.FC<InjectedFormProps<FormValues>> = React.memo((props) => {
   const {
     pristine,
     reset,
@@ -366,47 +371,47 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
       versionUpdate(versionId, { version }).then(resolve).catch(reject);
     })();
   });
-  const [changedEver, setChangedEver] = useState(false);
-  useEffect(() => {
-    const autosave = () => {
-      // debugger;
-      doSubmit().then((res) => {
-        if (res.updated === true) {
-          alert({
-            variant: 'success',
-            title: 'Autosaved',
-            message: 'Exam version saved automatically.',
-            autohide: true,
-          });
-        } else {
-          alert({
-            variant: 'danger',
-            title: 'Not Autosaved',
-            message: <pre>{res.reason}</pre>,
-            autohide: true,
-          });
-        }
-      }).catch((err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error saving.',
-          message: err.message,
-        });
-      });
-    };
-    if (pristine) {
-      if (changedEver) {
-        autosave(); // Autosave original value
-        setChangedEver(false);
-      }
-      return (): void => undefined;
-    }
-    setChangedEver(true);
-    const timer = setInterval(autosave, 20000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [alert, doSubmit, changedEver, pristine]);
+  // const [changedEver, setChangedEver] = useState(false);
+  // useEffect(() => {
+  //   const autosave = () => {
+  //     // debugger;
+  //     doSubmit().then((res) => {
+  //       if (res.updated === true) {
+  //         alert({
+  //           variant: 'success',
+  //           title: 'Autosaved',
+  //           message: 'Exam version saved automatically.',
+  //           autohide: true,
+  //         });
+  //       } else {
+  //         alert({
+  //           variant: 'danger',
+  //           title: 'Not Autosaved',
+  //           message: <pre>{res.reason}</pre>,
+  //           autohide: true,
+  //         });
+  //       }
+  //     }).catch((err) => {
+  //       alert({
+  //         variant: 'danger',
+  //         title: 'Error saving.',
+  //         message: err.message,
+  //       });
+  //     });
+  //   };
+  //   if (pristine) {
+  //     if (changedEver) {
+  //       autosave(); // Autosave original value
+  //       setChangedEver(false);
+  //     }
+  //     return (): void => undefined;
+  //   }
+  //   setChangedEver(true);
+  //   const timer = setInterval(autosave, 20000);
+  //   return () => {
+  //     clearInterval(timer);
+  //   };
+  // }, [alert, doSubmit, changedEver, pristine]);
   return (
     <form
       onSubmit={(e): void => {
@@ -472,7 +477,12 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
       </FormSection>
     </form>
   );
-};
+}, (prev, next) => (
+  prev.pristine === next.pristine
+  && prev.reset === next.reset
+  && prev.handleSubmit === next.handleSubmit
+));
+ExamEditor.displayName = 'ExamEditor';
 
 const ExamEditorForm = reduxForm({
   form: 'version-editor',

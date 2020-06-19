@@ -78,26 +78,26 @@ const Question: React.FC<{
     moveUp,
     remove,
   } = props;
-  const [moversVisible, setMoversVisible] = useState(false);
+  // const [moversVisible, setMoversVisible] = useState(false);
   return (
     <Card
       className="mb-3"
       border="primary"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onBlur={(): void => setMoversVisible(false)}
-      onMouseOut={(): void => setMoversVisible(false)}
+      // onMouseOver={(): void => setMoversVisible(true)}
+      // onFocus={(): void => setMoversVisible(true)}
+      // onBlur={(): void => setMoversVisible(false)}
+      // onMouseOut={(): void => setMoversVisible(false)}
     >
       <FormSection name={memberName}>
-        <MoveItem
-          visible={moversVisible}
-          variant="primary"
-          enableUp={qnum > 0}
-          enableDown={enableDown}
-          onUp={moveUp}
-          onDown={moveDown}
-          onDelete={remove}
-        />
+        {/* <MoveItem */}
+        {/*   visible={moversVisible} */}
+        {/*   variant="primary" */}
+        {/*   enableUp={qnum > 0} */}
+        {/*   enableDown={enableDown} */}
+        {/*   onUp={moveUp} */}
+        {/*   onDown={moveDown} */}
+        {/*   onDelete={remove} */}
+        {/* /> */}
         <Alert variant="primary">
           <Card.Title>
             {`Question ${qnum + 1}`}

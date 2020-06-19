@@ -38,25 +38,25 @@ const OneOption: React.FC<{
     moveUp,
     remove,
   } = props;
-  const [moversVisible, setMoversVisible] = useState(false);
+  // const [moversVisible, setMoversVisible] = useState(false);
   return (
     <Row
       className="p-2"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onBlur={(): void => setMoversVisible(false)}
-      onMouseOut={(): void => setMoversVisible(false)}
+      // onMouseOver={(): void => setMoversVisible(true)}
+      // onFocus={(): void => setMoversVisible(true)}
+      // onBlur={(): void => setMoversVisible(false)}
+      // onMouseOut={(): void => setMoversVisible(false)}
     >
       <Col className="flex-grow-01">
-        <MoveItem
-          visible={moversVisible}
-          variant="dark"
-          enableUp={optionNum > 0}
-          enableDown={enableDown}
-          onUp={moveUp}
-          onDown={moveDown}
-          onDelete={remove}
-        />
+        {/* <MoveItem */}
+        {/*   visible={moversVisible} */}
+        {/*   variant="dark" */}
+        {/*   enableUp={optionNum > 0} */}
+        {/*   enableDown={enableDown} */}
+        {/*   onUp={moveUp} */}
+        {/*   onDown={moveDown} */}
+        {/*   onDelete={remove} */}
+        {/* /> */}
         <Button
           variant={selected ? 'dark' : 'outline-dark'}
           onClick={onSelect}

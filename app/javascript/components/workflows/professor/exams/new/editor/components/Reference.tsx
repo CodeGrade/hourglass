@@ -9,7 +9,7 @@ import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/compone
 
 const EditReference: React.FC<{
   label: string;
-} & WrappedFieldProps> = (props) => {
+} & WrappedFieldProps> = React.memo((props) => {
   const {
     label,
     input,
@@ -33,6 +33,10 @@ const EditReference: React.FC<{
       </Col>
     </>
   );
-};
+}, (prev, next) => (
+  prev.label === next.label
+  && prev.input.value === next.input.value
+  && prev.input.onChange === next.input.onChange
+));
 
 export default EditReference;

@@ -16,7 +16,7 @@ import 'codemirror/mode/css/css';
 import 'codemirror/mode/xml/xml';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/mode/htmlmixed/htmlmixed';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { UnControlled as UnControlledCodeMirror, IUnControlledCodeMirror } from 'react-codemirror2';
 import { MarkDescription } from '@student/exams/show/types';
 import './ExamCodeBox.css';
@@ -137,14 +137,18 @@ export const Editor: React.FC<EditorProps> = (props) => {
     cursorBlinkRate: readOnly ? -1 : 500,
     ...options,
   };
+
+  const cmOnChange = useCallback((cm, _state, newVal): void => {
+    if (onChange && doSave) {
+      const appliedDescs = marksToDescs(cm.getAllMarks());
+      onChange(newVal, appliedDescs);
+    }
+  }, [onChange]);
+
+
   return (
     <UnControlledCodeMirror
-      onChange={(cm, _state, newVal): void => {
-        if (onChange && doSave) {
-          const appliedDescs = marksToDescs(cm.getAllMarks());
-          onChange(newVal, appliedDescs);
-        }
-      }}
+      onChange={cmOnChange}
       onGutterClick={(...args): void => {
         if (onGutterClick) onGutterClick(...args);
       }}

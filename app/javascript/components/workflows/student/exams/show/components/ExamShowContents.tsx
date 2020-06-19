@@ -28,12 +28,12 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const leave = useCallback(() => {
     submit();
   }, [submit]);
-  useEffect(() => {
-    const timer: number = window.setInterval(() => save(), INTERVAL);
-    return (): void => {
-      clearInterval(timer);
-    };
-  }, [save]);
+  // useEffect(() => {
+  //   const timer: number = window.setInterval(() => save(), INTERVAL);
+  //   return (): void => {
+  //     clearInterval(timer);
+  //   };
+  // }, [save]);
   useAnomalyListeners();
   const {
     questions,
@@ -45,10 +45,10 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const { railsExam } = useContext(RailsContext);
   return (
     <ExamContext.Provider value={{ files, fmap }}>
-      <BlockNav
-        onLeave={leave}
-        message="Are you sure you want to navigate away? Your exam will be submitted."
-      />
+      {/* <BlockNav */}
+      {/*   onLeave={leave} */}
+      {/*   message="Are you sure you want to navigate away? Your exam will be submitted." */}
+      {/* /> */}
       <ExamFilesContext.Provider value={{ references: reference }}>
         <h1>{railsExam.name}</h1>
         <HTML value={instructions} />

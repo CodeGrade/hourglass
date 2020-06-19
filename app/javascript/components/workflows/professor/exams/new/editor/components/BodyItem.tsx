@@ -95,24 +95,24 @@ const Body: React.FC<BodyProps> = (props) => {
     moveUp,
     remove,
   } = props;
-  const [moversVisible, setMoversVisible] = useState(false);
+  // const [moversVisible, setMoversVisible] = useState(false);
   return (
     <Card
       className="border border-secondary alert-secondary mb-3"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onMouseOut={(): void => setMoversVisible(false)}
-      onBlur={(): void => setMoversVisible(false)}
+      // onMouseOver={(): void => setMoversVisible(true)}
+      // onFocus={(): void => setMoversVisible(true)}
+      // onMouseOut={(): void => setMoversVisible(false)}
+      // onBlur={(): void => setMoversVisible(false)}
     >
-      <MoveItem
-        visible={moversVisible}
-        variant="secondary"
-        enableUp={bnum > 0}
-        enableDown={enableDown}
-        onUp={moveUp}
-        onDown={moveDown}
-        onDelete={remove}
-      />
+      {/* <MoveItem */}
+      {/*   visible={moversVisible} */}
+      {/*   variant="secondary" */}
+      {/*   enableUp={bnum > 0} */}
+      {/*   enableDown={enableDown} */}
+      {/*   onUp={moveUp} */}
+      {/*   onDown={moveDown} */}
+      {/*   onDelete={remove} */}
+      {/* /> */}
       <Card.Body>
         <Field
           name={`${memberName}.type`}

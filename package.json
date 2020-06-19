@@ -32,6 +32,7 @@
     "@types/react-router-dom": "^5.1.5",
     "@types/react-select": "^3.0.13",
     "@types/redux-form": "^8.2.6",
+    "@welldone-software/why-did-you-render": "^4.2.5",
     "babel-loader": "^8.1.0",
     "bootstrap": "^4.4.1",
     "codemirror": "^5.51.0",

@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import JumpTo from '@student/exams/show/components/navbar/JumpTo';
 import {
-  MSTP, PaginationState, QuestionInfo, MDTP,
+  MSTP, QuestionInfo, MDTP, PaginationCoordinates,
 } from '@student/exams/show/types';
 import {
   togglePagination,
@@ -11,10 +11,14 @@ import {
 } from '@student/exams/show/actions';
 
 const mapStateToProps: MSTP<{
-  pagination: PaginationState;
+  spyCoords: PaginationCoordinates[];
+  paginated: boolean;
+  spy: number;
   questions: QuestionInfo[];
 }> = (state) => ({
-  pagination: state.pagination,
+  spyCoords: state.pagination.spyCoords,
+  paginated: state.pagination.paginated,
+  spy: state.pagination.spy,
   questions: state.contents.exam.questions,
 });
 
@@ -41,3 +45,4 @@ const mapDispatchToProps: MDTP<{
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(JumpTo);
+JumpTo.whyDidYouRender = true;

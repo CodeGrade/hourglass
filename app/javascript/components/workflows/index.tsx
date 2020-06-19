@@ -1,7 +1,9 @@
+require('./wdyr');
+
 import { hot } from 'react-hot-loader';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { RailsContext } from '@student/exams/show/context';
 import RegularNavbar from '@hourglass/common/navbar';
 import { Container, Modal, Button } from 'react-bootstrap';
@@ -188,7 +190,7 @@ export const BlockNav: React.FC<{
   );
 };
 
-const Entry: React.FC = () => {
+const Entry: React.FC = React.memo(() => {
   const res = ApiMe.useResponse();
   const railsUser = res.type === 'RESULT' ? res.response.user : undefined;
 
@@ -196,32 +198,44 @@ const Entry: React.FC = () => {
   const [transitionMessage, setTransitionMessage] = useState('');
   const [transitionCallback, setTransitionCallback] = useState(() => (_) => undefined);
   const [customHandler, setCustomHandler] = useState<CustomHandler>(() => (_) => undefined);
+
+  const getUserConfirmation = useCallback((message, callback) => {
+    setTransitioning(true);
+    setTransitionMessage(message);
+    setTransitionCallback(() => callback);
+  }, []);
+
+  const onModalHide = useCallback(() => {
+    setTransitioning(false);
+    transitionCallback(false);
+    customHandler(false);
+  }, []);
+
+  const onModalLeave = useCallback(() => {
+    setTransitioning(false);
+    transitionCallback(true);
+    customHandler(true);
+  }, []);
+
+
+    // <DndProvider backend={HTML5Backend}>
   return (
-    <RailsContext.Provider
-      value={{
-        railsUser,
-      }}
-    >
-      <BlockerContext.Provider
+      <RailsContext.Provider
         value={{
-          setCustomHandler,
+          railsUser,
         }}
       >
-        <DndProvider backend={HTML5Backend}>
+        <BlockerContext.Provider
+          value={{
+            setCustomHandler,
+          }}
+        >
           <BrowserRouter
-            getUserConfirmation={(message, callback) => {
-              setTransitioning(true);
-              setTransitionMessage(message);
-              setTransitionCallback(() => callback);
-            }}
+            getUserConfirmation={getUserConfirmation}
           >
             <Modal
               show={transitioning}
-              onHide={() => {
-                setTransitioning(false);
-                transitionCallback(false);
-                customHandler(false);
-              }}
+              onHide={onModalHide}
             >
               <Modal.Header closeButton>
                 <Modal.Title>Are you sure you want to navigate?</Modal.Title>
@@ -232,21 +246,13 @@ const Entry: React.FC = () => {
               <Modal.Footer>
                 <Button
                   variant="primary"
-                  onClick={() => {
-                    setTransitioning(false);
-                    transitionCallback(false);
-                    customHandler(false);
-                  }}
+                  onClick={onModalHide}
                 >
                   Cancel
                 </Button>
                 <Button
                   variant="danger"
-                  onClick={() => {
-                    setTransitioning(false);
-                    transitionCallback(true);
-                    customHandler(true);
-                  }}
+                  onClick={onModalLeave}
                 >
                   Leave
                 </Button>
@@ -291,11 +297,11 @@ const Entry: React.FC = () => {
               </Route>
             </Switch>
           </BrowserRouter>
-        </DndProvider>
-      </BlockerContext.Provider>
-    </RailsContext.Provider>
+        </BlockerContext.Provider>
+      </RailsContext.Provider>
   );
-};
+});
+    // </DndProvider> 
 
 // ts-prune-ignore-next
 export default hot(module)(Entry);

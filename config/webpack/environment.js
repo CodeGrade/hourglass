@@ -41,7 +41,7 @@ environment.config.merge({
 
 environment.loaders.prepend('babel', {
   test: /.(ts|tsx)$/,
-  loader: ['babel-loader', 'ts-loader'],
+  loader: ['babel-loader'],
   exclude: [/node_modules/],
 });
 

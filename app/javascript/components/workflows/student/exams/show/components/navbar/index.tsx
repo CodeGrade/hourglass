@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useCallback } from 'react';
 import SnapshotInfo from '@student/exams/show/containers/SnapshotInfo';
 import LockdownInfo from '@student/exams/show/containers/LockdownInfo';
 import { RailsContext } from '@student/exams/show/context';
@@ -48,10 +48,10 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
       >
         <JumpTo />
       </NavAccordionItem>
-      <ExamMessages
-        expanded={expanded}
-        onSectionClick={onSectionClick}
-      />
+      {/* <ExamMessages */}
+      {/*   expanded={expanded} */}
+      {/*   onSectionClick={onSectionClick} */}
+      {/* /> */}
       <NavAccordionItem
         expanded={expanded}
         Icon={MdNoteAdd}
@@ -85,6 +85,18 @@ const ExamNavbar: React.FC<{
   const [openSection, setOpenSection] = useState('');
   const [openTimer, setOpenTimer] = useState('');
   const additionalClass = expanded ? 'sidebar-expanded' : 'sidebar-small';
+  const onSectionClick = useCallback((eventKey): void => {
+    if (expanded) {
+      if (openSection === eventKey) {
+        setOpenSection('');
+      } else {
+        setOpenSection(eventKey);
+      }
+    } else {
+      setExpanded(true);
+      setOpenSection(eventKey);
+    }
+  }, [expanded, openSection])
   return (
     <div
       id="sidebar"
@@ -154,18 +166,7 @@ const ExamNavbar: React.FC<{
       </div>
       <div className="mt-4 flex-fill overflow-auto">
         <NavAccordion
-          onSectionClick={(eventKey): void => {
-            if (expanded) {
-              if (openSection === eventKey) {
-                setOpenSection('');
-              } else {
-                setOpenSection(eventKey);
-              }
-            } else {
-              setExpanded(true);
-              setOpenSection(eventKey);
-            }
-          }}
+          onSectionClick={onSectionClick}
           openSection={openSection}
           expanded={expanded}
         />

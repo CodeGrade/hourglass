@@ -6,6 +6,7 @@ import {
 import {
   PaginationState,
   QuestionInfo,
+  PaginationCoordinates,
 } from '@student/exams/show/types';
 import {
   scrollToQuestion,
@@ -13,26 +14,25 @@ import {
 import { alphabetIdx } from '@hourglass/common/helpers';
 
 interface JumpToProps {
-  pagination: PaginationState;
   togglePagination: () => void;
   changeQuestion: (qnum: number, pnum?: number) => void;
   spyQuestion: (qnum: number, pnum?: number) => void;
   questions: QuestionInfo[];
+  spyCoords: PaginationCoordinates[];
+  paginated: boolean;
+  spy: number;
 }
 
 const JumpTo: React.FC<JumpToProps> = (props) => {
   const {
-    pagination,
     togglePagination,
     changeQuestion,
     spyQuestion,
     questions,
-  } = props;
-  const {
     paginated,
     spyCoords,
     spy,
-  } = pagination;
+  } = props;
   if (spyCoords.length === 0) return null;
   const selectedCoords = spyCoords[spy];
   const justQuestion = selectedCoords.part === undefined;

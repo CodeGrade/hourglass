@@ -1,6 +1,6 @@
 import ExamShowContents from '@student/exams/show/components/ExamShowContents';
 import { connect } from 'react-redux';
-import { saveSnapshot } from '@student/exams/show/actions';
+import { saveSnapshot, submitExam } from '@student/exams/show/actions';
 import {
   ExamVersion,
   MSTP,
@@ -20,9 +20,13 @@ const mapStateToProps: MSTP<{exam: ExamVersion}, OwnProps> = (state) => ({
 
 const mapDispatchToProps: MDTP<{
   save: () => void;
+  submit: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   save: (): void => {
     dispatch(saveSnapshot(ownProps.railsCourse.id, ownProps.railsExam.id));
+  },
+  submit: (): void => {
+    dispatch(submitExam(ownProps.railsCourse.id, ownProps.railsExam.id));
   },
 });
 

@@ -263,6 +263,7 @@ export function doTryLockdown(
 ): Thunk {
   return (dispatch): void => {
     lock(exam.policies).then(() => {
+      window.history.pushState({}, document.title);
       if (policyPermits(exam.policies, Policy.ignoreLockdown)) {
         dispatch(lockdownIgnored());
       } else {

@@ -35,14 +35,13 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
         <p>All exam files</p>
         <InputGroup>
           <Form.File
-            // TODO: required
             onChange={(e): void => {
               const { files: uploaded } = e.target;
               const upload = uploaded[0];
               if (upload) setFile(upload);
             }}
             label={curLabel}
-            accept="application/zip,.yaml,.yml"
+            accept="application/zip"
             custom
           />
           <InputGroup.Append>

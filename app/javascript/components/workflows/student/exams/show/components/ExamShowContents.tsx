@@ -27,7 +27,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   } = props;
   const leave = useCallback(() => {
     submit();
-  }, []);
+  }, [submit]);
   useEffect(() => {
     const timer: number = window.setInterval(() => save(), INTERVAL);
     return (): void => {

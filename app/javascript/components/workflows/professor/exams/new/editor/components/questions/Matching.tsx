@@ -33,16 +33,15 @@ const ChooseRightAnswer: React.FC<WrappedFieldProps & {
     numChoices,
   } = props;
   const {
-    value,
+    value = -1,
     onChange,
   } = input;
-  const valueI = value ?? -1;
   return (
     <FormControl variant="outlined">
       <InputLabel>Match</InputLabel>
       <Select
         margin="dense"
-        value={valueI}
+        value={value}
         onChange={onChange}
         label="Match"
       >

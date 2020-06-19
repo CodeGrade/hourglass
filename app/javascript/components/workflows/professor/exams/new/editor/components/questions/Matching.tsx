@@ -37,13 +37,14 @@ const ChooseRightAnswer: React.FC<WrappedFieldProps & {
     onChange,
   } = input;
   return (
-    <FormControl variant="outlined">
+    <FormControl variant="outlined" className="w-100">
       <InputLabel>Match</InputLabel>
       <Select
         margin="dense"
         value={value}
         onChange={onChange}
         label="Match"
+        className="w-100"
       >
         <MenuItem value={-1}>
           <em>None</em>
@@ -171,7 +172,7 @@ const OnePrompt: React.FC<{
         onBlur={(): void => setMoversVisible(false)}
         onMouseOut={(): void => setMoversVisible(false)}
       >
-        <Col className="flex-grow-01 pl-0">
+        <div className="float-left pl-0">
           <MoveItem
             visible={moversVisible}
             variant="dark"
@@ -182,8 +183,8 @@ const OnePrompt: React.FC<{
             onDelete={remove}
           />
           {`${alphabetIdx(valueNum)}.`}
-        </Col>
-        <Col className="pr-0">
+        </div>
+        <Col>
           <Field
             name="html"
             component={EditHTMLField}
@@ -191,13 +192,13 @@ const OnePrompt: React.FC<{
             placeholder="Enter a new prompt"
           />
         </Col>
-        <Col sm={2}>
+        <div className="float-right" style={{ width: 85 }}>
           <Field
             name="answer"
             component={ChooseRightAnswer}
             numChoices={numChoices}
           />
-        </Col>
+        </div>
       </Row>
     </FormSection>
   );

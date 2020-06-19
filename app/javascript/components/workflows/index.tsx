@@ -174,7 +174,10 @@ export const BlockNav: React.FC<{
   useEffect(() => {
     setCustomHandler(() => (b) => {
       if (b && onLeave) onLeave();
-      if (!b && onStay) onStay();
+      if (!b) {
+        if (onStay) onStay();
+        window.history.pushState({}, document.title);
+      }
     });
   }, [onStay, onLeave]);
   return (
@@ -216,8 +219,8 @@ const Entry: React.FC = () => {
               show={transitioning}
               onHide={() => {
                 setTransitioning(false);
-                customHandler(false);
                 transitionCallback(false);
+                customHandler(false);
               }}
             >
               <Modal.Header closeButton>
@@ -231,8 +234,8 @@ const Entry: React.FC = () => {
                   variant="primary"
                   onClick={() => {
                     setTransitioning(false);
-                    customHandler(false);
                     transitionCallback(false);
+                    customHandler(false);
                   }}
                 >
                   Cancel
@@ -241,8 +244,8 @@ const Entry: React.FC = () => {
                   variant="danger"
                   onClick={() => {
                     setTransitioning(false);
-                    customHandler(true);
                     transitionCallback(true);
+                    customHandler(true);
                   }}
                 >
                   Leave

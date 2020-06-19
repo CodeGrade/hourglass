@@ -5,14 +5,17 @@ require 'application_system_test_case'
 class AnomaliesTest < ApplicationSystemTestCase
   def setup
     Webpacker.compile
-    @registration = create(:registration)
+    @version = create(:exam_version, :with_lockdown)
+    @exam = @version.exam
+    @registration = create(:registration, exam: @exam, exam_version: @version)
     @student = @registration.user
-    @exam = @registration.exam
     sign_in @student
+    visit "/exams/#{@exam.id}"
+    start_btn = find_button class: 'btn-success'
+    start_btn.click
   end
 
-  test 'visiting the start page' do
-    visit "/exams/#{@exam.id}"
-    # binding.pry
+  test 'leaving fullscreen' do
+    binding.pry
   end
 end

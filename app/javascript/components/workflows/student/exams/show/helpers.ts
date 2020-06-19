@@ -8,7 +8,7 @@ import { DateTime } from 'luxon';
 
 export function getCSRFToken(): string {
   const elem: HTMLMetaElement = document.querySelector('[name=csrf-token]');
-  return elem.content;
+  return elem?.content ?? '';
 }
 
 /**

@@ -9,7 +9,7 @@
     "dev": "./bin/webpack-dev-server",
     "lint": "eslint 'app/javascript' --ext 'js,ts,jsx,tsx'",
     "typecheck": "tsc --noEmit --noErrorTruncation --pretty false --incremental false -p .",
-    "uml": "tplant -C --input app/javascript/types.ts --output types.svg",
+    "uml": "tplant -C --input app/javascript/components/workflows/student/exams/show/types.ts --output types.svg",
     "unused": "ts-prune"
   },
   "dependencies": {

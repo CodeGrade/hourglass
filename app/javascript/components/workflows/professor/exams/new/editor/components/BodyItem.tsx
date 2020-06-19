@@ -117,12 +117,10 @@ const Body: React.FC<BodyProps> = (props) => {
         <Field
           name={`${memberName}.type`}
           component={OneItem}
-          props={{
-            qnum,
-            pnum,
-            bnum,
-            memberName,
-          }}
+          qnum={qnum}
+          pnum={pnum}
+          bnum={bnum}
+          memberName={memberName}
         />
       </Card.Body>
     </Card>

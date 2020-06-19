@@ -183,7 +183,7 @@ const OnePrompt: React.FC<{
           />
           {`${alphabetIdx(valueNum)}.`}
         </Col>
-        <Col className="pr-0 flex-grow-1">
+        <Col className="pr-0">
           <Field
             name="html"
             component={EditHTMLField}
@@ -191,7 +191,7 @@ const OnePrompt: React.FC<{
             placeholder="Enter a new prompt"
           />
         </Col>
-        <Col sm={2} className="float-right pl-2">
+        <Col sm={2}>
           <Field
             name="answer"
             component={ChooseRightAnswer}

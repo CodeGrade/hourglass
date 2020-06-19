@@ -21,7 +21,7 @@ import { firstFile } from '@student/exams/show/files';
 import { FilePickerSelectWithPreview } from '../FilePicker';
 
 
-const languages = {
+export const languages = {
   scheme: 'Racket',
   'text/x-java': 'Java',
   'text/x-python': 'Python',

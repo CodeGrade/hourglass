@@ -8,6 +8,7 @@ import {
 import { BodyItemWithAnswer } from '@student/exams/show/types';
 import { WrappedFieldArrayProps } from 'redux-form';
 import BodyItem from '@professor/exams/new/editor/components/BodyItem';
+import { languages } from '@professor/exams/new/editor/components/questions/Code';
 
 const ShowBodyItems: React.FC<{
   qnum: number;
@@ -81,7 +82,7 @@ const ShowBodyItems: React.FC<{
               onClick={(): void => {
                 fields.push({
                   type: 'Code',
-                  lang: 'text/plain',
+                  lang: Object.keys(languages)[0],
                   prompt: {
                     type: 'HTML',
                     value: '',

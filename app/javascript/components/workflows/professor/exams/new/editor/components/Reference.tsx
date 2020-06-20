@@ -38,5 +38,6 @@ const EditReference: React.FC<{
   && prev.input.value === next.input.value
   && prev.input.onChange === next.input.onChange
 ));
+EditReference.displayName = 'EditReference';
 
 export default EditReference;

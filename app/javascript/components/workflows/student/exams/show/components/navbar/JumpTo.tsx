@@ -4,7 +4,6 @@ import {
   Form,
 } from 'react-bootstrap';
 import {
-  PaginationState,
   QuestionInfo,
   PaginationCoordinates,
 } from '@student/exams/show/types';

@@ -70,4 +70,5 @@ const ShowParts: React.FC<{
   );
 };
 
+ShowParts.displayName = 'ShowPartsMemo';
 export default ShowParts;

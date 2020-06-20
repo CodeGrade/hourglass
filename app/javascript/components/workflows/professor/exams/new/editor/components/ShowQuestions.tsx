@@ -8,7 +8,7 @@ import {
 import { QuestionInfo } from '@student/exams/show/types';
 import Question from '@professor/exams/new/editor/components/Question';
 
-const ShowQuestions: React.FC<WrappedFieldArrayProps<QuestionInfo>> = (props) => {
+const ShowQuestions: React.FC<WrappedFieldArrayProps<QuestionInfo>> = React.memo((props) => {
   const {
     fields,
   } = props;
@@ -63,6 +63,7 @@ const ShowQuestions: React.FC<WrappedFieldArrayProps<QuestionInfo>> = (props) =>
       </Row>
     </>
   );
-};
+}, (prev, next) => (prev.fields === next.fields));
 
+ShowQuestions.displayName = 'ShowQuestionsMemo';
 export default ShowQuestions;

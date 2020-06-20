@@ -16,7 +16,7 @@ interface HGAlertWithID extends HGAlert {
 
 const ShowAlert: React.FC<{
   alert: HGAlertWithID;
-}> = (props) => {
+}> = React.memo((props) => {
   const {
     alert,
   } = props;
@@ -43,11 +43,11 @@ const ShowAlert: React.FC<{
       )}
     </Toast>
   );
-};
+}, (prev, next) => (prev.alert.id === next.alert.id));
 
 const ShowAlerts: React.FC<{
   alerts: HGAlertWithID[];
-}> = ({ alerts }) => (
+}> = React.memo(({ alerts }) => (
   <div id="allAlerts">
     {alerts.map((alert) => (
       <ShowAlert
@@ -56,7 +56,12 @@ const ShowAlerts: React.FC<{
       />
     ))}
   </div>
-);
+), (prev, next) => (
+  prev.alerts.length === next.alerts.length
+  && prev.alerts.reduce((acc, prevAlert, idx) => (
+    acc && prevAlert.id === next.alerts[idx].id
+  ), true)
+));
 
 interface AlertContext {
   alert: (alert: HGAlert) => void;
@@ -78,12 +83,9 @@ export const AllAlerts: React.FC = ({ children }) => {
   useEffect(() => history.listen((_) => {
     setAlerts([]);
   }), [history]);
+  const alertContext = React.useMemo(() => ({ alert: addAlert }), [addAlert]);
   return (
-    <AlertContext.Provider
-      value={{
-        alert: addAlert,
-      }}
-    >
+    <AlertContext.Provider value={alertContext}>
       <ShowAlerts alerts={alerts} />
       {children}
     </AlertContext.Provider>

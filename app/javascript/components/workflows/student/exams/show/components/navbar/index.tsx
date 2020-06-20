@@ -96,7 +96,16 @@ const ExamNavbar: React.FC<{
       setExpanded(true);
       setOpenSection(eventKey);
     }
-  }, [expanded, openSection])
+  }, [expanded, openSection]);
+  const onExpandClick = useCallback((): void => {
+    if (expanded) {
+      setOpenSection('');
+      setOpenTimer('');
+      setExpanded(false);
+    } else {
+      setExpanded(true);
+    }
+  }, [expanded]);
   return (
     <div
       id="sidebar"
@@ -126,15 +135,7 @@ const ExamNavbar: React.FC<{
         <h1 aria-hidden="true" className="width-0">&nbsp;</h1>
         <Button
           className="ml-2"
-          onClick={(): void => {
-            if (expanded) {
-              setOpenSection('');
-              setOpenTimer('');
-              setExpanded(false);
-            } else {
-              setExpanded(true);
-            }
-          }}
+          onClick={onExpandClick}
         >
           {expanded
             ? <RenderIcon I={FaAngleDoubleLeft} />

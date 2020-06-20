@@ -19,6 +19,13 @@ interface ExamShowContentsProps {
 
 const INTERVAL = 10000;
 
+const ExamName: React.FC<{ name: string }> = (props) => {
+  const { name } = props;
+  return (
+    <h1>{name}</h1>
+  );
+};
+
 const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const {
     exam,
@@ -34,23 +41,25 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   //     clearInterval(timer);
   //   };
   // }, [save]);
-  useAnomalyListeners();
+  // useAnomalyListeners();
   const {
     questions,
     instructions,
     reference,
     files,
   } = exam;
-  const fmap = createMap(files);
+  const fmap = React.useMemo(() => createMap(files), [files]);
+  const examContext = React.useMemo(() => ({ files, fmap }), [files, fmap]);
+  const examFilesContext = React.useMemo(() => ({ references: reference }), [reference]);
   const { railsExam } = useContext(RailsContext);
   return (
-    <ExamContext.Provider value={{ files, fmap }}>
+    <ExamContext.Provider value={examContext}>
       {/* <BlockNav */}
       {/*   onLeave={leave} */}
       {/*   message="Are you sure you want to navigate away? Your exam will be submitted." */}
       {/* /> */}
-      <ExamFilesContext.Provider value={{ references: reference }}>
-        <h1>{railsExam.name}</h1>
+      <ExamFilesContext.Provider value={examFilesContext}>
+        <ExamName name={railsExam.name} />
         <HTML value={instructions} />
         {reference.length !== 0 && <FileViewer references={reference} />}
         <Row>

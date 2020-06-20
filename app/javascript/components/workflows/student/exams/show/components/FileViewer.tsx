@@ -142,7 +142,7 @@ interface FileViewerProps {
   alwaysShowTreeView?: boolean;
 }
 
-export const FileViewer: React.FC<FileViewerProps> = (props) => {
+export const FileViewer: React.FC<FileViewerProps> = React.memo((props) => {
   const { references, alwaysShowTreeView = false } = props;
   const { fmap } = useContext(ExamContext);
   const filteredFiles = getFilesForRefs(fmap, references);
@@ -170,7 +170,13 @@ export const FileViewer: React.FC<FileViewerProps> = (props) => {
       </Col>
     </Row>
   );
-};
+}, (prev, next) => (
+  prev.alwaysShowTreeView === next.alwaysShowTreeView
+  && prev.references.length === next.references.length
+  && prev.references.reduce((acc, prevRef, idx) => (
+    acc && prevRef === next.references[idx]
+  ), true)
+));
 
 
 interface ControlledFileViewerProps {
@@ -232,7 +238,7 @@ export const VeryControlledFileViewer: React.FC<{
   const {
     files,
   } = props;
-  const fmap = createMap(files);
+  const fmap = React.useMemo(() => createMap(files), [files]);
   const [selectedID, setSelectedID] = useState('');
   useEffect(() => {
     const first = firstFile(files);

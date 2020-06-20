@@ -17,6 +17,7 @@ export interface NavAccordionItemProps {
   direction?: 'up' | 'down';
 }
 
+const spacer = <span aria-hidden="true" className="width-0">&nbsp;</span>;
 const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
   const {
     onSectionClick,
@@ -36,7 +37,7 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
       onClick={(): void => onSectionClick(eventKey)}
     >
       <RenderIcon I={Icon} className="" />
-      <span aria-hidden="true" className="width-0">&nbsp;</span>
+      {spacer}
       <Collapse
         in={expanded}
         dimension="width"

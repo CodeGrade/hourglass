@@ -318,7 +318,7 @@ const SetInitial: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
-const Code: React.FC<CodeProps> = (props) => {
+const Code: React.FC<CodeProps> = React.memo((props) => {
   const {
     qnum,
     pnum,
@@ -351,6 +351,8 @@ const Code: React.FC<CodeProps> = (props) => {
       </Form.Group>
     </>
   );
-};
+}, (prev, next) => (
+  prev.qnum === next.qnum && prev.pnum === next.pnum && prev.bnum === next.bnum
+));
 
 export default Code;

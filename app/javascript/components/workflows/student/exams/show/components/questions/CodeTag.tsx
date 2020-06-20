@@ -20,7 +20,7 @@ interface CodeTagValProps {
   hideFile?: boolean;
 }
 
-const CodeTagVal: React.FC<CodeTagValProps> = (props) => {
+const CodeTagVal: React.FC<CodeTagValProps> = React.memo((props) => {
   const { value, hideFile = false } = props;
   return (
     <div>
@@ -48,7 +48,11 @@ const CodeTagVal: React.FC<CodeTagValProps> = (props) => {
       </span>
     </div>
   );
-};
+}, (prev, next) => (
+  prev?.value?.lineNumber === next?.value?.lineNumber
+  && prev?.value?.selectedFile === next?.value?.selectedFile
+  && prev?.hideFile === next?.hideFile
+));
 
 export { CodeTagVal };
 
@@ -61,7 +65,7 @@ interface FileModalProps {
   disabled: boolean;
 }
 
-const FileModal: React.FC<FileModalProps> = (props) => {
+const FileModal: React.FC<FileModalProps> = React.memo((props) => {
   const {
     show,
     onClose,
@@ -135,7 +139,17 @@ const FileModal: React.FC<FileModalProps> = (props) => {
       </Modal.Footer>
     </Modal>
   );
-};
+}, (prev, next) => (
+  prev.show === next.show
+  && prev.onClose === next.onClose
+  && prev.onSave === next.onSave
+  && prev.startValue === next.startValue
+  && prev.disabled === next.disabled
+  && prev.references.length === next.references.length
+  && prev.references.reduce((acc, prevRef, idx) => (
+    acc && prevRef === next.references[idx]
+  ), true)
+));
 
 interface CodeTagProps {
   info: CodeTagInfo;

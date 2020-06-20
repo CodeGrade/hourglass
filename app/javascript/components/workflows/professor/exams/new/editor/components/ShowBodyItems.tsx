@@ -171,4 +171,5 @@ const ShowBodyItems: React.FC<{
   );
 };
 
+ShowBodyItems.displayName = 'ShowBodyItemsMemo';
 export default ShowBodyItems;

@@ -65,4 +65,10 @@ const BottomWaypoint: React.FC<QScrollspyProps> = (props) => {
 };
 
 export const TopScrollspy = connect(TopWaypoint);
+TopScrollspy.displayName = 'PartTopScrollspy';
+TopWaypoint.whyDidYouRender = true;
+TopWaypoint.displayName = 'PartTopWaypoint';
 export const BottomScrollspy = connect(BottomWaypoint);
+BottomScrollspy.displayName = 'PartBottomScrollspy';
+BottomWaypoint.whyDidYouRender = true;
+BottomWaypoint.displayName = 'PartBottomWaypoint';

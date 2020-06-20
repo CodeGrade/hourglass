@@ -25,7 +25,20 @@ export interface MessageProps {
   body: React.ReactElement | string;
 }
 
-export const ShowMessage: React.FC<MessageProps> = (props) => {
+const ShowMessageTooltip: React.FC<{
+  icon: IconType;
+  iconClass?: string;
+  tooltip: string;
+}> = (props) => {
+  const { tooltip, icon, iconClass } = props;
+  return (
+    <span className="mr-2">
+      <Tooltip message={tooltip}><Icon I={icon} className={iconClass} /></Tooltip>
+    </span>
+  );
+};
+
+export const ShowMessage: React.FC<MessageProps> = React.memo((props) => {
   const {
     icon,
     iconClass,
@@ -35,16 +48,22 @@ export const ShowMessage: React.FC<MessageProps> = (props) => {
   } = props;
   return (
     <Media as="li">
-      <span className="mr-2">
-        <Tooltip message={tooltip}><Icon I={icon} className={iconClass} /></Tooltip>
-      </span>
+      <ShowMessageTooltip tooltip={tooltip} icon={icon} iconClass={iconClass} />
       <Media.Body>
         <p className="m-0"><i className="text-muted">{`(sent ${time.toLocaleString(DateTime.TIME_SIMPLE)})`}</i></p>
         <p>{body}</p>
       </Media.Body>
     </Media>
   );
-};
+}, (prev, next) => (
+  prev.icon === next.icon
+    && prev.iconClass === next.iconClass
+    && prev.tooltip === next.tooltip
+    && prev.body === next.body
+    && prev.time.equals(next.time)
+));
+
+const noMessages = <i>No messages.</i>;
 
 const ExamMessages: React.FC<ExamMessagesProps> = React.memo((props) => {
   const {
@@ -64,7 +83,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = React.memo((props) => {
     />
   ));
   const body = msgs.length === 0
-    ? <i>No messages.</i>
+    ? noMessages
     : msgs;
   const classes = unread ? 'bg-warning text-dark' : undefined;
   return (
@@ -90,15 +109,18 @@ const ExamMessages: React.FC<ExamMessagesProps> = React.memo((props) => {
       )}
     </NavAccordionItem>
   );
-}, (prev, next) => (
-  prev.unread === next.unread
-  && prev.messages.reduce((acc, current, idx) => {
-    const currentEqual = current === next.messages[idx];
-    return acc && currentEqual;
-  }, true)
-  && prev.expanded === next.expanded
-  && prev.onMessagesOpened === next.onMessagesOpened
-  && prev.onSectionClick === next.onSectionClick
-));
+}, (prev, next) => {
+  const same = prev.unread === next.unread
+    && prev.messages.length === next.messages.length
+    && prev.messages.reduce((acc, current, idx) => {
+      const currentEqual = current === next.messages[idx];
+      return acc && currentEqual;
+    }, true)
+    && prev.expanded === next.expanded
+    && prev.onMessagesOpened === next.onMessagesOpened
+    && prev.onSectionClick === next.onSectionClick;
+  console.log('ExamMessages same: ', same, prev, next);
+  return same;
+});
 
 export default ExamMessages;

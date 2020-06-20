@@ -449,7 +449,7 @@ const PreviewVersion: React.FC<{
   open: boolean;
   contents: ContentsState;
   railsExam: RailsExamVersion;
-}> = (props) => {
+}> = React.memo((props) => {
   const {
     open,
     contents,
@@ -471,4 +471,11 @@ const PreviewVersion: React.FC<{
       </div>
     </Collapse>
   );
-};
+}, (prev, next) => (
+  prev.open === next.open
+  && prev.contents === next.contents
+  && ((prev.railsExam === next.railsExam)
+    || (prev.railsExam.id === next.railsExam.id
+      && prev.railsExam.name === next.railsExam.name
+      && prev.railsExam.policies === next.railsExam.policies))
+));

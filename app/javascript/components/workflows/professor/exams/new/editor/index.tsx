@@ -205,19 +205,12 @@ const FormContextProvider: React.FC<{
     examRef,
     children,
   } = props;
-  const fmap = createMap(files);
+  const fmap = React.useMemo(() => createMap(files), [files]);
+  const examContext = React.useMemo(() => ({ files, fmap }), [files, fmap]);
+  const examFilesContext = React.useMemo(() => ({ references: examRef }), [examRef]);
   return (
-    <ExamContext.Provider
-      value={{
-        files,
-        fmap,
-      }}
-    >
-      <ExamFilesContext.Provider
-        value={{
-          references: examRef,
-        }}
-      >
+    <ExamContext.Provider value={examContext}>
+      <ExamFilesContext.Provider value={examFilesContext}>
         {children}
       </ExamFilesContext.Provider>
     </ExamContext.Provider>

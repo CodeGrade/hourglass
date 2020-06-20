@@ -17,7 +17,7 @@ interface ExamViewerProps {
   contents: ContentsState;
 }
 
-const ExamViewer: React.FC<ExamViewerProps> = (props) => {
+const ExamViewer: React.FC<ExamViewerProps> = React.memo((props) => {
   const {
     railsExam,
     contents,
@@ -32,12 +32,14 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     reference,
     questions,
   } = exam;
-  const fmap = createMap(files);
+  const fmap = React.useMemo(() => createMap(files), [files]);
+  const examContext = React.useMemo(() => ({ files, fmap }), [files, fmap]);
+  const examFilesContext = React.useMemo(() => ({ references: reference }), [reference]);
   return (
-    <ExamContext.Provider value={{ files, fmap }}>
+    <ExamContext.Provider value={examContext}>
       <ExamViewerContext.Provider value={{ answers }}>
         <RailsContext.Provider value={{ railsExam }}>
-          <ExamFilesContext.Provider value={{ references: reference }}>
+          <ExamFilesContext.Provider value={examFilesContext}>
             <div>
               {answers.scratch && (
                 <div>
@@ -61,6 +63,11 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
       </ExamViewerContext.Provider>
     </ExamContext.Provider>
   );
-};
+}, (prev, next) => (
+  prev.contents === next.contents
+  && prev.railsExam.id === next.railsExam.id
+  && prev.railsExam.name === next.railsExam.name
+  && prev.railsExam.policies === next.railsExam.policies
+));
 
 export default ExamViewer;

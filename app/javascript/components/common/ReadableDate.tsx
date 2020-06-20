@@ -32,7 +32,7 @@ interface ReadableDateProps {
   capitalize?: boolean;
 }
 
-const ReadableDate: React.FC<ReadableDateProps> = (props) => {
+const ReadableDate: React.FC<ReadableDateProps> = React.memo((props) => {
   const {
     value,
     relative = false,
@@ -49,6 +49,12 @@ const ReadableDate: React.FC<ReadableDateProps> = (props) => {
   return (
     <span className={className}>{str}</span>
   );
-};
+}, (prev, next) => (
+  prev.value.equals(next.value)
+  && prev.relative === next.relative
+  && prev.showTime === next.showTime
+  && prev.className === next.className
+  && prev.capitalize === next.capitalize
+));
 
 export default ReadableDate;

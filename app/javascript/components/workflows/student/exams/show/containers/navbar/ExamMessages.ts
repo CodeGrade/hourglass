@@ -1,23 +1,38 @@
+import { createSelector } from 'reselect';
 import { connect } from 'react-redux';
 import { MSTP, MDTP, ExamMessage } from '@student/exams/show/types';
-import ExamMessages from '@student/exams/show/components/navbar/ExamMessages';
+import ExamMessages, { ExamMessagesProps } from '@student/exams/show/components/navbar/ExamMessages';
 import { messagesOpened } from '@student/exams/show/actions';
+
+const getPersonalMessages = (state) => state.messages.messages.personal;
+const getRoomMessages = (state) => state.messages.messages.room;
+const getVersionMessages = (state) => state.messages.messages.version;
+
+const getAllMessages = createSelector(
+  [getPersonalMessages, getRoomMessages, getVersionMessages],
+  (personal, room, version) => ([
+    ...personal,
+    ...room,
+    ...version,
+  ].sort((msgA, msgB) => msgB.time.diff(msgA.time, 'seconds').seconds)));
 
 const mapStateToProps: MSTP<{
   messages: ExamMessage[];
   unread: boolean;
-}> = (state) => ({
-  messages: [
-    ...state.messages.messages.personal,
-    ...state.messages.messages.room,
-    ...state.messages.messages.version,
-  ].sort((msgA, msgB) => msgB.time.diff(msgA.time, 'seconds').seconds),
-  unread: state.messages.unread,
-});
+}, ExamMessagesProps> = (state, ourProps) => {
+  const newMessages = getAllMessages(state);
+  if (newMessages === ourProps.messages && state.messages.unread === ourProps.unread) {
+    return ourProps;
+  }
+  return {
+    messages: newMessages,
+    unread: state.messages.unread,
+  };
+};
 
 const mapDispatchToProps: MDTP<{
   onMessagesOpened: () => void;
-}> = (dispatch) => ({
+}, ExamMessagesProps> = (dispatch) => ({
   onMessagesOpened: (): void => {
     dispatch(messagesOpened());
   },

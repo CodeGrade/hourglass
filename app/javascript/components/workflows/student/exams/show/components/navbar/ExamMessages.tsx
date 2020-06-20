@@ -9,7 +9,7 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import Icon from '@student/exams/show/components/Icon';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 
-interface ExamMessagesProps {
+export interface ExamMessagesProps {
   expanded: boolean;
   messages: ExamMessage[];
   onMessagesOpened: () => void;
@@ -25,19 +25,6 @@ export interface MessageProps {
   body: React.ReactElement | string;
 }
 
-const ShowMessageTooltip: React.FC<{
-  icon: IconType;
-  iconClass?: string;
-  tooltip: string;
-}> = (props) => {
-  const { tooltip, icon, iconClass } = props;
-  return (
-    <span className="mr-2">
-      <Tooltip message={tooltip}><Icon I={icon} className={iconClass} /></Tooltip>
-    </span>
-  );
-};
-
 export const ShowMessage: React.FC<MessageProps> = React.memo((props) => {
   const {
     icon,
@@ -48,7 +35,9 @@ export const ShowMessage: React.FC<MessageProps> = React.memo((props) => {
   } = props;
   return (
     <Media as="li">
-      <ShowMessageTooltip tooltip={tooltip} icon={icon} iconClass={iconClass} />
+      <span className="mr-2">
+        <Tooltip message={tooltip}><Icon I={icon} className={iconClass} /></Tooltip>
+      </span>
       <Media.Body>
         <p className="m-0"><i className="text-muted">{`(sent ${time.toLocaleString(DateTime.TIME_SIMPLE)})`}</i></p>
         <p>{body}</p>
@@ -123,4 +112,5 @@ const ExamMessages: React.FC<ExamMessagesProps> = React.memo((props) => {
   return same;
 });
 
+ExamMessages.displayName = 'ExamMessagesMemo';
 export default ExamMessages;

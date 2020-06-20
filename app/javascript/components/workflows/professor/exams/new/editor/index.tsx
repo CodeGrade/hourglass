@@ -217,7 +217,7 @@ const FormContextProvider: React.FC<{
   );
 }, (prev, next) => (
   prev.files === next.files
-  && prev.examRef === next.files
+  && prev.examRef === next.examRef
 ));
 
 const FormContextProviderConnected = connect((state) => ({

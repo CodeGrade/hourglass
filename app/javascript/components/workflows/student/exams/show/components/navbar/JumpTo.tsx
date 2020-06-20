@@ -22,7 +22,7 @@ interface JumpToProps {
   spy: number;
 }
 
-const JumpTo: React.FC<JumpToProps> = (props) => {
+const JumpTo: React.FC<JumpToProps> = React.memo((props) => {
   const {
     togglePagination,
     changeQuestion,
@@ -112,5 +112,6 @@ const JumpTo: React.FC<JumpToProps> = (props) => {
       </Nav>
     </>
   );
-};
+});
+JumpTo.displayName = 'JumpToMemo';
 export default JumpTo;

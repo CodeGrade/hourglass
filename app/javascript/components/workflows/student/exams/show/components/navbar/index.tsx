@@ -29,7 +29,7 @@ interface NavAccordionProps {
   openSection: string;
 }
 
-const NavAccordion: React.FC<NavAccordionProps> = (props) => {
+const NavAccordion: React.FC<NavAccordionProps> = React.memo((props) => {
   const {
     expanded,
     onSectionClick,
@@ -72,7 +72,7 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
       </NavAccordionItem>
     </Accordion>
   );
-};
+});
 
 const ExamNavbar: React.FC<{
   time: TimeInfo;

@@ -80,5 +80,6 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
     </Card>
   );
 };
+NavAccordionItem.displayName = 'NavAccordionItem';
 
 export default NavAccordionItem;

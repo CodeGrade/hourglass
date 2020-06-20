@@ -40,15 +40,14 @@ const ShowExam: React.FC<ShowExamProps> = (props) => {
     final,
     lastSnapshot,
   } = props;
+  const railsContext = React.useMemo(() => ({
+    railsExam,
+    railsRegistration,
+    railsUser,
+    railsCourse,
+  }), [railsExam, railsRegistration, railsUser, railsCourse]);
   return (
-    <RailsContext.Provider
-      value={{
-        railsExam,
-        railsRegistration,
-        railsUser,
-        railsCourse,
-      }}
-    >
+    <RailsContext.Provider value={railsContext}>
       <Provider store={store}>
         {final ? <ExamSubmitted lastSnapshot={lastSnapshot} /> : <ExamTaker />}
       </Provider>

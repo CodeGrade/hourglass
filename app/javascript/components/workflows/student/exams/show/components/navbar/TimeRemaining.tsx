@@ -78,6 +78,20 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
     };
   }, [time, openTimer, expanded]);
   const endsLabel = remainingTime.valueOf() > 0 ? 'ends' : 'ended';
+  const onSectionClick = React.useCallback((eventKey): void => {
+    if (expanded) {
+      if (openTimer === eventKey) {
+        setOpenTimer('');
+      } else {
+        setOpenTimer(eventKey);
+      }
+    } else {
+      setExpanded(true);
+      setOpenTimer(eventKey);
+    }
+  }, [expanded, openTimer]);
+  const showRelativeStartClick = React.useCallback((): void => showRelativeStart((b) => !b), []);
+  const showRelativeEndClick = React.useCallback((): void => showRelativeEnd((b) => !b), []);
   return (
     <Accordion
       className="mt-4"
@@ -89,18 +103,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
         Icon={MdTimer}
         label={remaining}
         eventKey="time"
-        onSectionClick={(eventKey): void => {
-          if (expanded) {
-            if (openTimer === eventKey) {
-              setOpenTimer('');
-            } else {
-              setOpenTimer(eventKey);
-            }
-          } else {
-            setExpanded(true);
-            setOpenTimer(eventKey);
-          }
-        }}
+        onSectionClick={onSectionClick}
         direction="up"
       >
         <Table size="sm" borderless className="mb-0">
@@ -108,18 +111,18 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
             <tr>
               <td className="align-middle">Exam began:</td>
               <td className="w-100 align-middle">
-                <ReadableDate
-                  relative={relativeStart}
-                  showTime
-                  value={time.began}
-                />
+            <ReadableDate
+              relative={relativeStart}
+              showTime
+              value={time.began}
+            />
               </td>
               <td>
                 <Button
                   variant="outline-info"
                   size="sm"
                   className="ml-4"
-                  onClick={(): void => showRelativeStart((b) => !b)}
+                  onClick={showRelativeStartClick}
                 >
                   <RenderIcon I={FaClock} />
                 </Button>
@@ -128,18 +131,18 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
             <tr>
               <td className="align-middle">{`Exam ${endsLabel}:`}</td>
               <td className="w-100 align-middle">
-                <ReadableDate
-                  relative={relativeEnd}
-                  showTime
-                  value={time.ends}
-                />
+            <ReadableDate
+              relative={relativeEnd}
+              showTime
+              value={time.ends}
+            />
               </td>
               <td>
                 <Button
                   variant="outline-info"
                   size="sm"
                   className="ml-4"
-                  onClick={(): void => showRelativeEnd((b) => !b)}
+                  onClick={showRelativeEndClick}
                 >
                   <RenderIcon I={FaClock} />
                 </Button>

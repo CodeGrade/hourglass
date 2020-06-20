@@ -35,10 +35,12 @@ const ExamViewer: React.FC<ExamViewerProps> = React.memo((props) => {
   const fmap = React.useMemo(() => createMap(files), [files]);
   const examContext = React.useMemo(() => ({ files, fmap }), [files, fmap]);
   const examFilesContext = React.useMemo(() => ({ references: reference }), [reference]);
+  const examViewerContext = React.useMemo(() => ({ answers }), [answers]);
+  const railsContext = React.useMemo(() => ({ railsExam }), [railsExam]);
   return (
     <ExamContext.Provider value={examContext}>
-      <ExamViewerContext.Provider value={{ answers }}>
-        <RailsContext.Provider value={{ railsExam }}>
+      <ExamViewerContext.Provider value={examViewerContext}>
+        <RailsContext.Provider value={railsContext}>
           <ExamFilesContext.Provider value={examFilesContext}>
             <div>
               {answers.scratch && (

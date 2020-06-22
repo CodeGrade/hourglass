@@ -56,6 +56,39 @@ class Exam < ApplicationRecord
     (end_time - start_time).seconds
   end
 
+  def staff_checklist
+    {
+      status: {
+        type: 'COMPLETE'
+      }
+    }
+  end
+
+  def seating_checklist
+    {
+      status: {
+        type: 'NOT_STARTED'
+      }
+    }
+  end
+
+  def versions_checklist
+    {
+      status: {
+        type: 'WARNING',
+        reason: 'no reason...'
+      }
+    }
+  end
+
+  def checklist
+    {
+      staff: staff_checklist,
+      seating: seating_checklist,
+      versions: versions_checklist
+    }
+  end
+
   private
 
   def time_checks

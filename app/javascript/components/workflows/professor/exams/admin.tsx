@@ -11,7 +11,7 @@ import {
   useParams,
   useHistory,
 } from 'react-router-dom';
-import { useResponse as examsShow, Response as ShowResponse, Version } from '@hourglass/common/api/professor/exams/show';
+import { useResponse as examsShow, Response as ShowResponse, Version, Checklist, ChecklistItemStatus } from '@hourglass/common/api/professor/exams/show';
 import { ExhaustiveSwitchError, useRefresher } from '@hourglass/common/helpers';
 import {
   Card,
@@ -23,7 +23,7 @@ import {
   DropdownButton,
   Dropdown,
 } from 'react-bootstrap';
-import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import { FaChevronUp, FaChevronDown, FaCheck, FaTimes, FaMinus } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
 import { RailsExamVersion, ContentsState } from '@student/exams/show/types';
@@ -41,6 +41,8 @@ import {
 } from '@hourglass/common/api/professor/exams/update';
 import { DateTime } from 'luxon';
 import { importVersion } from '@hourglass/common/api/professor/exams/versions/import';
+import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
+import { IconType } from 'react-icons/lib';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -101,7 +103,7 @@ export const ExamAdmin: React.FC = () => {
             examName={response.response.name}
             refresh={refresh}
           />
-          <ProctoringInfo examId={examId} />
+          <ProctoringInfo examId={examId} checklist={response.response.checklist} />
         </>
       );
     default:
@@ -109,40 +111,71 @@ export const ExamAdmin: React.FC = () => {
   }
 };
 
+const statuses: Record<ChecklistItemStatus['type'], {
+  Icon: IconType;
+  variant: string;
+}> = {
+  NOT_STARTED: {
+    Icon: FaTimes,
+    variant: 'danger',
+  },
+  COMPLETE: {
+    Icon: FaCheck,
+    variant: 'success',
+  },
+  NA: {
+    Icon: MdDoNotDisturb,
+    variant: '',
+  },
+  WARNING: {
+    Icon: MdWarning,
+    variant: 'warning',
+  },
+};
+
+const ChecklistIcon: React.FC<{
+  status: ChecklistItemStatus;
+}> = (props) => {
+  const {
+    status,
+  } = props;
+  const { Icon: StatusIcon, variant } = statuses[status.type];
+  return (
+    <Icon I={StatusIcon} className={`text-${variant}`} />
+  );
+};
+
 const ProctoringInfo: React.FC<{
   examId: number;
+  checklist: Checklist;
 }> = (props) => {
   const {
     examId,
+    checklist,
   } = props;
   return (
     <>
-      <h2>Proctoring Arrangements</h2>
-      <Form.Group>
-        <Link to={`/exams/${examId}/assign-staff`}>
-          <Button
-            variant="info"
-          >
+      <h2>Proctoring Checklist</h2>
+      <ul className="list-unstyled">
+        <li>
+          <ChecklistIcon status={checklist.staff.status} />
+          <Link to={`/exams/${examId}/assign-staff`}>
             Assign staff members
-          </Button>
-        </Link>
-        <Link to={`/exams/${examId}/seating`}>
-          <Button
-            variant="info"
-            className="ml-2"
-          >
+          </Link>
+        </li>
+        <li>
+          <ChecklistIcon status={checklist.seating.status} />
+          <Link to={`/exams/${examId}/seating`}>
             Assign seating
-          </Button>
-        </Link>
-        <Link to={`/exams/${examId}/allocate-versions`}>
-          <Button
-            variant="info"
-            className="ml-2"
-          >
+          </Link>
+        </li>
+        <li>
+          <ChecklistIcon status={checklist.versions.status} />
+          <Link to={`/exams/${examId}/allocate-versions`}>
             Allocate versions
-          </Button>
-        </Link>
-      </Form.Group>
+          </Link>
+        </li>
+      </ul>
     </>
   );
 };

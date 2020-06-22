@@ -17,14 +17,41 @@ interface Server {
   start: string;
   end: string;
   versions: Version[];
+  checklist: Checklist;
 }
 
-export interface Response {
-  name: string;
-  duration: number;
+export type ChecklistItemStatus = Warning | NotStarted | Complete | NotApplicable;
+
+interface NotStarted {
+  type: 'NOT_STARTED';
+}
+interface Complete {
+  type: 'COMPLETE';
+}
+interface NotApplicable {
+  type: 'NA';
+}
+
+interface Warning {
+  type: 'WARNING';
+  reason: string;
+}
+
+export interface Checklist {
+  staff: {
+    status: ChecklistItemStatus;
+  };
+  seating: {
+    status: ChecklistItemStatus;
+  };
+  versions: {
+    status: ChecklistItemStatus;
+  };
+}
+
+export interface Response extends Omit<Omit<Server, 'start'>, 'end'> {
   start: DateTime;
   end: DateTime;
-  versions: Version[];
 }
 
 export function useResponse(examId: number, deps: React.DependencyList): ApiResponse<Response> {

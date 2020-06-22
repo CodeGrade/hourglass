@@ -33,11 +33,11 @@ class Exam < ApplicationRecord
   end
 
   def professors
-    registrations.includes(:user).where(role: 'professor').map(&:user)
+    course.professor_course_registrations.includes(:user).map(&:user)
   end
 
   def students
-    registrations.includes(:user).where(role: 'student').map(&:user)
+    registrations.includes(:user).map(&:user)
   end
 
   def unassigned_students
@@ -47,7 +47,7 @@ class Exam < ApplicationRecord
   end
 
   def registrations_without_rooms
-    registrations.reject(&:has_room?)
+    registrations.reject(&:room)
   end
 
   def rooms_without_staff

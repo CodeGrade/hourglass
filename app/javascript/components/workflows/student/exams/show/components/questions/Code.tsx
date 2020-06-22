@@ -70,10 +70,10 @@ const Code: React.FC<CodeProps> = React.memo((props) => {
   prev.disabled === next.disabled
   && prev.info === next.info
   && prev.onChange === next.onChange
-  && prev.value.text === next.value.text
-  && prev.value.marks.length === next.value.marks.length
-  && prev.value.marks.reduce((acc, prevMark, idx) => (
-    acc && prevMark === next.value.marks[idx]
+  && prev?.value?.text === next?.value?.text
+  && prev?.value?.marks?.length === next?.value?.marks?.length
+  && prev?.value?.marks?.reduce((acc, prevMark, idx) => (
+    acc && prevMark === next?.value?.marks?.[idx]
   ), true)
 ));
 Code.displayName = 'CodeMemo';

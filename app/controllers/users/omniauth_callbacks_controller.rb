@@ -6,6 +6,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
       @user.update_bottlenose_credentials(request.env["omniauth.auth"])
       sign_in_and_redirect @user, event: :authentication
       set_flash_message(:notice, :success, kind: 'Bottlenose') if is_navigational_format?
+      bottlenose_api.sync_courses
     else
       session["devise.bottlenose_data"] = request.env["omniauth.auth"]
       redirect_to new_user_registration_url

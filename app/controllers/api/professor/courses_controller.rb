@@ -25,7 +25,7 @@ module Api
       end
 
       def sync
-        bottlenose_api.sync_course(@course)
+        bottlenose_api.sync_course_regs(@course)
         render json: { synced: true }
       rescue Bottlenose::UnauthorizedError => e
         render json: {

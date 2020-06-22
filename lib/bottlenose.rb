@@ -17,15 +17,12 @@ module Bottlenose
           hg_course.last_sync = DateTime.now
           hg_course.active = true
           hg_course.save!
-          sync_course(hg_course)
-          # TODO remove once bottom TODO is done
-          reg = @user.professor_course_registrations.find_or_initialize_by(course: hg_course)
-          reg.save!
+          sync_course_regs(hg_course)
         end
       end
     end
 
-    def sync_course(course)
+    def sync_course_regs(course)
       got = bottlenose_get("/api/courses/#{course.bottlenose_id}/registrations")
       got.each do |sec_id, sec_obj|
         sec = course.sections.find_or_initialize_by(bottlenose_id: sec_id)
@@ -36,13 +33,22 @@ module Bottlenose
           reg = sec.student_registrations.find_or_initialize_by(user: user)
           reg.save!
         end
-        sec_obj['staff'].each do |staff|
-          user = sync_user(staff['user'])
+        sec_obj['graders'].each do |grader|
+          user = sync_user(grader)
           reg = sec.staff_registrations.find_or_initialize_by(user: user)
-          reg.ta = staff['ta']
           reg.save!
         end
-        # TODO profs
+        sec_obj['assistants'].each do |ta|
+          user = sync_user(ta)
+          reg = sec.staff_registrations.find_or_initialize_by(user: user)
+          reg.ta = true
+          reg.save!
+        end
+        sec_obj['professors'].each do |prof|
+          user = sync_user(prof)
+          reg = course.professor_course_registrations.find_or_initialize_by(user: user)
+          reg.save!
+        end
       end
     end
 

@@ -108,7 +108,6 @@ const ExamMessages: React.FC<ExamMessagesProps> = React.memo((props) => {
     && prev.expanded === next.expanded
     && prev.onMessagesOpened === next.onMessagesOpened
     && prev.onSectionClick === next.onSectionClick;
-  console.log('ExamMessages same: ', same, prev, next);
   return same;
 });
 

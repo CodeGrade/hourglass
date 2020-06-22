@@ -98,6 +98,8 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.references :user, null: false, foreign_key: true
       t.references :room, foreign_key: true
       t.references :exam_version, null: false, foreign_key: true
+      t.index [:exam_version_id, :user_id], unique: true
+      t.index [:user_id, :exam_version_id], unique: true
       t.index [:room_id, :user_id], unique: true
       t.index [:user_id, :room_id], unique: true
 

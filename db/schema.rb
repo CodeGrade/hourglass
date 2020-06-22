@@ -116,9 +116,11 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.datetime "end_time"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["exam_version_id", "user_id"], name: "index_registrations_on_exam_version_id_and_user_id", unique: true
     t.index ["exam_version_id"], name: "index_registrations_on_exam_version_id"
     t.index ["room_id", "user_id"], name: "index_registrations_on_room_id_and_user_id", unique: true
     t.index ["room_id"], name: "index_registrations_on_room_id"
+    t.index ["user_id", "exam_version_id"], name: "index_registrations_on_user_id_and_exam_version_id", unique: true
     t.index ["user_id", "room_id"], name: "index_registrations_on_user_id_and_room_id", unique: true
     t.index ["user_id"], name: "index_registrations_on_user_id"
   end

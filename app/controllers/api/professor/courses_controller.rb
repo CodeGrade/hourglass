@@ -41,6 +41,7 @@ module Api
             reg.ta = staff['ta']
             reg.save!
           end
+          # TODO profs
         end
         render json: { synced: true }
       rescue Bottlenose::UnauthorizedError => e

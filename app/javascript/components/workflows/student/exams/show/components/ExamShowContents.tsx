@@ -19,13 +19,6 @@ interface ExamShowContentsProps {
 
 const INTERVAL = 10000;
 
-const ExamName: React.FC<{ name: string }> = (props) => {
-  const { name } = props;
-  return (
-    <h1>{name}</h1>
-  );
-};
-
 const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const {
     exam,
@@ -35,13 +28,13 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const leave = useCallback(() => {
     submit();
   }, [submit]);
-  // useEffect(() => {
-  //   const timer: number = window.setInterval(() => save(), INTERVAL);
-  //   return (): void => {
-  //     clearInterval(timer);
-  //   };
-  // }, [save]);
-  // useAnomalyListeners();
+  useEffect(() => {
+    const timer: number = window.setInterval(() => save(), INTERVAL);
+    return (): void => {
+      clearInterval(timer);
+    };
+  }, [save]);
+  useAnomalyListeners();
   const {
     questions,
     instructions,
@@ -54,12 +47,12 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const { railsExam } = useContext(RailsContext);
   return (
     <ExamContext.Provider value={examContext}>
-      {/* <BlockNav */}
-      {/*   onLeave={leave} */}
-      {/*   message="Are you sure you want to navigate away? Your exam will be submitted." */}
-      {/* /> */}
+      <BlockNav
+        onLeave={leave}
+        message="Are you sure you want to navigate away? Your exam will be submitted."
+      />
       <ExamFilesContext.Provider value={examFilesContext}>
-        <ExamName name={railsExam.name} />
+        <h1>{railsExam.name}</h1>
         <HTML value={instructions} />
         {reference.length !== 0 && <FileViewer references={reference} />}
         <Row>

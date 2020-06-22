@@ -11,7 +11,6 @@ class Registration < ApplicationRecord
   has_one :accommodation, dependent: :destroy
 
   validates :user, presence: true
-  validates :room, presence: true
   validates :exam_version, presence: true
   validate :room_version_same_exam
 
@@ -19,12 +18,11 @@ class Registration < ApplicationRecord
   delegate :course, to: :exam
 
   def room_version_same_exam
-    room.exam == exam_version.exam
-  end
+    return unless room
 
-  def visible_to?(other_user)
-    # TODO: if other user is a prof for the course or an admin
-    other_user == user
+    return if room.exam == exam_version.exam
+
+    errors.add(:room, 'needs to be part of the correct exam')
   end
 
   # TIMELINE EXPLANATION

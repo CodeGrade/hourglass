@@ -14,7 +14,8 @@ const getAllMessages = createSelector(
     ...personal,
     ...room,
     ...version,
-  ].sort((msgA, msgB) => msgB.time.diff(msgA.time, 'seconds').seconds)));
+  ].sort((msgA, msgB) => msgB.time.diff(msgA.time, 'seconds').seconds)),
+);
 
 const mapStateToProps: MSTP<{
   messages: ExamMessage[];

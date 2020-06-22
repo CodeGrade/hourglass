@@ -111,11 +111,11 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
             <tr>
               <td className="align-middle">Exam began:</td>
               <td className="w-100 align-middle">
-            <ReadableDate
-              relative={relativeStart}
-              showTime
-              value={time.began}
-            />
+                <ReadableDate
+                  relative={relativeStart}
+                  showTime
+                  value={time.began}
+                />
               </td>
               <td>
                 <Button
@@ -131,11 +131,11 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
             <tr>
               <td className="align-middle">{`Exam ${endsLabel}:`}</td>
               <td className="w-100 align-middle">
-            <ReadableDate
-              relative={relativeEnd}
-              showTime
-              value={time.ends}
-            />
+                <ReadableDate
+                  relative={relativeEnd}
+                  showTime
+                  value={time.ends}
+                />
               </td>
               <td>
                 <Button

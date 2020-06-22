@@ -56,29 +56,51 @@ class Exam < ApplicationRecord
     (end_time - start_time).seconds
   end
 
+  # No rooms: NA
+  # No rooms have staff and staff exist: NOT_STARTED
+  # Some rooms have staff and some do not: WARNING
+  # All rooms have staff OR no staff exist: COMPLETE
   def staff_checklist
-    {
-      status: {
-        type: 'COMPLETE'
-      }
-    }
+    if rooms.length.zero?
+      checklist_na 'No rooms created for this exam.'
+    elsif course.has_staff? && rooms.none?(&:has_staff?)
+      checklist_not_started 'No rooms have proctors assigned.'
+    elsif course.has_staff? && !rooms.all?(&:has_staff?)
+      checklist_warning 'Some rooms have no proctors.'
+    else
+      checklist_complete 'All rooms have staff assigned.'
+    end
   end
 
+  # No rooms: NA
+  # All students have rooms: COMPLETE
+  # All students have nil rooms: NOT_STARTED
+  # Some students have nil rooms: WARNING
   def seating_checklist
-    {
-      status: {
-        type: 'NOT_STARTED'
-      }
-    }
+    if rooms.length.zero?
+      checklist_na 'No rooms created for this exam.'
+    elsif registrations.all?(&:room)
+      checklist_complete 'All students have assigned rooms.'
+    elsif registrations.none?(&:room)
+      checklist_not_started 'Students have not been assigned seating.'
+    else
+      checklist_warning 'Some students have not been assigned seats.'
+    end
   end
 
+  # No registrations: NOT_STARTED
+  # regs.count != students.count: WARNING
+  # regs.count == students.count: COMPLETE
   def versions_checklist
-    {
-      status: {
-        type: 'WARNING',
-        reason: 'no reason...'
-      }
-    }
+    if course.students.length.zero?
+      checklist_na 'This course has no students.'
+    elsif registrations.length.zero?
+      checklist_not_started 'No students have versions assigned.'
+    elsif registrations.length != course.students.length?
+      checklist_warning 'Some students have not been registered for an exam version.'
+    else
+      checklist_complete 'All students have exam versions assigned.'
+    end
   end
 
   def checklist
@@ -90,6 +112,34 @@ class Exam < ApplicationRecord
   end
 
   private
+
+  def checklist_complete(reason)
+    {
+      status: 'COMPLETE',
+      reason: reason
+    }
+  end
+
+  def checklist_warning(reason)
+    {
+      status: 'WARNING',
+      reason: reason
+    }
+  end
+
+  def checklist_not_started(reason)
+    {
+      status: 'NOT_STARTED',
+      reason: reason
+    }
+  end
+
+  def checklist_na(reason)
+    {
+      status: 'NA',
+      reason: reason
+    }
+  end
 
   def time_checks
     return unless duration > time_window

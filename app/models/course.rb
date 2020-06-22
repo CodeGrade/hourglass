@@ -23,4 +23,8 @@ class Course < ApplicationRecord
   def professors
     professor_course_registrations.select(:user_id).distinct.map(&:user)
   end
+
+  def has_staff?
+    staff_registrations.length.positive?
+  end
 end

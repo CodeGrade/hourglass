@@ -20,31 +20,24 @@ interface Server {
   checklist: Checklist;
 }
 
-export type ChecklistItemStatus = Warning | NotStarted | Complete | NotApplicable;
-
-interface NotStarted {
-  type: 'NOT_STARTED';
-}
-interface Complete {
-  type: 'COMPLETE';
-}
-interface NotApplicable {
-  type: 'NA';
-}
-
-interface Warning {
-  type: 'WARNING';
-  reason: string;
+export enum ChecklistItemStatus {
+  NotStarted = 'NOT_STARTED',
+  Complete = 'COMPLETE',
+  NA = 'NA',
+  Warning = 'WARNING',
 }
 
 export interface Checklist {
   staff: {
+    reason: string;
     status: ChecklistItemStatus;
   };
   seating: {
+    reason: string;
     status: ChecklistItemStatus;
   };
   versions: {
+    reason: string;
     status: ChecklistItemStatus;
   };
 }

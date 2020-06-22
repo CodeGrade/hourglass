@@ -114,34 +114,36 @@ export const ExamAdmin: React.FC = () => {
 
 const ChecklistIcon: React.FC<{
   status: ChecklistItemStatus;
+  reason: string;
 }> = (props) => {
   const {
     status,
+    reason,
   } = props;
-  switch (status.type) {
+  let contents;
+  switch (status) {
     case 'WARNING':
-      return (
-        <Tooltip message={status.reason}>
-          <span>
-            <Icon I={MdWarning} className="text-warning" />
-          </span>
-        </Tooltip>
-      );
+      contents = <Icon I={MdWarning} className="text-warning" />;
+      break;
     case 'NA':
-      return (
-        <Icon I={MdDoNotDisturb} />
-      );
+      contents = <Icon I={MdDoNotDisturb} />;
+      break;
     case 'COMPLETE':
-      return (
-        <Icon I={FaCheck} className="text-success" />
-      );
+      contents = <Icon I={FaCheck} className="text-success" />;
+      break;
     case 'NOT_STARTED':
-      return (
-        <Icon I={FaTimes} className="text-danger" />
-      );
+      contents = <Icon I={FaTimes} className="text-danger" />;
+      break;
     default:
       throw new ExhaustiveSwitchError(status);
   }
+  return (
+    <Tooltip message={reason}>
+      <span>
+        {contents}
+      </span>
+    </Tooltip>
+  );
 };
 
 const ProctoringInfo: React.FC<{
@@ -157,19 +159,28 @@ const ProctoringInfo: React.FC<{
       <h2>Proctoring Checklist</h2>
       <ul className="list-unstyled">
         <li>
-          <ChecklistIcon status={checklist.staff.status} />
+          <ChecklistIcon
+            reason={checklist.staff.reason}
+            status={checklist.staff.status}
+          />
           <Link to={`/exams/${examId}/assign-staff`}>
             Assign staff members
           </Link>
         </li>
         <li>
-          <ChecklistIcon status={checklist.seating.status} />
+          <ChecklistIcon
+            reason={checklist.seating.reason}
+            status={checklist.seating.status}
+          />
           <Link to={`/exams/${examId}/seating`}>
             Assign seating
           </Link>
         </li>
         <li>
-          <ChecklistIcon status={checklist.versions.status} />
+          <ChecklistIcon
+            reason={checklist.versions.reason}
+            status={checklist.versions.status}
+          />
           <Link to={`/exams/${examId}/allocate-versions`}>
             Allocate versions
           </Link>

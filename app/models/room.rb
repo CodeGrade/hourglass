@@ -14,4 +14,8 @@ class Room < ApplicationRecord
   def finalize!
     registrations.update_all(final: true)
   end
+
+  def has_staff?
+    proctor_registrations.length.positive?
+  end
 end

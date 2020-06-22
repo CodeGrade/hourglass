@@ -55,8 +55,9 @@ const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
 const QuestionReferenceProvider: React.FC<WrappedFieldProps> = (props) => {
   const { input, children } = props;
   const { value: references } = input;
+  const questionFilesContext = React.useMemo(() => ({ references }), [references]);
   return (
-    <QuestionFilesContext.Provider value={{ references }}>
+    <QuestionFilesContext.Provider value={questionFilesContext}>
       {children}
     </QuestionFilesContext.Provider>
   );

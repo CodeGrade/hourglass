@@ -33,8 +33,9 @@ const Part: React.FC<PartProps> = (props) => {
   } = part;
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
+  const partFilesContext = React.useMemo(() => ({ references: reference }), [reference]);
   return (
-    <PartFilesContext.Provider value={{ references: reference }}>
+    <PartFilesContext.Provider value={partFilesContext}>
       <div>
         {anonymous || (
           <h3 id={`question-${qnum}-part-${pnum}`}>

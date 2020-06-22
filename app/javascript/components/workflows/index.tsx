@@ -217,19 +217,12 @@ const Entry: React.FC = React.memo(() => {
     customHandler(true);
   }, []);
 
-
-    // <DndProvider backend={HTML5Backend}>
+  const railsContext = React.useMemo(() => ({ railsUser }), [railsUser]);
+  const blockerContext = React.useMemo(() => ({ setCustomHandler }), [setCustomHandler]);
   return (
-      <RailsContext.Provider
-        value={{
-          railsUser,
-        }}
-      >
-        <BlockerContext.Provider
-          value={{
-            setCustomHandler,
-          }}
-        >
+    // <DndProvider backend={HTML5Backend}>
+      <RailsContext.Provider value={railsContext}>
+        <BlockerContext.Provider value={blockerContext}>
           <BrowserRouter
             getUserConfirmation={getUserConfirmation}
           >
@@ -299,9 +292,9 @@ const Entry: React.FC = React.memo(() => {
           </BrowserRouter>
         </BlockerContext.Provider>
       </RailsContext.Provider>
+    // </DndProvider>
   );
 });
-    // </DndProvider> 
 
 // ts-prune-ignore-next
 export default hot(module)(Entry);

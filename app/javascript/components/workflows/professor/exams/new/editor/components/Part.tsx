@@ -63,8 +63,9 @@ const PartPoints: React.FC<WrappedFieldProps> = (props) => {
 const PartReferenceProvider: React.FC<WrappedFieldProps> = (props) => {
   const { input, children } = props;
   const { value: references } = input;
+  const partFilesContext = React.useMemo(() => ({ references }), [references]);
   return (
-    <PartFilesContext.Provider value={{ references }}>
+    <PartFilesContext.Provider value={partFilesContext}>
       {children}
     </PartFilesContext.Provider>
   );

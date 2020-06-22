@@ -18,4 +18,12 @@ class Room < ApplicationRecord
   def has_staff?
     proctor_registrations.length.positive?
   end
+
+  def has_registrations?
+    registrations.length.positive?
+  end
+
+  def has_users?
+    has_staff? || has_registrations?
+  end
 end

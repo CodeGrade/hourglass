@@ -30,6 +30,8 @@ class User < ApplicationRecord
            dependent: :destroy,
            inverse_of: 'recipient'
 
+  # TODO: validates :registrations, uniqueness: { scope: :exam_id }
+
   def self.from_omniauth(auth)
     user = where(username: auth.uid).first_or_initialize
     user.display_name = auth.info.display_name

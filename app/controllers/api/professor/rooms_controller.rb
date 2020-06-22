@@ -50,6 +50,28 @@ module Api
         }
       end
 
+      def update_all_rooms
+        body = params.permit(deletedRooms: [], newRooms: [], updatedRooms: {})
+        Room.transaction do
+          body[:deletedRooms].each do |id|
+            room = @exam.rooms.find_by!(id: id)
+            raise Error, "'#{room.name}' has users. Please remove them before deleting it." if room.has_users?
+
+            room.destroy!
+          end
+
+          body[:updatedRooms].each do |r|
+            room = @exam.rooms.find_by!(id: r['id'])
+            room.update!(name: r['name'])
+          end
+
+          body[:newRooms].each do |name|
+            room = Room.create(exam: @exam, name: name)
+            room.save!
+          end
+        end
+      end
+
       def update_all
         body = params.permit(unassigned: [], rooms: {})
         body[:unassigned].each do |id|

@@ -9,7 +9,7 @@ class Exam < ApplicationRecord
   has_many :questions, dependent: :destroy
   has_many :exam_versions, dependent: :destroy
 
-  has_many :registrations, through: :rooms
+  has_many :registrations, through: :exam_versions
   has_many :proctor_registrations, through: :rooms
 
   validates :course, presence: true

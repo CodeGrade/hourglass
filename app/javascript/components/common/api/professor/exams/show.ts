@@ -28,6 +28,10 @@ export enum ChecklistItemStatus {
 }
 
 export interface Checklist {
+  rooms: {
+    reason: string;
+    status: ChecklistItemStatus;
+  };
   staff: {
     reason: string;
     status: ChecklistItemStatus;

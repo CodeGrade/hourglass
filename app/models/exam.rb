@@ -46,6 +46,14 @@ class Exam < ApplicationRecord
     end
   end
 
+  def registrations_without_rooms
+    registrations.reject(&:has_room?)
+  end
+
+  def rooms_without_staff
+    rooms.reject(&:has_staff?)
+  end
+
   def unassigned_staff
     course.staff.reject do |s|
       proctor_registrations.exists? user: s
@@ -56,17 +64,28 @@ class Exam < ApplicationRecord
     (end_time - start_time).seconds
   end
 
+  def room_checklist
+    if rooms.blank?
+      checklist_not_started 'No rooms have been created for this exam.'
+    else
+      count = rooms.length
+      checklist_complete "#{count} #{'room'.pluralize(count)}"
+    end
+  end
+
   # No rooms: NA
   # No rooms have staff and staff exist: NOT_STARTED
   # Some rooms have staff and some do not: WARNING
   # All rooms have staff OR no staff exist: COMPLETE
   def staff_checklist
-    if rooms.length.zero?
+    if rooms.blank?
       checklist_na 'No rooms created for this exam.'
     elsif course.has_staff? && rooms.none?(&:has_staff?)
       checklist_not_started 'No rooms have proctors assigned.'
     elsif course.has_staff? && !rooms.all?(&:has_staff?)
-      checklist_warning 'Some rooms have no proctors.'
+      missing = rooms_without_staff.length
+      total = rooms.length
+      checklist_warning "Some rooms (#{missing}/#{total}) have no proctors."
     else
       checklist_complete 'All rooms have staff assigned.'
     end
@@ -77,14 +96,16 @@ class Exam < ApplicationRecord
   # All students have nil rooms: NOT_STARTED
   # Some students have nil rooms: WARNING
   def seating_checklist
-    if rooms.length.zero?
+    if rooms.blank?
       checklist_na 'No rooms created for this exam.'
     elsif registrations.all?(&:room)
       checklist_complete 'All students have assigned rooms.'
     elsif registrations.none?(&:room)
       checklist_not_started 'Students have not been assigned seating.'
     else
-      checklist_warning 'Some students have not been assigned seats.'
+      missing = registrations_without_rooms.length
+      total = students.length
+      checklist_warning "Some students (#{missing}/#{total}) have not been assigned seats."
     end
   end
 
@@ -92,19 +113,23 @@ class Exam < ApplicationRecord
   # regs.count != students.count: WARNING
   # regs.count == students.count: COMPLETE
   def versions_checklist
-    if course.students.length.zero?
+    if course.students.blank?
       checklist_na 'This course has no students.'
-    elsif registrations.length.zero?
+    elsif registrations.blank?
       checklist_not_started 'No students have versions assigned.'
-    elsif registrations.length != course.students.length?
-      checklist_warning 'Some students have not been registered for an exam version.'
+    elsif registrations.length != course.students.length
+      total = course.students.length
+      missing = unassigned_students.length
+      checklist_warning "Some students (#{missing}/#{total}) have not been registered for an exam version."
     else
-      checklist_complete 'All students have exam versions assigned.'
+      total = registrations.length
+      checklist_complete "All students (#{total}) have exam versions assigned."
     end
   end
 
   def checklist
     {
+      rooms: room_checklist,
       staff: staff_checklist,
       seating: seating_checklist,
       versions: versions_checklist

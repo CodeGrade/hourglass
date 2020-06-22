@@ -160,6 +160,15 @@ const ProctoringInfo: React.FC<{
       <ul className="list-unstyled">
         <li>
           <ChecklistIcon
+            reason={checklist.rooms.reason}
+            status={checklist.rooms.status}
+          />
+          <Link to={`/exams/${examId}/rooms`}>
+            Edit rooms
+          </Link>
+        </li>
+        <li>
+          <ChecklistIcon
             reason={checklist.staff.reason}
             status={checklist.staff.status}
           />

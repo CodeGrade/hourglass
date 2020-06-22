@@ -122,16 +122,16 @@ const ChecklistIcon: React.FC<{
   } = props;
   let contents;
   switch (status) {
-    case 'WARNING':
+    case ChecklistItemStatus.Warning:
       contents = <Icon I={MdWarning} className="text-warning" />;
       break;
-    case 'NA':
+    case ChecklistItemStatus.NA:
       contents = <Icon I={MdDoNotDisturb} />;
       break;
-    case 'COMPLETE':
+    case ChecklistItemStatus.Complete:
       contents = <Icon I={FaCheck} className="text-success" />;
       break;
-    case 'NOT_STARTED':
+    case ChecklistItemStatus.NotStarted:
       contents = <Icon I={FaTimes} className="text-danger" />;
       break;
     default:

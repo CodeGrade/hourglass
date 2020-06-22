@@ -110,7 +110,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
 
   create_table "registrations", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "room_id", null: false
+    t.bigint "room_id"
     t.bigint "exam_version_id", null: false
     t.datetime "start_time"
     t.datetime "end_time"

@@ -1,6 +1,7 @@
 import { useApiResponse, ApiResponse } from '@hourglass/common/types/api';
 
 interface Response {
+  unassigned: Student[]
   versions: Version[];
   sections: Section[];
 }

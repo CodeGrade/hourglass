@@ -9,8 +9,8 @@ module Api
       def index
         room_regs = @exam.registrations.group_by(&:room)
         render json: {
-          unassigned: @exam.unassigned_students.map do |s|
-            serialize_student s
+          unassigned: @exam.registrations_without_rooms.map do |reg|
+            serialize_student reg.user
           end,
           rooms: @exam.rooms.map do |room|
             regs = room_regs[room] || []
@@ -20,7 +20,7 @@ module Api
             {
               id: section.id,
               title: section.title,
-              students: section.students.map do |student|
+              students: section.registered_students_for(@exam).map do |student|
                 serialize_student student
               end
             }
@@ -60,7 +60,6 @@ module Api
           student_ids.each do |id|
             student_reg = @exam.registrations.find_or_initialize_by(user_id: id)
             student_reg.room_id = room_id
-            student_reg.exam_version ||= @exam.exam_versions.first
             student_reg.save!
           end
         end

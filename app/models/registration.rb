@@ -3,7 +3,7 @@
 # Room registrations for exam-taking students.
 class Registration < ApplicationRecord
   belongs_to :user
-  belongs_to :room
+  belongs_to :room, optional: true
   belongs_to :exam_version
 
   has_many :anomalies, dependent: :destroy

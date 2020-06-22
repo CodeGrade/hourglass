@@ -21,11 +21,14 @@ module Api
             regs = version_regs[version] || []
             serialize_version_regs version, regs
           end,
+          unassigned: @exam.unassigned_students.map do |s|
+            serialize_student s
+          end,
           sections: @exam.course.sections.map do |section|
             {
               id: section.id,
               title: section.title,
-              students: section.registered_students_for(@exam).map do |student|
+              students: section.students.map do |student|
                 serialize_student student
               end
             }

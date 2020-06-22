@@ -178,20 +178,20 @@ const ProctoringInfo: React.FC<{
         </li>
         <li>
           <ChecklistIcon
-            reason={checklist.seating.reason}
-            status={checklist.seating.status}
-          />
-          <Link to={`/exams/${examId}/seating`}>
-            Assign seating
-          </Link>
-        </li>
-        <li>
-          <ChecklistIcon
             reason={checklist.versions.reason}
             status={checklist.versions.status}
           />
           <Link to={`/exams/${examId}/allocate-versions`}>
             Allocate versions
+          </Link>
+        </li>
+        <li>
+          <ChecklistIcon
+            reason={checklist.seating.reason}
+            status={checklist.seating.status}
+          />
+          <Link to={`/exams/${examId}/seating`}>
+            Assign seating
           </Link>
         </li>
       </ul>

@@ -98,6 +98,8 @@ class Exam < ApplicationRecord
   def seating_checklist
     if rooms.blank?
       checklist_na 'No rooms created for this exam.'
+    elsif registrations.blank?
+      checklist_na 'No registered students for this exam.'
     elsif registrations.all?(&:room)
       checklist_complete 'All students have assigned rooms.'
     elsif registrations.none?(&:room)

@@ -196,7 +196,10 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   } = props;
   const { examId } = useParams();
   const addSectionToVersion = (section: Section, versionId: number): void => {
-    change('all', ({ versions }) => ({
+    change('all', ({ unassigned, versions }) => ({
+      unassigned: unassigned.filter((unassignedStudent: Student) => (
+        !section.students.find((student) => student.id === unassignedStudent.id)
+      )),
       versions: versions.map((version: Version) => {
         const filtered = version.students.filter((versionStudent) => (
           !section.students.find((student) => student.id === versionStudent.id)
@@ -245,6 +248,10 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
     >
       <FormSection name="all">
         <Form.Group>
+          <h2>Unassigned Students</h2>
+          <FieldArray name="unassigned" component={Students} />
+        </Form.Group>
+        <Form.Group>
           <FieldArray
             name="versions"
             component={Versions}
@@ -277,6 +284,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
 
 interface FormValues {
   all: {
+    unassigned: Student[];
     versions: Version[];
   };
 }
@@ -304,6 +312,7 @@ const DND: React.FC = () => {
             <DNDForm
               initialValues={{
                 all: {
+                  unassigned: response.response.unassigned,
                   versions: response.response.versions,
                 },
               }}

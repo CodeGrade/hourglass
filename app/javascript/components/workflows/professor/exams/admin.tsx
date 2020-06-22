@@ -11,7 +11,13 @@ import {
   useParams,
   useHistory,
 } from 'react-router-dom';
-import { useResponse as examsShow, Response as ShowResponse, Version, Checklist, ChecklistItemStatus } from '@hourglass/common/api/professor/exams/show';
+import {
+  useResponse as examsShow,
+  Response as ShowResponse,
+  Version,
+  Checklist,
+  ChecklistItemStatus,
+} from '@hourglass/common/api/professor/exams/show';
 import { ExhaustiveSwitchError, useRefresher } from '@hourglass/common/helpers';
 import {
   Card,
@@ -23,7 +29,12 @@ import {
   DropdownButton,
   Dropdown,
 } from 'react-bootstrap';
-import { FaChevronUp, FaChevronDown, FaCheck, FaTimes, FaMinus } from 'react-icons/fa';
+import {
+  FaChevronUp,
+  FaChevronDown,
+  FaCheck,
+  FaTimes,
+} from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
 import { RailsExamVersion, ContentsState } from '@student/exams/show/types';
@@ -42,7 +53,6 @@ import {
 import { DateTime } from 'luxon';
 import { importVersion } from '@hourglass/common/api/professor/exams/versions/import';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
-import { IconType } from 'react-icons/lib';
 import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
 
 export const ExamAdmin: React.FC = () => {

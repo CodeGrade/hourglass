@@ -31,13 +31,14 @@ module Api
           sec.title = "#{sec_obj['type']} - #{sec_obj['meeting_time']}"
           sec.save!
           sec_obj['students'].each do |student|
-            user = User.where(username: student['username']).first_or_initialize
-            user.display_name = student['display_name']
-            user.nuid = student['nuid']
-            user.email = student['email']
-            user.image_url = student['image_url']
-            user.save!
+            user = sync_user(student)
             reg = sec.student_registrations.find_or_initialize_by(user: user)
+            reg.save!
+          end
+          sec_obj['staff'].each do |staff|
+            user = sync_user(staff['user'])
+            reg = sec.staff_registrations.find_or_initialize_by(user: user)
+            reg.ta = staff['ta']
             reg.save!
           end
         end
@@ -47,11 +48,23 @@ module Api
           synced: false,
           reason: e.message
         }
-      rescue StandardError
+      rescue StandardError => e
         render json: {
           synced: false,
-          reason: 'Unknown error occurred.'
+          reason: e.message
         }
+      end
+
+      private
+
+      def sync_user(u)
+        user = User.where(username: u['username']).first_or_initialize
+        user.display_name = u['display_name']
+        user.nuid = u['nuid']
+        user.email = u['email']
+        user.image_url = u['image_url']
+        user.save!
+        user
       end
     end
   end

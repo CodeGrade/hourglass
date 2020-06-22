@@ -7,10 +7,7 @@ namespace :db do
   task populate: :environment do
     include FactoryBot::Syntax::Methods
 
-    if Rails.env.development?
-      Rake::Task['db:reset'].invoke
-      make_sample_data
-    end
+    make_sample_data if Rails.env.development?
   end
 end
 

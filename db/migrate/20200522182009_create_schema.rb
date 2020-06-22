@@ -57,6 +57,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
     create_table :staff_registrations do |t|
       t.references :section, null: false, foreign_key: true
       t.references :user, null: false, foreign_key: true
+      t.boolean :ta, null: false, default: false
       t.index [:section_id, :user_id], unique: true
       t.index [:user_id, :section_id], unique: true
 

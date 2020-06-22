@@ -159,6 +159,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   create_table "staff_registrations", force: :cascade do |t|
     t.bigint "section_id", null: false
     t.bigint "user_id", null: false
+    t.boolean "ta", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["section_id", "user_id"], name: "index_staff_registrations_on_section_id_and_user_id", unique: true

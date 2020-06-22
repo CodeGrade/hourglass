@@ -80,8 +80,8 @@ module Api
           # TODO: remove registration
           pp "UNASSIGNED: #{id}"
         end
-        body[:rooms].each do |room_id, student_ids|
-          student_ids.each do |id|
+        body[:rooms].each do |room_id, staff_ids|
+          staff_ids.each do |id|
             proctor_reg = @exam.proctor_registrations.find_or_initialize_by(user_id: id)
             proctor_reg.room_id = room_id
             proctor_reg.save!

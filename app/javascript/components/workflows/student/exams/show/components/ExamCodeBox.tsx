@@ -107,7 +107,9 @@ export const Editor: React.FC<EditorProps> = (props) => {
       appliedMarks.forEach((m) => m.clear());
       instance.setValue(value);
       setAppliedMarks(applyMarks(instance, markDescriptions));
-      instance.setCursor(curCursor);
+      instance.setCursor(curCursor.line, curCursor.ch, {
+        scroll: false,
+      });
       doSave = true;
     }
   }, [instance, ...valueUpdate]);
@@ -115,7 +117,11 @@ export const Editor: React.FC<EditorProps> = (props) => {
   // EFFECT: refresh the instance if any item in refreshProps changes
   useEffect(() => {
     if (instance) {
-      if (cursor) instance.setCursor(cursor);
+      if (cursor) {
+        instance.setCursor(cursor.line, cursor.ch, {
+          scroll: false,
+        });
+      }
       instance.refresh();
     }
   }, refreshProps);

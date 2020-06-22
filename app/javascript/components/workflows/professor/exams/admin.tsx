@@ -43,6 +43,7 @@ import { DateTime } from 'luxon';
 import { importVersion } from '@hourglass/common/api/professor/exams/versions/import';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
 import { IconType } from 'react-icons/lib';
+import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -111,38 +112,36 @@ export const ExamAdmin: React.FC = () => {
   }
 };
 
-const statuses: Record<ChecklistItemStatus['type'], {
-  Icon: IconType;
-  variant: string;
-}> = {
-  NOT_STARTED: {
-    Icon: FaTimes,
-    variant: 'danger',
-  },
-  COMPLETE: {
-    Icon: FaCheck,
-    variant: 'success',
-  },
-  NA: {
-    Icon: MdDoNotDisturb,
-    variant: '',
-  },
-  WARNING: {
-    Icon: MdWarning,
-    variant: 'warning',
-  },
-};
-
 const ChecklistIcon: React.FC<{
   status: ChecklistItemStatus;
 }> = (props) => {
   const {
     status,
   } = props;
-  const { Icon: StatusIcon, variant } = statuses[status.type];
-  return (
-    <Icon I={StatusIcon} className={`text-${variant}`} />
-  );
+  switch (status.type) {
+    case 'WARNING':
+      return (
+        <Tooltip message={status.reason}>
+          <span>
+            <Icon I={MdWarning} className="text-warning" />
+          </span>
+        </Tooltip>
+      );
+    case 'NA':
+      return (
+        <Icon I={MdDoNotDisturb} />
+      );
+    case 'COMPLETE':
+      return (
+        <Icon I={FaCheck} className="text-success" />
+      );
+    case 'NOT_STARTED':
+      return (
+        <Icon I={FaTimes} className="text-danger" />
+      );
+    default:
+      throw new ExhaustiveSwitchError(status);
+  }
 };
 
 const ProctoringInfo: React.FC<{

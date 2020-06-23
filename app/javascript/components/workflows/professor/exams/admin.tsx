@@ -176,7 +176,7 @@ const ProctoringInfo: React.FC<{
   return (
     <>
       <Switch>
-        <Route exact path="/exams/:examId/admin/:tabName">
+        <Route path="/exams/:examId/admin/:tabName">
           <ProctoringChecklist checklist={checklist} />
         </Route>
         <Route>
@@ -212,7 +212,9 @@ const ProctoringChecklist: React.FC<{
                 reason={checklist.rooms.reason}
                 status={checklist.rooms.status}
               />
-              Edit rooms
+              <span className="ml-2">
+                Edit rooms
+              </span>
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
@@ -224,7 +226,9 @@ const ProctoringChecklist: React.FC<{
                 reason={checklist.staff.reason}
                 status={checklist.staff.status}
               />
-              Assign staff members
+              <span className="ml-2">
+                Assign staff members
+              </span>
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
@@ -236,7 +240,9 @@ const ProctoringChecklist: React.FC<{
                 reason={checklist.versions.reason}
                 status={checklist.versions.status}
               />
-              Allocate versions
+              <span className="ml-2">
+                Allocate versions
+              </span>
             </Nav.Link>
           </Nav.Item>
           <Nav.Item>
@@ -248,7 +254,9 @@ const ProctoringChecklist: React.FC<{
                 reason={checklist.seating.reason}
                 status={checklist.seating.status}
               />
-              Assign seating
+              <span className="ml-2">
+                Assign seating
+              </span>
             </Nav.Link>
           </Nav.Item>
         </Nav>

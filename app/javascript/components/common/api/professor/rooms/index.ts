@@ -25,7 +25,6 @@ export interface Room {
   proctors: Student[];
 }
 
-
-export function useResponse(examId: number): ApiResponse<Response> {
-  return useApiResponse(`/api/professor/exams/${examId}/rooms`);
+export function useResponse(examId: number, deps?: React.DependencyList): ApiResponse<Response> {
+  return useApiResponse(`/api/professor/exams/${examId}/rooms`, undefined, undefined, deps);
 }

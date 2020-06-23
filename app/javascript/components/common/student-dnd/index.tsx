@@ -160,7 +160,7 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
               <h2>{room.name}</h2>
               <DropdownButton
                 title="Add entire section"
-                id={`add-section-${room.id}`}
+                id={`student-dnd-add-section-${room.id}`}
                 size="sm"
                 className="mb-2"
               >

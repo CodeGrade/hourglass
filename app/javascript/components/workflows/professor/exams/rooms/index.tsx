@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useContext } from 'react';
 import { Room, useResponse as indexRooms } from '@hourglass/common/api/professor/rooms/index';
 import { updateAll, Body } from '@hourglass/common/api/professor/rooms/updateAllRooms';
-import { useParams, useHistory } from 'react-router-dom';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { useParams, useHistory, Switch, Route } from 'react-router-dom';
+import { ExhaustiveSwitchError, useRefresher } from '@hourglass/common/helpers';
 import {
   Button,
   Form,
@@ -26,17 +26,20 @@ import { Provider } from 'react-redux';
 import store from '@professor/exams/rooms/store';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
+import { BsPencilSquare } from 'react-icons/bs';
+import LinkButton from '@hourglass/common/linkbutton';
 
 const EditExamRooms: React.FC = () => {
   const { examId } = useParams();
-  const response = indexRooms(examId);
+  const [refresher, refresh] = useRefresher();
+  const response = indexRooms(examId, [refresher]);
   switch (response.type) {
     case 'ERROR':
       return <p className="text-danger">{response.status}</p>;
     case 'LOADING':
       return <p>Loading...</p>;
     case 'RESULT':
-      return <Loaded rooms={response.response.rooms} />;
+      return <Loaded refresh={refresh} rooms={response.response.rooms} />;
     default:
       throw new ExhaustiveSwitchError(response);
   }
@@ -61,24 +64,93 @@ function createInitialValues(rooms: Room[]): FormValues {
 
 const Loaded: React.FC<{
   rooms: Room[];
+  refresh: () => void;
 }> = (props) => {
   const {
     rooms,
+    refresh,
   } = props;
-  const initialValues = useMemo(() => createInitialValues(rooms), [rooms]);
   return (
     <Row>
       <Col>
-        <h1>Edit rooms</h1>
+        <Switch>
+          <Route path="/exams/:examId/admin/rooms/edit">
+            <Editable refresh={refresh} rooms={rooms} />
+          </Route>
+          <Route>
+            <Readonly rooms={rooms} />
+          </Route>
+        </Switch>
+      </Col>
+    </Row>
+  );
+};
+
+interface RefreshContext {
+  refresh: () => void;
+}
+
+const RefreshContext = React.createContext<RefreshContext>({
+  refresh: () => undefined,
+});
+
+const Editable: React.FC<{
+  rooms: Room[];
+  refresh: () => void;
+}> = (props) => {
+  const {
+    rooms,
+    refresh,
+  } = props;
+  const initialValues = useMemo(() => createInitialValues(rooms), [rooms]);
+  return (
+    <>
+      <h1>Edit rooms</h1>
+      <RefreshContext.Provider value={{ refresh }}>
         <Provider store={store}>
           <EditExamRoomsForm
             initialValues={initialValues}
           />
         </Provider>
-      </Col>
-    </Row>
+      </RefreshContext.Provider>
+    </>
   );
 };
+
+const Readonly: React.FC<{
+  rooms: Room[];
+}> = (props) => {
+  const {
+    rooms,
+  } = props;
+  const { examId } = useParams();
+  return (
+    <>
+      <h1>
+        Rooms
+        <LinkButton
+          to={`/exams/${examId}/admin/rooms/edit`}
+          className="float-right"
+        >
+          <Icon I={BsPencilSquare} />
+          <span className="ml-2">
+            Edit
+          </span>
+        </LinkButton>
+      </h1>
+      {rooms.map((r) => (
+        <Form.Group key={r.id}>
+          <FormControl
+            size="lg"
+            value={r.name}
+            disabled
+          />
+        </Form.Group>
+      ))}
+    </>
+  );
+};
+
 
 const EditRoomName: React.FC<WrappedFieldProps> = (props) => {
   const { input } = props;
@@ -188,6 +260,7 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
     handleSubmit,
     initialValues,
   } = props;
+  const { refresh } = useContext(RefreshContext);
   const { examId } = useParams();
   const { alert } = useContext(AlertContext);
   const history = useHistory();
@@ -200,7 +273,8 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         const body = transformForSubmit(initialValues, values);
         updateAll(examId, body).then((res) => {
           if (res.created === false) throw new Error(res.reason);
-          history.push(`/exams/${examId}/admin`);
+          history.push(`/exams/${examId}/admin/rooms`);
+          refresh();
           alert({
             variant: 'success',
             message: 'Rooms saved successfully.',

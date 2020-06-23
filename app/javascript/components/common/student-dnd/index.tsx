@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import {
   Col,
@@ -224,6 +224,9 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   };
   const history = useHistory();
   const { alert } = useContext(AlertContext);
+  const cancel = useCallback(() => {
+    history.goBack();
+  }, [history]);
   return (
     <form
       onSubmit={handleSubmit(({ all }) => {
@@ -252,6 +255,32 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
       })}
     >
       <FormSection name="all">
+        <h1>
+          Edit Seating Assignments
+          <span className="float-right">
+            <Button
+              variant="danger"
+              className={pristine && 'd-none'}
+              onClick={reset}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="secondary"
+              className="ml-2"
+              onClick={cancel}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              className="ml-2"
+              type="submit"
+            >
+              Save
+            </Button>
+          </span>
+        </h1>
         <Form.Group>
           <h2>Unassigned Students</h2>
           <FieldArray name="unassigned" component={Students} />
@@ -264,23 +293,6 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               addSectionToRoom,
             }}
           />
-        </Form.Group>
-        <Form.Group>
-          <Button
-            variant="danger"
-            className={pristine && 'd-none'}
-            onClick={reset}
-          >
-            Reset
-          </Button>
-        </Form.Group>
-        <Form.Group>
-          <Button
-            variant="success"
-            type="submit"
-          >
-            Submit
-          </Button>
         </Form.Group>
       </FormSection>
     </form>
@@ -300,21 +312,18 @@ const Editable: React.FC<RoomAssignmentProps> = (props) => {
     rooms,
   } = props;
   return (
-    <>
-      <h1>Edit Seating Assignments</h1>
-      <Provider store={store}>
-        <FormContext.Provider value={{ sections }}>
-          <DNDForm
-            initialValues={{
-              all: {
-                unassigned,
-                rooms,
-              },
-            }}
-          />
-        </FormContext.Provider>
-      </Provider>
-    </>
+    <Provider store={store}>
+      <FormContext.Provider value={{ sections }}>
+        <DNDForm
+          initialValues={{
+            all: {
+              unassigned,
+              rooms,
+          },
+          }}
+        />
+      </FormContext.Provider>
+    </Provider>
   );
 };
 
@@ -327,7 +336,9 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
     <>
       <h1>
         Seating Assignments
-        <TabEditButton />
+        <span className="float-right">
+          <TabEditButton />
+        </span>
       </h1>
       <Form.Group>
         <h2>Unassigned Students</h2>

@@ -294,7 +294,6 @@ export const TabEditButton: React.FC = () => {
   return (
     <LinkButton
       to={`/exams/${examId}/admin/${tabName}/edit`}
-      className="float-right"
     >
       <Icon I={BsPencilSquare} />
       <span className="ml-2">

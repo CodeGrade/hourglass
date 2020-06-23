@@ -25,9 +25,9 @@ import {
 } from '@hourglass/common/api/professor/rooms';
 import { updateAll } from '@hourglass/common/api/professor/rooms/updateAll';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, Route, Switch } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import { useTabRefresher } from '@hourglass/workflows/professor/exams/admin';
+import { useTabRefresher, TabEditButton } from '@hourglass/workflows/professor/exams/admin';
 
 interface FormContextType {
   sections: Section[];
@@ -283,6 +283,105 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   );
 };
 
+interface RoomAssignmentProps {
+  sections: Section[];
+  unassigned: Student[];
+  rooms: Room[];
+}
+
+const Editable: React.FC<RoomAssignmentProps> = (props) => {
+  const {
+    sections,
+    unassigned,
+    rooms,
+  } = props;
+  return (
+    <Provider store={store}>
+      <FormContext.Provider value={{ sections }}>
+        <DNDForm
+          initialValues={{
+            all: {
+              unassigned,
+              rooms,
+            },
+          }}
+        />
+      </FormContext.Provider>
+    </Provider>
+  );
+};
+
+const Readonly: React.FC<RoomAssignmentProps> = (props) => {
+  const {
+    unassigned,
+    rooms,
+  } = props;
+  return (
+    <>
+      <h1>
+        Seating Assignments
+        <TabEditButton />
+      </h1>
+      <Form.Group>
+        <h2>Unassigned Students</h2>
+        <ul>
+          {unassigned.map((s) => (
+            <li key={s.id}>
+              {s.displayName}
+            </li>
+          ))}
+        </ul>
+      </Form.Group>
+      <Form.Group>
+        <Row>
+          {rooms.map((r) => (
+            <Col key={r.id}>
+              <h2>{r.name}</h2>
+              <ul>
+                {r.students.map((s) => (
+                  <li key={s.id}>
+                    {s.displayName}
+                  </li>
+                ))}
+              </ul>
+            </Col>
+          ))}
+        </Row>
+      </Form.Group>
+    </>
+  );
+};
+
+const Loaded: React.FC<RoomAssignmentProps> = (props) => {
+  const {
+    sections,
+    unassigned,
+    rooms,
+  } = props;
+  return (
+    <Row>
+      <Col>
+        <Switch>
+          <Route path="/exams/:examId/admin/seating/edit">
+            <Editable
+              sections={sections}
+              unassigned={unassigned}
+              rooms={rooms}
+            />
+          </Route>
+          <Route>
+            <Readonly
+              sections={sections}
+              unassigned={unassigned}
+              rooms={rooms}
+            />
+          </Route>
+        </Switch>
+      </Col>
+    </Row>
+  );
+};
+
 interface FormValues {
   all: {
     unassigned: Student[];
@@ -305,22 +404,11 @@ const AssignSeating: React.FC = () => {
       return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <Provider store={store}>
-          <FormContext.Provider
-            value={{
-              sections: response.response.sections,
-            }}
-          >
-            <DNDForm
-              initialValues={{
-                all: {
-                  unassigned: response.response.unassigned,
-                  rooms: response.response.rooms,
-                },
-              }}
-            />
-          </FormContext.Provider>
-        </Provider>
+        <Loaded
+          sections={response.response.sections}
+          unassigned={response.response.unassigned}
+          rooms={response.response.rooms}
+        />
       );
     default:
       throw new ExhaustiveSwitchError(response);

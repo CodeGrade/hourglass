@@ -25,7 +25,12 @@ import {
 } from '@hourglass/common/api/professor/rooms';
 import { updateAll } from '@hourglass/common/api/professor/rooms/updateAll';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { useHistory, useParams, Route, Switch } from 'react-router-dom';
+import {
+  useHistory,
+  useParams,
+  Route,
+  Switch,
+} from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import { useTabRefresher, TabEditButton } from '@hourglass/workflows/professor/exams/admin';
 
@@ -319,7 +324,7 @@ const Editable: React.FC<RoomAssignmentProps> = (props) => {
             all: {
               unassigned,
               rooms,
-          },
+            },
           }}
         />
       </FormContext.Provider>

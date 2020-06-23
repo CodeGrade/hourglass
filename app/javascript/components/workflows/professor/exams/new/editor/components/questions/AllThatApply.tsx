@@ -29,8 +29,7 @@ interface AllThatApplyProps {
 // TODO: add this upstream
 declare module 'redux-form' {
   interface FieldArrayFieldsProps<FieldValue> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    splice: (index: number, removeNum: number | null, value: any) => void;
+    splice: (index: number, removeNum: number | null, value: FieldValue) => void;
   }
 }
 

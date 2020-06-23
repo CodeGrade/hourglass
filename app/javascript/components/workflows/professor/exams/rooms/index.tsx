@@ -26,6 +26,7 @@ import {
 import { Provider } from 'react-redux';
 import store from '@professor/exams/rooms/store';
 import { AlertContext } from '@hourglass/common/alerts';
+import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
 
 const EditExamRooms: React.FC = () => {
   const { examId } = useParams();
@@ -46,7 +47,16 @@ export default EditExamRooms;
 
 function createInitialValues(rooms: Room[]): FormValues {
   return {
-    rooms: rooms.map(({ name, id }) => ({ name, id })),
+    rooms: rooms.map(({
+      name,
+      id,
+      students,
+      proctors,
+    }) => ({
+      name,
+      id,
+      numRegs: students.length + proctors.length,
+    })),
   };
 }
 
@@ -93,22 +103,24 @@ const renderRoom = (member: string, index: number, fields: FieldArrayFieldsProps
     key={index}
   >
     <li className="list-unstyled">
-      <Form.Group>
-        <InputGroup>
+      <Form.Group as={Row}>
+        <Col>
           <Field name="name" component={EditRoomName} />
-          <InputGroup.Append>
-            <Button
-              variant="danger"
-              onClick={() => fields.remove(index)}
-              // TODO: disabled={r.students.length !== 0}
-            >
-              <Icon I={FaTrash} />
-              <span className="ml-1">
-                Delete
-              </span>
-            </Button>
-          </InputGroup.Append>
-        </InputGroup>
+        </Col>
+        <div className="float-right">
+          <TooltipButton
+            variant="danger"
+            onClick={() => fields.remove(index)}
+            disabled={fields.get(index).numRegs !== 0}
+            disabledMessage="This room has registered users."
+            size="lg"
+          >
+            <Icon I={FaTrash} />
+            <span className="ml-1">
+              Delete
+            </span>
+          </TooltipButton>
+        </div>
       </Form.Group>
     </li>
   </FormSection>
@@ -121,6 +133,7 @@ const ShowRooms: React.FC<WrappedFieldArrayProps<FormRoom>> = (props) => {
   const addRoom = useCallback(() => {
     fields.push({
       name: '',
+      numRegs: 0,
     });
   }, [fields]);
   return (
@@ -237,6 +250,7 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
 interface FormRoom {
   id?: number;
   name: string;
+  numRegs: number;
 }
 
 interface FormValues {

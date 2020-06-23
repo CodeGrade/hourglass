@@ -22,7 +22,7 @@ export interface Student {
 export interface Room {
   id: number;
   name: string;
-  students: Student[];
+  proctors: Student[];
 }
 
 

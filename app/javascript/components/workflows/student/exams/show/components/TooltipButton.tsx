@@ -12,6 +12,7 @@ interface TooltipButtonProps {
   variant?: ButtonProps['variant'];
   className?: React.HTMLAttributes<HTMLButtonElement>['className'];
   cursorClass?: 'cursor-help' | 'cursor-not-allowed';
+  size?: ButtonProps['size'];
 }
 
 const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
@@ -24,6 +25,7 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
     children,
     className,
     cursorClass = 'cursor-help',
+    size,
   } = props;
   return (
     <Tooltip
@@ -39,6 +41,7 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
           onClick={onClick}
           disabled={disabled}
           className={`${className} ${disabled ? 'pointer-events-none' : ''}`}
+          size={size}
         >
           {children}
         </Button>

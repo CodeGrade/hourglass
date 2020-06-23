@@ -176,7 +176,7 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
                 ))}
               </DropdownButton>
               <FieldArray
-                name="students"
+                name="proctors"
                 component={Students}
               />
             </FormSection>
@@ -201,18 +201,18 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         !section.students.find((student) => student.id === unassignedStudent.id)
       )),
       rooms: rooms.map((room: Room) => {
-        const filtered = room.students.filter((roomStudent) => (
+        const filtered = room.proctors.filter((roomStudent) => (
           !section.students.find((student) => student.id === roomStudent.id)
         ));
         if (room.id === roomId) {
           return {
             ...room,
-            students: filtered.concat(section.students),
+            proctors: filtered.concat(section.students),
           };
         }
         return {
           ...room,
-          students: filtered,
+          proctors: filtered,
         };
       }),
     }));
@@ -224,7 +224,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
       onSubmit={handleSubmit(({ all }) => {
         const rooms = {};
         all.rooms.forEach((room) => {
-          rooms[room.id] = room.students.map((s) => s.id);
+          rooms[room.id] = room.proctors.map((s) => s.id);
         });
         const body = {
           unassigned: all.unassigned.map((s) => s.id),

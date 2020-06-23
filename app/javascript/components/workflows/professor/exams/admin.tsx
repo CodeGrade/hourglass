@@ -126,7 +126,7 @@ export const ExamAdmin: React.FC = () => {
             examName={response.response.name}
             refresh={refresh}
           />
-          <ProctoringInfo examId={examId} checklist={response.response.checklist} />
+          <ProctoringInfo refresh={refresh} examId={examId} checklist={response.response.checklist} />
         </>
       );
     default:
@@ -169,10 +169,12 @@ const ChecklistIcon: React.FC<{
 };
 
 const ProctoringInfo: React.FC<{
+  refresh: () => void;
   examId: number;
   checklist: Checklist;
 }> = (props) => {
   const {
+    refresh,
     examId,
     checklist,
   } = props;
@@ -180,7 +182,7 @@ const ProctoringInfo: React.FC<{
     <>
       <Switch>
         <Route path="/exams/:examId/admin/:tabName">
-          <ProctoringChecklist checklist={checklist} />
+          <ProctoringChecklist refresh={refresh} checklist={checklist} />
         </Route>
         <Route>
           <Redirect to={`/exams/${examId}/admin/rooms`} />
@@ -191,13 +193,17 @@ const ProctoringInfo: React.FC<{
 };
 
 const ProctoringChecklist: React.FC<{
+  refresh: () => void;
   checklist: Checklist;
 }> = (props) => {
   const {
+    refresh,
     checklist,
   } = props;
   const history = useHistory();
   const { examId, tabName } = useParams();
+  const location = useLocation();
+  useEffect(refresh, [location.pathname]);
   return (
     <>
       <h2>Proctoring Checklist</h2>

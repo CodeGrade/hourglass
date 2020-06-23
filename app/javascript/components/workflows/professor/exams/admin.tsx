@@ -3,6 +3,7 @@ import React, {
   useEffect,
   useContext,
   createRef,
+  useCallback,
 } from 'react';
 import {
   Switch,
@@ -71,8 +72,6 @@ import { GiOpenBook } from 'react-icons/gi';
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
   const [refresher, refresh] = useRefresher();
-  const history = useHistory();
-  const { alert } = useContext(AlertContext);
   const response = examsShow(examId, [refresher]);
   switch (response.type) {
     case 'ERROR':
@@ -87,53 +86,72 @@ export const ExamAdmin: React.FC = () => {
       return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <>
-          <Switch>
-            <Route path="/exams/:examId/admin/edit">
-              <ExamInfoEditor
-                response={response.response}
-                onCancel={(): void => {
-                  history.push(`/exams/${examId}/admin`);
-                }}
-                onSubmit={(info) => {
-                  updateExam(examId, info)
-                    .then((res) => {
-                      if (res.updated === true) {
-                        history.push(`/exams/${examId}/admin`);
-                        alert({
-                          variant: 'success',
-                          message: 'Exam info saved.',
-                        });
-                        refresh();
-                      } else {
-                        throw new Error(res.reason);
-                      }
-                    }).catch((err) => {
-                      alert({
-                        variant: 'danger',
-                        title: 'Error saving exam info.',
-                        message: err.message,
-                      });
-                    });
-                }}
-              />
-            </Route>
-            <Route path="/exams/:examId/admin">
-              <ExamInfoViewer response={response.response} />
-            </Route>
-          </Switch>
-          <TabbedChecklist
-            refresh={refresh}
-            examId={examId}
-            checklist={response.response.checklist}
-            versions={response.response.versions}
-            examName={response.response.name}
-          />
-        </>
+        <Loaded
+          refresh={refresh}
+          response={response.response}
+        />
       );
     default:
       throw new ExhaustiveSwitchError(response);
   }
+};
+
+const Loaded: React.FC<{
+  refresh: () => void;
+  response: ShowResponse;
+}> = (props) => {
+  const {
+    refresh,
+    response,
+  } = props;
+  const { examId } = useParams();
+  const history = useHistory();
+  const { alert } = useContext(AlertContext);
+  const [editing, setEditing] = useState(false);
+  const flipEditing = useCallback(() => setEditing((e) => !e), []);
+  return (
+    <>
+      {editing ? (
+        <ExamInfoEditor
+          response={response}
+          onCancel={flipEditing}
+          onSubmit={(info) => {
+            updateExam(examId, info)
+              .then((res) => {
+                if (res.updated === true) {
+                  setEditing(false);
+                  alert({
+                    variant: 'success',
+                    message: 'Exam info saved.',
+                  });
+                  refresh();
+                } else {
+                  throw new Error(res.reason);
+                }
+              }).catch((err) => {
+                alert({
+                  variant: 'danger',
+                  title: 'Error saving exam info.',
+                  message: err.message,
+                });
+              });
+          }}
+        />
+      ) : (
+        <ExamInfoViewer
+          onEdit={flipEditing}
+          response={response}
+        />
+      )}
+      <TabbedChecklist
+        refresh={refresh}
+        examId={examId}
+        checklist={response.checklist}
+        versions={response.versions}
+        examName={response.name}
+      />
+    </>
+  );
 };
 
 const ChecklistIcon: React.FC<{
@@ -185,21 +203,19 @@ const TabbedChecklist: React.FC<{
     versions,
   } = props;
   return (
-    <>
-      <Switch>
-        <Route path="/exams/:examId/admin/:tabName">
-          <PreFlightChecklist
-            refresh={refresh}
-            checklist={checklist}
-            examName={examName}
-            versions={versions}
-          />
-        </Route>
-        <Route>
-          <Redirect to={`/exams/${examId}/admin/rooms`} />
-        </Route>
-      </Switch>
-    </>
+    <Switch>
+      <Route path="/exams/:examId/admin/:tabName">
+        <PreFlightChecklist
+          refresh={refresh}
+          checklist={checklist}
+          examName={examName}
+          versions={versions}
+        />
+      </Route>
+      <Route>
+        <Redirect to={`/exams/${examId}/admin/edit-versions`} />
+      </Route>
+    </Switch>
   );
 };
 
@@ -356,12 +372,14 @@ export function useTabRefresher(currentTab: string): [number, () => void] {
 }
 
 const ExamInfoViewer: React.FC<{
+  onEdit: () => void;
   response: ShowResponse;
 }> = (props) => {
   const {
     examId,
   } = useParams();
   const {
+    onEdit,
     response,
   } = props;
   const {
@@ -381,9 +399,12 @@ const ExamInfoViewer: React.FC<{
         <ReadableDate value={end} showTime />
       </p>
       <p>{`Duration: ${duration / 60.0} minutes`}</p>
-      <LinkButton to={`/exams/${examId}/admin/edit`}>
+      <Button
+        variant="primary"
+        onClick={onEdit}
+      >
         Edit
-      </LinkButton>
+      </Button>
     </>
   );
 };

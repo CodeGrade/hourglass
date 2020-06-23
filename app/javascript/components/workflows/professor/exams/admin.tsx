@@ -66,6 +66,7 @@ import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
 import ErrorBoundary from '@hourglass/common/boundary';
 import { BsPencilSquare } from 'react-icons/bs';
+import { GiOpenBook } from 'react-icons/gi';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -121,12 +122,13 @@ export const ExamAdmin: React.FC = () => {
               <ExamInfoViewer response={response.response} />
             </Route>
           </Switch>
-          <VersionInfo
+          <TabbedChecklist
+            refresh={refresh}
+            examId={examId}
+            checklist={response.response.checklist}
             versions={response.response.versions}
             examName={response.response.name}
-            refresh={refresh}
           />
-          <ProctoringInfo refresh={refresh} examId={examId} checklist={response.response.checklist} />
         </>
       );
     default:
@@ -168,21 +170,30 @@ const ChecklistIcon: React.FC<{
   );
 };
 
-const ProctoringInfo: React.FC<{
+const TabbedChecklist: React.FC<{
   refresh: () => void;
   examId: number;
   checklist: Checklist;
+  examName: string;
+  versions: Version[];
 }> = (props) => {
   const {
     refresh,
     examId,
     checklist,
+    examName,
+    versions,
   } = props;
   return (
     <>
       <Switch>
         <Route path="/exams/:examId/admin/:tabName">
-          <ProctoringChecklist refresh={refresh} checklist={checklist} />
+          <PreFlightChecklist
+            refresh={refresh}
+            checklist={checklist}
+            examName={examName}
+            versions={versions}
+          />
         </Route>
         <Route>
           <Redirect to={`/exams/${examId}/admin/rooms`} />
@@ -192,13 +203,17 @@ const ProctoringInfo: React.FC<{
   );
 };
 
-const ProctoringChecklist: React.FC<{
+const PreFlightChecklist: React.FC<{
   refresh: () => void;
   checklist: Checklist;
+  examName: string;
+  versions: Version[];
 }> = (props) => {
   const {
     refresh,
     checklist,
+    examName,
+    versions,
   } = props;
   const history = useHistory();
   const { examId, tabName } = useParams();
@@ -206,12 +221,23 @@ const ProctoringChecklist: React.FC<{
   useEffect(refresh, [location.pathname]);
   return (
     <>
-      <h2>Proctoring Checklist</h2>
+      <h2>Pre-flight Checklist</h2>
       <Tab.Container activeKey={tabName}>
         <Nav
           variant="tabs"
           activeKey={tabName}
         >
+          <Nav.Item>
+            <Nav.Link
+              eventKey="edit-versions"
+              onClick={() => history.push(`/exams/${examId}/admin/edit-versions`)}
+            >
+              <Icon I={GiOpenBook} />
+              <span className="ml-2">
+                Edit versions
+              </span>
+            </Nav.Link>
+          </Nav.Item>
           <Nav.Item>
             <Nav.Link
               eventKey="rooms"
@@ -270,6 +296,15 @@ const ProctoringChecklist: React.FC<{
           </Nav.Item>
         </Nav>
         <Tab.Content className="border border-top-0 rounded-bottom p-2">
+          <Tab.Pane eventKey="edit-versions">
+            <ErrorBoundary>
+              <VersionInfo
+                refresh={refresh}
+                examName={examName}
+                versions={versions}
+              />
+            </ErrorBoundary>
+          </Tab.Pane>
           <Tab.Pane eventKey="rooms">
             <ErrorBoundary>
               <EditExamRooms />
@@ -463,7 +498,7 @@ const VersionInfo: React.FC<{
   const fileInputRef = createRef<HTMLInputElement>();
   return (
     <>
-      <h2>
+      <h1>
         Versions
         <div className="float-right">
           <input
@@ -515,7 +550,7 @@ const VersionInfo: React.FC<{
             New Version
           </Button>
         </div>
-      </h2>
+      </h1>
       <ul>
         {versions.map((v) => (
           <li key={v.id}>

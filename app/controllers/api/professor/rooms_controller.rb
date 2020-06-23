@@ -106,7 +106,12 @@ module Api
       def update_all_staff
         body = params.permit(unassigned: [], rooms: {}, proctors: [])
         ProctorRegistration.transaction do
-          # TODO: what to do with staff who get dragged to unassigned?
+          body[:unassigned].each do |id|
+            proctor_reg = @exam.proctor_registrations.find_by(user_id: id)
+            next unless proctor_reg
+
+            proctor_reg.destroy!
+          end
           body[:proctors].each do |id|
             proctor_reg = @exam.proctor_registrations.find_or_initialize_by(user_id: id)
             proctor_reg.room_id = nil

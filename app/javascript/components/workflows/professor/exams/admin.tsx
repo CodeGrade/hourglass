@@ -307,7 +307,7 @@ const PreFlightChecklist: React.FC<{
             </Nav.Link>
           </Nav.Item>
         </Nav>
-        <Tab.Content className="border border-top-0 rounded-bottom p-2">
+        <Tab.Content className="border border-top-0 rounded-bottom p-3">
           <Tab.Pane eventKey="edit-versions">
             <ErrorBoundary>
               <VersionInfo
@@ -381,24 +381,33 @@ const ExamInfoViewer: React.FC<{
     duration,
   } = response;
   return (
-    <>
-      <h1>{response.name}</h1>
-      <p>
-        Starts&nbsp;
-        <ReadableDate value={start} showTime />
-      </p>
-      <p>
-        Ends&nbsp;
-        <ReadableDate value={end} showTime />
-      </p>
-      <p>{`Duration: ${duration / 60.0} minutes`}</p>
-      <Button
-        variant="primary"
-        onClick={onEdit}
-      >
-        Edit
-      </Button>
-    </>
+    <Card className="mb-4">
+      <Card.Body>
+        <h1>
+          {response.name}
+          <span className="float-right">
+            <Button
+              variant="primary"
+              onClick={onEdit}
+            >
+              Edit
+            </Button>
+          </span>
+        </h1>
+        <Row>
+          <Form.Label column sm={2}>Starts:</Form.Label>
+          <ReadableDate value={start} showTime />
+        </Row>
+        <Row>
+          <Form.Label column sm={2}>Ends:</Form.Label>
+          <ReadableDate value={end} showTime />
+        </Row>
+        <Row>
+          <Form.Label column sm={2}>Duration:</Form.Label>
+          {`${duration / 60.0} minutes`}
+        </Row>
+      </Card.Body>
+    </Card>
   );
 };
 
@@ -422,22 +431,46 @@ export const ExamInfoEditor: React.FC<{
   const [duration, setDuration] = useState(response?.duration ?? NINETY_MINUTES);
 
   return (
-    <Card>
+    <Card className="mb-4">
       <Card.Body>
         <Form.Group as={Row} controlId="examTitle">
-          <Form.Label column sm={2}>Exam name:</Form.Label>
-          <Col sm={10}>
+          <Form.Label column sm={2}>
+            Exam name:
+          </Form.Label>
+          <Col>
             <Form.Control
               type="input"
               value={name}
               onChange={(e): void => setName(e.target.value)}
             />
           </Col>
+          <span className="float-right">
+            <Button
+              variant="danger"
+              onClick={(): void => onCancel()}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="success"
+              className="ml-2"
+              onClick={(): void => {
+                onSubmit({
+                  name,
+                  duration,
+                  start,
+                  end,
+                });
+              }}
+            >
+              Save
+            </Button>
+          </span>
         </Form.Group>
         <Form.Group as={Row} controlId="examStartTime">
           <Form.Label column sm={2}>Start time:</Form.Label>
-          <Col sm={10}>
-            <p>{start}</p>
+          <Col>
+            {/* <p>{start}</p> */}
             <DateTimePicker
               maxIsoValue={end}
               isoValue={start}
@@ -450,8 +483,8 @@ export const ExamInfoEditor: React.FC<{
         </Form.Group>
         <Form.Group as={Row} controlId="examEndTime">
           <Form.Label column sm={2}>End time:</Form.Label>
-          <Col sm={10}>
-            <p>{end}</p>
+          <Col>
+            {/* <p>{end}</p> */}
             <DateTimePicker
               isoValue={end}
               minIsoValue={start}
@@ -461,35 +494,13 @@ export const ExamInfoEditor: React.FC<{
         </Form.Group>
         <Form.Group as={Row} controlId="examDuration">
           <Form.Label column sm={2}>Duration (minutes):</Form.Label>
-          <Col sm={10}>
+          <Col>
             <Form.Control
               type="number"
               value={duration / 60.0}
               onChange={(e): void => setDuration(Number(e.target.value) * 60)}
             />
           </Col>
-        </Form.Group>
-        <Form.Group className="float-right">
-          <Button
-            variant="danger"
-            onClick={(): void => onCancel()}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="success"
-            className="ml-2"
-            onClick={(): void => {
-              onSubmit({
-                name,
-                duration,
-                start,
-                end,
-              });
-            }}
-          >
-            Save
-          </Button>
         </Form.Group>
       </Card.Body>
     </Card>

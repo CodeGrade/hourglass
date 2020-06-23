@@ -390,7 +390,8 @@ const ExamInfoViewer: React.FC<{
               variant="primary"
               onClick={onEdit}
             >
-              Edit
+              <Icon I={BsPencilSquare} />
+              <span className="ml-2">Edit</span>
             </Button>
           </span>
         </h1>

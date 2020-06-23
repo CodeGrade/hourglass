@@ -7,7 +7,6 @@ import {
   Button,
   Form,
   FormControl,
-  InputGroup,
   Row,
   Col,
 } from 'react-bootstrap';

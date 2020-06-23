@@ -2,11 +2,11 @@
 
 FactoryBot.define do
   factory :proctor_registration do
-    transient do
-      exam { build(:exam) }
-    end
-
     user
-    room { create(:room, exam: exam) }
+    exam
+
+    trait :in_room do
+      room { create(:room, exam: exam) }
+    end
   end
 end

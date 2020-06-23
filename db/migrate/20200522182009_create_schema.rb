@@ -119,9 +119,11 @@ class CreateSchema < ActiveRecord::Migration[6.0]
 
     create_table :proctor_registrations do |t|
       t.references :user, null: false, foreign_key: true
-      t.references :room, null: false, foreign_key: true
-      t.index [:room_id, :user_id], unique: true
-      t.index [:user_id, :room_id], unique: true
+      t.references :exam, null: false, foreign_key: true
+      t.references :room, foreign_key: true
+
+      t.index [:exam_id, :user_id], unique: true
+      t.index [:user_id, :exam_id], unique: true
 
       t.timestamps
     end

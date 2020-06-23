@@ -78,12 +78,14 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
 
   create_table "proctor_registrations", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "room_id", null: false
+    t.bigint "exam_id", null: false
+    t.bigint "room_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["room_id", "user_id"], name: "index_proctor_registrations_on_room_id_and_user_id", unique: true
+    t.index ["exam_id", "user_id"], name: "index_proctor_registrations_on_exam_id_and_user_id", unique: true
+    t.index ["exam_id"], name: "index_proctor_registrations_on_exam_id"
     t.index ["room_id"], name: "index_proctor_registrations_on_room_id"
-    t.index ["user_id", "room_id"], name: "index_proctor_registrations_on_user_id_and_room_id", unique: true
+    t.index ["user_id", "exam_id"], name: "index_proctor_registrations_on_user_id_and_exam_id", unique: true
     t.index ["user_id"], name: "index_proctor_registrations_on_user_id"
   end
 
@@ -212,6 +214,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   add_foreign_key "messages", "exams"
   add_foreign_key "messages", "users", column: "recipient_id"
   add_foreign_key "messages", "users", column: "sender_id"
+  add_foreign_key "proctor_registrations", "exams"
   add_foreign_key "proctor_registrations", "rooms"
   add_foreign_key "proctor_registrations", "users"
   add_foreign_key "professor_course_registrations", "courses"

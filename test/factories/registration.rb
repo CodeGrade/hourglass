@@ -7,8 +7,11 @@ FactoryBot.define do
     end
 
     user
-    room { create(:room, exam: exam) }
     exam_version { create(:exam_version, exam: exam) }
+
+    trait :in_room do
+      room { create(:room, exam: exam) }
+    end
 
     # Student starts at the start of their window
     trait :early_start do

@@ -12,9 +12,11 @@ namespace :db do
 end
 
 def make_sample_data
-  create(:admin, username: 'admin')
-  make_cs2500
-  make_cs3500
+  ActiveRecord::Base.transaction do
+    create(:admin, username: 'admin')
+    make_cs2500
+    make_cs3500
+  end
 end
 
 def make_cs2500
@@ -40,7 +42,7 @@ def make_cs2500
 
   cs2500proctor = create(:user, username: 'cs2500proctor')
   create(:staff_registration, user: cs2500proctor, section: cs2500lec)
-  create(:proctor_registration, user: cs2500proctor, room: cs2500_room1)
+  create(:proctor_registration, user: cs2500proctor, exam: cs2500midterm, room: cs2500_room1)
 
   cs2500student = create(:user, username: 'cs2500student')
   create(:student_registration, user: cs2500student, section: cs2500lec)
@@ -77,7 +79,7 @@ def make_cs3500
 
   cs3500proctor = create(:user, username: 'cs3500proctor')
   create(:staff_registration, user: cs3500proctor, section: cs3500lec)
-  create(:proctor_registration, user: cs3500proctor, room: cs3500_room1)
+  create(:proctor_registration, user: cs3500proctor, exam: cs3500final, room: cs3500_room1)
 
   cs3500student = create(:user, username: 'cs3500student')
   create(:student_registration, user: cs3500student, section: cs3500lec)

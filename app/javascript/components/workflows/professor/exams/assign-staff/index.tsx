@@ -336,7 +336,6 @@ const Editable: React.FC<StaffAssignmentProps> = (props) => {
 
 const Readonly: React.FC<StaffAssignmentProps> = (props) => {
   const {
-    sections,
     unassigned,
     proctors,
     rooms,

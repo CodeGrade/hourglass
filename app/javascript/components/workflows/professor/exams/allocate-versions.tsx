@@ -25,9 +25,9 @@ import {
 } from '@hourglass/common/api/professor/exams/versions';
 import { updateAll } from '@hourglass/common/api/professor/exams/versions/updateAll';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, Switch, Route } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import { useTabRefresher } from './admin';
+import { useTabRefresher, TabEditButton } from './admin';
 
 interface FormContextType {
   sections: Section[];
@@ -233,7 +233,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         };
         updateAll(examId, body).then((result) => {
           if (result.created === false) throw new Error(result.reason);
-          history.push(`/exams/${examId}/admin`);
+          history.push(`/exams/${examId}/admin/versions`);
           alert({
             variant: 'success',
             message: 'Versions successfully allocated.',
@@ -283,6 +283,105 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   );
 };
 
+interface VersionAssignmentProps {
+  sections: Section[];
+  unassigned: Student[];
+  versions: Version[];
+}
+
+const Editable: React.FC<VersionAssignmentProps> = (props) => {
+  const {
+    sections,
+    unassigned,
+    versions,
+  } = props;
+  return (
+    <Provider store={store}>
+      <FormContext.Provider value={{ sections }}>
+        <DNDForm
+          initialValues={{
+            all: {
+              unassigned,
+              versions,
+          },
+          }}
+        />
+      </FormContext.Provider>
+    </Provider>
+  );
+};
+
+const Readonly: React.FC<VersionAssignmentProps> = (props) => {
+  const {
+    unassigned,
+    versions,
+  } = props;
+  return (
+    <>
+      <h1>
+        Version Allocation
+        <TabEditButton />
+      </h1>
+      <Form.Group>
+        <h2>Unassigned Students</h2>
+        <ul>
+          {unassigned.map((s) => (
+            <li key={s.id}>
+              {s.displayName}
+            </li>
+          ))}
+        </ul>
+      </Form.Group>
+      <Form.Group>
+        <Row>
+          {versions.map((v) => (
+            <Col key={v.id}>
+              <h2>{v.name}</h2>
+              <ul>
+                {v.students.map((s) => (
+                  <li key={s.id}>
+                    {s.displayName}
+                  </li>
+                ))}
+              </ul>
+            </Col>
+          ))}
+        </Row>
+      </Form.Group>
+    </>
+  );
+};
+
+const Loaded: React.FC<VersionAssignmentProps> = (props) => {
+  const {
+    sections,
+    unassigned,
+    versions,
+  } = props;
+  return (
+    <Row>
+      <Col>
+        <Switch>
+          <Route path="/exams/:examId/admin/versions/edit">
+            <Editable
+              sections={sections}
+              unassigned={unassigned}
+              versions={versions}
+            />
+          </Route>
+          <Route>
+            <Readonly
+              unassigned={unassigned}
+              versions={versions}
+              sections={sections}
+            />
+          </Route>
+        </Switch>
+      </Col>
+    </Row>
+  );
+};
+
 interface FormValues {
   all: {
     unassigned: Student[];
@@ -305,22 +404,11 @@ const DND: React.FC = () => {
       return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <Provider store={store}>
-          <FormContext.Provider
-            value={{
-              sections: response.response.sections,
-            }}
-          >
-            <DNDForm
-              initialValues={{
-                all: {
-                  unassigned: response.response.unassigned,
-                  versions: response.response.versions,
-                },
-              }}
-            />
-          </FormContext.Provider>
-        </Provider>
+        <Loaded
+          sections={response.response.sections}
+          unassigned={response.response.unassigned}
+          versions={response.response.versions}
+        />
       );
     default:
       throw new ExhaustiveSwitchError(response);

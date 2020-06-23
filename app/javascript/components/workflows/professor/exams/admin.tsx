@@ -264,16 +264,24 @@ const ProctoringChecklist: React.FC<{
         </Nav>
         <Tab.Content>
           <Tab.Pane eventKey="rooms">
-            <EditExamRooms />
+            <ErrorBoundary>
+              <EditExamRooms />
+            </ErrorBoundary>
           </Tab.Pane>
           <Tab.Pane eventKey="staff">
-            <AssignStaff />
+            <ErrorBoundary>
+              <AssignStaff />
+            </ErrorBoundary>
           </Tab.Pane>
           <Tab.Pane eventKey="versions">
-            <AllocateVersions />
+            <ErrorBoundary>
+              <AllocateVersions />
+            </ErrorBoundary>
           </Tab.Pane>
           <Tab.Pane eventKey="seating">
-            <StudentDND />
+            <ErrorBoundary>
+              <StudentDND />
+            </ErrorBoundary>
           </Tab.Pane>
         </Tab.Content>
       </Tab.Container>
@@ -301,7 +309,6 @@ export function useTabRefresher(currentTab: string): [number, () => void] {
   const location = useLocation();
   const { tabName } = useParams();
   useEffect(() => {
-    console.log('tn', tabName);
     if (tabName === currentTab) refresh();
   }, [tabName, location.pathname]);
   return [refresher, refresh];

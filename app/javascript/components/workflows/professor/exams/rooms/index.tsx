@@ -112,12 +112,12 @@ const Readonly: React.FC<{
   } = props;
   return (
     <>
-      <h1>
+      <h2>
         Rooms
         <span className="float-right">
           <TabEditButton />
         </span>
-      </h1>
+      </h2>
       {rooms.map((r) => (
         <Form.Group key={r.id}>
           <FormControl
@@ -266,7 +266,7 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         });
       })}
     >
-      <h1>
+      <h2>
         Edit Rooms
         <span className="float-right">
           <Button
@@ -291,7 +291,7 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
             Save
           </Button>
         </span>
-      </h1>
+      </h2>
       <FieldArray name="rooms" component={ShowRooms} />
     </form>
   );

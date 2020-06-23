@@ -158,13 +158,13 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
   } = props;
   const { sections } = useContext(FormContext);
   return (
-    <Row>
+    <>
       {fields.map((member, index) => {
         const room = fields.get(index);
         return (
-          <Col key={room.id}>
+          <Form.Group key={room.id}>
             <FormSection name={member}>
-              <h2>
+              <h3>
                 {room.name}
                 <span className="float-right">
                   <DropdownButton
@@ -185,16 +185,16 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
                     ))}
                   </DropdownButton>
                 </span>
-              </h2>
+              </h3>
               <FieldArray
                 name="proctors"
                 component={Students}
               />
             </FormSection>
-          </Col>
+          </Form.Group>
         );
       })}
-    </Row>
+    </>
   );
 };
 
@@ -262,7 +262,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
       })}
     >
       <FormSection name="all">
-        <h1>
+        <h2>
           Edit Staff Registrations
           <span className="float-right">
             <Button
@@ -287,13 +287,13 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               Save
             </Button>
           </span>
-        </h1>
+        </h2>
         <Form.Group>
-          <h2>Unassigned Staff</h2>
+          <h3>Unassigned Staff</h3>
           <FieldArray name="unassigned" component={Students} />
         </Form.Group>
         <Form.Group>
-          <h2>Proctors Without Rooms</h2>
+          <h3>Proctors Without Rooms</h3>
           <FieldArray name="proctors" component={Students} />
         </Form.Group>
         <Form.Group>
@@ -361,14 +361,14 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
   } = props;
   return (
     <>
-      <h1>
+      <h2>
         Staff Registrations
         <span className="float-right">
           <TabEditButton />
         </span>
-      </h1>
+      </h2>
       <Form.Group>
-        <h2>Unassigned Staff</h2>
+        <h3>Unassigned Staff</h3>
         <div className="border px-2 flex-fill rounded">
           <ul className="list-unstyled column-count-4">
             {unassigned.map((s) => (
@@ -380,7 +380,7 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
         </div>
       </Form.Group>
       <Form.Group>
-        <h2>Proctors Without Rooms</h2>
+        <h3>Proctors Without Rooms</h3>
         <div className="border px-2 flex-fill rounded">
           <ul className="list-unstyled column-count-4">
             {proctors.map((s) => (
@@ -391,24 +391,24 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
           </ul>
         </div>
       </Form.Group>
-      <Form.Group>
-        <Row>
-          {rooms.map((r) => (
-            <Col key={r.id}>
-              <h2>{r.name}</h2>
-              <div className="border px-2 flex-fill rounded">
-                <ul className="list-unstyled column-count-4">
-                  {r.proctors.map((p) => (
-                    <li key={p.id} className="fixed-col-width">
-                      <span>{p.displayName}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Col>
-          ))}
-        </Row>
-      </Form.Group>
+      {rooms.map((r) => (
+        <Form.Group key={r.id}>
+          <h3>{r.name}</h3>
+          <div className="border px-2 flex-fill rounded">
+            {r.proctors.length === 0 ? (
+              <p>No proctors</p>
+            ) : (
+              <ul className="list-unstyled column-count-4">
+                {r.proctors.map((p) => (
+                  <li key={p.id} className="fixed-col-width">
+                    <span>{p.displayName}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </Form.Group>
+      ))}
     </>
   );
 };

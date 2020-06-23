@@ -233,7 +233,7 @@ const PreFlightChecklist: React.FC<{
   useEffect(refresh, [location.pathname]);
   return (
     <>
-      <h2>Pre-flight Checklist</h2>
+      <h1>Pre-flight Checklist</h1>
       <Tab.Container activeKey={tabName}>
         <Nav
           variant="tabs"
@@ -523,7 +523,7 @@ const VersionInfo: React.FC<{
   const fileInputRef = createRef<HTMLInputElement>();
   return (
     <>
-      <h1>
+      <h2>
         Versions
         <div className="float-right">
           <input
@@ -575,7 +575,7 @@ const VersionInfo: React.FC<{
             New Version
           </Button>
         </div>
-      </h1>
+      </h2>
       <ul>
         {versions.map((v) => (
           <li key={v.id}>

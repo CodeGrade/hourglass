@@ -127,7 +127,7 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
       >
         Drop students here!
       </p>
-      <ul className="list-unstyled column-count-4">
+      <ul className="list-unstyled column-count-4 w-100">
         {fields.map((member, index) => {
           const student = fields.get(index);
           return (
@@ -164,7 +164,7 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
         return (
           <Form.Group key={room.id}>
             <FormSection name={member}>
-              <h2>
+              <h3>
                 {room.name}
                 <span className="float-right">
                   <DropdownButton
@@ -185,7 +185,7 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
                     ))}
                   </DropdownButton>
                 </span>
-              </h2>
+              </h3>
               <FieldArray
                 name="students"
                 component={Students}
@@ -261,7 +261,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
       })}
     >
       <FormSection name="all">
-        <h1>
+        <h2>
           Edit Seating Assignments
           <span className="float-right">
             <Button
@@ -286,9 +286,9 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               Save
             </Button>
           </span>
-        </h1>
+        </h2>
         <Form.Group>
-          <h2>Unassigned Students</h2>
+          <h3>Unassigned Students</h3>
           <FieldArray name="unassigned" component={Students} />
         </Form.Group>
         <Form.Group>
@@ -340,14 +340,14 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
   } = props;
   return (
     <>
-      <h1>
+      <h2>
         Seating Assignments
         <span className="float-right">
           <TabEditButton />
         </span>
-      </h1>
+      </h2>
       <Form.Group>
-        <h2>Unassigned Students</h2>
+        <h3>Unassigned Students</h3>
         <div className="border px-2 flex-fill rounded">
           <ul className="list-unstyled column-count-4">
             {unassigned.map((s) => (
@@ -360,16 +360,19 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
       </Form.Group>
       {rooms.map((r) => (
         <Form.Group key={r.id}>
-          <h2>{r.name}</h2>
-          {r.students.length === 0 && <p>No students.</p>}
+          <h3>{r.name}</h3>
           <div className="border px-2 flex-fill rounded">
-            <ul className="list-unstyled column-count-4">
-              {r.students.map((s) => (
-                <li key={s.id} className="fixed-col-width">
-                  <span>{s.displayName}</span>
-                </li>
-              ))}
-            </ul>
+            {r.students.length === 0 ? (
+              <p>No students</p>
+            ) : (
+              <ul className="list-unstyled column-count-4">
+                {r.students.map((s) => (
+                  <li key={s.id} className="fixed-col-width">
+                    <span>{s.displayName}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </Form.Group>
       ))}

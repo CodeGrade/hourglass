@@ -127,7 +127,7 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
       >
         Drop students here!
       </p>
-      <ul className="list-unstyled column-count-4">
+      <ul className="list-unstyled column-count-4 w-100">
         {fields.map((member, index) => {
           const student = fields.get(index);
           return (
@@ -158,13 +158,13 @@ const Versions: React.FC<WrappedFieldArrayProps<Version> & VersionsProps> = (pro
   } = props;
   const { sections } = useContext(FormContext);
   return (
-    <Row>
+    <>
       {fields.map((member, index) => {
         const room = fields.get(index);
         return (
-          <Col key={room.id}>
+          <Form.Group key={room.id}>
             <FormSection name={member}>
-              <h2>
+              <h3>
                 {room.name}
                 <span className="float-right">
                   <DropdownButton
@@ -185,16 +185,16 @@ const Versions: React.FC<WrappedFieldArrayProps<Version> & VersionsProps> = (pro
                     ))}
                   </DropdownButton>
                 </span>
-              </h2>
+              </h3>
               <FieldArray
                 name="students"
                 component={Students}
               />
             </FormSection>
-          </Col>
+          </Form.Group>
         );
       })}
-    </Row>
+    </>
   );
 };
 
@@ -261,7 +261,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
       })}
     >
       <FormSection name="all">
-        <h1>
+        <h2>
           Edit Version Allocations
           <span className="float-right">
             <Button
@@ -286,9 +286,9 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               Save
             </Button>
           </span>
-        </h1>
+        </h2>
         <Form.Group>
-          <h2>Unassigned Students</h2>
+          <h3>Unassigned Students</h3>
           <FieldArray name="unassigned" component={Students} />
         </Form.Group>
         <Form.Group>
@@ -340,14 +340,14 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
   } = props;
   return (
     <>
-      <h1>
+      <h2>
         Version Allocations
         <span className="float-right">
           <TabEditButton />
         </span>
-      </h1>
+      </h2>
       <Form.Group>
-        <h2>Unassigned Students</h2>
+        <h3>Unassigned Students</h3>
         <div className="border px-2 flex-fill rounded">
           <ul className="list-unstyled column-count-4">
             {unassigned.map((s) => (
@@ -358,24 +358,24 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
           </ul>
         </div>
       </Form.Group>
-      <Form.Group>
-        <Row>
-          {versions.map((v) => (
-            <Col key={v.id}>
-              <h2>{v.name}</h2>
-              <div className="border px-2 flex-fill rounded">
-                <ul className="list-unstyled column-count-4">
-                  {v.students.map((s) => (
-                    <li key={s.id} className="fixed-col-width">
-                      <span>{s.displayName}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Col>
-          ))}
-        </Row>
-      </Form.Group>
+      {versions.map((v) => (
+        <Form.Group key={v.id}>
+          <h3>{v.name}</h3>
+          <div className="border px-2 flex-fill rounded">
+            {v.students.length === 0 ? (
+              <p>No students</p>
+            ) : (
+              <ul className="list-unstyled column-count-4">
+                {v.students.map((s) => (
+                  <li key={s.id} className="fixed-col-width">
+                    <span>{s.displayName}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </Form.Group>
+      ))}
     </>
   );
 };

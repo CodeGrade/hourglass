@@ -28,6 +28,9 @@ import {
   Col,
   DropdownButton,
   Dropdown,
+  Tabs,
+  Tab,
+  Nav,
 } from 'react-bootstrap';
 import {
   FaChevronUp,
@@ -54,6 +57,10 @@ import { DateTime } from 'luxon';
 import { importVersion } from '@hourglass/common/api/professor/exams/versions/import';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
 import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
+import EditExamRooms from '@professor/exams/rooms';
+import StudentDND from '@hourglass/common/student-dnd';
+import AllocateVersions from '@professor/exams/allocate-versions';
+import AssignStaff from '@professor/exams/assign-staff';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -164,47 +171,80 @@ const ProctoringInfo: React.FC<{
     examId,
     checklist,
   } = props;
+  const { tabName } = useParams();
+  const history = useHistory();
   return (
     <>
       <h2>Proctoring Checklist</h2>
-      <ul className="list-unstyled">
-        <li>
-          <ChecklistIcon
-            reason={checklist.rooms.reason}
-            status={checklist.rooms.status}
-          />
-          <Link to={`/exams/${examId}/rooms`}>
-            Edit rooms
-          </Link>
-        </li>
-        <li>
-          <ChecklistIcon
-            reason={checklist.staff.reason}
-            status={checklist.staff.status}
-          />
-          <Link to={`/exams/${examId}/assign-staff`}>
-            Assign staff members
-          </Link>
-        </li>
-        <li>
-          <ChecklistIcon
-            reason={checklist.versions.reason}
-            status={checklist.versions.status}
-          />
-          <Link to={`/exams/${examId}/allocate-versions`}>
-            Allocate versions
-          </Link>
-        </li>
-        <li>
-          <ChecklistIcon
-            reason={checklist.seating.reason}
-            status={checklist.seating.status}
-          />
-          <Link to={`/exams/${examId}/seating`}>
-            Assign seating
-          </Link>
-        </li>
-      </ul>
+      <Tab.Container activeKey={tabName}>
+        <Nav
+          variant="tabs"
+          activeKey={tabName}
+        >
+          <Nav.Item>
+            <Nav.Link
+              eventKey="rooms"
+              onClick={() => history.push(`/exams/${examId}/admin/rooms`)}
+            >
+              <ChecklistIcon
+                reason={checklist.rooms.reason}
+                status={checklist.rooms.status}
+              />
+              Edit rooms
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              eventKey="staff"
+              onClick={() => history.push(`/exams/${examId}/admin/staff`)}
+            >
+              <ChecklistIcon
+                reason={checklist.staff.reason}
+                status={checklist.staff.status}
+              />
+              Assign staff members
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              eventKey="versions"
+              onClick={() => history.push(`/exams/${examId}/admin/versions`)}
+            >
+              <ChecklistIcon
+                reason={checklist.versions.reason}
+                status={checklist.versions.status}
+              />
+              Allocate versions
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              eventKey="seating"
+              onClick={() => history.push(`/exams/${examId}/admin/seating`)}
+            >
+              <ChecklistIcon
+                reason={checklist.seating.reason}
+                status={checklist.seating.status}
+              />
+              Assign seating
+            </Nav.Link>
+          </Nav.Item>
+        </Nav>
+        <Tab.Content>
+          <Tab.Pane eventKey="rooms">
+            <EditExamRooms />
+          </Tab.Pane>
+          <Tab.Pane eventKey="staff">
+            <AssignStaff />
+          </Tab.Pane>
+          <Tab.Pane eventKey="versions">
+            <AllocateVersions />
+          </Tab.Pane>
+          <Tab.Pane eventKey="seating">
+            <StudentDND />
+          </Tab.Pane>
+        </Tab.Content>
+      </Tab.Container>
     </>
   );
 };

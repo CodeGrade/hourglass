@@ -21,12 +21,8 @@ import ShowExam from '@student/exams/show';
 import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
 import EditExamVersion from '@professor/exams/edit';
-import EditExamRooms from '@professor/exams/rooms';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import StudentDND from '@hourglass/common/student-dnd';
 import { AllAlerts } from '@hourglass/common/alerts';
-import AllocateVersions from '@professor/exams/allocate-versions';
-import AssignStaff from '@professor/exams/assign-staff';
 import './index.scss';
 
 interface StudentRegsProps {
@@ -265,23 +261,11 @@ const Entry: React.FC = () => {
                       <Route exact path="/">
                         <Exams />
                       </Route>
-                      <Route path="/exams/:examId/admin">
+                      <Route path="/exams/:examId/admin/:tabName">
                         <ExamAdmin />
                       </Route>
                       <Route path="/exams/:examId/versions/:versionId/edit" exact>
                         <EditExamVersion />
-                      </Route>
-                      <Route path="/exams/:examId/rooms" exact>
-                        <EditExamRooms />
-                      </Route>
-                      <Route path="/exams/:examId/seating" exact>
-                        <StudentDND />
-                      </Route>
-                      <Route path="/exams/:examId/allocate-versions" exact>
-                        <AllocateVersions />
-                      </Route>
-                      <Route path="/exams/:examId/assign-staff" exact>
-                        <AssignStaff />
                       </Route>
                       <Route path="/courses/:courseId">
                         <ShowCourse />

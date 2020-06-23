@@ -2,6 +2,7 @@ import { ApiResponse, useApiResponse } from '@hourglass/common/types/api';
 
 export interface Response {
   unassigned: Student[];
+  proctors: Student[];
   rooms: Room[];
   sections: Section[];
 }

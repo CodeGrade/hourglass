@@ -34,6 +34,9 @@ module Api
           unassigned: @exam.unassigned_staff.map do |s|
             serialize_student s
           end,
+          proctors: @exam.proctor_registrations_without_rooms.map do |reg|
+            serialize_student reg.user
+          end,
           rooms: @exam.rooms.map do |room|
             regs = room_regs[room] || []
             serialize_room_regs room, regs
@@ -101,12 +104,13 @@ module Api
       end
 
       def update_all_staff
-        body = params.permit(unassigned: [], rooms: {})
+        body = params.permit(unassigned: [], rooms: {}, proctors: [])
         ProctorRegistration.transaction do
-          body[:unassigned].each do |id|
-            # TODO make proctor room_id optional
-            # proctor_reg = @exam.proctor_registrations.find_by!(user_id: id)
-            # proctor_reg.update!(room_id: nil)
+          # TODO: what to do with staff who get dragged to unassigned?
+          body[:proctors].each do |id|
+            proctor_reg = @exam.proctor_registrations.find_or_initialize_by(user_id: id)
+            proctor_reg.room_id = nil
+            proctor_reg.save!
           end
           body[:rooms].each do |room_id, staff_ids|
             staff_ids.each do |id|

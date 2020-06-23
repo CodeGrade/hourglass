@@ -96,6 +96,7 @@ module Api
 
       def update_all
         body = params.permit(versions: {})
+        # TODO: what to do with students who get dragged to unassigned?
         body[:versions].each do |version_id, student_ids|
           student_ids.each do |id|
             student_reg = @exam.registrations.find_or_initialize_by(user_id: id)

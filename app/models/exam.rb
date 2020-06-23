@@ -50,6 +50,10 @@ class Exam < ApplicationRecord
     registrations.reject(&:room)
   end
 
+  def proctor_registrations_without_rooms
+    proctor_registrations.reject(&:room)
+  end
+
   def rooms_without_staff
     rooms.reject(&:has_staff?)
   end

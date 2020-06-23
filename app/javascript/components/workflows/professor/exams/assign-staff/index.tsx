@@ -228,6 +228,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         });
         const body = {
           unassigned: all.unassigned.map((s) => s.id),
+          proctors: all.proctors.map((s) => s.id),
           rooms,
         };
         updateAll(examId, body).then((result) => {
@@ -251,6 +252,10 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         <Form.Group>
           <h2>Unassigned Staff</h2>
           <FieldArray name="unassigned" component={Students} />
+        </Form.Group>
+        <Form.Group>
+          <h2>Proctors Without Rooms</h2>
+          <FieldArray name="proctors" component={Students} />
         </Form.Group>
         <Form.Group>
           <FieldArray
@@ -286,12 +291,13 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
 interface FormValues {
   all: {
     unassigned: Student[];
+    proctors: Student[];
     rooms: Room[];
   };
 }
 
 const DNDForm = reduxForm({
-  form: 'student-dnd',
+  form: 'staff-dnd',
 })(StudentDNDForm);
 
 const DND: React.FC = () => {
@@ -314,6 +320,7 @@ const DND: React.FC = () => {
               initialValues={{
                 all: {
                   unassigned: response.response.unassigned,
+                  proctors: response.response.proctors,
                   rooms: response.response.rooms,
                 },
               }}

@@ -14,6 +14,7 @@ interface Bad {
 
 interface Body {
   unassigned: Array<Student['id']>;
+  proctors: Array<Student['id']>;
   rooms: {
     [roomId: number]: Array<Student['id']>;
   };

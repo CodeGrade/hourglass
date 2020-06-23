@@ -290,7 +290,7 @@ interface FormValues {
 }
 
 const DNDForm = reduxForm({
-  form: 'student-dnd',
+  form: 'version-dnd',
 })(StudentDNDForm);
 
 const DND: React.FC = () => {

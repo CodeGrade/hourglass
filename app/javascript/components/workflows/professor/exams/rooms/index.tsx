@@ -179,17 +179,20 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const { examId } = useParams();
   const { alert } = useContext(AlertContext);
   const history = useHistory();
+  const cancel = useCallback(() => {
+    history.goBack();
+  }, [history]);
   return (
     <form
       onSubmit={handleSubmit((values) => {
         const body = transformForSubmit(initialValues, values);
         updateAll(examId, body).then((res) => {
           if (res.created === false) throw new Error(res.reason);
+          history.push(`/exams/${examId}/admin`);
           alert({
             variant: 'success',
             message: 'Rooms saved successfully.',
           });
-          history.push(`/exams/${examId}/admin`);
         }).catch((err) => {
           alert({
             autohide: true,
@@ -213,10 +216,18 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         <Button
           size="lg"
           className="ml-2"
-          variant="success"
+          variant="secondary"
+          onClick={cancel}
+        >
+          Cancel
+        </Button>
+        <Button
+          size="lg"
+          className="ml-2"
+          variant="primary"
           type="submit"
         >
-          Submit
+          Save
         </Button>
       </Form.Group>
     </form>

@@ -347,25 +347,29 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
       </h1>
       <Form.Group>
         <h2>Unassigned Students</h2>
-        <ul className="list-unstyled column-count-4">
-          {unassigned.map((s) => (
-            <li key={s.id}>
-              {s.displayName}
-            </li>
-          ))}
-        </ul>
-      </Form.Group>
-      {rooms.map((r) => (
-        <Form.Group key={r.id}>
-          <h2>{r.name}</h2>
-          {r.students.length === 0 && <p>No students.</p>}
+        <div className="border px-2 flex-fill rounded">
           <ul className="list-unstyled column-count-4">
-            {r.students.map((s) => (
+            {unassigned.map((s) => (
               <li key={s.id}>
                 {s.displayName}
               </li>
             ))}
           </ul>
+        </div>
+      </Form.Group>
+      {rooms.map((r) => (
+        <Form.Group key={r.id}>
+          <h2>{r.name}</h2>
+          {r.students.length === 0 && <p>No students.</p>}
+          <div className="border px-2 flex-fill rounded">
+            <ul className="list-unstyled column-count-4">
+              {r.students.map((s) => (
+                <li key={s.id}>
+                  {s.displayName}
+                </li>
+              ))}
+            </ul>
+          </div>
         </Form.Group>
       ))}
     </>

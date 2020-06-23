@@ -51,7 +51,7 @@ module Api
       end
 
       def update_all_rooms
-        body = params.permit(deletedRooms: [], newRooms: [], updatedRooms: {})
+        body = params.permit(deletedRooms: [], newRooms: [], updatedRooms: [:id, :name])
         Room.transaction do
           body[:deletedRooms].each do |id|
             room = @exam.rooms.find_by!(id: id)
@@ -70,6 +70,9 @@ module Api
             room.save!
           end
         end
+        render json: { created: true }
+      rescue StandardError => e
+        render json: { created: false, reason: e.message }
       end
 
       def update_all

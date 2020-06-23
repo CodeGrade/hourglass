@@ -142,15 +142,26 @@ const ShowRooms: React.FC<WrappedFieldArrayProps<FormRoom>> = (props) => {
   );
 };
 
-function transformForSubmit(initValues: FormValues, values: FormValues): Body {
+function transformForSubmit(initValues: Partial<FormValues>, values: FormValues): Body {
   const { rooms } = values;
   const { rooms: initRooms } = initValues;
   const updatedRooms: {
     id: number;
     name: string;
-  } = rooms.filter((r) => r.id !== undefined);
+  }[] = rooms.reduce((acc, room) => {
+    if (room.id !== undefined) {
+      return [
+        ...acc,
+        {
+          id: room.id,
+          name: room.name,
+        },
+      ];
+    }
+    return acc;
+  }, []);
   const newRooms = rooms.filter((r) => !('id' in r));
-  const deletedRooms = initRooms.filter((ir) => rooms.find((r) => r.id === ir.id));
+  const deletedRooms = initRooms.filter((ir) => !rooms.find((r) => r.id === ir.id));
   return {
     updatedRooms,
     newRooms: newRooms.map((r) => r.name),
@@ -171,10 +182,9 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   return (
     <form
       onSubmit={handleSubmit((values) => {
-        // TODO: transform values to be acceptable for updateAll (three fields)
-        // TODO: try submitting, show an error but don't redirect until successful
         const body = transformForSubmit(initialValues, values);
         updateAll(examId, body).then((res) => {
+          if (res.created === false) throw new Error(res.reason);
           alert({
             variant: 'success',
             message: 'Rooms saved successfully.',

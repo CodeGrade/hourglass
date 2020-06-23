@@ -9,6 +9,17 @@ export interface Body {
   newRooms: string[]; // names
 }
 
+type Response = Good | Bad;
+
+interface Good {
+  created: true;
+}
+
+interface Bad {
+  created: false;
+  reason: string;
+}
+
 export function updateAll(examId: number, body: Body): Promise<Response> {
   return hitApi(`/api/professor/exams/${examId}/rooms/update_all_rooms`, {
     method: 'POST',

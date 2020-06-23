@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import {
   Col,
@@ -25,7 +25,12 @@ import {
 } from '@hourglass/common/api/professor/exams/versions';
 import { updateAll } from '@hourglass/common/api/professor/exams/versions/updateAll';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { useHistory, useParams, Switch, Route } from 'react-router-dom';
+import {
+  useHistory,
+  useParams,
+  Switch,
+  Route,
+} from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import { useTabRefresher, TabEditButton } from './admin';
 
@@ -64,7 +69,7 @@ const DropTarget: React.FC<{
   return (
     <div
       ref={drop}
-      className={`${bg} border rounded px-2 text-center flex-fill`}
+      className={`${bg} border rounded px-2 flex-fill`}
     >
       {children}
     </div>
@@ -121,11 +126,11 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
       >
         Drop students here!
       </p>
-      <div className="d-flex mx-n1 justify-content-around rounded mb-2 flex-wrap">
+      <ul className="list-unstyled column-count-4">
         {fields.map((member, index) => {
           const student = fields.get(index);
           return (
-            <span
+            <li
               className="mx-1"
               key={`${member}-${student.id}`}
             >
@@ -133,10 +138,10 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
                 student={student}
                 onRemove={(): void => fields.remove(index)}
               />
-            </span>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </DropTarget>
   );
 };
@@ -158,24 +163,28 @@ const Versions: React.FC<WrappedFieldArrayProps<Version> & VersionsProps> = (pro
         return (
           <Col key={room.id}>
             <FormSection name={member}>
-              <h2>{room.name}</h2>
-              <DropdownButton
-                title="Add entire section"
-                id={`version-dnd-add-section-${room.id}`}
-                size="sm"
-                className="mb-2"
-              >
-                {sections.map((s) => (
-                  <Dropdown.Item
-                    key={s.id}
-                    onClick={(): void => {
-                      addSectionToVersion(s, room.id);
-                    }}
+              <h2>
+                {room.name}
+                <span className="float-right">
+                  <DropdownButton
+                    title="Add entire section"
+                    id={`version-dnd-add-section-${room.id}`}
+                    size="sm"
+                    className="mb-2"
                   >
-                    {s.title}
-                  </Dropdown.Item>
-                ))}
-              </DropdownButton>
+                    {sections.map((s) => (
+                      <Dropdown.Item
+                        key={s.id}
+                        onClick={(): void => {
+                          addSectionToVersion(s, room.id);
+                        }}
+                      >
+                        {s.title}
+                      </Dropdown.Item>
+                    ))}
+                  </DropdownButton>
+                </span>
+              </h2>
               <FieldArray
                 name="students"
                 component={Students}
@@ -220,6 +229,9 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   };
   const history = useHistory();
   const { alert } = useContext(AlertContext);
+  const cancel = useCallback(() => {
+    history.goBack();
+  }, [history]);
   return (
     <form
       onSubmit={handleSubmit(({ all }) => {
@@ -248,6 +260,32 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
       })}
     >
       <FormSection name="all">
+        <h1>
+          Edit Version Allocations
+          <span className="float-right">
+            <Button
+              variant="danger"
+              className={pristine && 'd-none'}
+              onClick={reset}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="secondary"
+              className="ml-2"
+              onClick={cancel}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              className="ml-2"
+              type="submit"
+            >
+              Save
+            </Button>
+          </span>
+        </h1>
         <Form.Group>
           <h2>Unassigned Students</h2>
           <FieldArray name="unassigned" component={Students} />
@@ -260,23 +298,6 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               addSectionToVersion,
             }}
           />
-        </Form.Group>
-        <Form.Group>
-          <Button
-            variant="danger"
-            className={pristine && 'd-none'}
-            onClick={reset}
-          >
-            Reset
-          </Button>
-        </Form.Group>
-        <Form.Group>
-          <Button
-            variant="success"
-            type="submit"
-          >
-            Submit
-          </Button>
         </Form.Group>
       </FormSection>
     </form>
@@ -303,7 +324,7 @@ const Editable: React.FC<VersionAssignmentProps> = (props) => {
             all: {
               unassigned,
               versions,
-          },
+            },
           }}
         />
       </FormContext.Provider>
@@ -319,31 +340,37 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
   return (
     <>
       <h1>
-        Version Allocation
-        <TabEditButton />
+        Version Allocations
+        <span className="float-right">
+          <TabEditButton />
+        </span>
       </h1>
       <Form.Group>
         <h2>Unassigned Students</h2>
-        <ul>
-          {unassigned.map((s) => (
-            <li key={s.id}>
-              {s.displayName}
-            </li>
-          ))}
-        </ul>
+        <div className="border px-2 flex-fill rounded">
+          <ul className="list-unstyled column-count-4">
+            {unassigned.map((s) => (
+              <li key={s.id}>
+                {s.displayName}
+              </li>
+            ))}
+          </ul>
+        </div>
       </Form.Group>
       <Form.Group>
         <Row>
           {versions.map((v) => (
             <Col key={v.id}>
               <h2>{v.name}</h2>
-              <ul>
-                {v.students.map((s) => (
-                  <li key={s.id}>
-                    {s.displayName}
-                  </li>
-                ))}
-              </ul>
+              <div className="border px-2 flex-fill rounded">
+                <ul className="list-unstyled column-count-4">
+                  {v.students.map((s) => (
+                    <li key={s.id}>
+                      {s.displayName}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </Col>
           ))}
         </Row>

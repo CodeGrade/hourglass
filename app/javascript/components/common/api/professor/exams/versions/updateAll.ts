@@ -13,6 +13,7 @@ interface Bad {
 }
 
 interface Body {
+  unassigned: Array<Student['id']>;
   versions: {
     [versionId: number]: Array<Student['id']>;
   };

@@ -227,6 +227,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           versions[version.id] = version.students.map((s) => s.id);
         });
         const body = {
+          unassigned: all.unassigned.map((s) => s.id),
           versions,
         };
         updateAll(examId, body).then((result) => {

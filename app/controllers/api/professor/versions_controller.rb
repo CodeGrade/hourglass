@@ -95,11 +95,30 @@ module Api
       end
 
       def update_all
-        body = params.permit(versions: {})
-        # TODO: what to do with students who get dragged to unassigned?
+        body = params.permit(versions: {}, unassigned: [])
+        body[:unassigned].each do |id|
+          user = @exam.course.students.find { |u| u.id == id }
+          raise "Invalid user ID requested (#{id})" if user.nil?
+
+          student_reg = @exam.registrations.find_by(user_id: id)
+          next unless student_reg
+
+          if student_reg.started?
+            raise "Cannot delete registration for '#{user.display_name}' since they have already started."
+          end
+
+          student_reg.destroy!
+        end
         body[:versions].each do |version_id, student_ids|
           student_ids.each do |id|
-            student_reg = @exam.registrations.find_or_initialize_by(user_id: id)
+            user = @exam.course.students.find { |u| u.id == id }
+            raise "Invalid user ID requested (#{id})" if user.nil?
+
+            student_reg = @exam.registrations.find_or_initialize_by(user: user)
+            next if student_reg.exam_version_id == version_id
+
+            raise "Cannot update already started student '#{user.display_name}'" if student_reg.started?
+
             student_reg.exam_version_id = version_id
             student_reg.save!
           end

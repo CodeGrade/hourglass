@@ -23,7 +23,7 @@ import {
   InjectedFormProps,
 } from 'redux-form';
 import { Provider } from 'react-redux';
-import store from '@professor/exams/rooms/store';
+import store from '@hourglass/common/student-dnd/store';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
 import { BsPencilSquare } from 'react-icons/bs';

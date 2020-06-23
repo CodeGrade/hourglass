@@ -4,6 +4,11 @@
   resize: vertical;
 }
 
+.react-codemirror2.h-auto .CodeMirror {
+  height: auto !important;
+  resize: none;
+}
+
 .CodeMirror-scroll {
   max-width: 100%;
   overflow: auto;

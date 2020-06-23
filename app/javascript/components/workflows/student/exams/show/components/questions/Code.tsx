@@ -10,6 +10,7 @@ interface CodeProps {
   value: CodeState;
   onChange?: (newVal: CodeState) => void;
   disabled: boolean;
+  autosize?: boolean;
 }
 
 const Code: React.FC<CodeProps> = (props) => {
@@ -18,6 +19,7 @@ const Code: React.FC<CodeProps> = (props) => {
     value: state,
     onChange,
     disabled,
+    autosize = false,
   } = props;
   const { prompt, lang, initial } = info;
   const { fmap } = useContext(ExamContext);
@@ -49,6 +51,7 @@ const Code: React.FC<CodeProps> = (props) => {
         <Col>
           <Editor
             disabled={disabled}
+            autosize={autosize}
             value={text}
             markDescriptions={marks}
             valueUpdate={[disabled]}

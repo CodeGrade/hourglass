@@ -33,7 +33,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     case 'HTML':
       return <HTML value={body} />;
     case 'Code':
-      return <Code info={body} value={value as CodeState} disabled />;
+      return <Code info={body} value={value as CodeState} disabled autosize />;
     case 'AllThatApply':
       return <DisplayAllThatApply info={body} value={value as AllThatApplyState} />;
     case 'CodeTag':

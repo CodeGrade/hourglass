@@ -65,6 +65,7 @@ export interface EditorProps {
   onSelection?: IUnControlledCodeMirror['onSelection'];
   refreshProps?: React.DependencyList;
   disabled?: boolean;
+  autosize?: boolean;
 }
 
 export const Editor: React.FC<EditorProps> = (props) => {
@@ -83,6 +84,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
     onSelection,
     refreshProps = [],
     disabled = false,
+    autosize = false,
   } = props;
 
   // keep track of codemirror instance
@@ -145,6 +147,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
   };
   return (
     <UnControlledCodeMirror
+      className={autosize ? 'h-auto' : ''}
       onChange={(cm, _state, newVal): void => {
         if (onChange && doSave) {
           const appliedDescs = marksToDescs(cm.getAllMarks());

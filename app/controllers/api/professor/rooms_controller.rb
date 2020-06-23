@@ -77,15 +77,17 @@ module Api
 
       def update_all
         body = params.permit(unassigned: [], rooms: {})
-        body[:unassigned].each do |id|
-          # TODO: remove registration
-          pp "UNASSIGNED: #{id}"
-        end
-        body[:rooms].each do |room_id, student_ids|
-          student_ids.each do |id|
-            student_reg = @exam.registrations.find_or_initialize_by(user_id: id)
-            student_reg.room_id = room_id
-            student_reg.save!
+        Registration.transaction do
+          body[:unassigned].each do |id|
+            student_reg = @exam.registrations.find_by!(user_id: id)
+            student_reg.update!(room_id: nil)
+          end
+          body[:rooms].each do |room_id, student_ids|
+            student_ids.each do |id|
+              student_reg = @exam.registrations.find_or_initialize_by(user_id: id)
+              student_reg.room_id = room_id
+              student_reg.save!
+            end
           end
         end
         render json: {
@@ -100,15 +102,18 @@ module Api
 
       def update_all_staff
         body = params.permit(unassigned: [], rooms: {})
-        body[:unassigned].each do |id|
-          # TODO: remove registration
-          pp "UNASSIGNED: #{id}"
-        end
-        body[:rooms].each do |room_id, staff_ids|
-          staff_ids.each do |id|
-            proctor_reg = @exam.proctor_registrations.find_or_initialize_by(user_id: id)
-            proctor_reg.room_id = room_id
-            proctor_reg.save!
+        ProctorRegistration.transaction do
+          body[:unassigned].each do |id|
+            # TODO make proctor room_id optional
+            # proctor_reg = @exam.proctor_registrations.find_by!(user_id: id)
+            # proctor_reg.update!(room_id: nil)
+          end
+          body[:rooms].each do |room_id, staff_ids|
+            staff_ids.each do |id|
+              proctor_reg = @exam.proctor_registrations.find_or_initialize_by(user_id: id)
+              proctor_reg.room_id = room_id
+              proctor_reg.save!
+            end
           end
         end
         render json: {

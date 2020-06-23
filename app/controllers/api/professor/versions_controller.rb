@@ -115,7 +115,7 @@ module Api
             raise "Invalid user ID requested (#{id})" if user.nil?
 
             student_reg = @exam.registrations.find_or_initialize_by(user: user)
-            next if student_reg.exam_version_id == version_id
+            next if student_reg.exam_version_id == version_id.to_i
 
             raise "Cannot update already started student '#{user.display_name}'" if student_reg.started?
 

@@ -33,6 +33,7 @@ import {
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import { useTabRefresher, TabEditButton } from '../admin';
+import '../list-columns.scss';
 
 interface FormContextType {
   sections: Section[];
@@ -131,7 +132,7 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
           const student = fields.get(index);
           return (
             <li
-              className="mx-1"
+              className="mx-1 fixed-col-width"
               key={`${member}-${student.id}`}
             >
               <DraggableStudent
@@ -371,8 +372,8 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
         <div className="border px-2 flex-fill rounded">
           <ul className="list-unstyled column-count-4">
             {unassigned.map((s) => (
-              <li key={s.id}>
-                {s.displayName}
+              <li key={s.id} className="fixed-col-width">
+                <span>{s.displayName}</span>
               </li>
             ))}
           </ul>
@@ -383,8 +384,8 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
         <div className="border px-2 flex-fill rounded">
           <ul className="list-unstyled column-count-4">
             {proctors.map((s) => (
-              <li key={s.id}>
-                {s.displayName}
+              <li key={s.id} className="fixed-col-width">
+                <span>{s.displayName}</span>
               </li>
             ))}
           </ul>
@@ -398,8 +399,8 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
               <div className="border px-2 flex-fill rounded">
                 <ul className="list-unstyled column-count-4">
                   {r.proctors.map((p) => (
-                    <li key={p.id}>
-                      {p.displayName}
+                    <li key={p.id} className="fixed-col-width">
+                      <span>{p.displayName}</span>
                     </li>
                   ))}
                 </ul>

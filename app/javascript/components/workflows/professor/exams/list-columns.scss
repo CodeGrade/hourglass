@@ -1,0 +1,7 @@
+.fixed-col-width > span, .fixed-col-width > button > span {
+  max-width: 100%;
+  display: inline-block;
+  break-inside: avoid;
+  word-wrap: anywhere;
+  white-space: break-spaces;
+}

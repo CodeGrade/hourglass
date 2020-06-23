@@ -55,7 +55,7 @@ module Api
         Room.transaction do
           body[:deletedRooms].each do |id|
             room = @exam.rooms.find_by!(id: id)
-            raise Error, "'#{room.name}' has users. Please remove them before deleting it." if room.has_users?
+            raise "'#{room.name}' has users. Please remove them before deleting it." if room.has_users?
 
             room.destroy!
           end

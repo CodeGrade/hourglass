@@ -27,6 +27,7 @@ import { updateAll } from '@hourglass/common/api/professor/rooms/updateAll';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { useHistory, useParams } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
+import { useTabRefresher } from '@hourglass/workflows/professor/exams/admin';
 
 interface FormContextType {
   sections: Section[];
@@ -295,7 +296,8 @@ const DNDForm = reduxForm({
 
 const DND: React.FC = () => {
   const { examId } = useParams();
-  const response = useRoomsIndex(examId);
+  const [refresher] = useTabRefresher('seating');
+  const response = useRoomsIndex(examId, [refresher]);
   switch (response.type) {
     case 'ERROR':
       return <p className="text-danger">{response.text}</p>;

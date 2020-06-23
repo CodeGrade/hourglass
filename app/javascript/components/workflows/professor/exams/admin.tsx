@@ -11,6 +11,7 @@ import {
   useParams,
   useHistory,
   Redirect,
+  useLocation,
 } from 'react-router-dom';
 import {
   useResponse as examsShow,
@@ -63,6 +64,7 @@ import StudentDND from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
 import ErrorBoundary from '@hourglass/common/boundary';
+import { BsPencilSquare } from 'react-icons/bs';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -278,6 +280,32 @@ const ProctoringChecklist: React.FC<{
     </>
   );
 };
+
+export const TabEditButton: React.FC = () => {
+  const { examId, tabName } = useParams();
+  return (
+    <LinkButton
+      to={`/exams/${examId}/admin/${tabName}/edit`}
+      className="float-right"
+    >
+      <Icon I={BsPencilSquare} />
+      <span className="ml-2">
+        Edit
+      </span>
+    </LinkButton>
+  );
+};
+
+export function useTabRefresher(currentTab: string): [number, () => void] {
+  const [refresher, refresh] = useRefresher();
+  const location = useLocation();
+  const { tabName } = useParams();
+  useEffect(() => {
+    console.log('tn', tabName);
+    if (tabName === currentTab) refresh();
+  }, [tabName, location.pathname]);
+  return [refresher, refresh];
+}
 
 const ExamInfoViewer: React.FC<{
   response: ShowResponse;

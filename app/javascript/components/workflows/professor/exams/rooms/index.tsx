@@ -28,10 +28,11 @@ import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
 import { BsPencilSquare } from 'react-icons/bs';
 import LinkButton from '@hourglass/common/linkbutton';
+import { useTabRefresher, TabEditButton } from '@professor/exams/admin';
 
 const EditExamRooms: React.FC = () => {
   const { examId } = useParams();
-  const [refresher, refresh] = useRefresher();
+  const [refresher] = useTabRefresher('rooms');
   const response = indexRooms(examId, [refresher]);
   switch (response.type) {
     case 'ERROR':
@@ -39,7 +40,7 @@ const EditExamRooms: React.FC = () => {
     case 'LOADING':
       return <p>Loading...</p>;
     case 'RESULT':
-      return <Loaded refresh={refresh} rooms={response.response.rooms} />;
+      return <Loaded rooms={response.response.rooms} />;
     default:
       throw new ExhaustiveSwitchError(response);
   }
@@ -64,18 +65,16 @@ function createInitialValues(rooms: Room[]): FormValues {
 
 const Loaded: React.FC<{
   rooms: Room[];
-  refresh: () => void;
 }> = (props) => {
   const {
     rooms,
-    refresh,
   } = props;
   return (
     <Row>
       <Col>
         <Switch>
           <Route path="/exams/:examId/admin/rooms/edit">
-            <Editable refresh={refresh} rooms={rooms} />
+            <Editable rooms={rooms} />
           </Route>
           <Route>
             <Readonly rooms={rooms} />
@@ -86,33 +85,21 @@ const Loaded: React.FC<{
   );
 };
 
-interface RefreshContext {
-  refresh: () => void;
-}
-
-const RefreshContext = React.createContext<RefreshContext>({
-  refresh: () => undefined,
-});
-
 const Editable: React.FC<{
   rooms: Room[];
-  refresh: () => void;
 }> = (props) => {
   const {
     rooms,
-    refresh,
   } = props;
   const initialValues = useMemo(() => createInitialValues(rooms), [rooms]);
   return (
     <>
       <h1>Edit rooms</h1>
-      <RefreshContext.Provider value={{ refresh }}>
-        <Provider store={store}>
-          <EditExamRoomsForm
-            initialValues={initialValues}
-          />
-        </Provider>
-      </RefreshContext.Provider>
+      <Provider store={store}>
+        <EditExamRoomsForm
+          initialValues={initialValues}
+        />
+      </Provider>
     </>
   );
 };
@@ -123,20 +110,11 @@ const Readonly: React.FC<{
   const {
     rooms,
   } = props;
-  const { examId } = useParams();
   return (
     <>
       <h1>
         Rooms
-        <LinkButton
-          to={`/exams/${examId}/admin/rooms/edit`}
-          className="float-right"
-        >
-          <Icon I={BsPencilSquare} />
-          <span className="ml-2">
-            Edit
-          </span>
-        </LinkButton>
+        <TabEditButton />
       </h1>
       {rooms.map((r) => (
         <Form.Group key={r.id}>
@@ -260,7 +238,6 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
     handleSubmit,
     initialValues,
   } = props;
-  const { refresh } = useContext(RefreshContext);
   const { examId } = useParams();
   const { alert } = useContext(AlertContext);
   const history = useHistory();
@@ -274,7 +251,6 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         updateAll(examId, body).then((res) => {
           if (res.created === false) throw new Error(res.reason);
           history.push(`/exams/${examId}/admin/rooms`);
-          refresh();
           alert({
             variant: 'success',
             message: 'Rooms saved successfully.',

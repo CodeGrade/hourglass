@@ -26,6 +26,6 @@ export interface Room {
 }
 
 
-export function useResponse(examId: number): ApiResponse<Response> {
-  return useApiResponse(`/api/professor/exams/${examId}/rooms/staff_regs`);
+export function useResponse(examId: number, deps?: React.DependencyList): ApiResponse<Response> {
+  return useApiResponse(`/api/professor/exams/${examId}/rooms/staff_regs`, undefined, undefined, deps);
 }

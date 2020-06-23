@@ -25,8 +25,12 @@ import {
 } from '@hourglass/common/api/professor/rooms/staffRegs';
 import { updateAll } from '@hourglass/common/api/professor/rooms/updateAllStaff';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useParams, Switch, Route } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
+import { useTabRefresher, TabEditButton } from '../admin';
+import LinkButton from '@hourglass/common/linkbutton';
+import { BsPencilSquare } from 'react-icons/bs';
+import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
 
 interface FormContextType {
   sections: Section[];
@@ -299,9 +303,127 @@ const DNDForm = reduxForm({
   form: 'staff-dnd',
 })(StudentDNDForm);
 
+interface StaffAssignmentProps {
+  sections: Section[];
+  unassigned: Student[];
+  proctors: Student[];
+  rooms: Room[];
+}
+
+const Editable: React.FC<StaffAssignmentProps> = (props) => {
+  const {
+    sections,
+    unassigned,
+    proctors,
+    rooms,
+  } = props;
+  return (
+    <Provider store={store}>
+      <FormContext.Provider value={{ sections }}>
+        <DNDForm
+          initialValues={{
+            all: {
+              unassigned,
+              proctors,
+              rooms,
+            },
+          }}
+        />
+      </FormContext.Provider>
+    </Provider>
+  );
+};
+
+const Readonly: React.FC<StaffAssignmentProps> = (props) => {
+  const {
+    sections,
+    unassigned,
+    proctors,
+    rooms,
+  } = props;
+  return (
+    <>
+      <h1>
+        Staff Registration
+        <TabEditButton />
+      </h1>
+      <Form.Group>
+        <h2>Unassigned Staff</h2>
+        <ul>
+          {unassigned.map((s) => (
+            <li key={s.id}>
+              {s.displayName}
+            </li>
+          ))}
+        </ul>
+      </Form.Group>
+      <Form.Group>
+        <h2>Proctors Without Rooms</h2>
+        <ul>
+          {proctors.map((s) => (
+            <li key={s.id}>
+              {s.displayName}
+            </li>
+          ))}
+        </ul>
+      </Form.Group>
+      <Form.Group>
+        <Row>
+          {rooms.map((r) => (
+            <Col key={r.id}>
+              <h2>{r.name}</h2>
+              <ul>
+                {r.proctors.map((p) => (
+                  <li key={p.id}>
+                    {p.displayName}
+                  </li>
+                ))}
+              </ul>
+            </Col>
+          ))}
+        </Row>
+      </Form.Group>
+    </>
+  );
+};
+
+const Loaded: React.FC<StaffAssignmentProps> = (props) => {
+  const {
+    sections,
+    unassigned,
+    proctors,
+    rooms,
+  } = props;
+  return (
+    <Row>
+      <Col>
+        <Switch>
+          <Route path="/exams/:examId/admin/staff/edit">
+            <Editable
+              sections={sections}
+              unassigned={unassigned}
+              proctors={proctors}
+              rooms={rooms}
+            />
+          </Route>
+          <Route>
+            <Readonly
+              sections={sections}
+              unassigned={unassigned}
+              proctors={proctors}
+              rooms={rooms}
+            />
+          </Route>
+        </Switch>
+      </Col>
+    </Row>
+  );
+};
+
 const DND: React.FC = () => {
   const { examId } = useParams();
-  const response = useStaffRegs(examId);
+  const [refresher] = useTabRefresher('staff');
+  const response = useStaffRegs(examId, [refresher]);
   switch (response.type) {
     case 'ERROR':
       return <p className="text-danger">{`${response.text} (${response.status})`}</p>;
@@ -309,23 +431,12 @@ const DND: React.FC = () => {
       return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <Provider store={store}>
-          <FormContext.Provider
-            value={{
-              sections: response.response.sections,
-            }}
-          >
-            <DNDForm
-              initialValues={{
-                all: {
-                  unassigned: response.response.unassigned,
-                  proctors: response.response.proctors,
-                  rooms: response.response.rooms,
-                },
-              }}
-            />
-          </FormContext.Provider>
-        </Provider>
+        <Loaded
+          sections={response.response.sections}
+          unassigned={response.response.unassigned}
+          proctors={response.response.proctors}
+          rooms={response.response.rooms}
+        />
       );
     default:
       throw new ExhaustiveSwitchError(response);

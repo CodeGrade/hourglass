@@ -24,6 +24,6 @@ export interface Version {
   students: Student[];
 }
 
-export function useResponse(examId: number): ApiResponse<Response> {
-  return useApiResponse(`/api/professor/exams/${examId}/versions`);
+export function useResponse(examId: number, deps?: React.DependencyList): ApiResponse<Response> {
+  return useApiResponse(`/api/professor/exams/${examId}/versions`, undefined, undefined, deps);
 }

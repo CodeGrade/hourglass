@@ -10,6 +10,7 @@ import {
   Link,
   useParams,
   useHistory,
+  Redirect,
 } from 'react-router-dom';
 import {
   useResponse as examsShow,
@@ -171,8 +172,28 @@ const ProctoringInfo: React.FC<{
     examId,
     checklist,
   } = props;
-  const { tabName } = useParams();
+  return (
+    <>
+      <Switch>
+        <Route exact path="/exams/:examId/admin/:tabName">
+          <ProctoringChecklist checklist={checklist} />
+        </Route>
+        <Route>
+          <Redirect to={`/exams/${examId}/admin/rooms`} />
+        </Route>
+      </Switch>
+    </>
+  );
+};
+
+const ProctoringChecklist: React.FC<{
+  checklist: Checklist;
+}> = (props) => {
+  const {
+    checklist,
+  } = props;
   const history = useHistory();
+  const { examId, tabName } = useParams();
   return (
     <>
       <h2>Proctoring Checklist</h2>

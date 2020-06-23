@@ -93,14 +93,11 @@ const Editable: React.FC<{
   } = props;
   const initialValues = useMemo(() => createInitialValues(rooms), [rooms]);
   return (
-    <>
-      <h1>Edit rooms</h1>
-      <Provider store={store}>
-        <EditExamRoomsForm
-          initialValues={initialValues}
-        />
-      </Provider>
-    </>
+    <Provider store={store}>
+      <EditExamRoomsForm
+        initialValues={initialValues}
+      />
+    </Provider>
   );
 };
 
@@ -114,7 +111,9 @@ const Readonly: React.FC<{
     <>
       <h1>
         Rooms
-        <TabEditButton />
+        <span className="float-right">
+          <TabEditButton />
+        </span>
       </h1>
       {rooms.map((r) => (
         <Form.Group key={r.id}>
@@ -153,23 +152,22 @@ const renderRoom = (member: string, index: number, fields: FieldArrayFieldsProps
   >
     <li className="list-unstyled">
       <Form.Group as={Row}>
-        <Col>
+        <Col className="d-flex">
           <Field name="name" component={EditRoomName} />
-        </Col>
-        <div className="float-right">
           <TooltipButton
             variant="danger"
             onClick={() => fields.remove(index)}
             disabled={fields.get(index).numRegs !== 0}
             disabledMessage="This room has registered users."
             size="lg"
+            className="text-nowrap ml-2"
           >
             <Icon I={FaTrash} />
             <span className="ml-1">
               Delete
             </span>
           </TooltipButton>
-        </div>
+        </Col>
       </Form.Group>
     </li>
   </FormSection>
@@ -265,33 +263,33 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         });
       })}
     >
+      <h1>
+        Edit Rooms
+        <span className="float-right">
+          <Button
+            className={pristine ? 'd-none' : ''}
+            variant="danger"
+            onClick={reset}
+          >
+            Reset
+          </Button>
+          <Button
+            className="ml-2"
+            variant="secondary"
+            onClick={cancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="ml-2"
+            variant="primary"
+            type="submit"
+          >
+            Save
+          </Button>
+        </span>
+      </h1>
       <FieldArray name="rooms" component={ShowRooms} />
-      <Form.Group className="float-right">
-        <Button
-          className={pristine ? 'd-none' : ''}
-          size="lg"
-          variant="danger"
-          onClick={reset}
-        >
-          Reset
-        </Button>
-        <Button
-          size="lg"
-          className="ml-2"
-          variant="secondary"
-          onClick={cancel}
-        >
-          Cancel
-        </Button>
-        <Button
-          size="lg"
-          className="ml-2"
-          variant="primary"
-          type="submit"
-        >
-          Save
-        </Button>
-      </Form.Group>
     </form>
   );
 };

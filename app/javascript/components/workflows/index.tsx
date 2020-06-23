@@ -24,6 +24,7 @@ import EditExamVersion from '@professor/exams/edit';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { AllAlerts } from '@hourglass/common/alerts';
 import './index.scss';
+import ErrorBoundary from '@hourglass/common/boundary';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -256,25 +257,27 @@ const Entry: React.FC = () => {
               <Route path="/">
                 <RegularNavbar />
                 <Container>
-                  <AllAlerts>
-                    <Switch>
-                      <Route exact path="/">
-                        <Exams />
-                      </Route>
-                      <Route path="/exams/:examId/admin">
-                        <ExamAdmin />
-                      </Route>
-                      <Route path="/exams/:examId/versions/:versionId/edit" exact>
-                        <EditExamVersion />
-                      </Route>
-                      <Route path="/courses/:courseId">
-                        <ShowCourse />
-                      </Route>
-                      <Route path="*">
-                        TODO: 404!
-                      </Route>
-                    </Switch>
-                  </AllAlerts>
+                  <ErrorBoundary>
+                    <AllAlerts>
+                      <Switch>
+                        <Route exact path="/">
+                          <Exams />
+                        </Route>
+                        <Route path="/exams/:examId/admin">
+                          <ExamAdmin />
+                        </Route>
+                        <Route path="/exams/:examId/versions/:versionId/edit" exact>
+                          <EditExamVersion />
+                        </Route>
+                        <Route path="/courses/:courseId">
+                          <ShowCourse />
+                        </Route>
+                        <Route path="*">
+                          TODO: 404!
+                        </Route>
+                      </Switch>
+                    </AllAlerts>
+                  </ErrorBoundary>
                 </Container>
               </Route>
             </Switch>

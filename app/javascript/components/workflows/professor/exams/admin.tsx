@@ -62,6 +62,7 @@ import EditExamRooms from '@professor/exams/rooms';
 import StudentDND from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
+import ErrorBoundary from '@hourglass/common/boundary';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -453,6 +454,12 @@ const VersionInfo: React.FC<{
             onClick={(): void => {
               createVersion(examId).then((res) => {
                 history.push(`/exams/${examId}/versions/${res.id}/edit`);
+              }).catch((err) => {
+                alert({
+                  variant: 'danger',
+                  title: 'Exam version not created.',
+                  message: err.message,
+                });
               });
             }}
           >
@@ -549,15 +556,17 @@ const ShowVersion: React.FC<{
           </TooltipButton>
         </div>
       </h3>
-      <PreviewVersion
-        open={preview}
-        railsExam={{
-          id: examId,
-          name: examName,
-          policies: version.policies,
-        }}
-        contents={version.contents}
-      />
+      <ErrorBoundary>
+        <PreviewVersion
+          open={preview}
+          railsExam={{
+            id: examId,
+            name: examName,
+            policies: version.policies,
+          }}
+          contents={version.contents}
+        />
+      </ErrorBoundary>
     </>
   );
 };

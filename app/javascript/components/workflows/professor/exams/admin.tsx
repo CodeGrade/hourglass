@@ -262,7 +262,7 @@ const ProctoringChecklist: React.FC<{
             </Nav.Link>
           </Nav.Item>
         </Nav>
-        <Tab.Content>
+        <Tab.Content className="border border-top-0 rounded-bottom p-2">
           <Tab.Pane eventKey="rooms">
             <ErrorBoundary>
               <EditExamRooms />

@@ -238,7 +238,6 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
             message: 'Versions successfully allocated.',
           });
         }).catch((e) => {
-          history.push(`/exams/${examId}/admin`);
           alert({
             variant: 'danger',
             title: 'Allocations not created.',

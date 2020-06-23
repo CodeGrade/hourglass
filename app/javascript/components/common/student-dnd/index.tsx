@@ -238,7 +238,6 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
             message: 'Room assignments successfully created.',
           });
         }).catch((e) => {
-          history.push(`/exams/${examId}/admin`);
           alert({
             variant: 'danger',
             title: 'Room assignments not created.',

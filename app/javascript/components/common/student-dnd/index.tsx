@@ -64,7 +64,7 @@ const DropTarget: React.FC<{
   return (
     <div
       ref={drop}
-      className={`${bg} border rounded px-2 text-center flex-fill`}
+      className={`${bg} border rounded px-2 flex-fill`}
     >
       {children}
     </div>
@@ -121,11 +121,11 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
       >
         Drop students here!
       </p>
-      <div className="d-flex mx-n1 justify-content-around rounded mb-2 flex-wrap">
+      <ul className="list-unstyled column-count-4">
         {fields.map((member, index) => {
           const student = fields.get(index);
           return (
-            <span
+            <li
               className="mx-1"
               key={`${member}-${student.id}`}
             >
@@ -133,10 +133,10 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
                 student={student}
                 onRemove={(): void => fields.remove(index)}
               />
-            </span>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </DropTarget>
   );
 };
@@ -152,39 +152,43 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
   } = props;
   const { sections } = useContext(FormContext);
   return (
-    <Row>
+    <>
       {fields.map((member, index) => {
         const room = fields.get(index);
         return (
-          <Col key={room.id}>
+          <Form.Group key={room.id}>
             <FormSection name={member}>
-              <h2>{room.name}</h2>
-              <DropdownButton
-                title="Add entire section"
-                id={`student-dnd-add-section-${room.id}`}
-                size="sm"
-                className="mb-2"
-              >
-                {sections.map((s) => (
-                  <Dropdown.Item
-                    key={s.id}
-                    onClick={(): void => {
-                      addSectionToRoom(s, room.id);
-                    }}
+              <h2>
+                {room.name}
+                <span className="float-right">
+                  <DropdownButton
+                    title="Add entire section"
+                    id={`student-dnd-add-section-${room.id}`}
+                    size="sm"
+                    className="mb-2"
                   >
-                    {s.title}
-                  </Dropdown.Item>
-                ))}
-              </DropdownButton>
+                    {sections.map((s) => (
+                      <Dropdown.Item
+                        key={s.id}
+                        onClick={(): void => {
+                          addSectionToRoom(s, room.id);
+                        }}
+                      >
+                        {s.title}
+                      </Dropdown.Item>
+                    ))}
+                  </DropdownButton>
+                </span>
+              </h2>
               <FieldArray
                 name="students"
                 component={Students}
               />
             </FormSection>
-          </Col>
+          </Form.Group>
         );
       })}
-    </Row>
+    </>
   );
 };
 
@@ -296,18 +300,21 @@ const Editable: React.FC<RoomAssignmentProps> = (props) => {
     rooms,
   } = props;
   return (
-    <Provider store={store}>
-      <FormContext.Provider value={{ sections }}>
-        <DNDForm
-          initialValues={{
-            all: {
-              unassigned,
-              rooms,
-            },
-          }}
-        />
-      </FormContext.Provider>
-    </Provider>
+    <>
+      <h1>Edit Seating Assignments</h1>
+      <Provider store={store}>
+        <FormContext.Provider value={{ sections }}>
+          <DNDForm
+            initialValues={{
+              all: {
+                unassigned,
+                rooms,
+              },
+            }}
+          />
+        </FormContext.Provider>
+      </Provider>
+    </>
   );
 };
 
@@ -324,7 +331,7 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
       </h1>
       <Form.Group>
         <h2>Unassigned Students</h2>
-        <ul>
+        <ul className="list-unstyled column-count-4">
           {unassigned.map((s) => (
             <li key={s.id}>
               {s.displayName}
@@ -332,22 +339,19 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
           ))}
         </ul>
       </Form.Group>
-      <Form.Group>
-        <Row>
-          {rooms.map((r) => (
-            <Col key={r.id}>
-              <h2>{r.name}</h2>
-              <ul>
-                {r.students.map((s) => (
-                  <li key={s.id}>
-                    {s.displayName}
-                  </li>
-                ))}
-              </ul>
-            </Col>
-          ))}
-        </Row>
-      </Form.Group>
+      {rooms.map((r) => (
+        <Form.Group key={r.id}>
+          <h2>{r.name}</h2>
+          {r.students.length === 0 && <p>No students.</p>}
+          <ul className="list-unstyled column-count-4">
+            {r.students.map((s) => (
+              <li key={s.id}>
+                {s.displayName}
+              </li>
+            ))}
+          </ul>
+        </Form.Group>
+      ))}
     </>
   );
 };

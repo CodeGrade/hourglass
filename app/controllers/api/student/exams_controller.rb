@@ -108,7 +108,7 @@ module Api
           answers: answers,
           messages: {
             personal: @registration.private_messages.map(&:serialize),
-            room: @registration.room.room_announcements.map(&:serialize),
+            room: @registration.room&.room_announcements&.map(&:serialize) || [],
             version: version.version_announcements.map(&:serialize)
           },
           questions: questions
@@ -124,7 +124,7 @@ module Api
           lockout: !saved,
           messages: {
             personal: after(@registration.private_messages, last_message_ids[:personal]).map(&:serialize),
-            room: after(@registration.room.room_announcements, last_message_ids[:room]).map(&:serialize),
+            room: after(@registration.room&.room_announcements || [], last_message_ids[:room]).map(&:serialize),
             version: after(version.version_announcements, last_message_ids[:version]).map(&:serialize)
           }
         }

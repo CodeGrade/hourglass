@@ -44,10 +44,7 @@ class ApiController < ApplicationController
   end
 
   def require_student_reg
-    @registration ||= Registration.find_by(
-      user: current_user,
-      room: @exam.rooms
-    )
+    @registration ||= @exam.registrations.find_by(user: current_user)
     return unless @registration.nil?
 
     head :forbidden

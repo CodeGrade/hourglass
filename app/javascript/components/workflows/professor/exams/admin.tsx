@@ -8,7 +8,6 @@ import React, {
 import {
   Switch,
   Route,
-  Link,
   useParams,
   useHistory,
   Redirect,
@@ -31,10 +30,8 @@ import {
   Col,
   DropdownButton,
   Dropdown,
-  Tabs,
   Tab,
   Nav,
-  Container,
 } from 'react-bootstrap';
 import {
   FaChevronUp,
@@ -105,7 +102,6 @@ const Loaded: React.FC<{
     response,
   } = props;
   const { examId } = useParams();
-  const history = useHistory();
   const { alert } = useContext(AlertContext);
   const [editing, setEditing] = useState(false);
   const flipEditing = useCallback(() => setEditing((e) => !e), []);
@@ -375,9 +371,6 @@ const ExamInfoViewer: React.FC<{
   onEdit: () => void;
   response: ShowResponse;
 }> = (props) => {
-  const {
-    examId,
-  } = useParams();
   const {
     onEdit,
     response,

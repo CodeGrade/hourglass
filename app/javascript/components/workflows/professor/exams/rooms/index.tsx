@@ -1,8 +1,13 @@
 import React, { useCallback, useMemo, useContext } from 'react';
 import { Room, useResponse as indexRooms } from '@hourglass/common/api/professor/rooms/index';
 import { updateAll, Body } from '@hourglass/common/api/professor/rooms/updateAllRooms';
-import { useParams, useHistory, Switch, Route } from 'react-router-dom';
-import { ExhaustiveSwitchError, useRefresher } from '@hourglass/common/helpers';
+import {
+  useParams,
+  useHistory,
+  Switch,
+  Route,
+} from 'react-router-dom';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   Button,
   Form,
@@ -26,8 +31,6 @@ import { Provider } from 'react-redux';
 import store from '@hourglass/common/student-dnd/store';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
-import { BsPencilSquare } from 'react-icons/bs';
-import LinkButton from '@hourglass/common/linkbutton';
 import { useTabRefresher, TabEditButton } from '@professor/exams/admin';
 
 const EditExamRooms: React.FC = () => {

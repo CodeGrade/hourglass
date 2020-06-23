@@ -60,7 +60,7 @@ import { importVersion } from '@hourglass/common/api/professor/exams/versions/im
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
 import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
 import EditExamRooms from '@professor/exams/rooms';
-import StudentDND from '@hourglass/common/student-dnd';
+import AssignSeating from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
 import ErrorBoundary from '@hourglass/common/boundary';
@@ -280,7 +280,7 @@ const ProctoringChecklist: React.FC<{
           </Tab.Pane>
           <Tab.Pane eventKey="seating">
             <ErrorBoundary>
-              <StudentDND />
+              <AssignSeating />
             </ErrorBoundary>
           </Tab.Pane>
         </Tab.Content>

@@ -294,7 +294,7 @@ const DNDForm = reduxForm({
   form: 'student-dnd',
 })(StudentDNDForm);
 
-const DND: React.FC = () => {
+const AssignSeating: React.FC = () => {
   const { examId } = useParams();
   const [refresher] = useTabRefresher('seating');
   const response = useRoomsIndex(examId, [refresher]);
@@ -327,4 +327,4 @@ const DND: React.FC = () => {
   }
 };
 
-export default DND;
+export default AssignSeating;

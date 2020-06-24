@@ -33,6 +33,6 @@ function transform(res: Server): Response {
   };
 }
 
-export function useResponse(examId: number): ApiResponse<Response> {
-  return useApiResponse<Server, Response>(`/api/proctor/exams/${examId}/anomalies`, undefined, transform);
+export function useResponse(examId: number, deps?: React.DependencyList): ApiResponse<Response> {
+  return useApiResponse<Server, Response>(`/api/proctor/exams/${examId}/anomalies`, undefined, transform, deps);
 }

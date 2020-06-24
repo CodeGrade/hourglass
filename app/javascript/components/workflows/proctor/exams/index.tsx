@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   useResponse as examsShow,
 } from '@hourglass/common/api/professor/exams/show';
@@ -30,23 +30,26 @@ import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import { ShowMessage } from '@hourglass/workflows/student/exams/show/components/navbar/ExamMessages';
 import { GiBugleCall } from 'react-icons/gi';
 import { Anomaly, useResponse as anomaliesIndex } from '@hourglass/common/api/proctor/anomalies';
+import { destroyAnomaly } from '@hourglass/common/api/proctor/anomalies/destroy';
 import Loading from '@hourglass/common/loading';
 import { finalizeRegistration } from '@hourglass/common/api/proctor/registrations/finalize';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
+import { useRefresher } from '@hourglass/common/helpers';
 
 const FinalizeButton: React.FC<{
   regId: number;
   regFinal: boolean;
+  refresh: () => void;
 }> = (props) => {
   const {
     regId,
     regFinal,
+    refresh,
   } = props;
   const { alert } = useContext(AlertContext);
   const [loading, setLoading] = useState(false);
-  const [finalized, setFinalized] = useState(regFinal);
-  const disabled = loading || finalized;
+  const disabled = loading || regFinal;
   const reason = loading ? 'Loading...' : 'Already final';
   return (
     <Loading loading={loading}>
@@ -62,8 +65,8 @@ const FinalizeButton: React.FC<{
                 variant: 'success',
                 message: 'Registration finalized.',
               });
-              setFinalized(true);
               setLoading(false);
+              refresh();
             } else {
               throw new Error(res.reason);
             }
@@ -73,7 +76,6 @@ const FinalizeButton: React.FC<{
               title: 'Error finalizing registration',
               message: err.message,
             });
-            setFinalized(false);
             setLoading(false);
           });
         }}
@@ -85,12 +87,66 @@ const FinalizeButton: React.FC<{
   );
 };
 
+const ClearButton: React.FC<{
+  anomalyId: number;
+  refresh: () => void;
+}> = (props) => {
+  const {
+    anomalyId,
+    refresh,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [loading, setLoading] = useState(false);
+  return (
+    <Loading loading={loading}>
+      <TooltipButton
+        disabled={loading}
+        disabledMessage="Loading..."
+        variant="success"
+        onClick={() => {
+          setLoading(true);
+          destroyAnomaly(anomalyId).then((res) => {
+            if (res.success === true) {
+              alert({
+                variant: 'success',
+                message: 'Anomaly cleared.',
+              });
+              setLoading(false);
+              refresh();
+            } else {
+              throw new Error(res.reason);
+            }
+          }).catch((err) => {
+            alert({
+              variant: 'danger',
+              title: 'Error clearing anomaly',
+              message: err.message,
+            });
+            setLoading(false);
+          });
+        }}
+      >
+        <Icon I={FaThumbsUp} />
+        Clear anomaly
+      </TooltipButton>
+    </Loading>
+  );
+};
+
 const ShowAnomalies: React.FC<{
   anomalies: Anomaly[];
+  refresh: () => void;
 }> = (props) => {
   const {
     anomalies,
+    refresh,
   } = props;
+  useEffect(() => {
+    const timer = setInterval(refresh, 5000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [refresh])
   return (
     <tbody>
       {anomalies.length === 0 && <tr><td>No anomalies.</td></tr>}
@@ -100,11 +156,8 @@ const ShowAnomalies: React.FC<{
           <td><ReadableDate showTime value={a.time} /></td>
           <td>{a.reason}</td>
           <td>
-            <FinalizeButton regId={a.reg.id} regFinal={a.reg.final} />
-            <Button variant="success">
-              <Icon I={FaThumbsUp} />
-              Clear anomaly
-            </Button>
+            <FinalizeButton refresh={refresh} regId={a.reg.id} regFinal={a.reg.final} />
+            <ClearButton refresh={refresh} anomalyId={a.id} />
             <Button variant="info">
               <Icon I={MdMessage} />
               Message student
@@ -122,7 +175,8 @@ const ExamAnomalies: React.FC<{
   const {
     examId,
   } = props;
-  const res = anomaliesIndex(examId);
+  const [refresher, refresh] = useRefresher();
+  const res = anomaliesIndex(examId, [refresher]);
   return (
     <>
       <h2>Anomalies</h2>
@@ -135,7 +189,7 @@ const ExamAnomalies: React.FC<{
             <th>Actions</th>
           </tr>
         </thead>
-        {res.type === 'RESULT' && <ShowAnomalies anomalies={res.response.anomalies} />}
+        {res.type === 'RESULT' && <ShowAnomalies refresh={refresh} anomalies={res.response.anomalies} />}
       </Table>
       {res.type === 'LOADING' && <p>Loading...</p>}
       {res.type === 'ERROR' && (

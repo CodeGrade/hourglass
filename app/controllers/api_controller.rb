@@ -44,6 +44,16 @@ class ApiController < ApplicationController
     head :forbidden
   end
 
+  def find_anomaly
+    @anomaly ||= Anomaly.find_by(id: params[:anomaly_id])
+    @registration ||= @anomaly.registration
+    @exam ||= @anomaly.exam
+    @course ||= @exam.course
+    return unless @anomaly.nil?
+
+    head :forbidden
+  end
+
   def find_version
     @version ||= ExamVersion.find_by(id: params[:version_id])
     @exam = @version.exam

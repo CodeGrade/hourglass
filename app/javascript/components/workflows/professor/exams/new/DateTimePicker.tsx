@@ -58,7 +58,10 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
         <Dropdown.Toggle id="choose-time">
           <BsCalendar />
         </Dropdown.Toggle>
-        <Dropdown.Menu className="p-0 d-flex flex-grow-1 DateTimeCustom">
+        <Dropdown.Menu
+          alignRight
+          className="p-0 d-flex flex-grow-1 DateTimeCustom"
+        >
           <DatePicker
             inline
             selected={value.toJSDate()}

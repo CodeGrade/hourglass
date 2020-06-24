@@ -2,6 +2,16 @@
 @import "node_modules/bootstrap/scss/variables";
 @import "node_modules/bootstrap/scss/mixins";
 
+html.react-timekeeper-noscroll {
+  overflow: unset !important;
+  padding-right: unset !important;
+}
+
+.DateTimeCustom:not(.show) {
+  left: unset !important;
+  right: 0 !important;
+}
+
 .DateTimeCustom {
   display: flex;
   align-items: stretch;
@@ -107,6 +117,15 @@
 
     .react-timekeeper__meridiem--active {
       @include button-variant(theme-color("primary"), theme-color("primary"));
+    }
+
+    .react-timekeeper__dropdown-numbers {
+      overflow-x: hidden;
+    }
+
+    .react-timekeeper__dropdown-number {
+      display: inline-block;
+      text-align: center;
     }
   }
 

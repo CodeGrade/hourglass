@@ -20,7 +20,7 @@
     },
     "Contents": {
       "type": "object",
-      "required": ["questions"],
+      "required": ["reference", "questions"],
       "additionalProperties": false,
       "properties": {
         "instructions": { "$ref": "#/definitions/HTML" },

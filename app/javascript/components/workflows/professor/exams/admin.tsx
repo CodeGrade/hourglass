@@ -3,13 +3,15 @@ import React, {
   useEffect,
   useContext,
   createRef,
+  useCallback,
 } from 'react';
 import {
   Switch,
   Route,
-  Link,
   useParams,
   useHistory,
+  Redirect,
+  useLocation,
 } from 'react-router-dom';
 import {
   useResponse as examsShow,
@@ -28,6 +30,8 @@ import {
   Col,
   DropdownButton,
   Dropdown,
+  Tab,
+  Nav,
 } from 'react-bootstrap';
 import {
   FaChevronUp,
@@ -54,12 +58,17 @@ import { DateTime } from 'luxon';
 import { importVersion } from '@hourglass/common/api/professor/exams/versions/import';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
 import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
+import EditExamRooms from '@professor/exams/rooms';
+import AssignSeating from '@hourglass/common/student-dnd';
+import AllocateVersions from '@professor/exams/allocate-versions';
+import AssignStaff from '@professor/exams/assign-staff';
+import ErrorBoundary from '@hourglass/common/boundary';
+import { BsPencilSquare } from 'react-icons/bs';
+import { GiOpenBook } from 'react-icons/gi';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
   const [refresher, refresh] = useRefresher();
-  const history = useHistory();
-  const { alert } = useContext(AlertContext);
   const response = examsShow(examId, [refresher]);
   switch (response.type) {
     case 'ERROR':
@@ -74,52 +83,71 @@ export const ExamAdmin: React.FC = () => {
       return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <>
-          <Switch>
-            <Route path="/exams/:examId/admin/edit">
-              <ExamInfoEditor
-                response={response.response}
-                onCancel={(): void => {
-                  history.push(`/exams/${examId}/admin`);
-                }}
-                onSubmit={(info) => {
-                  updateExam(examId, info)
-                    .then((res) => {
-                      if (res.updated === true) {
-                        history.push(`/exams/${examId}/admin`);
-                        alert({
-                          variant: 'success',
-                          message: 'Exam info saved.',
-                        });
-                        refresh();
-                      } else {
-                        throw new Error(res.reason);
-                      }
-                    }).catch((err) => {
-                      alert({
-                        variant: 'danger',
-                        title: 'Error saving exam info.',
-                        message: err.message,
-                      });
-                    });
-                }}
-              />
-            </Route>
-            <Route path="/exams/:examId/admin">
-              <ExamInfoViewer response={response.response} />
-            </Route>
-          </Switch>
-          <VersionInfo
-            versions={response.response.versions}
-            examName={response.response.name}
-            refresh={refresh}
-          />
-          <ProctoringInfo examId={examId} checklist={response.response.checklist} />
-        </>
+        <Loaded
+          refresh={refresh}
+          response={response.response}
+        />
       );
     default:
       throw new ExhaustiveSwitchError(response);
   }
+};
+
+const Loaded: React.FC<{
+  refresh: () => void;
+  response: ShowResponse;
+}> = (props) => {
+  const {
+    refresh,
+    response,
+  } = props;
+  const { examId } = useParams();
+  const { alert } = useContext(AlertContext);
+  const [editing, setEditing] = useState(false);
+  const flipEditing = useCallback(() => setEditing((e) => !e), []);
+  return (
+    <>
+      {editing ? (
+        <ExamInfoEditor
+          response={response}
+          onCancel={flipEditing}
+          onSubmit={(info) => {
+            updateExam(examId, info)
+              .then((res) => {
+                if (res.updated === true) {
+                  setEditing(false);
+                  alert({
+                    variant: 'success',
+                    message: 'Exam info saved.',
+                  });
+                  refresh();
+                } else {
+                  throw new Error(res.reason);
+                }
+              }).catch((err) => {
+                alert({
+                  variant: 'danger',
+                  title: 'Error saving exam info.',
+                  message: err.message,
+                });
+              });
+          }}
+        />
+      ) : (
+        <ExamInfoViewer
+          onEdit={flipEditing}
+          response={response}
+        />
+      )}
+      <TabbedChecklist
+        refresh={refresh}
+        examId={examId}
+        checklist={response.checklist}
+        versions={response.versions}
+        examName={response.name}
+      />
+    </>
+  );
 };
 
 const ChecklistIcon: React.FC<{
@@ -156,66 +184,195 @@ const ChecklistIcon: React.FC<{
   );
 };
 
-const ProctoringInfo: React.FC<{
+const TabbedChecklist: React.FC<{
+  refresh: () => void;
   examId: number;
   checklist: Checklist;
+  examName: string;
+  versions: Version[];
 }> = (props) => {
   const {
+    refresh,
     examId,
     checklist,
+    examName,
+    versions,
   } = props;
   return (
+    <Switch>
+      <Route path="/exams/:examId/admin/:tabName">
+        <PreFlightChecklist
+          refresh={refresh}
+          checklist={checklist}
+          examName={examName}
+          versions={versions}
+        />
+      </Route>
+      <Route>
+        <Redirect to={`/exams/${examId}/admin/edit-versions`} />
+      </Route>
+    </Switch>
+  );
+};
+
+const PreFlightChecklist: React.FC<{
+  refresh: () => void;
+  checklist: Checklist;
+  examName: string;
+  versions: Version[];
+}> = (props) => {
+  const {
+    refresh,
+    checklist,
+    examName,
+    versions,
+  } = props;
+  const history = useHistory();
+  const { examId, tabName } = useParams();
+  const location = useLocation();
+  useEffect(refresh, [location.pathname]);
+  return (
     <>
-      <h2>Proctoring Checklist</h2>
-      <ul className="list-unstyled">
-        <li>
-          <ChecklistIcon
-            reason={checklist.rooms.reason}
-            status={checklist.rooms.status}
-          />
-          <Link to={`/exams/${examId}/rooms`}>
-            Edit rooms
-          </Link>
-        </li>
-        <li>
-          <ChecklistIcon
-            reason={checklist.staff.reason}
-            status={checklist.staff.status}
-          />
-          <Link to={`/exams/${examId}/assign-staff`}>
-            Assign staff members
-          </Link>
-        </li>
-        <li>
-          <ChecklistIcon
-            reason={checklist.versions.reason}
-            status={checklist.versions.status}
-          />
-          <Link to={`/exams/${examId}/allocate-versions`}>
-            Allocate versions
-          </Link>
-        </li>
-        <li>
-          <ChecklistIcon
-            reason={checklist.seating.reason}
-            status={checklist.seating.status}
-          />
-          <Link to={`/exams/${examId}/seating`}>
-            Assign seating
-          </Link>
-        </li>
-      </ul>
+      <h1>Pre-flight Checklist</h1>
+      <Tab.Container activeKey={tabName}>
+        <Nav
+          variant="tabs"
+          activeKey={tabName}
+        >
+          <Nav.Item>
+            <Nav.Link
+              eventKey="edit-versions"
+              onClick={() => history.push(`/exams/${examId}/admin/edit-versions`)}
+            >
+              <Icon I={GiOpenBook} />
+              <span className="ml-2">
+                Edit versions
+              </span>
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              eventKey="rooms"
+              onClick={() => history.push(`/exams/${examId}/admin/rooms`)}
+            >
+              <ChecklistIcon
+                reason={checklist.rooms.reason}
+                status={checklist.rooms.status}
+              />
+              <span className="ml-2">
+                Edit rooms
+              </span>
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              eventKey="staff"
+              onClick={() => history.push(`/exams/${examId}/admin/staff`)}
+            >
+              <ChecklistIcon
+                reason={checklist.staff.reason}
+                status={checklist.staff.status}
+              />
+              <span className="ml-2">
+                Assign staff members
+              </span>
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              eventKey="versions"
+              onClick={() => history.push(`/exams/${examId}/admin/versions`)}
+            >
+              <ChecklistIcon
+                reason={checklist.versions.reason}
+                status={checklist.versions.status}
+              />
+              <span className="ml-2">
+                Allocate versions
+              </span>
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              eventKey="seating"
+              onClick={() => history.push(`/exams/${examId}/admin/seating`)}
+            >
+              <ChecklistIcon
+                reason={checklist.seating.reason}
+                status={checklist.seating.status}
+              />
+              <span className="ml-2">
+                Assign seating
+              </span>
+            </Nav.Link>
+          </Nav.Item>
+        </Nav>
+        <Tab.Content className="border border-top-0 rounded-bottom p-3">
+          <Tab.Pane eventKey="edit-versions">
+            <ErrorBoundary>
+              <VersionInfo
+                refresh={refresh}
+                examName={examName}
+                versions={versions}
+              />
+            </ErrorBoundary>
+          </Tab.Pane>
+          <Tab.Pane eventKey="rooms">
+            <ErrorBoundary>
+              <EditExamRooms />
+            </ErrorBoundary>
+          </Tab.Pane>
+          <Tab.Pane eventKey="staff">
+            <ErrorBoundary>
+              <AssignStaff />
+            </ErrorBoundary>
+          </Tab.Pane>
+          <Tab.Pane eventKey="versions">
+            <ErrorBoundary>
+              <AllocateVersions />
+            </ErrorBoundary>
+          </Tab.Pane>
+          <Tab.Pane eventKey="seating">
+            <ErrorBoundary>
+              <AssignSeating />
+            </ErrorBoundary>
+          </Tab.Pane>
+        </Tab.Content>
+      </Tab.Container>
     </>
   );
 };
 
+export const TabEditButton: React.FC = () => {
+  const { examId, tabName } = useParams();
+  return (
+    <LinkButton
+      to={`/exams/${examId}/admin/${tabName}/edit`}
+    >
+      <Icon I={BsPencilSquare} />
+      <span className="ml-2">
+        Edit
+      </span>
+    </LinkButton>
+  );
+};
+
+export function useTabRefresher(currentTab: string): [number, () => void] {
+  const [refresher, refresh] = useRefresher();
+  const location = useLocation();
+  const { tabName } = useParams();
+  useEffect(() => {
+    if (tabName === currentTab) refresh();
+  }, [tabName, location.pathname]);
+  return [refresher, refresh];
+}
+
 const ExamInfoViewer: React.FC<{
+  onEdit: () => void;
   response: ShowResponse;
 }> = (props) => {
   const {
-    examId,
-  } = useParams();
-  const {
+    onEdit,
     response,
   } = props;
   const {
@@ -224,21 +381,34 @@ const ExamInfoViewer: React.FC<{
     duration,
   } = response;
   return (
-    <>
-      <h1>{response.name}</h1>
-      <p>
-        Starts&nbsp;
-        <ReadableDate value={start} showTime />
-      </p>
-      <p>
-        Ends&nbsp;
-        <ReadableDate value={end} showTime />
-      </p>
-      <p>{`Duration: ${duration / 60.0} minutes`}</p>
-      <LinkButton to={`/exams/${examId}/admin/edit`}>
-        Edit
-      </LinkButton>
-    </>
+    <Card className="mb-4">
+      <Card.Body>
+        <h1>
+          {response.name}
+          <span className="float-right">
+            <Button
+              variant="primary"
+              onClick={onEdit}
+            >
+              <Icon I={BsPencilSquare} />
+              <span className="ml-2">Edit</span>
+            </Button>
+          </span>
+        </h1>
+        <Row>
+          <Form.Label column sm={2}>Starts:</Form.Label>
+          <ReadableDate value={start} showTime />
+        </Row>
+        <Row>
+          <Form.Label column sm={2}>Ends:</Form.Label>
+          <ReadableDate value={end} showTime />
+        </Row>
+        <Row>
+          <Form.Label column sm={2}>Duration:</Form.Label>
+          {`${duration / 60.0} minutes`}
+        </Row>
+      </Card.Body>
+    </Card>
   );
 };
 
@@ -254,82 +424,79 @@ export const ExamInfoEditor: React.FC<{
     onSubmit,
     onCancel,
   } = props;
-  const now = DateTime.local().toISO();
-  const threeHours = DateTime.local().plus({ hours: 3 }).toISO();
-  const [name, setName] = useState(response?.name ?? '');
-  const [start, setStart] = useState(response?.start.toISO() ?? now);
-  const [end, setEnd] = useState(response?.end.toISO() ?? threeHours);
-  const [duration, setDuration] = useState(response?.duration ?? NINETY_MINUTES);
+  const now = DateTime.local();
+  const threeHours = DateTime.local().plus({ hours: 3 });
+  const [name, setName] = useState<string>(response?.name ?? '');
+  const [start, setStart] = useState<DateTime>(response?.start ?? now);
+  const [end, setEnd] = useState<DateTime>(response?.end ?? threeHours);
+  const [duration, setDuration] = useState<number>(response?.duration ?? NINETY_MINUTES);
 
   return (
-    <Card>
+    <Card className="mb-4">
       <Card.Body>
         <Form.Group as={Row} controlId="examTitle">
-          <Form.Label column sm={2}>Exam name:</Form.Label>
-          <Col sm={10}>
+          <Form.Label column sm={2}>
+            Exam name:
+          </Form.Label>
+          <Col>
             <Form.Control
               type="input"
               value={name}
               onChange={(e): void => setName(e.target.value)}
             />
           </Col>
+          <span className="float-right">
+            <Button
+              variant="danger"
+              onClick={(): void => onCancel()}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="success"
+              className="ml-2"
+              onClick={(): void => {
+                onSubmit({
+                  name,
+                  duration,
+                  start: start.toISO(),
+                  end: end.toISO(),
+                });
+              }}
+            >
+              Save
+            </Button>
+          </span>
         </Form.Group>
         <Form.Group as={Row} controlId="examStartTime">
           <Form.Label column sm={2}>Start time:</Form.Label>
-          <Col sm={10}>
-            <p>{start}</p>
+          <Col>
             <DateTimePicker
-              maxIsoValue={end}
-              isoValue={start}
-              onChange={(newStart): void => {
-                // console.log(start, newStart.toISO());
-                setStart(newStart.toISO());
-              }}
+              value={start}
+              maxValue={end}
+              onChange={(newStart): void => setStart(newStart)}
             />
           </Col>
         </Form.Group>
         <Form.Group as={Row} controlId="examEndTime">
           <Form.Label column sm={2}>End time:</Form.Label>
-          <Col sm={10}>
-            <p>{end}</p>
+          <Col>
             <DateTimePicker
-              isoValue={end}
-              minIsoValue={start}
-              onChange={(newEnd): void => setEnd(newEnd.toISO())}
+              value={end}
+              minValue={start}
+              onChange={(newEnd): void => setEnd(newEnd)}
             />
           </Col>
         </Form.Group>
         <Form.Group as={Row} controlId="examDuration">
           <Form.Label column sm={2}>Duration (minutes):</Form.Label>
-          <Col sm={10}>
+          <Col>
             <Form.Control
               type="number"
               value={duration / 60.0}
               onChange={(e): void => setDuration(Number(e.target.value) * 60)}
             />
           </Col>
-        </Form.Group>
-        <Form.Group className="float-right">
-          <Button
-            variant="danger"
-            onClick={(): void => onCancel()}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="success"
-            className="ml-2"
-            onClick={(): void => {
-              onSubmit({
-                name,
-                duration,
-                start,
-                end,
-              });
-            }}
-          >
-            Save
-          </Button>
         </Form.Group>
       </Card.Body>
     </Card>
@@ -392,6 +559,12 @@ const VersionInfo: React.FC<{
             onClick={(): void => {
               createVersion(examId).then((res) => {
                 history.push(`/exams/${examId}/versions/${res.id}/edit`);
+              }).catch((err) => {
+                alert({
+                  variant: 'danger',
+                  title: 'Exam version not created.',
+                  message: err.message,
+                });
               });
             }}
           >
@@ -488,15 +661,17 @@ const ShowVersion: React.FC<{
           </TooltipButton>
         </div>
       </h3>
-      <PreviewVersion
-        open={preview}
-        railsExam={{
-          id: examId,
-          name: examName,
-          policies: version.policies,
-        }}
-        contents={version.contents}
-      />
+      <ErrorBoundary>
+        <PreviewVersion
+          open={preview}
+          railsExam={{
+            id: examId,
+            name: examName,
+            policies: version.policies,
+          }}
+          contents={version.contents}
+        />
+      </ErrorBoundary>
     </>
   );
 };

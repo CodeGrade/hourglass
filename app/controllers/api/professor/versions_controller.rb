@@ -81,6 +81,7 @@ module Api
             policies: [],
             answers: [],
             contents: {
+              reference: [],
               questions: []
             }
           }

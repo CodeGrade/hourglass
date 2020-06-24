@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useCallback } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import {
   Col,
@@ -25,8 +25,15 @@ import {
 } from '@hourglass/common/api/professor/rooms/staffRegs';
 import { updateAll } from '@hourglass/common/api/professor/rooms/updateAllStaff';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { useHistory, useParams } from 'react-router-dom';
+import {
+  useHistory,
+  useParams,
+  Switch,
+  Route,
+} from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
+import { useTabRefresher, TabEditButton } from '../admin';
+import '../list-columns.scss';
 
 interface FormContextType {
   sections: Section[];
@@ -63,7 +70,7 @@ const DropTarget: React.FC<{
   return (
     <div
       ref={drop}
-      className={`${bg} border rounded px-2 text-center flex-fill`}
+      className={`${bg} border rounded px-2 flex-fill`}
     >
       {children}
     </div>
@@ -120,22 +127,22 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
       >
         Drop staff here!
       </p>
-      <div className="d-flex mx-n1 justify-content-around rounded mb-2 flex-wrap">
+      <ul className="list-unstyled column-count-4">
         {fields.map((member, index) => {
           const student = fields.get(index);
           return (
-            <span
-              className="mx-1"
+            <li
+              className="mx-1 fixed-col-width"
               key={`${member}-${student.id}`}
             >
               <DraggableStudent
                 student={student}
                 onRemove={(): void => fields.remove(index)}
               />
-            </span>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </DropTarget>
   );
 };
@@ -151,39 +158,43 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
   } = props;
   const { sections } = useContext(FormContext);
   return (
-    <Row>
+    <>
       {fields.map((member, index) => {
         const room = fields.get(index);
         return (
-          <Col key={room.id}>
+          <Form.Group key={room.id}>
             <FormSection name={member}>
-              <h2>{room.name}</h2>
-              <DropdownButton
-                title="Add entire section"
-                id={`add-section-${room.id}`}
-                size="sm"
-                className="mb-2"
-              >
-                {sections.map((s) => (
-                  <Dropdown.Item
-                    key={s.id}
-                    onClick={(): void => {
-                      addSectionToRoom(s, room.id);
-                    }}
+              <h3>
+                {room.name}
+                <span className="float-right">
+                  <DropdownButton
+                    title="Add entire section"
+                    id={`staff-dnd-add-section-${room.id}`}
+                    size="sm"
+                    className="mb-2"
                   >
-                    {s.title}
-                  </Dropdown.Item>
-                ))}
-              </DropdownButton>
+                    {sections.map((s) => (
+                      <Dropdown.Item
+                        key={s.id}
+                        onClick={(): void => {
+                          addSectionToRoom(s, room.id);
+                        }}
+                      >
+                        {s.title}
+                      </Dropdown.Item>
+                    ))}
+                  </DropdownButton>
+                </span>
+              </h3>
               <FieldArray
                 name="proctors"
                 component={Students}
               />
             </FormSection>
-          </Col>
+          </Form.Group>
         );
       })}
-    </Row>
+    </>
   );
 };
 
@@ -219,6 +230,9 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   };
   const history = useHistory();
   const { alert } = useContext(AlertContext);
+  const cancel = useCallback(() => {
+    history.goBack();
+  }, [history]);
   return (
     <form
       onSubmit={handleSubmit(({ all }) => {
@@ -233,7 +247,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         };
         updateAll(examId, body).then((result) => {
           if (result.created === false) throw new Error(result.reason);
-          history.push(`/exams/${examId}/admin`);
+          history.push(`/exams/${examId}/admin/staff`);
           alert({
             variant: 'success',
             message: 'Room assignments successfully created.',
@@ -248,12 +262,38 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
       })}
     >
       <FormSection name="all">
+        <h2>
+          Edit Staff Registrations
+          <span className="float-right">
+            <Button
+              variant="danger"
+              className={pristine && 'd-none'}
+              onClick={reset}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="secondary"
+              className="ml-2"
+              onClick={cancel}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              className="ml-2"
+              type="submit"
+            >
+              Save
+            </Button>
+          </span>
+        </h2>
         <Form.Group>
-          <h2>Unassigned Staff</h2>
+          <h3>Unassigned Staff</h3>
           <FieldArray name="unassigned" component={Students} />
         </Form.Group>
         <Form.Group>
-          <h2>Proctors Without Rooms</h2>
+          <h3>Proctors Without Rooms</h3>
           <FieldArray name="proctors" component={Students} />
         </Form.Group>
         <Form.Group>
@@ -264,23 +304,6 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               addSectionToRoom,
             }}
           />
-        </Form.Group>
-        <Form.Group>
-          <Button
-            variant="danger"
-            className={pristine && 'd-none'}
-            onClick={reset}
-          >
-            Reset
-          </Button>
-        </Form.Group>
-        <Form.Group>
-          <Button
-            variant="success"
-            type="submit"
-          >
-            Submit
-          </Button>
         </Form.Group>
       </FormSection>
     </form>
@@ -299,9 +322,138 @@ const DNDForm = reduxForm({
   form: 'staff-dnd',
 })(StudentDNDForm);
 
+interface StaffAssignmentProps {
+  sections: Section[];
+  unassigned: Student[];
+  proctors: Student[];
+  rooms: Room[];
+}
+
+const Editable: React.FC<StaffAssignmentProps> = (props) => {
+  const {
+    sections,
+    unassigned,
+    proctors,
+    rooms,
+  } = props;
+  return (
+    <Provider store={store}>
+      <FormContext.Provider value={{ sections }}>
+        <DNDForm
+          initialValues={{
+            all: {
+              unassigned,
+              proctors,
+              rooms,
+            },
+          }}
+        />
+      </FormContext.Provider>
+    </Provider>
+  );
+};
+
+const Readonly: React.FC<StaffAssignmentProps> = (props) => {
+  const {
+    unassigned,
+    proctors,
+    rooms,
+  } = props;
+  return (
+    <>
+      <h2>
+        Staff Registrations
+        <span className="float-right">
+          <TabEditButton />
+        </span>
+      </h2>
+      <Form.Group>
+        <h3>Unassigned Staff</h3>
+        <div className="border px-2 flex-fill rounded">
+          <ul className="list-unstyled column-count-4">
+            {unassigned.map((s) => (
+              <li key={s.id} className="fixed-col-width">
+                <span>{s.displayName}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Form.Group>
+      <Form.Group>
+        <h3>Proctors Without Rooms</h3>
+        <div className="border px-2 flex-fill rounded">
+          {proctors.length === 0 ? (
+            <p>No proctors</p>
+          ) : (
+            <ul className="list-unstyled column-count-4">
+              {proctors.map((s) => (
+                <li key={s.id} className="fixed-col-width">
+                  <span>{s.displayName}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </Form.Group>
+      {rooms.map((r) => (
+        <Form.Group key={r.id}>
+          <h3>{r.name}</h3>
+          <div className="border px-2 flex-fill rounded">
+            {r.proctors.length === 0 ? (
+              <p>No proctors</p>
+            ) : (
+              <ul className="list-unstyled column-count-4">
+                {r.proctors.map((p) => (
+                  <li key={p.id} className="fixed-col-width">
+                    <span>{p.displayName}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </Form.Group>
+      ))}
+    </>
+  );
+};
+
+const Loaded: React.FC<StaffAssignmentProps> = (props) => {
+  const {
+    sections,
+    unassigned,
+    proctors,
+    rooms,
+  } = props;
+  return (
+    <Row>
+      <Col>
+        <Switch>
+          <Route path="/exams/:examId/admin/staff/edit">
+            <Editable
+              sections={sections}
+              unassigned={unassigned}
+              proctors={proctors}
+              rooms={rooms}
+            />
+          </Route>
+          <Route>
+            <Readonly
+              sections={sections}
+              unassigned={unassigned}
+              proctors={proctors}
+              rooms={rooms}
+            />
+          </Route>
+        </Switch>
+      </Col>
+    </Row>
+  );
+};
+
 const DND: React.FC = () => {
   const { examId } = useParams();
-  const response = useStaffRegs(examId);
+  const [refresher] = useTabRefresher('staff');
+  const response = useStaffRegs(examId, [refresher]);
   switch (response.type) {
     case 'ERROR':
       return <p className="text-danger">{`${response.text} (${response.status})`}</p>;
@@ -309,23 +461,12 @@ const DND: React.FC = () => {
       return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <Provider store={store}>
-          <FormContext.Provider
-            value={{
-              sections: response.response.sections,
-            }}
-          >
-            <DNDForm
-              initialValues={{
-                all: {
-                  unassigned: response.response.unassigned,
-                  proctors: response.response.proctors,
-                  rooms: response.response.rooms,
-                },
-              }}
-            />
-          </FormContext.Provider>
-        </Provider>
+        <Loaded
+          sections={response.response.sections}
+          unassigned={response.response.unassigned}
+          proctors={response.response.proctors}
+          rooms={response.response.rooms}
+        />
       );
     default:
       throw new ExhaustiveSwitchError(response);

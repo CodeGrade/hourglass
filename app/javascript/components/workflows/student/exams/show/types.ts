@@ -551,7 +551,7 @@ export interface TimeInfo {
 export interface ExamVersion {
   questions: QuestionInfo[];
   reference?: FileRef[];
-  instructions: HTMLVal;
+  instructions?: HTMLVal;
   files: ExamFile[];
 }
 

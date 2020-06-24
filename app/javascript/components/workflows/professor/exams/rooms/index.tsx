@@ -1,7 +1,12 @@
 import React, { useCallback, useMemo, useContext } from 'react';
 import { Room, useResponse as indexRooms } from '@hourglass/common/api/professor/rooms/index';
 import { updateAll, Body } from '@hourglass/common/api/professor/rooms/updateAllRooms';
-import { useParams, useHistory } from 'react-router-dom';
+import {
+  useParams,
+  useHistory,
+  Switch,
+  Route,
+} from 'react-router-dom';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   Button,
@@ -23,13 +28,15 @@ import {
   InjectedFormProps,
 } from 'redux-form';
 import { Provider } from 'react-redux';
-import store from '@professor/exams/rooms/store';
+import store from '@hourglass/common/student-dnd/store';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
+import { useTabRefresher, TabEditButton } from '@professor/exams/admin';
 
 const EditExamRooms: React.FC = () => {
   const { examId } = useParams();
-  const response = indexRooms(examId);
+  const [refresher] = useTabRefresher('rooms');
+  const response = indexRooms(examId, [refresher]);
   switch (response.type) {
     case 'ERROR':
       return <p className="text-danger">{response.status}</p>;
@@ -65,20 +72,65 @@ const Loaded: React.FC<{
   const {
     rooms,
   } = props;
-  const initialValues = useMemo(() => createInitialValues(rooms), [rooms]);
   return (
     <Row>
       <Col>
-        <h1>Edit rooms</h1>
-        <Provider store={store}>
-          <EditExamRoomsForm
-            initialValues={initialValues}
-          />
-        </Provider>
+        <Switch>
+          <Route path="/exams/:examId/admin/rooms/edit">
+            <Editable rooms={rooms} />
+          </Route>
+          <Route>
+            <Readonly rooms={rooms} />
+          </Route>
+        </Switch>
       </Col>
     </Row>
   );
 };
+
+const Editable: React.FC<{
+  rooms: Room[];
+}> = (props) => {
+  const {
+    rooms,
+  } = props;
+  const initialValues = useMemo(() => createInitialValues(rooms), [rooms]);
+  return (
+    <Provider store={store}>
+      <EditExamRoomsForm
+        initialValues={initialValues}
+      />
+    </Provider>
+  );
+};
+
+const Readonly: React.FC<{
+  rooms: Room[];
+}> = (props) => {
+  const {
+    rooms,
+  } = props;
+  return (
+    <>
+      <h2>
+        Rooms
+        <span className="float-right">
+          <TabEditButton />
+        </span>
+      </h2>
+      {rooms.map((r) => (
+        <Form.Group key={r.id}>
+          <FormControl
+            size="lg"
+            value={r.name}
+            disabled
+          />
+        </Form.Group>
+      ))}
+    </>
+  );
+};
+
 
 const EditRoomName: React.FC<WrappedFieldProps> = (props) => {
   const { input } = props;
@@ -103,23 +155,22 @@ const renderRoom = (member: string, index: number, fields: FieldArrayFieldsProps
   >
     <li className="list-unstyled">
       <Form.Group as={Row}>
-        <Col>
+        <Col className="d-flex">
           <Field name="name" component={EditRoomName} />
-        </Col>
-        <div className="float-right">
           <TooltipButton
             variant="danger"
             onClick={() => fields.remove(index)}
             disabled={fields.get(index).numRegs !== 0}
             disabledMessage="This room has registered users."
             size="lg"
+            className="text-nowrap ml-2"
           >
             <Icon I={FaTrash} />
             <span className="ml-1">
               Delete
             </span>
           </TooltipButton>
-        </div>
+        </Col>
       </Form.Group>
     </li>
   </FormSection>
@@ -200,7 +251,7 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         const body = transformForSubmit(initialValues, values);
         updateAll(examId, body).then((res) => {
           if (res.created === false) throw new Error(res.reason);
-          history.push(`/exams/${examId}/admin`);
+          history.push(`/exams/${examId}/admin/rooms`);
           alert({
             variant: 'success',
             message: 'Rooms saved successfully.',
@@ -215,33 +266,33 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         });
       })}
     >
+      <h2>
+        Edit Rooms
+        <span className="float-right">
+          <Button
+            className={pristine ? 'd-none' : ''}
+            variant="danger"
+            onClick={reset}
+          >
+            Reset
+          </Button>
+          <Button
+            className="ml-2"
+            variant="secondary"
+            onClick={cancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            className="ml-2"
+            variant="primary"
+            type="submit"
+          >
+            Save
+          </Button>
+        </span>
+      </h2>
       <FieldArray name="rooms" component={ShowRooms} />
-      <Form.Group className="float-right">
-        <Button
-          className={pristine ? 'd-none' : ''}
-          size="lg"
-          variant="danger"
-          onClick={reset}
-        >
-          Reset
-        </Button>
-        <Button
-          size="lg"
-          className="ml-2"
-          variant="secondary"
-          onClick={cancel}
-        >
-          Cancel
-        </Button>
-        <Button
-          size="lg"
-          className="ml-2"
-          variant="primary"
-          type="submit"
-        >
-          Save
-        </Button>
-      </Form.Group>
     </form>
   );
 };

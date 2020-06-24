@@ -8,14 +8,15 @@ const Loading: React.FC<{ loading: boolean }> = (props) => {
   return (
     <div className="d-inline-block position-relative">
       <div className={`${loadingClass} loadingSpinnerOuter`}>
-        <div className="loadingSpinnerOverlay" />
         <div className="loadingSpinnerInner">
           <Spinner animation="border" role="status">
             <span className="sr-only">Loading...</span>
           </Spinner>
         </div>
       </div>
-      {children}
+      <div className={loading ? 'loadingSpinnerDim' : ''}>
+        {children}
+      </div>
     </div>
   );
 };

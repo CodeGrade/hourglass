@@ -166,7 +166,9 @@ const ExamProctoring: React.FC = () => {
       <Container fluid className="mh-100 flex-column">
         <Row>
           <Col>
-            <h1>{res.type === 'RESULT' ? res.response.name : 'Exam'}</h1>
+            <Loading loading={res.type !== 'RESULT'}>
+              <h1>{res.type === 'RESULT' ? res.response.name : 'Exam'}</h1>
+            </Loading>
           </Col>
         </Row>
         <Row className="flex-grow-1">

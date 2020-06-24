@@ -158,6 +158,9 @@ const Loaded: React.FC<{
         <Link to={`/exams/${examId}/proctoring`}>
           <Button variant="success">Proctor!</Button>
         </Link>
+        <Link to={`/exams/${examId}/submissions`}>
+          <Button className="ml-2" variant="primary">View submissions</Button>
+        </Link>
       </Form.Group>
     </>
   );

@@ -79,6 +79,16 @@ class ApiController < ApplicationController
     require_prof_reg
   end
 
+  def require_staff_reg
+    @staff_registration ||= StaffRegistration.find_by(
+      user: current_user,
+      section: @course.sections
+    )
+    return unless @staff_registration.nil?
+
+    require_prof_reg
+  end
+
   def require_prof_reg
     @professor_course_registration ||= ProfessorCourseRegistration.find_by(
       user: current_user,

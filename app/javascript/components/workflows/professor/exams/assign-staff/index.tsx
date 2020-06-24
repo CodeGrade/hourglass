@@ -382,13 +382,17 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
       <Form.Group>
         <h3>Proctors Without Rooms</h3>
         <div className="border px-2 flex-fill rounded">
-          <ul className="list-unstyled column-count-4">
-            {proctors.map((s) => (
-              <li key={s.id} className="fixed-col-width">
-                <span>{s.displayName}</span>
-              </li>
-            ))}
-          </ul>
+          {proctors.length === 0 ? (
+            <p>No proctors</p>
+          ) : (
+            <ul className="list-unstyled column-count-4">
+              {proctors.map((s) => (
+                <li key={s.id} className="fixed-col-width">
+                  <span>{s.displayName}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </Form.Group>
       {rooms.map((r) => (

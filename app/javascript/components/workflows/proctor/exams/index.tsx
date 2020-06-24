@@ -30,6 +30,72 @@ import Icon from '@student/exams/show/components/Icon';
 import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import { ShowMessage } from '@hourglass/workflows/student/exams/show/components/navbar/ExamMessages';
 import { GiBugleCall } from 'react-icons/gi';
+import { Anomaly, useResponse as anomaliesIndex } from '@hourglass/common/api/professor/exams/anomalies';
+
+const ShowAnomalies: React.FC<{
+  anomalies: Anomaly[];
+}> = (props) => {
+  const {
+    anomalies,
+  } = props;
+  return (
+    <tbody>
+      {anomalies.map((a) => (
+        <tr key={a.id}>
+          <td>{a.reg.displayName}</td>
+          <td><ReadableDate showTime value={a.time} /></td>
+          <td>{a.reason}</td>
+          <td>
+            <Button variant="danger">
+              <Icon I={FaThumbsDown} />
+              Finalize
+            </Button>
+            <Button variant="success">
+              <Icon I={FaThumbsUp} />
+              Clear anomaly
+            </Button>
+            <Button variant="info">
+              <Icon I={MdMessage} />
+              Message student
+            </Button>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  );
+};
+
+const ExamAnomalies: React.FC<{
+  examId: number;
+}> = (props) => {
+  const {
+    examId,
+  } = props;
+  const res = anomaliesIndex(examId);
+  return (
+    <>
+      <h2>Anomalies</h2>
+      <Table>
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Timestamp</th>
+            <th>Reason</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        {res.type === 'LOADING' && <p>Loading...</p>}
+        {res.type === 'ERROR' && (
+          <span className="text-danger">
+            <p>Error</p>
+            <small>{`${res.text} (${res.status})`}</small>
+          </span>
+        )}
+        {res.type === 'RESULT' && <ShowAnomalies anomalies={res.response.anomalies} />}
+      </Table>
+    </>
+  );
+};
 
 interface ProctorExamProps {
   name: string;
@@ -38,6 +104,9 @@ interface ProctorExamProps {
 
 const ProctorExam: React.FC<ProctorExamProps> = (props) => {
   const { name } = props;
+  const {
+    examId,
+  } = useParams();
   const tabName = 'timeline';
   return (
     <Container fluid className="mh-100 flex-column">
@@ -47,41 +116,7 @@ const ProctorExam: React.FC<ProctorExamProps> = (props) => {
       </Row>
       <Row className="flex-grow-1">
         <Col sm={6}>
-          <h2>Anomalies</h2>
-          <Table>
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Timestamp</th>
-                <th>Reason</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Student X</td>
-                <td><ReadableDate showTime value={DateTime.local()} /></td>
-                <td>Goofing off</td>
-                <td>
-                  <Button variant="danger">
-                    <Icon I={FaThumbsDown} />
-                    Finalize
-                  </Button>
-                  <Button variant="success">
-                    <Icon I={FaThumbsUp} />
-                    Clear anomaly
-                  </Button>
-                  <Button variant="info">
-                    <Icon I={MdMessage} />
-                    Message student
-                  </Button>
-                </td>
-              </tr>
-              <tr>
-                <td colSpan={4}>...</td>
-              </tr>
-            </tbody>
-          </Table>
+          <ExamAnomalies examId={examId} />
         </Col>
         <Col sm={6} className="d-flex flex-column">
           <div className="flex-grow-1">

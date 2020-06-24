@@ -124,13 +124,15 @@ module Api
           lockout: !saved,
           messages: {
             personal: after(@registration.private_messages, last_message_ids[:personal]).map(&:serialize),
-            room: after(@registration.room&.room_announcements || [], last_message_ids[:room]).map(&:serialize),
+            room: after(@registration.room&.room_announcements, last_message_ids[:room]).map(&:serialize),
             version: after(version.version_announcements, last_message_ids[:version]).map(&:serialize)
           }
         }
       end
 
       def after(arr, last_id)
+        return [] unless arr
+
         arr.where('id > ?', last_id)
       end
 

@@ -50,6 +50,16 @@ class ApiController < ApplicationController
     head :forbidden
   end
 
+  def require_proctor_reg
+    @proctor_registration ||= ProctorRegistration.find_by(
+      user: current_user,
+      exam: @exam
+    )
+    return unless @proctor_registration.nil?
+
+    require_prof_reg
+  end
+
   def require_prof_reg
     @professor_course_registration ||= ProfessorCourseRegistration.find_by(
       user: current_user,

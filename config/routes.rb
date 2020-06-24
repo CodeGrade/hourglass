@@ -32,18 +32,13 @@ Rails.application.routes.draw do
       end
     end
 
-    # namespace :proctor do
-    #   resources :exams, only: [:create] do
-    #     post :finalize
-    #   end
-    #   resources :rooms, only: [] do
-    #     post :finalize
-    #   end
-    #   resources :registrations, only: [:show] do
-    #     post :finalize
-    #     resources :anomalies, param: 'anomaly_id', only: [:index, :destroy]
-    #   end
-    # end
+    namespace :proctor do
+      resources :exams, param: 'exam_id', only: [] do
+        member do
+          resources :anomalies, param: 'anomaly_id', only: [:index]
+        end
+      end
+    end
 
     namespace :student do
       resources :registrations, only: [:index]

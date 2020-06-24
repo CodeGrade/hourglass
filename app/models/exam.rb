@@ -11,6 +11,7 @@ class Exam < ApplicationRecord
   has_many :proctor_registrations, dependent: :destroy
 
   has_many :registrations, through: :exam_versions
+  has_many :anomalies, through: :registrations
 
   validates :course, presence: true
   validates :name, presence: true

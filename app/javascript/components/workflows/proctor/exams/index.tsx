@@ -84,15 +84,15 @@ const ExamAnomalies: React.FC<{
             <th>Actions</th>
           </tr>
         </thead>
-        {res.type === 'LOADING' && <p>Loading...</p>}
-        {res.type === 'ERROR' && (
-          <span className="text-danger">
-            <p>Error</p>
-            <small>{`${res.text} (${res.status})`}</small>
-          </span>
-        )}
         {res.type === 'RESULT' && <ShowAnomalies anomalies={res.response.anomalies} />}
       </Table>
+      {res.type === 'LOADING' && <p>Loading...</p>}
+      {res.type === 'ERROR' && (
+        <span className="text-danger">
+          <p>Error</p>
+          <small>{`${res.text} (${res.status})`}</small>
+        </span>
+      )}
     </>
   );
 };

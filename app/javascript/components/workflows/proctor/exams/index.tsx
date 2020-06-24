@@ -110,160 +110,164 @@ const ProctorExam: React.FC<ProctorExamProps> = (props) => {
   } = useParams();
   const tabName = 'timeline';
   return (
-    <Container fluid className="mh-100 flex-column">
+    <>
       <RegularNavbar />
-      <Row>
-        <h1>{name}</h1>
-      </Row>
-      <Row className="flex-grow-1">
-        <Col sm={6}>
-          <ExamAnomalies examId={examId} />
-        </Col>
-        <Col sm={6} className="d-flex flex-column">
-          <div className="flex-grow-1">
-            <h2>Messages</h2>
-            <Tab.Container activeKey={tabName}>
-              <Nav
-                variant="tabs"
-                activeKey={tabName}
-              >
-                <Nav.Item>
-                  <Nav.Link
-                    eventKey="timeline"
-                  >
-                    <Icon I={FaList} />
-                    <span className="ml-2">
-                      Timeline
-                    </span>
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link
-                    eventKey="received"
-                  >
-                    <Icon I={FaInbox} />
-                    <span className="ml-2">
-                      Received
-                    </span>
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link
-                    eventKey="sent"
-                  >
-                    <Icon I={MdSend} />
-                    <span className="ml-2">
-                      Sent
-                    </span>
-                  </Nav.Link>
-                </Nav.Item>
-              </Nav>
-              <Tab.Content className="border border-top-0 rounded-bottom p-3">
-                <Tab.Pane eventKey="timeline" className="overflow-scroll-y">
-                  <div>
-                    Filter by:
-                    <Select
-                      placeholder="Choose selection criteria..."
-                      options={[
-                        { value: 'all', label: 'anyone' },
-                        { value: 'Room 1', label: 'Room 1' },
-                        { value: 'Room 2', label: 'Room 2' },
-                        { value: 'Version 1', label: 'Version A' },
-                        { value: 'Version 2', label: 'Version B' },
-                        { value: 'studentX', label: 'Student X' },
-                      ]}
-                    />
-                  </div>
-                  <p>
-                    There should be one option per room,
-                    one option per exam version, and
-                    one option per student who has sent or received a message
-                  </p>
-                  <ShowMessage
-                    icon={MdPeople}
-                    tooltip="Sent to Room 1"
-                    body="Room broadcast"
-                    time={DateTime.local()}
-                  />
-                  <ShowMessage
-                    icon={GiBugleCall}
-                    tooltip="Sent to everyone"
-                    body="Message to everyone"
-                    time={DateTime.local()}
-                  />
-                  <Card border="warning">
-                    <ShowMessage
-                      icon={MdMessage}
-                      tooltip="Received from Student X"
-                      body="Unread message from Student X"
-                      time={DateTime.local()}
-                    />
+      <Container fluid className="mh-100 flex-column">
+        <Row>
+          <Col>
+            <h1>{name}</h1>
+          </Col>
+        </Row>
+        <Row className="flex-grow-1">
+          <Col sm={6}>
+            <ExamAnomalies examId={examId} />
+          </Col>
+          <Col sm={6} className="d-flex flex-column">
+            <div className="flex-grow-1">
+              <h2>Messages</h2>
+              <Tab.Container activeKey={tabName}>
+                <Nav
+                  variant="tabs"
+                  activeKey={tabName}
+                >
+                  <Nav.Item>
+                    <Nav.Link
+                      eventKey="timeline"
+                    >
+                      <Icon I={FaList} />
+                      <span className="ml-2">
+                        Timeline
+                      </span>
+                    </Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link
+                      eventKey="received"
+                    >
+                      <Icon I={FaInbox} />
+                      <span className="ml-2">
+                        Received
+                      </span>
+                    </Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link
+                      eventKey="sent"
+                    >
+                      <Icon I={MdSend} />
+                      <span className="ml-2">
+                        Sent
+                      </span>
+                    </Nav.Link>
+                  </Nav.Item>
+                </Nav>
+                <Tab.Content className="border border-top-0 rounded-bottom p-3">
+                  <Tab.Pane eventKey="timeline" className="overflow-scroll-y">
+                    <div>
+                      Filter by:
+                      <Select
+                        placeholder="Choose selection criteria..."
+                        options={[
+                          { value: 'all', label: 'anyone' },
+                          { value: 'Room 1', label: 'Room 1' },
+                          { value: 'Room 2', label: 'Room 2' },
+                          { value: 'Version 1', label: 'Version A' },
+                          { value: 'Version 2', label: 'Version B' },
+                          { value: 'studentX', label: 'Student X' },
+                        ]}
+                      />
+                    </div>
                     <p>
-                      (reply fills in the recipient below, and sets
-                      focus to the message sender)
+                      There should be one option per room,
+                      one option per exam version, and
+                      one option per student who has sent or received a message
                     </p>
-                    <span className="ml-auto m-0">
-                      <Button variant="info">
-                        <Icon I={MdSend} />
-                        Reply
-                      </Button>
-                      <Button variant="warning">
-                        <Icon I={FaCheck} />
-                        Mark as read
-                      </Button>
-                    </span>
-                  </Card>
-                  <div className="d-flex justify-content-between">
                     <ShowMessage
-                      icon={MdMessage}
-                      tooltip="Received from Student Y"
-                      body="Read message from Student Y"
+                      icon={MdPeople}
+                      tooltip="Sent to Room 1"
+                      body="Room broadcast"
                       time={DateTime.local()}
                     />
-                    <span className="align-self-center mr-2">
-                      <Button variant="info">
-                        <Icon I={MdSend} />
-                        Reply
-                      </Button>
-                    </span>
-                  </div>
-                  <ShowMessage
-                    icon={MdSend}
-                    tooltip="Sent to Student X"
-                    body="Message to Student X"
-                    time={DateTime.local()}
-                  />
-                </Tab.Pane>
-                <Tab.Pane eventKey="received">
-                  Ditto, but only received messages
-                </Tab.Pane>
-                <Tab.Pane eventKey="sent">
-                  Ditto, but only sent messages
-                </Tab.Pane>
-              </Tab.Content>
-            </Tab.Container>
-          </div>
-          <div>
-            <h2>Send message</h2>
-            <Form.Group as={Row}>
-              <Form.Label>To:</Form.Label>
-              <span>
-                select box that you can type in, with options for
-                student names, version names, and room names, or everyone
-              </span>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label>Message:</Form.Label>
-              <textarea />
-            </Form.Group>
-            <Button variant="success">
-              <Icon I={MdSend} />
-              Send
-            </Button>
-          </div>
-        </Col>
-      </Row>
-    </Container>
+                    <ShowMessage
+                      icon={GiBugleCall}
+                      tooltip="Sent to everyone"
+                      body="Message to everyone"
+                      time={DateTime.local()}
+                    />
+                    <Card border="warning">
+                      <ShowMessage
+                        icon={MdMessage}
+                        tooltip="Received from Student X"
+                        body="Unread message from Student X"
+                        time={DateTime.local()}
+                      />
+                      <p>
+                        (reply fills in the recipient below, and sets
+                        focus to the message sender)
+                      </p>
+                      <span className="ml-auto m-0">
+                        <Button variant="info">
+                          <Icon I={MdSend} />
+                          Reply
+                        </Button>
+                        <Button variant="warning">
+                          <Icon I={FaCheck} />
+                          Mark as read
+                        </Button>
+                      </span>
+                    </Card>
+                    <div className="d-flex justify-content-between">
+                      <ShowMessage
+                        icon={MdMessage}
+                        tooltip="Received from Student Y"
+                        body="Read message from Student Y"
+                        time={DateTime.local()}
+                      />
+                      <span className="align-self-center mr-2">
+                        <Button variant="info">
+                          <Icon I={MdSend} />
+                          Reply
+                        </Button>
+                      </span>
+                    </div>
+                    <ShowMessage
+                      icon={MdSend}
+                      tooltip="Sent to Student X"
+                      body="Message to Student X"
+                      time={DateTime.local()}
+                    />
+                  </Tab.Pane>
+                  <Tab.Pane eventKey="received">
+                    Ditto, but only received messages
+                  </Tab.Pane>
+                  <Tab.Pane eventKey="sent">
+                    Ditto, but only sent messages
+                  </Tab.Pane>
+                </Tab.Content>
+              </Tab.Container>
+            </div>
+            <div>
+              <h2>Send message</h2>
+              <Form.Group as={Row}>
+                <Form.Label>To:</Form.Label>
+                <span>
+                  select box that you can type in, with options for
+                  student names, version names, and room names, or everyone
+                </span>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <Form.Label>Message:</Form.Label>
+                <textarea />
+              </Form.Group>
+              <Button variant="success">
+                <Icon I={MdSend} />
+                Send
+              </Button>
+            </div>
+          </Col>
+        </Row>
+      </Container>
+    </>
   );
 };
 

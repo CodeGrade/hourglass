@@ -147,7 +147,7 @@ const ShowAnomalies: React.FC<{
     return () => {
       clearInterval(timer);
     };
-  }, [refresh])
+  }, [refresh]);
   return (
     <tbody>
       {anomalies.length === 0 && <tr><td>No anomalies.</td></tr>}

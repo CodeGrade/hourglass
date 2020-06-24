@@ -12,6 +12,7 @@ import {
   useHistory,
   Redirect,
   useLocation,
+  Link,
 } from 'react-router-dom';
 import {
   useResponse as examsShow,
@@ -149,6 +150,9 @@ const Loaded: React.FC<{
         versions={response.versions}
         examName={response.name}
       />
+      <Link to={`/exams/${examId}/proctoring`}>
+        <Button variant="success">Proctor!</Button>
+      </Link>
     </>
   );
 };

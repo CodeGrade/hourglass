@@ -20,6 +20,7 @@ import * as ApiProfessorCourses from '@hourglass/common/api/professor/courses';
 import ShowExam from '@student/exams/show';
 import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
+import ExamProctoring from '@proctor/exams/index';
 import EditExamVersion from '@professor/exams/edit';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { AllAlerts } from '@hourglass/common/alerts';
@@ -256,6 +257,9 @@ const Entry: React.FC = () => {
             <Switch>
               <Route path="/exams/:examId" exact>
                 <Exam />
+              </Route>
+              <Route path="/exams/:examId/proctoring">
+                <ExamProctoring />
               </Route>
               <Route path="/">
                 <RegularNavbar />

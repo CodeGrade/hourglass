@@ -52,8 +52,8 @@ const ExamSubmission: React.FC = () => {
       <h1>{`Submission by ${res.response.user.displayName}`}</h1>
       <ExamViewer
         railsExam={{
-          id: 10,
-          name: 'TEST',
+          id: 0,
+          name: 'not used',
           policies: [],
         }}
         contents={res.response.contents}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   useResponse as examsShow,
 } from '@hourglass/common/api/professor/exams/show';
@@ -97,11 +97,17 @@ const ExamAnomalies: React.FC<{
   );
 };
 
+enum ProctoringTab {
+  Timeline = 'timeline',
+  Received = 'received',
+  Sent = 'sent',
+}
+
 const ExamProctoring: React.FC = () => {
   const {
     examId,
   } = useParams();
-  const tabName = 'timeline';
+  const [tabName, setTabName] = useState<ProctoringTab>(ProctoringTab.Timeline);
   const res = examsShow(examId);
   return (
     <>
@@ -123,10 +129,11 @@ const ExamProctoring: React.FC = () => {
                 <Nav
                   variant="tabs"
                   activeKey={tabName}
+                  onSelect={(key) => setTabName(key)}
                 >
                   <Nav.Item>
                     <Nav.Link
-                      eventKey="timeline"
+                      eventKey={ProctoringTab.Timeline}
                     >
                       <Icon I={FaList} />
                       <span className="ml-2">
@@ -136,7 +143,7 @@ const ExamProctoring: React.FC = () => {
                   </Nav.Item>
                   <Nav.Item>
                     <Nav.Link
-                      eventKey="received"
+                      eventKey={ProctoringTab.Received}
                     >
                       <Icon I={FaInbox} />
                       <span className="ml-2">
@@ -146,7 +153,7 @@ const ExamProctoring: React.FC = () => {
                   </Nav.Item>
                   <Nav.Item>
                     <Nav.Link
-                      eventKey="sent"
+                      eventKey={ProctoringTab.Sent}
                     >
                       <Icon I={MdSend} />
                       <span className="ml-2">
@@ -156,7 +163,7 @@ const ExamProctoring: React.FC = () => {
                   </Nav.Item>
                 </Nav>
                 <Tab.Content className="border border-top-0 rounded-bottom p-3">
-                  <Tab.Pane eventKey="timeline" className="overflow-scroll-y">
+                  <Tab.Pane eventKey={ProctoringTab.Timeline} className="overflow-scroll-y">
                     <div>
                       Filter by:
                       <Select
@@ -231,10 +238,10 @@ const ExamProctoring: React.FC = () => {
                       time={DateTime.local()}
                     />
                   </Tab.Pane>
-                  <Tab.Pane eventKey="received">
+                  <Tab.Pane eventKey={ProctoringTab.Received}>
                     Ditto, but only received messages
                   </Tab.Pane>
-                  <Tab.Pane eventKey="sent">
+                  <Tab.Pane eventKey={ProctoringTab.Sent}>
                     Ditto, but only sent messages
                   </Tab.Pane>
                 </Tab.Content>

@@ -35,6 +35,15 @@ class ApiController < ApplicationController
     head :forbidden
   end
 
+  def find_registration_and_exam_and_course
+    @registration ||= Registration.find_by(id: params[:registration_id])
+    @exam ||= @registration.exam
+    @course ||= @exam.course
+    return unless @registration.nil?
+
+    head :forbidden
+  end
+
   def find_version
     @version ||= ExamVersion.find_by(id: params[:version_id])
     @exam = @version.exam

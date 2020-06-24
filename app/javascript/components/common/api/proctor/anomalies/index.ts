@@ -6,6 +6,7 @@ interface ServerAnomaly {
   reg: {
     id: number;
     displayName: string;
+    final: boolean;
   }
   time: string;
   reason: string;

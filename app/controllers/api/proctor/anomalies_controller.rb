@@ -4,8 +4,7 @@ module Api
   module Proctor
     # Exam-wide anomaly controls.
     class AnomaliesController < ProctorController
-      before_action :find_exam_and_course, only: [:index]
-      before_action :find_course
+      before_action :find_exam_and_course
       before_action :require_proctor_reg
 
       def index
@@ -14,7 +13,8 @@ module Api
             id: a.id,
             reg: {
               id: a.registration.id,
-              displayName: a.user.display_name
+              displayName: a.user.display_name,
+              final: a.registration.final?
             },
             time: a.created_at,
             reason: a.reason

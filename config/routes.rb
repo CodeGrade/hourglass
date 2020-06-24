@@ -33,9 +33,14 @@ Rails.application.routes.draw do
     end
 
     namespace :proctor do
-      resources :exams, param: 'exam_id', only: [] do
+      resources :exams, shallow: true, param: 'exam_id', only: [] do
         member do
           resources :anomalies, param: 'anomaly_id', only: [:index]
+          resources :registrations, param: 'registration_id', only: [] do
+            member do
+              post :finalize
+            end
+          end
         end
       end
     end

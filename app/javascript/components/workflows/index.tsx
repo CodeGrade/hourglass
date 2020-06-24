@@ -259,7 +259,9 @@ const Entry: React.FC = () => {
                 <Exam />
               </Route>
               <Route path="/exams/:examId/proctoring">
-                <ExamProctoring />
+                <AllAlerts>
+                  <ExamProctoring />
+                </AllAlerts>
               </Route>
               <Route path="/">
                 <RegularNavbar />

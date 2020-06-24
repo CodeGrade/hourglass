@@ -27,7 +27,7 @@ class Exam < ApplicationRecord
   end
 
   def finalized?
-    registrations.all?(&:final)
+    registrations.all?(&:final?)
   end
 
   def finalize!

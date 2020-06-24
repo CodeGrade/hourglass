@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import {
   useResponse as examsShow,
 } from '@hourglass/common/api/professor/exams/show';
@@ -30,6 +30,60 @@ import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import { ShowMessage } from '@hourglass/workflows/student/exams/show/components/navbar/ExamMessages';
 import { GiBugleCall } from 'react-icons/gi';
 import { Anomaly, useResponse as anomaliesIndex } from '@hourglass/common/api/proctor/anomalies';
+import Loading from '@hourglass/common/loading';
+import { finalizeRegistration } from '@hourglass/common/api/proctor/registrations/finalize';
+import { AlertContext } from '@hourglass/common/alerts';
+import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
+
+const FinalizeButton: React.FC<{
+  regId: number;
+  regFinal: boolean;
+}> = (props) => {
+  const {
+    regId,
+    regFinal,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [loading, setLoading] = useState(false);
+  const [finalized, setFinalized] = useState(regFinal);
+  const disabled = loading || finalized;
+  const reason = loading ? 'Loading...' : 'Already final';
+  return (
+    <Loading loading={loading}>
+      <TooltipButton
+        disabled={disabled}
+        disabledMessage={reason}
+        variant="danger"
+        onClick={() => {
+          setLoading(true);
+          finalizeRegistration(regId).then((res) => {
+            if (res.success === true) {
+              alert({
+                variant: 'success',
+                message: 'Registration finalized.',
+              });
+              setFinalized(true);
+              setLoading(false);
+            } else {
+              throw new Error(res.reason);
+            }
+          }).catch((err) => {
+            alert({
+              variant: 'danger',
+              title: 'Error finalizing registration',
+              message: err.message,
+            });
+            setFinalized(false);
+            setLoading(false);
+          });
+        }}
+      >
+        <Icon I={FaThumbsDown} />
+        Finalize
+      </TooltipButton>
+    </Loading>
+  );
+};
 
 const ShowAnomalies: React.FC<{
   anomalies: Anomaly[];
@@ -46,10 +100,7 @@ const ShowAnomalies: React.FC<{
           <td><ReadableDate showTime value={a.time} /></td>
           <td>{a.reason}</td>
           <td>
-            <Button variant="danger">
-              <Icon I={FaThumbsDown} />
-              Finalize
-            </Button>
+            <FinalizeButton regId={a.reg.id} regFinal={a.reg.final} />
             <Button variant="success">
               <Icon I={FaThumbsUp} />
               Clear anomaly

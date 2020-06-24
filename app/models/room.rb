@@ -8,11 +8,11 @@ class Room < ApplicationRecord
   validates :name, presence: true
 
   def finalized?
-    registrations.all?(&:final)
+    registrations.all?(&:final?)
   end
 
   def finalize!
-    registrations.update_all(final: true)
+    registrations.each(&:finalize!)
   end
 
   def has_staff?

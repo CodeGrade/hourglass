@@ -91,6 +91,10 @@ class Registration < ApplicationRecord
     !end_time.nil?
   end
 
+  def finalize!
+    update!(end_time: DateTime.now)
+  end
+
   def current_answers
     snapshots.last&.answers || exam_version.default_answers
   end

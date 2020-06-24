@@ -89,6 +89,7 @@ const FileContents: React.FC<FileContentsProps> = (props) => {
         }}
         options={{
           styleActiveLine: !!selectedLine,
+          matchBrackets: false,
         }}
         cursor={cursor}
         onCursor={(ed, pos): void => {

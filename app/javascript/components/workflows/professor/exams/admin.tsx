@@ -424,12 +424,12 @@ export const ExamInfoEditor: React.FC<{
     onSubmit,
     onCancel,
   } = props;
-  const now = DateTime.local().toISO();
-  const threeHours = DateTime.local().plus({ hours: 3 }).toISO();
-  const [name, setName] = useState(response?.name ?? '');
-  const [start, setStart] = useState(response?.start.toISO() ?? now);
-  const [end, setEnd] = useState(response?.end.toISO() ?? threeHours);
-  const [duration, setDuration] = useState(response?.duration ?? NINETY_MINUTES);
+  const now = DateTime.local();
+  const threeHours = DateTime.local().plus({ hours: 3 });
+  const [name, setName] = useState<string>(response?.name ?? '');
+  const [start, setStart] = useState<DateTime>(response?.start ?? now);
+  const [end, setEnd] = useState<DateTime>(response?.end ?? threeHours);
+  const [duration, setDuration] = useState<number>(response?.duration ?? NINETY_MINUTES);
 
   return (
     <Card className="mb-4">
@@ -459,8 +459,8 @@ export const ExamInfoEditor: React.FC<{
                 onSubmit({
                   name,
                   duration,
-                  start,
-                  end,
+                  start: start.toISO(),
+                  end: end.toISO(),
                 });
               }}
             >
@@ -471,25 +471,20 @@ export const ExamInfoEditor: React.FC<{
         <Form.Group as={Row} controlId="examStartTime">
           <Form.Label column sm={2}>Start time:</Form.Label>
           <Col>
-            {/* <p>{start}</p> */}
             <DateTimePicker
-              maxIsoValue={end}
-              isoValue={start}
-              onChange={(newStart): void => {
-                // console.log(start, newStart.toISO());
-                setStart(newStart.toISO());
-              }}
+              value={start}
+              maxValue={end}
+              onChange={(newStart): void => setStart(newStart)}
             />
           </Col>
         </Form.Group>
         <Form.Group as={Row} controlId="examEndTime">
           <Form.Label column sm={2}>End time:</Form.Label>
           <Col>
-            {/* <p>{end}</p> */}
             <DateTimePicker
-              isoValue={end}
-              minIsoValue={start}
-              onChange={(newEnd): void => setEnd(newEnd.toISO())}
+              value={end}
+              minValue={start}
+              onChange={(newEnd): void => setEnd(newEnd)}
             />
           </Col>
         </Form.Group>

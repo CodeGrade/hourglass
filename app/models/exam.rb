@@ -18,7 +18,8 @@ class Exam < ApplicationRecord
     only_integer: true
   }
 
-  validate :time_checks
+  validate :end_after_start
+  validate :duration_valid
 
   def duration
     self[:duration].seconds
@@ -173,9 +174,15 @@ class Exam < ApplicationRecord
     }
   end
 
-  def time_checks
+  def duration_valid
     return unless duration > time_window
 
     errors.add(:duration, "can't be longer than the duration between start and end times")
+  end
+
+  def end_after_start
+    return unless end_time <= start_time
+
+    errors.add(:end_time, 'must be later than start time')
   end
 end

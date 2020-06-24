@@ -13,9 +13,8 @@ import './DateTimePicker.scss';
 
 interface DateTimeProps {
   value?: DateTime;
-  isoValue?: string;
-  minIsoValue?: string;
-  maxIsoValue?: string;
+  minValue?: DateTime;
+  maxValue?: DateTime;
   onChange?: (newVal: DateTime) => void;
 }
 
@@ -39,19 +38,15 @@ const timeZones = {
 const DateTimePicker: React.FC<DateTimeProps> = (props) => {
   const {
     value,
-    isoValue,
-    minIsoValue,
-    maxIsoValue,
+    minValue,
+    maxValue,
     onChange,
   } = props;
-  const curValue = value ?? DateTime.fromISO(isoValue);
-  const curMinValue = minIsoValue ? DateTime.fromISO(minIsoValue) : undefined;
-  const curMaxValue = maxIsoValue ? DateTime.fromISO(maxIsoValue) : undefined;
-  const [timeZone, setTimeZone] = useState(curValue.zoneName in timeZones ? curValue.zoneName : 'UTC');
+  const [timeZone, setTimeZone] = useState(value.zoneName in timeZones ? value.zoneName : 'UTC');
   return (
     <InputGroup className="w-100 d-flex">
       <InputGroup.Text className="d-flex flex-grow-1">
-        {curValue.toLocaleString({
+        {value.toLocaleString({
           ...DateTime.DATETIME_HUGE,
           timeZone,
           timeZoneName: 'short',
@@ -66,26 +61,26 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
         <Dropdown.Menu className="p-0 d-flex flex-grow-1 DateTimeCustom">
           <DatePicker
             inline
-            selected={curValue.toJSDate()}
+            selected={value.toJSDate()}
             calendarClassName="NestedDatePicker"
-            minDate={curMinValue?.toJSDate()}
-            maxDate={curMaxValue?.toJSDate()}
+            minDate={minValue?.toJSDate()}
+            maxDate={maxValue?.toJSDate()}
             onChange={(date, _event): void => {
               if (onChange) {
-                onChange(mergeDateTime(DateTime.fromJSDate(date), curValue));
+                onChange(mergeDateTime(DateTime.fromJSDate(date), value));
               }
             }}
           />
           <TimePicker
-            time={curValue.toFormat('hh:mm a')}
+            time={value.toFormat('hh:mm a')}
             onChange={(time): void => {
               if (onChange) {
                 onChange(mergeDateTime(
-                  curValue,
+                  value,
                   DateTime.fromObject({
                     hour: time.hour,
                     minute: time.minute,
-                    zone: curValue.zone,
+                    zone: value.zone,
                   }),
                 ));
               }
@@ -103,7 +98,7 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
                     onClick={(): void => {
                       setTimeZone(tzName);
                       if (onChange) {
-                        onChange(curValue.setZone(tzName, { keepLocalTime: true }));
+                        onChange(value.setZone(tzName, { keepLocalTime: true }));
                       }
                     }}
                   >

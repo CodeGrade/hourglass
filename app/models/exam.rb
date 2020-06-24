@@ -27,7 +27,7 @@ class Exam < ApplicationRecord
   end
 
   def finalized?
-    registrations.all?(&:final?)
+    registrations.in_progress?.empty?
   end
 
   def finalize!
@@ -43,17 +43,18 @@ class Exam < ApplicationRecord
   end
 
   def unassigned_students
+    student_regs_by_id = registrations.group_by(&:user_id)
     course.students.reject do |s|
-      registrations.exists? user: s
+      student_regs_by_id.has_key? s.id
     end
   end
 
   def registrations_without_rooms
-    registrations.reject(&:room)
+    registrations.where(room: nil)
   end
 
   def proctor_registrations_without_rooms
-    proctor_registrations.reject(&:room)
+    proctor_registrations.where(room: nil)
   end
 
   def rooms_without_staff
@@ -61,8 +62,9 @@ class Exam < ApplicationRecord
   end
 
   def unassigned_staff
+    proctor_regs_by_id = proctor_registrations.group_by(&:user_id)
     course.staff.reject do |s|
-      proctor_registrations.exists? user: s
+      proctor_regs_by_id.has_key? s.id
     end
   end
 

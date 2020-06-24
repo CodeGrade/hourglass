@@ -58,7 +58,7 @@ module Api
           start: @exam.start_time,
           end: @exam.end_time,
           duration: @exam.duration,
-          versions: @exam.exam_versions.map {|v| serialize_version(v) },
+          versions: @exam.exam_versions.includes(:registrations).map {|v| serialize_version(v) },
           checklist: @exam.checklist
         }
       end

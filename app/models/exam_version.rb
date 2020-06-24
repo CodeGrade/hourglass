@@ -52,11 +52,11 @@ class ExamVersion < ApplicationRecord
   end
 
   def any_started?
-    registrations.any?(&:started?)
+    registrations.started?.exists?
   end
 
   def any_finalized?
-    registrations.any?(&:final?)
+    registrations.final?.exists?
   end
 
   def export_json

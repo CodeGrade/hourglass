@@ -8,13 +8,13 @@ module Api
 
       def index
         render json: {
-          unassigned: @exam.registrations_without_rooms.map do |reg|
+          unassigned: @exam.registrations_without_rooms.includes(:user).map do |reg|
             serialize_student reg.user
           end,
-          rooms: @exam.rooms.map do |room|
+          rooms: @exam.rooms.includes(registrations: [:user], proctor_registrations: [:user]).map do |room|
             serialize_room_regs room
           end,
-          sections: @exam.course.sections.map do |section|
+          sections: @exam.course.sections.includes(:staff).map do |section|
             {
               id: section.id,
               title: section.title,
@@ -31,13 +31,13 @@ module Api
           unassigned: @exam.unassigned_staff.map do |s|
             serialize_student s
           end,
-          proctors: @exam.proctor_registrations_without_rooms.map do |reg|
+          proctors: @exam.proctor_registrations_without_rooms.includes(:user).map do |reg|
             serialize_student reg.user
           end,
-          rooms: @exam.rooms.map do |room|
+          rooms: @exam.rooms.includes(registrations: [:user], proctor_registrations: [:user]).map do |room|
             serialize_room_regs room
           end,
-          sections: @exam.course.sections.map do |section|
+          sections: @exam.course.sections.includes(:staff).map do |section|
             {
               id: section.id,
               title: section.title,
@@ -145,10 +145,10 @@ module Api
         {
           id: room.id,
           name: room.name,
-          students: room.registrations.map(&:user).map do |s|
+          students: room.registrations.includes(:user).map(&:user).map do |s|
             serialize_student s
           end,
-          proctors: room.proctor_registrations.map(&:user).map do |s|
+          proctors: room.proctor_registrations.includes(:user).map(&:user).map do |s|
             serialize_student s
           end
         }

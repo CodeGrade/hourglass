@@ -8,7 +8,7 @@ class Room < ApplicationRecord
   validates :name, presence: true
 
   def finalized?
-    registrations.all?(&:final?)
+    registrations.in_progress?.empty?
   end
 
   def finalize!
@@ -16,11 +16,11 @@ class Room < ApplicationRecord
   end
 
   def has_staff?
-    proctor_registrations.length.positive?
+    proctor_registrations.exists?
   end
 
   def has_registrations?
-    registrations.length.positive?
+    registrations.exists?
   end
 
   def has_users?

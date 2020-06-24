@@ -11,7 +11,6 @@ interface CodeProps {
   onChange?: (newVal: CodeState) => void;
   disabled: boolean;
   autosize?: boolean;
-  noMatchBrackets?: boolean;
 }
 
 const Code: React.FC<CodeProps> = (props) => {
@@ -21,7 +20,6 @@ const Code: React.FC<CodeProps> = (props) => {
     onChange,
     disabled,
     autosize = false,
-    noMatchBrackets = false,
   } = props;
   const { prompt, lang, initial } = info;
   const { fmap } = useContext(ExamContext);
@@ -58,9 +56,6 @@ const Code: React.FC<CodeProps> = (props) => {
             markDescriptions={marks}
             valueUpdate={[disabled]}
             language={lang}
-            options={{
-              matchBrackets: !noMatchBrackets,
-            }}
             onChange={(newText, newMarks): void => {
               if (onChange) {
                 onChange({

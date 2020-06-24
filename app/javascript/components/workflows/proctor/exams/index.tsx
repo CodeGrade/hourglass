@@ -40,6 +40,7 @@ const ShowAnomalies: React.FC<{
   } = props;
   return (
     <tbody>
+      {anomalies.length === 0 && <p>No anomalies.</p>}
       {anomalies.map((a) => (
         <tr key={a.id}>
           <td>{a.reg.displayName}</td>

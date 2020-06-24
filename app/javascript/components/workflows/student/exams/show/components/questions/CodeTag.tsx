@@ -111,7 +111,7 @@ const FileModal: React.FC<FileModalProps> = (props) => {
           }}
           onChangeLine={(newLine): void => {
             setSelected((old) => ({
-              selectedFile: old.selectedFile,
+              ...old,
               lineNumber: newLine,
             }));
           }}

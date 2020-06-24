@@ -207,7 +207,7 @@ export const ControlledFileViewer: React.FC<ControlledFileViewerProps> = (props)
         <Col sm={3} className="overflow-scroll-x">
           <FileTree
             files={filteredFiles}
-            selectedFile={selection?.selectedFile ?? firstID}
+            selectedFile={selection?.selectedFile ?? null}
             onChangeFile={onChangeFile}
             fmap={fmap}
           />
@@ -215,7 +215,7 @@ export const ControlledFileViewer: React.FC<ControlledFileViewerProps> = (props)
       )}
       <Col sm={showTreeView ? 9 : 12}>
         <FileContents
-          selectedFile={selection?.selectedFile ?? firstID}
+          selectedFile={selection?.selectedFile}
           selectedLine={selection?.lineNumber}
           onChangeLine={onChangeLine}
           refreshProps={refreshProps}

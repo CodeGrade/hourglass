@@ -29,7 +29,7 @@ import Icon from '@student/exams/show/components/Icon';
 import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import { ShowMessage } from '@hourglass/workflows/student/exams/show/components/navbar/ExamMessages';
 import { GiBugleCall } from 'react-icons/gi';
-import { Anomaly, useResponse as anomaliesIndex } from '@hourglass/common/api/professor/exams/anomalies';
+import { Anomaly, useResponse as anomaliesIndex } from '@hourglass/common/api/proctor/anomalies';
 
 const ShowAnomalies: React.FC<{
   anomalies: Anomaly[];

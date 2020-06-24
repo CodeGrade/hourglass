@@ -124,7 +124,7 @@ const ProctorExam: React.FC<ProctorExamProps> = (props) => {
               </Nav>
               <Tab.Content className="border border-top-0 rounded-bottom p-3">
                 <Tab.Pane eventKey="timeline" className="overflow-scroll-y">
-                  <p>
+                  <div>
                     Filter by:
                     <Select
                       placeholder="Choose selection criteria..."
@@ -137,7 +137,7 @@ const ProctorExam: React.FC<ProctorExamProps> = (props) => {
                         { value: 'studentX', label: 'Student X' },
                       ]}
                     />
-                  </p>
+                  </div>
                   <p>
                     There should be one option per room,
                     one option per exam version, and
@@ -155,46 +155,42 @@ const ProctorExam: React.FC<ProctorExamProps> = (props) => {
                     body="Message to everyone"
                     time={DateTime.local()}
                   />
-                  <ShowMessage
-                    icon={MdMessage}
-                    tooltip="Received from Student X"
-                    body={(
-                      <Card border="warning">
-                        <p>Unread message from Student X</p>
-                        <p>
-                          (reply fills in the recipient below, and sets
-                          focus to the message sender)
-                        </p>
-                        <p className="float-right m-0">
-                          <Button variant="info">
-                            <Icon I={MdSend} />
-                            Reply
-                          </Button>
-                          <Button variant="warning">
-                            <Icon I={FaCheck} />
-                            Mark as read
-                          </Button>
-                        </p>
-                      </Card>
-                    )}
-                    time={DateTime.local()}
-                  />
-                  <ShowMessage
-                    icon={MdMessage}
-                    tooltip="Received from Student Y"
-                    body={(
-                      <>
-                        <p>Read message from Student X</p>
-                        <p className="m-0 float-right">
-                          <Button variant="info">
-                            <Icon I={MdSend} />
-                            Reply
-                          </Button>
-                        </p>
-                      </>
-                    )}
-                    time={DateTime.local()}
-                  />
+                  <Card border="warning">
+                    <ShowMessage
+                      icon={MdMessage}
+                      tooltip="Received from Student X"
+                      body="Unread message from Student X"
+                      time={DateTime.local()}
+                    />
+                    <p>
+                      (reply fills in the recipient below, and sets
+                      focus to the message sender)
+                    </p>
+                    <span className="ml-auto m-0">
+                      <Button variant="info">
+                        <Icon I={MdSend} />
+                        Reply
+                      </Button>
+                      <Button variant="warning">
+                        <Icon I={FaCheck} />
+                        Mark as read
+                      </Button>
+                    </span>
+                  </Card>
+                  <div className="d-flex justify-content-between">
+                    <ShowMessage
+                      icon={MdMessage}
+                      tooltip="Received from Student Y"
+                      body="Read message from Student Y"
+                      time={DateTime.local()}
+                    />
+                    <span className="align-self-center mr-2">
+                      <Button variant="info">
+                        <Icon I={MdSend} />
+                        Reply
+                      </Button>
+                    </span>
+                  </div>
                   <ShowMessage
                     icon={MdSend}
                     tooltip="Sent to Student X"

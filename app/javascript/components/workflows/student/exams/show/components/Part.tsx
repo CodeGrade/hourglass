@@ -10,6 +10,7 @@ import './Part.css';
 import Body from '@student/exams/show/components/Body';
 import { alphabetIdx } from '@hourglass/common/helpers';
 import { PartFilesContext } from '../context';
+import ErrorBoundary from '@hourglass/common/boundary';
 
 interface PartProps {
   part: PartInfo;
@@ -69,7 +70,9 @@ const Part: React.FC<PartProps> = (props) => {
           // Body numbers are STATIC.
           // eslint-disable-next-line react/no-array-index-key
           <div className="p-2 bodyitem" key={i}>
-            <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
+            <ErrorBoundary>
+              <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
+            </ErrorBoundary>
           </div>
         ))}
         {anonymous || (

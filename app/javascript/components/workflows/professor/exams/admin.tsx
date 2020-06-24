@@ -483,6 +483,7 @@ export const ExamInfoEditor: React.FC<{
               Save
             </Button>
           </span>
+          <div className="col flex-grow-0 pl-0" />
         </Form.Group>
         <Form.Group as={Row} controlId="examStartTime">
           <Form.Label column sm={2}>Start time:</Form.Label>

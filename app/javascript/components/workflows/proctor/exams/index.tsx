@@ -6,7 +6,6 @@ import RegularNavbar from '@hourglass/common/navbar';
 import Select from 'react-select';
 import { DateTime } from 'luxon';
 import { useParams } from 'react-router-dom';
-import { useRefresher, ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   Container,
   Row,
@@ -40,7 +39,7 @@ const ShowAnomalies: React.FC<{
   } = props;
   return (
     <tbody>
-      {anomalies.length === 0 && <p>No anomalies.</p>}
+      {anomalies.length === 0 && <tr><td>No anomalies.</td></tr>}
       {anomalies.map((a) => (
         <tr key={a.id}>
           <td>{a.reg.displayName}</td>
@@ -98,24 +97,19 @@ const ExamAnomalies: React.FC<{
   );
 };
 
-interface ProctorExamProps {
-  name: string;
-  examId: number;
-}
-
-const ProctorExam: React.FC<ProctorExamProps> = (props) => {
-  const { name } = props;
+const ExamProctoring: React.FC = () => {
   const {
     examId,
   } = useParams();
   const tabName = 'timeline';
+  const res = examsShow(examId);
   return (
     <>
       <RegularNavbar />
       <Container fluid className="mh-100 flex-column">
         <Row>
           <Col>
-            <h1>{name}</h1>
+            <h1>{res.type === 'RESULT' ? res.response.name : 'Exam'}</h1>
           </Col>
         </Row>
         <Row className="flex-grow-1">
@@ -269,21 +263,6 @@ const ProctorExam: React.FC<ProctorExamProps> = (props) => {
       </Container>
     </>
   );
-};
-
-const ExamProctoring: React.FC = () => {
-  const { examId } = useParams();
-  const [refresher] = useRefresher();
-  const res = examsShow(examId, [refresher]);
-  switch (res.type) {
-    case 'ERROR':
-    case 'LOADING':
-      return <p>Loading...</p>;
-    case 'RESULT':
-      return <ProctorExam examId={examId} name={res.response.name} />;
-    default:
-      throw new ExhaustiveSwitchError(res);
-  }
 };
 
 export default ExamProctoring;

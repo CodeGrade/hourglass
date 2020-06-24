@@ -51,7 +51,7 @@ export interface Response extends Omit<Omit<Server, 'start'>, 'end'> {
   end: DateTime;
 }
 
-export function useResponse(examId: number, deps: React.DependencyList): ApiResponse<Response> {
+export function useResponse(examId: number, deps?: React.DependencyList): ApiResponse<Response> {
   return useApiResponse<Server, Response>(`/api/professor/exams/${examId}`, {}, (res) => ({
     ...res,
     start: DateTime.fromISO(res.start),

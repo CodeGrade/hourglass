@@ -110,6 +110,7 @@ const ClearButton: React.FC<{
               alert({
                 variant: 'success',
                 message: 'Anomaly cleared.',
+                autohide: true,
               });
               setLoading(false);
               refresh();

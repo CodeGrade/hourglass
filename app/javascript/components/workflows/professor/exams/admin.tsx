@@ -111,48 +111,54 @@ const Loaded: React.FC<{
   const flipEditing = useCallback(() => setEditing((e) => !e), []);
   return (
     <>
-      {editing ? (
-        <ExamInfoEditor
-          response={response}
-          onCancel={flipEditing}
-          onSubmit={(info) => {
-            updateExam(examId, info)
-              .then((res) => {
-                if (res.updated === true) {
-                  setEditing(false);
+      <Form.Group>
+        {editing ? (
+          <ExamInfoEditor
+            response={response}
+            onCancel={flipEditing}
+            onSubmit={(info) => {
+              updateExam(examId, info)
+                .then((res) => {
+                  if (res.updated === true) {
+                    setEditing(false);
+                    alert({
+                      variant: 'success',
+                      message: 'Exam info saved.',
+                    });
+                    refresh();
+                  } else {
+                    throw new Error(res.reason);
+                  }
+                }).catch((err) => {
                   alert({
-                    variant: 'success',
-                    message: 'Exam info saved.',
+                    variant: 'danger',
+                    title: 'Error saving exam info.',
+                    message: err.message,
                   });
-                  refresh();
-                } else {
-                  throw new Error(res.reason);
-                }
-              }).catch((err) => {
-                alert({
-                  variant: 'danger',
-                  title: 'Error saving exam info.',
-                  message: err.message,
                 });
-              });
-          }}
+            }}
+          />
+        ) : (
+          <ExamInfoViewer
+            onEdit={flipEditing}
+            response={response}
+          />
+        )}
+      </Form.Group>
+      <Form.Group>
+        <TabbedChecklist
+          refresh={refresh}
+          examId={examId}
+          checklist={response.checklist}
+          versions={response.versions}
+          examName={response.name}
         />
-      ) : (
-        <ExamInfoViewer
-          onEdit={flipEditing}
-          response={response}
-        />
-      )}
-      <TabbedChecklist
-        refresh={refresh}
-        examId={examId}
-        checklist={response.checklist}
-        versions={response.versions}
-        examName={response.name}
-      />
-      <Link to={`/exams/${examId}/proctoring`}>
-        <Button variant="success">Proctor!</Button>
-      </Link>
+      </Form.Group>
+      <Form.Group>
+        <Link to={`/exams/${examId}/proctoring`}>
+          <Button variant="success">Proctor!</Button>
+        </Link>
+      </Form.Group>
     </>
   );
 };
@@ -388,7 +394,7 @@ const ExamInfoViewer: React.FC<{
     duration,
   } = response;
   return (
-    <Card className="mb-4">
+    <Card>
       <Card.Body>
         <h1>
           {response.name}

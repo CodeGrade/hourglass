@@ -535,7 +535,8 @@ const ExamMessages: React.FC<{
     examId,
   } = props;
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
-  const res = useExamMessages(examId);
+  const [refresher, refresh] = useRefresher();
+  const res = useExamMessages(examId, [refresher]);
   switch (res.type) {
     case 'LOADING':
       return <Loading loading />;
@@ -622,7 +623,7 @@ const ExamMessages: React.FC<{
             </Tab.Container>
           </div>
           <div>
-            <SendMessage recipients={res.response.recipients} />
+            <SendMessage refresh={refresh} recipients={res.response.recipients} />
           </div>
         </>
       );
@@ -639,10 +640,12 @@ interface MessageFilterOption {
 const SendMessageButton: React.FC<{
   recipient: Recipient;
   message: string;
+  refresh: () => void;
 }> = (props) => {
   const {
     recipient,
     message,
+    refresh,
   } = props;
   const { examId } = useParams();
   const { alert } = useContext(AlertContext);
@@ -666,7 +669,7 @@ const SendMessageButton: React.FC<{
                 autohide: true,
               });
               setLoading(false);
-              // TODO: refresh();
+              refresh();
             } else {
               throw new Error(res.reason);
             }
@@ -689,9 +692,11 @@ const SendMessageButton: React.FC<{
 
 const SendMessage: React.FC<{
   recipients: Recipient[];
+  refresh: () => void;
 }> = (props) => {
   const {
     recipients,
+    refresh,
   } = props;
   const options = recipients.concat([{
     type: MessageType.Exam,
@@ -732,7 +737,7 @@ const SendMessage: React.FC<{
         </Col>
       </Form.Group>
       <Form.Group>
-        <SendMessageButton recipient={val.value} message={message} />
+        <SendMessageButton refresh={refresh} recipient={val.value} message={message} />
       </Form.Group>
     </>
   );

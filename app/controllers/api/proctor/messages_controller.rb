@@ -28,7 +28,7 @@ module Api
           ver = ExamVersion.find_by!(id: message_params[:recipient][:id])
           raise "Invalid version: #{body[:id]}" if ver.exam != @exam
 
-          msg = VersionAnnouncement.new(version: ver, body: message_params[:body])
+          msg = VersionAnnouncement.new(exam_version: ver, body: message_params[:body])
           msg.save!
         when 'ROOM'
           room = Room.find_by!(id: message_params[:recipient][:id])
@@ -47,9 +47,8 @@ module Api
           success: true
         }
       rescue StandardError => e
-        puts e.backtrace
         render json: {
-          succcess: false,
+          success: false,
           reason: e.message
         }
       end

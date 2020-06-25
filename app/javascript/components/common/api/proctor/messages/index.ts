@@ -142,7 +142,7 @@ function convertTimes<
   return old.map((a) => convertTime<MT, Shared, T>(mt, a));
 }
 
-export function useResponse(examId: number): ApiResponse<Response> {
+export function useResponse(examId: number, deps?: React.DependencyList): ApiResponse<Response> {
   return useApiResponse<Server, Response>(`/api/proctor/exams/${examId}/messages`, undefined, (res) => ({
     ...res,
     questions: convertTimes<MessageType.Question, QuestionShared, QuestionServer>(
@@ -168,5 +168,5 @@ export function useResponse(examId: number): ApiResponse<Response> {
       MessageType.Exam,
       res.exam,
     ),
-  }));
+  }), deps);
 }

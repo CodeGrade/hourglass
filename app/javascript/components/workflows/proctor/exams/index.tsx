@@ -10,7 +10,7 @@ import {
   useResponse as examsShow,
 } from '@hourglass/common/api/professor/exams/show';
 import RegularNavbar from '@hourglass/common/navbar';
-import Select, { OptionsType } from 'react-select';
+import Select from 'react-select';
 import { useParams } from 'react-router-dom';
 import {
   Container,
@@ -600,12 +600,12 @@ const Loaded: React.FC<{
       })),
     },
   ]), [recipients]);
-  const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(recipientOptions[0].options[0]);
+  const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(
+    recipientOptions[0].options[0],
+  );
 
   const replyTo = (userId: number) => {
-    const recip = recipientOptions[3].options.find((option) => {
-      return option.value.id === userId;
-    });
+    const recip = recipientOptions[3].options.find((option) => option.value.id === userId);
     if (!recip) {
       alert({
         variant: 'danger',
@@ -705,7 +705,7 @@ const Loaded: React.FC<{
       </div>
     </>
   );
-}
+};
 
 const ExamMessages: React.FC<{
   examId: number;

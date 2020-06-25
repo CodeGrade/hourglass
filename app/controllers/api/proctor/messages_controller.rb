@@ -104,7 +104,7 @@ module Api
         {
           id: msg.id,
           time: msg.created_at,
-          sender: { displayName: msg.sender.display_name },
+          sender: { id: msg.sender.id, displayName: msg.sender.display_name },
           body: msg.body
         }
       end

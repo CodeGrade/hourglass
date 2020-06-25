@@ -34,6 +34,7 @@ interface QuestionShared {
   id: number;
   body: string;
   sender: {
+    id: number;
     displayName: string;
   };
 }

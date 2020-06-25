@@ -323,15 +323,18 @@ const ShowRoomAnnouncement: React.FC<{
 
 const ShowQuestion: React.FC<{
   question: Question;
+  replyTo: (userId: number) => void;
 }> = (props) => {
   const {
     question,
+    replyTo,
   } = props;
   const {
     sender,
     body,
     time,
   } = question;
+  const reply = useCallback(() => replyTo(sender.id), [sender.id]);
   return (
     <Readable>
       <div className="d-flex">
@@ -343,7 +346,10 @@ const ShowQuestion: React.FC<{
         />
         <div className="flex-grow-1" />
         <span className="align-self-center mr-2">
-          <Button variant="info">
+          <Button
+            variant="info"
+            onClick={reply}
+          >
             <Icon I={MdSend} />
             Reply
           </Button>
@@ -404,15 +410,17 @@ const Readable: React.FC = (props) => {
 
 const SingleMessage: React.FC<{
   message: Message;
+  replyTo: (userId: number) => void;
 }> = (props) => {
   const {
     message,
+    replyTo,
   } = props;
   switch (message.type) {
     case MessageType.Direct:
       return <ShowDirectMessage message={message} />;
     case MessageType.Question:
-      return <ShowQuestion question={message} />;
+      return <ShowQuestion replyTo={replyTo} question={message} />;
     case MessageType.Room:
       return <ShowRoomAnnouncement announcement={message} />;
     case MessageType.Version:
@@ -427,6 +435,7 @@ const SingleMessage: React.FC<{
 type FilterVals = { value: string; label: string; };
 
 const ShowMessages: React.FC<{
+  replyTo: (userId: number) => void;
   receivedOnly?: boolean;
   sentOnly?: boolean;
   sent: DirectMessage[];
@@ -436,6 +445,7 @@ const ShowMessages: React.FC<{
   exam: ExamAnnouncement[];
 }> = (props) => {
   const {
+    replyTo,
     receivedOnly = false,
     sentOnly = false,
     questions,
@@ -506,6 +516,7 @@ const ShowMessages: React.FC<{
     });
   }
   all.sort((a, b) => b.time.diff(a.time).milliseconds);
+
   return (
     <>
       <Form.Group as={Row} controlId="message-filter">
@@ -523,7 +534,7 @@ const ShowMessages: React.FC<{
         </Col>
       </Form.Group>
       {all.map((m) => (
-        <SingleMessage key={`${m.type}-${m.id}`} message={m} />
+        <SingleMessage key={`${m.type}-${m.id}`} replyTo={replyTo} message={m} />
       ))}
     </>
   );
@@ -551,6 +562,7 @@ const Loaded: React.FC<{
     exam,
     recipients,
   } = response;
+  const { alert } = useContext(AlertContext);
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
   const recipientOptions = useMemo<RecipientOptions>(() => ([
     {
@@ -587,6 +599,21 @@ const Loaded: React.FC<{
     },
   ]), [recipients]);
   const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(recipientOptions[0].options[0]);
+
+  const replyTo = (userId: number) => {
+    const recip = recipientOptions[3].options.find((option) => {
+      return option.value.id === userId;
+    });
+    if (!recip) {
+      alert({
+        variant: 'danger',
+        title: 'Error replying to message',
+        message: `Invalid User ID: ${userId}`,
+      });
+    }
+    setSelectedRecipient(recip);
+  };
+
   return (
     <>
       <div className="flex-grow-1">
@@ -631,6 +658,7 @@ const Loaded: React.FC<{
           <Tab.Content className="border border-top-0 rounded-bottom p-3">
             <Tab.Pane eventKey={MessagesTab.Timeline} className="overflow-scroll-y">
               <ShowMessages
+                replyTo={replyTo}
                 sent={sent}
                 questions={questions}
                 version={version}
@@ -640,6 +668,7 @@ const Loaded: React.FC<{
             </Tab.Pane>
             <Tab.Pane eventKey={MessagesTab.Received} className="overflow-scroll-y">
               <ShowMessages
+                replyTo={replyTo}
                 sent={sent}
                 questions={questions}
                 version={version}
@@ -650,6 +679,7 @@ const Loaded: React.FC<{
             </Tab.Pane>
             <Tab.Pane eventKey={MessagesTab.Sent} className="overflow-scroll-y">
               <ShowMessages
+                replyTo={replyTo}
                 sent={sent}
                 questions={questions}
                 version={version}

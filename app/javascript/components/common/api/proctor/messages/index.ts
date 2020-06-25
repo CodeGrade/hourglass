@@ -1,6 +1,14 @@
 import { DateTime } from 'luxon';
 import { ApiResponse, useApiResponse } from '@hourglass/common/types/api';
 
+export enum MessageType {
+  Direct = 'DIRECT',
+  Question = 'QUESTION',
+  Room = 'ROOM',
+  Version = 'VERSION',
+  Exam = 'EXAM',
+}
+
 interface DirectMessageShared {
   id: number;
   body: string;
@@ -14,6 +22,7 @@ interface DirectMessageShared {
 }
 
 export interface DirectMessage extends DirectMessageShared {
+  type: MessageType.Direct;
   time: DateTime;
 }
 
@@ -30,6 +39,7 @@ interface QuestionShared {
 }
 
 export interface Question extends QuestionShared {
+  type: MessageType.Question;
   time: DateTime;
 }
 
@@ -46,6 +56,7 @@ interface VersionAnnouncementShared {
 }
 
 export interface VersionAnnouncement extends VersionAnnouncementShared {
+  type: MessageType.Version;
   time: DateTime;
 }
 
@@ -62,6 +73,7 @@ interface RoomAnnouncementShared {
 }
 
 export interface RoomAnnouncement extends RoomAnnouncementShared {
+  type: MessageType.Room;
   time: DateTime;
 }
 
@@ -75,6 +87,7 @@ interface ExamAnnouncementShared {
 }
 
 export interface ExamAnnouncement extends ExamAnnouncementShared {
+  type: MessageType.Exam;
   time: DateTime;
 }
 
@@ -98,29 +111,53 @@ export interface Response {
   exam: ExamAnnouncement[];
 }
 
+export type Message =
+  Question | DirectMessage | VersionAnnouncement | RoomAnnouncement | ExamAnnouncement;
+
 function convertTime<
+  MT extends MessageType,
   Shared,
   T extends Shared & { time: string }
-  >(old: T): Shared & { time: DateTime } {
+>(mt: MT, old: T): Shared & { time: DateTime, type: MT } {
   return {
     ...old,
+    type: mt,
     time: DateTime.fromISO(old.time),
   };
 }
 
 function convertTimes<
+  MT extends MessageType,
   Shared,
   T extends Shared & { time: string }
-  >(old: T[]): Array<Shared & { time: DateTime }> {
-  return old.map((a) => convertTime(a));
+>(mt: MT, old: T[]): Array<Shared & { time: DateTime, type: MT }> {
+  return old.map((a) => convertTime<MT, Shared, T>(mt, a));
 }
 
 export function useResponse(examId: number): ApiResponse<Response> {
   return useApiResponse<Server, Response>(`/api/proctor/exams/${examId}/messages`, undefined, (res) => ({
-    questions: convertTimes<QuestionShared, QuestionServer>(res.questions),
-    sent: convertTimes<DirectMessageShared, DirectMessageServer>(res.sent),
-    version: convertTimes<VersionAnnouncementShared, VersionAnnouncementServer>(res.version),
-    room: convertTimes<RoomAnnouncementShared, RoomAnnouncementServer>(res.room),
-    exam: convertTimes<ExamAnnouncementShared, ExamAnnouncementServer>(res.exam),
+    questions: convertTimes<MessageType.Question, QuestionShared, QuestionServer>(
+      MessageType.Question, res.questions,
+    ),
+    sent: convertTimes<MessageType.Direct, DirectMessageShared, DirectMessageServer>(
+      MessageType.Direct,
+      res.sent,
+    ),
+    version: convertTimes<
+      MessageType.Version,
+      VersionAnnouncementShared,
+      VersionAnnouncementServer
+    >(
+      MessageType.Version,
+      res.version,
+    ),
+    room: convertTimes<MessageType.Room, RoomAnnouncementShared, RoomAnnouncementServer>(
+      MessageType.Room,
+      res.room,
+    ),
+    exam: convertTimes<MessageType.Exam, ExamAnnouncementShared, ExamAnnouncementServer>(
+      MessageType.Exam,
+      res.exam,
+    ),
   }));
 }

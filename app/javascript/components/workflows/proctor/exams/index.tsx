@@ -33,7 +33,7 @@ import Loading from '@hourglass/common/loading';
 import { finalizeRegistration } from '@hourglass/common/api/proctor/registrations/finalize';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
-import { useRefresher } from '@hourglass/common/helpers';
+import { useRefresher, ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   RoomAnnouncement,
   DirectMessage,
@@ -41,6 +41,8 @@ import {
   Question,
   VersionAnnouncement,
   ExamAnnouncement,
+  Message,
+  MessageType,
 } from '@hourglass/common/api/proctor/messages';
 import { GiBugleCall } from 'react-icons/gi';
 
@@ -352,6 +354,28 @@ const Readable: React.FC = (props) => {
   );
 };
 
+const SingleMessage: React.FC<{
+  message: Message;
+}> = (props) => {
+  const {
+    message,
+  } = props;
+  switch (message.type) {
+    case MessageType.Direct:
+      return <ShowDirectMessage message={message} />;
+    case MessageType.Question:
+      return <ShowQuestion question={message} />;
+    case MessageType.Room:
+      return <ShowRoomAnnouncement announcement={message} />;
+    case MessageType.Version:
+      return <ShowVersionAnnouncement announcement={message} />;
+    case MessageType.Exam:
+      return <ShowExamAnnouncement announcement={message} />;
+    default:
+      throw new ExhaustiveSwitchError(message);
+  }
+};
+
 const ShowMessages: React.FC<{
   examId: number;
   receivedOnly?: boolean;
@@ -374,37 +398,30 @@ const ShowMessages: React.FC<{
       </div>
     );
   }
-  const questions = res.response.questions.map((q) => (
-    <Readable key={q.id}>
-      <ShowQuestion question={q} />
-    </Readable>
-  ));
-  const sent = (
-    <>
-      {res.response.sent.map((m) => (
-        <ShowDirectMessage key={m.id} message={m} />
-      ))}
-      {res.response.room.map((m) => (
-        <ShowRoomAnnouncement key={m.id} announcement={m} />
-      ))}
-      {res.response.version.map((m) => (
-        <ShowVersionAnnouncement key={m.id} announcement={m} />
-      ))}
-      {res.response.exam.map((m) => (
-        <ShowExamAnnouncement key={m.id} announcement={m} />
-      ))}
-    </>
-  );
-  if (receivedOnly) {
-    return <>{questions}</>;
+  const {
+    questions,
+    sent,
+    version,
+    room,
+    exam,
+  } = res.response;
+  let all: Array<Message> = [];
+  if (!receivedOnly) {
+    all = all
+      .concat(sent)
+      .concat(version)
+      .concat(room)
+      .concat(exam);
   }
-  if (sentOnly) {
-    return <>{sent}</>;
+  if (!sentOnly) {
+    all = all.concat(questions);
   }
+  all.sort((a, b) => b.time.diff(a.time).milliseconds);
   return (
     <>
-      {questions}
-      {sent}
+      {all.map((m) => (
+        <SingleMessage key={m.id} message={m} />
+      ))}
     </>
   );
 };

@@ -36,6 +36,7 @@ import { finalizeRegistration } from '@hourglass/common/api/proctor/registration
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
 import { useRefresher } from '@hourglass/common/helpers';
+import { RoomAnnouncement, DirectMessage } from '@hourglass/common/api/proctor/messages';
 
 const FinalizeButton: React.FC<{
   regId: number;
@@ -203,17 +204,242 @@ const ExamAnomalies: React.FC<{
   );
 };
 
-enum ProctoringTab {
+const ShowRoomAnnouncement: React.FC<{
+  announcement: RoomAnnouncement;
+}> = (props) => {
+  const {
+    announcement,
+  } = props;
+  const {
+    room,
+    body,
+    time,
+  } = announcement;
+  return (
+    <ShowMessage
+      icon={MdPeople}
+      tooltip={`Sent to ${room.name}`}
+      body={body}
+      time={time}
+    />
+  );
+};
+
+const ShowDirectMessage: React.FC<{
+  message: DirectMessage;
+}> = (props) => {
+  const {
+    message,
+  } = props;
+  const {
+    sender,
+    recipient,
+    body,
+    time,
+  } = message;
+  return (
+    <div className="d-flex">
+      <ShowMessage
+        icon={MdMessage}
+        tooltip={`Received from ${recipient.displayName}`}
+        body={body}
+        time={time}
+      />
+      <div className="flex-grow-1" />
+      <span className="align-self-center mr-2">
+        <Button variant="info">
+          <Icon I={MdSend} />
+          Reply
+        </Button>
+      </span>
+    </div>
+  );
+};
+
+const Readable: React.FC = (props) => {
+  const { children } = props;
+  const [read, setRead] = useState(false);
+  return (
+    <Card
+      border="warning"
+      className={read && 'border-0'}
+    >
+      <div>
+        {children}
+        <span
+          className={`${read ? 'd-none' : ''} float-right align-self-center`}
+        >
+          <Button
+            variant="warning"
+            onClick={() => setRead(true)}
+          >
+            <Icon I={FaCheck} />
+            Mark as read
+          </Button>
+        </span>
+      </div>
+    </Card>
+  );
+};
+
+const ShowMessages: React.FC<{
+  examId: number;
+}> = (props) => {
+  return (
+    <>
+      <ShowRoomAnnouncement
+        announcement={{
+          id: 1,
+          room: { name: 'Room 1' },
+          body: 'Room broadcast',
+          time: DateTime.local(),
+        }}
+      />
+      <ShowMessage
+        icon={GiBugleCall}
+        tooltip="Sent to everyone"
+        body="Message to everyone"
+        time={DateTime.local()}
+      />
+      <Readable>
+        <ShowDirectMessage
+          message={{
+            id: 1,
+            body: 'Unread message from Student X',
+            time: DateTime.local(),
+            sender: { displayName: 'Student X' },
+            recipient: { displayName: 'Prof' },
+          }}
+        />
+      </Readable>
+      <ShowDirectMessage
+        message={{
+          id: 1,
+          body: 'Read message from Student Y',
+          time: DateTime.local(),
+          sender: { displayName: 'Student Y' },
+          recipient: { displayName: 'Prof' },
+        }}
+      />
+      <ShowMessage
+        icon={MdSend}
+        tooltip="Sent to Student X"
+        body="Message to Student X"
+        time={DateTime.local()}
+      />
+    </>
+  );
+};
+
+const MessagesTimeline: React.FC<{
+  examId: number;
+}> = (props) => {
+  const {
+    examId,
+  } = props;
+  return (
+    <>
+      <div>
+        Filter by:
+        <Select
+          placeholder="Choose selection criteria..."
+          options={[
+            { value: 'all', label: 'anyone' },
+            { value: 'Room 1', label: 'Room 1' },
+            { value: 'Room 2', label: 'Room 2' },
+            { value: 'Version 1', label: 'Version A' },
+            { value: 'Version 2', label: 'Version B' },
+            { value: 'studentX', label: 'Student X' },
+          ]}
+        />
+      </div>
+      <p>
+        There should be one option per room,
+        one option per exam version, and
+        one option per student who has sent or received a message
+      </p>
+      <p>
+        (reply fills in the recipient below, and sets
+        focus to the message sender)
+      </p>
+      <ShowMessages examId={examId} />
+    </>
+  );
+};
+
+enum MessagesTab {
   Timeline = 'timeline',
   Received = 'received',
   Sent = 'sent',
 }
 
+const ExamMessages: React.FC<{
+  examId: number;
+}> = (props) => {
+  const {
+    examId,
+  } = props;
+  const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
+  return (
+    <>
+      <h2>Messages</h2>
+      <Tab.Container activeKey={tabName}>
+        <Nav
+          variant="tabs"
+          activeKey={tabName}
+          onSelect={(key) => setTabName(key)}
+        >
+          <Nav.Item>
+            <Nav.Link
+              eventKey={MessagesTab.Timeline}
+            >
+              <Icon I={FaList} />
+              <span className="ml-2">
+                Timeline
+              </span>
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              eventKey={MessagesTab.Received}
+            >
+              <Icon I={FaInbox} />
+              <span className="ml-2">
+                Received
+              </span>
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              eventKey={MessagesTab.Sent}
+            >
+              <Icon I={MdSend} />
+              <span className="ml-2">
+                Sent
+              </span>
+            </Nav.Link>
+          </Nav.Item>
+        </Nav>
+        <Tab.Content className="border border-top-0 rounded-bottom p-3">
+          <Tab.Pane eventKey={MessagesTab.Timeline} className="overflow-scroll-y">
+            <MessagesTimeline examId={examId} />
+          </Tab.Pane>
+          <Tab.Pane eventKey={MessagesTab.Received}>
+            Ditto, but only received messages
+          </Tab.Pane>
+          <Tab.Pane eventKey={MessagesTab.Sent}>
+            Ditto, but only sent messages
+          </Tab.Pane>
+        </Tab.Content>
+      </Tab.Container>
+    </>
+  );
+};
+
 const ExamProctoring: React.FC = () => {
   const {
     examId,
   } = useParams();
-  const [tabName, setTabName] = useState<ProctoringTab>(ProctoringTab.Timeline);
   const res = examsShow(examId);
   return (
     <>
@@ -232,128 +458,7 @@ const ExamProctoring: React.FC = () => {
           </Col>
           <Col sm={6} className="d-flex flex-column">
             <div className="flex-grow-1">
-              <h2>Messages</h2>
-              <Tab.Container activeKey={tabName}>
-                <Nav
-                  variant="tabs"
-                  activeKey={tabName}
-                  onSelect={(key) => setTabName(key)}
-                >
-                  <Nav.Item>
-                    <Nav.Link
-                      eventKey={ProctoringTab.Timeline}
-                    >
-                      <Icon I={FaList} />
-                      <span className="ml-2">
-                        Timeline
-                      </span>
-                    </Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link
-                      eventKey={ProctoringTab.Received}
-                    >
-                      <Icon I={FaInbox} />
-                      <span className="ml-2">
-                        Received
-                      </span>
-                    </Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link
-                      eventKey={ProctoringTab.Sent}
-                    >
-                      <Icon I={MdSend} />
-                      <span className="ml-2">
-                        Sent
-                      </span>
-                    </Nav.Link>
-                  </Nav.Item>
-                </Nav>
-                <Tab.Content className="border border-top-0 rounded-bottom p-3">
-                  <Tab.Pane eventKey={ProctoringTab.Timeline} className="overflow-scroll-y">
-                    <div>
-                      Filter by:
-                      <Select
-                        placeholder="Choose selection criteria..."
-                        options={[
-                          { value: 'all', label: 'anyone' },
-                          { value: 'Room 1', label: 'Room 1' },
-                          { value: 'Room 2', label: 'Room 2' },
-                          { value: 'Version 1', label: 'Version A' },
-                          { value: 'Version 2', label: 'Version B' },
-                          { value: 'studentX', label: 'Student X' },
-                        ]}
-                      />
-                    </div>
-                    <p>
-                      There should be one option per room,
-                      one option per exam version, and
-                      one option per student who has sent or received a message
-                    </p>
-                    <ShowMessage
-                      icon={MdPeople}
-                      tooltip="Sent to Room 1"
-                      body="Room broadcast"
-                      time={DateTime.local()}
-                    />
-                    <ShowMessage
-                      icon={GiBugleCall}
-                      tooltip="Sent to everyone"
-                      body="Message to everyone"
-                      time={DateTime.local()}
-                    />
-                    <Card border="warning">
-                      <ShowMessage
-                        icon={MdMessage}
-                        tooltip="Received from Student X"
-                        body="Unread message from Student X"
-                        time={DateTime.local()}
-                      />
-                      <p>
-                        (reply fills in the recipient below, and sets
-                        focus to the message sender)
-                      </p>
-                      <span className="ml-auto m-0">
-                        <Button variant="info">
-                          <Icon I={MdSend} />
-                          Reply
-                        </Button>
-                        <Button variant="warning">
-                          <Icon I={FaCheck} />
-                          Mark as read
-                        </Button>
-                      </span>
-                    </Card>
-                    <div className="d-flex justify-content-between">
-                      <ShowMessage
-                        icon={MdMessage}
-                        tooltip="Received from Student Y"
-                        body="Read message from Student Y"
-                        time={DateTime.local()}
-                      />
-                      <span className="align-self-center mr-2">
-                        <Button variant="info">
-                          <Icon I={MdSend} />
-                          Reply
-                        </Button>
-                      </span>
-                    </div>
-                    <ShowMessage
-                      icon={MdSend}
-                      tooltip="Sent to Student X"
-                      body="Message to Student X"
-                      time={DateTime.local()}
-                    />
-                  </Tab.Pane>
-                  <Tab.Pane eventKey={ProctoringTab.Received}>
-                    Ditto, but only received messages
-                  </Tab.Pane>
-                  <Tab.Pane eventKey={ProctoringTab.Sent}>
-                    Ditto, but only sent messages
-                  </Tab.Pane>
-                </Tab.Content>
-              </Tab.Container>
+              <ExamMessages examId={examId} />
             </div>
             <div>
               <h2>Send message</h2>

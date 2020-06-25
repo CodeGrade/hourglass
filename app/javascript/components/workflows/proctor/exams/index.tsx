@@ -3,12 +3,13 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useCallback,
 } from 'react';
 import {
   useResponse as examsShow,
 } from '@hourglass/common/api/professor/exams/show';
 import RegularNavbar from '@hourglass/common/navbar';
-import Select from 'react-select';
+import Select, { OptionsType } from 'react-select';
 import { useParams } from 'react-router-dom';
 import {
   Container,
@@ -42,6 +43,7 @@ import { useRefresher, ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   RoomAnnouncement,
   DirectMessage,
+  Response,
   useResponse as useExamMessages,
   Question,
   VersionAnnouncement,
@@ -533,186 +535,24 @@ enum MessagesTab {
   Sent = 'sent',
 }
 
-const ExamMessages: React.FC<{
-  examId: number;
-}> = (props) => {
-  const {
-    examId,
-  } = props;
-  const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
-  const [refresher, refresh] = useRefresher();
-  const res = useExamMessages(examId, [refresher]);
-  switch (res.type) {
-    case 'LOADING':
-      return <Loading loading />;
-    case 'ERROR':
-      return (
-        <div className="text-danger">
-          <p>Error</p>
-          <small>{res.text}</small>
-        </div>
-      );
-    case 'RESULT':
-      return (
-        <>
-          <div className="flex-grow-1">
-            <h2>Messages</h2>
-            <Tab.Container activeKey={tabName}>
-              <Nav
-                variant="tabs"
-                activeKey={tabName}
-                onSelect={(key) => setTabName(key)}
-              >
-                <Nav.Item>
-                  <Nav.Link
-                    eventKey={MessagesTab.Timeline}
-                  >
-                    <Icon I={FaList} />
-                    <span className="ml-2">
-                      Timeline
-                    </span>
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link
-                    eventKey={MessagesTab.Received}
-                  >
-                    <Icon I={FaInbox} />
-                    <span className="ml-2">
-                      Received
-                    </span>
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link
-                    eventKey={MessagesTab.Sent}
-                  >
-                    <Icon I={MdSend} />
-                    <span className="ml-2">
-                      Sent
-                    </span>
-                  </Nav.Link>
-                </Nav.Item>
-              </Nav>
-              <Tab.Content className="border border-top-0 rounded-bottom p-3">
-                <Tab.Pane eventKey={MessagesTab.Timeline} className="overflow-scroll-y">
-                  <ShowMessages
-                    sent={res.response.sent}
-                    questions={res.response.questions}
-                    version={res.response.version}
-                    room={res.response.room}
-                    exam={res.response.exam}
-                  />
-                </Tab.Pane>
-                <Tab.Pane eventKey={MessagesTab.Received} className="overflow-scroll-y">
-                  <ShowMessages
-                    sent={res.response.sent}
-                    questions={res.response.questions}
-                    version={res.response.version}
-                    room={res.response.room}
-                    exam={res.response.exam}
-                    receivedOnly
-                  />
-                </Tab.Pane>
-                <Tab.Pane eventKey={MessagesTab.Sent} className="overflow-scroll-y">
-                  <ShowMessages
-                    sent={res.response.sent}
-                    questions={res.response.questions}
-                    version={res.response.version}
-                    room={res.response.room}
-                    exam={res.response.exam}
-                    sentOnly
-                  />
-                </Tab.Pane>
-              </Tab.Content>
-            </Tab.Container>
-          </div>
-          <div>
-            <SendMessage refresh={refresh} recipients={res.response.recipients} />
-          </div>
-        </>
-      );
-    default:
-      throw new ExhaustiveSwitchError(res);
-  }
-};
-
-interface MessageFilterOption {
-  value: Recipient;
-  label: string;
-}
-
-const SendMessageButton: React.FC<{
-  recipient: Recipient;
-  message: string;
+const Loaded: React.FC<{
   refresh: () => void;
+  response: Response;
 }> = (props) => {
   const {
-    recipient,
-    message,
     refresh,
+    response,
   } = props;
-  const { examId } = useParams();
-  const { alert } = useContext(AlertContext);
-  const [loading, setLoading] = useState(false);
-  const disabled = message === '' || loading;
-  const disabledMessage = loading ? 'Loading...' : 'Enter a message to send';
-  return (
-    <Loading loading={loading}>
-      <TooltipButton
-        placement="top"
-        disabled={disabled}
-        disabledMessage={disabledMessage}
-        variant="success"
-        onClick={() => {
-          setLoading(true);
-          sendMessage(examId, recipient, message).then((res) => {
-            if (res.success === true) {
-              alert({
-                variant: 'success',
-                message: 'Message sent.',
-                autohide: true,
-              });
-              setLoading(false);
-              refresh();
-            } else {
-              throw new Error(res.reason);
-            }
-          }).catch((err) => {
-            alert({
-              variant: 'danger',
-              title: 'Error sending message',
-              message: err.message,
-            });
-            setLoading(false);
-          });
-        }}
-      >
-        <Icon I={MdSend} />
-        Send
-      </TooltipButton>
-    </Loading>
-  );
-};
-
-type RecipientOptions = {
-  label: string;
-  options: MessageFilterOption[];
-}[]
-
-const SendMessage: React.FC<{
-  recipients: {
-    students: Recipient[];
-    rooms: Recipient[];
-    versions: Recipient[];
-  };
-  refresh: () => void;
-}> = (props) => {
   const {
+    sent,
+    questions,
+    version,
+    room,
+    exam,
     recipients,
-    refresh,
-  } = props;
-  const options = useMemo<RecipientOptions>(() => ([
+  } = response;
+  const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
+  const recipientOptions = useMemo<RecipientOptions>(() => ([
     {
       label: 'Entire exam',
       options: [{
@@ -746,8 +586,200 @@ const SendMessage: React.FC<{
       })),
     },
   ]), [recipients]);
-  const [val, setVal] = useState<MessageFilterOption>(options[0].options[0]);
+  const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(recipientOptions[0].options[0]);
+  return (
+    <>
+      <div className="flex-grow-1">
+        <h2>Messages</h2>
+        <Tab.Container activeKey={tabName}>
+          <Nav
+            variant="tabs"
+            activeKey={tabName}
+            onSelect={(key) => setTabName(key)}
+          >
+            <Nav.Item>
+              <Nav.Link
+                eventKey={MessagesTab.Timeline}
+              >
+                <Icon I={FaList} />
+                <span className="ml-2">
+                  Timeline
+                </span>
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link
+                eventKey={MessagesTab.Received}
+              >
+                <Icon I={FaInbox} />
+                <span className="ml-2">
+                  Received
+                </span>
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link
+                eventKey={MessagesTab.Sent}
+              >
+                <Icon I={MdSend} />
+                <span className="ml-2">
+                  Sent
+                </span>
+              </Nav.Link>
+            </Nav.Item>
+          </Nav>
+          <Tab.Content className="border border-top-0 rounded-bottom p-3">
+            <Tab.Pane eventKey={MessagesTab.Timeline} className="overflow-scroll-y">
+              <ShowMessages
+                sent={sent}
+                questions={questions}
+                version={version}
+                room={room}
+                exam={exam}
+              />
+            </Tab.Pane>
+            <Tab.Pane eventKey={MessagesTab.Received} className="overflow-scroll-y">
+              <ShowMessages
+                sent={sent}
+                questions={questions}
+                version={version}
+                room={room}
+                exam={exam}
+                receivedOnly
+              />
+            </Tab.Pane>
+            <Tab.Pane eventKey={MessagesTab.Sent} className="overflow-scroll-y">
+              <ShowMessages
+                sent={sent}
+                questions={questions}
+                version={version}
+                room={room}
+                exam={exam}
+                sentOnly
+              />
+            </Tab.Pane>
+          </Tab.Content>
+        </Tab.Container>
+      </div>
+      <div>
+        <SendMessage
+          recipientOptions={recipientOptions}
+          selectedRecipient={selectedRecipient}
+          setSelectedRecipient={setSelectedRecipient}
+          refresh={refresh}
+        />
+      </div>
+    </>
+  );
+}
+
+const ExamMessages: React.FC<{
+  examId: number;
+}> = (props) => {
+  const {
+    examId,
+  } = props;
+  const [refresher, refresh] = useRefresher();
+  const res = useExamMessages(examId, [refresher]);
+  switch (res.type) {
+    case 'LOADING':
+      return <Loading loading />;
+    case 'ERROR':
+      return (
+        <div className="text-danger">
+          <p>Error</p>
+          <small>{res.text}</small>
+        </div>
+      );
+    case 'RESULT':
+      return <Loaded refresh={refresh} response={res.response} />;
+    default:
+      throw new ExhaustiveSwitchError(res);
+  }
+};
+
+interface MessageFilterOption {
+  value: Recipient;
+  label: string;
+}
+
+const SendMessageButton: React.FC<{
+  recipient: Recipient;
+  message: string;
+  refresh: () => void;
+  onSuccess: () => void;
+}> = (props) => {
+  const {
+    recipient,
+    message,
+    refresh,
+    onSuccess,
+  } = props;
+  const { examId } = useParams();
+  const { alert } = useContext(AlertContext);
+  const [loading, setLoading] = useState(false);
+  const disabled = message === '' || loading;
+  const disabledMessage = loading ? 'Loading...' : 'Enter a message to send';
+  return (
+    <Loading loading={loading}>
+      <TooltipButton
+        placement="top"
+        disabled={disabled}
+        disabledMessage={disabledMessage}
+        variant="success"
+        onClick={() => {
+          setLoading(true);
+          sendMessage(examId, recipient, message).then((res) => {
+            if (res.success === true) {
+              alert({
+                variant: 'success',
+                message: 'Message sent.',
+                autohide: true,
+              });
+              setLoading(false);
+              onSuccess();
+              refresh();
+            } else {
+              throw new Error(res.reason);
+            }
+          }).catch((err) => {
+            alert({
+              variant: 'danger',
+              title: 'Error sending message',
+              message: err.message,
+            });
+            setLoading(false);
+          });
+        }}
+      >
+        <Icon I={MdSend} />
+        Send
+      </TooltipButton>
+    </Loading>
+  );
+};
+
+type RecipientOptions = {
+  label: string;
+  options: MessageFilterOption[];
+}[]
+
+const SendMessage: React.FC<{
+  selectedRecipient: MessageFilterOption;
+  setSelectedRecipient: (option: MessageFilterOption) => void;
+  recipientOptions: RecipientOptions;
+  refresh: () => void;
+}> = (props) => {
+  const {
+    selectedRecipient,
+    setSelectedRecipient,
+    recipientOptions,
+    refresh,
+  } = props;
   const [message, setMessage] = useState('');
+  const resetVals = useCallback(() => {
+    setMessage('');
+  }, []);
   const groupStyles = {
     display: 'flex',
     alignItems: 'center',
@@ -771,12 +803,12 @@ const SendMessage: React.FC<{
         <Col>
           <Select
             placeholder="Choose selection criteria..."
-            value={val}
+            value={selectedRecipient}
             onChange={(value: MessageFilterOption) => {
-              setVal(value);
+              setSelectedRecipient(value);
             }}
             formatGroupLabel={formatGroupLabel}
-            options={options}
+            options={recipientOptions}
           />
         </Col>
       </Form.Group>
@@ -793,7 +825,12 @@ const SendMessage: React.FC<{
         </Col>
       </Form.Group>
       <Form.Group>
-        <SendMessageButton refresh={refresh} recipient={val.value} message={message} />
+        <SendMessageButton
+          onSuccess={resetVals}
+          refresh={refresh}
+          recipient={selectedRecipient.value}
+          message={message}
+        />
       </Form.Group>
     </>
   );

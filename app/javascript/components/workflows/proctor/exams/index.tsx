@@ -809,6 +809,7 @@ const SendMessage: React.FC<{
             }}
             formatGroupLabel={formatGroupLabel}
             options={recipientOptions}
+            menuPlacement="auto"
           />
         </Col>
       </Form.Group>

@@ -65,6 +65,7 @@ import AssignStaff from '@professor/exams/assign-staff';
 import ErrorBoundary from '@hourglass/common/boundary';
 import { BsPencilSquare } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
+import DocumentTitle from '@hourglass/common/documentTitle';
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -83,10 +84,12 @@ export const ExamAdmin: React.FC = () => {
       return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <Loaded
-          refresh={refresh}
-          response={response.response}
-        />
+        <DocumentTitle title={response.response.name}>
+          <Loaded
+            refresh={refresh}
+            response={response.response}
+          />
+        </DocumentTitle>
       );
     default:
       throw new ExhaustiveSwitchError(response);

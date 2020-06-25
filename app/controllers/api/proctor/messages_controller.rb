@@ -9,7 +9,8 @@ module Api
 
       def index
         render json: {
-          direct: @exam.messages.map { |m| serialize_message m },
+          sent: @exam.messages.map { |m| serialize_message m },
+          questions: @exam.questions.map { |q| serialize_question q },
           version: @exam.version_announcements.map { |m| serialize_ver_announcement m },
           room: @exam.room_announcements.map { |m| serialize_room_announcement m }
         }
@@ -22,8 +23,17 @@ module Api
           id: msg.id,
           body: msg.body,
           time: msg.created_at,
-          sender: { displayName: msg.sender.display_name },
+          sender: { isMe: msg.sender == current_user, displayName: msg.sender.display_name },
           recipient: { displayName: msg.recipient.display_name }
+        }
+      end
+
+      def serialize_question(msg)
+        {
+          id: msg.id,
+          time: msg.created_at,
+          sender: { displayName: msg.sender.display_name },
+          body: msg.body
         }
       end
 

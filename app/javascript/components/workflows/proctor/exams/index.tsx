@@ -36,7 +36,7 @@ import { finalizeRegistration } from '@hourglass/common/api/proctor/registration
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
 import { useRefresher } from '@hourglass/common/helpers';
-import { RoomAnnouncement, DirectMessage } from '@hourglass/common/api/proctor/messages';
+import { RoomAnnouncement, DirectMessage, useResponse as useExamMessages, Question, VersionAnnouncement } from '@hourglass/common/api/proctor/messages';
 
 const FinalizeButton: React.FC<{
   regId: number;
@@ -204,6 +204,27 @@ const ExamAnomalies: React.FC<{
   );
 };
 
+const ShowVersionAnnouncement: React.FC<{
+  announcement: VersionAnnouncement;
+}> = (props) => {
+  const {
+    announcement,
+  } = props;
+  const {
+    version,
+    body,
+    time,
+  } = announcement;
+  return (
+    <ShowMessage
+      icon={MdPeople}
+      tooltip={`Sent to ${version.name}`}
+      body={body}
+      time={time}
+    />
+  );
+};
+
 const ShowRoomAnnouncement: React.FC<{
   announcement: RoomAnnouncement;
 }> = (props) => {
@@ -225,6 +246,36 @@ const ShowRoomAnnouncement: React.FC<{
   );
 };
 
+const ShowQuestion: React.FC<{
+  question: Question;
+}> = (props) => {
+  const {
+    question,
+  } = props;
+  const {
+    sender,
+    body,
+    time,
+  } = question;
+  return (
+    <div className="d-flex">
+      <ShowMessage
+        icon={MdMessage}
+        tooltip={`Received from ${sender.displayName}`}
+        body={body}
+        time={time}
+      />
+      <div className="flex-grow-1" />
+      <span className="align-self-center mr-2">
+        <Button variant="info">
+          <Icon I={MdSend} />
+          Reply
+        </Button>
+      </span>
+    </div>
+  );
+};
+
 const ShowDirectMessage: React.FC<{
   message: DirectMessage;
 }> = (props) => {
@@ -237,22 +288,14 @@ const ShowDirectMessage: React.FC<{
     body,
     time,
   } = message;
+  const senderName = `${sender.displayName}${sender.isMe ? ' (you)' : ''}`;
   return (
-    <div className="d-flex">
-      <ShowMessage
-        icon={MdMessage}
-        tooltip={`Received from ${recipient.displayName}`}
-        body={body}
-        time={time}
-      />
-      <div className="flex-grow-1" />
-      <span className="align-self-center mr-2">
-        <Button variant="info">
-          <Icon I={MdSend} />
-          Reply
-        </Button>
-      </span>
-    </div>
+    <ShowMessage
+      icon={MdSend}
+      tooltip={`Sent by ${senderName} to ${recipient.displayName}`}
+      body={body}
+      time={time}
+    />
   );
 };
 
@@ -285,50 +328,45 @@ const Readable: React.FC = (props) => {
 const ShowMessages: React.FC<{
   examId: number;
 }> = (props) => {
+  const {
+    examId,
+  } = props;
+  const res = useExamMessages(examId);
+  if (res.type === 'LOADING') {
+    return <Loading loading />;
+  }
+  if (res.type === 'ERROR') {
+    return (
+      <div className="text-danger">
+        <p>Error</p>
+        <small>{res.text}</small>
+      </div>
+    );
+  }
   return (
     <>
-      <ShowRoomAnnouncement
-        announcement={{
-          id: 1,
-          room: { name: 'Room 1' },
-          body: 'Room broadcast',
-          time: DateTime.local(),
-        }}
-      />
-      <ShowMessage
-        icon={GiBugleCall}
-        tooltip="Sent to everyone"
-        body="Message to everyone"
-        time={DateTime.local()}
-      />
-      <Readable>
-        <ShowDirectMessage
-          message={{
-            id: 1,
-            body: 'Unread message from Student X',
-            time: DateTime.local(),
-            sender: { displayName: 'Student X' },
-            recipient: { displayName: 'Prof' },
-          }}
-        />
-      </Readable>
-      <ShowDirectMessage
-        message={{
-          id: 1,
-          body: 'Read message from Student Y',
-          time: DateTime.local(),
-          sender: { displayName: 'Student Y' },
-          recipient: { displayName: 'Prof' },
-        }}
-      />
-      <ShowMessage
-        icon={MdSend}
-        tooltip="Sent to Student X"
-        body="Message to Student X"
-        time={DateTime.local()}
-      />
+      {res.response.questions.map((q) => (
+        <Readable key={q.id}>
+          <ShowQuestion question={q} />
+        </Readable>
+      ))}
+      {res.response.sent.map((m) => (
+        <ShowDirectMessage key={m.id} message={m} />
+      ))}
+      {res.response.room.map((m) => (
+        <ShowRoomAnnouncement key={m.id} announcement={m} />
+      ))}
+      {res.response.version.map((m) => (
+        <ShowVersionAnnouncement key={m.id} announcement={m} />
+      ))}
     </>
   );
+  //     <ShowMessage
+  //       icon={GiBugleCall}
+  //       tooltip="Sent to everyone"
+  //       body="Message to everyone"
+  //       time={DateTime.local()}
+  //     />
 };
 
 const MessagesTimeline: React.FC<{

@@ -1,10 +1,11 @@
-import { DateTime } from "luxon";
-import { ApiResponse, useApiResponse } from "@hourglass/common/types/api";
+import { DateTime } from 'luxon';
+import { ApiResponse, useApiResponse } from '@hourglass/common/types/api';
 
 interface DirectMessageShared {
   id: number;
   body: string;
   sender: {
+    isMe: boolean;
     displayName: string;
   };
   recipient: {
@@ -17,6 +18,22 @@ export interface DirectMessage extends DirectMessageShared {
 }
 
 interface DirectMessageServer extends DirectMessageShared {
+  time: string;
+}
+
+interface QuestionShared {
+  id: number;
+  body: string;
+  sender: {
+    displayName: string;
+  };
+}
+
+export interface Question extends QuestionShared {
+  time: DateTime;
+}
+
+interface QuestionServer extends QuestionShared {
   time: string;
 }
 
@@ -53,18 +70,23 @@ interface RoomAnnouncementServer extends RoomAnnouncementShared {
 }
 
 interface Server {
-  direct: DirectMessageServer[];
+  sent: DirectMessageServer[];
+  questions: QuestionServer[];
   version: VersionAnnouncementServer[];
   room: RoomAnnouncementServer[];
 }
 
 export interface Response {
-  direct: DirectMessage[];
+  sent: DirectMessage[];
+  questions: Question[];
   version: VersionAnnouncement[];
   room: RoomAnnouncement[];
 }
 
-function convertTime<Shared, T extends Shared & { time: string }>(old: T): Shared & { time: DateTime } {
+function convertTime<
+  Shared,
+  T extends Shared & { time: string }
+  >(old: T): Shared & { time: DateTime } {
   return {
     ...old,
     time: DateTime.fromISO(old.time),
@@ -72,8 +94,9 @@ function convertTime<Shared, T extends Shared & { time: string }>(old: T): Share
 }
 
 export function useResponse(examId: number): ApiResponse<Response> {
-  return useApiResponse<Server, Response>(`/exams/${examId}/messages`, undefined, (res) => ({
-    direct: res.direct.map((a) => convertTime<DirectMessageShared, DirectMessageServer>(a)),
+  return useApiResponse<Server, Response>(`/api/proctor/exams/${examId}/messages`, undefined, (res) => ({
+    questions: res.questions.map((a) => convertTime<QuestionShared, QuestionServer>(a)),
+    sent: res.sent.map((a) => convertTime<DirectMessageShared, DirectMessageServer>(a)),
     version: res.version.map((a) => convertTime<VersionAnnouncementShared, VersionAnnouncementServer>(a)),
     room: res.room.map((a) => convertTime<RoomAnnouncementShared, RoomAnnouncementServer>(a)),
   }));

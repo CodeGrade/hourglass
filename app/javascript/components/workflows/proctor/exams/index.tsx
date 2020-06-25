@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useMemo,
   useCallback,
+  useRef,
 } from 'react';
 import {
   useResponse as examsShow,
@@ -563,6 +564,7 @@ const Loaded: React.FC<{
     recipients,
   } = response;
   const { alert } = useContext(AlertContext);
+  const messageRef = useRef<HTMLTextAreaElement>();
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
   const recipientOptions = useMemo<RecipientOptions>(() => ([
     {
@@ -612,6 +614,7 @@ const Loaded: React.FC<{
       });
     }
     setSelectedRecipient(recip);
+    if (messageRef.current) messageRef.current.focus();
   };
 
   return (
@@ -697,6 +700,7 @@ const Loaded: React.FC<{
           selectedRecipient={selectedRecipient}
           setSelectedRecipient={setSelectedRecipient}
           refresh={refresh}
+          messageRef={messageRef}
         />
       </div>
     </>
@@ -799,12 +803,14 @@ const SendMessage: React.FC<{
   setSelectedRecipient: (option: MessageFilterOption) => void;
   recipientOptions: RecipientOptions;
   refresh: () => void;
+  messageRef: React.Ref<HTMLTextAreaElement>;
 }> = (props) => {
   const {
     selectedRecipient,
     setSelectedRecipient,
     recipientOptions,
     refresh,
+    messageRef,
   } = props;
   const [message, setMessage] = useState('');
   const resetVals = useCallback(() => {
@@ -847,6 +853,7 @@ const SendMessage: React.FC<{
         <Form.Label column sm="auto">Message:</Form.Label>
         <Col>
           <Form.Control
+            ref={messageRef}
             value={message}
             onChange={(e) => {
               setMessage(e.target.value);

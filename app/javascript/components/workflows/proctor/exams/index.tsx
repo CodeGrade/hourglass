@@ -287,21 +287,23 @@ const ShowQuestion: React.FC<{
     time,
   } = question;
   return (
-    <div className="d-flex">
-      <ShowMessage
-        icon={MdMessage}
-        tooltip={`Received from ${sender.displayName}`}
-        body={body}
-        time={time}
-      />
-      <div className="flex-grow-1" />
-      <span className="align-self-center mr-2">
-        <Button variant="info">
-          <Icon I={MdSend} />
-          Reply
-        </Button>
-      </span>
-    </div>
+    <Readable>
+      <div className="d-flex">
+        <ShowMessage
+          icon={MdMessage}
+          tooltip={`Received from ${sender.displayName}`}
+          body={body}
+          time={time}
+        />
+        <div className="flex-grow-1" />
+        <span className="align-self-center mr-2">
+          <Button variant="info">
+            <Icon I={MdSend} />
+            Reply
+          </Button>
+        </span>
+      </div>
+    </Readable>
   );
 };
 

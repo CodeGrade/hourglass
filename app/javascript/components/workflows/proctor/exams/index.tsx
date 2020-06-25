@@ -15,6 +15,7 @@ import {
   Nav,
   Form,
   Card,
+  Media,
 } from 'react-bootstrap';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import {
@@ -26,7 +27,6 @@ import {
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
-import { ShowMessage } from '@hourglass/workflows/student/exams/show/components/navbar/ExamMessages';
 import { Anomaly, useResponse as anomaliesIndex } from '@hourglass/common/api/proctor/anomalies';
 import { destroyAnomaly } from '@hourglass/common/api/proctor/anomalies/destroy';
 import Loading from '@hourglass/common/loading';
@@ -45,6 +45,43 @@ import {
   MessageType,
 } from '@hourglass/common/api/proctor/messages';
 import { GiBugleCall } from 'react-icons/gi';
+import { DateTime } from 'luxon';
+import { IconType } from 'react-icons';
+
+
+export interface MessageProps {
+  icon: IconType;
+  iconClass?: string;
+  tooltip: string;
+  time: DateTime;
+  body: React.ReactElement | string;
+}
+
+const ShowMessage: React.FC<MessageProps> = (props) => {
+  const {
+    icon,
+    iconClass,
+    tooltip,
+    time,
+    body,
+  } = props;
+  return (
+    <Media as="li">
+      <span className="mr-2">
+        <Icon I={icon} className={iconClass} />
+      </span>
+      <Media.Body>
+        <p className="m-0">
+          <i className="text-muted">
+            {`${tooltip} (${time.toLocaleString(DateTime.TIME_SIMPLE)})`}
+          </i>
+        </p>
+        <p>{body}</p>
+      </Media.Body>
+    </Media>
+  );
+};
+
 
 const FinalizeButton: React.FC<{
   regId: number;

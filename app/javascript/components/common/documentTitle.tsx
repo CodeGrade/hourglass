@@ -9,7 +9,7 @@ const DocumentTitle: React.FC<{
   } = props;
   useEffect(() => {
     document.title = title;
-  }, []);
+  }, [title]);
   return <>{children}</>;
 };
 

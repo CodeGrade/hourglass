@@ -519,8 +519,8 @@ const ShowMessages: React.FC<{
 
   return (
     <>
-      <Form.Group as={Row} controlId="message-filter">
-        <Form.Label column sm="auto">Filter by:</Form.Label>
+      <Form.Group className="d-flex" controlId="message-filter">
+        <Form.Label column sm="auto" className="pl-0">Filter by:</Form.Label>
         <Col>
           <Select
             isClearable

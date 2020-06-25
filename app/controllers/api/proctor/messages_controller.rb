@@ -13,11 +13,82 @@ module Api
           questions: @exam.questions.map { |q| serialize_question q },
           version: @exam.version_announcements.map { |m| serialize_ver_announcement m },
           room: @exam.room_announcements.map { |m| serialize_room_announcement m },
-          exam: @exam.exam_announcements.map { |m| serialize_exam_announcement m }
+          exam: @exam.exam_announcements.map { |m| serialize_exam_announcement m },
+          recipients: recipient_list
+        }
+      end
+
+      def create
+        message_params = params.require(:message).permit(:body, recipient: [:type, :id])
+        case message_params[:recipient][:type]
+        when 'EXAM'
+          msg = ExamAnnouncement.new(exam: @exam, body: message_params[:body])
+          msg.save!
+        when 'VERSION'
+          ver = ExamVersion.find_by!(id: message_params[:recipient][:id])
+          raise "Invalid version: #{body[:id]}" if ver.exam != @exam
+
+          msg = VersionAnnouncement.new(version: ver, body: message_params[:body])
+          msg.save!
+        when 'ROOM'
+          room = Room.find_by!(id: message_params[:recipient][:id])
+          raise "Invalid room: #{body[:id]}" if room.exam != @exam
+
+          msg = RoomAnnouncement.new(room: room, body: message_params[:body])
+          msg.save!
+        when 'DIRECT'
+          user = @exam.students.find_by!(id: message_params[:recipient][:id])
+          msg = Message.new(exam: @exam, sender: current_user, recipient: user, body: message_params[:body])
+          msg.save!
+        else
+          raise "Invalid message type: #{message_params[:recipient][:type]}"
+        end
+        render json: {
+          success: true
+        }
+      rescue StandardError => e
+        puts e.backtrace
+        render json: {
+          succcess: false,
+          reason: e.message
         }
       end
 
       private
+
+      def recipient_list
+        direct_recipients + version_recipients + room_recipients
+      end
+
+      def direct_recipients
+        @exam.students.map do |s|
+          {
+            type: 'DIRECT',
+            id: s.id,
+            name: s.display_name
+          }
+        end
+      end
+
+      def version_recipients
+        @exam.exam_versions.map do |ev|
+          {
+            type: 'VERSION',
+            id: ev.id,
+            name: ev.name
+          }
+        end
+      end
+
+      def room_recipients
+        @exam.rooms.map do |room|
+          {
+            type: 'ROOM',
+            id: room.id,
+            name: room.name
+          }
+        end
+      end
 
       def serialize_message(msg)
         {

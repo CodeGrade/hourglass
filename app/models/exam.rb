@@ -25,6 +25,8 @@ class Exam < ApplicationRecord
   validate :end_after_start
   validate :duration_valid
 
+  delegate :professors, to: :course
+
   def duration
     self[:duration].seconds
   end
@@ -37,12 +39,8 @@ class Exam < ApplicationRecord
     rooms.map(&:finalize!)
   end
 
-  def professors
-    course.professor_course_registrations.includes(:user).map(&:user)
-  end
-
   def students
-    registrations.includes(:user).map(&:user)
+    User.where(id: registrations.select(:user_id))
   end
 
   def unassigned_students

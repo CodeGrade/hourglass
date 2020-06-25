@@ -36,7 +36,11 @@ export const ShowMessage: React.FC<MessageProps> = (props) => {
   return (
     <Media as="li">
       <span className="mr-2">
-        <Tooltip message={tooltip}><Icon I={icon} className={iconClass} /></Tooltip>
+        <Tooltip message={tooltip}>
+          <div>
+            <Icon I={icon} className={iconClass} />
+          </div>
+        </Tooltip>
       </span>
       <Media.Body>
         <p className="m-0"><i className="text-muted">{`(sent ${time.toLocaleString(DateTime.TIME_SIMPLE)})`}</i></p>

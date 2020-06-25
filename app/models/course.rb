@@ -13,15 +13,15 @@ class Course < ApplicationRecord
   validates :bottlenose_id, presence: true
 
   def students
-    student_registrations.select(:user_id).includes(:user).distinct.map(&:user)
+    User.where(id: student_registrations.select(:user_id))
   end
 
   def staff
-    staff_registrations.select(:user_id).includes(:user).distinct.map(&:user)
+    User.where(id: staff_registrations.select(:user_id))
   end
 
   def professors
-    professor_course_registrations.select(:user_id).includes(:user).distinct.map(&:user)
+    User.where(id: professor_course_registrations.select(:user_id))
   end
 
   def has_staff?

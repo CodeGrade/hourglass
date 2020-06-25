@@ -25,6 +25,7 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { AllAlerts } from '@hourglass/common/alerts';
 import './index.scss';
 import ErrorBoundary from '@hourglass/common/boundary';
+import DocumentTitle from '@hourglass/common/documentTitle';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -134,14 +135,16 @@ const Exam: React.FC = () => {
       );
     case 'RESULT':
       return (
-        <ShowExam
-          railsUser={railsUser}
-          railsExam={showRes.response.railsExam}
-          railsCourse={showRes.response.railsCourse}
-          railsRegistration={showRes.response.railsRegistration}
-          final={showRes.response.final}
-          lastSnapshot={showRes.response.lastSnapshot}
-        />
+        <DocumentTitle title={showRes.response.railsExam.name}>
+          <ShowExam
+            railsUser={railsUser}
+            railsExam={showRes.response.railsExam}
+            railsCourse={showRes.response.railsCourse}
+            railsRegistration={showRes.response.railsRegistration}
+            final={showRes.response.final}
+            lastSnapshot={showRes.response.lastSnapshot}
+          />
+        </DocumentTitle>
       );
     default:
       throw new ExhaustiveSwitchError(showRes);
@@ -261,7 +264,9 @@ const Entry: React.FC = () => {
                     <AllAlerts>
                       <Switch>
                         <Route exact path="/">
-                          <Exams />
+                          <DocumentTitle title="My Exams">
+                            <Exams />
+                          </DocumentTitle>
                         </Route>
                         <Route path="/exams/:examId/admin">
                           <ExamAdmin />
@@ -273,7 +278,9 @@ const Entry: React.FC = () => {
                           <ShowCourse />
                         </Route>
                         <Route path="*">
-                          TODO: 404!
+                          <DocumentTitle title="Not found">
+                            TODO: 404!
+                          </DocumentTitle>
                         </Route>
                       </Switch>
                     </AllAlerts>

@@ -6,6 +6,7 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { useResponse as examsIndex } from '@hourglass/common/api/professor/exams';
 import NewExam from '@professor/exams/new';
 import SyncCourse from '@professor/courses/sync';
+import DocumentTitle from '@hourglass/common/documentTitle';
 
 interface CourseExamsProps {
   courseId: number;
@@ -74,13 +75,19 @@ const ShowCourse: React.FC = () => {
             </div>
           </div>
           <Route path="/courses/:courseId" exact>
-            <CourseExams courseId={courseId} />
+            <DocumentTitle title={res.response.course.title}>
+              <CourseExams courseId={courseId} />
+            </DocumentTitle>
           </Route>
           <Route path="/courses/:courseId/sync" exact>
-            <SyncCourse />
+            <DocumentTitle title={`Sync - ${res.response.course.title}`}>
+              <SyncCourse />
+            </DocumentTitle>
           </Route>
           <Route path="/courses/:courseId/new" exact>
-            <NewExam />
+            <DocumentTitle title={`New Exam - ${res.response.course.title}`}>
+              <NewExam />
+            </DocumentTitle>
           </Route>
         </>
       );

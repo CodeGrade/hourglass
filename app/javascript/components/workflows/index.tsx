@@ -135,14 +135,16 @@ const Exam: React.FC = () => {
       );
     case 'RESULT':
       return (
-        <ShowExam
-          railsUser={railsUser}
-          railsExam={showRes.response.railsExam}
-          railsCourse={showRes.response.railsCourse}
-          railsRegistration={showRes.response.railsRegistration}
-          final={showRes.response.final}
-          lastSnapshot={showRes.response.lastSnapshot}
-        />
+        <DocumentTitle title={showRes.response.railsExam.name}>
+          <ShowExam
+            railsUser={railsUser}
+            railsExam={showRes.response.railsExam}
+            railsCourse={showRes.response.railsCourse}
+            railsRegistration={showRes.response.railsRegistration}
+            final={showRes.response.final}
+            lastSnapshot={showRes.response.lastSnapshot}
+          />
+        </DocumentTitle>
       );
     default:
       throw new ExhaustiveSwitchError(showRes);

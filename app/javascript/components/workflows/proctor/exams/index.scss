@@ -1,0 +1,29 @@
+.wrapper {
+  flex-basis: 100%;
+  display: flex;
+  margin: 0 auto;
+}
+.content-wrapper {
+  position: relative;
+  flex-grow: 1;
+}
+.inner-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  justify-content: space-between;
+}
+.content {
+  flex-grow: 1;
+  flex-basis: 100%;
+  position: absolute;
+  width: 100%;
+  max-height: 100%;
+}
+.overflow-auto-y {
+  overflow-y: scroll;
+}
+
+.filterMessages__menu-list {
+  z-index: 999 !important;
+}

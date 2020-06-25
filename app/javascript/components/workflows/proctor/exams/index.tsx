@@ -57,7 +57,7 @@ import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
 import { sendMessage } from '@hourglass/common/api/proctor/messages/create';
-
+import './index.scss';
 
 export interface MessageProps {
   icon: IconType;
@@ -524,6 +524,7 @@ const ShowMessages: React.FC<{
         <Form.Label column sm="auto" className="pl-0">Filter by:</Form.Label>
         <Col>
           <Select
+            classNamePrefix="filterMessages"
             isClearable
             placeholder="Choose selection criteria..."
             value={filter}
@@ -534,9 +535,13 @@ const ShowMessages: React.FC<{
           />
         </Col>
       </Form.Group>
-      {all.map((m) => (
-        <SingleMessage key={`${m.type}-${m.id}`} replyTo={replyTo} message={m} />
-      ))}
+      <div className="content-wrapper h-100">
+        <div className="content overflow-auto-y">
+          {all.map((m) => (
+            <SingleMessage key={`${m.type}-${m.id}`} replyTo={replyTo} message={m} />
+          ))}
+        </div>
+      </div>
     </>
   );
 };
@@ -618,10 +623,10 @@ const Loaded: React.FC<{
   };
 
   return (
-    <>
-      <div className="flex-grow-1">
-        <h2>Messages</h2>
-        <Tab.Container activeKey={tabName}>
+    <Tab.Container activeKey={tabName}>
+      <div className="wrapper h-100">
+        <div className="inner-wrapper">
+          <h2>Messages</h2>
           <Nav
             variant="tabs"
             activeKey={tabName}
@@ -658,52 +663,68 @@ const Loaded: React.FC<{
               </Nav.Link>
             </Nav.Item>
           </Nav>
-          <Tab.Content className="border border-top-0 rounded-bottom p-3">
-            <Tab.Pane eventKey={MessagesTab.Timeline} className="overflow-scroll-y">
-              <ShowMessages
-                replyTo={replyTo}
-                sent={sent}
-                questions={questions}
-                version={version}
-                room={room}
-                exam={exam}
-              />
-            </Tab.Pane>
-            <Tab.Pane eventKey={MessagesTab.Received} className="overflow-scroll-y">
-              <ShowMessages
-                replyTo={replyTo}
-                sent={sent}
-                questions={questions}
-                version={version}
-                room={room}
-                exam={exam}
-                receivedOnly
-              />
-            </Tab.Pane>
-            <Tab.Pane eventKey={MessagesTab.Sent} className="overflow-scroll-y">
-              <ShowMessages
-                replyTo={replyTo}
-                sent={sent}
-                questions={questions}
-                version={version}
-                room={room}
-                exam={exam}
-                sentOnly
-              />
-            </Tab.Pane>
-          </Tab.Content>
-        </Tab.Container>
+          <div className="content-wrapper border border-top-0 rounded-bottom">
+            <div className="content h-100">
+              <Tab.Content className="p-3 h-100">
+                <Tab.Pane eventKey={MessagesTab.Timeline} className="h-100">
+                  <div className="wrapper h-100">
+                    <div className="inner-wrapper h-100">
+                      <ShowMessages
+                        replyTo={replyTo}
+                        sent={sent}
+                        questions={questions}
+                        version={version}
+                        room={room}
+                        exam={exam}
+                      />
+                    </div>
+                  </div>
+                </Tab.Pane>
+                <Tab.Pane eventKey={MessagesTab.Received} className="h-100">
+                  <div className="wrapper h-100">
+                    <div className="inner-wrapper h-100">
+                      <ShowMessages
+                        replyTo={replyTo}
+                        sent={sent}
+                        questions={questions}
+                        version={version}
+                        room={room}
+                        exam={exam}
+                        receivedOnly
+                      />
+                    </div>
+                  </div>
+                </Tab.Pane>
+                <Tab.Pane eventKey={MessagesTab.Sent} className="h-100">
+                  <div className="wrapper h-100">
+                    <div className="inner-wrapper h-100">
+                      <ShowMessages
+                        replyTo={replyTo}
+                        sent={sent}
+                        questions={questions}
+                        version={version}
+                        room={room}
+                        exam={exam}
+                        sentOnly
+                      />
+                    </div>
+                  </div>
+                </Tab.Pane>
+              </Tab.Content>
+            </div>
+          </div>
+          <div>
+            <SendMessage
+              recipientOptions={recipientOptions}
+              selectedRecipient={selectedRecipient}
+              setSelectedRecipient={setSelectedRecipient}
+              refresh={refresh}
+              messageRef={messageRef}
+            />
+          </div>
+        </div>
       </div>
-      <div>
-        <SendMessage
-          recipientOptions={recipientOptions}
-          selectedRecipient={selectedRecipient}
-          setSelectedRecipient={setSelectedRecipient}
-          refresh={refresh}
-          messageRef={messageRef}
-        />
-      </div>
-    </>
+    </Tab.Container>
   );
 };
 
@@ -880,26 +901,32 @@ const ExamProctoring: React.FC = () => {
   } = useParams();
   const res = examsShow(examId);
   return (
-    <>
-      <RegularNavbar />
-      <Container fluid className="mh-100 flex-column">
-        <Row>
-          <Col>
-            <Loading loading={res.type !== 'RESULT'}>
-              <h1>{res.type === 'RESULT' ? res.response.name : 'Exam'}</h1>
-            </Loading>
-          </Col>
-        </Row>
-        <Row className="flex-grow-1">
-          <Col sm={6}>
-            <ExamAnomalies examId={examId} />
-          </Col>
-          <Col sm={6} className="d-flex flex-column">
-            <ExamMessages examId={examId} />
-          </Col>
-        </Row>
-      </Container>
-    </>
+    <Container fluid>
+      <div className="wrapper vh-100">
+        <div className="inner-wrapper">
+          <RegularNavbar />
+          <Row>
+            <Col>
+              <Loading loading={res.type !== 'RESULT'}>
+                <h1>{res.type === 'RESULT' ? res.response.name : 'Exam'}</h1>
+              </Loading>
+            </Col>
+          </Row>
+          <div className="content-wrapper">
+            <div className="content h-100">
+              <Row className="h-100">
+                <Col sm={6}>
+                  <ExamAnomalies examId={examId} />
+                </Col>
+                <Col sm={6}>
+                  <ExamMessages examId={examId} />
+                </Col>
+              </Row>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Container>
   );
 };
 

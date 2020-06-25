@@ -828,9 +828,9 @@ const SendMessage: React.FC<{
   return (
     <>
       <h2>Send message</h2>
-      <Form.Group controlId="message-recipient-box">
-        <Form.Label column sm="auto" className="ml-0">To:</Form.Label>
-        <Col className="mr-0">
+      <Form.Group as={Row} controlId="message-recipient-box">
+        <Form.Label column sm="auto">To:</Form.Label>
+        <Col>
           <Select
             placeholder="Choose selection criteria..."
             value={selectedRecipient}

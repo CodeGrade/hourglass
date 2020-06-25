@@ -56,13 +56,16 @@ module Api
       private
 
       def recipient_list
-        direct_recipients + version_recipients + room_recipients
+        {
+          students: direct_recipients,
+          versions: version_recipients,
+          rooms: room_recipients
+        }
       end
 
       def direct_recipients
-        @exam.students.map do |s|
+        @exam.students.order(:display_name).map do |s|
           {
-            type: 'DIRECT',
             id: s.id,
             name: s.display_name
           }
@@ -70,9 +73,8 @@ module Api
       end
 
       def version_recipients
-        @exam.exam_versions.map do |ev|
+        @exam.exam_versions.order(:name).map do |ev|
           {
-            type: 'VERSION',
             id: ev.id,
             name: ev.name
           }
@@ -80,9 +82,8 @@ module Api
       end
 
       def room_recipients
-        @exam.rooms.map do |room|
+        @exam.rooms.order(:name).map do |room|
           {
-            type: 'ROOM',
             id: room.id,
             name: room.name
           }

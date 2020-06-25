@@ -107,7 +107,11 @@ interface Server {
   version: VersionAnnouncementServer[];
   room: RoomAnnouncementServer[];
   exam: ExamAnnouncementServer[];
-  recipients: Recipient[];
+  recipients: {
+    rooms: Recipient[];
+    students: Recipient[];
+    versions: Recipient[];
+  }
 }
 
 export interface Response {
@@ -116,7 +120,11 @@ export interface Response {
   version: VersionAnnouncement[];
   room: RoomAnnouncement[];
   exam: ExamAnnouncement[];
-  recipients: Recipient[];
+  recipients: {
+    rooms: Recipient[];
+    students: Recipient[];
+    versions: Recipient[];
+  }
 }
 
 export type Message =

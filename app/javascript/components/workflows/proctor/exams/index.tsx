@@ -1,9 +1,14 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, {
+  useState,
+  useContext,
+  useEffect,
+  useMemo,
+} from 'react';
 import {
   useResponse as examsShow,
 } from '@hourglass/common/api/professor/exams/show';
 import RegularNavbar from '@hourglass/common/navbar';
-import Select, { OptionsType } from 'react-select';
+import Select from 'react-select';
 import { useParams } from 'react-router-dom';
 import {
   Container,
@@ -690,24 +695,74 @@ const SendMessageButton: React.FC<{
   );
 };
 
+type RecipientOptions = {
+  label: string;
+  options: MessageFilterOption[];
+}[]
+
 const SendMessage: React.FC<{
-  recipients: Recipient[];
+  recipients: {
+    students: Recipient[];
+    rooms: Recipient[];
+    versions: Recipient[];
+  };
   refresh: () => void;
 }> = (props) => {
   const {
     recipients,
     refresh,
   } = props;
-  const options = recipients.concat([{
-    type: MessageType.Exam,
-    id: -1,
-    name: 'Entire Exam',
-  }]).map((r) => ({
-    label: r.name,
-    value: r,
-  }));
-  const [val, setVal] = useState(options[0]);
+  const options = useMemo<RecipientOptions>(() => ([
+    {
+      label: 'Entire exam',
+      options: [{
+        label: 'Entire exam',
+        value: {
+          type: MessageType.Exam,
+          id: -1,
+          name: 'Entire exam',
+        },
+      }],
+    },
+    {
+      label: 'Rooms',
+      options: recipients.rooms.map((r) => ({
+        label: r.name,
+        value: { ...r, type: MessageType.Room },
+      })),
+    },
+    {
+      label: 'Versions',
+      options: recipients.versions.map((r) => ({
+        label: r.name,
+        value: { ...r, type: MessageType.Version },
+      })),
+    },
+    {
+      label: 'Students',
+      options: recipients.students.map((r) => ({
+        label: r.name,
+        value: { ...r, type: MessageType.Direct },
+      })),
+    },
+  ]), [recipients]);
+  const [val, setVal] = useState<MessageFilterOption>(options[0].options[0]);
   const [message, setMessage] = useState('');
+  const groupStyles = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  };
+  const formatGroupLabel = (data) => {
+    if (data.options.length > 1) {
+      return (
+        <div style={groupStyles}>
+          <span>{data.label}</span>
+        </div>
+      );
+    }
+    return <span />;
+  };
   return (
     <>
       <h2>Send message</h2>
@@ -717,9 +772,10 @@ const SendMessage: React.FC<{
           <Select
             placeholder="Choose selection criteria..."
             value={val}
-            onChange={(value: MessageFilterOption, _action) => {
+            onChange={(value: MessageFilterOption) => {
               setVal(value);
             }}
+            formatGroupLabel={formatGroupLabel}
             options={options}
           />
         </Col>

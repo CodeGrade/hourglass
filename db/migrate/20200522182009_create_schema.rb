@@ -135,6 +135,13 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
+    create_table :exam_announcements do |t|
+      t.references :exam, null: false, foreign_key: true
+      t.text :body, null: false
+
+      t.timestamps
+    end
+
     create_table :version_announcements do |t|
       t.references :exam_version, null: false, foreign_key: true
       t.text :body, null: false

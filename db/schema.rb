@@ -41,6 +41,14 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "exam_announcements", force: :cascade do |t|
+    t.bigint "exam_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["exam_id"], name: "index_exam_announcements_on_exam_id"
+  end
+
   create_table "exam_versions", force: :cascade do |t|
     t.string "name", null: false
     t.jsonb "files", null: false
@@ -209,6 +217,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
 
   add_foreign_key "accommodations", "registrations"
   add_foreign_key "anomalies", "registrations"
+  add_foreign_key "exam_announcements", "exams"
   add_foreign_key "exam_versions", "exams"
   add_foreign_key "exams", "courses"
   add_foreign_key "messages", "exams"

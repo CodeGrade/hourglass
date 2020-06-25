@@ -24,6 +24,7 @@ def make_cs2500
   cs2500lec = create(:section, :lecture, course: cs2500)
   cs2500lab = create(:section, :lab, course: cs2500)
   cs2500midterm = create(:exam, name: 'CS2500 Midterm', course: cs2500, duration: 5.minutes)
+  create(:exam_announcement, exam: cs2500midterm)
 
   cs2500_v1 = create(:exam_version, :cs2500_v1, exam: cs2500midterm)
   create(:version_announcement, exam_version: cs2500_v1)
@@ -67,6 +68,7 @@ def make_cs3500
   cs3500lec = create(:section, :lecture, course: cs3500)
   cs3500lab = create(:section, :lab, course: cs3500)
   cs3500final = create(:exam, name: 'CS3500 Final', course: cs3500, duration: 15.minutes)
+  create(:exam_announcement, exam: cs3500final)
 
   cs3500_v1 = create(:exam_version, :cs3500_v1, exam: cs3500final)
   create(:version_announcement, exam_version: cs3500_v1)

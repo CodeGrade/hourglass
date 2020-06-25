@@ -4,7 +4,6 @@ import {
 } from '@hourglass/common/api/professor/exams/show';
 import RegularNavbar from '@hourglass/common/navbar';
 import Select from 'react-select';
-import { DateTime } from 'luxon';
 import { useParams } from 'react-router-dom';
 import {
   Container,
@@ -28,7 +27,6 @@ import {
 import Icon from '@student/exams/show/components/Icon';
 import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import { ShowMessage } from '@hourglass/workflows/student/exams/show/components/navbar/ExamMessages';
-import { GiBugleCall } from 'react-icons/gi';
 import { Anomaly, useResponse as anomaliesIndex } from '@hourglass/common/api/proctor/anomalies';
 import { destroyAnomaly } from '@hourglass/common/api/proctor/anomalies/destroy';
 import Loading from '@hourglass/common/loading';
@@ -36,7 +34,13 @@ import { finalizeRegistration } from '@hourglass/common/api/proctor/registration
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
 import { useRefresher } from '@hourglass/common/helpers';
-import { RoomAnnouncement, DirectMessage, useResponse as useExamMessages, Question, VersionAnnouncement } from '@hourglass/common/api/proctor/messages';
+import {
+  RoomAnnouncement,
+  DirectMessage,
+  useResponse as useExamMessages,
+  Question,
+  VersionAnnouncement,
+} from '@hourglass/common/api/proctor/messages';
 
 const FinalizeButton: React.FC<{
   regId: number;
@@ -347,12 +351,11 @@ const ShowMessages: React.FC<{
       </div>
     );
   }
-  const questions =
-    res.response.questions.map((q) => (
-      <Readable key={q.id}>
-        <ShowQuestion question={q} />
-      </Readable>
-    ));
+  const questions = res.response.questions.map((q) => (
+    <Readable key={q.id}>
+      <ShowQuestion question={q} />
+    </Readable>
+  ));
   const sent = (
     <>
       {res.response.sent.map((m) => (

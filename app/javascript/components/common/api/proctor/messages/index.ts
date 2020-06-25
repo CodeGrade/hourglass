@@ -93,11 +93,18 @@ function convertTime<
   };
 }
 
+function convertTimes<
+  Shared,
+  T extends Shared & { time: string }
+  >(old: T[]): Array<Shared & { time: DateTime }> {
+  return old.map((a) => convertTime(a));
+}
+
 export function useResponse(examId: number): ApiResponse<Response> {
   return useApiResponse<Server, Response>(`/api/proctor/exams/${examId}/messages`, undefined, (res) => ({
-    questions: res.questions.map((a) => convertTime<QuestionShared, QuestionServer>(a)),
-    sent: res.sent.map((a) => convertTime<DirectMessageShared, DirectMessageServer>(a)),
-    version: res.version.map((a) => convertTime<VersionAnnouncementShared, VersionAnnouncementServer>(a)),
-    room: res.room.map((a) => convertTime<RoomAnnouncementShared, RoomAnnouncementServer>(a)),
+    questions: convertTimes<QuestionShared, QuestionServer>(res.questions),
+    sent: convertTimes<DirectMessageShared, DirectMessageServer>(res.sent),
+    version: convertTimes<VersionAnnouncementShared, VersionAnnouncementServer>(res.version),
+    room: convertTimes<RoomAnnouncementShared, RoomAnnouncementServer>(res.room),
   }));
 }

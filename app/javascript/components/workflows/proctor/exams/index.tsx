@@ -40,7 +40,9 @@ import {
   useResponse as useExamMessages,
   Question,
   VersionAnnouncement,
+  ExamAnnouncement,
 } from '@hourglass/common/api/proctor/messages';
+import { GiBugleCall } from 'react-icons/gi';
 
 const FinalizeButton: React.FC<{
   regId: number;
@@ -208,6 +210,27 @@ const ExamAnomalies: React.FC<{
   );
 };
 
+const ShowExamAnnouncement: React.FC<{
+  announcement: ExamAnnouncement;
+}> = (props) => {
+  const {
+    announcement,
+  } = props;
+  const {
+    body,
+    time,
+  } = announcement;
+  return (
+    <ShowMessage
+      icon={GiBugleCall}
+      tooltip="Sent to entire exam"
+      body={body}
+      time={time}
+    />
+  );
+};
+
+
 const ShowVersionAnnouncement: React.FC<{
   announcement: VersionAnnouncement;
 }> = (props) => {
@@ -367,6 +390,9 @@ const ShowMessages: React.FC<{
       {res.response.version.map((m) => (
         <ShowVersionAnnouncement key={m.id} announcement={m} />
       ))}
+      {res.response.exam.map((m) => (
+        <ShowExamAnnouncement key={m.id} announcement={m} />
+      ))}
     </>
   );
   if (receivedOnly) {
@@ -381,12 +407,6 @@ const ShowMessages: React.FC<{
       {sent}
     </>
   );
-  //     <ShowMessage
-  //       icon={GiBugleCall}
-  //       tooltip="Sent to everyone"
-  //       body="Message to everyone"
-  //       time={DateTime.local()}
-  //     />
 };
 
 const MessagesTimeline: React.FC<{

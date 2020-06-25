@@ -12,7 +12,8 @@ module Api
           sent: @exam.messages.map { |m| serialize_message m },
           questions: @exam.questions.map { |q| serialize_question q },
           version: @exam.version_announcements.map { |m| serialize_ver_announcement m },
-          room: @exam.room_announcements.map { |m| serialize_room_announcement m }
+          room: @exam.room_announcements.map { |m| serialize_room_announcement m },
+          exam: @exam.exam_announcements.map { |m| serialize_exam_announcement m }
         }
       end
 
@@ -51,6 +52,14 @@ module Api
           id: msg.id,
           time: msg.created_at,
           room: msg.room.slice(:name),
+          body: msg.body
+        }
+      end
+
+      def serialize_exam_announcement(msg)
+        {
+          id: msg.id,
+          time: msg.created_at,
           body: msg.body
         }
       end

@@ -69,11 +69,25 @@ interface RoomAnnouncementServer extends RoomAnnouncementShared {
   time: string;
 }
 
+interface ExamAnnouncementShared {
+  id: number;
+  body: string;
+}
+
+export interface ExamAnnouncement extends ExamAnnouncementShared {
+  time: DateTime;
+}
+
+interface ExamAnnouncementServer extends ExamAnnouncementShared {
+  time: string;
+}
+
 interface Server {
   sent: DirectMessageServer[];
   questions: QuestionServer[];
   version: VersionAnnouncementServer[];
   room: RoomAnnouncementServer[];
+  exam: ExamAnnouncementServer[];
 }
 
 export interface Response {
@@ -81,6 +95,7 @@ export interface Response {
   questions: Question[];
   version: VersionAnnouncement[];
   room: RoomAnnouncement[];
+  exam: ExamAnnouncement[];
 }
 
 function convertTime<
@@ -106,5 +121,6 @@ export function useResponse(examId: number): ApiResponse<Response> {
     sent: convertTimes<DirectMessageShared, DirectMessageServer>(res.sent),
     version: convertTimes<VersionAnnouncementShared, VersionAnnouncementServer>(res.version),
     room: convertTimes<RoomAnnouncementShared, RoomAnnouncementServer>(res.room),
+    exam: convertTimes<ExamAnnouncementShared, ExamAnnouncementServer>(res.exam),
   }));
 }

@@ -3,7 +3,7 @@ import {
   useResponse as examsShow,
 } from '@hourglass/common/api/professor/exams/show';
 import RegularNavbar from '@hourglass/common/navbar';
-import Select from 'react-select';
+import Select, { OptionsType } from 'react-select';
 import { useParams } from 'react-router-dom';
 import {
   Container,
@@ -415,6 +415,8 @@ const SingleMessage: React.FC<{
   }
 };
 
+type FilterVals = { value: string; label: string; };
+
 const ShowMessages: React.FC<{
   examId: number;
   receivedOnly?: boolean;
@@ -426,6 +428,7 @@ const ShowMessages: React.FC<{
     sentOnly = false,
   } = props;
   const res = useExamMessages(examId);
+  const [filter, setFilter] = useState<FilterVals>(undefined);
   if (res.type === 'LOADING') {
     return <Loading loading />;
   }
@@ -455,52 +458,75 @@ const ShowMessages: React.FC<{
   if (!sentOnly) {
     all = all.concat(questions);
   }
+
+  const filterSet = all.reduce((acc, m) => {
+    let option;
+    switch (m.type) {
+      case MessageType.Direct:
+        option = m.recipient.displayName;
+        break;
+      case MessageType.Question:
+        option = m.sender.displayName;
+        break;
+      case MessageType.Room:
+        option = m.room.name;
+        break;
+      case MessageType.Version:
+        option = m.version.name;
+        break;
+      case MessageType.Exam:
+        break;
+      default:
+        throw new ExhaustiveSwitchError(m);
+    }
+    if (option) {
+      return acc.add(option);
+    }
+    return acc;
+  }, new Set<FilterVals>());
+  const filterOptions = [];
+  filterSet.forEach((o) => {
+    filterOptions.push({ value: o, label: o });
+  });
+
+  if (filter) {
+    all = all.filter((m) => {
+      switch (m.type) {
+        case MessageType.Direct:
+          return m.recipient.displayName === filter.value;
+        case MessageType.Question:
+          return m.sender.displayName === filter.value;
+        case MessageType.Room:
+          return m.room.name === filter.value;
+        case MessageType.Version:
+          return m.version.name === filter.value;
+        case MessageType.Exam:
+          return true;
+        default:
+          throw new ExhaustiveSwitchError(m);
+      }
+    });
+  }
   all.sort((a, b) => b.time.diff(a.time).milliseconds);
   return (
     <>
+      <Form.Group as={Row} controlId="message-filter">
+        <Form.Label column sm="auto">Filter by:</Form.Label>
+        <Col>
+          <Select
+            isClearable
+            placeholder="Choose selection criteria..."
+            value={filter}
+            onChange={(value: FilterVals, _action) => {
+              setFilter(value);
+            }}
+            options={filterOptions}
+          />
+        </Col>
+      </Form.Group>
       {all.map((m) => (
-        <SingleMessage key={m.id} message={m} />
+        <SingleMessage key={`${m.type}-${m.id}`} message={m} />
       ))}
-    </>
-  );
-};
-
-const MessagesTimeline: React.FC<{
-  examId: number;
-  receivedOnly?: boolean;
-  sentOnly?: boolean;
-}> = (props) => {
-  const {
-    examId,
-    receivedOnly,
-    sentOnly,
-  } = props;
-  return (
-    <>
-      <div>
-        Filter by:
-        <Select
-          placeholder="Choose selection criteria..."
-          options={[
-            { value: 'all', label: 'anyone' },
-            { value: 'Room 1', label: 'Room 1' },
-            { value: 'Room 2', label: 'Room 2' },
-            { value: 'Version 1', label: 'Version A' },
-            { value: 'Version 2', label: 'Version B' },
-            { value: 'studentX', label: 'Student X' },
-          ]}
-        />
-      </div>
-      <p>
-        There should be one option per room,
-        one option per exam version, and
-        one option per student who has sent or received a message
-      </p>
-      <p>
-        (reply fills in the recipient below, and sets
-        focus to the message sender)
-      </p>
-      <ShowMessages receivedOnly={receivedOnly} sentOnly={sentOnly} examId={examId} />
     </>
   );
 };
@@ -560,13 +586,13 @@ const ExamMessages: React.FC<{
         </Nav>
         <Tab.Content className="border border-top-0 rounded-bottom p-3">
           <Tab.Pane eventKey={MessagesTab.Timeline} className="overflow-scroll-y">
-            <MessagesTimeline examId={examId} />
+            <ShowMessages examId={examId} />
           </Tab.Pane>
           <Tab.Pane eventKey={MessagesTab.Received}>
-            <MessagesTimeline receivedOnly examId={examId} />
+            <ShowMessages receivedOnly examId={examId} />
           </Tab.Pane>
           <Tab.Pane eventKey={MessagesTab.Sent}>
-            <MessagesTimeline sentOnly examId={examId} />
+            <ShowMessages sentOnly examId={examId} />
           </Tab.Pane>
         </Tab.Content>
       </Tab.Container>

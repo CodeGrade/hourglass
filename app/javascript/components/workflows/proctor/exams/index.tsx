@@ -327,9 +327,13 @@ const Readable: React.FC = (props) => {
 
 const ShowMessages: React.FC<{
   examId: number;
+  receivedOnly?: boolean;
+  sentOnly?: boolean;
 }> = (props) => {
   const {
     examId,
+    receivedOnly = false,
+    sentOnly = false,
   } = props;
   const res = useExamMessages(examId);
   if (res.type === 'LOADING') {
@@ -343,13 +347,14 @@ const ShowMessages: React.FC<{
       </div>
     );
   }
-  return (
+  const questions =
+    res.response.questions.map((q) => (
+      <Readable key={q.id}>
+        <ShowQuestion question={q} />
+      </Readable>
+    ));
+  const sent = (
     <>
-      {res.response.questions.map((q) => (
-        <Readable key={q.id}>
-          <ShowQuestion question={q} />
-        </Readable>
-      ))}
       {res.response.sent.map((m) => (
         <ShowDirectMessage key={m.id} message={m} />
       ))}
@@ -359,6 +364,18 @@ const ShowMessages: React.FC<{
       {res.response.version.map((m) => (
         <ShowVersionAnnouncement key={m.id} announcement={m} />
       ))}
+    </>
+  );
+  if (receivedOnly) {
+    return <>{questions}</>;
+  }
+  if (sentOnly) {
+    return <>{sent}</>;
+  }
+  return (
+    <>
+      {questions}
+      {sent}
     </>
   );
   //     <ShowMessage
@@ -371,9 +388,13 @@ const ShowMessages: React.FC<{
 
 const MessagesTimeline: React.FC<{
   examId: number;
+  receivedOnly?: boolean;
+  sentOnly?: boolean;
 }> = (props) => {
   const {
     examId,
+    receivedOnly,
+    sentOnly,
   } = props;
   return (
     <>
@@ -400,7 +421,7 @@ const MessagesTimeline: React.FC<{
         (reply fills in the recipient below, and sets
         focus to the message sender)
       </p>
-      <ShowMessages examId={examId} />
+      <ShowMessages receivedOnly={receivedOnly} sentOnly={sentOnly} examId={examId} />
     </>
   );
 };
@@ -463,10 +484,10 @@ const ExamMessages: React.FC<{
             <MessagesTimeline examId={examId} />
           </Tab.Pane>
           <Tab.Pane eventKey={MessagesTab.Received}>
-            Ditto, but only received messages
+            <MessagesTimeline receivedOnly examId={examId} />
           </Tab.Pane>
           <Tab.Pane eventKey={MessagesTab.Sent}>
-            Ditto, but only sent messages
+            <MessagesTimeline sentOnly examId={examId} />
           </Tab.Pane>
         </Tab.Content>
       </Tab.Container>

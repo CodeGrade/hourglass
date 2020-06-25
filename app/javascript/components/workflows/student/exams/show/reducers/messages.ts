@@ -9,6 +9,7 @@ export default (state: MessagesState = {
     personal: [],
     room: [],
     version: [],
+    exam: [],
   },
 }, action: ExamTakerAction): MessagesState => {
   switch (action.type) {
@@ -31,6 +32,7 @@ export default (state: MessagesState = {
           action.messages.personal.length !== 0
           || action.messages.room.length !== 0
           || action.messages.version.length !== 0
+          || action.messages.exam.length !== 0
         ),
       };
     case 'MESSAGES_OPENED':

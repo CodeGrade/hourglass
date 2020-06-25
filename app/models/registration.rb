@@ -121,10 +121,4 @@ class Registration < ApplicationRecord
   def private_messages
     exam.messages.where(recipient: user)
   end
-
-  def all_messages
-    private_messages +
-      room.room_announcements +
-      exam_version.version_announcements
-  end
 end

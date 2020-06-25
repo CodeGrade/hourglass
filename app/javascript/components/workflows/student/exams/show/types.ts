@@ -59,6 +59,7 @@ export interface ContentsResponse {
     personal: RailsExamMessage[];
     room: RailsExamMessage[];
     version: RailsExamMessage[];
+    exam: RailsExamMessage[];
   };
 
   questions: RailsExamQuestion[];
@@ -70,7 +71,7 @@ export interface RailsExamQuestion {
   id: number;
 }
 
-export type ExamMessageType = 'personal' | 'room' | 'version';
+export type ExamMessageType = 'personal' | 'room' | 'version' | 'exam';
 
 export interface RailsExamMessage {
   time: string;
@@ -152,6 +153,7 @@ export interface LoadExamAction {
     personal: ExamMessage[];
     room: ExamMessage[];
     version: ExamMessage[];
+    exam: ExamMessage[];
   };
   questions: ProfQuestion[];
 }
@@ -198,6 +200,7 @@ export interface SnapshotSaveResult {
     personal: RailsExamMessage[];
     room: RailsExamMessage[];
     version: RailsExamMessage[];
+    exam: RailsExamMessage[];
   };
 }
 
@@ -303,6 +306,7 @@ export interface MessagesState {
     personal: ExamMessage[];
     room: ExamMessage[];
     version: ExamMessage[];
+    exam: ExamMessage[];
   };
 }
 

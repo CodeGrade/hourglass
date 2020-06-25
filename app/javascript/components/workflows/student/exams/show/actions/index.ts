@@ -177,6 +177,7 @@ export function loadExam(
     personal: ExamMessage[];
     room: ExamMessage[];
     version: ExamMessage[];
+    exam: ExamMessage[];
   },
   questions: ProfQuestion[],
 ): LoadExamAction {
@@ -246,6 +247,7 @@ export function doLoad(courseID: number, examID: number): Thunk {
             personal: convertMsgs(messages.personal),
             room: convertMsgs(messages.room),
             version: convertMsgs(messages.version),
+            exam: convertMsgs(messages.exam),
           };
           const newQs = convertQs(questions);
           dispatch(loadExam(exam, newTime, answers, newMsgs, newQs));
@@ -300,6 +302,10 @@ function snapshotSaving(): SnapshotSaving {
   };
 }
 
+function lastMessageId(messages: ExamMessage[]): number {
+  return messages[messages.length - 1]?.id ?? 0;
+}
+
 export function saveSnapshot(courseID: number, examID: number): Thunk {
   return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
@@ -307,11 +313,11 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
       dispatch(snapshotSaving());
     }
     const { answers } = state.contents;
-    // The messages list is sorted from newest to oldest.
     const lastMessageIds = {
-      personal: state.messages.messages.personal[0]?.id ?? 0,
-      room: state.messages.messages.room[0]?.id ?? 0,
-      version: state.messages.messages.version[0]?.id ?? 0,
+      personal: lastMessageId(state.messages.messages.personal),
+      room: lastMessageId(state.messages.messages.room),
+      version: lastMessageId(state.messages.messages.version),
+      exam: lastMessageId(state.messages.messages.exam),
     };
 
     const url = `/api/student/exams/${examID}/take`;
@@ -348,12 +354,14 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
             personal: convertMsgs(messages.personal),
             room: convertMsgs(messages.room),
             version: convertMsgs(messages.version),
+            exam: convertMsgs(messages.exam),
           };
           dispatch(snapshotSuccess());
           [
             ...newMsgs.personal,
             ...newMsgs.room,
             ...newMsgs.version,
+            ...newMsgs.exam,
           ].forEach((msg) => {
             dispatch(messageReceived(msg));
           });

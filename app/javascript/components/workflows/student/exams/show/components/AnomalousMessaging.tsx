@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Card } from 'react-bootstrap';
+import { Card, Row, Col } from 'react-bootstrap';
 import AskQuestion from '@student/exams/show/containers/navbar/AskQuestion';
 import { ExamMessagesStandalone } from '@student/exams/show/containers/navbar/ExamMessages';
 
@@ -20,24 +20,28 @@ const AnomalousMessaging: React.FC<{
     };
   }, []);
   return (
-    <>
-      <Card>
-        <Card.Title>
-          <h2>Ask a question</h2>
-        </Card.Title>
-        <Card.Body>
-          <AskQuestion />
-        </Card.Body>
-      </Card>
-      <Card>
-        <Card.Title>
-          <h2>Received Messages</h2>
-        </Card.Title>
-        <Card.Body>
-          <ExamMessagesStandalone />
-        </Card.Body>
-      </Card>
-    </>
+    <Row>
+      <Col>
+        <Card>
+          <Card.Title>
+            <h2>Ask a question</h2>
+          </Card.Title>
+          <Card.Body>
+            <AskQuestion />
+          </Card.Body>
+        </Card>
+      </Col>
+      <Col>
+        <Card>
+          <Card.Title>
+            <h2>Received Messages</h2>
+          </Card.Title>
+          <Card.Body>
+            <ExamMessagesStandalone />
+          </Card.Body>
+        </Card>
+      </Col>
+    </Row>
   );
 };
 

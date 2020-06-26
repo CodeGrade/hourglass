@@ -67,6 +67,26 @@ import ErrorBoundary from '@hourglass/common/boundary';
 import { BsPencilSquare } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
+import Loading from '@hourglass/common/loading';
+
+const loadingStatus = {
+  reason: 'Loading...',
+  status: ChecklistItemStatus.NotStarted,
+};
+
+const emptyResponse: ShowResponse = {
+  start: DateTime.local(),
+  end: DateTime.local(),
+  name: 'Exam',
+  duration: 0,
+  versions: [],
+  checklist: {
+    rooms: loadingStatus,
+    staff: loadingStatus,
+    seating: loadingStatus,
+    versions: loadingStatus,
+  },
+};
 
 export const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
@@ -82,14 +102,15 @@ export const ExamAdmin: React.FC = () => {
         </span>
       );
     case 'LOADING':
-      return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <DocumentTitle title={response.response.name}>
-          <Loaded
-            refresh={refresh}
-            response={response.response}
-          />
+        <DocumentTitle title={response.type === 'LOADING' ? 'Exam' : response.response.name}>
+          <Loading loading={response.type === 'LOADING'}>
+            <Loaded
+              refresh={refresh}
+              response={response.type === 'LOADING' ? emptyResponse : response.response}
+            />
+          </Loading>
         </DocumentTitle>
       );
     default:

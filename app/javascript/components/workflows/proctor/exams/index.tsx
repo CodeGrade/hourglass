@@ -1151,13 +1151,18 @@ const ProctoringSplitView: React.FC<{
         </div>
       );
     case 'LOADING':
-      return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <SplitViewLoaded
-          examId={examId}
-          recipients={res.response.recipients}
-        />
+        <Loading loading={res.type === 'LOADING'} className="h-100">
+          <SplitViewLoaded
+            examId={examId}
+            recipients={res.type === 'RESULT' ? res.response.recipients : {
+              rooms: [],
+              students: [],
+              versions: [],
+            }}
+          />
+        </Loading>
       );
     default:
       throw new ExhaustiveSwitchError(res);

@@ -34,6 +34,7 @@ import {
 import { AlertContext } from '@hourglass/common/alerts';
 import { useTabRefresher, TabEditButton } from '../admin';
 import '../list-columns.scss';
+import Loading from '@hourglass/common/loading';
 
 interface FormContextType {
   sections: Section[];
@@ -458,15 +459,16 @@ const DND: React.FC = () => {
     case 'ERROR':
       return <p className="text-danger">{`${response.text} (${response.status})`}</p>;
     case 'LOADING':
-      return <p>Loading...</p>;
     case 'RESULT':
       return (
-        <Loaded
-          sections={response.response.sections}
-          unassigned={response.response.unassigned}
-          proctors={response.response.proctors}
-          rooms={response.response.rooms}
-        />
+        <Loading loading={response.type === 'LOADING'}>
+          <Loaded
+            sections={response.type === 'LOADING' ? [] : response.response.sections}
+            unassigned={response.type === 'LOADING' ? [] : response.response.unassigned}
+            proctors={response.type === 'LOADING' ? [] : response.response.proctors}
+            rooms={response.type === 'LOADING' ? [] : response.response.rooms}
+          />
+        </Loading>
       );
     default:
       throw new ExhaustiveSwitchError(response);

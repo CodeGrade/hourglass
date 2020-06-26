@@ -148,7 +148,42 @@ class Exam < ApplicationRecord
     }
   end
 
+  def message_recipients
+    {
+      students: direct_recipients,
+      versions: version_recipients,
+      rooms: room_recipients
+    }
+  end
+
   private
+
+  def direct_recipients
+    students.order(:display_name).map do |s|
+      {
+        id: s.id,
+        name: s.display_name
+      }
+    end
+  end
+
+  def version_recipients
+    exam_versions.order(:name).map do |ev|
+      {
+        id: ev.id,
+        name: ev.name
+      }
+    end
+  end
+
+  def room_recipients
+    rooms.order(:name).map do |room|
+      {
+        id: room.id,
+        name: room.name
+      }
+    end
+  end
 
   def checklist_complete(reason)
     {

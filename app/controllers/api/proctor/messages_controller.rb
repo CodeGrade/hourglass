@@ -14,7 +14,7 @@ module Api
           version: @exam.version_announcements.map { |m| serialize_ver_announcement m },
           room: @exam.room_announcements.map { |m| serialize_room_announcement m },
           exam: @exam.exam_announcements.map { |m| serialize_exam_announcement m },
-          recipients: recipient_list
+          recipients: @exam.message_recipients
         }
       end
 
@@ -54,41 +54,6 @@ module Api
       end
 
       private
-
-      def recipient_list
-        {
-          students: direct_recipients,
-          versions: version_recipients,
-          rooms: room_recipients
-        }
-      end
-
-      def direct_recipients
-        @exam.students.order(:display_name).map do |s|
-          {
-            id: s.id,
-            name: s.display_name
-          }
-        end
-      end
-
-      def version_recipients
-        @exam.exam_versions.order(:name).map do |ev|
-          {
-            id: ev.id,
-            name: ev.name
-          }
-        end
-      end
-
-      def room_recipients
-        @exam.rooms.order(:name).map do |room|
-          {
-            id: room.id,
-            name: room.name
-          }
-        end
-      end
 
       def serialize_message(msg)
         {

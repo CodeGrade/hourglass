@@ -35,6 +35,7 @@ Rails.application.routes.draw do
     namespace :proctor do
       resources :exams, shallow: true, param: 'exam_id', only: [] do
         member do
+          post :finalize
           resources :anomalies, param: 'anomaly_id', only: [:index, :destroy]
           resources :messages, param: 'message_id', only: [:index, :create] do
             collection do

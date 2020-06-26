@@ -65,6 +65,7 @@ import { IconType } from 'react-icons';
 import { sendMessage } from '@hourglass/common/api/proctor/messages/create';
 import './index.scss';
 import { BsListCheck } from 'react-icons/bs';
+import { doFinalize } from '@hourglass/common/api/proctor/exams/finalize';
 
 export interface MessageProps {
   icon: IconType;
@@ -245,20 +246,46 @@ const formatGroupLabel = (data) => {
 };
 
 const FinalizeRegs: React.FC<{
+  examId: number;
   recipientOptions: RecipientOptions;
 }> = (props) => {
   const {
+    examId,
     recipientOptions,
   } = props;
+  const { alert } = useContext(AlertContext);
   const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(
     recipientOptions[0].options[0],
   );
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const openModal = useCallback(() => setShowModal(true), []);
   const closeModal = useCallback(() => setShowModal(false), []);
   const finalize = () => {
-    // TODO: finalize selection
-    closeModal();
+    setLoading(true);
+    doFinalize(examId, {
+      type: 'VERSION',
+      id: selectedRecipient.value.id,
+    }).then((res) => {
+      if (res.success !== true) {
+        throw new Error(res.reason);
+      }
+      closeModal();
+      setLoading(false);
+      alert({
+        variant: 'success',
+        title: 'Finalization successful',
+        message: `Finalized '${selectedRecipient.label}'.`,
+      });
+      setLoading(false);
+    }).catch((err) => {
+      setLoading(false);
+      alert({
+        variant: 'danger',
+        title: `Error finalizing '${selectedRecipient.label}'`,
+        message: err.message,
+      });
+    });
   };
   return (
     <>
@@ -300,17 +327,22 @@ const FinalizeRegs: React.FC<{
         </Modal.Body>
         <Modal.Footer>
           <Button
+            disabled={loading}
             variant="secondary"
             onClick={closeModal}
           >
             Cancel
           </Button>
-          <Button
-            variant="danger"
-            onClick={finalize}
-          >
-            Finalize
-          </Button>
+          <Loading loading={loading}>
+            <TooltipButton
+              disabled={loading}
+              disabledMessage="Loading..."
+              variant="danger"
+              onClick={finalize}
+            >
+              Finalize
+            </TooltipButton>
+          </Loading>
         </Modal.Footer>
       </Modal>
     </>
@@ -358,7 +390,7 @@ const ExamAnomalies: React.FC<{
               </div>
             </div>
             <div>
-              <FinalizeRegs recipientOptions={recipientOptions} />
+              <FinalizeRegs examId={examId} recipientOptions={recipientOptions} />
             </div>
           </div>
         </div>

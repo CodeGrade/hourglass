@@ -24,6 +24,7 @@ import {
   Card,
   Media,
   Alert,
+  Modal,
 } from 'react-bootstrap';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import {
@@ -256,33 +257,67 @@ const FinalizeRegs: React.FC = () => {
   const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(
     recipientOptions[0].options[0],
   );
+  const [showModal, setShowModal] = useState(false);
+  const openModal = useCallback(() => setShowModal(true), []);
+  const closeModal = useCallback(() => setShowModal(false), []);
+  const finalize = () => {
+    // TODO: finalize selection
+    closeModal();
+  };
   return (
-    <Alert variant="danger">
-      <h2>Finalization</h2>
-      <Form.Group as={Row} controlId="finalize-target-box">
-        <Form.Label column sm="auto">Target:</Form.Label>
-        <Col>
-          <Select
-            placeholder="Choose selection criteria..."
-            value={selectedRecipient}
-            onChange={(value: MessageFilterOption) => {
-              setSelectedRecipient(value);
-            }}
-            formatGroupLabel={formatGroupLabel}
-            options={recipientOptions}
-            menuPlacement="auto"
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group>
-        <Button
-          variant="danger"
-        >
-          <Icon I={BsListCheck} />
+    <>
+      <Alert variant="danger">
+        <h2>Finalization</h2>
+        <Form.Group as={Row} controlId="finalize-target-box">
+          <Form.Label column sm="auto">Target:</Form.Label>
+          <Col>
+            <Select
+              placeholder="Choose selection criteria..."
+              value={selectedRecipient}
+              onChange={(value: MessageFilterOption) => {
+                setSelectedRecipient(value);
+              }}
+              formatGroupLabel={formatGroupLabel}
+              options={recipientOptions}
+              menuPlacement="auto"
+            />
+          </Col>
+        </Form.Group>
+        <Form.Group>
+          <Button
+            variant="danger"
+            onClick={openModal}
+          >
+            <Icon I={BsListCheck} />
+            Finalize
+          </Button>
+        </Form.Group>
+      </Alert>
+      <Modal show={showModal} onHide={closeModal}>
+        <Modal.Header closeButton>
           Finalize
-        </Button>
-      </Form.Group>
-    </Alert>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            Are you sure you want to finalize <i>{selectedRecipient.label}</i>?
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={closeModal}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={finalize}
+          >
+            Finalize
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 };
 

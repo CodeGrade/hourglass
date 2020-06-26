@@ -8,7 +8,7 @@ class Room < ApplicationRecord
   validates :name, presence: true
 
   def finalized?
-    registrations.in_progress?.empty?
+    registrations.in_progress.empty?
   end
 
   def finalize!

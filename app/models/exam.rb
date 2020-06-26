@@ -32,11 +32,11 @@ class Exam < ApplicationRecord
   end
 
   def finalized?
-    registrations.in_progress?.empty?
+    registrations.in_progress.empty?
   end
 
   def finalize!
-    rooms.map(&:finalize!)
+    exam_versions.map(&:finalize!)
   end
 
   def students

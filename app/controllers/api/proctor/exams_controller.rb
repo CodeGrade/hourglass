@@ -11,11 +11,19 @@ module Api
         target = params.require(:target).permit(:type, :id)
         case target[:type]
         when 'EXAM'
-          raise 'TODO'
+          raise 'That exam is already final.' if @exam.finalized?
+
+          @exam.finalize!
         when 'VERSION'
-          raise 'TODO'
+          ver = @exam.exam_versions.find_by!(id: target[:id])
+          raise 'That version is already final.' if ver.finalized?
+
+          ver.finalize!
         when 'ROOM'
-          raise 'TODO'
+          room = @exam.rooms.find_by!(id: target[:id])
+          raise 'That room is already final.' if room.finalized?
+
+          room.finalize!
         when 'USER'
           reg = @exam.registrations.find_by!(user_id: target[:id])
           raise 'That registration is already final.' if reg.final?

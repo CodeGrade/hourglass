@@ -75,8 +75,9 @@ class Registration < ApplicationRecord
     end
   end
 
-  scope :not_started?, -> { where(start_time: nil) }
-  scope :started?, -> { where.not(start_time: nil) }
+  scope :not_started, -> { where(start_time: nil) }
+  scope :started, -> { where.not(start_time: nil) }
+
   def started?
     !start_time.nil?
   end
@@ -90,8 +91,8 @@ class Registration < ApplicationRecord
     anomalies.size.positive?
   end
 
-  scope :in_progress?, -> { where(end_time: nil) }
-  scope :final?, -> { where.not(end_time: nil) }
+  scope :in_progress, -> { where(end_time: nil) }
+  scope :final, -> { where.not(end_time: nil) }
   
   def final?
     !end_time.nil?

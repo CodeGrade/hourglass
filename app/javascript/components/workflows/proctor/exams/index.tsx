@@ -23,6 +23,7 @@ import {
   Form,
   Card,
   Media,
+  Alert,
 } from 'react-bootstrap';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import {
@@ -226,6 +227,40 @@ const ShowAnomalies: React.FC<{
   );
 };
 
+const FinalizeRegs: React.FC = () => {
+  const recipientOptions = useMemo<RecipientOptions>(() => ([
+    {
+      label: 'Entire exam',
+      options: [{
+        label: 'Entire exam',
+        value: {
+          type: MessageType.Exam,
+          id: -1,
+          name: 'Entire exam',
+        },
+      }],
+    },
+  ]), []);
+  return (
+    <Alert variant="danger">
+      <h2>Finalization</h2>
+      <Form.Group as={Row} controlId="finalize-target-box">
+        <Form.Label column sm="auto">Target:</Form.Label>
+        <Select
+          placeholder="Choose selection criteria..."
+          // value={selectedRecipient}
+          // onChange={(value: MessageFilterOption) => {
+          //   setSelectedRecipient(value);
+          // }}
+          formatGroupLabel={formatGroupLabel}
+          options={recipientOptions}
+          menuPlacement="auto"
+        />
+      </Form.Group>
+    </Alert>
+  );
+};
+
 const ExamAnomalies: React.FC<{
   examId: number;
 }> = (props) => {
@@ -263,6 +298,9 @@ const ExamAnomalies: React.FC<{
                   {res.type === 'RESULT' && <ShowAnomalies refresh={refresh} anomalies={res.response.anomalies} />}
                 </Table>
               </div>
+            </div>
+            <div>
+              <FinalizeRegs />
             </div>
           </div>
         </div>
@@ -838,6 +876,17 @@ type RecipientOptions = {
   options: MessageFilterOption[];
 }[]
 
+const formatGroupLabel = (data) => {
+  if (data.options.length > 1) {
+    return (
+      <div className="proctor-groupstyles">
+        <span>{data.label}</span>
+      </div>
+    );
+  }
+  return <span />;
+};
+
 const SendMessage: React.FC<{
   selectedRecipient: MessageFilterOption;
   setSelectedRecipient: (option: MessageFilterOption) => void;
@@ -856,21 +905,6 @@ const SendMessage: React.FC<{
   const resetVals = useCallback(() => {
     setMessage('');
   }, []);
-  const groupStyles = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  };
-  const formatGroupLabel = (data) => {
-    if (data.options.length > 1) {
-      return (
-        <div style={groupStyles}>
-          <span>{data.label}</span>
-        </div>
-      );
-    }
-    return <span />;
-  };
   return (
     <>
       <h2>Send message</h2>

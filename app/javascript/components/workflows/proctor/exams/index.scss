@@ -21,9 +21,14 @@
   max-height: 100%;
 }
 .overflow-auto-y {
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .filterMessages__menu-list {
   z-index: 999 !important;
+}
+.proctor-groupstyles {
+  display: flex;
+  align-items: 'center';
+  justify-content: 'space-between';
 }

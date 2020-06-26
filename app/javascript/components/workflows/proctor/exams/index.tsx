@@ -720,11 +720,19 @@ enum MessagesTab {
 }
 
 const Loaded: React.FC<{
+  selectedRecipient: MessageFilterOption;
+  setSelectedRecipient: (option: MessageFilterOption) => void;
+  messageRef: React.Ref<HTMLTextAreaElement>;
+  replyTo: (userId: number) => void;
   refresh: () => void;
   response: Response;
   recipientOptions: RecipientOptions;
 }> = (props) => {
   const {
+    selectedRecipient,
+    setSelectedRecipient,
+    messageRef,
+    replyTo,
     refresh,
     response,
     recipientOptions,
@@ -743,24 +751,7 @@ const Loaded: React.FC<{
     };
   }, [refresh]);
   const { alert } = useContext(AlertContext);
-  const messageRef = useRef<HTMLTextAreaElement>();
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
-  const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(
-    recipientOptions[0].options[0],
-  );
-
-  const replyTo = (userId: number) => {
-    const recip = recipientOptions[3].options.find((option) => option.value.id === userId);
-    if (!recip) {
-      alert({
-        variant: 'danger',
-        title: 'Error replying to message',
-        message: `Invalid User ID: ${userId}`,
-      });
-    }
-    setSelectedRecipient(recip);
-    if (messageRef.current) messageRef.current.focus();
-  };
 
   return (
     <Tab.Container activeKey={tabName}>
@@ -869,10 +860,18 @@ const Loaded: React.FC<{
 };
 
 const ExamMessages: React.FC<{
+  selectedRecipient: MessageFilterOption;
+  setSelectedRecipient: (option: MessageFilterOption) => void;
+  messageRef: React.Ref<HTMLTextAreaElement>;
+  replyTo: (userId: number) => void;
   recipientOptions: RecipientOptions;
   examId: number;
 }> = (props) => {
   const {
+    selectedRecipient,
+    setSelectedRecipient,
+    messageRef,
+    replyTo,
     recipientOptions,
     examId,
   } = props;
@@ -900,6 +899,10 @@ const ExamMessages: React.FC<{
               exam: [],
               room: [],
             }}
+            selectedRecipient={selectedRecipient}
+            setSelectedRecipient={setSelectedRecipient}
+            messageRef={messageRef}
+            replyTo={replyTo}
           />
         </Loading>
       );
@@ -1043,6 +1046,7 @@ const SplitViewLoaded: React.FC<{
     examId,
     recipients,
   } = props;
+  const messageRef = useRef<HTMLTextAreaElement>();
   const recipientOptions = useMemo<RecipientOptions>(() => ([
     {
       label: 'Entire exam',
@@ -1077,6 +1081,21 @@ const SplitViewLoaded: React.FC<{
       })),
     },
   ]), [recipients]);
+  const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(
+    recipientOptions[0].options[0],
+  );
+  const replyTo = (userId: number) => {
+    const recip = recipientOptions[3].options.find((option) => option.value.id === userId);
+    if (!recip) {
+      alert({
+        variant: 'danger',
+        title: 'Error replying to message',
+        message: `Invalid User ID: ${userId}`,
+      });
+    }
+    setSelectedRecipient(recip);
+    if (messageRef.current) messageRef.current.focus();
+  };
   return (
     <Row className="h-100">
       <Col sm={6}>
@@ -1089,6 +1108,10 @@ const SplitViewLoaded: React.FC<{
         <ExamMessages
           recipientOptions={recipientOptions}
           examId={examId}
+          selectedRecipient={selectedRecipient}
+          setSelectedRecipient={setSelectedRecipient}
+          messageRef={messageRef}
+          replyTo={replyTo}
         />
       </Col>
     </Row>

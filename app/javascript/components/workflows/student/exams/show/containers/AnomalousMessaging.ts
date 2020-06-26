@@ -2,9 +2,13 @@ import { connect } from 'react-redux';
 import { MDTP } from '@student/exams/show/types';
 import AnomalousMessaging from '@student/exams/show/components/AnomalousMessaging';
 import { loadMessages, loadQuestions } from '@student/exams/show/actions';
+import { HitApiError } from '@hourglass/common/types/api';
 
 interface OwnProps {
   examId: number;
+  onError: (error: HitApiError) => void;
+  onSuccess: () => void;
+  disabled: boolean;
 }
 
 const mapDispatchToProps: MDTP<{
@@ -12,10 +16,12 @@ const mapDispatchToProps: MDTP<{
   loadQuestions: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   refreshMessages: () => {
-    dispatch(loadMessages(ownProps.examId));
+    const { onError, onSuccess } = ownProps;
+    dispatch(loadMessages(ownProps.examId, onSuccess, onError));
   },
   loadQuestions: () => {
-    dispatch(loadQuestions(ownProps.examId));
+    const { onError, onSuccess } = ownProps;
+    dispatch(loadQuestions(ownProps.examId, onSuccess, onError));
   },
 });
 

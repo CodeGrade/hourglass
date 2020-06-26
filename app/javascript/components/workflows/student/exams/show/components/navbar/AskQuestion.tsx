@@ -66,12 +66,14 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
 };
 
 interface AskQuestionProps {
+  disabled?: boolean;
   questions: ProfQuestion[];
   onSubmit: (courseID: number, examID: number, body: string) => void;
 }
 
 const AskQuestion: React.FC<AskQuestionProps> = (props) => {
   const {
+    disabled = false,
     questions,
     onSubmit,
   } = props;
@@ -93,12 +95,12 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
           setVal(event.target.value);
         }}
         as="textarea"
-        disabled={anySending}
+        disabled={anySending || disabled}
       />
       <Button
         className="ml-auto mt-3 float-right"
         variant="success"
-        disabled={anySending || valEmpty}
+        disabled={anySending || valEmpty || disabled}
         onClick={(): void => {
           onSubmit(railsCourse.id, railsExam.id, val);
           setVal('');

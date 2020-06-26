@@ -40,28 +40,28 @@ export async function hitApi<T>(url: string, options: RequestInit = {}, isJson =
     ...headers,
   };
   if (isJson) fetchHeaders['Content-Type'] = 'application/json';
-  return fetch(url, {
-    headers: fetchHeaders,
-    credentials: 'same-origin',
-    ...otherOptions,
-  })
-    .catch((err) => {
-      throw new HitApiError({
-        type: 'ERROR',
-        status: -1,
-        text: err.message,
-      });
-    })
-    .then((res) => {
-      if (!res.ok) {
-        throw new HitApiError({
-          type: 'ERROR',
-          status: res.status,
-          text: res.statusText,
-        });
-      }
-      return res.json() as Promise<T>;
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: fetchHeaders,
+      credentials: 'same-origin',
+      ...otherOptions,
     });
+  } catch (err) {
+    throw new HitApiError({
+      type: 'ERROR',
+      status: -1,
+      text: err.message,
+    });
+  }
+  if (!res.ok) {
+    throw new HitApiError({
+      type: 'ERROR',
+      status: res.status,
+      text: res.statusText,
+    });
+  }
+  return res.json() as Promise<T>;
 }
 
 export function useApiResponse<Server, Res = Server>(

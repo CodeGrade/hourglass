@@ -4,10 +4,12 @@ import AskQuestion from '@student/exams/show/containers/navbar/AskQuestion';
 import { ExamMessagesStandalone } from '@student/exams/show/containers/navbar/ExamMessages';
 
 const AnomalousMessaging: React.FC<{
+  disabled: boolean;
   refreshMessages: () => void;
   loadQuestions: () => void;
 }> = (props) => {
   const {
+    disabled,
     refreshMessages,
     loadQuestions,
   } = props;
@@ -27,7 +29,7 @@ const AnomalousMessaging: React.FC<{
             <Card.Title>
               <h2>Ask a question</h2>
             </Card.Title>
-            <AskQuestion />
+            <AskQuestion disabled={disabled} />
           </Card.Body>
         </Card>
       </Col>
@@ -37,7 +39,7 @@ const AnomalousMessaging: React.FC<{
             <Card.Title>
               <h2>Received Messages</h2>
             </Card.Title>
-            <ExamMessagesStandalone />
+            <ExamMessagesStandalone disabled={disabled} />
           </Card.Body>
         </Card>
       </Col>

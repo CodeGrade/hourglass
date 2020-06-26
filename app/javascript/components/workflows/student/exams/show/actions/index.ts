@@ -47,6 +47,7 @@ import lock from '@student/exams/show/lockdown/lock';
 import { DateTime } from 'luxon';
 import { getLatestMessages } from '@hourglass/common/api/student/exams/messages';
 import { getAllQuestions } from '@hourglass/common/api/student/exams/questions';
+import { HitApiError } from '@hourglass/common/types/api';
 
 export function questionAsked(id: number, body: string): QuestionAskedAction {
   return {
@@ -306,9 +307,7 @@ function snapshotSaving(): SnapshotSaving {
 }
 
 function lastMessageId(messages: ExamMessage[]): number {
-  return messages.reduce((newest, m) => {
-    return m.id > newest ? m.id : newest;
-  }, 0);
+  return messages.reduce((newest, m) => (m.id > newest ? m.id : newest), 0);
 }
 
 function receiveMessages(
@@ -344,18 +343,23 @@ export function setQuestions(questions: ProfQuestion[]): SetQuestionsAction {
   };
 }
 
-export function loadQuestions(examId: number): Thunk {
+export function loadQuestions(
+  examId: number,
+  onSuccess: () => void,
+  onError: (err: HitApiError) => void,
+): Thunk {
   return (dispatch): void => {
     getAllQuestions(examId).then((res) => {
       dispatch(setQuestions(res.questions));
-    }).catch((err) => {
-      // TODO
-      console.error(err, 'Error fetching questions');
-    });
+    }).then(() => onSuccess).catch(onError);
   };
 }
 
-export function loadMessages(examId: number): Thunk {
+export function loadMessages(
+  examId: number,
+  onSuccess: () => void,
+  onError: (err: HitApiError) => void,
+): Thunk {
   return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
     const lastMessageIds = {
@@ -366,10 +370,7 @@ export function loadMessages(examId: number): Thunk {
     };
     getLatestMessages(examId, lastMessageIds).then((res) => {
       dispatch(receiveMessages(res.messages));
-    }).catch((err) => {
-      // TODO
-      console.error(err, 'Error receiving messages.');
-    });
+    }).then(() => onSuccess()).catch(onError);
   };
 }
 

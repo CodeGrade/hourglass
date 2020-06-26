@@ -917,7 +917,7 @@ const ExamProctoring: React.FC = () => {
     <Container fluid>
       <div className="wrapper vh-100">
         <div className="inner-wrapper">
-          <RegularNavbar />
+          <RegularNavbar className="row" />
           <Row>
             <Col>
               <Loading loading={res.type !== 'RESULT'}>

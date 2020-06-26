@@ -25,7 +25,10 @@ function logOut(): void {
   });
 }
 
-const RegularNavbar: React.FC = () => {
+const RegularNavbar: React.FC<{ className?: string }> = (props) => {
+  const {
+    className,
+  } = props;
   const {
     railsUser,
   } = useContext(RailsContext);
@@ -33,6 +36,7 @@ const RegularNavbar: React.FC = () => {
     <Navbar
       bg="light"
       expand="md"
+      className={className}
     >
       <Navbar.Brand>
         {railsUser ? (

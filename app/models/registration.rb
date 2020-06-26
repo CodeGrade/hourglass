@@ -86,7 +86,7 @@ class Registration < ApplicationRecord
     DateTime.now > effective_end_time
   end
 
-  scope :anomalous?, -> { joins(:anomalies) }
+  scope :anomalous, -> { joins(:anomalies) }
   def anomalous?
     anomalies.size.positive?
   end

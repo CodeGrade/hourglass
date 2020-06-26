@@ -10,10 +10,9 @@ export default (state: ProfQuestionState = {
 }, action: ExamTakerAction): ProfQuestionState => {
   switch (action.type) {
     case 'LOAD_EXAM': {
-      const lastId = action.questions[0]?.id ?? 0;
       return {
         ...state,
-        lastId,
+        lastId: action.questions.reduce((acc, q) => (q.id > acc ? q.id : acc), 0),
         questions: action.questions,
       };
     }

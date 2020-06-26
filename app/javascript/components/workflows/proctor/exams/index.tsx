@@ -203,11 +203,13 @@ const ClearButton: React.FC<{
 };
 
 const ShowAnomalies: React.FC<{
+  replyTo: (userId: number) => void;
   examId: number;
   anomalies: Anomaly[];
   refresh: () => void;
 }> = (props) => {
   const {
+    replyTo,
     examId,
     anomalies,
     refresh,
@@ -234,7 +236,12 @@ const ShowAnomalies: React.FC<{
               regFinal={a.reg.final}
             />
             <ClearButton refresh={refresh} anomalyId={a.id} />
-            <Button variant="info">
+            <Button
+              variant="info"
+              onClick={() => {
+                replyTo(a.user.id);
+              }}
+            >
               <Icon I={MdMessage} />
               Message student
             </Button>
@@ -380,10 +387,12 @@ const FinalizeRegs: React.FC<{
 };
 
 const ExamAnomalies: React.FC<{
+  replyTo: (userId: number) => void;
   recipientOptions: RecipientOptions;
   examId: number;
 }> = (props) => {
   const {
+    replyTo,
     recipientOptions,
     examId,
   } = props;
@@ -412,7 +421,14 @@ const ExamAnomalies: React.FC<{
                   </span>
                 )}
                 <tbody>
-                  {res.type === 'RESULT' && <ShowAnomalies examId={examId} refresh={refresh} anomalies={res.response.anomalies} />}
+                  {res.type === 'RESULT' && (
+                    <ShowAnomalies
+                      replyTo={replyTo}
+                      examId={examId}
+                      refresh={refresh}
+                      anomalies={res.response.anomalies}
+                    />
+                  )}
                 </tbody>
               </Table>
             </Loading>
@@ -1102,6 +1118,7 @@ const SplitViewLoaded: React.FC<{
         <ExamAnomalies
           recipientOptions={recipientOptions}
           examId={examId}
+          replyTo={replyTo}
         />
       </Col>
       <Col sm={6}>

@@ -227,7 +227,12 @@ const ShowAnomalies: React.FC<{
           <td><ReadableDate showTime value={a.time} /></td>
           <td>{a.reason}</td>
           <td>
-            <FinalizeButton examId={examId} refresh={refresh} userId={a.user.id} regFinal={a.reg.final} />
+            <FinalizeButton
+              examId={examId}
+              refresh={refresh}
+              userId={a.user.id}
+              regFinal={a.reg.final}
+            />
             <ClearButton refresh={refresh} anomalyId={a.id} />
             <Button variant="info">
               <Icon I={MdMessage} />
@@ -345,7 +350,9 @@ const FinalizeRegs: React.FC<{
         </Modal.Header>
         <Modal.Body>
           <p>
-            Are you sure you want to finalize <i>{selectedRecipient.label}</i>?
+            {'Are you sure you want to finalize '}
+            <i>{selectedRecipient.label}</i>
+            ?
           </p>
         </Modal.Body>
         <Modal.Footer>
@@ -892,7 +899,7 @@ const ExamMessages: React.FC<{
           refresh={refresh}
           response={res.response}
         />
-    );
+      );
     default:
       throw new ExhaustiveSwitchError(res);
   }
@@ -1083,7 +1090,7 @@ const SplitViewLoaded: React.FC<{
       </Col>
     </Row>
   );
-}
+};
 
 const ProctoringSplitView: React.FC<{
   examId: number;
@@ -1103,7 +1110,12 @@ const ProctoringSplitView: React.FC<{
     case 'LOADING':
       return <p>Loading...</p>;
     case 'RESULT':
-      return <SplitViewLoaded examId={examId} recipients={res.response.recipients} />
+      return (
+        <SplitViewLoaded
+          examId={examId}
+          recipients={res.response.recipients}
+        />
+      );
     default:
       throw new ExhaustiveSwitchError(res);
   }

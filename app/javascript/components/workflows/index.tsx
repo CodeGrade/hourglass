@@ -95,8 +95,14 @@ const ProfessorRegs: React.FC<ProfessorCoursesProps> = (props) => {
 const Exams: React.FC = () => {
   const studentResponse = ApiStudentReg.useResponse();
   const profResponse = ApiProfessorCourses.useResponse();
+  const bothLoading = studentResponse.type === 'LOADING' && profResponse.type === 'LOADING';
+  const studentEmpty = studentResponse.type === 'RESULT' && studentResponse.response.regs.length === 0;
+  const profEmpty = profResponse.type === 'RESULT' && profResponse.response.courses.length === 0;
+  const bothEmpty = studentEmpty && profEmpty;
   return (
     <div>
+      {bothLoading && <p>Loading...</p>}
+      {bothEmpty && <p>You have no registrations.</p>}
       {studentResponse.type === 'RESULT' && (
         <StudentRegs
           regs={studentResponse.response.regs}

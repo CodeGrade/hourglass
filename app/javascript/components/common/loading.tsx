@@ -1,23 +1,17 @@
 import React from 'react';
 import { Spinner } from 'react-bootstrap';
-import './loading.css';
+import LoadingOverlay from 'react-loading-overlay';
 
-const Loading: React.FC<{ loading: boolean }> = (props) => {
-  const { loading, children } = props;
-  const loadingClass = loading ? '' : 'd-none';
+const Loading: React.FC<{ loading: boolean; className?: string }> = (props) => {
+  const { loading, className, children } = props;
   return (
-    <div className="d-inline-block position-relative">
-      <div className={`${loadingClass} loadingSpinnerOuter`}>
-        <div className="loadingSpinnerInner">
-          <Spinner animation="border" role="status">
-            <span className="sr-only">Loading...</span>
-          </Spinner>
-        </div>
-      </div>
-      <div className={loading ? 'loadingSpinnerDim' : ''}>
-        {children}
-      </div>
-    </div>
+    <LoadingOverlay
+      className={className}
+      active={loading}
+      spinner={<Spinner animation="border" role="status" />}
+    >
+      {children}
+    </LoadingOverlay>
   );
 };
 

@@ -219,7 +219,7 @@ const ShowAnomalies: React.FC<{
     };
   }, [refresh]);
   return (
-    <tbody>
+    <>
       {anomalies.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
       {anomalies.map((a) => (
         <tr key={a.id}>
@@ -241,7 +241,7 @@ const ShowAnomalies: React.FC<{
           </td>
         </tr>
       ))}
-    </tbody>
+    </>
   );
 };
 
@@ -389,45 +389,41 @@ const ExamAnomalies: React.FC<{
   } = props;
   const [refresher, refresh] = useRefresher();
   const res = anomaliesIndex(examId, [refresher]);
-  switch (res.type) {
-    case 'LOADING':
-      return <p>Loading...</p>;
-    case 'ERROR':
-      return (
-        <span className="text-danger">
-          <p>Error</p>
-          <small>{`${res.text} (${res.status})`}</small>
-        </span>
-      );
-    case 'RESULT':
-      return (
-        <div className="wrapper h-100">
-          <div className="inner-wrapper">
-            <h2>Anomalies</h2>
-            <div className="content-wrapper">
-              <div className="content overflow-auto-y">
-                <Table>
-                  <thead>
-                    <tr>
-                      <th>Student</th>
-                      <th>Timestamp</th>
-                      <th>Reason</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
+  return (
+    <div className="wrapper h-100">
+      <div className="inner-wrapper">
+        <h2>Anomalies</h2>
+        <div className="content-wrapper">
+          <div className="content overflow-auto-y">
+            <Loading loading={res.type === 'LOADING'}>
+              <Table>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Timestamp</th>
+                    <th>Reason</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                {res.type === 'ERROR' && (
+                  <span className="text-danger">
+                    <p>Error</p>
+                    <small>{`${res.text} (${res.status})`}</small>
+                  </span>
+                )}
+                <tbody>
                   {res.type === 'RESULT' && <ShowAnomalies examId={examId} refresh={refresh} anomalies={res.response.anomalies} />}
-                </Table>
-              </div>
-            </div>
-            <div>
-              <FinalizeRegs examId={examId} recipientOptions={recipientOptions} />
-            </div>
+                </tbody>
+              </Table>
+            </Loading>
           </div>
         </div>
-      );
-    default:
-      throw new ExhaustiveSwitchError(res);
-  }
+        <div>
+          <FinalizeRegs examId={examId} recipientOptions={recipientOptions} />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const ShowExamAnnouncement: React.FC<{
@@ -883,8 +879,6 @@ const ExamMessages: React.FC<{
   const [refresher, refresh] = useRefresher();
   const res = useExamMessages(examId, [refresher]);
   switch (res.type) {
-    case 'LOADING':
-      return <Loading loading />;
     case 'ERROR':
       return (
         <div className="text-danger">
@@ -892,13 +886,22 @@ const ExamMessages: React.FC<{
           <small>{res.text}</small>
         </div>
       );
+    case 'LOADING':
     case 'RESULT':
       return (
-        <Loaded
-          recipientOptions={recipientOptions}
-          refresh={refresh}
-          response={res.response}
-        />
+        <Loading loading={res.type === 'LOADING'} className="h-100">
+          <Loaded
+            recipientOptions={recipientOptions}
+            refresh={refresh}
+            response={res.type === 'RESULT' ? res.response : {
+              sent: [],
+              questions: [],
+              version: [],
+              exam: [],
+              room: [],
+            }}
+          />
+        </Loading>
       );
     default:
       throw new ExhaustiveSwitchError(res);

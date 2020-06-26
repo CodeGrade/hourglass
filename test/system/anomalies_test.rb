@@ -16,6 +16,6 @@ class AnomaliesTest < ApplicationSystemTestCase
   end
 
   test 'leaving fullscreen' do
-    binding.pry
+    skip
   end
 end

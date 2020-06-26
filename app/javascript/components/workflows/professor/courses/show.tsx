@@ -7,6 +7,7 @@ import { useResponse as examsIndex } from '@hourglass/common/api/professor/exams
 import NewExam from '@professor/exams/new';
 import SyncCourse from '@professor/courses/sync';
 import DocumentTitle from '@hourglass/common/documentTitle';
+import Loading from '@hourglass/common/loading';
 
 interface CourseExamsProps {
   courseId: number;
@@ -46,54 +47,59 @@ const CourseExams: React.FC<CourseExamsProps> = (props) => {
 const ShowCourse: React.FC = () => {
   const { courseId } = useParams();
   const res = showCourse(courseId);
+  let course;
   switch (res.type) {
     case 'ERROR':
+      return <p>Error</p>;
     case 'LOADING':
-      return <p>Loading...</p>;
+      course = { id: courseId, title: 'Course' };
+      break;
     case 'RESULT':
-      return (
-        <>
-          <div className="d-flex align-items-center justify-content-between">
-            <h1>
-              {res.response.course.title}
-            </h1>
-            <div>
-              <Link to={`/courses/${courseId}/sync`}>
-                <Button
-                  variant="danger"
-                >
-                  Sync
-                </Button>
-              </Link>
-              <Link to={`/courses/${courseId}/new`} className="ml-1">
-                <Button
-                  variant="success"
-                >
-                  New Exam
-                </Button>
-              </Link>
-            </div>
-          </div>
-          <Route path="/courses/:courseId" exact>
-            <DocumentTitle title={res.response.course.title}>
-              <CourseExams courseId={courseId} />
-            </DocumentTitle>
-          </Route>
-          <Route path="/courses/:courseId/sync" exact>
-            <DocumentTitle title={`Sync - ${res.response.course.title}`}>
-              <SyncCourse />
-            </DocumentTitle>
-          </Route>
-          <Route path="/courses/:courseId/new" exact>
-            <DocumentTitle title={`New Exam - ${res.response.course.title}`}>
-              <NewExam />
-            </DocumentTitle>
-          </Route>
-        </>
-      );
+      course = res.response.course;
+      break;
     default:
       throw new ExhaustiveSwitchError(res);
   }
+  return (
+    <Loading loading={res.type === 'LOADING'}>
+      <div className="d-flex align-items-center justify-content-between">
+        <h1>
+          {course.title}
+        </h1>
+        <div>
+          <Link to={`/courses/${courseId}/sync`}>
+            <Button
+              variant="danger"
+            >
+              Sync
+            </Button>
+          </Link>
+          <Link to={`/courses/${courseId}/new`} className="ml-1">
+            <Button
+              variant="success"
+            >
+              New Exam
+            </Button>
+          </Link>
+        </div>
+      </div>
+      <Route path="/courses/:courseId" exact>
+        <DocumentTitle title={course.title}>
+          <CourseExams courseId={courseId} />
+        </DocumentTitle>
+      </Route>
+      <Route path="/courses/:courseId/sync" exact>
+        <DocumentTitle title={`Sync - ${course.title}`}>
+          <SyncCourse />
+        </DocumentTitle>
+      </Route>
+      <Route path="/courses/:courseId/new" exact>
+        <DocumentTitle title={`New Exam - ${course.title}`}>
+          <NewExam />
+        </DocumentTitle>
+      </Route>
+    </Loading>
+  );
 };
 
 export default ShowCourse;

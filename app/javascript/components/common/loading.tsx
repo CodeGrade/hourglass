@@ -8,7 +8,13 @@ const Loading: React.FC<{ loading: boolean; className?: string }> = (props) => {
     <LoadingOverlay
       className={className}
       active={loading}
-      spinner={<Spinner animation="border" role="status" />}
+      spinner={(
+        <>
+          <Spinner animation="border" role="status" />
+          <br />
+        </>
+      )}
+      text="Loading..."
     >
       {children}
     </LoadingOverlay>

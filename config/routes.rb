@@ -59,6 +59,8 @@ Rails.application.routes.draw do
       resources :exams, param: 'exam_id', only: [:show] do
         member do
           post :take
+          post :question
+          post :messages
         end
       end
     end

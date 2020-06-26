@@ -8,9 +8,9 @@ module Api
       before_action :find_exam_and_course
 
       before_action :require_student_reg
-      before_action :check_over, only: [:take]
+      before_action :check_over, only: [:take, :question, :messages]
       before_action :check_anomaly, only: [:take]
-      before_action :check_final, only: [:take]
+      before_action :check_final, only: [:take, :question, :messages]
 
       def show
         render json: {
@@ -37,8 +37,22 @@ module Api
         when 'snapshot' then render json: snapshot
         when 'submit' then render json: submit
         when 'anomaly' then render json: anomaly
-        when 'question' then render json: question
         end
+      end
+
+      def question
+        q_params = params.require(:question).permit(:body)
+        q = Question.new body: q_params[:body], exam: @exam, sender: current_user
+        render json: {
+          success: q.save,
+          messages: q.errors.full_messages
+        }
+      end
+
+      def messages
+        render json: {
+          messages: messages_to_send
+        }
       end
 
       private
@@ -54,15 +68,6 @@ module Api
           Anomaly.create(registration: registration, reason: e.message)
         end
         render json: { lockout: true, reason: e.message }
-      end
-
-      def question
-        q_params = params.require(:question).permit(:body)
-        q = Question.new body: q_params[:body], exam: @exam, sender: current_user
-        {
-          success: q.save,
-          messages: q.errors.full_messages
-        }
       end
 
       def anomaly
@@ -116,19 +121,23 @@ module Api
         }
       end
 
-      def snapshot
+      def messages_to_send
         last_message_ids = params.require(:lastMessageIds).permit(:personal, :room, :version, :exam)
-        answers = answer_params
-        saved = @registration.save_answers(answers)
         version = @registration.exam_version
         {
+          personal: after(@registration.private_messages, last_message_ids[:personal]).map(&:serialize),
+          room: after(@registration.room&.room_announcements, last_message_ids[:room]).map(&:serialize),
+          version: after(version.version_announcements, last_message_ids[:version]).map(&:serialize),
+          exam: after(@exam.exam_announcements, last_message_ids[:exam]).map(&:serialize)
+        }
+      end
+
+      def snapshot
+        answers = answer_params
+        saved = @registration.save_answers(answers)
+        {
           lockout: !saved,
-          messages: {
-            personal: after(@registration.private_messages, last_message_ids[:personal]).map(&:serialize),
-            room: after(@registration.room&.room_announcements, last_message_ids[:room]).map(&:serialize),
-            version: after(version.version_announcements, last_message_ids[:version]).map(&:serialize),
-            exam: after(@exam.exam_announcements, last_message_ids[:exam]).map(&:serialize)
-          }
+          messages: messages_to_send
         }
       end
 

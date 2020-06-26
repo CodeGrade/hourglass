@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import { MSTP, MDTP, ExamMessage } from '@student/exams/show/types';
-import ExamMessages from '@student/exams/show/components/navbar/ExamMessages';
+import ExamMessages, { ShowExamMessages } from '@student/exams/show/components/navbar/ExamMessages';
 import { messagesOpened } from '@student/exams/show/actions';
 
 const mapStateToProps: MSTP<{
@@ -25,3 +25,8 @@ const mapDispatchToProps: MDTP<{
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ExamMessages);
+
+export const ExamMessagesStandalone = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(ShowExamMessages);

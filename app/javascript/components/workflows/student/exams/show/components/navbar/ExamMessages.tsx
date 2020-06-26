@@ -50,13 +50,15 @@ export const ShowMessage: React.FC<MessageProps> = (props) => {
   );
 };
 
-const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
+export const ShowExamMessages: React.FC<{
+  messages: ExamMessage[];
+  unread: boolean;
+  onMessagesOpened: () => void;
+}> = (props) => {
   const {
-    expanded,
     messages,
-    onMessagesOpened,
     unread,
-    onSectionClick,
+    onMessagesOpened,
   } = props;
   const msgs = messages.map((msg) => (
     <ShowMessage
@@ -70,16 +72,8 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   const body = msgs.length === 0
     ? <i>No messages.</i>
     : msgs;
-  const classes = unread ? 'bg-warning text-dark' : undefined;
   return (
-    <NavAccordionItem
-      expanded={expanded}
-      Icon={MdFeedback}
-      label="Professor messages"
-      className={classes}
-      eventKey="profmsg"
-      onSectionClick={onSectionClick}
-    >
+    <>
       <ul className="p-0">
         {body}
       </ul>
@@ -92,6 +86,33 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
           Acknowledge unread messages
         </Button>
       )}
+    </>
+  );
+};
+
+const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
+  const {
+    expanded,
+    messages,
+    onMessagesOpened,
+    unread,
+    onSectionClick,
+  } = props;
+  const classes = unread ? 'bg-warning text-dark' : undefined;
+  return (
+    <NavAccordionItem
+      expanded={expanded}
+      Icon={MdFeedback}
+      label="Professor messages"
+      className={classes}
+      eventKey="profmsg"
+      onSectionClick={onSectionClick}
+    >
+      <ShowExamMessages
+        messages={messages}
+        unread={unread}
+        onMessagesOpened={onMessagesOpened}
+      />
     </NavAccordionItem>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Button } from 'react-bootstrap';
 import { RailsContext } from '@student/exams/show/context';
+import AnomalousMessagingContainer from '@student/exams/show/containers/AnomalousMessaging';
 
 interface PreStartProps {
   onClick: () => void;
@@ -26,6 +27,7 @@ const PreStart: React.FC<PreStartProps> = (props) => {
           You have been locked out of this exam.
           Please see an instructor.
         </i>
+        <AnomalousMessagingContainer examId={railsExam.id} />
       </div>
     );
   }

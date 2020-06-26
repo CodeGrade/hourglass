@@ -108,6 +108,9 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
       </Button>
       <span className="clearfix" />
       <hr className="my-2" />
+      {questions.length === 0 && (
+        <i>No questions sent.</i>
+      )}
       <ul className="p-0">
         {questions.map((q) => (
           <ShowQuestion

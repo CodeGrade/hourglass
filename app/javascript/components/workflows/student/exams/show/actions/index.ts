@@ -35,6 +35,7 @@ import {
   Policy,
   RailsCourse,
   TimeInfo,
+  RailsExamMessage,
 } from '@student/exams/show/types';
 import {
   getCSRFToken,
@@ -43,6 +44,7 @@ import {
 } from '@student/exams/show/helpers';
 import lock from '@student/exams/show/lockdown/lock';
 import { DateTime } from 'luxon';
+import { getLatestMessages } from '@hourglass/common/api/student/exams/messages';
 
 export function questionAsked(id: number, body: string): QuestionAskedAction {
   return {
@@ -70,7 +72,7 @@ export function askQuestion(courseID: number, examID: number, body: string): Thu
   return (dispatch, getState): void => {
     const qID = getState().questions.lastId + 1;
     dispatch(questionAsked(qID, body));
-    const url = `/api/student/exams/${examID}/take`;
+    const url = `/api/student/exams/${examID}/question`;
     fetch(url, {
       method: 'POST',
       headers: {
@@ -253,7 +255,6 @@ export function doLoad(courseID: number, examID: number): Thunk {
           dispatch(loadExam(exam, newTime, answers, newMsgs, newQs));
         }
       }).catch((err) => {
-        // TODO: store a message to tell the user what went wrong
         dispatch(lockdownFailed(`Error starting exam: ${err.message}`));
       });
   };
@@ -303,7 +304,53 @@ function snapshotSaving(): SnapshotSaving {
 }
 
 function lastMessageId(messages: ExamMessage[]): number {
-  return messages[messages.length - 1]?.id ?? 0;
+  return messages.reduce((newest, m) => {
+    return m.id > newest ? m.id : newest;
+  }, 0);
+}
+
+function receiveMessages(
+  messages: {
+    personal: RailsExamMessage[];
+    room: RailsExamMessage[];
+    version: RailsExamMessage[];
+    exam: RailsExamMessage[];
+  },
+): Thunk {
+  return (dispatch): void => {
+    const newMsgs = {
+      personal: convertMsgs(messages.personal),
+      room: convertMsgs(messages.room),
+      version: convertMsgs(messages.version),
+      exam: convertMsgs(messages.exam),
+    };
+    [
+      ...newMsgs.personal,
+      ...newMsgs.room,
+      ...newMsgs.version,
+      ...newMsgs.exam,
+    ].forEach((msg) => {
+      dispatch(messageReceived(msg));
+    });
+  };
+}
+
+export function loadMessages(examId: number): Thunk {
+  return (dispatch, getState): void => {
+    const state: ExamTakerState = getState();
+    const lastMessageIds = {
+      personal: lastMessageId(state.messages.messages.personal),
+      room: lastMessageId(state.messages.messages.room),
+      version: lastMessageId(state.messages.messages.version),
+      exam: lastMessageId(state.messages.messages.exam),
+    };
+    getLatestMessages(examId, lastMessageIds).then((res) => {
+      dispatch(receiveMessages(res.messages));
+    }).catch((err) => {
+      // TODO
+      console.error(err, 'Error receiving messages.');
+    });
+  };
 }
 
 export function saveSnapshot(courseID: number, examID: number): Thunk {
@@ -350,21 +397,8 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
           dispatch(snapshotFailure(error));
           window.location.href = '/';
         } else {
-          const newMsgs = {
-            personal: convertMsgs(messages.personal),
-            room: convertMsgs(messages.room),
-            version: convertMsgs(messages.version),
-            exam: convertMsgs(messages.exam),
-          };
+          dispatch(receiveMessages(messages));
           dispatch(snapshotSuccess());
-          [
-            ...newMsgs.personal,
-            ...newMsgs.room,
-            ...newMsgs.version,
-            ...newMsgs.exam,
-          ].forEach((msg) => {
-            dispatch(messageReceived(msg));
-          });
         }
       }).catch((err) => {
         const error = `Error saving snapshot to server: ${err.message}`;

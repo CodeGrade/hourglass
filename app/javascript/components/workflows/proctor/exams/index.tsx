@@ -581,6 +581,12 @@ const Loaded: React.FC<{
     exam,
     recipients,
   } = response;
+  useEffect(() => {
+    const timer = setInterval(refresh, 5000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, [refresh]);
   const { alert } = useContext(AlertContext);
   const messageRef = useRef<HTMLTextAreaElement>();
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);

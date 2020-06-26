@@ -59,6 +59,7 @@ import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
 import { sendMessage } from '@hourglass/common/api/proctor/messages/create';
 import './index.scss';
+import { BsListCheck } from 'react-icons/bs';
 
 export interface MessageProps {
   icon: IconType;
@@ -252,6 +253,9 @@ const FinalizeRegs: React.FC = () => {
       }],
     },
   ]), []);
+  const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(
+    recipientOptions[0].options[0],
+  );
   return (
     <Alert variant="danger">
       <h2>Finalization</h2>
@@ -260,15 +264,23 @@ const FinalizeRegs: React.FC = () => {
         <Col>
           <Select
             placeholder="Choose selection criteria..."
-            // value={selectedRecipient}
-            // onChange={(value: MessageFilterOption) => {
-            //   setSelectedRecipient(value);
-            // }}
+            value={selectedRecipient}
+            onChange={(value: MessageFilterOption) => {
+              setSelectedRecipient(value);
+            }}
             formatGroupLabel={formatGroupLabel}
             options={recipientOptions}
             menuPlacement="auto"
           />
         </Col>
+      </Form.Group>
+      <Form.Group>
+        <Button
+          variant="danger"
+        >
+          <Icon I={BsListCheck} />
+          Finalize
+        </Button>
       </Form.Group>
     </Alert>
   );

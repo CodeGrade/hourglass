@@ -36,6 +36,7 @@ import {
   RailsCourse,
   TimeInfo,
   RailsExamMessage,
+  SetQuestionsAction,
 } from '@student/exams/show/types';
 import {
   getCSRFToken,
@@ -45,6 +46,7 @@ import {
 import lock from '@student/exams/show/lockdown/lock';
 import { DateTime } from 'luxon';
 import { getLatestMessages } from '@hourglass/common/api/student/exams/messages';
+import { getAllQuestions } from '@hourglass/common/api/student/exams/questions';
 
 export function questionAsked(id: number, body: string): QuestionAskedAction {
   return {
@@ -331,6 +333,24 @@ function receiveMessages(
       ...newMsgs.exam,
     ].forEach((msg) => {
       dispatch(messageReceived(msg));
+    });
+  };
+}
+
+export function setQuestions(questions: ProfQuestion[]): SetQuestionsAction {
+  return {
+    type: 'SET_QUESTIONS',
+    questions,
+  };
+}
+
+export function loadQuestions(examId: number): Thunk {
+  return (dispatch): void => {
+    getAllQuestions(examId).then((res) => {
+      dispatch(setQuestions(res.questions));
+    }).catch((err) => {
+      // TODO
+      console.error(err, 'Error fetching questions');
     });
   };
 }

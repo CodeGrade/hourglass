@@ -280,7 +280,13 @@ export interface ProfQuestion {
 export type ProfQuestionStatus = 'SENDING' | 'FAILED' | 'SENT';
 
 export type ProfQuestionAction =
+  SetQuestionsAction |
   QuestionAskedAction | QuestionFailedAction | QuestionSucceededAction;
+
+export interface SetQuestionsAction {
+  type: 'SET_QUESTIONS';
+  questions: ProfQuestion[];
+}
 
 export interface QuestionAskedAction {
   type: 'QUESTION_ASKED';

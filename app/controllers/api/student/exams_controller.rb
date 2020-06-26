@@ -8,9 +8,9 @@ module Api
       before_action :find_exam_and_course
 
       before_action :require_student_reg
-      before_action :check_over, only: [:take, :question, :messages]
+      before_action :check_over, only: [:take, :question, :messages, :questions]
       before_action :check_anomaly, only: [:take]
-      before_action :check_final, only: [:take, :question, :messages]
+      before_action :check_final, only: [:take, :question, :messages, :questions]
 
       def show
         render json: {
@@ -38,6 +38,12 @@ module Api
         when 'submit' then render json: submit
         when 'anomaly' then render json: anomaly
         end
+      end
+
+      def questions
+        render json: {
+          questions: all_questions
+        }
       end
 
       def question
@@ -117,7 +123,7 @@ module Api
             version: version.version_announcements.map(&:serialize),
             exam: @exam.exam_announcements.map(&:serialize)
           },
-          questions: questions
+          questions: all_questions
         }
       end
 
@@ -166,12 +172,11 @@ module Api
       end
 
       # Returns all of the questions the current user has asked for this exam.
-      def questions
+      def all_questions
         qs = @registration.my_questions.order(created_at: :desc)
         qs.map(&:serialize)
       end
 
-      private
       def answer_params
         {
           answers: params.require(:answers).require(:answers).map do |qans|

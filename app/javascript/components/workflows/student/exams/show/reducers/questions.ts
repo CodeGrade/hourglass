@@ -17,6 +17,12 @@ export default (state: ProfQuestionState = {
         questions: action.questions,
       };
     }
+    case 'SET_QUESTIONS':
+      return {
+        ...state,
+        questions: action.questions,
+        lastId: action.questions.reduce((acc, q) => (q.id > acc ? q.id : acc), 0),
+      };
     case 'QUESTION_ASKED':
       return {
         ...state,

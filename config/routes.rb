@@ -60,6 +60,7 @@ Rails.application.routes.draw do
         member do
           post :take
           post :question
+          get :questions
           post :messages
         end
       end

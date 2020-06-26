@@ -30,7 +30,7 @@ export class HitApiError extends Error {
   }
 }
 
-export async function hitApi<T>(url: string, options?: RequestInit, isJson = true): Promise<T> {
+export async function hitApi<T>(url: string, options: RequestInit = {}, isJson = true): Promise<T> {
   const {
     headers = {},
     ...otherOptions

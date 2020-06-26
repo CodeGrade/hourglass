@@ -5,11 +5,14 @@ import { ExamMessagesStandalone } from '@student/exams/show/containers/navbar/Ex
 
 const AnomalousMessaging: React.FC<{
   refreshMessages: () => void;
+  loadQuestions: () => void;
 }> = (props) => {
   const {
     refreshMessages,
+    loadQuestions,
   } = props;
   useEffect(() => {
+    loadQuestions();
     refreshMessages();
     const timer = setInterval(refreshMessages, 5000);
     return () => {

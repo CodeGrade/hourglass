@@ -7,7 +7,7 @@ import {
   ButtonGroup,
 } from 'react-bootstrap';
 import { MarkDescription, CodeState, CodeInfo } from '@student/exams/show/types';
-import { Editor } from '@student/exams/show/components/ExamCodeBox';
+import { Editor, marksToDescs } from '@student/exams/show/components/ExamCodeBox';
 import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 import { FaLock, FaBan } from 'react-icons/fa';
 import {
@@ -25,7 +25,7 @@ export const languages = {
   scheme: 'Racket',
   'text/x-java': 'Java',
   'text/x-python': 'Python',
-  'text/x-javascript': 'Javascript',
+  'text/javascript': 'Javascript',
   mllike: 'ML',
   'text/x-ebnf': 'ML Yacc',
   'text/x-csrc': 'C',
@@ -159,7 +159,7 @@ const EditCodeAnswerValues: React.FC<{
           if (origin === undefined) return;
           if (ranges.length > 0) {
             const curRange = ranges[0];
-            const selectedMarks = editor.findMarks(curRange.from(), curRange.to());
+            const selectedMarks = marksToDescs(editor.findMarks(curRange.from(), curRange.to()));
             const lastLine = editor.lastLine();
             const lastLineLen = editor.getLine(lastLine).length;
             if (selectedMarks.length === 0) {
@@ -170,11 +170,14 @@ const EditCodeAnswerValues: React.FC<{
                 finalPos: { line: lastLine, ch: lastLineLen },
               });
             } else {
-              const markRange = selectedMarks[0].find();
+              const activeMark = selectedMarks[0];
               setLockState({
                 active: true,
                 enabled: true,
-                curRange: markRange,
+                curRange: {
+                  from: activeMark.from,
+                  to: activeMark.to,
+                },
                 finalPos: { line: lastLine, ch: lastLineLen },
               });
             }

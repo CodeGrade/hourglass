@@ -766,7 +766,6 @@ const Loaded: React.FC<{
       clearInterval(timer);
     };
   }, [refresh]);
-  const { alert } = useContext(AlertContext);
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
 
   return (
@@ -1062,6 +1061,7 @@ const SplitViewLoaded: React.FC<{
     examId,
     recipients,
   } = props;
+  const { alert } = useContext(AlertContext);
   const messageRef = useRef<HTMLTextAreaElement>();
   const recipientOptions = useMemo<RecipientOptions>(() => ([
     {

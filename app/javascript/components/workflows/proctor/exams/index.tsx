@@ -206,7 +206,7 @@ const ShowAnomalies: React.FC<{
   }, [refresh]);
   return (
     <tbody>
-      {anomalies.length === 0 && <tr><td>No anomalies.</td></tr>}
+      {anomalies.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
       {anomalies.map((a) => (
         <tr key={a.id}>
           <td>{a.reg.displayName}</td>
@@ -234,29 +234,42 @@ const ExamAnomalies: React.FC<{
   } = props;
   const [refresher, refresh] = useRefresher();
   const res = anomaliesIndex(examId, [refresher]);
-  return (
-    <>
-      <h2>Anomalies</h2>
-      <Table>
-        <thead>
-          <tr>
-            <th>Student</th>
-            <th>Timestamp</th>
-            <th>Reason</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        {res.type === 'RESULT' && <ShowAnomalies refresh={refresh} anomalies={res.response.anomalies} />}
-      </Table>
-      {res.type === 'LOADING' && <p>Loading...</p>}
-      {res.type === 'ERROR' && (
+  switch (res.type) {
+    case 'LOADING':
+      return <p>Loading...</p>;
+    case 'ERROR':
+      return (
         <span className="text-danger">
           <p>Error</p>
           <small>{`${res.text} (${res.status})`}</small>
         </span>
-      )}
-    </>
-  );
+      );
+    case 'RESULT':
+      return (
+        <div className="wrapper h-100">
+          <div className="inner-wrapper">
+            <h2>Anomalies</h2>
+            <div className="content-wrapper">
+              <div className="content overflow-auto-y">
+                <Table>
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Timestamp</th>
+                      <th>Reason</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  {res.type === 'RESULT' && <ShowAnomalies refresh={refresh} anomalies={res.response.anomalies} />}
+                </Table>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    default:
+      throw new ExhaustiveSwitchError(res);
+  }
 };
 
 const ShowExamAnnouncement: React.FC<{

@@ -30,7 +30,7 @@ function applyMarks(cm: CM.Editor, marks: MarkDescription[]): CM.TextMarker[] {
   }));
 }
 
-function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
+export function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
   return marks.filter((m) => m.className === 'readOnly').map((m) => {
     const { inclusiveLeft, inclusiveRight } = m;
     const found = m.find();

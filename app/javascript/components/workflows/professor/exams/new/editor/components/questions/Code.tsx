@@ -25,7 +25,7 @@ export const languages = {
   scheme: 'Racket',
   'text/x-java': 'Java',
   'text/x-python': 'Python',
-  'text/x-javascript': 'Javascript',
+  'text/javascript': 'Javascript',
   mllike: 'ML',
   'text/x-ebnf': 'ML Yacc',
   'text/x-csrc': 'C',

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Alert } from 'react-bootstrap';
 import { RailsContext } from '@student/exams/show/context';
 import AnomalousMessagingContainer from '@student/exams/show/containers/AnomalousMessaging';
 
@@ -23,10 +23,12 @@ const PreStart: React.FC<PreStartProps> = (props) => {
     return (
       <div>
         <h1>{railsExam.name}</h1>
-        <i className="text-danger">
-          You have been locked out of this exam.
-          Please see an instructor.
-        </i>
+        <Alert variant="danger">
+          <i>
+            You have been locked out of this exam.
+            Please contact an instructor, either in a message below, in person, or via email.
+          </i>
+        </Alert>
         <AnomalousMessagingContainer examId={railsExam.id} />
       </div>
     );

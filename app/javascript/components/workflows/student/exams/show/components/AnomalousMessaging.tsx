@@ -23,21 +23,25 @@ const AnomalousMessaging: React.FC<{
     <Row>
       <Col>
         <Card>
-          <Card.Title>
-            <h2>Ask a question</h2>
-          </Card.Title>
           <Card.Body>
-            <AskQuestion />
+            <Card.Title>
+              <h2>Ask a question</h2>
+            </Card.Title>
+            <Card.Text>
+              <AskQuestion />
+            </Card.Text>
           </Card.Body>
         </Card>
       </Col>
       <Col>
         <Card>
-          <Card.Title>
-            <h2>Received Messages</h2>
-          </Card.Title>
           <Card.Body>
-            <ExamMessagesStandalone />
+            <Card.Title>
+              <h2>Received Messages</h2>
+            </Card.Title>
+            <Card.Text>
+              <ExamMessagesStandalone />
+            </Card.Text>
           </Card.Body>
         </Card>
       </Col>

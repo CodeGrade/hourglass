@@ -39,7 +39,6 @@ import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import { Anomaly, useResponse as anomaliesIndex } from '@hourglass/common/api/proctor/anomalies';
 import { destroyAnomaly } from '@hourglass/common/api/proctor/anomalies/destroy';
 import Loading from '@hourglass/common/loading';
-import { finalizeRegistration } from '@hourglass/common/api/proctor/registrations/finalize';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
 import { useRefresher, ExhaustiveSwitchError } from '@hourglass/common/helpers';
@@ -102,12 +101,14 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
 
 
 const FinalizeButton: React.FC<{
-  regId: number;
+  examId: number;
+  userId: number;
   regFinal: boolean;
   refresh: () => void;
 }> = (props) => {
   const {
-    regId,
+    examId,
+    userId,
     regFinal,
     refresh,
   } = props;
@@ -123,7 +124,10 @@ const FinalizeButton: React.FC<{
         variant="danger"
         onClick={() => {
           setLoading(true);
-          finalizeRegistration(regId).then((res) => {
+          doFinalize(examId, {
+            type: 'USER',
+            id: userId,
+          }).then((res) => {
             if (res.success === true) {
               alert({
                 variant: 'success',
@@ -199,10 +203,12 @@ const ClearButton: React.FC<{
 };
 
 const ShowAnomalies: React.FC<{
+  examId: number;
   anomalies: Anomaly[];
   refresh: () => void;
 }> = (props) => {
   const {
+    examId,
     anomalies,
     refresh,
   } = props;
@@ -217,11 +223,11 @@ const ShowAnomalies: React.FC<{
       {anomalies.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
       {anomalies.map((a) => (
         <tr key={a.id}>
-          <td>{a.reg.displayName}</td>
+          <td>{a.user.displayName}</td>
           <td><ReadableDate showTime value={a.time} /></td>
           <td>{a.reason}</td>
           <td>
-            <FinalizeButton refresh={refresh} regId={a.reg.id} regFinal={a.reg.final} />
+            <FinalizeButton examId={examId} refresh={refresh} userId={a.user.id} regFinal={a.reg.final} />
             <ClearButton refresh={refresh} anomalyId={a.id} />
             <Button variant="info">
               <Icon I={MdMessage} />
@@ -263,8 +269,25 @@ const FinalizeRegs: React.FC<{
   const closeModal = useCallback(() => setShowModal(false), []);
   const finalize = () => {
     setLoading(true);
+    let type;
+    switch (selectedRecipient.value.type) {
+      case MessageType.Exam:
+        type = 'EXAM';
+        break;
+      case MessageType.Room:
+        type = 'ROOM';
+        break;
+      case MessageType.Direct:
+        type = 'USER';
+        break;
+      case MessageType.Version:
+        type = 'VERSION';
+        break;
+      default:
+        throw new ExhaustiveSwitchError(selectedRecipient.value.type);
+    }
     doFinalize(examId, {
-      type: 'VERSION',
+      type,
       id: selectedRecipient.value.id,
     }).then((res) => {
       if (res.success !== true) {
@@ -385,7 +408,7 @@ const ExamAnomalies: React.FC<{
                       <th>Actions</th>
                     </tr>
                   </thead>
-                  {res.type === 'RESULT' && <ShowAnomalies refresh={refresh} anomalies={res.response.anomalies} />}
+                  {res.type === 'RESULT' && <ShowAnomalies examId={examId} refresh={refresh} anomalies={res.response.anomalies} />}
                 </Table>
               </div>
             </div>

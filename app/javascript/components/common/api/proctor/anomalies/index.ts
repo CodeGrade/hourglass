@@ -3,11 +3,14 @@ import { ApiResponse, useApiResponse } from '@hourglass/common/types/api';
 
 interface ServerAnomaly {
   id: number;
+  user: {
+    displayName: string;
+    id: number;
+  };
   reg: {
     id: number;
-    displayName: string;
     final: boolean;
-  }
+  };
   time: string;
   reason: string;
 }

@@ -17,7 +17,10 @@ module Api
         when 'ROOM'
           raise 'TODO'
         when 'USER'
-          raise 'TODO'
+          reg = @exam.registrations.find_by!(user_id: target[:id])
+          raise 'That registration is already final.' if reg.final?
+
+          reg.finalize!
         else
           raise "Invalid recipient type: #{target[:type]}"
         end

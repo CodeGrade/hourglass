@@ -13,9 +13,12 @@ module Api
         anomalies = @exam.anomalies.map do |a|
           {
             id: a.id,
+            user: {
+              displayName: a.user.display_name,
+              id: a.user.id
+            },
             reg: {
               id: a.registration.id,
-              displayName: a.user.display_name,
               final: a.registration.final?
             },
             time: a.created_at,

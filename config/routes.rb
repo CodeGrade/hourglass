@@ -42,11 +42,6 @@ Rails.application.routes.draw do
               get :recipients
             end
           end
-          resources :registrations, param: 'registration_id', only: [] do
-            member do
-              post :finalize
-            end
-          end
         end
       end
     end

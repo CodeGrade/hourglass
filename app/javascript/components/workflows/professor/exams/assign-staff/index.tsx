@@ -32,9 +32,9 @@ import {
   Route,
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
+import Loading from '@hourglass/common/loading';
 import { useTabRefresher, TabEditButton } from '../admin';
 import '../list-columns.scss';
-import Loading from '@hourglass/common/loading';
 
 interface FormContextType {
   sections: Section[];

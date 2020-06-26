@@ -227,6 +227,17 @@ const ShowAnomalies: React.FC<{
   );
 };
 
+const formatGroupLabel = (data) => {
+  if (data.options.length > 1) {
+    return (
+      <div className="proctor-groupstyles">
+        <span>{data.label}</span>
+      </div>
+    );
+  }
+  return <span />;
+};
+
 const FinalizeRegs: React.FC = () => {
   const recipientOptions = useMemo<RecipientOptions>(() => ([
     {
@@ -246,16 +257,18 @@ const FinalizeRegs: React.FC = () => {
       <h2>Finalization</h2>
       <Form.Group as={Row} controlId="finalize-target-box">
         <Form.Label column sm="auto">Target:</Form.Label>
-        <Select
-          placeholder="Choose selection criteria..."
-          // value={selectedRecipient}
-          // onChange={(value: MessageFilterOption) => {
-          //   setSelectedRecipient(value);
-          // }}
-          formatGroupLabel={formatGroupLabel}
-          options={recipientOptions}
-          menuPlacement="auto"
-        />
+        <Col>
+          <Select
+            placeholder="Choose selection criteria..."
+            // value={selectedRecipient}
+            // onChange={(value: MessageFilterOption) => {
+            //   setSelectedRecipient(value);
+            // }}
+            formatGroupLabel={formatGroupLabel}
+            options={recipientOptions}
+            menuPlacement="auto"
+          />
+        </Col>
       </Form.Group>
     </Alert>
   );
@@ -875,17 +888,6 @@ type RecipientOptions = {
   label: string;
   options: MessageFilterOption[];
 }[]
-
-const formatGroupLabel = (data) => {
-  if (data.options.length > 1) {
-    return (
-      <div className="proctor-groupstyles">
-        <span>{data.label}</span>
-      </div>
-    );
-  }
-  return <span />;
-};
 
 const SendMessage: React.FC<{
   selectedRecipient: MessageFilterOption;

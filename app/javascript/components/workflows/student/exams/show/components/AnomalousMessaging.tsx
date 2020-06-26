@@ -27,9 +27,7 @@ const AnomalousMessaging: React.FC<{
             <Card.Title>
               <h2>Ask a question</h2>
             </Card.Title>
-            <Card.Text>
-              <AskQuestion />
-            </Card.Text>
+            <AskQuestion />
           </Card.Body>
         </Card>
       </Col>
@@ -39,9 +37,7 @@ const AnomalousMessaging: React.FC<{
             <Card.Title>
               <h2>Received Messages</h2>
             </Card.Title>
-            <Card.Text>
-              <ExamMessagesStandalone />
-            </Card.Text>
+            <ExamMessagesStandalone />
           </Card.Body>
         </Card>
       </Col>

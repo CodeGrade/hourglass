@@ -15,6 +15,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gems-
     - uses: cachix/install-nix-action@v10
+    - name: Setup nix channel
+      run: |
+        nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
+        nix-channel --update
     - name: Get nix deps
       run: nix-shell --run 'echo'
     - name: Install ruby gems
@@ -23,9 +27,9 @@ jobs:
       run: nix-shell --run 'yarn install --frozen-lockfile'
     - name: Setup postgres
       run: |
-        nix-shell --pure --run 'start_postgres'
-        nix-shell --pure --run 'rails db:setup'
+        nix-shell --run 'start_postgres'
+        nix-shell --run 'rails db:setup'
     - name: Lint factories
-      run: nix-shell --pure --run 'rails factory_bot:lint'
+      run: nix-shell --run 'rails factory_bot:lint'
     - name: Run tests
-      run: nix-shell --pure --run 'rails test'
+      run: nix-shell --run 'rails test'

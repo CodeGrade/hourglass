@@ -53,7 +53,7 @@ in mkShell {
     yarn
     start_postgres
     stop_postgres
-    racket
+    # racket
     chromedriver
     chromium
     which

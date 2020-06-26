@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import { Button, Alert } from 'react-bootstrap';
 import { RailsContext } from '@student/exams/show/context';
 import AnomalousMessagingContainer from '@student/exams/show/containers/AnomalousMessaging';
+import ErrorBoundary from '@hourglass/common/boundary';
 
 interface PreStartProps {
   onClick: () => void;
@@ -29,7 +30,9 @@ const PreStart: React.FC<PreStartProps> = (props) => {
             Please contact an instructor, either in a message below, in person, or via email.
           </i>
         </Alert>
-        <AnomalousMessagingContainer examId={railsExam.id} />
+        <ErrorBoundary>
+          <AnomalousMessagingContainer examId={railsExam.id} />
+        </ErrorBoundary>
       </div>
     );
   }

@@ -13,7 +13,12 @@ module Api
           questions: @exam.questions.map { |q| serialize_question q },
           version: @exam.version_announcements.map { |m| serialize_ver_announcement m },
           room: @exam.room_announcements.map { |m| serialize_room_announcement m },
-          exam: @exam.exam_announcements.map { |m| serialize_exam_announcement m },
+          exam: @exam.exam_announcements.map { |m| serialize_exam_announcement m }
+        }
+      end
+
+      def recipients
+        render json: {
           recipients: @exam.message_recipients
         }
       end

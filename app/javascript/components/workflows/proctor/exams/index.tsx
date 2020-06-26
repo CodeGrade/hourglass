@@ -53,8 +53,12 @@ import {
   ExamAnnouncement,
   Message,
   MessageType,
-  Recipient,
 } from '@hourglass/common/api/proctor/messages';
+import {
+  Recipient,
+  SplitRecipients,
+  useMessageRecipients,
+} from '@hourglass/common/api/proctor/messages/recipients';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
@@ -240,20 +244,12 @@ const formatGroupLabel = (data) => {
   return <span />;
 };
 
-const FinalizeRegs: React.FC = () => {
-  const recipientOptions = useMemo<RecipientOptions>(() => ([
-    {
-      label: 'Entire exam',
-      options: [{
-        label: 'Entire exam',
-        value: {
-          type: MessageType.Exam,
-          id: -1,
-          name: 'Entire exam',
-        },
-      }],
-    },
-  ]), []);
+const FinalizeRegs: React.FC<{
+  recipientOptions: RecipientOptions;
+}> = (props) => {
+  const {
+    recipientOptions,
+  } = props;
   const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(
     recipientOptions[0].options[0],
   );
@@ -322,9 +318,11 @@ const FinalizeRegs: React.FC = () => {
 };
 
 const ExamAnomalies: React.FC<{
+  recipientOptions: RecipientOptions;
   examId: number;
 }> = (props) => {
   const {
+    recipientOptions,
     examId,
   } = props;
   const [refresher, refresh] = useRefresher();
@@ -360,7 +358,7 @@ const ExamAnomalies: React.FC<{
               </div>
             </div>
             <div>
-              <FinalizeRegs />
+              <FinalizeRegs recipientOptions={recipientOptions} />
             </div>
           </div>
         </div>
@@ -666,10 +664,12 @@ enum MessagesTab {
 const Loaded: React.FC<{
   refresh: () => void;
   response: Response;
+  recipientOptions: RecipientOptions;
 }> = (props) => {
   const {
     refresh,
     response,
+    recipientOptions,
   } = props;
   const {
     sent,
@@ -677,7 +677,6 @@ const Loaded: React.FC<{
     version,
     room,
     exam,
-    recipients,
   } = response;
   useEffect(() => {
     const timer = setInterval(refresh, 5000);
@@ -688,40 +687,6 @@ const Loaded: React.FC<{
   const { alert } = useContext(AlertContext);
   const messageRef = useRef<HTMLTextAreaElement>();
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
-  const recipientOptions = useMemo<RecipientOptions>(() => ([
-    {
-      label: 'Entire exam',
-      options: [{
-        label: 'Entire exam',
-        value: {
-          type: MessageType.Exam,
-          id: -1,
-          name: 'Entire exam',
-        },
-      }],
-    },
-    {
-      label: 'Rooms',
-      options: recipients.rooms.map((r) => ({
-        label: r.name,
-        value: { ...r, type: MessageType.Room },
-      })),
-    },
-    {
-      label: 'Versions',
-      options: recipients.versions.map((r) => ({
-        label: r.name,
-        value: { ...r, type: MessageType.Version },
-      })),
-    },
-    {
-      label: 'Students',
-      options: recipients.students.map((r) => ({
-        label: r.name,
-        value: { ...r, type: MessageType.Direct },
-      })),
-    },
-  ]), [recipients]);
   const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(
     recipientOptions[0].options[0],
   );
@@ -846,9 +811,11 @@ const Loaded: React.FC<{
 };
 
 const ExamMessages: React.FC<{
+  recipientOptions: RecipientOptions;
   examId: number;
 }> = (props) => {
   const {
+    recipientOptions,
     examId,
   } = props;
   const [refresher, refresh] = useRefresher();
@@ -864,7 +831,13 @@ const ExamMessages: React.FC<{
         </div>
       );
     case 'RESULT':
-      return <Loaded refresh={refresh} response={res.response} />;
+      return (
+        <Loaded
+          recipientOptions={recipientOptions}
+          refresh={refresh}
+          response={res.response}
+        />
+    );
     default:
       throw new ExhaustiveSwitchError(res);
   }
@@ -997,6 +970,90 @@ const SendMessage: React.FC<{
   );
 };
 
+const SplitViewLoaded: React.FC<{
+  examId: number;
+  recipients: SplitRecipients;
+}> = (props) => {
+  const {
+    examId,
+    recipients,
+  } = props;
+  const recipientOptions = useMemo<RecipientOptions>(() => ([
+    {
+      label: 'Entire exam',
+      options: [{
+        label: 'Entire exam',
+        value: {
+          type: MessageType.Exam,
+          id: -1,
+          name: 'Entire exam',
+        },
+      }],
+    },
+    {
+      label: 'Rooms',
+      options: recipients.rooms.map((r) => ({
+        label: r.name,
+        value: { ...r, type: MessageType.Room },
+      })),
+    },
+    {
+      label: 'Versions',
+      options: recipients.versions.map((r) => ({
+        label: r.name,
+        value: { ...r, type: MessageType.Version },
+      })),
+    },
+    {
+      label: 'Students',
+      options: recipients.students.map((r) => ({
+        label: r.name,
+        value: { ...r, type: MessageType.Direct },
+      })),
+    },
+  ]), [recipients]);
+  return (
+    <Row className="h-100">
+      <Col sm={6}>
+        <ExamAnomalies
+          recipientOptions={recipientOptions}
+          examId={examId}
+        />
+      </Col>
+      <Col sm={6}>
+        <ExamMessages
+          recipientOptions={recipientOptions}
+          examId={examId}
+        />
+      </Col>
+    </Row>
+  );
+}
+
+const ProctoringSplitView: React.FC<{
+  examId: number;
+}> = (props) => {
+  const {
+    examId,
+  } = props;
+  const res = useMessageRecipients(examId);
+  switch (res.type) {
+    case 'ERROR':
+      return (
+        <div className="text-danger">
+          <p>Error</p>
+          <small>{res.text}</small>
+        </div>
+      );
+    case 'LOADING':
+      return <p>Loading...</p>;
+    case 'RESULT':
+      return <SplitViewLoaded examId={examId} recipients={res.response.recipients} />
+    default:
+      throw new ExhaustiveSwitchError(res);
+  }
+};
+
 const ExamProctoring: React.FC = () => {
   const {
     examId,
@@ -1016,14 +1073,7 @@ const ExamProctoring: React.FC = () => {
           </Row>
           <div className="content-wrapper">
             <div className="content h-100">
-              <Row className="h-100">
-                <Col sm={6}>
-                  <ExamAnomalies examId={examId} />
-                </Col>
-                <Col sm={6}>
-                  <ExamMessages examId={examId} />
-                </Col>
-              </Row>
+              <ProctoringSplitView examId={examId} />
             </div>
           </div>
         </div>

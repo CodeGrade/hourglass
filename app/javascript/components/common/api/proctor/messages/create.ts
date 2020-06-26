@@ -1,4 +1,4 @@
-import { Recipient } from '@hourglass/common/api/proctor/messages';
+import { Recipient } from '@hourglass/common/api/proctor/messages/recipients';
 import { hitApi } from '@hourglass/common/types/api';
 
 export type Response = Good | Bad;

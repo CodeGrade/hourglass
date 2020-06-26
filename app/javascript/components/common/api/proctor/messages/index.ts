@@ -96,23 +96,12 @@ interface ExamAnnouncementServer extends ExamAnnouncementShared {
   time: string;
 }
 
-export interface Recipient {
-  type: MessageType.Direct | MessageType.Room | MessageType.Version | MessageType.Exam;
-  id: number;
-  name: string;
-}
-
 interface Server {
   sent: DirectMessageServer[];
   questions: QuestionServer[];
   version: VersionAnnouncementServer[];
   room: RoomAnnouncementServer[];
   exam: ExamAnnouncementServer[];
-  recipients: {
-    rooms: Recipient[];
-    students: Recipient[];
-    versions: Recipient[];
-  }
 }
 
 export interface Response {
@@ -121,11 +110,6 @@ export interface Response {
   version: VersionAnnouncement[];
   room: RoomAnnouncement[];
   exam: ExamAnnouncement[];
-  recipients: {
-    rooms: Recipient[];
-    students: Recipient[];
-    versions: Recipient[];
-  }
 }
 
 export type Message =
@@ -153,7 +137,6 @@ function convertTimes<
 
 export function useResponse(examId: number, deps?: React.DependencyList): ApiResponse<Response> {
   return useApiResponse<Server, Response>(`/api/proctor/exams/${examId}/messages`, undefined, (res) => ({
-    ...res,
     questions: convertTimes<MessageType.Question, QuestionShared, QuestionServer>(
       MessageType.Question, res.questions,
     ),

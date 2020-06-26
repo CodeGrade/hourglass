@@ -76,7 +76,7 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
     body,
   } = props;
   return (
-    <Media as="li">
+    <Media>
       <span className="mr-2">
         <Icon I={icon} className={iconClass} />
       </span>

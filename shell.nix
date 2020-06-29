@@ -53,6 +53,7 @@ in mkShell {
     yarn
     start_postgres
     stop_postgres
+    nodePackages.typescript-language-server
     # racket
     chromedriver
     chromium

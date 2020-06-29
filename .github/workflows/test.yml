@@ -8,17 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: actions/cache@v2
-      with:
-        path: .nix-gems/
-        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-gems-
     - uses: cachix/install-nix-action@v10
-    - name: Setup nix channel
-      run: |
-        nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
-        nix-channel --update
     - name: Get nix deps
       run: nix-shell --run 'echo'
     - name: Install ruby gems

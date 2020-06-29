@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import {
+  Form,
   InputGroup,
   ListGroup,
   Dropdown,
+  Button,
 } from 'react-bootstrap';
 import { BsCalendar } from 'react-icons/bs';
 import DatePicker from 'react-datepicker';
@@ -10,12 +12,15 @@ import TimePicker from 'react-timekeeper';
 import { DateTime } from 'luxon';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DateTimePicker.scss';
+import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
+import { FaTimes } from 'react-icons/fa';
 
 interface DateTimeProps {
   value?: DateTime;
   minValue?: DateTime;
   maxValue?: DateTime;
-  onChange?: (newVal: DateTime) => void;
+  onChange: (newVal: DateTime) => void;
+  nullable?: boolean;
 }
 
 function mergeDateTime(date: DateTime, time: DateTime): DateTime {
@@ -41,17 +46,31 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
     minValue,
     maxValue,
     onChange,
+    nullable = false,
   } = props;
-  const [timeZone, setTimeZone] = useState(value.zoneName in timeZones ? value.zoneName : 'UTC');
+  const [timeZone, setTimeZone] = useState(value?.zoneName in timeZones ? value.zoneName : 'UTC');
   return (
     <InputGroup className="w-100 d-flex">
-      <InputGroup.Text className="d-flex flex-grow-1">
-        {value.toLocaleString({
+      <Form.Control
+        disabled
+        value={value?.toLocaleString({
           ...DateTime.DATETIME_HUGE,
           timeZone,
           timeZoneName: 'short',
-        })}
-      </InputGroup.Text>
+        }) ?? 'Not set.'}
+      />
+      {value && nullable && (
+        <InputGroup.Append>
+          <Button
+            size="sm"
+            variant="link"
+            className="text-dark border"
+            onClick={() => onChange(undefined)}
+          >
+            <Icon I={FaTimes} />
+          </Button>
+        </InputGroup.Append>
+      )}
       <Dropdown
         as={InputGroup.Append}
       >
@@ -64,26 +83,26 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
         >
           <DatePicker
             inline
-            selected={value.toJSDate()}
+            selected={value?.toJSDate()}
             calendarClassName="NestedDatePicker"
             minDate={minValue?.toJSDate()}
             maxDate={maxValue?.toJSDate()}
             onChange={(date, _event): void => {
               if (onChange) {
-                onChange(mergeDateTime(DateTime.fromJSDate(date), value));
+                onChange(mergeDateTime(DateTime.fromJSDate(date), value ?? DateTime.local()));
               }
             }}
           />
           <TimePicker
-            time={value.toFormat('hh:mm a')}
+            time={value?.toFormat('hh:mm a')}
             onChange={(time): void => {
               if (onChange) {
                 onChange(mergeDateTime(
-                  value,
+                  value ?? DateTime.local(),
                   DateTime.fromObject({
                     hour: time.hour,
                     minute: time.minute,
-                    zone: value.zone,
+                    zone: (value ?? DateTime.local()).zone,
                   }),
                 ));
               }
@@ -101,7 +120,9 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
                     onClick={(): void => {
                       setTimeZone(tzName);
                       if (onChange) {
-                        onChange(value.setZone(tzName, { keepLocalTime: true }));
+                        onChange(
+                          (value ?? DateTime.local()).setZone(tzName, { keepLocalTime: true }),
+                        );
                       }
                     }}
                   >

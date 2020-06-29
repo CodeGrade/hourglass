@@ -12,6 +12,7 @@ class Accommodation < ApplicationRecord
   }
 
   delegate :user, to: :registration
+  delegate :exam, to: :registration
 
   def factor
     (percent_time_expansion.to_f / 100.0) + 1.0

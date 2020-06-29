@@ -87,5 +87,6 @@ def make_cs3500
   create(:student_registration, user: cs3500student, section: cs3500lec)
   create(:student_registration, user: cs3500student, section: cs3500lab)
   cs3500student_reg = create(:registration, user: cs3500student, room: cs3500_room1, exam_version: cs3500_v1)
+  create(:accommodation, registration: cs3500student_reg)
   create(:snapshot, registration: cs3500student_reg)
 end

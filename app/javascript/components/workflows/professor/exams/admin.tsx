@@ -39,6 +39,7 @@ import {
   FaChevronDown,
   FaCheck,
   FaTimes,
+  FaUserClock,
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
@@ -60,6 +61,7 @@ import { importVersion } from '@hourglass/common/api/professor/exams/versions/im
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
 import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
 import EditExamRooms from '@professor/exams/rooms';
+import ManageAccommodations from '@professor/exams/accommodations';
 import AssignSeating from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
@@ -343,6 +345,17 @@ const PreFlightChecklist: React.FC<{
               </span>
             </Nav.Link>
           </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              eventKey="accommodations"
+              onClick={() => history.push(`/exams/${examId}/admin/accommodations`)}
+            >
+              <Icon I={FaUserClock} />
+              <span className="ml-2">
+                Accommodations
+              </span>
+            </Nav.Link>
+          </Nav.Item>
         </Nav>
         <Tab.Content className="border border-top-0 rounded-bottom p-3">
           <Tab.Pane eventKey="edit-versions">
@@ -372,6 +385,11 @@ const PreFlightChecklist: React.FC<{
           <Tab.Pane eventKey="seating">
             <ErrorBoundary>
               <AssignSeating />
+            </ErrorBoundary>
+          </Tab.Pane>
+          <Tab.Pane eventKey="accommodations">
+            <ErrorBoundary>
+              <ManageAccommodations />
             </ErrorBoundary>
           </Tab.Pane>
         </Tab.Content>

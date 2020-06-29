@@ -3,3 +3,5 @@ Style/SymbolArray:
   EnforcedStyle: brackets
 Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
+Style/TrailingCommaInArguments:
+  EnforcedStyleForMultiline: comma

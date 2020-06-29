@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
 
   create_table "accommodations", force: :cascade do |t|
     t.bigint "registration_id", null: false
-    t.datetime "new_start_time", null: false
+    t.datetime "new_start_time"
     t.integer "percent_time_expansion", default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

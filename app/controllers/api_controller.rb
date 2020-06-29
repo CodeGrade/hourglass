@@ -35,6 +35,14 @@ class ApiController < ApplicationController
     head :forbidden
   end
 
+  def find_accommodation
+    @accommodation ||= Accommodation.find_by(id: params[:accommodation_id])
+    @exam = @accommodation.exam
+    return unless @accommodation.nil?
+
+    head :forbidden
+  end
+
   def find_registration_and_exam_and_course
     @registration ||= Registration.find_by(id: params[:registration_id])
     @exam ||= @registration.exam

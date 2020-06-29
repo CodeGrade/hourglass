@@ -12,6 +12,7 @@ class Exam < ApplicationRecord
   has_many :exam_announcements, dependent: :destroy
 
   has_many :registrations, through: :exam_versions
+  has_many :accommodations, through: :registrations
   has_many :version_announcements, through: :exam_versions
   has_many :room_announcements, through: :rooms
   has_many :anomalies, through: :registrations

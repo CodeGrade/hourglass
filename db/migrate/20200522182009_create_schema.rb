@@ -113,7 +113,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
 
     create_table :accommodations do |t|
       t.references :registration, null: false, foreign_key: true
-      t.datetime :new_start_time, null: false
+      t.datetime :new_start_time
       t.integer :percent_time_expansion, null: false, default: 0
 
       t.timestamps

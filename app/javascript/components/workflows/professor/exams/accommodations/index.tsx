@@ -18,6 +18,8 @@ import ReadableDate from '@hourglass/common/ReadableDate';
 import { BsPencilSquare } from 'react-icons/bs';
 import { updateAccommodation } from '@hourglass/common/api/professor/accommodations/update';
 import { AlertContext } from '@hourglass/common/alerts';
+import { FaTrash } from 'react-icons/fa';
+import destroyAccommodation from '@hourglass/common/api/professor/accommodations/destroy';
 
 const SingleAccommodation: React.FC<{
   refresh: () => void;
@@ -33,6 +35,23 @@ const SingleAccommodation: React.FC<{
   const [startTime, setStartTime] = useState(accommodation.startTime);
   const [extraTime, setExtraTime] = useState(accommodation.extraTime);
   const { alert } = useContext(AlertContext);
+  const destroy = () => {
+    destroyAccommodation(accommodation.id).then((res) => {
+      refresh();
+      alert({
+        variant: 'success',
+        title: 'Successfully deleted accommodation',
+        autohide: true,
+        message: `Accommodation for '${accommodation.reg.user.displayName}' deleted.`,
+      });
+    }).catch((err) => {
+      alert({
+        variant: 'danger',
+        title: 'Error deleting accommodation',
+        message: err.message,
+      });
+    });
+  };
   const submit = () => {
     updateAccommodation(accommodation.id, {
       startTime,
@@ -112,7 +131,17 @@ const SingleAccommodation: React.FC<{
       <td>{accommodation.extraTime}</td>
       <td align="right">
         <Button
+          variant="danger"
+          onClick={destroy}
+        >
+          <Icon I={FaTrash} />
+          <span className="ml-2">
+            Delete
+          </span>
+        </Button>
+        <Button
           variant="primary"
+          className="ml-2"
           onClick={edit}
         >
           <Icon I={BsPencilSquare} />

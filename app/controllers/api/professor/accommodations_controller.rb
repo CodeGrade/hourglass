@@ -4,7 +4,7 @@ module Api
   module Professor
     # Accommodation controls for exams.
     class AccommodationsController < ProfessorController
-      before_action :find_accommodation, only: [:update]
+      before_action :find_accommodation, only: [:update, :destroy]
       before_action :find_exam_and_course
       before_action :require_prof_reg
 
@@ -34,6 +34,18 @@ module Api
           new_start_time: accommodation_params[:startTime],
           percent_time_expansion: accommodation_params[:extraTime],
         )
+        render json: {
+          success: true,
+        }
+      rescue StandardError => e
+        render json: {
+          success: false,
+          reason: e.message,
+        }
+      end
+
+      def destroy
+        @accommodation.destroy!
         render json: {
           success: true,
         }

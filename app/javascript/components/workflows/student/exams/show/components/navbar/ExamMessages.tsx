@@ -122,11 +122,9 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
     onMessagesOpened,
     onSectionClick,
   } = props;
-  const unread: boolean = Object.values(messages).reduce((acc, msgs) => {
-    return acc || msgs.reduce((innerAcc, msg) => {
-      return innerAcc || msg.time > lastViewed;
-    }, false);
-  }, false);
+  const unread: boolean = Object.values(messages).reduce((acc, msgs: ExamMessage[]) => (
+    acc || msgs.reduce((innerAcc, msg) => (innerAcc || msg.time > lastViewed), false)
+  ), false);
   const classes = unread ? 'bg-warning text-dark' : undefined;
   return (
     <NavAccordionItem

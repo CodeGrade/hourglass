@@ -21,11 +21,9 @@ import {
   Tab,
   Nav,
   Form,
-  Card,
   Media,
   Alert,
   Modal,
-  ButtonProps,
 } from 'react-bootstrap';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import {
@@ -33,7 +31,6 @@ import {
   FaThumbsDown,
   FaInbox,
   FaList,
-  FaCheck,
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
@@ -564,32 +561,6 @@ const ShowDirectMessage: React.FC<{
       body={body}
       time={time}
     />
-  );
-};
-
-const Readable: React.FC = (props) => {
-  const { children } = props;
-  const [read, setRead] = useState(false);
-  return (
-    <Card
-      border="warning"
-      className={read && 'border-0'}
-    >
-      <div>
-        {children}
-        <span
-          className={`${read ? 'd-none' : ''} float-right align-self-center`}
-        >
-          <Button
-            variant="warning"
-            onClick={() => setRead(true)}
-          >
-            <Icon I={FaCheck} />
-            Mark as read
-          </Button>
-        </span>
-      </div>
-    </Card>
   );
 };
 

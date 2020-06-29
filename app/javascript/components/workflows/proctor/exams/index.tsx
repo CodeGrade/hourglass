@@ -704,7 +704,7 @@ const ShowMessages: React.FC<{
                 <SingleMessage replyTo={replyTo} message={m} />
               </div>
             ))}
-            <PreviousMessages />
+            {earlier.length > 0 && <PreviousMessages />}
           </div>
           {earlier.map((m) => (
             <SingleMessage key={`${m.type}-${m.id}`} replyTo={replyTo} message={m} />

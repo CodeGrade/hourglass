@@ -98,7 +98,7 @@ export const ShowExamMessages: React.FC<{
             />
           </div>
         ))}
-        <PreviousMessages />
+        {earlier.length > 0 && <PreviousMessages />}
       </div>
       {earlier.map((msg) => (
         <ShowMessage

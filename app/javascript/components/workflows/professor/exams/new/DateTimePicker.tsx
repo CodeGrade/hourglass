@@ -49,7 +49,7 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
     onChange,
     nullable = false,
   } = props;
-  const [timeZone, setTimeZone] = useState(value?.zoneName in timeZones ? value.zoneName : 'UTC');
+  const timeZone = value?.zoneName ?? 'UTC';
   return (
     <InputGroup className="w-100 d-flex">
       <Form.Control
@@ -119,7 +119,6 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
                     active={timeZone === tzName}
                     action
                     onClick={(): void => {
-                      setTimeZone(tzName);
                       if (onChange) {
                         onChange(
                           (value ?? DateTime.local()).setZone(tzName, { keepLocalTime: true }),

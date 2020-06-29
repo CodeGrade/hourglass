@@ -25,6 +25,58 @@ import Select from 'react-select';
 import { useRegistrationsIndex } from '@hourglass/common/api/professor/registrations';
 import Loading from '@hourglass/common/loading';
 import { createAccommodation } from '@hourglass/common/api/professor/accommodations/create';
+import { DateTime } from 'luxon';
+
+const AccommodationEditor: React.FC<{
+  submit: (startTime: DateTime, extraTime: number) => void;
+  cancel: () => void;
+  accommodation: Accommodation;
+}> = (props) => {
+  const {
+    submit,
+    cancel,
+    accommodation,
+  } = props;
+  const [startTime, setStartTime] = useState(accommodation.startTime);
+  const [extraTime, setExtraTime] = useState(accommodation.extraTime);
+  return (
+    <tr>
+      <td className="align-middle">
+        {accommodation.reg.user.displayName}
+      </td>
+      <td>
+        <DateTimePicker
+          onChange={setStartTime}
+          value={startTime}
+          nullable
+        />
+      </td>
+      <td>
+        <Form.Control
+          type="number"
+          min={0}
+          value={extraTime}
+          onChange={(e) => setExtraTime(Number(e.target.value))}
+        />
+      </td>
+      <td align="right" className="text-nowrap">
+        <Button
+          variant="secondary"
+          onClick={cancel}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          className="ml-2"
+          onClick={() => submit(startTime, extraTime)}
+        >
+          Save
+        </Button>
+      </td>
+    </tr>
+  );
+};
 
 const SingleAccommodation: React.FC<{
   refresh: () => void;
@@ -37,8 +89,6 @@ const SingleAccommodation: React.FC<{
   const [editing, setEditing] = useState(false);
   const edit = useCallback(() => setEditing(true), []);
   const stopEdit = useCallback(() => setEditing(false), []);
-  const [startTime, setStartTime] = useState(accommodation.startTime);
-  const [extraTime, setExtraTime] = useState(accommodation.extraTime);
   const { alert } = useContext(AlertContext);
   const destroy = () => {
     destroyAccommodation(accommodation.id).then((_res) => {
@@ -57,7 +107,7 @@ const SingleAccommodation: React.FC<{
       });
     });
   };
-  const submit = () => {
+  const submit = (startTime: DateTime, extraTime: number) => {
     updateAccommodation(accommodation.id, {
       startTime,
       extraTime,
@@ -83,42 +133,11 @@ const SingleAccommodation: React.FC<{
   };
   if (editing) {
     return (
-      <tr>
-        <td className="align-middle">
-          {accommodation.reg.user.displayName}
-        </td>
-        <td>
-          <DateTimePicker
-            onChange={setStartTime}
-            value={startTime}
-            nullable
-          />
-        </td>
-        <td>
-          <Form.Control
-            type="number"
-            min={0}
-            value={extraTime}
-            onChange={(e) => setExtraTime(Number(e.target.value))}
-          />
-        </td>
-        <td align="right" className="text-nowrap">
-          <Button
-            variant="secondary"
-            onClick={stopEdit}
-            className={editing ? '' : 'd-none'}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            className={editing ? 'ml-2' : 'd-none'}
-            onClick={submit}
-          >
-            Save
-          </Button>
-        </td>
-      </tr>
+      <AccommodationEditor
+        accommodation={accommodation}
+        cancel={stopEdit}
+        submit={submit}
+      />
     );
   }
   return (
@@ -135,28 +154,25 @@ const SingleAccommodation: React.FC<{
       </td>
       <td className="align-middle">{accommodation.extraTime}</td>
       <td align="right" className="text-nowrap">
-        <div>
-          {/* This div makes sure the buttons don't maintain focus after switching utility */}
-          <Button
-            variant="danger"
-            onClick={destroy}
-          >
-            <Icon I={FaTrash} />
-            <span className="ml-2">
-              Delete
-            </span>
-          </Button>
-          <Button
-            variant="primary"
-            className="ml-2"
-            onClick={edit}
-          >
-            <Icon I={BsPencilSquare} />
-            <span className="ml-2">
-              Edit
-            </span>
-          </Button>
-        </div>
+        <Button
+          variant="danger"
+          onClick={destroy}
+        >
+          <Icon I={FaTrash} />
+          <span className="ml-2">
+            Delete
+          </span>
+        </Button>
+        <Button
+          variant="primary"
+          className="ml-2"
+          onClick={edit}
+        >
+          <Icon I={BsPencilSquare} />
+          <span className="ml-2">
+            Edit
+          </span>
+        </Button>
       </td>
     </tr>
   );

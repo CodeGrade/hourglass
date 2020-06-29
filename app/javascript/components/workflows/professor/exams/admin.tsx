@@ -530,7 +530,7 @@ export const ExamInfoEditor: React.FC<{
             <DateTimePicker
               value={start}
               maxValue={end}
-              onChange={(newStart): void => setStart(newStart)}
+              onChange={setStart}
             />
           </Col>
         </Form.Group>
@@ -540,7 +540,7 @@ export const ExamInfoEditor: React.FC<{
             <DateTimePicker
               value={end}
               minValue={start}
-              onChange={(newEnd): void => setEnd(newEnd)}
+              onChange={setEnd}
             />
           </Col>
         </Form.Group>

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # From https://insights.kyan.com/devise-authentication-strategies-a1a6b4e2b891
 module Devise
   module Strategies

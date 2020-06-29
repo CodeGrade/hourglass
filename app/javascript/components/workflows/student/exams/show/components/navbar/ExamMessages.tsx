@@ -8,8 +8,7 @@ import { GiBugleCall } from 'react-icons/gi';
 import Tooltip from '@student/exams/show/components/Tooltip';
 import Icon from '@student/exams/show/components/Icon';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
-import { NewMessages, PreviousMessages } from '@hourglass/workflows/proctor/exams';
-import '@hourglass/workflows/proctor/exams/newabove.scss';
+import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
 
 interface ExamMessagesProps {
   lastViewed: DateTime;

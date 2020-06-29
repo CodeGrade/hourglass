@@ -102,7 +102,7 @@ const SingleAccommodation: React.FC<{
             onChange={(e) => setExtraTime(Number(e.target.value))}
           />
         </td>
-        <td align="right">
+        <td align="right" className="text-nowrap">
           <Button
             variant="secondary"
             onClick={stopEdit}
@@ -134,7 +134,7 @@ const SingleAccommodation: React.FC<{
         )}
       </td>
       <td className="align-middle">{accommodation.extraTime}</td>
-      <td align="right">
+      <td align="right" className="text-nowrap">
         <div>
           {/* This div makes sure the buttons don't maintain focus after switching utility */}
           <Button
@@ -258,10 +258,10 @@ const Loaded: React.FC<{
         <Table>
           <thead>
             <tr>
-              <th className="w-25">Student</th>
-              <th className="w-25">Start Time</th>
-              <th className="w-25">% Extra Time</th>
-              <th className="text-right w-25">Actions</th>
+              <Col as="th" sm="auto">Student</Col>
+              <Col as="th">Start Time</Col>
+              <Col as="th" sm="auto" className="text-nowrap">% Extra Time</Col>
+              <Col as="th" sm="auto">Actions</Col>
             </tr>
           </thead>
           <tbody>

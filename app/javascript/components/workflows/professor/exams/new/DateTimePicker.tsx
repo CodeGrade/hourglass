@@ -54,7 +54,7 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
       <Form.Control
         disabled
         value={value?.toLocaleString({
-          ...DateTime.DATETIME_HUGE,
+          ...DateTime.DATETIME_SHORT,
           timeZone,
           timeZoneName: 'short',
         }) ?? 'Not set.'}

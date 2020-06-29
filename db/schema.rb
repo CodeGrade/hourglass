@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.integer "percent_time_expansion", default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["registration_id"], name: "index_accommodations_on_registration_id"
+    t.index ["registration_id"], name: "index_accommodations_on_registration_id", unique: true
   end
 
   create_table "anomalies", force: :cascade do |t|

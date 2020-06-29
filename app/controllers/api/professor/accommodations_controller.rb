@@ -44,6 +44,23 @@ module Api
         }
       end
 
+      def create
+        reg_id = params.require(:registrationId)
+        @registration = @exam.registrations.find_by!(id: reg_id)
+        @accommodation = Accommodation.new(
+          registration: @registration,
+        )
+        @accommodation.save!
+        render json: {
+          success: true,
+        }
+      rescue StandardError => e
+        render json: {
+          success: false,
+          reason: e.message,
+        }
+      end
+
       def destroy
         @accommodation.destroy!
         render json: {

@@ -2,6 +2,7 @@ import React, { useCallback, useState, useContext } from 'react';
 import {
   Row,
   Col,
+  InputGroup,
   Button,
   Form,
   Table,
@@ -20,6 +21,10 @@ import { updateAccommodation } from '@hourglass/common/api/professor/accommodati
 import { AlertContext } from '@hourglass/common/alerts';
 import { FaTrash } from 'react-icons/fa';
 import destroyAccommodation from '@hourglass/common/api/professor/accommodations/destroy';
+import Select from 'react-select';
+import { useRegistrationsIndex } from '@hourglass/common/api/professor/registrations';
+import Loading from '@hourglass/common/loading';
+import { createAccommodation } from '@hourglass/common/api/professor/accommodations/create';
 
 const SingleAccommodation: React.FC<{
   refresh: () => void;
@@ -36,7 +41,7 @@ const SingleAccommodation: React.FC<{
   const [extraTime, setExtraTime] = useState(accommodation.extraTime);
   const { alert } = useContext(AlertContext);
   const destroy = () => {
-    destroyAccommodation(accommodation.id).then((res) => {
+    destroyAccommodation(accommodation.id).then((_res) => {
       refresh();
       alert({
         variant: 'success',
@@ -154,6 +159,82 @@ const SingleAccommodation: React.FC<{
   );
 };
 
+interface Selection {
+  label: string;
+  value: number;
+}
+
+const NewAccommodation: React.FC<{
+  refresh: () => void;
+}> = (props) => {
+  const {
+    refresh,
+  } = props;
+  const { examId } = useParams();
+  const res = useRegistrationsIndex(examId);
+  const [selected, setSelected] = useState<Selection>(undefined);
+  const { alert } = useContext(AlertContext);
+  const options = res.type === 'RESULT' ? res.response.registrations.map((r) => ({
+    label: r.displayName,
+    value: r.id,
+  })) : [];
+  const submit = () => {
+    if (!selected) return;
+    createAccommodation(examId, selected.value).then((result) => {
+      if (result.success !== true) {
+        throw new Error(res.reason);
+      }
+      refresh();
+      alert({
+        variant: 'success',
+        title: 'Successfully created accommodation',
+        autohide: true,
+        message: `Accommodation for '${selected.label}' created.`,
+      });
+    }).catch((err) => {
+      refresh();
+      alert({
+        variant: 'danger',
+        title: 'Error creating accommodation',
+        message: err.message,
+      });
+    });
+  };
+  if (res.type === 'ERROR') {
+    return (
+      <span className="text-danger">
+        <p>
+          Something went wrong.
+        </p>
+        <small>
+          {res.text}
+        </small>
+      </span>
+    );
+  }
+  return (
+    <Loading loading={res.type === 'LOADING'}>
+      <InputGroup>
+        <Select
+          value={selected}
+          onChange={setSelected}
+          className="flex-grow-1"
+          options={options}
+        />
+        <InputGroup.Append>
+          <Button
+            onClick={submit}
+            variant="success"
+            disabled={!selected}
+          >
+            Create accommodation
+          </Button>
+        </InputGroup.Append>
+      </InputGroup>
+    </Loading>
+  );
+};
+
 const Loaded: React.FC<{
   refresh: () => void;
   accommodations: Accommodation[];
@@ -163,8 +244,8 @@ const Loaded: React.FC<{
     accommodations,
   } = props;
   return (
-    <Row>
-      <Col>
+    <>
+      <Form.Group>
         <h2>Accommodations</h2>
         <Table>
           <thead>
@@ -181,8 +262,13 @@ const Loaded: React.FC<{
             ))}
           </tbody>
         </Table>
-      </Col>
-    </Row>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Col>
+          <NewAccommodation refresh={refresh} />
+        </Col>
+      </Form.Group>
+    </>
   );
 };
 

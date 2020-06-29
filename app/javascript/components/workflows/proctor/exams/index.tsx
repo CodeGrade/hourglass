@@ -25,6 +25,7 @@ import {
   Media,
   Alert,
   Modal,
+  ButtonProps,
 } from 'react-bootstrap';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import {
@@ -65,6 +66,8 @@ import { sendMessage } from '@hourglass/common/api/proctor/messages/create';
 import './index.scss';
 import { BsListCheck } from 'react-icons/bs';
 import { doFinalize } from '@hourglass/common/api/proctor/exams/finalize';
+import './newabove.scss';
+import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
 
 export interface MessageProps {
   icon: IconType;
@@ -520,26 +523,24 @@ const ShowQuestion: React.FC<{
   } = question;
   const reply = useCallback(() => replyTo(sender.id), [sender.id]);
   return (
-    <Readable>
-      <div className="d-flex">
-        <ShowMessage
-          icon={MdMessage}
-          tooltip={`Received from ${sender.displayName}`}
-          body={body}
-          time={time}
-        />
-        <div className="flex-grow-1" />
-        <span className="align-self-center mr-2">
-          <Button
-            variant="info"
-            onClick={reply}
-          >
-            <Icon I={MdSend} />
-            Reply
-          </Button>
-        </span>
-      </div>
-    </Readable>
+    <div className="d-flex">
+      <ShowMessage
+        icon={MdMessage}
+        tooltip={`Received from ${sender.displayName}`}
+        body={body}
+        time={time}
+      />
+      <div className="flex-grow-1" />
+      <span className="align-self-center mr-2">
+        <Button
+          variant="info"
+          onClick={reply}
+        >
+          <Icon I={MdSend} />
+          Reply
+        </Button>
+      </span>
+    </div>
   );
 };
 
@@ -616,6 +617,47 @@ const SingleMessage: React.FC<{
   }
 };
 
+const NewMessages: React.FC<{
+  onClick: () => void;
+}> = ({ onClick }) => (
+  <Tooltip
+    message="Click to dismiss"
+  >
+    <Button
+      block
+      variant="outline-light text-dark"
+      as="div"
+      onClick={onClick}
+    >
+      <Row className="m-0 fancy-hr">
+        <Col>
+          <hr className="fancy-left-warning" />
+        </Col>
+        <Col sm="auto" className="p-0 d-flex justify-content-center flex-column">
+          New Messages
+        </Col>
+        <Col>
+          <hr className="fancy-right-warning" />
+        </Col>
+      </Row>
+    </Button>
+  </Tooltip>
+);
+
+const PreviousMessages: React.FC = () => (
+  <Row className="m-0 fancy-hr">
+    <Col>
+      <hr className="fancy-left" />
+    </Col>
+    <Col sm="auto" className="p-0 d-flex justify-content-center flex-column">
+      Previous messages
+    </Col>
+    <Col>
+      <hr className="fancy-right" />
+    </Col>
+  </Row>
+);
+
 type FilterVals = { value: string; label: string; };
 
 const ShowMessages: React.FC<{
@@ -638,6 +680,8 @@ const ShowMessages: React.FC<{
     room,
     exam,
   } = props;
+  const [lastViewed, setLastViewed] = useState<DateTime>(DateTime.local());
+  const resetLastViewed = useCallback(() => setLastViewed(DateTime.local()), []);
   const [filter, setFilter] = useState<FilterVals>(undefined);
   let all: Array<Message> = [];
   if (!receivedOnly) {
@@ -700,6 +744,10 @@ const ShowMessages: React.FC<{
     });
   }
   all.sort((a, b) => b.time.diff(a.time).milliseconds);
+  const idx = all.findIndex((msg) => msg.time < lastViewed);
+  const earlier = idx === -1 ? all : all.slice(idx);
+  const later = idx === -1 ? [] : all.slice(0, idx);
+  const dividerClass = later.length === 0 ? 'd-none' : '';
 
   return (
     <>
@@ -720,7 +768,16 @@ const ShowMessages: React.FC<{
       </Form.Group>
       <div className="content-wrapper h-100">
         <div className="content overflow-auto-y">
-          {all.map((m) => (
+          <div className={dividerClass}>
+            <NewMessages onClick={resetLastViewed} />
+            {later.map((m) => (
+              <div className="new-message" key={`${m.type}-${m.id}`}>
+                <SingleMessage replyTo={replyTo} message={m} />
+              </div>
+            ))}
+            <PreviousMessages />
+          </div>
+          {earlier.map((m) => (
             <SingleMessage key={`${m.type}-${m.id}`} replyTo={replyTo} message={m} />
           ))}
         </div>

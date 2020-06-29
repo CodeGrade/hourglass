@@ -69,11 +69,11 @@ class MarksProcessor
       .each_with_index.map do |mark, idx|
         a = {
           key: "~ro:#{idx + 1}:s~",
-          location: mark['from']
+          location: mark['from'],
         }
         b = {
           key: "~ro:#{idx + 1}:e~",
-          location: mark['to']
+          location: mark['to'],
         }
         [a, b]
       end

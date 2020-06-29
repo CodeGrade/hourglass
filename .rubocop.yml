@@ -1,3 +1,5 @@
 require: rubocop-rails
 Style/SymbolArray:
   EnforcedStyle: brackets
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma

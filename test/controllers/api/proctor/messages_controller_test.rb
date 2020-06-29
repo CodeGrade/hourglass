@@ -21,9 +21,9 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
       'message': {
         'body' => 'Test message',
         'recipient' => {
-          'type' => 'EXAM'
-        }
-      }
+          'type' => 'EXAM',
+        },
+      },
     }
     assert_response :success
     expected = { 'success' => true }
@@ -39,9 +39,9 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
         'body' => 'Test message',
         'recipient' => {
           'type' => 'VERSION',
-          'id' => @version.id
-        }
-      }
+          'id' => @version.id,
+        },
+      },
     }
     assert_response :success
     expected = { 'success' => true }
@@ -57,9 +57,9 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
         'body' => 'Test message',
         'recipient' => {
           'type' => 'ROOM',
-          'id' => @room.id
-        }
-      }
+          'id' => @room.id,
+        },
+      },
     }
     assert_response :success
     expected = { 'success' => true }
@@ -75,9 +75,9 @@ class MessagesControllerTest < ActionDispatch::IntegrationTest
         'body' => 'Test message',
         'recipient' => {
           'type' => 'DIRECT',
-          'id' => @student.id
-        }
-      }
+          'id' => @student.id,
+        },
+      },
     }
     assert_response :success
     expected = { 'success' => true }

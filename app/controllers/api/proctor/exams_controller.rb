@@ -33,12 +33,12 @@ module Api
           raise "Invalid recipient type: #{target[:type]}"
         end
         render json: {
-          success: true
+          success: true,
         }
       rescue StandardError => e
         render json: {
           success: false,
-          reason: e.message
+          reason: e.message,
         }
       end
     end

@@ -12,7 +12,7 @@ class ExamAnnouncement < ApplicationRecord
       id: id,
       body: body,
       time: created_at,
-      type: 'exam'
+      type: 'exam',
     }
   end
 end

@@ -12,15 +12,15 @@ module Api
           courses: @registrations.map(&:course).map do |course|
             {
               id: course.id,
-              title: course.title
+              title: course.title,
             }
-          end
+          end,
         }
       end
 
       def show
         render json: {
-          course: @course.slice(:id, :title)
+          course: @course.slice(:id, :title),
         }
       end
 
@@ -30,12 +30,12 @@ module Api
       rescue Bottlenose::UnauthorizedError => e
         render json: {
           synced: false,
-          reason: e.message
+          reason: e.message,
         }
       rescue StandardError => e
         render json: {
           synced: false,
-          reason: e.message
+          reason: e.message,
         }
       end
     end

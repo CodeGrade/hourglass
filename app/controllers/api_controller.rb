@@ -9,8 +9,8 @@ class ApiController < ApplicationController
   def me
     render json: {
       user: {
-        displayName: current_user.display_name
-      }
+        displayName: current_user.display_name,
+      },
     }
   end
 

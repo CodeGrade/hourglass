@@ -50,7 +50,7 @@ class Upload
   def map_reference(ref)
     {
       type: ref.keys.first,
-      path: ref.values.first
+      path: ref.values.first,
     }
   end
 
@@ -85,7 +85,7 @@ class Upload
 
     {
       type: 'HTML',
-      value: str
+      value: str,
     }
   end
 
@@ -116,7 +116,7 @@ class Upload
             elsif b.key? 'CodeTag'
               {
                 selectedFile: b['CodeTag']['correctAnswer']['filename'],
-                lineNumber: b['CodeTag']['correctAnswer']['line']
+                lineNumber: b['CodeTag']['correctAnswer']['line'],
               }
             elsif b.key? 'Matching'
               b['Matching']['correctAnswers']
@@ -163,14 +163,14 @@ class Upload
               if b.is_a? String
                 {
                   type: 'HTML',
-                  value: b
+                  value: b,
                 }
               elsif b.is_a? Hash
                 if b.key? 'AllThatApply'
                   {
                     type: 'AllThatApply',
                     prompt: make_html_val(b['AllThatApply']['prompt']),
-                    options: make_html_vals(b['AllThatApply']['options'].map(&:keys).flatten)
+                    options: make_html_vals(b['AllThatApply']['options'].map(&:keys).flatten),
                   }
                 elsif b.key? 'Code'
                   initial = b['Code']['initial']
@@ -184,7 +184,7 @@ class Upload
                       processed = MarksProcessor.process_marks(ensure_utf8(initial['code'], 'text/plain'))
                       initial = {
                         text: processed[:text],
-                        marks: processed[:marks]
+                        marks: processed[:marks],
                       }
                     end
                   end
@@ -192,7 +192,7 @@ class Upload
                     type: 'Code',
                     prompt: make_html_val(b['Code']['prompt']),
                     lang: b['Code']['lang'],
-                    initial: initial
+                    initial: initial,
                   }.compact
                 elsif b.key? 'CodeTag'
                   referent =
@@ -219,24 +219,24 @@ class Upload
                     promptsLabel: make_html_val(b['Matching']['promptsLabel']),
                     valuesLabel: make_html_val(b['Matching']['valuesLabel']),
                     prompts: make_html_vals(b['Matching']['prompts']),
-                    values: make_html_vals(b['Matching']['values'])
+                    values: make_html_vals(b['Matching']['values']),
                   }.compact
                 elsif b.key? 'MultipleChoice'
                   {
                     type: 'MultipleChoice',
                     prompt: make_html_val(b['MultipleChoice']['prompt']),
-                    options: make_html_vals(b['MultipleChoice']['options'])
+                    options: make_html_vals(b['MultipleChoice']['options']),
                   }
                 elsif b.key? 'Text'
                   if b['Text'].nil?
                     {
                       type: 'Text',
-                      prompt: ''
+                      prompt: '',
                     }
                   else
                     {
                       type: 'Text',
-                      prompt: make_html_val(b['Text']['prompt'])
+                      prompt: make_html_val(b['Text']['prompt']),
                     }
                   end
                 elsif b.key? 'TrueFalse'
@@ -249,7 +249,7 @@ class Upload
                         ''
                       else
                         make_html_val(b['TrueFalse']['prompt'])
-                      end
+                      end,
                   }
                 elsif b.key? 'YesNo'
                   {
@@ -261,7 +261,7 @@ class Upload
                         ''
                       else
                         make_html_val(b['YesNo']['prompt'])
-                      end
+                      end,
                   }
                 else
                   raise 'Bad question type.'
@@ -269,9 +269,9 @@ class Upload
               else
                 raise 'Bad body item.'
               end
-            end
+            end,
           }.compact
-        end
+        end,
       }.compact
     end
     {
@@ -279,9 +279,9 @@ class Upload
       contents: {
         questions: questions,
         reference: e_reference,
-        instructions: make_html_val(contents['instructions'])
+        instructions: make_html_val(contents['instructions']),
       }.compact,
-      answers: answers
+      answers: answers,
     }
   end
 
@@ -290,13 +290,13 @@ class Upload
       {
         path: path.basename.to_s,
         link_to: path.dirname.join(File.readlink(path)),
-        broken: (!File.exist?(File.realpath(path)) rescue true)
+        broken: (!File.exist?(File.realpath(path)) rescue true),
       }
     elsif path.file?
       {
         path: path.basename.to_s,
         full_path: path,
-        relPath: path.relative_path_from(base_path)
+        relPath: path.relative_path_from(base_path),
       }
     elsif path.directory?
       {
@@ -304,7 +304,7 @@ class Upload
         relPath: path.relative_path_from(base_path),
         children: path.children.sort.collect do |child|
           rec_path(base_path, child)
-        end
+        end,
       }
     end
   end

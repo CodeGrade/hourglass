@@ -29,8 +29,8 @@ class ExamsControllerTest < ActionDispatch::IntegrationTest
     post finalize_api_proctor_exam_path(@exam), as: :json, params: {
       'target' => {
         'type' => 'EXAM',
-        'id' => @exam.id
-      }
+        'id' => @exam.id,
+      },
     }
     assert_response :success
     expected = { 'success' => true }
@@ -54,8 +54,8 @@ class ExamsControllerTest < ActionDispatch::IntegrationTest
     post finalize_api_proctor_exam_path(@exam), as: :json, params: {
       'target' => {
         'type' => 'VERSION',
-        'id' => @version.id
-      }
+        'id' => @version.id,
+      },
     }
     assert_response :success
     expected = { 'success' => true }
@@ -75,8 +75,8 @@ class ExamsControllerTest < ActionDispatch::IntegrationTest
     post finalize_api_proctor_exam_path(@exam), as: :json, params: {
       'target' => {
         'type' => 'ROOM',
-        'id' => @room.id
-      }
+        'id' => @room.id,
+      },
     }
     assert_response :success
     expected = { 'success' => true }
@@ -92,8 +92,8 @@ class ExamsControllerTest < ActionDispatch::IntegrationTest
     post finalize_api_proctor_exam_path(@exam), as: :json, params: {
       'target' => {
         'type' => 'USER',
-        'id' => @student.id
-      }
+        'id' => @student.id,
+      },
     }
     assert_response :success
     expected = { 'success' => true }

@@ -20,9 +20,9 @@ module Api
               title: section.title,
               students: section.registered_students_for(@exam).map do |student|
                 serialize_student student
-              end
+              end,
             }
-          end
+          end,
         }
       end
 
@@ -43,9 +43,9 @@ module Api
               title: section.title,
               students: section.staff.map do |student|
                 serialize_student student
-              end
+              end,
             }
-          end
+          end,
         }
       end
 
@@ -90,12 +90,12 @@ module Api
           end
         end
         render json: {
-          created: true
+          created: true,
         }
       rescue StandardError => e
         render json: {
           created: false,
-          reason: e.message
+          reason: e.message,
         }
       end
 
@@ -122,12 +122,12 @@ module Api
           end
         end
         render json: {
-          created: true
+          created: true,
         }
       rescue StandardError => e
         render json: {
           created: false,
-          reason: e.message
+          reason: e.message,
         }
       end
 
@@ -137,7 +137,7 @@ module Api
         {
           id: user.id,
           displayName: user.display_name,
-          username: user.username
+          username: user.username,
         }
       end
 
@@ -150,7 +150,7 @@ module Api
           end,
           proctors: room.proctor_registrations.includes(:user).map(&:user).map do |s|
             serialize_student s
-          end
+          end,
         }
       end
     end

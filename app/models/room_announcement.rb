@@ -14,7 +14,7 @@ class RoomAnnouncement < ApplicationRecord
       id: id,
       body: body,
       time: created_at,
-      type: 'room'
+      type: 'room',
     }
   end
 end

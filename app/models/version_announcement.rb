@@ -12,7 +12,7 @@ class VersionAnnouncement < ApplicationRecord
       id: id,
       body: body,
       time: created_at,
-      type: 'version'
+      type: 'version',
     }
   end
 end

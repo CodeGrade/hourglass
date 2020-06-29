@@ -15,31 +15,31 @@ module Api
             id: a.id,
             user: {
               displayName: a.user.display_name,
-              id: a.user.id
+              id: a.user.id,
             },
             reg: {
               id: a.registration.id,
-              final: a.registration.final?
+              final: a.registration.final?,
             },
             time: a.created_at,
-            reason: a.reason
+            reason: a.reason,
           }
         end
 
         render json: {
-          anomalies: anomalies
+          anomalies: anomalies,
         }
       end
 
       def destroy
         @anomaly.destroy!
         render json: {
-          success: true
+          success: true,
         }
       rescue StandardError => e
         render json: {
           success: false,
-          reason: e.message
+          reason: e.message,
         }
       end
     end

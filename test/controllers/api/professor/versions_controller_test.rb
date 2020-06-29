@@ -14,11 +14,11 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
           'contents' => {
             'questions' => [],
             'reference' => [],
-            'instructions' => { 'type' => 'HTML', 'value' => '' }
-          }
+            'instructions' => { 'type' => 'HTML', 'value' => '' },
+          },
         },
-        'files' => []
-      }
+        'files' => [],
+      },
     }
     assert_response :success
     expected = { 'updated' => true }
@@ -71,13 +71,13 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
           'reference' => [],
           'instructions' => {
             'type' => 'HTML',
-            'value' => ''
+            'value' => '',
           },
-          'files' => []
+          'files' => [],
         },
-        'answers' => { 'answers' => [] }
+        'answers' => { 'answers' => [] },
       },
-      'anyStarted' => false
+      'anyStarted' => false,
     }
     assert_equal expected, parsed.except('id')
     assert parsed['id'].integer?
@@ -151,7 +151,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     sign_in reg.user
     UploadTestHelper.with_test_uploaded_fixture_zip 'cs3500final-v1' do |upload|
       post import_api_professor_versions_path(exam), params: {
-        upload: upload
+        upload: upload,
       }
     end
     assert_response :created

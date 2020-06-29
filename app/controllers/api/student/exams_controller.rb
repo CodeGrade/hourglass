@@ -17,17 +17,17 @@ module Api
           railsExam: {
             id: @exam.id,
             name: @exam.name,
-            policies: @registration.exam_version.policies
+            policies: @registration.exam_version.policies,
           },
           railsRegistration: {
             id: @registration.id,
-            anomalous: @registration.anomalous?
+            anomalous: @registration.anomalous?,
           },
           railsCourse: {
-            id: @course.id
+            id: @course.id,
           },
           final: @registration.final? || @registration.over?,
-          lastSnapshot: @registration.snapshots.last&.created_at
+          lastSnapshot: @registration.snapshots.last&.created_at,
         }
       end
 
@@ -42,7 +42,7 @@ module Api
 
       def questions
         render json: {
-          questions: all_questions
+          questions: all_questions,
         }
       end
 
@@ -51,13 +51,13 @@ module Api
         q = Question.new body: q_params[:body], exam: @exam, sender: current_user
         render json: {
           success: q.save,
-          messages: q.errors.full_messages
+          messages: q.errors.full_messages,
         }
       end
 
       def messages
         render json: {
-          messages: messages_to_send
+          messages: messages_to_send,
         }
       end
 
@@ -85,7 +85,7 @@ module Api
         @anomaly.registration = @registration
         saved = @anomaly.save
         {
-          created: saved
+          created: saved,
         }
       end
 
@@ -110,20 +110,20 @@ module Api
             questions: version.contents['questions'],
             reference: version.contents['reference'],
             instructions: version.contents['instructions'],
-            files: version.files
+            files: version.files,
           },
           time: {
             began: @registration.accommodated_start_time,
-            ends: @registration.accommodated_end_time
+            ends: @registration.accommodated_end_time,
           },
           answers: answers,
           messages: {
             personal: @registration.private_messages.map(&:serialize),
             room: @registration.room&.room_announcements&.map(&:serialize) || [],
             version: version.version_announcements.map(&:serialize),
-            exam: @exam.exam_announcements.map(&:serialize)
+            exam: @exam.exam_announcements.map(&:serialize),
           },
-          questions: all_questions
+          questions: all_questions,
         }
       end
 
@@ -134,7 +134,7 @@ module Api
           personal: after(@registration.private_messages, last_message_ids[:personal]).map(&:serialize),
           room: after(@registration.room&.room_announcements, last_message_ids[:room]).map(&:serialize),
           version: after(version.version_announcements, last_message_ids[:version]).map(&:serialize),
-          exam: after(@exam.exam_announcements, last_message_ids[:exam]).map(&:serialize)
+          exam: after(@exam.exam_announcements, last_message_ids[:exam]).map(&:serialize),
         }
       end
 
@@ -143,7 +143,7 @@ module Api
         saved = @registration.save_answers(answers)
         {
           lockout: !saved,
-          messages: messages_to_send
+          messages: messages_to_send,
         }
       end
 
@@ -190,7 +190,7 @@ module Api
               end
             end
           end,
-          scratch: params[:answers][:scratch]  
+          scratch: params[:answers][:scratch],  
         }.stringify_keys
       end
     end

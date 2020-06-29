@@ -19,12 +19,12 @@ module Api
         @exam.save!
         render json: {
           created: true,
-          id: @exam.id
+          id: @exam.id,
         }
       rescue StandardError => e
         render json: {
           created: false,
-          reason: e.message
+          reason: e.message,
         }
       end
 
@@ -35,12 +35,12 @@ module Api
             name: body[:name],
             start_time: DateTime.parse(body[:start]),
             end_time: DateTime.parse(body[:end]),
-            duration: body[:duration]
+            duration: body[:duration],
           }
         )
         render json: {
           updated: updated,
-          reason: @exam.errors.full_messages.to_sentence
+          reason: @exam.errors.full_messages.to_sentence,
         }
       end
 
@@ -48,7 +48,7 @@ module Api
         render json: {
           exams: @course.exams.each do |exam|
             exam.slice(:id, :name)
-          end
+          end,
         }
       end
 
@@ -59,7 +59,7 @@ module Api
           end: @exam.end_time,
           duration: @exam.duration,
           versions: @exam.exam_versions.includes(:registrations).map {|v| serialize_version(v) },
-          checklist: @exam.checklist
+          checklist: @exam.checklist,
         }
       end
 
@@ -75,13 +75,13 @@ module Api
               questions: version.contents['questions'],
               reference: version.contents['reference'],
               instructions: version.contents['instructions'],
-              files: version.files
+              files: version.files,
             },
             answers: {
-              answers: version.answers
-            }
+              answers: version.answers,
+            },
           },
-          anyStarted: version.any_started?
+          anyStarted: version.any_started?,
         }
       end
     end

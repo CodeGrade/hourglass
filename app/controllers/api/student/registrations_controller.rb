@@ -13,9 +13,9 @@ module Api
           regInfo: student_regs.map do |reg|
             [reg.id, {
               exam: reg.exam.slice(:id, :name),
-              course: reg.course.slice(:id)
+              course: reg.course.slice(:id),
             }]
-          end.to_h
+          end.to_h,
         }
         # TODO: put this in proctor/regs#index
         # proctor_regs = ProctorRegistration.where(user: current_user)

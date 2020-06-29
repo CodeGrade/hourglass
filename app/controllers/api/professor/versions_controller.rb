@@ -30,9 +30,9 @@ module Api
               title: section.title,
               students: section.students.map do |student|
                 serialize_student student
-              end
+              end,
             }
-          end
+          end,
         }
       end
 
@@ -42,16 +42,16 @@ module Api
           {
             name: version[:name],
             info: version[:info],
-            files: version[:files]
+            files: version[:files],
           }
         )
         render json: {
-          updated: true
+          updated: true,
         }
       rescue StandardError => e
         render json: {
           updated: false,
-          reason: e.message
+          reason: e.message,
         }
       end
 
@@ -67,7 +67,7 @@ module Api
         )
         @version.save!
         render json: {
-          id: @version.id
+          id: @version.id,
         }, status: :created
       end
 
@@ -82,8 +82,8 @@ module Api
             answers: [],
             contents: {
               reference: [],
-              questions: []
-            }
+              questions: [],
+            },
           }
         )
         @version.save!
@@ -125,12 +125,12 @@ module Api
           end
         end
         render json: {
-          created: true
+          created: true,
         }
       rescue StandardError => e
         render json: {
           created: false,
-          reason: e.message
+          reason: e.message,
         }
       end
 
@@ -162,7 +162,7 @@ module Api
         {
           id: user.id,
           displayName: user.display_name,
-          username: user.username
+          username: user.username,
         }
       end
 
@@ -172,7 +172,7 @@ module Api
           name: version.name,
           students: regs.map(&:user).map do |s|
             serialize_student s
-          end
+          end,
         }
       end
 
@@ -186,13 +186,13 @@ module Api
               questions: version.contents['questions'],
               reference: version.contents['reference'] || [],
               instructions: version.contents['instructions'] || { type: 'HTML', value: '' },
-              files: version.files
+              files: version.files,
             },
             answers: {
-              answers: version.answers
-            }
+              answers: version.answers,
+            },
           },
-          anyStarted: version.any_started?
+          anyStarted: version.any_started?,
         }
       end
     end

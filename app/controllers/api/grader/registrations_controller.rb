@@ -14,8 +14,8 @@ module Api
             id: r.id,
             user: {
               id: r.user.id,
-              displayName: r.user.display_name
-            }
+              displayName: r.user.display_name,
+            },
           }
         end
         render json: regs
@@ -26,17 +26,17 @@ module Api
         render json: {
           user: {
             id: @registration.user.id,
-            displayName: @registration.user.display_name
+            displayName: @registration.user.display_name,
           },
           contents: {
             exam: {
               questions: version.contents['questions'],
               reference: version.contents['reference'],
               instructions: version.contents['instructions'],
-              files: version.files
+              files: version.files,
             },
-            answers: @registration.current_answers
-          }
+            answers: @registration.current_answers,
+          },
         }
       end
     end

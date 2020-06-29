@@ -14,7 +14,7 @@ class Question < ApplicationRecord
     {
       body: body,
       time: created_at,
-      id: id
+      id: id,
     }
   end
 end

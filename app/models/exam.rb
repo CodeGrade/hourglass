@@ -19,7 +19,7 @@ class Exam < ApplicationRecord
   validates :course, presence: true
   validates :name, presence: true
   validates :duration, presence: true, numericality: {
-    only_integer: true
+    only_integer: true,
   }
 
   validate :end_after_start
@@ -144,7 +144,7 @@ class Exam < ApplicationRecord
       rooms: room_checklist,
       staff: staff_checklist,
       seating: seating_checklist,
-      versions: versions_checklist
+      versions: versions_checklist,
     }
   end
 
@@ -152,7 +152,7 @@ class Exam < ApplicationRecord
     {
       students: direct_recipients,
       versions: version_recipients,
-      rooms: room_recipients
+      rooms: room_recipients,
     }
   end
 
@@ -162,7 +162,7 @@ class Exam < ApplicationRecord
     students.order(:display_name).map do |s|
       {
         id: s.id,
-        name: s.display_name
+        name: s.display_name,
       }
     end
   end
@@ -171,7 +171,7 @@ class Exam < ApplicationRecord
     exam_versions.order(:name).map do |ev|
       {
         id: ev.id,
-        name: ev.name
+        name: ev.name,
       }
     end
   end
@@ -180,7 +180,7 @@ class Exam < ApplicationRecord
     rooms.order(:name).map do |room|
       {
         id: room.id,
-        name: room.name
+        name: room.name,
       }
     end
   end
@@ -188,28 +188,28 @@ class Exam < ApplicationRecord
   def checklist_complete(reason)
     {
       status: 'COMPLETE',
-      reason: reason
+      reason: reason,
     }
   end
 
   def checklist_warning(reason)
     {
       status: 'WARNING',
-      reason: reason
+      reason: reason,
     }
   end
 
   def checklist_not_started(reason)
     {
       status: 'NOT_STARTED',
-      reason: reason
+      reason: reason,
     }
   end
 
   def checklist_na(reason)
     {
       status: 'NA',
-      reason: reason
+      reason: reason,
     }
   end
 

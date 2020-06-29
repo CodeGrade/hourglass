@@ -26,7 +26,7 @@ class MessageTest < ActiveSupport::TestCase
         exam: e,
         sender: reg.user,
         recipient: reg2.user,
-        body: 'hi'
+        body: 'hi',
       }
     )
     assert_not msg.valid?

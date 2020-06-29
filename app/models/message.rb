@@ -23,7 +23,7 @@ class Message < ApplicationRecord
       id: id,
       body: body,
       time: created_at,
-      type: 'personal'
+      type: 'personal',
     }
   end
 end

@@ -139,7 +139,7 @@ class ArchiveUtils
       tar: true,
       gz: true,
       tgz: true,
-      zip: true
+      zip: true,
     }
     # Unsupported file types, taken from https://en.wikipedia.org/wiki/List_of_archive_formats
     ['rar', 'ar', 'cpio', 'shar', 'lbr', 'iso', 'mar', 'sbx', 'bz2', 'lz', 'lzma', 'lzo', 'sfark', 'sz',
@@ -730,7 +730,7 @@ class ArchiveUtils
             src_dir[:contents][filename] = {
               name: filename,
               type: :symlink,
-              target: target
+              target: target,
             }
           else
             raise SafeExtractionError.new(file, '<json>', entry.name)
@@ -768,7 +768,7 @@ class ArchiveUtils
       name: name,
       type: :file,
       contents: contents,
-      perms: perms
+      perms: perms,
     }
   end
 
@@ -776,7 +776,7 @@ class ArchiveUtils
     {
       name: name,
       type: :dir,
-      contents: {}
+      contents: {},
     }
   end  
 end

@@ -17,13 +17,13 @@ class ExamVersion < ApplicationRecord
   EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save.json').to_s
   validates :info, presence: true, json: {
     schema: -> { EXAM_SAVE_SCHEMA },
-    message: ->(errors) { errors }
+    message: ->(errors) { errors },
   }
 
   FILES_SCHEMA = Rails.root.join('config/schemas/files.json').to_s
   validates :files, presence: true, allow_blank: true, json: {
     schema: -> { FILES_SCHEMA },
-    message: ->(errors) { errors }
+    message: ->(errors) { errors },
   }
 
   def policies
@@ -47,7 +47,7 @@ class ExamVersion < ApplicationRecord
     def_answers = [[[]]] if def_answers.empty?
     {
       answers: def_answers,
-      scratch: ''
+      scratch: '',
     }
   end
 
@@ -70,7 +70,7 @@ class ExamVersion < ApplicationRecord
   def export_json
     {
       info: info,
-      files: files
+      files: files,
     }.to_json
   end
 

@@ -5,6 +5,12 @@ require 'rails/test_help'
 require 'minitest/reporters'
 Minitest::Reporters.use! [Minitest::Reporters::SpecReporter.new]
 
+Selenium::WebDriver::Chrome::Service.driver_path = `which chromedriver`.chomp
+
+chromium_path = `which chromium`.chomp
+chromium_path = `which chromium-browser`.chomp if chromium_path.blank?
+Selenium::WebDriver::Chrome.path = chromium_path
+
 class ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
 end

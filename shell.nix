@@ -53,9 +53,12 @@ in mkShell {
     yarn
     start_postgres
     stop_postgres
-    nodePackages.typescript
-    nodePackages.eslint_d
-    racket
+    nodePackages.typescript-language-server
+    # racket
+    chromedriver
+    chromium
+    which
+    lzma
   ];
 
   shellHook = ''

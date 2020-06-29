@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'audit'
 require 'rubygems/package'
 require 'zlib'

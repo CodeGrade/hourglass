@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class MarksProcessor
   def self.process_marks(contents)
     lines = contents.lines.map &:chomp

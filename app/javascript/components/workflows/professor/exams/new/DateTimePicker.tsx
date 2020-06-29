@@ -34,6 +34,7 @@ function mergeDateTime(date: DateTime, time: DateTime): DateTime {
 }
 
 const timeZones = {
+  UTC: 'UTC',
   'America/New_York': 'East Coast, USA',
   'Europe/London': 'London, UK',
   'America/Los_Angeles': 'West Coast, USA',

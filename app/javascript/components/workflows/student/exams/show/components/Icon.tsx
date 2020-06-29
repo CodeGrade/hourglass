@@ -7,12 +7,14 @@ const ICON_SIZE = '1.5em';
 
 interface IconProps {
   I: IconType;
+  size?: string;
   className?: string;
 }
 
 const Icon: React.FC<IconProps> = (props) => {
   const {
     I,
+    size = ICON_SIZE,
     className = '',
   } = props;
   const spin = I === AiOutlineLoading;
@@ -20,7 +22,7 @@ const Icon: React.FC<IconProps> = (props) => {
   const allClasses = `${className} ${spinClass}`;
   return (
     <span className={allClasses}>
-      <I size={ICON_SIZE} />
+      <I size={size} />
     </span>
   );
 };

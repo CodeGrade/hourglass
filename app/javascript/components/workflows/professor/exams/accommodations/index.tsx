@@ -162,7 +162,7 @@ const SingleAccommodation: React.FC<{
           variant="danger"
           onClick={destroy}
         >
-          <Icon I={FaTrash} />
+          <Icon I={FaTrash} size="1.25em" />
           <span className="ml-2">
             Delete
           </span>
@@ -172,7 +172,7 @@ const SingleAccommodation: React.FC<{
           className="ml-2"
           onClick={edit}
         >
-          <Icon I={BsPencilSquare} />
+          <Icon I={BsPencilSquare} size="1.25em" />
           <span className="ml-2">
             Edit
           </span>

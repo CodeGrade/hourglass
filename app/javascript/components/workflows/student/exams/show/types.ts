@@ -46,6 +46,13 @@ export interface AnomalousReponse {
   type: 'ANOMALOUS';
 }
 
+interface RailsAllExamMessages {
+  personal: RailsExamMessage[];
+  room: RailsExamMessage[];
+  version: RailsExamMessage[];
+  exam: RailsExamMessage[];
+}
+
 export interface ContentsResponse {
   type: 'CONTENTS';
 
@@ -55,12 +62,7 @@ export interface ContentsResponse {
 
   answers: AnswersState;
 
-  messages: {
-    personal: RailsExamMessage[];
-    room: RailsExamMessage[];
-    version: RailsExamMessage[];
-    exam: RailsExamMessage[];
-  };
+  messages: RailsAllExamMessages;
 
   questions: RailsExamQuestion[];
 }
@@ -70,8 +72,6 @@ export interface RailsExamQuestion {
   body: string;
   id: number;
 }
-
-export type ExamMessageType = 'personal' | 'room' | 'version' | 'exam';
 
 export interface RailsExamMessage {
   time: string;
@@ -149,12 +149,7 @@ export interface LoadExamAction {
   exam: ExamVersion;
   time: TimeInfo;
   answers: AnswersState;
-  messages: {
-    personal: ExamMessage[];
-    room: ExamMessage[];
-    version: ExamMessage[];
-    exam: ExamMessage[];
-  };
+  messages: AllExamMessages;
   questions: ProfQuestion[];
 }
 
@@ -196,12 +191,7 @@ export interface SnapshotFailure {
 
 export interface SnapshotSaveResult {
   lockout: boolean;
-  messages: {
-    personal: RailsExamMessage[];
-    room: RailsExamMessage[];
-    version: RailsExamMessage[];
-    exam: RailsExamMessage[];
-  };
+  messages: RailsAllExamMessages;
 }
 
 export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure;
@@ -305,16 +295,12 @@ export interface QuestionSucceededAction {
 }
 
 export interface MessagesState {
-  // Whether there are unread messages.
-  unread: boolean;
+  lastView: DateTime;
 
-  messages: {
-    personal: ExamMessage[];
-    room: ExamMessage[];
-    version: ExamMessage[];
-    exam: ExamMessage[];
-  };
+  messages: AllExamMessages;
 }
+
+export type ExamMessageType = 'personal' | 'room' | 'version' | 'exam';
 
 export interface ExamMessage {
   body: string;
@@ -325,6 +311,13 @@ export interface ExamMessage {
 
   // Rails ID of the message.
   id: number;
+}
+
+export interface AllExamMessages {
+  personal: ExamMessage[];
+  room: ExamMessage[];
+  version: ExamMessage[];
+  exam: ExamMessage[];
 }
 
 export type MessagesAction = MessageReceivedAction | MessagesOpenedAction;

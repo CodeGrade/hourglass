@@ -1,19 +1,15 @@
 import { connect } from 'react-redux';
-import { MSTP, MDTP, ExamMessage } from '@student/exams/show/types';
+import { MSTP, MDTP, AllExamMessages } from '@student/exams/show/types';
 import ExamMessages, { ShowExamMessages } from '@student/exams/show/components/navbar/ExamMessages';
 import { messagesOpened } from '@student/exams/show/actions';
+import { DateTime } from 'luxon';
 
 const mapStateToProps: MSTP<{
-  messages: ExamMessage[];
-  unread: boolean;
+  messages: AllExamMessages;
+  lastViewed: DateTime;
 }> = (state) => ({
-  messages: [
-    ...state.messages.messages.personal,
-    ...state.messages.messages.room,
-    ...state.messages.messages.version,
-    ...state.messages.messages.exam,
-  ].sort((msgA, msgB) => msgB.time.diff(msgA.time, 'seconds').seconds),
-  unread: state.messages.unread,
+  messages: state.messages.messages,
+  lastViewed: state.messages.lastView,
 });
 
 const mapDispatchToProps: MDTP<{

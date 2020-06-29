@@ -1,6 +1,6 @@
 import React from 'react';
-import { ExamMessage } from '@student/exams/show/types';
-import { Button, Media } from 'react-bootstrap';
+import { ExamMessage, AllExamMessages } from '@student/exams/show/types';
+import { Media } from 'react-bootstrap';
 import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
 import { MdFeedback, MdMessage } from 'react-icons/md';
@@ -8,12 +8,13 @@ import { GiBugleCall } from 'react-icons/gi';
 import Tooltip from '@student/exams/show/components/Tooltip';
 import Icon from '@student/exams/show/components/Icon';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
+import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
 
 interface ExamMessagesProps {
+  lastViewed: DateTime;
   expanded: boolean;
-  messages: ExamMessage[];
+  messages: AllExamMessages;
   onMessagesOpened: () => void;
-  unread: boolean;
   onSectionClick: (eventKey: string) => void;
 }
 
@@ -51,53 +52,78 @@ export const ShowMessage: React.FC<MessageProps> = (props) => {
 };
 
 export const ShowExamMessages: React.FC<{
-  messages: ExamMessage[];
-  unread: boolean;
+  lastViewed: DateTime;
+  messages: AllExamMessages;
   onMessagesOpened: () => void;
 }> = (props) => {
   const {
+    lastViewed,
     messages,
-    unread,
     onMessagesOpened,
   } = props;
-  const msgs = messages.map((msg) => (
-    <ShowMessage
-      key={`${msg.type}${msg.id}`}
-      body={msg.body}
-      icon={msg.type === 'personal' ? MdMessage : GiBugleCall}
-      tooltip={msg.type === 'personal' ? 'Sent only to you' : 'Announcement'}
-      time={msg.time}
-    />
-  ));
-  const body = msgs.length === 0
-    ? <i>No messages.</i>
-    : msgs;
+  const {
+    personal,
+    exam,
+    version,
+    room,
+  } = messages;
+  const all: Array<ExamMessage> = personal
+    .concat(exam)
+    .concat(version)
+    .concat(room);
+  all.sort((a, b) => b.time.diff(a.time).milliseconds);
+  const idx = all.findIndex((msg) => msg.time < lastViewed);
+  const earlier = idx === -1 ? [] : all.slice(idx);
+  const later = idx === -1 ? all : all.slice(0, idx);
+  const dividerClass = later.length === 0 ? 'd-none' : '';
+
+  if (all.length === 0) {
+    return <i>No messages.</i>;
+  }
+
   return (
     <>
-      <ul className="p-0">
-        {body}
-      </ul>
-      {unread && (
-        <Button
-          variant="success"
-          className="float-right"
-          onClick={(): void => onMessagesOpened()}
-        >
-          Acknowledge unread messages
-        </Button>
-      )}
+      <div className={dividerClass}>
+        <NewMessages onClick={onMessagesOpened} />
+        {later.map((msg) => (
+          <div
+            className="new-message"
+            key={`${msg.type}${msg.id}`}
+          >
+            <ShowMessage
+              body={msg.body}
+              icon={msg.type === 'personal' ? MdMessage : GiBugleCall}
+              tooltip={msg.type === 'personal' ? 'Sent only to you' : 'Announcement'}
+              time={msg.time}
+            />
+          </div>
+        ))}
+        <PreviousMessages />
+      </div>
+      {earlier.map((msg) => (
+        <ShowMessage
+          key={`${msg.type}${msg.id}`}
+          body={msg.body}
+          icon={msg.type === 'personal' ? MdMessage : GiBugleCall}
+          tooltip={msg.type === 'personal' ? 'Sent only to you' : 'Announcement'}
+          time={msg.time}
+        />
+      ))}
     </>
   );
 };
 
 const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   const {
+    lastViewed,
     expanded,
     messages,
     onMessagesOpened,
-    unread,
     onSectionClick,
   } = props;
+  const unread: boolean = Object.values(messages).reduce((acc, msgs: ExamMessage[]) => (
+    acc || msgs.reduce((innerAcc, msg) => (innerAcc || msg.time > lastViewed), false)
+  ), false);
   const classes = unread ? 'bg-warning text-dark' : undefined;
   return (
     <NavAccordionItem
@@ -109,8 +135,8 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
       onSectionClick={onSectionClick}
     >
       <ShowExamMessages
+        lastViewed={lastViewed}
         messages={messages}
-        unread={unread}
         onMessagesOpened={onMessagesOpened}
       />
     </NavAccordionItem>

@@ -1,0 +1,24 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
+.fancy-hr hr {
+  height: 2px;
+  outline: 0;
+  border: 0;
+  &.fancy-left {
+    background: linear-gradient(to right, transparent, theme-color("secondary"));
+  }
+  &.fancy-right {
+    background: linear-gradient(to right, theme-color("secondary"), transparent);
+  }
+  &.fancy-left-warning {
+    background: linear-gradient(to right, transparent, theme-color("warning"));
+  }
+  &.fancy-right-warning {
+    background: linear-gradient(to right, theme-color("warning"), transparent);
+  }
+}
+
+.new-message {
+  background-color: rgba(theme-color("warning"), 0.2);
+}

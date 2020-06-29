@@ -197,10 +197,15 @@ const NewAccommodation: React.FC<{
   const { alert } = useContext(AlertContext);
   const accs = new Set();
   accommodations.forEach((a) => accs.add(a.reg.id));
-  const options = res.type === 'RESULT' ? res.response.registrations.map((r) => ({
-    label: r.displayName,
-    value: r.id,
-  })).filter((r) => !accs.has(r.value)) : [];
+  const options = res.type === 'RESULT'
+    ? res.response.registrations
+      .sort((a, b) => a.displayName.localeCompare(b.displayName))
+      .map((r) => ({
+        label: r.displayName,
+        value: r.id,
+      }))
+      .filter((r) => !accs.has(r.value))
+    : [];
   const submit = () => {
     if (!selected) return;
     createAccommodation(examId, selected.value).then((result) => {
@@ -267,6 +272,7 @@ const Loaded: React.FC<{
     refresh,
     accommodations,
   } = props;
+  accommodations.sort((a, b) => a.reg.user.displayName.localeCompare(b.reg.user.displayName));
   return (
     <>
       <Form.Group>

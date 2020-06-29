@@ -937,7 +937,7 @@ const SendMessageButton: React.FC<{
   const disabled = message === '' || loading;
   const disabledMessage = loading ? 'Loading...' : 'Enter a message to send';
   return (
-    <Loading loading={loading}>
+    <Loading loading={loading} noText>
       <TooltipButton
         placement="top"
         disabled={disabled}

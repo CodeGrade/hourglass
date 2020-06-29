@@ -84,7 +84,7 @@ const SingleAccommodation: React.FC<{
   if (editing) {
     return (
       <tr>
-        <td>
+        <td className="align-middle">
           {accommodation.reg.user.displayName}
         </td>
         <td>
@@ -104,18 +104,18 @@ const SingleAccommodation: React.FC<{
         </td>
         <td align="right">
           <Button
-            variant="success"
+            variant="secondary"
+            onClick={stopEdit}
             className={editing ? '' : 'd-none'}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            className={editing ? 'ml-2' : 'd-none'}
             onClick={submit}
           >
             Save
-          </Button>
-          <Button
-            variant="danger"
-            onClick={stopEdit}
-            className={editing ? 'ml-2' : 'd-none'}
-          >
-            Cancel
           </Button>
         </td>
       </tr>
@@ -123,37 +123,40 @@ const SingleAccommodation: React.FC<{
   }
   return (
     <tr>
-      <td>
+      <td className="align-middle">
         {accommodation.reg.user.displayName}
       </td>
-      <td>
+      <td className="align-middle">
         {accommodation.startTime ? (
           <ReadableDate showTime value={accommodation.startTime} />
         ) : (
           <i>Not set.</i>
         )}
       </td>
-      <td>{accommodation.extraTime}</td>
+      <td className="align-middle">{accommodation.extraTime}</td>
       <td align="right">
-        <Button
-          variant="danger"
-          onClick={destroy}
-        >
-          <Icon I={FaTrash} />
-          <span className="ml-2">
-            Delete
-          </span>
-        </Button>
-        <Button
-          variant="primary"
-          className="ml-2"
-          onClick={edit}
-        >
-          <Icon I={BsPencilSquare} />
-          <span className="ml-2">
-            Edit
-          </span>
-        </Button>
+        <div>
+          {/* This div makes sure the buttons don't maintain focus after switching utility */}
+          <Button
+            variant="danger"
+            onClick={destroy}
+          >
+            <Icon I={FaTrash} />
+            <span className="ml-2">
+              Delete
+            </span>
+          </Button>
+          <Button
+            variant="primary"
+            className="ml-2"
+            onClick={edit}
+          >
+            <Icon I={BsPencilSquare} />
+            <span className="ml-2">
+              Edit
+            </span>
+          </Button>
+        </div>
       </td>
     </tr>
   );
@@ -165,26 +168,31 @@ interface Selection {
 }
 
 const NewAccommodation: React.FC<{
+  accommodations: Accommodation[];
   refresh: () => void;
 }> = (props) => {
   const {
+    accommodations,
     refresh,
   } = props;
   const { examId } = useParams();
   const res = useRegistrationsIndex(examId);
-  const [selected, setSelected] = useState<Selection>(undefined);
+  const [selected, setSelected] = useState<Selection>(null);
   const { alert } = useContext(AlertContext);
+  const accs = new Set();
+  accommodations.forEach((a) => accs.add(a.reg.id));
   const options = res.type === 'RESULT' ? res.response.registrations.map((r) => ({
     label: r.displayName,
     value: r.id,
-  })) : [];
+  })).filter((r) => !accs.has(r.value)) : [];
   const submit = () => {
     if (!selected) return;
     createAccommodation(examId, selected.value).then((result) => {
       if (result.success !== true) {
-        throw new Error(res.reason);
+        throw new Error(result.reason);
       }
       refresh();
+      setSelected(null);
       alert({
         variant: 'success',
         title: 'Successfully created accommodation',
@@ -250,10 +258,10 @@ const Loaded: React.FC<{
         <Table>
           <thead>
             <tr>
-              <th>Student</th>
-              <th>Start Time</th>
-              <th>% Extra Time</th>
-              <th>Actions</th>
+              <th className="w-25">Student</th>
+              <th className="w-25">Start Time</th>
+              <th className="w-25">% Extra Time</th>
+              <th className="text-right w-25">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -265,7 +273,7 @@ const Loaded: React.FC<{
       </Form.Group>
       <Form.Group as={Row}>
         <Col>
-          <NewAccommodation refresh={refresh} />
+          <NewAccommodation accommodations={accommodations} refresh={refresh} />
         </Col>
       </Form.Group>
     </>

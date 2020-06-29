@@ -231,6 +231,7 @@ const NewAccommodationLoaded: React.FC<{
   return (
     <InputGroup>
       <Select
+        isClearable
         value={selected}
         onChange={setSelected}
         className="flex-grow-1"

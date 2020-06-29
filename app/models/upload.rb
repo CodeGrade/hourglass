@@ -206,7 +206,7 @@ class Upload
                       raise 'No reference for exam.' if e_reference.nil?
                       'exam'
                     else
-                      raise "CodeTag reference is invalid."
+                      raise 'CodeTag reference is invalid.'
                     end
                   {
                     type: 'CodeTag',
@@ -339,7 +339,7 @@ class Upload
     return nil if item.nil?
 
     if item[:full_path]
-      return nil if File.basename(item[:full_path].to_s) == ".DS_Store"
+      return nil if File.basename(item[:full_path].to_s) == '.DS_Store'
 
       mimetype = ApplicationHelper.mime_type(item[:full_path])
       contents =
@@ -353,7 +353,7 @@ class Upload
           "Error reading file:\n#{e.to_s}"
         end
 
-      if mimetype.starts_with? "image/"
+      if mimetype.starts_with? 'image/'
         contents = Base64.encode(contents)
         item[:contents] = ensure_utf8(contents, mimetype)
       else
@@ -364,14 +364,14 @@ class Upload
       item[:text] = item[:path]
       # pdf_path: item[:converted_path],
       item[:type] = mimetype
-      item[:filedir] = "file"
+      item[:filedir] = 'file'
       item.delete(:full_path)
     elsif item[:link_to]
-      item[:type] = "symlink"
+      item[:type] = 'symlink'
     else
-      return nil if item[:path] == "__MACOSX"
-      item[:filedir] = "dir"
-      item[:text] = item[:path] + "/"
+      return nil if item[:path] == '__MACOSX'
+      item[:filedir] = 'dir'
+      item[:text] = item[:path] + '/'
       item[:nodes] = item[:children].map { |n| with_extracted(n) }.compact
       item.delete(:children)
     end

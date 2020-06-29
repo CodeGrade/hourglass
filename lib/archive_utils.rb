@@ -87,14 +87,14 @@ Gem::Package::TarReader.class_exec do
   def safe_each
     # from https://dracoater.blogspot.com/2013/10/extracting-files-from-targz-with-ruby.html
     self.rewind
-    dest = ""
+    dest = ''
     self.each do |entry|
       if entry.full_name == TAR_LONGLINK
         dest = dest + entry.read.strip
         next
       else
         yield(WrapTarEntry.new(entry, dest + entry.full_name))
-        dest = ""
+        dest = ''
       end
     end
   end
@@ -142,12 +142,12 @@ class ArchiveUtils
       zip: true
     }
     # Unsupported file types, taken from https://en.wikipedia.org/wiki/List_of_archive_formats
-    ["rar", "ar", "cpio", "shar", "lbr", "iso", "mar", "sbx", "bz2", "lz", "lzma", "lzo", "sfark", "sz",
-     "xz", "z", "7z", "s7z", "ace", "afa", "alz", "apk", "arc", "arj", "b1", "b6z", "ba", "bh", "cab",
-     "car", "cfs", "cpt", "dar", "dd", "dgc", "dmg", "ear", "gca", "ha", "hki", "ice", "jar", "kgb",
-     "lzh", "lha", "pak", "partimg", "paq6", "paq7", "paq8", "pea", "pim", "pit", "qda", "rk", "sda",
-     "sea", "sen", "sfx", "shk", "sit", "sitx", "sqx", "uc", "uc0", "uc2", "ucn", "ur2", "ue2", "uca",
-     "uha", "war", "wim", "xar", "xp3", "yz1", "zipx", "zoo", "zpaq", "zz", "ecc", "par", "par2", "rev"].each do |ext|
+    ['rar', 'ar', 'cpio', 'shar', 'lbr', 'iso', 'mar', 'sbx', 'bz2', 'lz', 'lzma', 'lzo', 'sfark', 'sz',
+     'xz', 'z', '7z', 's7z', 'ace', 'afa', 'alz', 'apk', 'arc', 'arj', 'b1', 'b6z', 'ba', 'bh', 'cab',
+     'car', 'cfs', 'cpt', 'dar', 'dd', 'dgc', 'dmg', 'ear', 'gca', 'ha', 'hki', 'ice', 'jar', 'kgb',
+     'lzh', 'lha', 'pak', 'partimg', 'paq6', 'paq7', 'paq8', 'pea', 'pim', 'pit', 'qda', 'rk', 'sda',
+     'sea', 'sen', 'sfx', 'shk', 'sit', 'sitx', 'sqx', 'uc', 'uc0', 'uc2', 'ucn', 'ur2', 'ue2', 'uca',
+     'uha', 'war', 'wim', 'xar', 'xp3', 'yz1', 'zipx', 'zoo', 'zpaq', 'zz', 'ecc', 'par', 'par2', 'rev'].each do |ext|
       known[ext] = false
     end
     known
@@ -214,25 +214,25 @@ class ArchiveUtils
     end
 
     def to_s
-      do_does = (@link.length == 1 ? "does" : "do")
+      do_does = (@link.length == 1 ? 'does' : 'do')
       "Could not extract #{file} to #{dest}: #{link.join(', ')} #{do_does} not stay within the extraction directory"
     end
   end
 
   def self.is_zip?(file, mime)
-    mime == "application/zip" || file.ends_with?(".zip")
+    mime == 'application/zip' || file.ends_with?('.zip')
   end
 
   def self.is_tar?(file, mime)
-    mime == "application/x-tar" || file.ends_with?(".tar")
+    mime == 'application/x-tar' || file.ends_with?('.tar')
   end
 
   def self.is_tar_gz?(file, mime)
-    mime == "application/x-compressed-tar" || file.ends_with?(".tar.gz") || file.ends_with?(".tgz")
+    mime == 'application/x-compressed-tar' || file.ends_with?('.tar.gz') || file.ends_with?('.tgz')
   end
 
   def self.is_gz?(file, mime)
-    mime == "application/gzip" || file.ends_with?(".gz")
+    mime == 'application/gzip' || file.ends_with?('.gz')
   end
 
   def self.too_many_files?(file, mime, limit = ArchiveUtils.MAX_FILES)
@@ -257,14 +257,14 @@ class ArchiveUtils
     elsif is_tar_gz?(file, mime)
       tar_gz_invalid_paths?(file)
     elsif is_gz?(file, mime)
-      if !(file.encode("utf-8").valid_encoding? rescue false)
-        raise FileReadError(file, mime, "File name is not valid UTF-8")
+      if !(file.encode('utf-8').valid_encoding? rescue false)
+        raise FileReadError(file, mime, 'File name is not valid UTF-8')
       end
 
       return false # A .gz file only contains a single file
     else
-      if !(file.encode("utf-8").valid_encoding? rescue false)
-        raise FileReadError(file, mime, "File name is not valid UTF-8")
+      if !(file.encode('utf-8').valid_encoding? rescue false)
+        raise FileReadError(file, mime, 'File name is not valid UTF-8')
       end
 
       return false # it's a single file
@@ -302,7 +302,7 @@ class ArchiveUtils
     elsif is_tar_gz?(file, mime)
       tar_gz_extract(file, dest, force_readable)
     elsif is_gz?(file, mime)
-      dest = File.join(dest, File.basename(file, ".gz"))
+      dest = File.join(dest, File.basename(file, '.gz'))
       gzip_extract(file, dest, force_readable)
     else
       if File.symlink?(file)
@@ -310,7 +310,7 @@ class ArchiveUtils
       end
 
       FileUtils.cp(file, dest)
-      FileUtils.chmod "u+r", dest, verbose: false if force_readable
+      FileUtils.chmod 'u+r', dest, verbose: false if force_readable
     end
   end
 
@@ -345,7 +345,7 @@ class ArchiveUtils
     elsif is_tar_gz?(file, mime)
       tar_gz_entries(file, from_stream)
     elsif is_gz?(file, mime)
-      [[File.basename(file, ".gz"), true]].to_h
+      [[File.basename(file, '.gz'), true]].to_h
     else
       [[file, true]].to_h
     end
@@ -408,7 +408,7 @@ class ArchiveUtils
 
   def self.helper_invalid_paths?(file, type, stream)
     stream.safe_each do |entry|
-      if !(entry.name.encode("utf-8").valid_encoding? rescue false)
+      if !(entry.name.encode('utf-8').valid_encoding? rescue false)
         raise FileReadError.new(file, type, "Entry name `#{entry.name}` is not valid UTF-8")
       end
     end
@@ -453,13 +453,13 @@ class ArchiveUtils
   def self.helper_entries(file, type, stream)
     output = {}
     stream.safe_each do |entry|
-      out = encode_or_escape(File.join("/", entry.name.gsub("\\", "/").sub(/\/$/, "")))
-      if out.to_s.match?("__MACOSX") || out.to_s.match?(".DS_Store")
+      out = encode_or_escape(File.join('/', entry.name.gsub('\\', '/').sub(/\/$/, '')))
+      if out.to_s.match?('__MACOSX') || out.to_s.match?('.DS_Store')
         next
       end
 
-      out = out.squeeze("/") # eliminate consecutive slashes
-      out = out.sub(/\/$/, "") # eliminate trailing slash
+      out = out.squeeze('/') # eliminate consecutive slashes
+      out = out.sub(/\/$/, '') # eliminate trailing slash
       if (out.starts_with?(File::SEPARATOR) rescue false)
         temp = output
         File.dirname(out).to_s.split(File::SEPARATOR).each do |dir|
@@ -562,14 +562,14 @@ class ArchiveUtils
     # (This could only mean that we'd use mkdir_p to create not/yet/existing
     # within some/real/path, which is indeed nested within some/real/path.)
 
-    path = path.squeeze("/") # eliminate consecutive slashes
-    path = path.sub(/\/$/, "") # eliminate trailing slash
+    path = path.squeeze('/') # eliminate consecutive slashes
+    path = path.sub(/\/$/, '') # eliminate trailing slash
     until (File.realdirpath(path) rescue false) do
       if path =~ /(^|\/)\.\.$/
         return nil # Doesn't contain any prefix
       else
         old_path = path
-        path = path.sub(/(^|\/)[^\/]+$/, "")
+        path = path.sub(/(^|\/)[^\/]+$/, '')
       end
     end
     return File.realdirpath(path)
@@ -577,9 +577,9 @@ class ArchiveUtils
 
   def self.encode_or_escape(str)
     begin
-      str.encode("utf-8")
+      str.encode('utf-8')
     rescue Exception => e
-      str.force_encoding("utf-8")
+      str.force_encoding('utf-8')
       if str.valid_encoding?
         str
       else
@@ -591,8 +591,8 @@ class ArchiveUtils
   def self.helper_extract(file, type, archive, dest, force_readable)
     seen_symlinks = false
     archive.safe_each do |entry|
-      out = encode_or_escape(File.join(dest, entry.name.gsub("\\", "/").sub(/\/$/, "")))
-      if out.to_s.match?("__MACOSX") || out.to_s.match?(".DS_Store")
+      out = encode_or_escape(File.join(dest, entry.name.gsub('\\', '/').sub(/\/$/, '')))
+      if out.to_s.match?('__MACOSX') || out.to_s.match?('.DS_Store')
         next
       end
 
@@ -603,11 +603,11 @@ class ArchiveUtils
         elsif entry.file?
           FileUtils.rm_rf out unless File.file? out
           FileUtils.mkdir_p(File.dirname(out))
-          File.open(out, "wb") do |f|
+          File.open(out, 'wb') do |f|
             f.print entry.read
           end
           FileUtils.chmod entry.unix_perms, out, verbose: false if entry.unix_perms
-          FileUtils.chmod "u+r", out, verbose: false if force_readable
+          FileUtils.chmod 'u+r', out, verbose: false if force_readable
         else
           FileUtils.rm_rf out unless File.file? out
           FileUtils.mkdir_p(File.dirname(out))
@@ -658,10 +658,10 @@ class ArchiveUtils
 
   def self.gzip_extract(file, dest, force_readable)
     Zlib::GzipReader.open(file) do |input_stream|
-      File.open(dest, "w") do |output_stream|
+      File.open(dest, 'w') do |output_stream|
         IO.copy_stream(input_stream, output_stream)
       end
-      FileUtils.chmod "u+r", dest, verbose: false if force_readable
+      FileUtils.chmod 'u+r', dest, verbose: false if force_readable
     end
     return true
   end
@@ -682,18 +682,18 @@ class ArchiveUtils
   
   def self.helper_to_json(file, type, archive)
     seen_symlinks = false
-    dest = "/tmp/<json>"
-    ans = dir_to_json("")
+    dest = '/tmp/<json>'
+    ans = dir_to_json('')
     archive.safe_each do |entry|
-      out = encode_or_escape(File.join(dest, entry.name.gsub("\\", "/").sub(/\/$/, "")))
-      if out.to_s.match?("__MACOSX") || out.to_s.match?(".DS_Store")
+      out = encode_or_escape(File.join(dest, entry.name.gsub('\\', '/').sub(/\/$/, '')))
+      if out.to_s.match?('__MACOSX') || out.to_s.match?('.DS_Store')
         next
       end
 
       safe_dir = safe_realdir(out)
       puts "Safe_dir: #{safe_dir}, out: #{out}, dest: #{dest}"
       if (safe_dir.starts_with?(dest) rescue false)
-        path = Pathname.new(out.gsub(dest, "")).each_filename.to_a
+        path = Pathname.new(out.gsub(dest, '')).each_filename.to_a
         puts "Path: #{path}"
         if entry.directory?
           traverse_and_make_path(file, dest, entry.name, path, ans)
@@ -720,11 +720,11 @@ class ArchiveUtils
       archive.safe_each do |entry|
         if entry.symlink?
           out = encode_or_escape(File.join(dest, entry.name))
-          src_path = Pathname.new(safe_realdir(out).gsub(dest, ""))
+          src_path = Pathname.new(safe_realdir(out).gsub(dest, ''))
           link_target = entry.read
           dest_path = safe_realdir(link_target)
           if (dest_path.starts_with(dest))
-            target = traverse_and_make_path(file, dest, entry.name, Path.name.new(dest_path.gsub(dest, "")), ans)
+            target = traverse_and_make_path(file, dest, entry.name, Path.name.new(dest_path.gsub(dest, '')), ans)
             filename = src_path.pop
             src_dir = traverse_and_make_path(file, dest, entry.name, src_path, ans)
             src_dir[:contents][filename] = {
@@ -733,7 +733,7 @@ class ArchiveUtils
               target: target
             }
           else
-            raise SafeExtractionError.new(file, "<json>", entry.name)
+            raise SafeExtractionError.new(file, '<json>', entry.name)
           end
         end
       end

@@ -16,7 +16,7 @@ class MarksProcessor
       match = reTag.match(lines[lineNum])
       while match do
         idx = match.begin(0)
-        lines[lineNum].sub!(match[0], "")
+        lines[lineNum].sub!(match[0], '')
         if match[2] == 's'
           count += 1
           marks[:byNum][match[1]] = {

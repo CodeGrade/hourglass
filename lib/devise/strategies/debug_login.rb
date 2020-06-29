@@ -11,7 +11,7 @@ module Devise
            Devise::Encryptor.compare(user.class, user.encrypted_password, params[:user][:password])
           success!(user)
         else
-          fail("Did not recognize username/password")
+          fail('Did not recognize username/password')
         end
       end
 

@@ -617,7 +617,7 @@ const SingleMessage: React.FC<{
   }
 };
 
-const NewMessages: React.FC<{
+export const NewMessages: React.FC<{
   onClick: () => void;
 }> = ({ onClick }) => (
   <Tooltip
@@ -625,7 +625,8 @@ const NewMessages: React.FC<{
   >
     <Button
       block
-      variant="outline-light text-dark"
+      variant="outline-light"
+      className="text-dark"
       as="div"
       onClick={onClick}
     >
@@ -644,7 +645,7 @@ const NewMessages: React.FC<{
   </Tooltip>
 );
 
-const PreviousMessages: React.FC = () => (
+export const PreviousMessages: React.FC = () => (
   <Row className="m-0 fancy-hr">
     <Col>
       <hr className="fancy-left" />
@@ -745,8 +746,8 @@ const ShowMessages: React.FC<{
   }
   all.sort((a, b) => b.time.diff(a.time).milliseconds);
   const idx = all.findIndex((msg) => msg.time < lastViewed);
-  const earlier = idx === -1 ? all : all.slice(idx);
-  const later = idx === -1 ? [] : all.slice(0, idx);
+  const earlier = idx === -1 ? [] : all.slice(idx);
+  const later = idx === -1 ? all : all.slice(0, idx);
   const dividerClass = later.length === 0 ? 'd-none' : '';
 
   return (

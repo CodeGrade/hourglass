@@ -2,9 +2,10 @@ import {
   MessagesState,
   ExamTakerAction,
 } from '@student/exams/show/types';
+import { DateTime } from 'luxon';
 
 export default (state: MessagesState = {
-  unread: false,
+  lastView: DateTime.fromSeconds(0),
   messages: {
     personal: [],
     room: [],
@@ -21,25 +22,19 @@ export default (state: MessagesState = {
       ];
       return {
         ...state,
-        unread: true,
         messages,
       };
     }
     case 'LOAD_EXAM':
       return {
+        ...state,
         messages: action.messages,
-        unread: (
-          action.messages.personal.length !== 0
-          || action.messages.room.length !== 0
-          || action.messages.version.length !== 0
-          || action.messages.exam.length !== 0
-        ),
       };
     case 'MESSAGES_OPENED':
       return {
         ...state,
         messages: state.messages,
-        unread: false,
+        lastView: DateTime.local(),
       };
     default:
       return state;

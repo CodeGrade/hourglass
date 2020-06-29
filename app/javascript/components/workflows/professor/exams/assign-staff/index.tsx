@@ -250,6 +250,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           if (result.created === false) throw new Error(result.reason);
           history.push(`/exams/${examId}/admin/staff`);
           alert({
+            autohide: true,
             variant: 'success',
             message: 'Room assignments successfully created.',
           });

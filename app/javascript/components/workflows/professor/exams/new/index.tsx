@@ -34,6 +34,7 @@ const NewExamForm: React.FC = () => {
             history.push(`/exams/${id}/admin`);
             alert({
               variant: 'success',
+              autohide: true,
               message: 'Exam created successfully.',
             });
           })

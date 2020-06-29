@@ -249,6 +249,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           history.push(`/exams/${examId}/admin/seating`);
           alert({
             variant: 'success',
+            autohide: true,
             message: 'Room assignments successfully created.',
           });
         }).catch((e) => {

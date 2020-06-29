@@ -130,6 +130,7 @@ const FinalizeButton: React.FC<{
             if (res.success === true) {
               alert({
                 variant: 'success',
+                autohide: true,
                 message: 'Registration finalized.',
               });
               setLoading(false);
@@ -308,6 +309,7 @@ const FinalizeRegs: React.FC<{
       setLoading(false);
       alert({
         variant: 'success',
+        autohide: true,
         title: 'Finalization successful',
         message: `Finalized '${selectedRecipient.label}'.`,
       });

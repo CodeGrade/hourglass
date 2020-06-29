@@ -254,6 +254,7 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           history.push(`/exams/${examId}/admin/rooms`);
           alert({
             variant: 'success',
+            autohide: true,
             message: 'Rooms saved successfully.',
           });
         }).catch((err) => {

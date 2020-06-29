@@ -249,6 +249,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           history.push(`/exams/${examId}/admin/versions`);
           alert({
             variant: 'success',
+            autohide: true,
             message: 'Versions successfully allocated.',
           });
         }).catch((e) => {

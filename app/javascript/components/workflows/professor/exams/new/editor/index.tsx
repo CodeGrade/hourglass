@@ -422,6 +422,7 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
             history.push(`/exams/${examId}/admin`);
             alert({
               variant: 'success',
+              autohide: true,
               message: 'Exam version updated successfully.',
             });
           }

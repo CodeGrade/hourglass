@@ -146,6 +146,7 @@ const Loaded: React.FC<{
                     setEditing(false);
                     alert({
                       variant: 'success',
+                      autohide: true,
                       message: 'Exam info saved.',
                     });
                     refresh();
@@ -590,6 +591,7 @@ const VersionInfo: React.FC<{
                 history.push(`/exams/${examId}/versions/${res.id}/edit`);
                 alert({
                   variant: 'success',
+                  autohide: true,
                   message: 'Exam version successfully imported.',
                 });
               }).catch((err) => {
@@ -702,6 +704,7 @@ const ShowVersion: React.FC<{
                 refresh();
                 alert({
                   variant: 'success',
+                  autohide: true,
                   message: 'Version deleted successfully.',
                 });
               }).catch((err) => {

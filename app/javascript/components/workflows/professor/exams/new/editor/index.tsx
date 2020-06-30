@@ -366,47 +366,37 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
       versionUpdate(versionId, { version }).then(resolve).catch(reject);
     })();
   });
-  const [changedEver, setChangedEver] = useState(false);
-  useEffect(() => {
-    const autosave = () => {
-      // debugger;
-      doSubmit().then((res) => {
-        if (res.updated === true) {
-          alert({
-            variant: 'success',
-            title: 'Autosaved',
-            message: 'Exam version saved automatically.',
-            autohide: true,
-          });
-        } else {
-          alert({
-            variant: 'danger',
-            title: 'Not Autosaved',
-            message: <pre>{res.reason}</pre>,
-            autohide: true,
-          });
-        }
-      }).catch((err) => {
+  const autosave = () => {
+    doSubmit().then((res) => {
+      if (res.updated === true) {
+        alert({
+          variant: 'success',
+          title: 'Autosaved',
+          message: 'Exam version saved automatically.',
+          autohide: true,
+        });
+      } else {
         alert({
           variant: 'danger',
-          title: 'Error saving.',
-          message: err.message,
+          title: 'Not Autosaved',
+          message: <pre>{res.reason}</pre>,
+          autohide: true,
         });
-      });
-    };
-    if (pristine) {
-      if (changedEver) {
-        autosave(); // Autosave original value
-        setChangedEver(false);
       }
-      return (): void => undefined;
-    }
-    setChangedEver(true);
+    }).catch((err) => {
+      alert({
+        variant: 'danger',
+        title: 'Error saving.',
+        message: err.message,
+      });
+    });
+  };
+  useEffect(() => {
     const timer = setInterval(autosave, 20000);
     return () => {
       clearInterval(timer);
     };
-  }, [alert, doSubmit, changedEver, pristine]);
+  }, [alert, autosave]);
   return (
     <form
       onSubmit={(e): void => {

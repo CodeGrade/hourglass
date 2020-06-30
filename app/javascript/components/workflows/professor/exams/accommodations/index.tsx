@@ -123,6 +123,7 @@ const SingleAccommodation: React.FC<{
       alert({
         variant: 'success',
         title: 'Successfully updated accommodation',
+        autohide: true,
         message: `Accommodation for '${accommodation.registration.user.displayName}' updated.`,
       });
     }).catch((err) => {

@@ -22,7 +22,7 @@ import { AlertContext } from '@hourglass/common/alerts';
 import { FaTrash } from 'react-icons/fa';
 import destroyAccommodation from '@hourglass/common/api/professor/accommodations/destroy';
 import Select from 'react-select';
-import { useRegistrationsIndex } from '@hourglass/common/api/professor/registrations';
+import { Registration, useRegistrationsIndex } from '@hourglass/common/api/professor/registrations';
 import Loading from '@hourglass/common/loading';
 import { createAccommodation } from '@hourglass/common/api/professor/accommodations/create';
 import { DateTime } from 'luxon';
@@ -181,34 +181,28 @@ const SingleAccommodation: React.FC<{
   );
 };
 
-interface Selection {
-  label: string;
-  value: number;
-}
-
-const NewAccommodation: React.FC<{
+const NewAccommodationLoaded: React.FC<{
   accommodations: Accommodation[];
+  registrations: Registration[];
   refresh: () => void;
 }> = (props) => {
   const {
     accommodations,
+    registrations,
     refresh,
   } = props;
   const { examId } = useParams();
-  const res = useRegistrationsIndex(examId);
   const [selected, setSelected] = useState<Selection>(null);
   const { alert } = useContext(AlertContext);
   const accs = new Set();
   accommodations.forEach((a) => accs.add(a.registration.id));
-  const options = res.type === 'RESULT'
-    ? res.response.registrations
-      .sort((a, b) => a.displayName.localeCompare(b.displayName))
-      .map((r) => ({
-        label: r.displayName,
-        value: r.id,
-      }))
-      .filter((r) => !accs.has(r.value))
-    : [];
+  const options = registrations
+    .sort((a, b) => a.displayName.localeCompare(b.displayName))
+    .map((r) => ({
+      label: r.displayName,
+      value: r.id,
+    }))
+    .filter((r) => !accs.has(r.value));
   const submit = () => {
     if (!selected) return;
     createAccommodation(examId, selected.value).then((result) => {
@@ -232,39 +226,69 @@ const NewAccommodation: React.FC<{
       });
     });
   };
-  if (res.type === 'ERROR') {
-    return (
-      <span className="text-danger">
-        <p>
-          Something went wrong.
-        </p>
-        <small>
-          {res.text}
-        </small>
-      </span>
-    );
-  }
+
   return (
-    <Loading loading={res.type === 'LOADING'}>
-      <InputGroup>
-        <Select
-          value={selected}
-          onChange={setSelected}
-          className="flex-grow-1"
-          options={options}
-        />
-        <InputGroup.Append>
-          <Button
-            onClick={submit}
-            variant="success"
-            disabled={!selected}
-          >
-            Create accommodation
-          </Button>
-        </InputGroup.Append>
-      </InputGroup>
-    </Loading>
+    <InputGroup>
+      <Select
+        value={selected}
+        onChange={setSelected}
+        className="flex-grow-1"
+        options={options}
+      />
+      <InputGroup.Append>
+        <Button
+          onClick={submit}
+          variant="success"
+          disabled={!selected}
+        >
+          Create accommodation
+        </Button>
+      </InputGroup.Append>
+    </InputGroup>
   );
+};
+
+interface Selection {
+  label: string;
+  value: number;
+}
+
+const NewAccommodation: React.FC<{
+  accommodations: Accommodation[];
+  refresh: () => void;
+}> = (props) => {
+  const {
+    accommodations,
+    refresh,
+  } = props;
+  const { examId } = useParams();
+  const res = useRegistrationsIndex(examId);
+  switch (res.type) {
+    case 'ERROR':
+      return (
+        <span className="text-danger">
+          <p>
+            Something went wrong.
+          </p>
+          <small>
+            {res.text}
+          </small>
+        </span>
+      );
+    case 'LOADING':
+    case 'RESULT':
+      return (
+        <Loading loading={res.type === 'LOADING'}>
+          <NewAccommodationLoaded
+            refresh={refresh}
+            accommodations={accommodations}
+            registrations={res.type === 'RESULT' ? res.response.registrations : []}
+          />
+        </Loading>
+      );
+    default:
+      throw new ExhaustiveSwitchError(res);
+  }
 };
 
 const Loaded: React.FC<{

@@ -37,12 +37,12 @@ const AccommodationEditor: React.FC<{
     cancel,
     accommodation,
   } = props;
-  const [startTime, setStartTime] = useState(accommodation.startTime);
-  const [extraTime, setExtraTime] = useState(accommodation.extraTime);
+  const [startTime, setStartTime] = useState(accommodation.newStartTime);
+  const [extraTime, setExtraTime] = useState(accommodation.percentTimeExpansion);
   return (
     <tr>
       <td className="align-middle">
-        {accommodation.reg.user.displayName}
+        {accommodation.registration.user.displayName}
       </td>
       <td>
         <DateTimePicker
@@ -100,7 +100,7 @@ const SingleAccommodation: React.FC<{
         variant: 'success',
         title: 'Successfully deleted accommodation',
         autohide: true,
-        message: `Accommodation for '${accommodation.reg.user.displayName}' deleted.`,
+        message: `Accommodation for '${accommodation.registration.user.displayName}' deleted.`,
       });
     }).catch((err) => {
       alert({
@@ -110,10 +110,10 @@ const SingleAccommodation: React.FC<{
       });
     });
   };
-  const submit = (startTime: DateTime, extraTime: number) => {
+  const submit = (newStartTime: DateTime, percentTimeExpansion: number) => {
     updateAccommodation(accommodation.id, {
-      startTime,
-      extraTime,
+      newStartTime,
+      percentTimeExpansion,
     }).then((res) => {
       if (res.success !== true) {
         throw new Error(res.reason);
@@ -123,7 +123,7 @@ const SingleAccommodation: React.FC<{
       alert({
         variant: 'success',
         title: 'Successfully updated accommodation',
-        message: `Accommodation for '${accommodation.reg.user.displayName}' updated.`,
+        message: `Accommodation for '${accommodation.registration.user.displayName}' updated.`,
       });
     }).catch((err) => {
       setEditing(false);
@@ -146,16 +146,16 @@ const SingleAccommodation: React.FC<{
   return (
     <tr>
       <td className="align-middle">
-        {accommodation.reg.user.displayName}
+        {accommodation.registration.user.displayName}
       </td>
       <td className="align-middle">
-        {accommodation.startTime ? (
-          <ReadableDate showTime value={accommodation.startTime} />
+        {accommodation.newStartTime ? (
+          <ReadableDate showTime value={accommodation.newStartTime} />
         ) : (
           <i>Not set.</i>
         )}
       </td>
-      <td className="align-middle">{accommodation.extraTime}</td>
+      <td className="align-middle">{accommodation.percentTimeExpansion}</td>
       <td align="right" className="text-nowrap">
         <Button
           variant="danger"
@@ -199,7 +199,7 @@ const NewAccommodation: React.FC<{
   const [selected, setSelected] = useState<Selection>(null);
   const { alert } = useContext(AlertContext);
   const accs = new Set();
-  accommodations.forEach((a) => accs.add(a.reg.id));
+  accommodations.forEach((a) => accs.add(a.registration.id));
   const options = res.type === 'RESULT'
     ? res.response.registrations
       .sort((a, b) => a.displayName.localeCompare(b.displayName))
@@ -275,7 +275,7 @@ const Loaded: React.FC<{
     refresh,
     accommodations,
   } = props;
-  accommodations.sort((a, b) => a.reg.user.displayName.localeCompare(b.reg.user.displayName));
+  accommodations.sort((a, b) => a.registration.user.displayName.localeCompare(b.registration.user.displayName));
   return (
     <>
       <Form.Group>

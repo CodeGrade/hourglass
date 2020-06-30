@@ -15,9 +15,9 @@ module Api
             user = reg.user
             {
               id: acc.id,
-              startTime: acc.new_start_time,
-              extraTime: acc.percent_time_expansion,
-              reg: {
+              newStartTime: acc.new_start_time,
+              percentTimeExpansion: acc.percent_time_expansion,
+              registration: {
                 id: reg.id,
                 user: {
                   displayName: user.display_name,
@@ -29,10 +29,10 @@ module Api
       end
 
       def update
-        accommodation_params = params.require(:accommodation).permit(:startTime, :extraTime)
+        accommodation_params = params.require(:accommodation).permit(:newStartTime, :percentTimeExpansion)
         @accommodation.update!(
-          new_start_time: accommodation_params[:startTime],
-          percent_time_expansion: accommodation_params[:extraTime],
+          new_start_time: accommodation_params[:newStartTime],
+          percent_time_expansion: accommodation_params[:percentTimeExpansion],
         )
         render json: {
           success: true,

@@ -13,8 +13,8 @@ interface Bad {
 }
 
 export interface Body {
-  startTime?: DateTime;
-  extraTime: number;
+  newStartTime?: DateTime;
+  percentTimeExpansion: number;
 }
 
 export function updateAccommodation(accommodationId: number, body: Body): Promise<Response> {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useResponse as useRegsIndex } from '@hourglass/common/api/grader/registrations';
-import { useResponse as useRegsShow } from '@hourglass/common/api/grader/registrations/show';
+import { useRegistrationsShow as useRegsShow } from '@hourglass/common/api/grader/registrations/show';
 import {
   useParams,
   Switch,

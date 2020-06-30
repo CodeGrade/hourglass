@@ -9,6 +9,6 @@ export interface Response {
   };
 }
 
-export function useResponse(registrationId: number): ApiResponse<Response> {
+export function useRegistrationsShow(registrationId: number): ApiResponse<Response> {
   return useApiResponse(`/api/grader/registrations/${registrationId}`);
 }

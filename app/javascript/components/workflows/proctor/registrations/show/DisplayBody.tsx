@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { ExamViewerContext } from '@student/exams/show/context';
-import Code from '@student/exams/show/components/questions/Code';
+import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import DisplayCodeTag from '@proctor/registrations/show/questions/DisplayCodeTag';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
@@ -36,7 +36,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     case 'Code':
       return (
         <Prompted prompt={body.prompt}>
-          <Code info={body} value={value as CodeState} disabled autosize />
+          <DisplayCode info={body} value={value as CodeState} />
         </Prompted>
       );
     case 'AllThatApply':

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { FaChevronCircleLeft, FaChevronCircleRight } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
@@ -22,7 +22,7 @@ import { useVersionsShow } from '@hourglass/common/api/grader/versions/show';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import { ExamViewerContext, ExamContext } from '@student/exams/show/context';
 import { createMap } from '@student/exams/show/files';
-import Code from '@student/exams/show/components/questions/Code';
+import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
 import DisplayCodeTag from '@proctor/registrations/show/questions/DisplayCodeTag';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
@@ -40,6 +40,46 @@ const PromptRow: React.FC<{
     </Col>
   </Row>
 );
+
+interface AnswersRowProps<T, V> {
+  ShowStudent?: React.ComponentType<{
+    info: T,
+    value: V,
+  }>;
+  ShowExpected: React.ComponentType<{
+    info: T,
+    value: V,
+  }>;
+  info: T;
+  studentAnswer: V;
+  expectedAnswer: V;
+}
+
+const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
+  const {
+    ShowExpected,
+    ShowStudent = ShowExpected,
+    info,
+    studentAnswer,
+    expectedAnswer,
+  } = props;
+  return (
+    <Row>
+      <Col>
+        <ShowStudent
+          info={info}
+          value={studentAnswer}
+        />
+      </Col>
+      <Col>
+        <ShowExpected
+          info={info}
+          value={expectedAnswer}
+        />
+      </Col>
+    </Row>
+  );
+};
 
 const GradeBodyItem: React.FC<{
   expectedAnswer: AnswerState;
@@ -63,144 +103,84 @@ const GradeBodyItem: React.FC<{
       return (
         <>
           <PromptRow prompt={info.prompt} />
-          <Row>
-            <Col>
-              <Code
-                info={info}
-                value={studentAnswer as CodeState}
-                disabled
-                autosize
-              />
-            </Col>
-            <Col>
-              <Code
-                info={info}
-                value={expectedAnswer as CodeState}
-                disabled
-                autosize
-              />
-            </Col>
-          </Row>
+          <AnswersRow
+            info={info}
+            ShowExpected={DisplayCode}
+            studentAnswer={studentAnswer as CodeState}
+            expectedAnswer={expectedAnswer as CodeState}
+          />
         </>
       );
     case 'CodeTag':
       return (
         <>
           <PromptRow prompt={info.prompt} />
-          <Row>
-            <Col>
-              <DisplayCodeTag
-                info={info}
-                value={studentAnswer as CodeTagState}
-              />
-            </Col>
-            <Col>
-              <DisplayCodeTag
-                info={info}
-                value={expectedAnswer as CodeTagState}
-              />
-            </Col>
-          </Row>
+          <AnswersRow
+            info={info}
+            ShowExpected={DisplayCodeTag}
+            studentAnswer={studentAnswer as CodeTagState}
+            expectedAnswer={expectedAnswer as CodeTagState}
+          />
         </>
       );
     case 'YesNo':
       return (
         <>
           <PromptRow prompt={info.prompt} />
-          <Row>
-            <Col>
-              <DisplayYesNo
-                info={info}
-                value={studentAnswer as YesNoState}
-              />
-            </Col>
-            <Col>
-              <DisplayYesNo
-                info={info}
-                value={expectedAnswer as YesNoState}
-              />
-            </Col>
-          </Row>
+          <AnswersRow
+            info={info}
+            ShowExpected={DisplayYesNo}
+            studentAnswer={studentAnswer as YesNoState}
+            expectedAnswer={expectedAnswer as YesNoState}
+          />
         </>
       );
     case 'Text':
       return (
         <>
           <PromptRow prompt={info.prompt} />
-          <Row>
-            <Col>
-              <DisplayText
-                info={info}
-                value={studentAnswer as TextState}
-              />
-            </Col>
-            <Col>
-              <DisplayText
-                info={info}
-                value={expectedAnswer as TextState}
-              />
-            </Col>
-          </Row>
+          <AnswersRow
+            info={info}
+            ShowExpected={DisplayText}
+            studentAnswer={studentAnswer as TextState}
+            expectedAnswer={expectedAnswer as TextState}
+          />
         </>
       );
     case 'Matching':
       return (
         <>
           {/* <PromptRow prompt={info.prompt} /> */}
-          <Row>
-            <Col>
-              <DisplayMatching
-                info={info}
-                value={studentAnswer as MatchingState}
-              />
-            </Col>
-            <Col>
-              <DisplayMatching
-                info={info}
-                value={expectedAnswer as MatchingState}
-              />
-            </Col>
-          </Row>
+          <AnswersRow
+            info={info}
+            ShowExpected={DisplayMatching}
+            studentAnswer={studentAnswer as MatchingState}
+            expectedAnswer={expectedAnswer as MatchingState}
+          />  
         </>
       );
     case 'AllThatApply':
       return (
         <>
           <PromptRow prompt={info.prompt} />
-          <Row>
-            <Col>
-              <DisplayAllThatApply
-                info={info}
-                value={studentAnswer as AllThatApplyState}
-              />
-            </Col>
-            <Col>
-              <DisplayAllThatApply
-                info={info}
-                value={expectedAnswer as AllThatApplyState}
-              />
-            </Col>
-          </Row>
+          <AnswersRow
+            info={info}
+            ShowExpected={DisplayAllThatApply}
+            studentAnswer={studentAnswer as AllThatApplyState}
+            expectedAnswer={expectedAnswer as AllThatApplyState}
+          />
         </>
       );
     case 'MultipleChoice':
       return (
         <>
           <PromptRow prompt={info.prompt} />
-          <Row>
-            <Col>
-              <DisplayMultipleChoice
-                info={info}
-                value={studentAnswer as MultipleChoiceState}
-              />
-            </Col>
-            <Col>
-              <DisplayMultipleChoice
-                info={info}
-                value={expectedAnswer as MultipleChoiceState}
-              />
-            </Col>
-          </Row>
+          <AnswersRow
+            info={info}
+            ShowExpected={DisplayMultipleChoice}
+            studentAnswer={studentAnswer as MultipleChoiceState}
+            expectedAnswer={expectedAnswer as MultipleChoiceState}
+          />
         </>
       );
     default:
@@ -236,10 +216,11 @@ const Grade: React.FC<{
                   const ans = answers.answers[qnum][pnum][bnum];
                   const expectedAnswer = isNoAns(ans) ? undefined : ans;
                   return (
-                    <>
+                    <React.Fragment
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={bnum}
+                    >
                       <GradeBodyItem
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={bnum}
                         info={b}
                         studentAnswer={contents.answers.answers[qnum][pnum][bnum]}
                         expectedAnswer={expectedAnswer}
@@ -255,7 +236,7 @@ const Grade: React.FC<{
                           rubric
                         </Col>
                       </Row>
-                    </>
+                    </React.Fragment>
                   );
                 })}
               </div>

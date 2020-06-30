@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import QuillPasteSmart from 'quill-paste-smart';
 import 'react-quill/dist/quill.snow';
@@ -59,6 +59,12 @@ const CustomEditor: React.FC<CustomEditorProps> = (props) => {
     onChange,
   } = props;
 
+  const filteredOnChange = useCallback((val, delta, source, editor) => {
+    const quillBreak = new RegExp('<p><br></p>', 'g');
+    const filteredVal = val.replace(quillBreak, '');
+    onChange(filteredVal, delta, source, editor);
+  }, [onChange]);
+
   return (
     <ReactQuill
       id={id}
@@ -70,7 +76,7 @@ const CustomEditor: React.FC<CustomEditorProps> = (props) => {
       modules={{
         toolbar: toolbarOptions,
       }}
-      onChange={onChange}
+      onChange={filteredOnChange}
     />
   );
 };

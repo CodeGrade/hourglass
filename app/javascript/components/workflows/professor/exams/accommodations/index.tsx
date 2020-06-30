@@ -91,7 +91,10 @@ const SingleAccommodation: React.FC<{
   const stopEdit = useCallback(() => setEditing(false), []);
   const { alert } = useContext(AlertContext);
   const destroy = () => {
-    destroyAccommodation(accommodation.id).then((_res) => {
+    destroyAccommodation(accommodation.id).then((res) => {
+      if (res.success !== true) {
+        throw new Error(res.reason);
+      }
       refresh();
       alert({
         variant: 'success',

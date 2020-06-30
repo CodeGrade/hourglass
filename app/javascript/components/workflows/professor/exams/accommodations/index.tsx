@@ -275,7 +275,9 @@ const Loaded: React.FC<{
     refresh,
     accommodations,
   } = props;
-  accommodations.sort((a, b) => a.registration.user.displayName.localeCompare(b.registration.user.displayName));
+  accommodations.sort(
+    (a, b) => a.registration.user.displayName.localeCompare(b.registration.user.displayName),
+  );
   return (
     <>
       <Form.Group>
@@ -318,9 +320,15 @@ const ManageAccommodations: React.FC = () => {
         </span>
       );
     case 'LOADING':
-      return <p>Loading...</p>;
     case 'RESULT':
-      return <Loaded refresh={refresh} accommodations={response.response.accommodations} />;
+      return (
+        <Loading loading={response.type === 'LOADING'}>
+          <Loaded
+            refresh={refresh}
+            accommodations={response.type === 'LOADING' ? [] : response.response.accommodations}
+          />
+        </Loading>
+      );
     default:
       throw new ExhaustiveSwitchError(response);
   }

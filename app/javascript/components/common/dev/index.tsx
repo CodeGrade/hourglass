@@ -225,17 +225,20 @@ const Grade: React.FC<{
           </Col>
         </Row>
         {contents.exam.questions.map((q, qnum) => (
+          // eslint-disable-next-line react/no-array-index-key
           <div key={qnum}>
-            <h2>Q {qnum+1}</h2>
+            <h2>{`Q ${qnum + 1}`}</h2>
             {q.parts.map((p, pnum) => (
+              // eslint-disable-next-line react/no-array-index-key
               <div key={pnum}>
-                <h3>P {pnum + 1}</h3>
+                <h3>{`P ${pnum + 1}`}</h3>
                 {p.body.map((b, bnum) => {
                   const ans = answers.answers[qnum][pnum][bnum];
                   const expectedAnswer = isNoAns(ans) ? undefined : ans;
                   return (
                     <>
                       <GradeBodyItem
+                        // eslint-disable-next-line react/no-array-index-key
                         key={bnum}
                         info={b}
                         studentAnswer={contents.answers.answers[qnum][pnum][bnum]}
@@ -291,7 +294,6 @@ export default () => {
         </Col>
       </Row>
     );
-  } else {
-    return null;
   }
+  return null;
 };

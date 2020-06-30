@@ -21,7 +21,7 @@ const Code: React.FC<CodeProps> = (props) => {
     disabled,
     autosize = false,
   } = props;
-  const { prompt, lang, initial } = info;
+  const { lang, initial } = info;
   const { fmap } = useContext(ExamContext);
   let text = state?.text ?? undefined;
   let marks = state?.marks ?? undefined;
@@ -41,33 +41,26 @@ const Code: React.FC<CodeProps> = (props) => {
   text = text ?? '';
   marks = marks ?? [];
   return (
-    <>
-      <Row>
-        <Col>
-          <HTML value={prompt} />
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Editor
-            disabled={disabled}
-            autosize={autosize}
-            value={text}
-            markDescriptions={marks}
-            valueUpdate={[disabled]}
-            language={lang}
-            onChange={(newText, newMarks): void => {
-              if (onChange) {
-                onChange({
-                  text: newText,
-                  marks: newMarks,
-                });
-              }
-            }}
-          />
-        </Col>
-      </Row>
-    </>
+    <Row>
+      <Col>
+        <Editor
+          disabled={disabled}
+          autosize={autosize}
+          value={text}
+          markDescriptions={marks}
+          valueUpdate={[disabled]}
+          language={lang}
+          onChange={(newText, newMarks): void => {
+            if (onChange) {
+              onChange({
+                text: newText,
+                marks: newMarks,
+              });
+            }
+          }}
+        />
+      </Col>
+    </Row>
   );
 };
 export default Code;

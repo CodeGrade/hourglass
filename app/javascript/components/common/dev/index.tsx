@@ -8,10 +8,14 @@ import {
   Table,
   ButtonGroup,
   Alert,
-  ButtonProps,
   AlertProps,
 } from 'react-bootstrap';
-import { FaChevronCircleLeft, FaChevronCircleRight, FaThumbsDown, FaThumbsUp } from 'react-icons/fa';
+import {
+  FaChevronCircleLeft,
+  FaChevronCircleRight,
+  FaThumbsDown,
+  FaThumbsUp,
+} from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { useRegistrationsShow } from '@hourglass/common/api/grader/registrations/show';
 import {
@@ -227,7 +231,7 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayMatching}
             studentAnswer={studentAnswer as MatchingState}
             expectedAnswer={expectedAnswer as MatchingState}
-          />  
+          />
         </>
       );
     case 'AllThatApply':
@@ -313,7 +317,7 @@ const Grade: React.FC<{
   );
 };
 
-export default () => {
+const Grading: React.FC = () => {
   const res = useRegistrationsShow(1);
   const versionRes = useVersionsShow(1);
   if (res.type === 'RESULT' && versionRes.type === 'RESULT') {
@@ -338,3 +342,5 @@ export default () => {
   }
   return null;
 };
+
+export default Grading;

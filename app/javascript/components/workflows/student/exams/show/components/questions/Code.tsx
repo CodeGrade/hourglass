@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { CodeInfo, CodeState } from '@student/exams/show/types';
 import { ExamContext } from '@student/exams/show/context';
-import HTML from '@student/exams/show/components/HTML';
 import { Editor } from '../ExamCodeBox';
 
 interface CodeProps {

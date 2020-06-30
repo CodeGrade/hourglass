@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col, Button, Card, Table } from 'react-bootstrap';
 import { FaChevronCircleLeft, FaChevronCircleRight } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { useRegistrationsShow } from '@hourglass/common/api/grader/registrations/show';
@@ -64,20 +64,38 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
     expectedAnswer,
   } = props;
   return (
-    <Row>
-      <Col>
-        <ShowStudent
-          info={info}
-          value={studentAnswer}
-        />
-      </Col>
-      <Col>
-        <ShowExpected
-          info={info}
-          value={expectedAnswer}
-        />
-      </Col>
-    </Row>
+    <Card>
+      <Card.Body className="p-0">
+        <Table>
+          <thead>
+            <tr>
+              <th className="w-50">Student</th>
+              <th className="w-50">Rubric</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <ShowStudent
+                  info={info}
+                  value={studentAnswer}
+                />
+              </td>
+              <td>
+                <ShowExpected
+                  info={info}
+                  value={expectedAnswer}
+                />
+              </td>
+            </tr>
+            <tr>
+              <td>grading</td>
+              <td>etc</td>
+            </tr>
+          </tbody>
+        </Table>
+      </Card.Body>
+    </Card>
   );
 };
 
@@ -216,27 +234,16 @@ const Grade: React.FC<{
                   const ans = answers.answers[qnum][pnum][bnum];
                   const expectedAnswer = isNoAns(ans) ? undefined : ans;
                   return (
-                    <React.Fragment
+                    <GradeBodyItem
                       // eslint-disable-next-line react/no-array-index-key
                       key={bnum}
-                    >
-                      <GradeBodyItem
-                        info={b}
-                        studentAnswer={contents.answers.answers[qnum][pnum][bnum]}
-                        expectedAnswer={expectedAnswer}
-                        qnum={qnum}
-                        pnum={pnum}
-                        bnum={bnum}
-                      />
-                      <Row className="bg-light">
-                        <Col>
-                          grading
-                        </Col>
-                        <Col>
-                          rubric
-                        </Col>
-                      </Row>
-                    </React.Fragment>
+                      info={b}
+                      studentAnswer={contents.answers.answers[qnum][pnum][bnum]}
+                      expectedAnswer={expectedAnswer}
+                      qnum={qnum}
+                      pnum={pnum}
+                      bnum={bnum}
+                    />
                   );
                 })}
               </div>

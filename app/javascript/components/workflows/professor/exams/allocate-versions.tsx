@@ -351,7 +351,9 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
         <h3>Unassigned Students</h3>
         <div className="border px-2 flex-fill rounded">
           <ul className="list-unstyled column-count-4">
-            {unassigned.map((s) => (
+            {unassigned.length === 0 ? (
+              <p>No students</p>
+            ) : unassigned.map((s) => (
               <li key={s.id} className="fixed-col-width">
                 <span>{s.displayName}</span>
               </li>

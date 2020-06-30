@@ -9,6 +9,7 @@ class Registration < ApplicationRecord
   has_many :anomalies, dependent: :destroy
   has_many :snapshots, dependent: :destroy
   has_one :accommodation, dependent: :destroy
+  has_many :grading_locks, dependent: :destroy
 
   validates :user, presence: true
   validates :exam_version, presence: true

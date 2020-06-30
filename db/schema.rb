@@ -71,6 +71,18 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.index ["course_id"], name: "index_exams_on_course_id"
   end
 
+  create_table "grading_locks", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.bigint "grader_id", null: false
+    t.integer "qnum", null: false
+    t.integer "pnum", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["grader_id"], name: "index_grading_locks_on_grader_id"
+    t.index ["registration_id", "qnum", "pnum"], name: "index_grading_locks_on_registration_id_and_qnum_and_pnum", unique: true
+    t.index ["registration_id"], name: "index_grading_locks_on_registration_id"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.bigint "exam_id", null: false
     t.bigint "sender_id", null: false
@@ -221,6 +233,8 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   add_foreign_key "exam_announcements", "exams"
   add_foreign_key "exam_versions", "exams"
   add_foreign_key "exams", "courses"
+  add_foreign_key "grading_locks", "registrations"
+  add_foreign_key "grading_locks", "users", column: "grader_id"
   add_foreign_key "messages", "exams"
   add_foreign_key "messages", "users", column: "recipient_id"
   add_foreign_key "messages", "users", column: "sender_id"

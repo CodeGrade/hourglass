@@ -5,7 +5,7 @@ module Api
     # Student registration controls.
     class RegistrationsController < GraderController
       before_action :find_exam_and_course, only: [:index]
-      before_action :find_registration_and_exam_and_course, only: [:show]
+      before_action :find_registration_and_exam_and_course, except: [:index]
       before_action :require_staff_reg
 
       def index
@@ -38,6 +38,31 @@ module Api
             answers: @registration.current_answers,
           },
         }
+      end
+
+      def start_grading
+        body = params.permit(:qnum, :pnum)
+        GradingLock.transaction do
+          lock = @registration.grading_locks.find_by(body)
+          return head :conflict if lock
+
+          lock = GradingLock.new(body.merge(registration: @registration, grader: current_user))
+          lock.save!
+        end
+      end
+
+      def finish_grading
+        body = params.permit(:qnum, :pnum)
+        GradingLock.transaction do
+          lock = @registration.grading_locks.find_by(body)
+          return head :not_found unless lock
+
+          if lock.grader != current_user
+            return head :forbidden unless @professor_course_registration
+          end
+
+          lock.destroy!
+        end
       end
     end
   end

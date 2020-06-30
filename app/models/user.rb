@@ -30,6 +30,12 @@ class User < ApplicationRecord
            dependent: :destroy,
            inverse_of: 'recipient'
 
+  has_many :grading_locks,
+           foreign_key: 'grader',
+           class_name: 'GradingLock',
+           dependent: :destroy,
+           inverse_of: 'grader'
+
   # TODO: validates :registrations, uniqueness: { scope: :exam_id }
 
   def self.from_omniauth(auth)

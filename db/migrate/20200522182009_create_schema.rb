@@ -187,5 +187,17 @@ class CreateSchema < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+
+    create_table :grading_locks do |t|
+      t.references :registration, null: false, foreign_key: true
+      t.references :grader, null: false, foreign_key: { to_table: 'users' }
+
+      t.integer :qnum, null: false
+      t.integer :pnum, null: false
+
+      t.index [:registration_id, :qnum, :pnum], unique: true
+
+      t.timestamps
+    end
   end
 end

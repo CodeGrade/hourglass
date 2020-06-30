@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :user do
     transient do
-      sequence :num
+      sequence :num, User.maximum(:id)
     end
 
     username { "user#{num}" }

@@ -7,4 +7,9 @@ class GradingLock < ApplicationRecord
 
   validates :registration, presence: true
   validates :grader, presence: true
+
+  validates :pnum, uniqueness: {
+    scope: [:registration_id, :qnum],
+    message: 'is already being graded',
+  }
 end

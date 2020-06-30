@@ -10,6 +10,12 @@ Rails.application.routes.draw do
           post :sync
           resources :exams, param: 'exam_id', only: [:create, :index, :show, :update] do
             member do
+              resources :grading_locks, only: [:index] do
+                collection do
+                  post :release_all
+                end
+              end
+
               resources :registrations, param: 'registration_id', only: [:index]
               resources :accommodations, param: 'accommodation_id', only: [:index, :update, :destroy, :create]
               resources :versions, param: 'version_id', only: [:index, :show, :create, :update, :destroy] do

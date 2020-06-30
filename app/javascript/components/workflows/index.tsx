@@ -28,6 +28,7 @@ import { AllAlerts } from '@hourglass/common/alerts';
 import './index.scss';
 import ErrorBoundary from '@hourglass/common/boundary';
 import DocumentTitle from '@hourglass/common/documentTitle';
+import Dev from '@hourglass/common/dev';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -269,6 +270,12 @@ const Entry: React.FC = () => {
                 <AllAlerts>
                   <ExamProctoring />
                 </AllAlerts>
+              </Route>
+              <Route exact path="/dev">
+                <RegularNavbar />
+                <Container fluid>
+                  <Dev />
+                </Container>
               </Route>
               <Route path="/">
                 <RegularNavbar />

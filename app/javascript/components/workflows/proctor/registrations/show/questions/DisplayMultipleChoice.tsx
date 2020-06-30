@@ -12,30 +12,22 @@ const DisplayMultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
     info,
     value,
   } = props;
-  const { options, prompt } = info;
-  let theRest;
+  const { options } = info;
   if (value === undefined) {
-    theRest = (
+    return (
       <>
         <b>Answer: </b>
         <i>None selected</i>
       </>
     );
-  } else {
-    theRest = (
-      <>
-        <b>Answer: </b>
-        <span className="btn btn-sm btn-outline-dark disabled">
-          <HTML value={options[value]} />
-        </span>
-      </>
-    );
   }
   return (
-    <div>
-      <div><HTML value={prompt} /></div>
-      {theRest}
-    </div>
+    <>
+      <b>Answer: </b>
+      <span className="btn btn-sm btn-outline-dark disabled">
+        <HTML value={options[value]} />
+      </span>
+    </>
   );
 };
 

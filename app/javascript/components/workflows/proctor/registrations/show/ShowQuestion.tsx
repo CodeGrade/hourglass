@@ -24,7 +24,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     description,
     parts,
   } = question;
-  const singlePart = parts.length === 1 && !parts[0].name;
+  const singlePart = parts.length === 1 && !parts[0].name.value;
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
@@ -32,7 +32,9 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     <QuestionFilesContext.Provider value={{ references: reference }}>
       <div>
         <h1>
-          <HTML value={name} />
+          <div className="d-inline-block">
+            <HTML value={name} />
+          </div>
           {singlePart && (
             <small className="float-right text-muted">
               {subtitle}

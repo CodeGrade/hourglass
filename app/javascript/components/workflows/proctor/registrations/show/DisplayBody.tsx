@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { ExamViewerContext } from '@student/exams/show/context';
 import Code from '@student/exams/show/components/questions/Code';
-import DisplayYesNoInput from '@proctor/registrations/show/questions/DisplayYesNo';
+import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import DisplayCodeTag from '@proctor/registrations/show/questions/DisplayCodeTag';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
@@ -15,6 +15,7 @@ import {
 } from '@student/exams/show/types';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
+import Prompted from '@proctor/registrations/show/questions/Prompted';
 
 const DisplayBody: React.FC<BodyProps> = (props) => {
   const {
@@ -33,18 +34,43 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     case 'HTML':
       return <HTML value={body} />;
     case 'Code':
-      return <Code info={body} value={value as CodeState} disabled autosize />;
+      return (
+        <Prompted prompt={body.prompt}>
+          <Code info={body} value={value as CodeState} disabled autosize />
+        </Prompted>
+      );
     case 'AllThatApply':
-      return <DisplayAllThatApply info={body} value={value as AllThatApplyState} />;
+      return (
+        <Prompted prompt={body.prompt}>
+          <DisplayAllThatApply info={body} value={value as AllThatApplyState} />
+        </Prompted>
+      );
     case 'CodeTag':
-      return <DisplayCodeTag info={body} value={value as CodeTagState} />;
+      return (
+        <Prompted prompt={body.prompt}>
+          <DisplayCodeTag info={body} value={value as CodeTagState} />
+        </Prompted>
+      );
     case 'YesNo':
-      return <DisplayYesNoInput info={body} value={value as YesNoState} />;
+      return (
+        <Prompted prompt={body.prompt}>
+          <DisplayYesNo info={body} value={value as YesNoState} />
+        </Prompted>
+      );
     case 'MultipleChoice':
-      return <DisplayMultipleChoice info={body} value={value as MultipleChoiceState} />;
+      return (
+        <Prompted prompt={body.prompt}>
+          <DisplayMultipleChoice info={body} value={value as MultipleChoiceState} />
+        </Prompted>
+      );
     case 'Text':
-      return <DisplayText info={body} value={value as TextState} />;
+      return (
+        <Prompted prompt={body.prompt}>
+          <DisplayText info={body} value={value as TextState} />
+        </Prompted>
+      );
     case 'Matching':
+      // TODO: prompt me
       return <DisplayMatching info={body} value={value as MatchingState} />;
     default:
       throw new ExhaustiveSwitchError(body);

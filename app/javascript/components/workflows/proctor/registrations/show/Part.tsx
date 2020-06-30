@@ -38,13 +38,15 @@ const Part: React.FC<PartProps> = (props) => {
       <div>
         {anonymous || (
           <h3 id={`question-${qnum}-part-${pnum}`}>
-            <HTML value={name} />
+            <div className="d-inline-block">
+              <HTML value={name} />
+            </div>
             <small className="float-right text-muted">
               {subtitle}
             </small>
           </h3>
         )}
-        <div><HTML value={description} /></div>
+        {description?.value && <HTML value={description} />}
         {reference.length !== 0 && <FileViewer references={reference} />}
         {body.map((b, i) => (
           // Body numbers are STATIC.

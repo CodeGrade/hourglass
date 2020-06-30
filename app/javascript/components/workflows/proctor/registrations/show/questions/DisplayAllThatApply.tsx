@@ -12,35 +12,27 @@ const DisplayAllThatApply: React.FC<AllThatApplyProps> = (props) => {
     info,
     value,
   } = props;
-  const { options, prompt } = info;
-  let theRest;
+  const { options } = info;
   if (!value || !Object.values(value).some((ans) => !!ans)) {
-    theRest = (
+    return (
       <>
         <b>Answer: </b>
         <i>None selected</i>
       </>
     );
-  } else {
-    theRest = (
-      <>
-        <b>Answer: </b>
-        <ul>
-          {options.map((o, i) => {
-            // options array is STATIC
-            // eslint-disable-next-line react/no-array-index-key
-            if (value?.[i]) { return <li key={i}><HTML value={o} /></li>; }
-            return null;
-          })}
-        </ul>
-      </>
-    );
   }
   return (
-    <div>
-      <div><HTML value={prompt} /></div>
-      {theRest}
-    </div>
+    <>
+      <b>Answer: </b>
+      <ul>
+        {options.map((o, i) => {
+          // options array is STATIC
+          // eslint-disable-next-line react/no-array-index-key
+          if (value?.[i]) { return <li key={i}><HTML value={o} /></li>; }
+          return null;
+        })}
+      </ul>
+    </>
   );
 };
 

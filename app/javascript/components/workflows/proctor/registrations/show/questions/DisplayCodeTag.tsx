@@ -79,7 +79,7 @@ const DisplayCodeTag: React.FC<CodeTagProps> = (props) => {
     info,
     value,
   } = props;
-  const { choices, prompt } = info;
+  const { choices } = info;
   const [showModal, setShowModal] = useState(false);
   const examReferences = useContext(ExamFilesContext);
   const questionReferences = useContext(QuestionFilesContext);
@@ -100,50 +100,31 @@ const DisplayCodeTag: React.FC<CodeTagProps> = (props) => {
   }
   const { fmap } = useContext(ExamContext);
   const filteredFiles = getFilesForRefs(fmap, references);
-  let theRest;
   if (value) {
-    theRest = (
-      <>
-        <Row className="mt-2 align-items-baseline">
-          <Col>
-            <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />
-          </Col>
-          <Col>
-            <Button size="sm" onClick={(): void => setShowModal(true)} variant="outline-info">
-              Show line
-            </Button>
-            <FileModal
-              references={references}
-              show={showModal}
-              onClose={(): void => setShowModal(false)}
-              value={value}
-            />
-          </Col>
-        </Row>
-      </>
-    );
-  } else {
-    theRest = (
-      <Row className="mt-2">
+    return (
+      <Row className="mt-2 align-items-baseline">
         <Col>
-          <b>File: </b>
-          <i>No file selected</i>
+          <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />
+        </Col>
+        <Col>
+          <Button size="sm" onClick={(): void => setShowModal(true)} variant="outline-info">
+            Show line
+          </Button>
+          <FileModal
+            references={references}
+            show={showModal}
+            onClose={(): void => setShowModal(false)}
+            value={value}
+          />
         </Col>
       </Row>
     );
   }
   return (
-    <Row>
+    <Row className="mt-2">
       <Col>
-        {prompt
-         && (
-         <Row>
-           <Col sm={12}>
-             <HTML value={prompt} />
-           </Col>
-         </Row>
-         )}
-        {theRest}
+        <b>File: </b>
+        <i>No file selected</i>
       </Col>
     </Row>
   );

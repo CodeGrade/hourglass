@@ -1,6 +1,5 @@
 import React from 'react';
 import { YesNoInfo } from '@student/exams/show/types';
-import HTML from '@student/exams/show/components/HTML';
 
 export interface YesNoProps {
   info: YesNoInfo;
@@ -13,35 +12,26 @@ const DisplayYesNo: React.FC<YesNoProps> = (props) => {
     value,
   } = props;
   const {
-    prompt,
     yesLabel,
     noLabel,
   } = info;
-  let theRest;
   if (value === undefined) {
-    theRest = (
+    return (
       <>
         <b>Answer: </b>
         <i>No answer given</i>
       </>
     );
-  } else {
-    theRest = (
-      <>
-        <b>Answer: </b>
-        <span className="btn btn-sm btn-outline-dark disabled">
-          {value
-            ? yesLabel
-            : noLabel}
-        </span>
-      </>
-    );
   }
   return (
-    <div>
-      <div><HTML value={prompt} /></div>
-      {theRest}
-    </div>
+    <>
+      <b>Answer: </b>
+      <span className="btn btn-sm btn-outline-dark disabled">
+        {value
+          ? yesLabel
+          : noLabel}
+      </span>
+    </>
   );
 };
 

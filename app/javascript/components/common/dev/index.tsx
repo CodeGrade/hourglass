@@ -51,7 +51,7 @@ const Feedback: React.FC<{
     dismissible
   >
     <Row>
-      <Form.Group as={Col} sm="auto">
+      <Form.Group as={Col} lg="auto">
         <Form.Label>Points</Form.Label>
         <Form.Control step={0.5} type="number" min={0} />
       </Form.Group>

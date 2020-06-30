@@ -1,6 +1,17 @@
 import React, { ReactElement } from 'react';
-import { Row, Col, Button, Card, Table } from 'react-bootstrap';
-import { FaChevronCircleLeft, FaChevronCircleRight } from 'react-icons/fa';
+import {
+  Form,
+  Row,
+  Col,
+  Button,
+  Card,
+  Table,
+  ButtonGroup,
+  Alert,
+  ButtonProps,
+  AlertProps,
+} from 'react-bootstrap';
+import { FaChevronCircleLeft, FaChevronCircleRight, FaThumbsDown, FaThumbsUp } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { useRegistrationsShow } from '@hourglass/common/api/grader/registrations/show';
 import {
@@ -30,6 +41,44 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
+import Select from 'react-select';
+
+const Feedback: React.FC<{
+  variant: AlertProps['variant'];
+}> = ({ variant }) => (
+  <Alert
+    variant={variant}
+    dismissible
+  >
+    <Row>
+      <Form.Group as={Col} sm="auto">
+        <Form.Label>Points</Form.Label>
+        <Form.Control step={0.5} type="number" min={0} />
+      </Form.Group>
+      <Form.Group as={Col}>
+        <Form.Label>Category</Form.Label>
+        <Select options={[]} />
+      </Form.Group>
+    </Row>
+    <Row>
+      <Form.Group as={Col}>
+        <Form.Label>Comment</Form.Label>
+        <Form.Control as="textarea" />
+      </Form.Group>
+    </Row>
+  </Alert>
+);
+
+const ItemizedGrades: React.FC = () => (
+  <ButtonGroup>
+    <Button variant="danger">
+      <Icon I={FaThumbsDown} />
+    </Button>
+    <Button variant="success">
+      <Icon I={FaThumbsUp} />
+    </Button>
+  </ButtonGroup>
+);
 
 const PromptRow: React.FC<{
   prompt: HTMLVal;
@@ -89,7 +138,11 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
               </td>
             </tr>
             <tr>
-              <td>grading</td>
+              <td>
+                <ItemizedGrades />
+                <Feedback variant="success" />
+                <Feedback variant="danger" />
+              </td>
               <td>etc</td>
             </tr>
           </tbody>

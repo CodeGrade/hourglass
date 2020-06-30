@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@student/exams/show/context';
 import {

@@ -4,7 +4,6 @@ import {
   Row, Col, Modal, Button,
 } from 'react-bootstrap';
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
-import HTML from '@student/exams/show/components/HTML';
 import { CodeTagVal } from '@student/exams/show/components/questions/CodeTag';
 import {
   ExamFilesContext,

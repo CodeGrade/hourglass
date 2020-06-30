@@ -101,4 +101,24 @@ class ExamVersion < ApplicationRecord
       end
     end
   end
+
+  def serialize
+    {
+      id: id,
+      name: name,
+      policies: policies,
+      contents: {
+        exam: {
+          questions: contents['questions'],
+          reference: contents['reference'] || [],
+          instructions: contents['instructions'] || { type: 'HTML', value: '' },
+          files: files,
+        },
+        answers: {
+          answers: answers,
+        },
+      },
+      anyStarted: any_started?,
+    }
+  end
 end

@@ -11,7 +11,7 @@ module Api
       before_action :no_started_regs, only: [:destroy]
 
       def show
-        render json: serialize_version(@version)
+        render json: @version.serialize
       end
 
       def index
@@ -87,7 +87,7 @@ module Api
           }
         )
         @version.save!
-        render json: serialize_version(@version)
+        render json: @version.serialize
       end
 
       def destroy
@@ -173,26 +173,6 @@ module Api
           students: regs.map(&:user).map do |s|
             serialize_student s
           end,
-        }
-      end
-
-      def serialize_version(version)
-        {
-          id: version.id,
-          name: version.name,
-          policies: version.policies,
-          contents: {
-            exam: {
-              questions: version.contents['questions'],
-              reference: version.contents['reference'] || [],
-              instructions: version.contents['instructions'] || { type: 'HTML', value: '' },
-              files: version.files,
-            },
-            answers: {
-              answers: version.answers,
-            },
-          },
-          anyStarted: version.any_started?,
         }
       end
     end

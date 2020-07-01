@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-require 'factory_bot_rails'
-
 namespace :db do
   desc 'Fill database with sample data'
   task populate: :environment do
+    require 'factory_bot_rails'
     include FactoryBot::Syntax::Methods
 
     make_sample_data if Rails.env.development?

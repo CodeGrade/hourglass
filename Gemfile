@@ -40,7 +40,7 @@ gem 'activerecord_json_validator'
 
 group :development, :test do
   gem 'byebug'
-  gem 'factory_bot_rails'
+  gem 'factory_bot_rails', require: false
   gem 'minitest-reporters'
   gem 'pry'
   gem 'pry-rails'

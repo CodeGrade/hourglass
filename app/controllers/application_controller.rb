@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# require 'bottlenose'
-
 class ApplicationController < ActionController::Base
   protect_from_forgery
 

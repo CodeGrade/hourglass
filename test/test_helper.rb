@@ -20,5 +20,6 @@ end
 class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
+  require 'factory_bot_rails'
   include FactoryBot::Syntax::Methods
 end

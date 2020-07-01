@@ -289,13 +289,15 @@ const Grade: React.FC<{
                 <h3>{`P ${pnum + 1}`}</h3>
                 {p.body.map((b, bnum) => {
                   const ans = answers.answers[qnum][pnum][bnum];
+                  const studentAns = contents.answers.answers[qnum][pnum][bnum];
+                  const studentAnswer = isNoAns(studentAns) ? undefined : studentAns;
                   const expectedAnswer = isNoAns(ans) ? undefined : ans;
                   return (
                     <GradeBodyItem
                       // eslint-disable-next-line react/no-array-index-key
                       key={bnum}
                       info={b}
-                      studentAnswer={contents.answers.answers[qnum][pnum][bnum]}
+                      studentAnswer={studentAnswer}
                       expectedAnswer={expectedAnswer}
                       qnum={qnum}
                       pnum={pnum}

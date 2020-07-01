@@ -29,6 +29,7 @@ module.exports = function(api) {
   ];
 
   const plugins = [
+    'relay',
     '@babel/plugin-syntax-dynamic-import',
     'react-hot-loader/babel',
     '@babel/plugin-transform-destructuring',

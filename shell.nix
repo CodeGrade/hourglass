@@ -59,6 +59,7 @@ in mkShell {
     chromium
     which
     lzma
+    watchman
   ];
 
   shellHook = ''

@@ -43,3 +43,5 @@ yarn-debug.log*
 .yarn-integrity
 
 /.log/
+__generated__/
+/app/javascript/relay/

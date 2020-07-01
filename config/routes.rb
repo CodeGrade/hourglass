@@ -13,6 +13,7 @@ Rails.application.routes.draw do
               resources :grading_locks, only: [:index] do
                 collection do
                   post :release_all
+                  post :start_grading
                 end
               end
 

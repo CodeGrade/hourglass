@@ -17,9 +17,13 @@
       }
     },
     "PartGrades": {
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/BodyItemGrade"
+      "type": "object",
+      "properties": {
+        "finished": { "type": "boolean" },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/BodyItemGrade" }
+        }
       }
     },
     "BodyItemGrade": {
@@ -29,7 +33,13 @@
       ]
     },
     "Deduction": {
-      "type": "number"
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["amount", "grader_id"],
+      "properties": {
+        "amount": { "type": "number" },
+        "grader_id": { "type": "number" }
+      }
     },
     "Comments": {
       "type": "array",

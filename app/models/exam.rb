@@ -33,6 +33,16 @@ class Exam < ApplicationRecord
     self[:duration].seconds
   end
 
+  def finalize_registrations_that_have_run_out_of_time!
+    registrations.in_progress.each do |r|
+      r.finalize! if r.over?
+    end
+  end
+
+  def finalized_registrations
+    registrations.final
+  end
+
   def finalized?
     registrations.in_progress.empty?
   end

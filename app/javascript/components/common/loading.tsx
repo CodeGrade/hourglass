@@ -17,11 +17,20 @@ const Loading: React.FC<{
     <LoadingOverlay
       className={className}
       active={loading}
+      styles={{
+        overlay: (base) => ({
+          ...base,
+          borderRadius: '0.25rem',
+        }),
+        content: (base) => ({
+          ...base,
+          display: 'flex',
+          alignItems: 'center',
+          flexDirection: 'column',
+        })
+      }}
       spinner={(
-        <>
-          <Spinner animation="border" role="status" />
-          <br />
-        </>
+        <Spinner animation="border" role="status" />
       )}
       text={noText ? undefined : 'Loading...'}
     >

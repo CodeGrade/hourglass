@@ -51,6 +51,14 @@ class ExamVersion < ApplicationRecord
     }
   end
 
+  def qp_pairs
+    contents['questions'].each_with_index.map do |q, qnum|
+      q['parts'].each_with_index.map do |_, pnum|
+        [qnum, pnum]
+      end
+    end.flatten(1)
+  end
+
   def any_started?
     registrations.started.exists?
   end

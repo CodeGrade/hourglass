@@ -73,7 +73,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
 
   create_table "grading_locks", force: :cascade do |t|
     t.bigint "registration_id", null: false
-    t.bigint "grader_id", null: false
+    t.bigint "grader_id"
     t.integer "qnum", null: false
     t.integer "pnum", null: false
     t.datetime "created_at", precision: 6, null: false

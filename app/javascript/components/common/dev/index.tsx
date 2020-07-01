@@ -46,6 +46,7 @@ import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatchi
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import Select from 'react-select';
+import { useParams } from 'react-router-dom';
 
 const Feedback: React.FC<{
   variant: AlertProps['variant'];
@@ -320,7 +321,8 @@ const Grade: React.FC<{
 };
 
 const Grading: React.FC = () => {
-  const res = useRegistrationsShow(1);
+  const { registrationId, qnum, pnum } = useParams();
+  const res = useRegistrationsShow(registrationId);
   const versionRes = useVersionsShow(1);
   if (res.type === 'RESULT' && versionRes.type === 'RESULT') {
     return (

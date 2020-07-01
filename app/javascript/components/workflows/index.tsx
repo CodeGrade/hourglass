@@ -30,6 +30,7 @@ import './index.scss';
 import ErrorBoundary from '@hourglass/common/boundary';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import Dev from '@hourglass/common/dev';
+import LinkButton from '@hourglass/common/linkbutton';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -100,6 +101,7 @@ const StaffRegs: React.FC<{
   const {
     regs,
   } = props;
+  if (regs.length === 0) return null;
   return (
     <>
       <h1>Exams to Grade</h1>
@@ -112,9 +114,13 @@ const StaffRegs: React.FC<{
               <li
                 key={exam.id}
               >
-                <Link to={`/exams/${exam.id}/grade`}>
-                  {exam.name}
-                </Link>
+                <h2>{exam.name}</h2>
+                <LinkButton to={`/exams/${exam.id}/grading`} variant="success">
+                  Start Grading
+                </LinkButton>
+                <Button className="ml-2" disabled>
+                  Re-grade
+                </Button>
               </li>
             ))}
           </React.Fragment>
@@ -317,11 +323,13 @@ const Entry: React.FC = () => {
                   <ExamProctoring />
                 </AllAlerts>
               </Route>
-              <Route exact path="/dev">
-                <RegularNavbar />
-                <Container fluid>
-                  <Dev />
-                </Container>
+              <Route exact path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
+                <DocumentTitle title="Grading">
+                  <RegularNavbar />
+                  <Container fluid>
+                    <Dev />
+                  </Container>
+                </DocumentTitle>
               </Route>
               <Route path="/">
                 <RegularNavbar />

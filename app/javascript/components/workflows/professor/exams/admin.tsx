@@ -21,7 +21,7 @@ import {
   Checklist,
   ChecklistItemStatus,
 } from '@hourglass/common/api/professor/exams/show';
-import { ExhaustiveSwitchError, useRefresher } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, useRefresher, sleep } from '@hourglass/common/helpers';
 import {
   Card,
   Collapse,
@@ -33,6 +33,7 @@ import {
   Dropdown,
   Tab,
   Nav,
+  ButtonProps,
 } from 'react-bootstrap';
 import {
   FaChevronUp,
@@ -70,6 +71,7 @@ import { BsPencilSquare } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import Loading from '@hourglass/common/loading';
+import startGrading from '@hourglass/common/api/professor/grading_locks/startGrading';
 
 const loadingStatus = {
   reason: 'Loading...',
@@ -118,6 +120,62 @@ export const ExamAdmin: React.FC = () => {
     default:
       throw new ExhaustiveSwitchError(response);
   }
+};
+
+const LoadingButton: React.FC<{
+  onClick: () => Promise<void>;
+} & ButtonProps> = (props) => {
+  const {
+    onClick,
+    children,
+    ...rest
+  } = props;
+  const [loading, setLoading] = useState(false);
+  const clickHandler = useCallback((e) => {
+    e.target.blur();
+    if (loading) return;
+    setLoading(true);
+    onClick().then(() => {
+      setLoading(false);
+    }).catch(() => {
+      setLoading(false);
+    });
+  }, [onClick, loading]);
+  return (
+    <Loading loading={loading} noText className="d-inline-block">
+      <Button
+        onClick={clickHandler}
+        {...rest}
+      >
+        {children}
+      </Button>
+    </Loading>
+  );
+};
+
+const StartGradingButton: React.FC = () => {
+  const { examId } = useParams();
+  const { alert } = useContext(AlertContext);
+  const history = useHistory();
+  return (
+    <LoadingButton
+      variant="success"
+      onClick={async () => {
+        try {
+          await startGrading(examId);
+          history.push(`/exams/${examId}/grading`);
+        } catch (e) {
+          alert({
+            variant: 'danger',
+            title: 'Could not start grading',
+            message: e.message,
+          });
+        }
+      }}
+    >
+      Grade!
+    </LoadingButton>
+  );
 };
 
 const Loaded: React.FC<{
@@ -180,8 +238,9 @@ const Loaded: React.FC<{
       </Form.Group>
       <Form.Group>
         <Link to={`/exams/${examId}/proctoring`}>
-          <Button variant="success">Proctor!</Button>
+          <Button className="mr-2" variant="success">Proctor!</Button>
         </Link>
+        <StartGradingButton />
         <Link to={`/exams/${examId}/submissions`}>
           <Button className="ml-2" variant="primary">View submissions</Button>
         </Link>
@@ -198,7 +257,7 @@ const ChecklistIcon: React.FC<{
     status,
     reason,
   } = props;
-  let contents;
+  let contents: {};
   switch (status) {
     case ChecklistItemStatus.Warning:
       contents = <Icon I={MdWarning} className="text-warning" />;

@@ -17,6 +17,7 @@ import * as ApiMe from '@hourglass/common/api/me';
 import * as ApiStudentExamsShow from '@hourglass/common/api/student/exams/show';
 import * as ApiStudentReg from '@hourglass/common/api/student/registrations';
 import * as ApiProfessorCourses from '@hourglass/common/api/professor/courses';
+import { useStaffRegistrationsIndex, StaffRegistration } from '@hourglass/common/api/grader/staff_registrations';
 import ShowExam from '@student/exams/show';
 import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
@@ -93,17 +94,56 @@ const ProfessorRegs: React.FC<ProfessorCoursesProps> = (props) => {
   );
 };
 
+const StaffRegs: React.FC<{
+  regs: StaffRegistration[];
+}> = (props) => {
+  const {
+    regs,
+  } = props;
+  return (
+    <>
+      <h1>Exams to Grade</h1>
+      <ul>
+        {regs.map((r) => (
+          <React.Fragment
+            key={r.id}
+          >
+            {r.course.exams.map((exam) => (
+              <li
+                key={exam.id}
+              >
+                <Link to={`/exams/${exam.id}/grade`}>
+                  {exam.name}
+                </Link>
+              </li>
+            ))}
+          </React.Fragment>
+        ))}
+      </ul>
+    </>
+  );
+};
+
 const Exams: React.FC = () => {
   const studentResponse = ApiStudentReg.useResponse();
   const profResponse = ApiProfessorCourses.useResponse();
-  const bothLoading = studentResponse.type === 'LOADING' && profResponse.type === 'LOADING';
+  const staffResponse = useStaffRegistrationsIndex();
+
+  const allLoading = (
+    studentResponse.type === 'LOADING'
+    && profResponse.type === 'LOADING'
+    && staffResponse.type === 'LOADING'
+  );
+
   const studentEmpty = studentResponse.type === 'RESULT' && studentResponse.response.regs.length === 0;
   const profEmpty = profResponse.type === 'RESULT' && profResponse.response.courses.length === 0;
-  const bothEmpty = studentEmpty && profEmpty;
+  const staffEmpty = staffResponse.type === 'RESULT' && staffResponse.response.regs.length === 0;
+
+  const allEmpty = studentEmpty && profEmpty && staffEmpty;
   return (
     <div>
-      {bothLoading && <p>Loading...</p>}
-      {bothEmpty && <p>You have no registrations.</p>}
+      {allLoading && <p>Loading...</p>}
+      {allEmpty && <p>You have no registrations.</p>}
       {studentResponse.type === 'RESULT' && (
         <StudentRegs
           regs={studentResponse.response.regs}
@@ -113,6 +153,12 @@ const Exams: React.FC = () => {
       {profResponse.type === 'RESULT' && (
         <ProfessorRegs
           courses={profResponse.response.courses}
+        />
+      )}
+      {staffResponse.type === 'ERROR' && <p>{staffResponse.text}</p>}
+      {staffResponse.type === 'RESULT' && (
+        <StaffRegs
+          regs={staffResponse.response.regs}
         />
       )}
     </div>

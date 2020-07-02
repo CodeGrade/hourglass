@@ -4,22 +4,8 @@ module Api
   module Grader
     # Student registration controls.
     class RegistrationsController < GraderController
-      before_action :find_exam_and_course, only: [:index]
-      before_action :find_registration_and_exam_and_course, only: [:show]
+      before_action :find_registration_and_exam_and_course
       before_action :require_staff_reg
-
-      def index
-        regs = @exam.registrations.select(&:final?).map do |r|
-          {
-            id: r.id,
-            user: {
-              id: r.user.id,
-              displayName: r.user.display_name,
-            },
-          }
-        end
-        render json: regs
-      end
 
       def show
         version = @registration.exam_version

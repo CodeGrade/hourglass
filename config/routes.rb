@@ -51,7 +51,7 @@ Rails.application.routes.draw do
     namespace :grader do
       resources :exams, shallow: true, param: 'exam_id', only: [] do
         member do
-          resources :registrations, param: 'registration_id', only: [:index, :show]
+          resources :registrations, param: 'registration_id', only: [:show]
         end
       end
     end

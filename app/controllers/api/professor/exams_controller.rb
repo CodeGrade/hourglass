@@ -44,14 +44,6 @@ module Api
         }
       end
 
-      def index
-        render json: {
-          exams: @course.exams.each do |exam|
-            exam.slice(:id, :name)
-          end,
-        }
-      end
-
       def show
         render json: {
           name: @exam.name,

@@ -61,7 +61,6 @@ Rails.application.routes.draw do
     end
 
     namespace :student do
-      resources :registrations, only: [:index]
       resources :exams, param: 'exam_id', only: [:show] do
         member do
           post :take

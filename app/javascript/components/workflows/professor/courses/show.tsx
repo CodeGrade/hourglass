@@ -1,50 +1,47 @@
 import React from 'react';
 import { useParams, Link, Route } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { useResponse as examsIndex } from '@hourglass/common/api/professor/exams';
 import NewExam from '@professor/exams/new';
 import SyncCourse from '@professor/courses/sync';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import Loading from '@hourglass/common/loading';
 import { QueryRenderer, graphql } from 'react-relay';
 import environment from '@hourglass/relay/environment';
+import { useFragment } from 'relay-hooks';
 import { showCourseQuery } from './__generated__/showCourseQuery.graphql';
+import { show_courseExams$key } from './__generated__/show_courseExams.graphql';
 
-
-interface CourseExamsProps {
-  courseId: number;
-}
-
-const CourseExams: React.FC<CourseExamsProps> = (props) => {
+const CourseExams: React.FC<{
+  courseExams: show_courseExams$key;
+}> = (props) => {
   const {
-    courseId,
+    courseExams,
   } = props;
-  const res = examsIndex(courseId);
-  switch (res.type) {
-    case 'ERROR':
-    case 'LOADING':
-      return <p>Loading...</p>;
-    case 'RESULT':
-      return (
-        <>
-          <h2>Exams</h2>
-          <ul>
-            {res.response.exams.map((exam) => (
-              <li key={exam.id}>
-                <Link
-                  to={`/exams/${exam.id}/admin`}
-                >
-                  {exam.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </>
-      );
-    default:
-      throw new ExhaustiveSwitchError(res);
-  }
+  const res = useFragment(
+    graphql`
+    fragment show_courseExams on Exam @relay(plural: true) {
+      railsId
+      name
+    }
+    `,
+    courseExams,
+  );
+  return (
+    <>
+      <h2>Exams</h2>
+      <ul>
+        {res.map((exam) => (
+          <li key={exam.railsId}>
+            <Link
+              to={`/exams/${exam.railsId}/admin`}
+            >
+              {exam.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
 };
 
 const ShowCourse: React.FC = () => {
@@ -56,6 +53,9 @@ const ShowCourse: React.FC = () => {
         query showCourseQuery($railsId: Int!) {
           course(railsId: $railsId) {
             title
+            exams {
+              ...show_courseExams
+            }
           }
         }
         `}
@@ -66,17 +66,14 @@ const ShowCourse: React.FC = () => {
         if (error) {
           return <p>Error</p>;
         }
-        let course;
         if (!props) {
-          course = { id: courseId, title: 'Course' };
-        } else {
-          course = { id: courseId, title: props.course.title };
+          return <p>Loading...</p>;
         }
         return (
           <Loading loading={!props}>
             <div className="d-flex align-items-center justify-content-between">
               <h1>
-                {course.title}
+                {props.course.title}
               </h1>
               <div>
                 <Link to={`/courses/${courseId}/sync`}>
@@ -96,17 +93,17 @@ const ShowCourse: React.FC = () => {
               </div>
             </div>
             <Route path="/courses/:courseId" exact>
-              <DocumentTitle title={course.title}>
-                <CourseExams courseId={courseId} />
+              <DocumentTitle title={props.course.title}>
+                <CourseExams courseExams={props.course.exams} />
               </DocumentTitle>
             </Route>
             <Route path="/courses/:courseId/sync" exact>
-              <DocumentTitle title={`Sync - ${course.title}`}>
+              <DocumentTitle title={`Sync - ${props.course.title}`}>
                 <SyncCourse />
               </DocumentTitle>
             </Route>
             <Route path="/courses/:courseId/new" exact>
-              <DocumentTitle title={`New Exam - ${course.title}`}>
+              <DocumentTitle title={`New Exam - ${props.course.title}`}>
                 <NewExam />
               </DocumentTitle>
             </Route>

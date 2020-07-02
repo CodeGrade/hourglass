@@ -70,7 +70,7 @@ const ShowCourse: React.FC = () => {
           return <p>Loading...</p>;
         }
         return (
-          <Loading loading={!props}>
+          <>
             <div className="d-flex align-items-center justify-content-between">
               <h1>
                 {props.course.title}
@@ -107,7 +107,7 @@ const ShowCourse: React.FC = () => {
                 <NewExam />
               </DocumentTitle>
             </Route>
-          </Loading>
+          </>
         );
       }}
     />

@@ -1,7 +1,7 @@
 import { hot } from 'react-hot-loader';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import RegularNavbar from '@hourglass/common/navbar';
 import { Container, Modal, Button } from 'react-bootstrap';
 import {
@@ -68,13 +68,10 @@ const Entry: React.FC = () => {
   const [transitionMessage, setTransitionMessage] = useState('');
   const [transitionCallback, setTransitionCallback] = useState(() => (_) => undefined);
   const [customHandler, setCustomHandler] = useState<CustomHandler>(() => (_) => undefined);
+  const contextValue = useMemo(() => ({ setCustomHandler }), []);
   return (
     <RelayEnvironmentProvider environment={environment}>
-      <BlockerContext.Provider
-        value={{
-          setCustomHandler,
-        }}
-      >
+      <BlockerContext.Provider value={contextValue}>
         <DndProvider backend={HTML5Backend}>
           <BrowserRouter
             getUserConfirmation={(message, callback) => {

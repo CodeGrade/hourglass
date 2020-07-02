@@ -46,7 +46,6 @@ const RegularNavbar: React.FC<{
     `,
     me,
   );
-  console.log(res.createdAt);
   return (
     <Navbar
       bg="light"
@@ -54,37 +53,40 @@ const RegularNavbar: React.FC<{
       className={className}
     >
       <Navbar.Brand>
-        {res ? (
-          <Link to="/">
-            Hourglass
-          </Link>
-        ) : (
-          <a href="/">Hourglass</a>
-        )}
+        <Link to="/">
+          Hourglass
+        </Link>
       </Navbar.Brand>
       <Navbar.Toggle />
       <Navbar.Collapse className="justify-content-end">
-        {res && (
-          <>
-            <Navbar.Text
-              className="mr-2"
-            >
-              {res.displayName}
-            </Navbar.Text>
-            <Form inline>
-              <Button
-                variant="outline-danger"
-                onClick={logOut}
-              >
-                Log Out
-              </Button>
-            </Form>
-          </>
-        )}
+        <Navbar.Text
+          className="mr-2"
+        >
+          {res.displayName}
+        </Navbar.Text>
+        <Form inline>
+          <Button
+            variant="outline-danger"
+            onClick={logOut}
+          >
+            Log Out
+          </Button>
+        </Form>
       </Navbar.Collapse>
     </Navbar>
   );
 };
+
+const NavbarLogin: React.FC = () => (
+  <Navbar
+    bg="light"
+    expand="md"
+  >
+    <Navbar.Brand>
+      <a href="/">Hourglass</a>
+    </Navbar.Brand>
+  </Navbar>
+);
 
 const RN: React.FC = () => (
   <QueryRenderer<navbarQuery>
@@ -98,11 +100,8 @@ const RN: React.FC = () => (
       `}
     variables={{}}
     render={({ error, props }) => {
-      if (error) {
-        return <div>Error!</div>;
-      }
-      if (!props) {
-        return <div>Loading...</div>;
+      if (error || !props) {
+        return <NavbarLogin />;
       }
       return (
         <RegularNavbar me={props.me} />

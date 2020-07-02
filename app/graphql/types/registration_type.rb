@@ -6,18 +6,20 @@ module Types
     field :rails_id, Integer, null: false
     delegate :id, to: :object, prefix: :rails
 
-    # field :user_id, Integer, null: false
     # field :room_id, Integer, null: true
     field :start_time, GraphQL::Types::ISO8601DateTime, null: true
     field :end_time, GraphQL::Types::ISO8601DateTime, null: true
     # field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     # field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
+    field :user, Types::UserType, null: false
     field :exam, Types::ExamType, null: false
-    delegate :exam, to: :object
-
     field :exam_version, Types::ExamVersionType, null: false
-    delegate :exam_version, to: :object
+
+    field :current_answers, String, null: false
+    def current_answers
+      object.current_answers.to_json
+    end
 
     field :anomalous, Boolean, null: false
     def anomalous

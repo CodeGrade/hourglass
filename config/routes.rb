@@ -43,11 +43,7 @@ Rails.application.routes.draw do
         member do
           post :finalize
           resources :anomalies, param: 'anomaly_id', only: [:index, :destroy]
-          resources :messages, param: 'message_id', only: [:index, :create] do
-            collection do
-              get :recipients
-            end
-          end
+          resources :messages, param: 'message_id', only: [:index, :create]
         end
       end
     end

@@ -26,6 +26,8 @@ class Exam < ApplicationRecord
   validate :end_after_start
   validate :duration_valid
 
+  enum checklist_status: [:na, :complete, :warning, :not_started]
+
   delegate :professors, to: :course
 
   def duration
@@ -74,6 +76,34 @@ class Exam < ApplicationRecord
     (end_time - start_time).seconds
   end
 
+  def checklist_complete(reason)
+    {
+      status: :complete,
+      reason: reason,
+    }
+  end
+
+  def checklist_warning(reason)
+    {
+      status: :warning,
+      reason: reason,
+    }
+  end
+
+  def checklist_not_started(reason)
+    {
+      status: :not_started,
+      reason: reason,
+    }
+  end
+
+  def checklist_na(reason)
+    {
+      status: :na,
+      reason: reason,
+    }
+  end
+
   def room_checklist
     if rooms.blank?
       checklist_not_started 'No rooms have been created for this exam.'
@@ -103,7 +133,7 @@ class Exam < ApplicationRecord
 
   # No rooms: NA
   # All students have rooms: COMPLETE
-  # All students have nil rooms: NOT_STARTED
+  # All student have nil rooms: NOT_STARTED
   # Some students have nil rooms: WARNING
   def seating_checklist
     if rooms.blank?
@@ -184,34 +214,6 @@ class Exam < ApplicationRecord
         name: room.name,
       }
     end
-  end
-
-  def checklist_complete(reason)
-    {
-      status: 'COMPLETE',
-      reason: reason,
-    }
-  end
-
-  def checklist_warning(reason)
-    {
-      status: 'WARNING',
-      reason: reason,
-    }
-  end
-
-  def checklist_not_started(reason)
-    {
-      status: 'NOT_STARTED',
-      reason: reason,
-    }
-  end
-
-  def checklist_na(reason)
-    {
-      status: 'NA',
-      reason: reason,
-    }
   end
 
   def duration_valid

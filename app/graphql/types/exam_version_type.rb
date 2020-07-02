@@ -15,5 +15,15 @@ module Types
 
     field :policies, [String], null: false
     delegate :policies, to: :object
+
+    field :any_started, Boolean, null: false
+    def any_started
+      object.any_started?
+    end
+
+    field :contents, String, null: false
+    def contents
+      object.old_contents.to_json
+    end
   end
 end

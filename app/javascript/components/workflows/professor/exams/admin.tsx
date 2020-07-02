@@ -101,16 +101,25 @@ const Loaded: React.FC<{
   refresh: () => void;
   response: ShowResponse;
   exam: admin_examInfo$key;
+  examID: string;
 }> = (props) => {
   const {
     refresh,
     response,
     exam,
+    examID,
   } = props;
   const { examId } = useParams();
   const { alert } = useContext(AlertContext);
   const [editing, setEditing] = useState(false);
   const flipEditing = useCallback(() => setEditing((e) => !e), []);
+  const onError = (emsg) => {
+    alert({
+      variant: 'danger',
+      title: 'Error saving exam info.',
+      message: emsg,
+    });
+  };
   const [mutate, { loading }] = useMutation(
     graphql`
       mutation adminUpdateExamMutation($input: UpdateExamInput!) {
@@ -126,13 +135,12 @@ const Loaded: React.FC<{
       }
     `,
     {
+      onError: (err) => {
+        onError(err.message);
+      },
       onCompleted: ({ updateExam }) => {
         if (updateExam.errors.length !== 0) {
-          alert({
-            variant: 'danger',
-            title: 'Error saving exam info.',
-            message: updateExam.errors.join('\n'),
-          });
+          onError(updateExam.errors.join('\n'));
           return;
         }
         setEditing(false);
@@ -155,9 +163,9 @@ const Loaded: React.FC<{
               mutate({
                 variables: {
                   input: {
-                    railsId: Number(examId),
-                    duration: info.duration,
+                    examId: examID,
                     name: info.name,
+                    duration: info.duration,
                     startTime: info.start,
                     endTime: info.end,
                   },
@@ -788,6 +796,7 @@ const ExamAdmin: React.FC = () => {
         query adminExamQuery($examRailsId: Int!) {
           exam(railsId: $examRailsId) {
             ...admin_examInfo
+            id
             name
             startTime
             endTime
@@ -810,6 +819,7 @@ const ExamAdmin: React.FC = () => {
             <Loaded
               exam={props.exam}
               refresh={() => undefined}
+              examID={props.exam.id}
               response={{
                 name: props.exam.name,
                 start: DateTime.fromISO(props.exam.startTime),

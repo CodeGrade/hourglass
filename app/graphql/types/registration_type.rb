@@ -1,5 +1,6 @@
 module Types
   class RegistrationType < Types::BaseObject
+    implements GraphQL::Types::Relay::Node
     global_id_field :id
 
     field :rails_id, Integer, null: false

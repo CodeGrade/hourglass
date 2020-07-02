@@ -1,6 +1,11 @@
 module Types
   class ProctorRegistrationType < Types::BaseObject
-    field :id, ID, null: false
+    implements GraphQL::Types::Relay::Node
+    global_id_field :id
+
+    field :rails_id, Integer, null: false
+    delegate :id, to: :object, prefix: :rails
+
     field :user_id, Integer, null: false
     field :exam_id, Integer, null: false
     field :room_id, Integer, null: true

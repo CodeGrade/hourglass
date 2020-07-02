@@ -1,5 +1,6 @@
 module Types
   class ExamType < Types::BaseObject
+    implements GraphQL::Types::Relay::Node
     global_id_field :id
 
     field :rails_id, Integer, null: false

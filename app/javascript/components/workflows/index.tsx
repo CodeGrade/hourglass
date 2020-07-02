@@ -28,8 +28,13 @@ import './index.scss';
 import ErrorBoundary from '@hourglass/common/boundary';
 import DocumentTitle from '@hourglass/common/documentTitle';
 
-import { RelayEnvironmentProvider } from 'relay-hooks';
+import { RelayEnvironmentProvider, useFragment, graphql } from 'relay-hooks';
 import environment from '@hourglass/relay/environment';
+import { QueryRenderer, FragmentRef } from 'react-relay';
+
+import { workflowsQuery } from './__generated__/workflowsQuery.graphql';
+import { workflows_studentregs$key } from './__generated__/workflows_studentregs.graphql';
+import { workflows_profregs$key } from './__generated__/workflows_profregs.graphql';
 
 interface StudentRegsProps {
   regs: ApiStudentReg.Reg[];
@@ -73,19 +78,35 @@ const ProfessorRegs: React.FC<ProfessorCoursesProps> = (props) => {
   const {
     courses,
   } = props;
-  if (courses.length === 0) return null;
+};
+
+const ShowRegistrations: React.FC<{
+  registrations: workflows_studentregs$key;
+}> = (props) => {
+  const {
+    registrations,
+  } = props;
+  const res = useFragment(
+    graphql`
+    fragment workflows_studentregs on Registration @relay(plural: true) {
+      id
+      exam {
+        railsId
+        name
+      }
+    }
+    `,
+    registrations,
+  );
+  if (res.length === 0) return null;
   return (
     <>
-      <h1>Courses</h1>
+      <h1>Take an Exam</h1>
       <ul>
-        {courses.map((c) => (
-          <li
-            key={c.id}
-          >
-            <Link
-              to={`/courses/${c.id}`}
-            >
-              {c.title}
+        {res.map((reg) => (
+          <li key={reg.id}>
+            <Link to={`/exams/${reg.exam.railsId}`}>
+              {reg.exam.name}
             </Link>
           </li>
         ))}
@@ -94,31 +115,85 @@ const ProfessorRegs: React.FC<ProfessorCoursesProps> = (props) => {
   );
 };
 
-const Exams: React.FC = () => {
-  const studentResponse = ApiStudentReg.useResponse();
-  const profResponse = ApiProfessorCourses.useResponse();
-  const bothLoading = studentResponse.type === 'LOADING' && profResponse.type === 'LOADING';
-  const studentEmpty = studentResponse.type === 'RESULT' && studentResponse.response.regs.length === 0;
-  const profEmpty = profResponse.type === 'RESULT' && profResponse.response.courses.length === 0;
-  const bothEmpty = studentEmpty && profEmpty;
+const ShowProfRegs: React.FC<{
+  professorCourseRegistrations: workflows_profregs$key;
+}> = (props) => {
+  const {
+    professorCourseRegistrations,
+  } = props;
+  const res = useFragment(
+    graphql`
+    fragment workflows_profregs on ProfessorCourseRegistration @relay(plural: true) {
+      course {
+        id
+        railsId
+        title
+      }
+    }
+    `,
+    professorCourseRegistrations,
+  );
+  if (res.length === 0) return null;
   return (
-    <div>
-      {bothLoading && <p>Loading...</p>}
-      {bothEmpty && <p>You have no registrations.</p>}
-      {studentResponse.type === 'RESULT' && (
-        <StudentRegs
-          regs={studentResponse.response.regs}
-          regInfo={studentResponse.response.regInfo}
-        />
-      )}
-      {profResponse.type === 'RESULT' && (
-        <ProfessorRegs
-          courses={profResponse.response.courses}
-        />
-      )}
-    </div>
+    <>
+      <h1>Courses</h1>
+      <ul>
+        {res.map(({ course }) => (
+          <li
+            key={course.id}
+          >
+            <Link
+              to={`/courses/${course.railsId}`}
+            >
+              {course.title}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
+
+
+const Exams: React.FC = () => (
+  <QueryRenderer<workflowsQuery>
+    environment={environment}
+    query={graphql`
+      query workflowsQuery {
+        me {
+          registrations {
+            ...workflows_studentregs
+          }
+          professorCourseRegistrations {
+            ...workflows_profregs
+          }
+        }
+      }
+      `}
+    variables={{}}
+    render={({ error, props }) => {
+      if (error) {
+        return <p>Error</p>;
+      }
+      if (!props) {
+        return <p>Loading...</p>;
+      }
+      const allEmpty = (
+        props.me.registrations.length === 0
+        && props.me.professorCourseRegistrations.length === 0
+      );
+      if (allEmpty) {
+        return <p>You have no registrations.</p>;
+      }
+      return (
+        <>
+          <ShowRegistrations registrations={props.me.registrations} />
+          <ShowProfRegs professorCourseRegistrations={props.me.professorCourseRegistrations} />
+        </>
+      );
+    }}
+  />
+);
 
 const Exam: React.FC = () => {
   const { examId } = useParams();

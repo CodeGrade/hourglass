@@ -3,7 +3,7 @@
 module Api
   module Professor
     class ExamsController < ProfessorController
-      before_action :find_exam_and_course, only: [:show, :update]
+      before_action :find_exam_and_course, only: [:show]
       before_action :find_course
       before_action :require_prof_reg
 
@@ -25,22 +25,6 @@ module Api
         render json: {
           created: false,
           reason: e.message,
-        }
-      end
-
-      def update
-        body = params.require(:exam).permit(:name, :start, :end, :duration)
-        updated = @exam.update(
-          {
-            name: body[:name],
-            start_time: DateTime.parse(body[:start]),
-            end_time: DateTime.parse(body[:end]),
-            duration: body[:duration],
-          }
-        )
-        render json: {
-          updated: updated,
-          reason: @exam.errors.full_messages.to_sentence,
         }
       end
 

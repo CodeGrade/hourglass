@@ -18,34 +18,37 @@ const NewExamForm: React.FC = () => {
   const { alert } = useContext(AlertContext);
   const history = useHistory();
   return (
-    <ExamInfoEditor
-      onCancel={(): void => {
-        history.push(`/courses/${courseId}`);
-      }}
-      onSubmit={(info): void => {
-        createExam(courseId, info)
-          .then((res) => {
-            if (res.created === false) {
-              throw new Error(res.reason);
-            }
-            return res;
-          })
-          .then(({ id }) => {
-            history.push(`/exams/${id}/admin`);
-            alert({
-              variant: 'success',
-              autohide: true,
-              message: 'Exam created successfully.',
-            });
-          })
-          .catch((err) => {
-            alert({
-              variant: 'danger',
-              title: 'Error creating exam.',
-              message: err.message,
-            });
-          });
-      }}
-    />
+    <p>
+      TODO
+    </p>
   );
+  // <ExamInfoEditor
+  //   onCancel={(): void => {
+  //     history.push(`/courses/${courseId}`);
+  //   }}
+  //   onSubmit={(info): void => {
+  //     createExam(courseId, info)
+  //       .then((res) => {
+  //         if (res.created === false) {
+  //           throw new Error(res.reason);
+  //         }
+  //         return res;
+  //       })
+  //       .then(({ id }) => {
+  //         history.push(`/exams/${id}/admin`);
+  //         alert({
+  //           variant: 'success',
+  //           autohide: true,
+  //           message: 'Exam created successfully.',
+  //         });
+  //       })
+  //       .catch((err) => {
+  //         alert({
+  //           variant: 'danger',
+  //           title: 'Error creating exam.',
+  //           message: err.message,
+  //         });
+  //       });
+  //   }}
+  // />
 };

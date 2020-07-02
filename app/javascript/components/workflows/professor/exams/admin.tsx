@@ -15,7 +15,6 @@ import {
   Link,
 } from 'react-router-dom';
 import {
-  useResponse as examsShow,
   Response as ShowResponse,
   Version,
   Checklist,
@@ -52,10 +51,6 @@ import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import createVersion from '@hourglass/common/api/professor/exams/versions/create';
 import deleteVersion from '@hourglass/common/api/professor/exams/versions/delete';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import {
-  ExamUpdateInfo,
-  updateExam,
-} from '@hourglass/common/api/professor/exams/update';
 import { DateTime } from 'luxon';
 import { importVersion } from '@hourglass/common/api/professor/exams/versions/import';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
@@ -70,6 +65,18 @@ import { BsPencilSquare } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import Loading from '@hourglass/common/loading';
+import { QueryRenderer, graphql } from 'react-relay';
+import environment from '@hourglass/relay/environment';
+import { useFragment, useMutation } from 'relay-hooks';
+import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
+import { admin_examInfo$key } from './__generated__/admin_examInfo.graphql';
+
+export interface ExamUpdateInfo {
+  name: string;
+  start: string;
+  end: string;
+  duration: number;
+}
 
 const loadingStatus = {
   reason: 'Loading...',
@@ -90,76 +97,72 @@ const emptyResponse: ShowResponse = {
   },
 };
 
-export const ExamAdmin: React.FC = () => {
-  const { examId } = useParams();
-  const [refresher, refresh] = useRefresher();
-  const response = examsShow(examId, [refresher]);
-  switch (response.type) {
-    case 'ERROR':
-      return (
-        <span
-          className="text-danger"
-        >
-          {response.text}
-        </span>
-      );
-    case 'LOADING':
-    case 'RESULT':
-      return (
-        <DocumentTitle title={response.type === 'LOADING' ? 'Exam' : response.response.name}>
-          <Loading loading={response.type === 'LOADING'}>
-            <Loaded
-              refresh={refresh}
-              response={response.type === 'LOADING' ? emptyResponse : response.response}
-            />
-          </Loading>
-        </DocumentTitle>
-      );
-    default:
-      throw new ExhaustiveSwitchError(response);
-  }
-};
-
 const Loaded: React.FC<{
   refresh: () => void;
   response: ShowResponse;
+  exam: admin_examInfo$key;
 }> = (props) => {
   const {
     refresh,
     response,
+    exam,
   } = props;
   const { examId } = useParams();
   const { alert } = useContext(AlertContext);
   const [editing, setEditing] = useState(false);
   const flipEditing = useCallback(() => setEditing((e) => !e), []);
+  const [mutate, { loading }] = useMutation(
+    graphql`
+      mutation adminUpdateExamMutation($input: UpdateExamInput!) {
+        updateExam(input: $input) {
+          errors
+          exam {
+            name
+            duration
+            startTime
+            endTime
+          }
+        }
+      }
+    `,
+    {
+      onCompleted: ({ updateExam }) => {
+        if (updateExam.errors.length !== 0) {
+          alert({
+            variant: 'danger',
+            title: 'Error saving exam info.',
+            message: updateExam.errors.join('\n'),
+          });
+          return;
+        }
+        setEditing(false);
+        alert({
+          variant: 'success',
+          autohide: true,
+          message: 'Exam info saved.',
+        });
+      },
+    },
+  );
   return (
     <>
       <Form.Group>
         {editing ? (
           <ExamInfoEditor
-            response={response}
+            exam={exam}
             onCancel={flipEditing}
             onSubmit={(info) => {
-              updateExam(examId, info)
-                .then((res) => {
-                  if (res.updated === true) {
-                    setEditing(false);
-                    alert({
-                      variant: 'success',
-                      autohide: true,
-                      message: 'Exam info saved.',
-                    });
-                    refresh();
-                  } else {
-                    throw new Error(res.reason);
-                  }
-                }).catch((err) => {
-                  alert({
-                    variant: 'danger',
-                    title: 'Error saving exam info.',
-                    message: err.message,
-                  });
-                });
+              mutate({
+                variables: {
+                  input: {
+                    railsId: Number(examId),
+                    duration: info.duration,
+                    name: info.name,
+                    startTime: info.start,
+                    endTime: info.end,
+                  },
+                },
+              });
             }}
           />
         ) : (
@@ -471,21 +474,30 @@ const ExamInfoViewer: React.FC<{
 const NINETY_MINUTES = 5400;
 
 export const ExamInfoEditor: React.FC<{
-  response?: ShowResponse;
+  exam: admin_examInfo$key;
   onSubmit: (info: ExamUpdateInfo) => void;
   onCancel: () => void;
 }> = (props) => {
   const {
-    response,
+    exam,
     onSubmit,
     onCancel,
   } = props;
-  const now = DateTime.local();
-  const threeHours = DateTime.local().plus({ hours: 3 });
-  const [name, setName] = useState<string>(response?.name ?? '');
-  const [start, setStart] = useState<DateTime>(response?.start ?? now);
-  const [end, setEnd] = useState<DateTime>(response?.end ?? threeHours);
-  const [duration, setDuration] = useState<number>(response?.duration ?? NINETY_MINUTES);
+  const examInfo = useFragment(
+    graphql`
+    fragment admin_examInfo on Exam {
+      name
+      startTime
+      endTime
+      duration
+    }
+    `,
+    exam,
+  );
+  const [name, setName] = useState<string>(examInfo.name);
+  const [start, setStart] = useState<DateTime>(DateTime.fromISO(examInfo.startTime));
+  const [end, setEnd] = useState<DateTime>(DateTime.fromISO(examInfo.endTime));
+  const [duration, setDuration] = useState<number>(examInfo.duration);
 
   return (
     <Card className="mb-4">
@@ -735,8 +747,6 @@ const ShowVersion: React.FC<{
   );
 };
 
-export default ExamAdmin;
-
 interface CodeMirroredElement extends Element {
   CodeMirror: CodeMirrorEditor;
 }
@@ -768,3 +778,69 @@ const PreviewVersion: React.FC<{
     </Collapse>
   );
 };
+
+const ExamAdmin: React.FC = () => {
+  const { examId } = useParams();
+  return (
+    <QueryRenderer<adminExamQuery>
+      environment={environment}
+      query={graphql`
+        query adminExamQuery($examRailsId: Int!) {
+          exam(railsId: $examRailsId) {
+            ...admin_examInfo
+            name
+            startTime
+            endTime
+            duration
+          }
+        }
+        `}
+      variables={{
+        examRailsId: Number(examId),
+      }}
+      render={({ error, props }) => {
+        if (error) {
+          return <p>Error</p>;
+        }
+        if (!props) {
+          return <p>Loading...</p>;
+        }
+        return (
+          <DocumentTitle title={props.exam.name}>
+            <Loaded
+              exam={props.exam}
+              refresh={() => undefined}
+              response={{
+                name: props.exam.name,
+                start: DateTime.fromISO(props.exam.startTime),
+                end: DateTime.fromISO(props.exam.endTime),
+                duration: props.exam.duration,
+                versions: [],
+                checklist: {
+                  rooms: {
+                    reason: 'TODO',
+                    status: ChecklistItemStatus.NotStarted,
+                  },
+                  staff: {
+                    reason: 'TODO',
+                    status: ChecklistItemStatus.NotStarted,
+                  },
+                  seating: {
+                    reason: 'TODO',
+                    status: ChecklistItemStatus.NotStarted,
+                  },
+                  versions: {
+                    reason: 'TODO',
+                    status: ChecklistItemStatus.NotStarted,
+                  },
+                },
+              }}
+            />
+          </DocumentTitle>
+        );
+      }}
+    />
+  );
+};
+
+export default ExamAdmin;

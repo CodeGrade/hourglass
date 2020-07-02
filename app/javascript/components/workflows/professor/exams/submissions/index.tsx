@@ -1,5 +1,4 @@
 import React from 'react';
-import { useRegistrationsShow as useRegsShow } from '@hourglass/common/api/grader/registrations/show';
 import {
   useParams,
   Switch,
@@ -9,11 +8,10 @@ import {
 import ExamViewer from '@hourglass/workflows/proctor/registrations/show';
 import { QueryRenderer, graphql } from 'react-relay';
 import environment from '@hourglass/relay/environment';
-import { useFragment } from 'relay-hooks';
 import { submissionsAllQuery } from './__generated__/submissionsAllQuery.graphql';
 import { submissionsOneQuery } from './__generated__/submissionsOneQuery.graphql';
 
-const ExamSubmissions: React.FC = (props) => {
+const ExamSubmissions: React.FC = () => {
   const { examId } = useParams();
   return (
     <QueryRenderer<submissionsAllQuery>

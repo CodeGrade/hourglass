@@ -1,6 +1,10 @@
 module Types
   class CourseType < Types::BaseObject
-    field :id, ID, null: false
+    global_id_field :id
+
+    field :rails_id, Integer, null: false
+    delegate :id, to: :object, prefix: :rails
+
     field :title, String, null: false
     field :last_sync, GraphQL::Types::ISO8601DateTime, null: true
     field :active, Boolean, null: false

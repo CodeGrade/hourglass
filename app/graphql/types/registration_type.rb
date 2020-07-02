@@ -1,6 +1,7 @@
 module Types
   class RegistrationType < Types::BaseObject
-    field :id, ID, null: false
+    global_id_field :id
+
     field :user_id, Integer, null: false
     field :room_id, Integer, null: true
     field :exam_version_id, Integer, null: false

@@ -1,6 +1,10 @@
 module Types
   class ExamType < Types::BaseObject
-    field :id, ID, null: false
+    global_id_field :id
+
+    field :rails_id, Integer, null: false
+    delegate :id, to: :object, prefix: :rails
+
     field :course_id, Integer, null: false
     field :name, String, null: false
     field :bottlenose_assignment_id, Integer, null: true

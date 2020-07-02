@@ -2,6 +2,8 @@ module Types
   class QueryType < Types::BaseObject
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
+    add_field(GraphQL::Types::Relay::NodeField)
+    add_field(GraphQL::Types::Relay::NodesField)
     
     field :me, UserType, null: false
     def me
@@ -28,12 +30,12 @@ module Types
     #   Registration.all
     # end
 
-    field :user, UserType, null: false do
-      argument :username, String, required: true
-    end
+    # field :user, UserType, null: false do
+    #   argument :username, String, required: true
+    # end
 
-    def user(username:)
-      User.find_by(username: username)
-    end
+    # def user(username:)
+    #   User.find_by(username: username)
+    # end
   end
 end

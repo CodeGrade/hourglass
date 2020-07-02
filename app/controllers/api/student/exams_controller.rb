@@ -8,28 +8,9 @@ module Api
       before_action :find_exam_and_course
 
       before_action :require_student_reg
-      before_action :check_over, only: [:take, :question, :messages, :questions]
+      before_action :check_over
+      before_action :check_final
       before_action :check_anomaly, only: [:take]
-      before_action :check_final, only: [:take, :question, :messages, :questions]
-
-      def show
-        render json: {
-          railsExam: {
-            id: @exam.id,
-            name: @exam.name,
-            policies: @registration.exam_version.policies,
-          },
-          railsRegistration: {
-            id: @registration.id,
-            anomalous: @registration.anomalous?,
-          },
-          railsCourse: {
-            id: @course.id,
-          },
-          final: @registration.final? || @registration.over?,
-          lastSnapshot: @registration.snapshots.last&.created_at,
-        }
-      end
 
       def take
         case params[:task]

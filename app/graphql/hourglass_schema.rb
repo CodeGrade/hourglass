@@ -37,6 +37,8 @@ class HourglassSchema < GraphQL::Schema
       Types::StaffRegistrationType
     when Exam
       Types::ExamType
+    when ExamVersion
+      Types::ExamVersionType
     else
       raise("Unexpected object: #{obj}")
     end

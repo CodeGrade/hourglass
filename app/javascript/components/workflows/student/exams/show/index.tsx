@@ -1,11 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Provider } from 'react-redux';
 import { Container } from 'react-bootstrap';
 import store from '@student/exams/show/store';
 import RegularNavbar from '@hourglass/common/navbar';
-import * as ApiStudentExamsShow from '@hourglass/common/api/student/exams/show';
 import { useParams } from 'react-router-dom';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   RailsExamVersion,
   RailsUser,
@@ -17,6 +15,10 @@ import ExamSubmitted from '@student/exams/show/components/ExamSubmitted';
 import { RailsContext } from '@student/exams/show/context';
 import { DateTime } from 'luxon';
 import DocumentTitle from '@hourglass/common/documentTitle';
+import { QueryRenderer } from 'react-relay';
+import environment from '@hourglass/relay/environment';
+import { graphql } from 'relay-hooks';
+import { showQuery } from './__generated__/showQuery.graphql';
 
 interface ShowExamProps {
   // The current logged-in user.
@@ -64,43 +66,88 @@ const Exam: React.FC<ShowExamProps> = (props) => {
 
 const ShowExam: React.FC = () => {
   const { examId } = useParams();
-  const { railsUser } = useContext(RailsContext);
-  const showRes = ApiStudentExamsShow.useResponse(examId);
-  switch (showRes.type) {
-    case 'ERROR':
-      return (
-        <>
-          <RegularNavbar />
-          <Container>
-            <span className="text-danger">{showRes.text}</span>
-          </Container>
-        </>
-      );
-    case 'LOADING':
-      return (
-        <>
-          <RegularNavbar />
-          <Container>
-            <p>Loading...</p>
-          </Container>
-        </>
-      );
-    case 'RESULT':
-      return (
-        <DocumentTitle title={showRes.response.railsExam.name}>
-          <Exam
-            railsUser={railsUser}
-            railsExam={showRes.response.railsExam}
-            railsCourse={showRes.response.railsCourse}
-            railsRegistration={showRes.response.railsRegistration}
-            final={showRes.response.final}
-            lastSnapshot={showRes.response.lastSnapshot}
-          />
-        </DocumentTitle>
-      );
-    default:
-      throw new ExhaustiveSwitchError(showRes);
-  }
+  return (
+    <QueryRenderer<showQuery>
+      environment={environment}
+      query={graphql`
+        query showQuery($railsId: Int!) {
+          me {
+            displayName
+          }
+          exam(railsId: $railsId) {
+            railsId
+            name
+            course {
+              railsId
+            }
+            myRegistration {
+              railsId
+              final
+              lastSnapshotTime
+              anomalous
+              examVersion {
+                policies
+              }
+            }
+          }
+        }
+        `}
+      variables={{
+        railsId: Number(examId),
+      }}
+      render={({ error, props }) => {
+        if (error) {
+          return (
+            <>
+              <RegularNavbar />
+              <Container>
+                <span className="text-danger">{error.message}</span>
+              </Container>
+            </>
+          );
+        }
+        if (!props) {
+          return (
+            <>
+              <RegularNavbar />
+              <Container>
+                <p>Loading...</p>
+              </Container>
+            </>
+          );
+        }
+        const railsUser: RailsUser = {
+          displayName: props.me.displayName,
+        };
+        const railsExam: RailsExamVersion = {
+          id: props.exam.railsId,
+          name: props.exam.name,
+          policies: props.exam.myRegistration.examVersion.policies,
+        };
+        const railsRegistration: RailsRegistration = {
+          id: props.exam.myRegistration.railsId,
+          anomalous: props.exam.myRegistration.anomalous,
+        };
+        const railsCourse: RailsCourse = {
+          id: props.exam.course.railsId,
+        };
+        const { final, lastSnapshotTime } = props.exam.myRegistration;
+        const lastSnapshot = lastSnapshotTime ? DateTime.fromISO(lastSnapshotTime) : undefined;
+        return (
+          <DocumentTitle title={props.exam.name}>
+            <Exam
+              railsUser={railsUser}
+              railsExam={railsExam}
+              railsCourse={railsCourse}
+              railsRegistration={railsRegistration}
+              final={final}
+              lastSnapshot={lastSnapshot}
+            />
+          </DocumentTitle>
+        );
+      }}
+    />
+  );
 };
 
 export default ShowExam;

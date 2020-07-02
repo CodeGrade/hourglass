@@ -14,8 +14,6 @@ import {
   Prompt,
 } from 'react-router-dom';
 import * as ApiStudentExamsShow from '@hourglass/common/api/student/exams/show';
-import * as ApiStudentReg from '@hourglass/common/api/student/registrations';
-import * as ApiProfessorCourses from '@hourglass/common/api/professor/courses';
 import ShowExam from '@student/exams/show';
 import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
@@ -30,55 +28,11 @@ import DocumentTitle from '@hourglass/common/documentTitle';
 
 import { RelayEnvironmentProvider, useFragment, graphql } from 'relay-hooks';
 import environment from '@hourglass/relay/environment';
-import { QueryRenderer, FragmentRef } from 'react-relay';
+import { QueryRenderer } from 'react-relay';
 
 import { workflowsQuery } from './__generated__/workflowsQuery.graphql';
 import { workflows_studentregs$key } from './__generated__/workflows_studentregs.graphql';
 import { workflows_profregs$key } from './__generated__/workflows_profregs.graphql';
-
-interface StudentRegsProps {
-  regs: ApiStudentReg.Reg[];
-  regInfo: ApiStudentReg.RegInfo;
-}
-
-const StudentRegs: React.FC<StudentRegsProps> = (props) => {
-  const {
-    regs,
-    regInfo,
-  } = props;
-  if (regs.length === 0) return null;
-  return (
-    <>
-      <h1>Take an Exam</h1>
-      <ul>
-        {regs.map((reg) => {
-          const { exam } = regInfo[reg.id];
-          return (
-            <li
-              key={reg.id}
-            >
-              <Link
-                to={`/exams/${exam.id}`}
-              >
-                {exam.name}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </>
-  );
-};
-
-interface ProfessorCoursesProps {
-  courses: ApiProfessorCourses.Course[];
-}
-
-const ProfessorRegs: React.FC<ProfessorCoursesProps> = (props) => {
-  const {
-    courses,
-  } = props;
-};
 
 const ShowRegistrations: React.FC<{
   registrations: workflows_studentregs$key;

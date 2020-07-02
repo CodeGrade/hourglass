@@ -6,9 +6,6 @@ import React, {
   useCallback,
   useRef,
 } from 'react';
-import {
-  useResponse as examsShow,
-} from '@hourglass/common/api/professor/exams/show';
 import RegularNavbar from '@hourglass/common/navbar';
 import Select from 'react-select';
 import { useParams } from 'react-router-dom';
@@ -54,7 +51,6 @@ import {
 import {
   Recipient,
   SplitRecipients,
-  useMessageRecipients,
 } from '@hourglass/common/api/proctor/messages/recipients';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
@@ -64,6 +60,12 @@ import './index.scss';
 import { BsListCheck } from 'react-icons/bs';
 import { doFinalize } from '@hourglass/common/api/proctor/exams/finalize';
 import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
+import { QueryRenderer, graphql } from 'react-relay';
+import environment from '@hourglass/relay/environment';
+
+import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
+import DocumentTitle from '@hourglass/common/documentTitle';
+import { useFragment } from 'relay-hooks';
 
 export interface MessageProps {
   icon: IconType;
@@ -1124,64 +1126,94 @@ const SplitViewLoaded: React.FC<{
 };
 
 const ProctoringSplitView: React.FC<{
-  examId: number;
+  exam: any;
 }> = (props) => {
+  const { examId } = useParams();
   const {
-    examId,
+    exam,
   } = props;
-  const res = useMessageRecipients(examId);
-  switch (res.type) {
-    case 'ERROR':
-      return (
-        <div className="text-danger">
-          <p>Error</p>
-          <small>{res.text}</small>
-        </div>
-      );
-    case 'LOADING':
-    case 'RESULT':
-      return (
-        <Loading loading={res.type === 'LOADING'} className="h-100">
-          <SplitViewLoaded
-            examId={examId}
-            recipients={res.type === 'RESULT' ? res.response.recipients : {
-              rooms: [],
-              students: [],
-              versions: [],
-            }}
-          />
-        </Loading>
-      );
-    default:
-      throw new ExhaustiveSwitchError(res);
-  }
+  const res = useFragment(
+    graphql`
+    fragment exams_recipients on Exam {
+      examVersions { railsId name }
+      students { railsId displayName }
+      rooms { railsId name }
+    }
+    `,
+    exam,
+  );
+  return (
+    <SplitViewLoaded
+      examId={examId}
+      recipients={{
+        versions: res.examVersions.map((ev) => ({
+          type: MessageType.Version,
+          id: ev.railsId,
+          name: ev.name,
+        })).sort((a, b) => a.name.localeCompare(b.name)),
+        students: res.students.map((student) => ({
+          type: MessageType.Direct,
+          id: student.railsId,
+          name: student.displayName,
+        })).sort((a, b) => a.name.localeCompare(b.name)),
+        rooms: res.rooms.map((room) => ({
+          type: MessageType.Room,
+          id: room.railsId,
+          name: room.name,
+        })).sort((a, b) => a.name.localeCompare(b.name)),
+      }}
+    />
+  );
 };
 
 const ExamProctoring: React.FC = () => {
   const {
     examId,
   } = useParams();
-  const res = examsShow(examId);
   return (
-    <Container fluid>
-      <div className="wrapper vh-100">
-        <div className="inner-wrapper">
-          <RegularNavbar className="row" />
-          <Row>
-            <Col>
-              <Loading loading={res.type !== 'RESULT'}>
-                <h1>{res.type === 'RESULT' ? res.response.name : 'Exam'}</h1>
-              </Loading>
-            </Col>
-          </Row>
-          <div className="content-wrapper">
-            <div className="content h-100">
-              <ProctoringSplitView examId={examId} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </Container>
+    <QueryRenderer<examsProctorQuery>
+      environment={environment}
+      query={graphql`
+        query examsProctorQuery($examRailsId: Int!) {
+          exam(railsId: $examRailsId) {
+            ...exams_recipients
+            name
+          }
+        }
+        `}
+      variables={{
+        examRailsId: Number(examId),
+      }}
+      render={({ error, props }) => {
+        if (error) {
+          return <p>Error</p>;
+        }
+        if (!props) {
+          return <p>Loading...</p>;
+        }
+        return (
+          <DocumentTitle title={`${props.exam.name} - Proctoring`}>
+            <Container fluid>
+              <div className="wrapper vh-100">
+                <div className="inner-wrapper">
+                  <RegularNavbar className="row" />
+                  <Row>
+                    <Col>
+                      <h1>{props.exam.name}</h1>
+                    </Col>
+                  </Row>
+                  <div className="content-wrapper">
+                    <div className="content h-100">
+                      <ProctoringSplitView exam={props.exam} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Container>
+          </DocumentTitle>
+        );
+      }}
+    />
   );
 };
 

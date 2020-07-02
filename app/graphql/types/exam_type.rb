@@ -15,7 +15,25 @@ module Types
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
     field :course, Types::CourseType, null: false
-    delegate :course, to: :object
+    field :exam_versions, [Types::ExamVersionType], null: false
+
+    field :students, [Types::UserType], null: false
+    field :rooms, [Types::RoomType], null: false
+
+    field :checklist, Types::ExamChecklistType, null: false
+
+    field :registration, Types::RegistrationType, null: true do
+      argument :rails_id, Integer, required: true
+    end
+
+    def registration(rails_id:)
+      object.registrations.find_by(id: rails_id)
+    end
+
+    field :final_registrations, [Types::RegistrationType], null: false
+    def final_registrations
+      object.registrations.final
+    end
 
     field :my_registration, Types::RegistrationType, null: true
     def my_registration

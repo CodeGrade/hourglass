@@ -1,5 +1,4 @@
 import React from 'react';
-import { useResponse as useRegsIndex } from '@hourglass/common/api/grader/registrations';
 import { useRegistrationsShow as useRegsShow } from '@hourglass/common/api/grader/registrations/show';
 import {
   useParams,
@@ -8,57 +7,104 @@ import {
   Link,
 } from 'react-router-dom';
 import ExamViewer from '@hourglass/workflows/proctor/registrations/show';
+import { QueryRenderer, graphql } from 'react-relay';
+import environment from '@hourglass/relay/environment';
+import { useFragment } from 'relay-hooks';
+import { submissionsAllQuery } from './__generated__/submissionsAllQuery.graphql';
+import { submissionsOneQuery } from './__generated__/submissionsOneQuery.graphql';
 
-const ExamSubmissions: React.FC = () => {
+const ExamSubmissions: React.FC = (props) => {
   const { examId } = useParams();
-  const res = useRegsIndex(examId);
-  if (res.type !== 'RESULT') {
-    return <p>Loading...</p>;
-  }
-  if (res.response.length === 0) {
-    return <p>No submissions.</p>;
-  }
   return (
-    <ul>
-      {res.response.map((reg) => (
-        <li key={reg.id}>
-          <Link to={`/exams/${examId}/submissions/${reg.id}`}>
-            {reg.user.displayName}
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <QueryRenderer<submissionsAllQuery>
+      environment={environment}
+      query={graphql`
+        query submissionsAllQuery($examRailsId: Int!) {
+          exam(railsId: $examRailsId) {
+            finalRegistrations {
+              railsId
+              user {
+                displayName
+              }
+            }
+          }
+        }
+        `}
+      variables={{
+        examRailsId: Number(examId),
+      }}
+      render={({ error, props }) => {
+        if (error) {
+          return <p>Error</p>;
+        }
+        if (!props) {
+          return <p>Loading...</p>;
+        }
+        return (
+          <ul>
+            {props.exam.finalRegistrations.map((reg) => (
+              <li key={reg.railsId}>
+                <Link to={`/exams/${examId}/submissions/${reg.railsId}`}>
+                  {reg.user.displayName}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        );
+      }}
+    />
   );
 };
 
-const ExamSubmission: React.FC = () => {
-  const { registrationId } = useParams();
-  const res = useRegsShow(registrationId);
-  if (res.type === 'LOADING') {
-    return <p>Loading...</p>;
-  }
-  if (res.type === 'ERROR') {
-    return (
-      <>
-        <span className="text-danger">
-          <p>Error</p>
-          <small>{res.text}</small>
-        </span>
-      </>
-    );
-  }
+const ExamSubmission: React.FC = (props) => {
+  const { examId, registrationId } = useParams();
   return (
-    <>
-      <h1>{`Submission by ${res.response.user.displayName}`}</h1>
-      <ExamViewer
-        railsExam={{
-          id: 0,
-          name: 'not used',
-          policies: [],
-        }}
-        contents={res.response.contents}
-      />
-    </>
+    <QueryRenderer<submissionsOneQuery>
+      environment={environment}
+      query={graphql`
+        query submissionsOneQuery($examRailsId: Int!, $registrationRailsId: Int!) {
+          exam(railsId: $examRailsId) {
+            registration(railsId: $registrationRailsId) {
+              currentAnswers
+              user {
+                displayName
+              }
+              examVersion {
+                contents
+              }
+            }
+          }
+        }
+        `}
+      variables={{
+        examRailsId: Number(examId),
+        registrationRailsId: Number(registrationId),
+      }}
+      render={({ error, props }) => {
+        if (error) {
+          return <p>Error</p>;
+        }
+        if (!props) {
+          return <p>Loading...</p>;
+        }
+        return (
+          <>
+            <h1>{`Submission by ${props.exam.registration.user.displayName}`}</h1>
+            <ExamViewer
+              railsExam={{
+                id: 0,
+                name: 'not used',
+                policies: [],
+              }}
+              contents={{
+                exam: JSON.parse(props.exam.registration.examVersion.contents).exam,
+                answers: JSON.parse(props.exam.registration.currentAnswers),
+              }}
+            />
+          </>
+        );
+      }}
+    />
   );
 };
 

@@ -64,7 +64,6 @@ import ErrorBoundary from '@hourglass/common/boundary';
 import { BsPencilSquare } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import Loading from '@hourglass/common/loading';
 import { QueryRenderer, graphql } from 'react-relay';
 import environment from '@hourglass/relay/environment';
 import { useFragment, useMutation } from 'relay-hooks';
@@ -77,25 +76,6 @@ export interface ExamUpdateInfo {
   end: string;
   duration: number;
 }
-
-const loadingStatus = {
-  reason: 'Loading...',
-  status: ChecklistItemStatus.NotStarted,
-};
-
-const emptyResponse: ShowResponse = {
-  start: DateTime.local(),
-  end: DateTime.local(),
-  name: 'Exam',
-  duration: 0,
-  versions: [],
-  checklist: {
-    rooms: loadingStatus,
-    staff: loadingStatus,
-    seating: loadingStatus,
-    versions: loadingStatus,
-  },
-};
 
 const Loaded: React.FC<{
   refresh: () => void;
@@ -787,6 +767,16 @@ const PreviewVersion: React.FC<{
   );
 };
 
+function mkV(gql) {
+  return {
+    id: gql.railsId,
+    name: gql.name,
+    policies: gql.policies,
+    contents: JSON.parse(gql.contents),
+    anyStarted: gql.anyStarted,
+  };
+}
+
 const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
   return (
@@ -801,6 +791,31 @@ const ExamAdmin: React.FC = () => {
             startTime
             endTime
             duration
+            examVersions {
+              railsId
+              name
+              policies
+              anyStarted
+              contents
+            }
+            checklist {
+              rooms {
+                reason
+                status
+              }
+              staff {
+                reason
+                status
+              }
+              seating {
+                reason
+                status
+              }
+              versions {
+                reason
+                status
+              }
+            }
           }
         }
         `}
@@ -825,25 +840,8 @@ const ExamAdmin: React.FC = () => {
                 start: DateTime.fromISO(props.exam.startTime),
                 end: DateTime.fromISO(props.exam.endTime),
                 duration: props.exam.duration,
-                versions: [],
-                checklist: {
-                  rooms: {
-                    reason: 'TODO',
-                    status: ChecklistItemStatus.NotStarted,
-                  },
-                  staff: {
-                    reason: 'TODO',
-                    status: ChecklistItemStatus.NotStarted,
-                  },
-                  seating: {
-                    reason: 'TODO',
-                    status: ChecklistItemStatus.NotStarted,
-                  },
-                  versions: {
-                    reason: 'TODO',
-                    status: ChecklistItemStatus.NotStarted,
-                  },
-                },
+                versions: props.exam.examVersions.map(mkV),
+                checklist: props.exam.checklist,
               }}
             />
           </DocumentTitle>

@@ -88,7 +88,9 @@ const NavbarLogin: React.FC = () => (
   </Navbar>
 );
 
-const RN: React.FC = () => (
+const RN: React.FC<{
+  className?: string;
+}> = ({ className }) => (
   <QueryRenderer<navbarQuery>
     environment={environment}
     query={graphql`
@@ -104,7 +106,7 @@ const RN: React.FC = () => (
         return <NavbarLogin />;
       }
       return (
-        <RegularNavbar me={props.me} />
+        <RegularNavbar className={className} me={props.me} />
       );
     }}
   />

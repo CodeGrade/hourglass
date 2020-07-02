@@ -102,6 +102,20 @@ class ExamVersion < ApplicationRecord
     end
   end
 
+  def old_contents
+    {
+      exam: {
+        questions: contents['questions'],
+        reference: contents['reference'] || [],
+        instructions: contents['instructions'] || { type: 'HTML', value: '' },
+        files: files,
+      },
+      answers: {
+        answers: answers,
+      },
+    }
+  end
+
   def serialize
     {
       id: id,

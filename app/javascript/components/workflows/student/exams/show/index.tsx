@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { Container } from 'react-bootstrap';
 import store from '@student/exams/show/store';
 import RegularNavbar from '@hourglass/common/navbar';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory, Redirect } from 'react-router-dom';
 import {
   RailsExamVersion,
   RailsUser,
@@ -66,6 +66,7 @@ const Exam: React.FC<ShowExamProps> = (props) => {
 
 const ShowExam: React.FC = () => {
   const { examId } = useParams();
+  const history = useHistory();
   return (
     <QueryRenderer<showQuery>
       environment={environment}
@@ -114,6 +115,11 @@ const ShowExam: React.FC = () => {
                 <p>Loading...</p>
               </Container>
             </>
+          );
+        }
+        if (!props.exam.myRegistration) {
+          return (
+            <Redirect to="/" />
           );
         }
         const railsUser: RailsUser = {

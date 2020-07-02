@@ -229,116 +229,108 @@ export const BlockNav: React.FC<{
 };
 
 const Entry: React.FC = () => {
-  const railsUser = undefined; // TODO: remove
-
   const [transitioning, setTransitioning] = useState(false);
   const [transitionMessage, setTransitionMessage] = useState('');
   const [transitionCallback, setTransitionCallback] = useState(() => (_) => undefined);
   const [customHandler, setCustomHandler] = useState<CustomHandler>(() => (_) => undefined);
   return (
     <RelayEnvironmentProvider environment={environment}>
-      <RailsContext.Provider
+      <BlockerContext.Provider
         value={{
-          railsUser,
+          setCustomHandler,
         }}
       >
-        <BlockerContext.Provider
-          value={{
-            setCustomHandler,
-          }}
-        >
-          <DndProvider backend={HTML5Backend}>
-            <BrowserRouter
-              getUserConfirmation={(message, callback) => {
-                setTransitioning(true);
-                setTransitionMessage(message);
-                setTransitionCallback(() => callback);
+        <DndProvider backend={HTML5Backend}>
+          <BrowserRouter
+            getUserConfirmation={(message, callback) => {
+              setTransitioning(true);
+              setTransitionMessage(message);
+              setTransitionCallback(() => callback);
+            }}
+          >
+            <Modal
+              show={transitioning}
+              onHide={() => {
+                setTransitioning(false);
+                transitionCallback(false);
+                customHandler(false);
               }}
             >
-              <Modal
-                show={transitioning}
-                onHide={() => {
-                  setTransitioning(false);
-                  transitionCallback(false);
-                  customHandler(false);
-                }}
-              >
-                <Modal.Header closeButton>
-                  <Modal.Title>Are you sure you want to navigate?</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                  {transitionMessage}
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button
-                    variant="primary"
-                    onClick={() => {
-                      setTransitioning(false);
-                      transitionCallback(false);
-                      customHandler(false);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="danger"
-                    onClick={() => {
-                      setTransitioning(false);
-                      transitionCallback(true);
-                      customHandler(true);
-                    }}
-                  >
-                    Leave
-                  </Button>
-                </Modal.Footer>
-              </Modal>
-              <Switch>
-                <Route path="/exams/:examId" exact>
-                  <Exam />
-                </Route>
-                <Route path="/exams/:examId/proctoring">
-                  <AllAlerts>
-                    <ExamProctoring />
-                  </AllAlerts>
-                </Route>
-                <Route path="/">
-                  <RegularNavbar />
-                  <Container>
-                    <ErrorBoundary>
-                      <AllAlerts>
-                        <Switch>
-                          <Route exact path="/">
-                            <DocumentTitle title="My Exams">
-                              <Exams />
-                            </DocumentTitle>
-                          </Route>
-                          <Route path="/exams/:examId/admin">
-                            <ExamAdmin />
-                          </Route>
-                          <Route path="/exams/:examId/submissions">
-                            <ExamSubmissions />
-                          </Route>
-                          <Route path="/exams/:examId/versions/:versionId/edit" exact>
-                            <EditExamVersion />
-                          </Route>
-                          <Route path="/courses/:courseId">
-                            <ShowCourse />
-                          </Route>
-                          <Route path="*">
-                            <DocumentTitle title="Not found">
-                              TODO: 404!
-                            </DocumentTitle>
-                          </Route>
-                        </Switch>
-                      </AllAlerts>
-                    </ErrorBoundary>
-                  </Container>
-                </Route>
-              </Switch>
-            </BrowserRouter>
-          </DndProvider>
-        </BlockerContext.Provider>
-      </RailsContext.Provider>
+              <Modal.Header closeButton>
+                <Modal.Title>Are you sure you want to navigate?</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {transitionMessage}
+              </Modal.Body>
+              <Modal.Footer>
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setTransitioning(false);
+                    transitionCallback(false);
+                    customHandler(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="danger"
+                  onClick={() => {
+                    setTransitioning(false);
+                    transitionCallback(true);
+                    customHandler(true);
+                  }}
+                >
+                  Leave
+                </Button>
+              </Modal.Footer>
+            </Modal>
+            <Switch>
+              <Route path="/exams/:examId" exact>
+                <Exam />
+              </Route>
+              <Route path="/exams/:examId/proctoring">
+                <AllAlerts>
+                  <ExamProctoring />
+                </AllAlerts>
+              </Route>
+              <Route path="/">
+                <RegularNavbar />
+                <Container>
+                  <ErrorBoundary>
+                    <AllAlerts>
+                      <Switch>
+                        <Route exact path="/">
+                          <DocumentTitle title="My Exams">
+                            <Exams />
+                          </DocumentTitle>
+                        </Route>
+                        <Route path="/exams/:examId/admin">
+                          <ExamAdmin />
+                        </Route>
+                        <Route path="/exams/:examId/submissions">
+                          <ExamSubmissions />
+                        </Route>
+                        <Route path="/exams/:examId/versions/:versionId/edit" exact>
+                          <EditExamVersion />
+                        </Route>
+                        <Route path="/courses/:courseId">
+                          <ShowCourse />
+                        </Route>
+                        <Route path="*">
+                          <DocumentTitle title="Not found">
+                            TODO: 404!
+                          </DocumentTitle>
+                        </Route>
+                      </Switch>
+                    </AllAlerts>
+                  </ErrorBoundary>
+                </Container>
+              </Route>
+            </Switch>
+          </BrowserRouter>
+        </DndProvider>
+      </BlockerContext.Provider>
     </RelayEnvironmentProvider>
   );
 };

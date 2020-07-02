@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   end
   namespace :api do
     namespace :professor do
-      resources :courses, shallow: true, param: 'course_id', only: [:index, :show] do
+      resources :courses, shallow: true, param: 'course_id', only: [:show] do
         member do
           post :sync
           resources :exams, param: 'exam_id', only: [:create, :index, :show, :update] do

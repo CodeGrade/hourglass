@@ -2,24 +2,20 @@ import { hot } from 'react-hot-loader';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import React, { useContext, useState, useEffect } from 'react';
-import { RailsContext } from '@student/exams/show/context';
 import RegularNavbar from '@hourglass/common/navbar';
 import { Container, Modal, Button } from 'react-bootstrap';
 import {
   BrowserRouter,
   Route,
   Switch,
-  useParams,
   Prompt,
 } from 'react-router-dom';
-import * as ApiStudentExamsShow from '@hourglass/common/api/student/exams/show';
 import ShowExam from '@student/exams/show';
 import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
 import ExamSubmissions from '@professor/exams/submissions';
 import ExamProctoring from '@proctor/exams/index';
 import EditExamVersion from '@professor/exams/edit';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { AllAlerts } from '@hourglass/common/alerts';
 import './index.scss';
 import ErrorBoundary from '@hourglass/common/boundary';
@@ -28,47 +24,6 @@ import Home from '@hourglass/workflows/home';
 
 import { RelayEnvironmentProvider } from 'relay-hooks';
 import environment from '@hourglass/relay/environment';
-
-const Exam: React.FC = () => {
-  const { examId } = useParams();
-  const { railsUser } = useContext(RailsContext);
-  const showRes = ApiStudentExamsShow.useResponse(examId);
-  switch (showRes.type) {
-    case 'ERROR':
-      return (
-        <>
-          <RegularNavbar />
-          <Container>
-            <span className="text-danger">{showRes.text}</span>
-          </Container>
-        </>
-      );
-    case 'LOADING':
-      return (
-        <>
-          <RegularNavbar />
-          <Container>
-            <p>Loading...</p>
-          </Container>
-        </>
-      );
-    case 'RESULT':
-      return (
-        <DocumentTitle title={showRes.response.railsExam.name}>
-          <ShowExam
-            railsUser={railsUser}
-            railsExam={showRes.response.railsExam}
-            railsCourse={showRes.response.railsCourse}
-            railsRegistration={showRes.response.railsRegistration}
-            final={showRes.response.final}
-            lastSnapshot={showRes.response.lastSnapshot}
-          />
-        </DocumentTitle>
-      );
-    default:
-      throw new ExhaustiveSwitchError(showRes);
-  }
-};
 
 type CustomHandler = (b: boolean) => void;
 
@@ -167,7 +122,7 @@ const Entry: React.FC = () => {
             </Modal>
             <Switch>
               <Route path="/exams/:examId" exact>
-                <Exam />
+                <ShowExam />
               </Route>
               <Route path="/exams/:examId/proctoring">
                 <AllAlerts>

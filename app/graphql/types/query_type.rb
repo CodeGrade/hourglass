@@ -18,6 +18,14 @@ module Types
       Exam.find(rails_id)
     end
 
+    field :course, CourseType, null: false do
+      argument :rails_id, Integer, required: true
+    end
+
+    def course(rails_id:)
+      Course.find(rails_id)
+    end
+
     # field :courses, [CourseType], null: false
     # def courses
     #   Course.all

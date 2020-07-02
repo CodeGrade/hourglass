@@ -6,12 +6,6 @@ module Api
       before_action :find_course
       before_action :require_prof_reg
 
-      def show
-        render json: {
-          course: @course.slice(:id, :title),
-        }
-      end
-
       def sync
         bottlenose_api.sync_course_regs(@course)
         render json: { synced: true }

@@ -5,7 +5,7 @@ import { DateTime } from 'luxon';
 export interface RailsExamVersion {
   id: number;
   name: string;
-  policies: Policy[];
+  readonly policies: Policy[];
 }
 
 export interface RailsExam {

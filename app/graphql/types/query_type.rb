@@ -9,11 +9,14 @@ module Types
     def me
       context[:current_user]
     end
-    
-    # field :exams, [ExamType], null: false
-    # def exams
-    #   Exam.all
-    # end
+
+    field :exam, ExamType, null: false do
+      argument :rails_id, Integer, required: true
+    end
+
+    def exam(rails_id:)
+      Exam.find(rails_id)
+    end
 
     # field :courses, [CourseType], null: false
     # def courses

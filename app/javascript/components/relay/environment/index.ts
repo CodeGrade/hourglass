@@ -23,9 +23,7 @@ function fetchQuery(
       query: operation.text,
       variables,
     }),
-  }).then((response) => {
-    return response.json();
-  });
+  }).then((response) => response.json());
 }
 
 const cable = ActionCable.createConsumer();
@@ -34,15 +32,15 @@ const subscriptionHandler = createHandler({
   cable,
 });
 
-const handleSubscribe = (operation, variables, cacheConfig) => {
-  return Observable.create((sink) => {
+const handleSubscribe = (operation, variables, cacheConfig) => (
+  Observable.create((sink) => {
     subscriptionHandler(operation, variables, cacheConfig, {
       onNext: sink.next,
       onError: sink.error,
       onCompleted: sink.complete,
     });
-  });
-};
+  })
+);
 
 const network = Network.create(fetchQuery, handleSubscribe);
 

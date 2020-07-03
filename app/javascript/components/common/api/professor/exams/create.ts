@@ -1,5 +1,11 @@
 import { hitApi } from '@hourglass/common/types/api';
-import { ExamUpdateInfo } from './update';
+
+export interface ExamUpdateInfo {
+  name: string;
+  start: string;
+  end: string;
+  duration: number;
+}
 
 interface Good {
   created: true;

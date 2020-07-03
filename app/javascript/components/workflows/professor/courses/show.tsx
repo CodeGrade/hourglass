@@ -4,7 +4,6 @@ import { Button } from 'react-bootstrap';
 import NewExam from '@professor/exams/new';
 import SyncCourse from '@professor/courses/sync';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import Loading from '@hourglass/common/loading';
 import { QueryRenderer, graphql } from 'react-relay';
 import environment from '@hourglass/relay/environment';
 import { useFragment } from 'relay-hooks';

@@ -66,7 +66,6 @@ const Exam: React.FC<ShowExamProps> = (props) => {
 
 const ShowExam: React.FC = () => {
   const { examId } = useParams();
-  const history = useHistory();
   return (
     <QueryRenderer<showQuery>
       environment={environment}

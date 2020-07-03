@@ -3,6 +3,7 @@
 namespace :factory_bot do
   desc 'Verify that all FactoryBot factories are valid'
   task lint: :environment do
+    require 'factory_bot_rails'
     if Rails.env.test?
       conn = ActiveRecord::Base.connection
       conn.transaction do

@@ -47,6 +47,14 @@ module.exports = {
         tsx: 'never',
       },
     ],
+    camelcase: [
+      'error',
+      {
+        allow: [
+          '\\$key$',
+        ],
+      },
+    ],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],

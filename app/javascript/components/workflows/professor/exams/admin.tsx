@@ -69,6 +69,7 @@ import environment from '@hourglass/relay/environment';
 import { useFragment, useMutation } from 'relay-hooks';
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
 import { admin_examInfo$key } from './__generated__/admin_examInfo.graphql';
+import { adminUpdateExamMutation } from './__generated__/adminUpdateExamMutation.graphql';
 
 export interface ExamUpdateInfo {
   name: string;
@@ -100,7 +101,7 @@ const Loaded: React.FC<{
       message: emsg,
     });
   };
-  const [mutate, { loading }] = useMutation(
+  const [mutate, { loading }] = useMutation<adminUpdateExamMutation>(
     graphql`
       mutation adminUpdateExamMutation($input: UpdateExamInput!) {
         updateExam(input: $input) {
@@ -471,7 +472,7 @@ export const ExamInfoEditor: React.FC<{
     onSubmit,
     onCancel,
   } = props;
-  const examInfo = useFragment(
+  const examInfo = useFragment<admin_examInfo$key>(
     graphql`
     fragment admin_examInfo on Exam {
       name

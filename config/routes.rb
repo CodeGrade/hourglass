@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  mount ActionCable.server => '/cable'
   post "/graphql", to: "graphql#execute"
   if Rails.env.development?
     get "/graphiql", to: "graphql#graphiql"

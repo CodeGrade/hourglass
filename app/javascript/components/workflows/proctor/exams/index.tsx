@@ -63,9 +63,13 @@ import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
 import { QueryRenderer, graphql } from 'react-relay';
 import environment from '@hourglass/relay/environment';
 
-import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import { useFragment } from 'relay-hooks';
+import { useFragment, useMutation, useSubscription } from 'relay-hooks';
+
+import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
+import { exams_recipients$key } from './__generated__/exams_recipients.graphql';
+
+import { exams_anomalies$key } from './__generated__/exams_anomalies.graphql';
 
 export interface MessageProps {
   icon: IconType;
@@ -102,19 +106,41 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
 
 
 const FinalizeButton: React.FC<{
-  examId: number;
-  userId: number;
+  registrationId: string;
   regFinal: boolean;
-  refresh: () => void;
 }> = (props) => {
   const {
-    examId,
-    userId,
+    registrationId,
     regFinal,
-    refresh,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [loading, setLoading] = useState(false);
+  const [mutate, { loading }] = useMutation(
+    graphql`
+      mutation examsFinalizeRegistrationMutation($input: FinalizeRegistrationInput!) {
+        finalizeRegistration(input: $input) {
+          registration {
+            final
+          }
+        }
+      }
+    `,
+    {
+      onCompleted: ({ finalizeRegistration }) => {
+        alert({
+          variant: 'success',
+          autohide: true,
+          message: 'Registration finalized.',
+        });
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error finalizing registration',
+          message: err.message,
+        });
+      },
+    },
+  );
   const disabled = loading || regFinal;
   const reason = loading ? 'Loading...' : 'Already final';
   return (
@@ -124,29 +150,12 @@ const FinalizeButton: React.FC<{
         disabledMessage={reason}
         variant="danger"
         onClick={() => {
-          setLoading(true);
-          doFinalize(examId, {
-            type: 'USER',
-            id: userId,
-          }).then((res) => {
-            if (res.success === true) {
-              alert({
-                variant: 'success',
-                autohide: true,
-                message: 'Registration finalized.',
-              });
-              setLoading(false);
-              refresh();
-            } else {
-              throw new Error(res.reason);
-            }
-          }).catch((err) => {
-            alert({
-              variant: 'danger',
-              title: 'Error finalizing registration',
-              message: err.message,
-            });
-            setLoading(false);
+          mutate({
+            variables: {
+              input: {
+                registrationId,
+              },
+            },
           });
         }}
       >
@@ -204,44 +213,75 @@ const ClearButton: React.FC<{
   );
 };
 
+const newAnomalySubscriptionSpec = graphql`
+  subscription examsNewAnomalySubscription($examRailsId: Int!) {
+    anomalyWasCreated(examRailsId: $examRailsId) {
+      ...exams_anomalies
+    }
+  }
+`;
+
 const ShowAnomalies: React.FC<{
-  replyTo: (userId: number) => void;
-  examId: number;
-  anomalies: Anomaly[];
-  refresh: () => void;
+  exam: exams_anomalies$key;
 }> = (props) => {
   const {
-    replyTo,
-    examId,
-    anomalies,
-    refresh,
+    exam,
   } = props;
-  useEffect(() => {
-    const timer = setInterval(refresh, 5000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [refresh]);
+  const res = useFragment(
+    graphql`
+      fragment exams_anomalies on Exam {
+        id
+        railsId
+        anomalies {
+          id
+          railsId
+          createdAt
+          reason
+          registration {
+            id
+            railsId
+            final
+            user {
+              railsId
+              displayName
+            }
+          }
+        }
+      }
+    `,
+    exam,
+  );
+  const subscriptionObject = useMemo(() => ({
+    subscription: newAnomalySubscriptionSpec,
+    variables: {
+      examRailsId: res.railsId,
+    },
+  }), [res.railsId]);
+  useSubscription(subscriptionObject);
+  const { anomalies } = res;
   return (
     <>
       {anomalies.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
       {anomalies.map((a) => (
         <tr key={a.id}>
-          <td>{a.user.displayName}</td>
-          <td><ReadableDate showTime value={a.time} /></td>
+          <td>{a.registration.user.displayName}</td>
+          <td>
+            <ReadableDate
+              showTime
+              value={DateTime.fromISO(a.createdAt)}
+            />
+          </td>
           <td>{a.reason}</td>
           <td>
             <FinalizeButton
-              examId={examId}
-              refresh={refresh}
-              userId={a.user.id}
-              regFinal={a.reg.final}
+              registrationId={a.registration.id}
+              regFinal={a.registration.final}
             />
-            <ClearButton refresh={refresh} anomalyId={a.id} />
+            {/* <ClearButton refresh={refresh} anomalyId={a.id} /> */}
             <Button
               variant="info"
               onClick={() => {
-                replyTo(a.user.id);
+                // replyTo(a.user.id);
               }}
             >
               <Icon I={MdMessage} />
@@ -393,52 +433,37 @@ const ExamAnomalies: React.FC<{
   replyTo: (userId: number) => void;
   recipientOptions: RecipientOptions;
   examId: number;
+  exam: exams_anomalies$key;
 }> = (props) => {
   const {
     replyTo,
     recipientOptions,
     examId,
+    exam,
   } = props;
-  const [refresher, refresh] = useRefresher();
-  const res = anomaliesIndex(examId, [refresher]);
   return (
     <div className="wrapper h-100">
       <div className="inner-wrapper">
         <h2>Anomalies</h2>
         <div className="content-wrapper">
           <div className="content overflow-auto-y">
-            <Loading loading={res.type === 'LOADING'}>
-              <Table>
-                <thead>
-                  <tr>
-                    <th>Student</th>
-                    <th>Timestamp</th>
-                    <th>Reason</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                {res.type === 'ERROR' && (
-                  <span className="text-danger">
-                    <p>Error</p>
-                    <small>{`${res.text} (${res.status})`}</small>
-                  </span>
-                )}
-                <tbody>
-                  {res.type === 'RESULT' && (
-                    <ShowAnomalies
-                      replyTo={replyTo}
-                      examId={examId}
-                      refresh={refresh}
-                      anomalies={res.response.anomalies}
-                    />
-                  )}
-                </tbody>
-              </Table>
-            </Loading>
+            <Table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Timestamp</th>
+                  <th>Reason</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ShowAnomalies exam={exam} />
+              </tbody>
+            </Table>
           </div>
         </div>
         <div>
-          <FinalizeRegs examId={examId} recipientOptions={recipientOptions} />
+          {/*<FinalizeRegs examId={examId} recipientOptions={recipientOptions} />*/}
         </div>
       </div>
     </div>
@@ -750,12 +775,12 @@ const Loaded: React.FC<{
     room,
     exam,
   } = response;
-  useEffect(() => {
-    const timer = setInterval(refresh, 5000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [refresh]);
+  // useEffect(() => {
+  //   const timer = setInterval(refresh, 5000);
+  //   return () => {
+  //     clearInterval(timer);
+  //   };
+  // }, [refresh]);
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
 
   return (
@@ -1044,10 +1069,12 @@ const SendMessage: React.FC<{
 };
 
 const SplitViewLoaded: React.FC<{
+  exam: exam_anomalies$key;
   examId: number;
   recipients: SplitRecipients;
 }> = (props) => {
   const {
+    exam,
     examId,
     recipients,
   } = props;
@@ -1106,6 +1133,7 @@ const SplitViewLoaded: React.FC<{
     <Row className="h-100">
       <Col sm={6}>
         <ExamAnomalies
+          exam={exam}
           recipientOptions={recipientOptions}
           examId={examId}
           replyTo={replyTo}
@@ -1126,13 +1154,13 @@ const SplitViewLoaded: React.FC<{
 };
 
 const ProctoringSplitView: React.FC<{
-  exam: any;
+  exam: exams_recipients$key;
 }> = (props) => {
   const { examId } = useParams();
   const {
     exam,
   } = props;
-  const res = useFragment(
+  const res = useFragment<exams_recipients$key>(
     graphql`
     fragment exams_recipients on Exam {
       examVersions { railsId name }
@@ -1144,6 +1172,7 @@ const ProctoringSplitView: React.FC<{
   );
   return (
     <SplitViewLoaded
+      exam={exam}
       examId={examId}
       recipients={{
         versions: res.examVersions.map((ev) => ({
@@ -1177,6 +1206,7 @@ const ExamProctoring: React.FC = () => {
         query examsProctorQuery($examRailsId: Int!) {
           exam(railsId: $examRailsId) {
             ...exams_recipients
+            ...exams_anomalies
             name
           }
         }

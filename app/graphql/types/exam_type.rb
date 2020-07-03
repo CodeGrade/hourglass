@@ -22,6 +22,8 @@ module Types
 
     field :checklist, Types::ExamChecklistType, null: false
 
+    field :anomalies, [Types::AnomalyType], null: false
+
     field :registration, Types::RegistrationType, null: true do
       argument :rails_id, Integer, required: true
     end

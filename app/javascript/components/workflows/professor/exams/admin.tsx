@@ -460,8 +460,6 @@ const ExamInfoViewer: React.FC<{
   );
 };
 
-const NINETY_MINUTES = 5400;
-
 export const ExamInfoEditor: React.FC<{
   exam: admin_examInfo$key;
   onSubmit: (info: ExamUpdateInfo) => void;

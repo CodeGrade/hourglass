@@ -54,7 +54,7 @@ const ExamSubmissions: React.FC = () => {
   );
 };
 
-const ExamSubmission: React.FC = (props) => {
+const ExamSubmission: React.FC = () => {
   const { examId, registrationId } = useParams();
   return (
     <QueryRenderer<submissionsOneQuery>

@@ -5,13 +5,13 @@ class Exam < ApplicationRecord
   belongs_to :course
 
   has_many :rooms, dependent: :destroy
-  has_many :messages, dependent: :destroy
-  has_many :questions, dependent: :destroy
   has_many :exam_versions, dependent: :destroy
   has_many :proctor_registrations, dependent: :destroy
   has_many :exam_announcements, dependent: :destroy
 
   has_many :registrations, through: :exam_versions
+  has_many :messages, through: :registrations
+  has_many :questions, through: :registrations
   has_many :accommodations, through: :registrations
   has_many :version_announcements, through: :exam_versions
   has_many :room_announcements, through: :rooms

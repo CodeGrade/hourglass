@@ -159,21 +159,15 @@ class CreateSchema < ActiveRecord::Migration[6.0]
     end
 
     create_table :messages do |t|
-      t.references :exam, null: false, foreign_key: true
-
       t.references :sender, null: false, foreign_key: { to_table: 'users' }
-      t.references :recipient, null: false, foreign_key: { to_table: 'users' }
-
-      t.index [:exam_id, :recipient_id]
+      t.references :registration, null: false, foreign_key: true
 
       t.text :body, null: false
       t.timestamps
     end
 
     create_table :questions do |t|
-      t.references :exam, null: false, foreign_key: true
-
-      t.references :sender, null: false, foreign_key: { to_table: 'users' }
+      t.references :registration, null: false, foreign_key: true
 
       t.text :body, null: false
       t.timestamps

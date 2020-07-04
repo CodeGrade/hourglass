@@ -2,12 +2,7 @@
 
 FactoryBot.define do
   factory :question do
-    transient do
-      reg { build(:registration) }
-    end
-
-    exam { reg.exam }
-    sender { reg.user }
+    registration
     body { 'Am I allowed to use toBinaryString?' }
   end
 end

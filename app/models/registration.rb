@@ -8,6 +8,8 @@ class Registration < ApplicationRecord
 
   has_many :anomalies, dependent: :destroy
   has_many :snapshots, dependent: :destroy
+  has_many :messages, dependent: :destroy
+  has_many :questions, dependent: :destroy
   has_one :accommodation, dependent: :destroy
 
   validates :user, presence: true
@@ -116,10 +118,10 @@ class Registration < ApplicationRecord
   end
 
   def my_questions
-    exam.questions.where(sender: user)
+    questions
   end
 
   def private_messages
-    exam.messages.where(recipient: user)
+    messages
   end
 end

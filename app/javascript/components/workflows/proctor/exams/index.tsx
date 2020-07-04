@@ -34,14 +34,9 @@ import Loading from '@hourglass/common/loading';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import {
-  Recipient,
-  SplitRecipients,
-} from '@hourglass/common/api/proctor/messages/recipients';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
-import { sendMessage } from '@hourglass/common/api/proctor/messages/create';
 import './index.scss';
 import { BsListCheck } from 'react-icons/bs';
 import { doFinalize } from '@hourglass/common/api/proctor/exams/finalize';
@@ -58,6 +53,18 @@ import { exams_recipients$key } from './__generated__/exams_recipients.graphql';
 import { exams_anomalies$key } from './__generated__/exams_anomalies.graphql';
 import { ConnectionHandler } from 'relay-runtime';
 
+export interface Recipient {
+  type: MessageType.Direct | MessageType.Room | MessageType.Version | MessageType.Exam;
+  id: string;
+  name: string;
+}
+
+export interface SplitRecipients {
+  rooms: Recipient[];
+  students: Recipient[];
+  versions: Recipient[];
+}
+
 enum MessageType {
   Direct = 'DIRECT',
   Question = 'QUESTION',
@@ -69,14 +76,16 @@ enum MessageType {
 interface DirectMessage {
   type: MessageType.Direct;
   time: DateTime;
-  id: number;
   body: string;
   sender: {
     isMe: boolean;
     displayName: string;
   };
-  recipient: {
-    displayName: string;
+  registration: {
+    id: number;
+    user: {
+      displayName: string;
+    };
   };
 }
 
@@ -85,9 +94,11 @@ interface Question {
   time: DateTime;
   id: number;
   body: string;
-  sender: {
+  registration: {
     id: number;
-    displayName: string;
+    user: {
+      displayName: string;
+    };
   };
 }
 
@@ -309,6 +320,7 @@ const ClearButton: React.FC<{
 
 const ShowAnomaly: React.FC = (props) => {
   const {
+    replyTo,
     examId,
     anomalyKey,
   } = props;
@@ -316,15 +328,13 @@ const ShowAnomaly: React.FC = (props) => {
     graphql`
     fragment exams_anomaly on Anomaly {
       id
-      railsId
       createdAt
       reason
       registration {
         id
-        railsId
         final
         user {
-          railsId
+          id
           displayName
         }
       }
@@ -351,7 +361,8 @@ const ShowAnomaly: React.FC = (props) => {
         <Button
           variant="info"
           onClick={() => {
-            replyTo(anomaly.registration.user.railsId);
+            console.log('user', anomaly.registration.user);
+            replyTo(anomaly.registration.id);
           }}
         >
           <Icon I={MdMessage} />
@@ -422,7 +433,7 @@ const ShowAnomalies: React.FC<{
     <>
       {res.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
       {res.anomalies.edges.map((edge) => (
-        <ShowAnomaly key={edge.node.id} examId={res.id} anomalyKey={edge.node} />
+        <ShowAnomaly key={edge.node.id} replyTo={replyTo} examId={res.id} anomalyKey={edge.node} />
       ))}
     </>
   );
@@ -676,16 +687,16 @@ const ShowQuestion: React.FC<{
     replyTo,
   } = props;
   const {
-    sender,
+    registration,
     body,
     time,
   } = question;
-  const reply = useCallback(() => replyTo(sender.id), [sender.id]);
+  const reply = useCallback(() => replyTo(registration.id), [registration.id]);
   return (
     <div className="d-flex">
       <ShowMessage
         icon={MdMessage}
-        tooltip={`Received from ${sender.displayName}`}
+        tooltip={`Received from ${registration.user.displayName}`}
         body={body}
         time={time}
       />
@@ -711,7 +722,7 @@ const ShowDirectMessage: React.FC<{
   } = props;
   const {
     sender,
-    recipient,
+    registration,
     body,
     time,
   } = message;
@@ -719,7 +730,7 @@ const ShowDirectMessage: React.FC<{
   return (
     <ShowMessage
       icon={MdSend}
-      tooltip={`Sent by ${senderName} to ${recipient.displayName}`}
+      tooltip={`Sent by ${senderName} to ${registration.user.displayName}`}
       body={body}
       time={time}
     />
@@ -791,10 +802,10 @@ const ShowMessages: React.FC<{
     let option;
     switch (m.type) {
       case MessageType.Direct:
-        option = m.recipient.displayName;
+        option = m.registration.user.displayName;
         break;
       case MessageType.Question:
-        option = m.sender.displayName;
+        option = m.registration.user.displayName;
         break;
       case MessageType.Room:
         option = m.room.name;
@@ -885,8 +896,8 @@ enum MessagesTab {
 }
 
 const newMessageSubscriptionSpec = graphql`
-  subscription examsNewMessageSubscription($examRailsId: Int!) {
-    messageWasSent(examRailsId: $examRailsId) {
+  subscription examsNewMessageSubscription($examId: ID!) {
+    messageWasSent(examId: $examId) {
       ...exams_messages
     }
   }
@@ -897,7 +908,7 @@ const Loaded: React.FC<{
   setSelectedRecipient: (option: MessageFilterOption) => void;
   messageRef: React.Ref<HTMLTextAreaElement>;
   replyTo: (userId: number) => void;
-  examId: number;
+  examId: string;
   response: Response;
   recipientOptions: RecipientOptions;
 }> = (props) => {
@@ -920,7 +931,7 @@ const Loaded: React.FC<{
   const subscriptionObject = useMemo(() => ({
     subscription: newMessageSubscriptionSpec,
     variables: {
-      examRailsId: examId,
+      examId,
     },
   }), [examId]);
   useSubscription(subscriptionObject);
@@ -1050,7 +1061,7 @@ const ExamMessages: React.FC<{
   const res = useFragment(
     graphql`
       fragment exams_messages on Exam {
-        railsId
+        id
         versionAnnouncements {
           railsId
           id
@@ -1079,10 +1090,11 @@ const ExamMessages: React.FC<{
           railsId
           id
           createdAt
-          sender {
+          registration {
             id
-            railsId
-            displayName
+            user {
+              displayName
+            }
           }
           body
         }
@@ -1095,8 +1107,11 @@ const ExamMessages: React.FC<{
             isMe
             displayName
           }
-          recipient {
-            displayName
+          registration {
+            id
+            user {
+              displayName
+            }
           }
         }
       }
@@ -1105,7 +1120,7 @@ const ExamMessages: React.FC<{
   );
   return (
     <Loaded
-      examId={res.railsId}
+      examId={res.id}
       recipientOptions={recipientOptions}
       response={{
         sent: res.messages.map((msg) => ({
@@ -1113,17 +1128,14 @@ const ExamMessages: React.FC<{
           id: msg.railsId,
           body: msg.body,
           sender: msg.sender,
-          recipient: msg.recipient,
+          registration: msg.registration,
           time: DateTime.fromISO(msg.createdAt),
         })),
         questions: res.questions.map((question) => ({
           type: MessageType.Question,
           id: question.railsId,
           body: question.body,
-          sender: {
-            id: question.sender.railsId,
-            displayName: question.sender.displayName,
-          },
+          registration: question.registration,
           time: DateTime.fromISO(question.createdAt),
         })),
         version: res.versionAnnouncements.map((va) => ({
@@ -1219,7 +1231,7 @@ const SendMessageButton: React.FC<{
           mutate({
             variables: {
               input: {
-                recipientId: recipient.realId,
+                recipientId: recipient.id,
                 message,
               },
             },
@@ -1315,8 +1327,7 @@ const SplitViewLoaded: React.FC<{
         label: 'Entire exam',
         value: {
           type: MessageType.Exam,
-          realId: exam.id,
-          id: -1,
+          id: exam.id,
           name: 'Entire exam',
         },
       }],
@@ -1346,13 +1357,13 @@ const SplitViewLoaded: React.FC<{
   const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(
     recipientOptions[0].options[0],
   );
-  const replyTo = (userId: number) => {
-    const recip = recipientOptions[3].options.find((option) => option.value.id === userId);
+  const replyTo = (registrationId: string) => {
+    const recip = recipientOptions[3].options.find((option) => option.value.id === registrationId);
     if (!recip) {
       alert({
         variant: 'danger',
         title: 'Error replying to message',
-        message: `Invalid User ID: ${userId}`,
+        message: `Invalid registration ID: ${registrationId}`,
       });
     }
     setSelectedRecipient(recip);
@@ -1393,15 +1404,21 @@ const ProctoringSplitView: React.FC<{
   const res = useFragment<exams_recipients$key>(
     graphql`
     fragment exams_recipients on Exam {
-      examVersions { id railsId name }
+      examVersions {
+        id
+        name
+      }
       registrations {
         id
         user {
-          railsId
+          id
           displayName
         }
       }
-      rooms { id railsId name }
+      rooms {
+        id
+        name
+      }
     }
     `,
     exam,
@@ -1413,21 +1430,18 @@ const ProctoringSplitView: React.FC<{
       recipients={{
         versions: res.examVersions.map((ev) => ({
           type: MessageType.Version,
-          id: ev.railsId,
+          id: ev.id,
           name: ev.name,
-          realId: ev.id,
         })).sort((a, b) => a.name.localeCompare(b.name)),
         students: res.registrations.map((registration) => ({
           type: MessageType.Direct,
-          id: registration.user.railsId,
+          id: registration.id,
           name: registration.user.displayName,
-          realId: registration.id,
         })).sort((a, b) => a.name.localeCompare(b.name)),
         rooms: res.rooms.map((room) => ({
           type: MessageType.Room,
-          id: room.railsId,
+          id: room.id,
           name: room.name,
-          realId: room.id,
         })).sort((a, b) => a.name.localeCompare(b.name)),
       }}
     />

@@ -2,13 +2,14 @@
 
 # A message sent from a professor to a student during an exam.
 class Message < ApplicationRecord
-  belongs_to :exam
   belongs_to :sender, class_name: 'User'
-  belongs_to :recipient, class_name: 'User'
+  belongs_to :registration
 
   validates :sender, presence: true
-  validates :recipient, presence: true
+  validates :registration, presence: true
   validates :body, presence: true
+
+  delegate :exam, to: :registration
 
   validate :sent_by_prof
 
@@ -16,12 +17,6 @@ class Message < ApplicationRecord
     return if exam.course.professors.include? sender
 
     errors.add(:sender, 'must be a professor')
-  end
-
-  after_create :trigger_subscription
-
-  def trigger_subscription
-    HourglassSchema.subscriptions.trigger(:message_was_sent, { exam_rails_id: exam.id }, exam)
   end
 
   def serialize

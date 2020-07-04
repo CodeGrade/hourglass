@@ -27,22 +27,36 @@ class HourglassSchema < GraphQL::Schema
 
   def self.resolve_type(type, obj, ctx)
     case obj
-    when User
-      Types::UserType
-    when Registration
-      Types::RegistrationType
+    when Anomaly
+      Types::AnomalyType
     when Course
       Types::CourseType
-    when ProctorRegistration
-      Types::ProctorRegistrationType
-    when ProfessorCourseRegistration
-      Types::ProfessorCourseRegistrationType
-    when StaffRegistration
-      Types::StaffRegistrationType
+    when ExamAnnouncement
+      Types::ExamAnnouncementType
     when Exam
       Types::ExamType
     when ExamVersion
       Types::ExamVersionType
+    when Message
+      Types::MessageType
+    when ProctorRegistration
+      Types::ProctorRegistrationType
+    when ProfessorCourseRegistration
+      Types::ProfessorCourseRegistrationType
+    when Question
+      Types::QuestionType
+    when Registration
+      Types::RegistrationType
+    when RoomAnnouncement
+      Types::RoomAnnouncementType
+    when Room
+      Types::RoomType
+    when StaffRegistration
+      Types::StaffRegistrationType
+    when User
+      Types::UserType
+    when VersionAnnouncement
+      Types::VersionAnnouncementType
     else
       raise("Unexpected object: #{obj}")
     end

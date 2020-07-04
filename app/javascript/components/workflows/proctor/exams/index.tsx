@@ -30,7 +30,6 @@ import {
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
-import { destroyAnomaly } from '@hourglass/common/api/proctor/anomalies/destroy';
 import Loading from '@hourglass/common/loading';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
@@ -230,7 +229,40 @@ const ClearButton: React.FC<{
     anomalyId,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [loading, setLoading] = useState(false);
+  const [mutate, { loading }] = useMutation(
+    graphql`
+    mutation examsDestroyAnomalyMutation($input: DestroyAnomalyInput!) {
+      destroyAnomaly(input: $input) {
+        errors
+      }
+    }
+    `,
+    {
+      onCompleted: ({ destroyAnomaly }) => {
+        const { errors } = destroyAnomaly;
+        if (errors.length !== 0) {
+          alert({
+            variant: 'danger',
+            title: 'Error clearing anomaly',
+            message: errors.join('\n'),
+          });
+        } else {
+          alert({
+            variant: 'success',
+            message: 'Anomaly cleared.',
+            autohide: true,
+          });
+        }
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error clearing anomaly',
+          message: err.message,
+        });
+      },
+    },
+  );
   return (
     <Loading loading={loading}>
       <TooltipButton
@@ -238,25 +270,12 @@ const ClearButton: React.FC<{
         disabledMessage="Loading..."
         variant="success"
         onClick={() => {
-          setLoading(true);
-          destroyAnomaly(anomalyId).then((res) => {
-            if (res.success === true) {
-              alert({
-                variant: 'success',
-                message: 'Anomaly cleared.',
-                autohide: true,
-              });
-              setLoading(false);
-            } else {
-              throw new Error(res.reason);
-            }
-          }).catch((err) => {
-            alert({
-              variant: 'danger',
-              title: 'Error clearing anomaly',
-              message: err.message,
-            });
-            setLoading(false);
+          mutate({
+            variables: {
+              input: {
+                anomalyId,
+              },
+            },
           });
         }}
       >
@@ -333,7 +352,7 @@ const ShowAnomalies: React.FC<{
               registrationId={a.registration.id}
               regFinal={a.registration.final}
             />
-            <ClearButton anomalyId={a.railsId} />
+            <ClearButton anomalyId={a.id} />
             <Button
               variant="info"
               onClick={() => {

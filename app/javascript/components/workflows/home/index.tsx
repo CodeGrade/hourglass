@@ -90,10 +90,14 @@ const Home: React.FC = () => (
         query homeQuery {
           me {
             registrations {
-              ...home_studentregs
+              nodes {
+                ...home_studentregs
+              }
             }
             professorCourseRegistrations {
-              ...home_profregs
+              nodes {
+                ...home_profregs
+              }
             }
           }
         }
@@ -107,16 +111,16 @@ const Home: React.FC = () => (
           return <p>Loading...</p>;
         }
         const allEmpty = (
-          props.me.registrations.length === 0
-          && props.me.professorCourseRegistrations.length === 0
+          props.me.registrations.nodes.length === 0
+          && props.me.professorCourseRegistrations.nodes.length === 0
         );
         if (allEmpty) {
           return <p>You have no registrations.</p>;
         }
         return (
           <>
-            <ShowRegistrations registrations={props.me.registrations} />
-            <ShowProfRegs professorCourseRegistrations={props.me.professorCourseRegistrations} />
+            <ShowRegistrations registrations={props.me.registrations.nodes} />
+            <ShowProfRegs professorCourseRegistrations={props.me.professorCourseRegistrations.nodes} />
           </>
         );
       }}

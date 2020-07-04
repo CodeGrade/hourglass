@@ -14,7 +14,7 @@ module Types
     field :admin, Boolean, null: false
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
 
-    field :registrations, [Types::RegistrationType], null: false
+    field :registrations, Types::RegistrationType.connection_type, null: false
     delegate :registrations, to: :object
 
     field :isMe, Boolean, null: false
@@ -28,7 +28,7 @@ module Types
     # field :proctor_registrations, [Types::ProctorRegistrationType], null: false
     # delegate :proctor_registrations, to: :object
 
-    field :professor_course_registrations, [Types::ProfessorCourseRegistrationType], null: false
+    field :professor_course_registrations, Types::ProfessorCourseRegistrationType.connection_type, null: false
     delegate :professor_course_registrations, to: :object
   end
 end

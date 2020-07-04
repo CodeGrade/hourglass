@@ -56,6 +56,7 @@ import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
 import { exams_recipients$key } from './__generated__/exams_recipients.graphql';
 
 import { exams_anomalies$key } from './__generated__/exams_anomalies.graphql';
+import { ConnectionHandler } from 'relay-runtime';
 
 enum MessageType {
   Direct = 'DIRECT',
@@ -223,9 +224,11 @@ const FinalizeButton: React.FC<{
 };
 
 const ClearButton: React.FC<{
-  anomalyId: number;
+  examId: string;
+  anomalyId: string;
 }> = (props) => {
   const {
+    examId,
     anomalyId,
   } = props;
   const { alert } = useContext(AlertContext);
@@ -233,11 +236,27 @@ const ClearButton: React.FC<{
     graphql`
     mutation examsDestroyAnomalyMutation($input: DestroyAnomalyInput!) {
       destroyAnomaly(input: $input) {
+        deletedId
         errors
       }
     }
     `,
     {
+      optimisticResponse: {
+        destroyAnomaly: {
+          deletedId: anomalyId,
+          errors: [],
+        },
+      },
+      configs: [{
+        type: 'RANGE_DELETE',
+        parentID: examId,
+        connectionKeys: [{
+          key: 'Exam_anomalies',
+        }],
+        pathToConnection: ['exam', 'anomalies'],
+        deletedIDFieldName: 'deletedId',
+      }],
       onCompleted: ({ destroyAnomaly }) => {
         const { errors } = destroyAnomaly;
         if (errors.length !== 0) {
@@ -286,10 +305,72 @@ const ClearButton: React.FC<{
   );
 };
 
+const ShowAnomaly: React.FC = (props) => {
+  const {
+    examId,
+    anomalyKey,
+  } = props;
+  const anomaly = useFragment(
+    graphql`
+    fragment exams_anomaly on Anomaly {
+      id
+      railsId
+      createdAt
+      reason
+      registration {
+        id
+        railsId
+        final
+        user {
+          railsId
+          displayName
+        }
+      }
+    }
+    `,
+    anomalyKey,
+  );
+  return (
+    <tr key={anomaly.id}>
+      <td>{anomaly.registration.user.displayName}</td>
+      <td>
+        <ReadableDate
+          showTime
+          value={DateTime.fromISO(anomaly.createdAt)}
+        />
+      </td>
+      <td>{anomaly.reason}</td>
+      <td>
+        <FinalizeButton
+          registrationId={anomaly.registration.id}
+          regFinal={anomaly.registration.final}
+        />
+        <ClearButton examId={examId} anomalyId={anomaly.id} />
+        <Button
+          variant="info"
+          onClick={() => {
+            replyTo(anomaly.registration.user.railsId);
+          }}
+        >
+          <Icon I={MdMessage} />
+          Message student
+        </Button>
+      </td>
+    </tr>
+  );
+};
+
 const newAnomalySubscriptionSpec = graphql`
   subscription examsNewAnomalySubscription($examRailsId: Int!) {
     anomalyWasCreated(examRailsId: $examRailsId) {
-      ...exams_anomalies
+      anomaly {
+        ...exams_anomaly
+      }
+      anomalyEdge {
+        node {
+          id
+        }
+      }
     }
   }
 `;
@@ -307,18 +388,11 @@ const ShowAnomalies: React.FC<{
       fragment exams_anomalies on Exam {
         id
         railsId
-        anomalies {
-          id
-          railsId
-          createdAt
-          reason
-          registration {
-            id
-            railsId
-            final
-            user {
-              railsId
-              displayName
+        anomalies(first: 100) @connection(key: "Exam_anomalies", filters: []) {
+          edges {
+            node {
+              id
+              ...exams_anomaly
             }
           }
         }
@@ -331,39 +405,23 @@ const ShowAnomalies: React.FC<{
     variables: {
       examRailsId: res.railsId,
     },
+    configs: [{
+      type: 'RANGE_ADD',
+      parentID: res.id,
+      connectionInfo: [{
+        key: 'Exam_anomalies',
+        rangeBehavior: 'append',
+      }],
+      edgeName: 'anomalyEdge',
+    }],
   }), [res.railsId]);
   useSubscription(subscriptionObject);
-  const { anomalies } = res;
+  console.log(res.anomalies);
   return (
     <>
-      {anomalies.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
-      {anomalies.map((a) => (
-        <tr key={a.id}>
-          <td>{a.registration.user.displayName}</td>
-          <td>
-            <ReadableDate
-              showTime
-              value={DateTime.fromISO(a.createdAt)}
-            />
-          </td>
-          <td>{a.reason}</td>
-          <td>
-            <FinalizeButton
-              registrationId={a.registration.id}
-              regFinal={a.registration.final}
-            />
-            <ClearButton anomalyId={a.id} />
-            <Button
-              variant="info"
-              onClick={() => {
-                replyTo(a.registration.user.railsId);
-              }}
-            >
-              <Icon I={MdMessage} />
-              Message student
-            </Button>
-          </td>
-        </tr>
+      {res.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
+      {res.anomalies.edges.map((edge) => (
+        <ShowAnomaly key={edge.node.id} examId={res.id} anomalyKey={edge.node} />
       ))}
     </>
   );

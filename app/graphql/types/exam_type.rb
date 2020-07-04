@@ -22,7 +22,7 @@ module Types
 
     field :checklist, Types::ExamChecklistType, null: false
 
-    field :anomalies, [Types::AnomalyType], null: false
+    field :anomalies, Types::AnomalyType.connection_type, null: false
 
     field :messages, [Types::MessageType], null: false
 

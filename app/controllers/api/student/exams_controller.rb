@@ -30,6 +30,12 @@ module Api
       def question
         q_params = params.require(:question).permit(:body)
         q = Question.new body: q_params[:body], exam: @exam, sender: current_user
+        # TODO:
+        # HourglassSchema.subscriptions.trigger(
+        #   :message_was_sent, 
+        #   { exam_id: HourglassSchema.id_from_object(exam) },
+        #   exam,
+        # )
         render json: {
           success: q.save,
           messages: q.errors.full_messages,

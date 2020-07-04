@@ -9,12 +9,6 @@ class RoomAnnouncement < ApplicationRecord
 
   delegate :exam, to: :room
 
-  after_create :trigger_subscription
-
-  def trigger_subscription
-    HourglassSchema.subscriptions.trigger(:message_was_sent, { exam_rails_id: exam.id }, exam)
-  end
-
   def serialize
     {
       id: id,

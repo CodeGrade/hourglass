@@ -2,21 +2,14 @@
 
 # Questions from students during an exam.
 class Question < ApplicationRecord
-  belongs_to :exam
-  belongs_to :sender, class_name: 'User'
+  belongs_to :registration
 
-  validates :exam, presence: true
-  validates :sender, presence: true
+  delegate :exam, to: :registration
+
+  validates :registration, presence: true
   validates :body, presence: true
 
-  after_create :trigger_subscription
-
-  def trigger_subscription
-    HourglassSchema.subscriptions.trigger(:message_was_sent, { exam_rails_id: exam.id }, exam)
-  end
-
   def serialize
-    # TODO
     {
       body: body,
       time: created_at,

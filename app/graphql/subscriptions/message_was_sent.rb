@@ -1,10 +1,9 @@
 class Subscriptions::MessageWasSent < Subscriptions::BaseSubscription
-  argument :exam_rails_id, Integer, required: true
+  argument :exam_id, ID, required: true, loads: Types::ExamType
 
   payload_type Types::ExamType
 
-  def authorized?(exam_rails_id:)
-    exam = Exam.find_by!(id: exam_rails_id)
+  def authorized?(exam:)
     reg = ProctorRegistration.find_by(
       user: context[:current_user],
       exam: exam,
@@ -18,8 +17,7 @@ class Subscriptions::MessageWasSent < Subscriptions::BaseSubscription
     return false, { errors: ['You do not have permission.'] }
   end
 
-  def subscribe(exam_rails_id:)
-    exam = Exam.find_by!(id: exam_rails_id)
+  def subscribe(exam:)
     exam
   end
 end

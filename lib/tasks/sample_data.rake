@@ -50,8 +50,8 @@ def make_cs2500
   cs2500student_reg = create(:registration, user: cs2500student, room: cs2500_room1, exam_version: cs2500_v1)
   create(:snapshot, registration: cs2500student_reg)
 
-  create(:question, reg: cs2500student_reg)
-  create(:message, prof_reg: cs2500prof_reg, exam: cs2500midterm, recipient: cs2500student)
+  create(:question, registration: cs2500student_reg)
+  create(:message, sender: cs2500prof, registration: cs2500student_reg)
 
   cs2500student2 = create(:user, username: 'cs2500student2')
   create(:student_registration, user: cs2500student2, section: cs2500lec)

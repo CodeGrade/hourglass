@@ -72,15 +72,12 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   end
 
   create_table "messages", force: :cascade do |t|
-    t.bigint "exam_id", null: false
     t.bigint "sender_id", null: false
-    t.bigint "recipient_id", null: false
+    t.bigint "registration_id", null: false
     t.text "body", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["exam_id", "recipient_id"], name: "index_messages_on_exam_id_and_recipient_id"
-    t.index ["exam_id"], name: "index_messages_on_exam_id"
-    t.index ["recipient_id"], name: "index_messages_on_recipient_id"
+    t.index ["registration_id"], name: "index_messages_on_registration_id"
     t.index ["sender_id"], name: "index_messages_on_sender_id"
   end
 
@@ -109,13 +106,11 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   end
 
   create_table "questions", force: :cascade do |t|
-    t.bigint "exam_id", null: false
-    t.bigint "sender_id", null: false
+    t.bigint "registration_id", null: false
     t.text "body", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["exam_id"], name: "index_questions_on_exam_id"
-    t.index ["sender_id"], name: "index_questions_on_sender_id"
+    t.index ["registration_id"], name: "index_questions_on_registration_id"
   end
 
   create_table "registrations", force: :cascade do |t|
@@ -220,16 +215,14 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   add_foreign_key "exam_announcements", "exams"
   add_foreign_key "exam_versions", "exams"
   add_foreign_key "exams", "courses"
-  add_foreign_key "messages", "exams"
-  add_foreign_key "messages", "users", column: "recipient_id"
+  add_foreign_key "messages", "registrations"
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "proctor_registrations", "exams"
   add_foreign_key "proctor_registrations", "rooms"
   add_foreign_key "proctor_registrations", "users"
   add_foreign_key "professor_course_registrations", "courses"
   add_foreign_key "professor_course_registrations", "users"
-  add_foreign_key "questions", "exams"
-  add_foreign_key "questions", "users", column: "sender_id"
+  add_foreign_key "questions", "registrations"
   add_foreign_key "registrations", "exam_versions"
   add_foreign_key "registrations", "rooms"
   add_foreign_key "registrations", "users"

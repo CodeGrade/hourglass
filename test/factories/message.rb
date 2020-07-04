@@ -3,12 +3,12 @@
 FactoryBot.define do
   factory :message do
     transient do
-      prof_reg { create(:professor_course_registration) }
+      exam { create(:exam) }
+      prof_reg { create(:professor_course_registration, exam: exam) }
     end
 
     sender { prof_reg.user }
-    recipient { create(:user) }
-    exam { create(:exam, course: prof_reg.course) }
+    registration { create(:registration, exam: exam) }
     body { 'Read the directions for that question more carefully..' }
   end
 end

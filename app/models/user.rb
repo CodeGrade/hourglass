@@ -24,12 +24,6 @@ class User < ApplicationRecord
            dependent: :destroy,
            inverse_of: 'sender'
 
-  has_many :received_messages,
-           foreign_key: 'recipient',
-           class_name: 'Message',
-           dependent: :destroy,
-           inverse_of: 'recipient'
-
   # TODO: validates :registrations, uniqueness: { scope: :exam_id }
 
   def self.from_omniauth(auth)

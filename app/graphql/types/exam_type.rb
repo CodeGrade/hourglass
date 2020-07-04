@@ -24,6 +24,16 @@ module Types
 
     field :anomalies, [Types::AnomalyType], null: false
 
+    field :messages, [Types::MessageType], null: false
+
+    field :version_announcements, [Types::VersionAnnouncementType], null: false
+
+    field :room_announcements, [Types::RoomAnnouncementType], null: false
+
+    field :exam_announcements, [Types::ExamAnnouncementType], null: false
+
+    field :questions, [Types::QuestionType], null: false
+
     field :registration, Types::RegistrationType, null: true do
       argument :rails_id, Integer, required: true
     end

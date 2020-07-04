@@ -4,8 +4,16 @@
 class VersionAnnouncement < ApplicationRecord
   belongs_to :exam_version
 
+  delegate :exam, to: :exam_version
+
   validates :exam_version, presence: true
   validates :body, presence: true
+
+  after_create :trigger_subscription
+
+  def trigger_subscription
+    HourglassSchema.subscriptions.trigger(:message_was_sent, { exam_rails_id: exam.id }, exam)
+  end
 
   def serialize
     {

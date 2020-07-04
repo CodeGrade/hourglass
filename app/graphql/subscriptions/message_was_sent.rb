@@ -1,4 +1,4 @@
-class Subscriptions::AnomalyWasCreated < Subscriptions::BaseSubscription
+class Subscriptions::MessageWasSent < Subscriptions::BaseSubscription
   argument :exam_rails_id, Integer, required: true
 
   payload_type Types::ExamType

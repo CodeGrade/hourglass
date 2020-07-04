@@ -1,7 +1,6 @@
 import React, {
   useState,
   useContext,
-  useEffect,
   useMemo,
   useCallback,
   useRef,
@@ -31,23 +30,11 @@ import {
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
-import { Anomaly, useResponse as anomaliesIndex } from '@hourglass/common/api/proctor/anomalies';
 import { destroyAnomaly } from '@hourglass/common/api/proctor/anomalies/destroy';
 import Loading from '@hourglass/common/loading';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
-import { useRefresher, ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import {
-  RoomAnnouncement,
-  DirectMessage,
-  Response,
-  useResponse as useExamMessages,
-  Question,
-  VersionAnnouncement,
-  ExamAnnouncement,
-  Message,
-  MessageType,
-} from '@hourglass/common/api/proctor/messages';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   Recipient,
   SplitRecipients,
@@ -70,6 +57,76 @@ import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
 import { exams_recipients$key } from './__generated__/exams_recipients.graphql';
 
 import { exams_anomalies$key } from './__generated__/exams_anomalies.graphql';
+
+enum MessageType {
+  Direct = 'DIRECT',
+  Question = 'QUESTION',
+  Room = 'ROOM',
+  Version = 'VERSION',
+  Exam = 'EXAM',
+}
+
+interface DirectMessage {
+  type: MessageType.Direct;
+  time: DateTime;
+  id: number;
+  body: string;
+  sender: {
+    isMe: boolean;
+    displayName: string;
+  };
+  recipient: {
+    displayName: string;
+  };
+}
+
+interface Question {
+  type: MessageType.Question;
+  time: DateTime;
+  id: number;
+  body: string;
+  sender: {
+    id: number;
+    displayName: string;
+  };
+}
+
+interface VersionAnnouncement {
+  type: MessageType.Version;
+  time: DateTime;
+  id: number;
+  version: {
+    name: string;
+  };
+  body: string;
+}
+
+interface RoomAnnouncement {
+  type: MessageType.Room;
+  time: DateTime;
+  id: number;
+  room: {
+    name: string;
+  };
+  body: string;
+}
+
+interface ExamAnnouncement {
+  type: MessageType.Exam;
+  id: number;
+  body: string;
+  time: DateTime;
+}
+
+interface Response {
+  sent: DirectMessage[];
+  questions: Question[];
+  version: VersionAnnouncement[];
+  room: RoomAnnouncement[];
+  exam: ExamAnnouncement[];
+}
+
+type Message = Question | DirectMessage | VersionAnnouncement | RoomAnnouncement | ExamAnnouncement;
 
 export interface MessageProps {
   icon: IconType;
@@ -125,7 +182,7 @@ const FinalizeButton: React.FC<{
       }
     `,
     {
-      onCompleted: ({ finalizeRegistration }) => {
+      onCompleted: () => {
         alert({
           variant: 'success',
           autohide: true,
@@ -168,11 +225,9 @@ const FinalizeButton: React.FC<{
 
 const ClearButton: React.FC<{
   anomalyId: number;
-  refresh: () => void;
 }> = (props) => {
   const {
     anomalyId,
-    refresh,
   } = props;
   const { alert } = useContext(AlertContext);
   const [loading, setLoading] = useState(false);
@@ -192,7 +247,6 @@ const ClearButton: React.FC<{
                 autohide: true,
               });
               setLoading(false);
-              refresh();
             } else {
               throw new Error(res.reason);
             }
@@ -222,9 +276,11 @@ const newAnomalySubscriptionSpec = graphql`
 `;
 
 const ShowAnomalies: React.FC<{
+  replyTo: (userId: number) => void;
   exam: exams_anomalies$key;
 }> = (props) => {
   const {
+    replyTo,
     exam,
   } = props;
   const res = useFragment(
@@ -277,11 +333,11 @@ const ShowAnomalies: React.FC<{
               registrationId={a.registration.id}
               regFinal={a.registration.final}
             />
-            {/* <ClearButton refresh={refresh} anomalyId={a.id} /> */}
+            <ClearButton anomalyId={a.railsId} />
             <Button
               variant="info"
               onClick={() => {
-                // replyTo(a.user.id);
+                replyTo(a.registration.user.railsId);
               }}
             >
               <Icon I={MdMessage} />
@@ -457,13 +513,13 @@ const ExamAnomalies: React.FC<{
                 </tr>
               </thead>
               <tbody>
-                <ShowAnomalies exam={exam} />
+                <ShowAnomalies replyTo={replyTo} exam={exam} />
               </tbody>
             </Table>
           </div>
         </div>
         <div>
-          {/*<FinalizeRegs examId={examId} recipientOptions={recipientOptions} />*/}
+          <FinalizeRegs examId={examId} recipientOptions={recipientOptions} />
         </div>
       </div>
     </div>
@@ -750,12 +806,20 @@ enum MessagesTab {
   Sent = 'sent',
 }
 
+const newMessageSubscriptionSpec = graphql`
+  subscription examsNewMessageSubscription($examRailsId: Int!) {
+    messageWasSent(examRailsId: $examRailsId) {
+      ...exams_messages
+    }
+  }
+`;
+
 const Loaded: React.FC<{
   selectedRecipient: MessageFilterOption;
   setSelectedRecipient: (option: MessageFilterOption) => void;
   messageRef: React.Ref<HTMLTextAreaElement>;
   replyTo: (userId: number) => void;
-  refresh: () => void;
+  examId: number;
   response: Response;
   recipientOptions: RecipientOptions;
 }> = (props) => {
@@ -764,7 +828,7 @@ const Loaded: React.FC<{
     setSelectedRecipient,
     messageRef,
     replyTo,
-    refresh,
+    examId,
     response,
     recipientOptions,
   } = props;
@@ -775,12 +839,13 @@ const Loaded: React.FC<{
     room,
     exam,
   } = response;
-  // useEffect(() => {
-  //   const timer = setInterval(refresh, 5000);
-  //   return () => {
-  //     clearInterval(timer);
-  //   };
-  // }, [refresh]);
+  const subscriptionObject = useMemo(() => ({
+    subscription: newMessageSubscriptionSpec,
+    variables: {
+      examRailsId: examId,
+    },
+  }), [examId]);
+  useSubscription(subscriptionObject);
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
 
   return (
@@ -879,7 +944,6 @@ const Loaded: React.FC<{
               recipientOptions={recipientOptions}
               selectedRecipient={selectedRecipient}
               setSelectedRecipient={setSelectedRecipient}
-              refresh={refresh}
               messageRef={messageRef}
             />
           </div>
@@ -895,7 +959,7 @@ const ExamMessages: React.FC<{
   messageRef: React.Ref<HTMLTextAreaElement>;
   replyTo: (userId: number) => void;
   recipientOptions: RecipientOptions;
-  examId: number;
+  exam: any;
 }> = (props) => {
   const {
     selectedRecipient,
@@ -903,42 +967,114 @@ const ExamMessages: React.FC<{
     messageRef,
     replyTo,
     recipientOptions,
-    examId,
+    exam,
   } = props;
-  const [refresher, refresh] = useRefresher();
-  const res = useExamMessages(examId, [refresher]);
-  switch (res.type) {
-    case 'ERROR':
-      return (
-        <div className="text-danger">
-          <p>Error</p>
-          <small>{res.text}</small>
-        </div>
-      );
-    case 'LOADING':
-    case 'RESULT':
-      return (
-        <Loading loading={res.type === 'LOADING'} className="h-100">
-          <Loaded
-            recipientOptions={recipientOptions}
-            refresh={refresh}
-            response={res.type === 'RESULT' ? res.response : {
-              sent: [],
-              questions: [],
-              version: [],
-              exam: [],
-              room: [],
-            }}
-            selectedRecipient={selectedRecipient}
-            setSelectedRecipient={setSelectedRecipient}
-            messageRef={messageRef}
-            replyTo={replyTo}
-          />
-        </Loading>
-      );
-    default:
-      throw new ExhaustiveSwitchError(res);
-  }
+  const res = useFragment(
+    graphql`
+      fragment exams_messages on Exam {
+        railsId
+        versionAnnouncements {
+          railsId
+          id
+          createdAt
+          body
+          examVersion {
+            name
+          }
+        }
+        roomAnnouncements {
+          id
+          railsId
+          createdAt
+          body
+          room {
+            name
+          }
+        }
+        examAnnouncements {
+          id
+          railsId
+          createdAt
+          body
+        }
+        questions {
+          railsId
+          id
+          createdAt
+          sender {
+            id
+            railsId
+            displayName
+          }
+          body
+        }
+        messages {
+          railsId
+          id
+          body
+          createdAt
+          sender {
+            isMe
+            displayName
+          }
+          recipient {
+            displayName
+          }
+        }
+      }
+    `,
+    exam,
+  );
+  return (
+    <Loaded
+      examId={res.railsId}
+      recipientOptions={recipientOptions}
+      response={{
+        sent: res.messages.map((msg) => ({
+          type: MessageType.Direct,
+          id: msg.railsId,
+          body: msg.body,
+          sender: msg.sender,
+          recipient: msg.recipient,
+          time: DateTime.fromISO(msg.createdAt),
+        })),
+        questions: res.questions.map((question) => ({
+          type: MessageType.Question,
+          id: question.railsId,
+          body: question.body,
+          sender: {
+            id: question.sender.railsId,
+            displayName: question.sender.displayName,
+          },
+          time: DateTime.fromISO(question.createdAt),
+        })),
+        version: res.versionAnnouncements.map((va) => ({
+          type: MessageType.Version,
+          id: va.railsId,
+          body: va.body,
+          version: va.examVersion,
+          time: DateTime.fromISO(va.createdAt),
+        })),
+        exam: res.examAnnouncements.map((ea) => ({
+          type: MessageType.Exam,
+          id: ea.railsId,
+          body: ea.body,
+          time: DateTime.fromISO(ea.createdAt),
+        })),
+        room: res.roomAnnouncements.map((ra) => ({
+          type: MessageType.Room,
+          id: ra.railsId,
+          body: ra.body,
+          room: ra.room,
+          time: DateTime.fromISO(ra.createdAt),
+        })),
+      }}
+      selectedRecipient={selectedRecipient}
+      setSelectedRecipient={setSelectedRecipient}
+      messageRef={messageRef}
+      replyTo={replyTo}
+    />
+  );
 };
 
 interface MessageFilterOption {
@@ -949,13 +1085,11 @@ interface MessageFilterOption {
 const SendMessageButton: React.FC<{
   recipient: Recipient;
   message: string;
-  refresh: () => void;
   onSuccess: () => void;
 }> = (props) => {
   const {
     recipient,
     message,
-    refresh,
     onSuccess,
   } = props;
   const { examId } = useParams();
@@ -981,7 +1115,6 @@ const SendMessageButton: React.FC<{
               });
               setLoading(false);
               onSuccess();
-              refresh();
             } else {
               throw new Error(res.reason);
             }
@@ -1011,14 +1144,12 @@ const SendMessage: React.FC<{
   selectedRecipient: MessageFilterOption;
   setSelectedRecipient: (option: MessageFilterOption) => void;
   recipientOptions: RecipientOptions;
-  refresh: () => void;
   messageRef: React.Ref<HTMLTextAreaElement>;
 }> = (props) => {
   const {
     selectedRecipient,
     setSelectedRecipient,
     recipientOptions,
-    refresh,
     messageRef,
   } = props;
   const [message, setMessage] = useState('');
@@ -1059,7 +1190,6 @@ const SendMessage: React.FC<{
       <Form.Group>
         <SendMessageButton
           onSuccess={resetVals}
-          refresh={refresh}
           recipient={selectedRecipient.value}
           message={message}
         />
@@ -1141,6 +1271,7 @@ const SplitViewLoaded: React.FC<{
       </Col>
       <Col sm={6}>
         <ExamMessages
+          exam={exam}
           recipientOptions={recipientOptions}
           examId={examId}
           selectedRecipient={selectedRecipient}
@@ -1207,6 +1338,7 @@ const ExamProctoring: React.FC = () => {
           exam(railsId: $examRailsId) {
             ...exams_recipients
             ...exams_anomalies
+            ...exams_messages
             name
           }
         }

@@ -5,6 +5,7 @@ class Anomaly < ApplicationRecord
   belongs_to :registration
 
   after_create :trigger_subscription
+  after_destroy :trigger_subscription
 
   validates :registration, presence: true
 

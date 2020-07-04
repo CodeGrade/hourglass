@@ -9,28 +9,6 @@ module Api
 
       before_action :require_proctor_reg
 
-      def index
-        anomalies = @exam.anomalies.map do |a|
-          {
-            id: a.id,
-            user: {
-              displayName: a.user.display_name,
-              id: a.user.id,
-            },
-            reg: {
-              id: a.registration.id,
-              final: a.registration.final?,
-            },
-            time: a.created_at,
-            reason: a.reason,
-          }
-        end
-
-        render json: {
-          anomalies: anomalies,
-        }
-      end
-
       def destroy
         @anomaly.destroy!
         render json: {

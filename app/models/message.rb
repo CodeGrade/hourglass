@@ -18,6 +18,12 @@ class Message < ApplicationRecord
     errors.add(:sender, 'must be a professor')
   end
 
+  after_create :trigger_subscription
+
+  def trigger_subscription
+    HourglassSchema.subscriptions.trigger(:message_was_sent, { exam_rails_id: exam.id }, exam)
+  end
+
   def serialize
     {
       id: id,

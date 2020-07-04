@@ -17,6 +17,11 @@ module Types
     field :registrations, [Types::RegistrationType], null: false
     delegate :registrations, to: :object
 
+    field :isMe, Boolean, null: false
+    def isMe
+      object == context[:current_user]
+    end
+
     # field :staff_registrations, [Types::StaffRegistrationType], null: false
     # delegate :staff_registrations, to: :object
 

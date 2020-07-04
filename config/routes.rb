@@ -43,7 +43,6 @@ Rails.application.routes.draw do
       resources :exams, shallow: true, param: 'exam_id', only: [] do
         member do
           post :finalize
-          resources :messages, param: 'message_id', only: [:create]
         end
       end
     end

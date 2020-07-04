@@ -42,6 +42,8 @@ module Types
       object.registrations.find_by(id: rails_id)
     end
 
+    field :registrations, [Types::RegistrationType], null: false
+
     field :final_registrations, [Types::RegistrationType], null: false
     def final_registrations
       object.registrations.final

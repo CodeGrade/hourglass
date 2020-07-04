@@ -1111,9 +1111,42 @@ const SendMessageButton: React.FC<{
     message,
     onSuccess,
   } = props;
-  const { examId } = useParams();
   const { alert } = useContext(AlertContext);
-  const [loading, setLoading] = useState(false);
+  const [mutate, { loading }] = useMutation(
+    graphql`
+      mutation examsSendMessageMutation($input: SendMessageInput!) {
+        sendMessage(input: $input) {
+          errors
+        }
+      }
+    `,
+    {
+      onCompleted: ({ sendMessage }) => {
+        const { errors } = sendMessage;
+        if (errors.length !== 0) {
+          alert({
+            variant: 'danger',
+            title: 'Error sending message',
+            message: errors.join('\n'),
+          });
+        } else {
+          alert({
+            variant: 'success',
+            message: 'Message sent.',
+            autohide: true,
+          });
+          onSuccess();
+        }
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error sending message',
+          message: err.message,
+        });
+      },
+    },
+  );
   const disabled = message === '' || loading;
   const disabledMessage = loading ? 'Loading...' : 'Enter a message to send';
   return (
@@ -1124,26 +1157,13 @@ const SendMessageButton: React.FC<{
         disabledMessage={disabledMessage}
         variant="success"
         onClick={() => {
-          setLoading(true);
-          sendMessage(examId, recipient, message).then((res) => {
-            if (res.success === true) {
-              alert({
-                variant: 'success',
-                message: 'Message sent.',
-                autohide: true,
-              });
-              setLoading(false);
-              onSuccess();
-            } else {
-              throw new Error(res.reason);
-            }
-          }).catch((err) => {
-            alert({
-              variant: 'danger',
-              title: 'Error sending message',
-              message: err.message,
-            });
-            setLoading(false);
+          mutate({
+            variables: {
+              input: {
+                recipientId: recipient.realId,
+                message,
+              },
+            },
           });
         }}
       >
@@ -1236,6 +1256,7 @@ const SplitViewLoaded: React.FC<{
         label: 'Entire exam',
         value: {
           type: MessageType.Exam,
+          realId: exam.id,
           id: -1,
           name: 'Entire exam',
         },
@@ -1313,9 +1334,15 @@ const ProctoringSplitView: React.FC<{
   const res = useFragment<exams_recipients$key>(
     graphql`
     fragment exams_recipients on Exam {
-      examVersions { railsId name }
-      students { railsId displayName }
-      rooms { railsId name }
+      examVersions { id railsId name }
+      registrations {
+        id
+        user {
+          railsId
+          displayName
+        }
+      }
+      rooms { id railsId name }
     }
     `,
     exam,
@@ -1329,16 +1356,19 @@ const ProctoringSplitView: React.FC<{
           type: MessageType.Version,
           id: ev.railsId,
           name: ev.name,
+          realId: ev.id,
         })).sort((a, b) => a.name.localeCompare(b.name)),
-        students: res.students.map((student) => ({
+        students: res.registrations.map((registration) => ({
           type: MessageType.Direct,
-          id: student.railsId,
-          name: student.displayName,
+          id: registration.user.railsId,
+          name: registration.user.displayName,
+          realId: registration.id,
         })).sort((a, b) => a.name.localeCompare(b.name)),
         rooms: res.rooms.map((room) => ({
           type: MessageType.Room,
           id: room.railsId,
           name: room.name,
+          realId: room.id,
         })).sort((a, b) => a.name.localeCompare(b.name)),
       }}
     />
@@ -1359,6 +1389,7 @@ const ExamProctoring: React.FC = () => {
             ...exams_anomalies
             ...exams_messages
             name
+            id
           }
         }
         `}

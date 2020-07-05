@@ -39,14 +39,6 @@ Rails.application.routes.draw do
       end
     end
 
-    namespace :proctor do
-      resources :exams, shallow: true, param: 'exam_id', only: [] do
-        member do
-          post :finalize
-        end
-      end
-    end
-
     namespace :student do
       resources :exams, param: 'exam_id', only: [] do
         member do

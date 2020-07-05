@@ -7,27 +7,6 @@ module Api
       before_action :find_course
       before_action :require_prof_reg
 
-      def create
-        exam_params = params.require(:exam).permit(:name, :duration, :start, :end)
-        @exam = Exam.new(
-          name: exam_params[:name],
-          course: @course,
-          start_time: DateTime.parse(exam_params[:start]),
-          end_time: DateTime.parse(exam_params[:end]),
-          duration: exam_params[:duration]
-        )
-        @exam.save!
-        render json: {
-          created: true,
-          id: @exam.id,
-        }
-      rescue StandardError => e
-        render json: {
-          created: false,
-          reason: e.message,
-        }
-      end
-
       def show
         render json: {
           name: @exam.name,

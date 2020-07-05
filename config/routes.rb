@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       resources :courses, shallow: true, param: 'course_id', only: [] do
         member do
           post :sync
-          resources :exams, param: 'exam_id', only: [:create, :show] do
+          resources :exams, param: 'exam_id', only: [:show] do
             member do
               resources :registrations, param: 'registration_id', only: [:index]
               resources :accommodations, param: 'accommodation_id', only: [:index, :update, :destroy, :create]

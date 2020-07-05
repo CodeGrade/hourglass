@@ -52,6 +52,7 @@ const ShowCourse: React.FC = () => {
         query showCourseQuery($railsId: Int!) {
           course(railsId: $railsId) {
             title
+            id
             exams {
               ...show_courseExams
             }
@@ -103,7 +104,7 @@ const ShowCourse: React.FC = () => {
             </Route>
             <Route path="/courses/:courseId/new" exact>
               <DocumentTitle title={`New Exam - ${props.course.title}`}>
-                <NewExam />
+                <NewExam courseId={props.course.id} />
               </DocumentTitle>
             </Route>
           </>

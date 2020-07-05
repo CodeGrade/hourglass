@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import { Container } from 'react-bootstrap';
 import store from '@student/exams/show/store';
 import RegularNavbar from '@hourglass/common/navbar';
-import { useParams, useHistory, Redirect } from 'react-router-dom';
+import { useParams, Redirect } from 'react-router-dom';
 import {
   RailsExamVersion,
   RailsUser,

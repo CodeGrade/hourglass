@@ -62,7 +62,7 @@ const ExamSubmission: React.FC = () => {
       query={graphql`
         query submissionsOneQuery($examRailsId: Int!, $registrationRailsId: Int!) {
           exam(railsId: $examRailsId) {
-            registration(railsId: $registrationRailsId) {
+            railsRegistration(railsId: $registrationRailsId) {
               currentAnswers
               user {
                 displayName

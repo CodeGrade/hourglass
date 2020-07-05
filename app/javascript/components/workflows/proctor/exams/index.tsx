@@ -46,12 +46,13 @@ import environment from '@hourglass/relay/environment';
 
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { useFragment, useMutation, useSubscription } from 'relay-hooks';
+import { ConnectionHandler } from 'relay-runtime';
 
 import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
 import { exams_recipients$key } from './__generated__/exams_recipients.graphql';
 
 import { exams_anomalies$key } from './__generated__/exams_anomalies.graphql';
-import { ConnectionHandler } from 'relay-runtime';
+import { exams_anomaly$key } from './__generated__/exams_anomaly.graphql';
 
 export interface Recipient {
   type: MessageType.Direct | MessageType.Room | MessageType.Version | MessageType.Exam;
@@ -172,6 +173,19 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
   );
 };
 
+const finalizeItemMutation = graphql`
+mutation examsFinalizeItemMutation($input: FinalizeItemInput!) {
+  finalizeItem(input: $input) {
+    errors
+    exam {
+      registrations {
+        id
+        final
+      }
+    }
+  }
+}
+`;
 
 const FinalizeButton: React.FC<{
   registrationId: string;
@@ -183,22 +197,23 @@ const FinalizeButton: React.FC<{
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation(
-    graphql`
-      mutation examsFinalizeRegistrationMutation($input: FinalizeRegistrationInput!) {
-        finalizeRegistration(input: $input) {
-          registration {
-            final
-          }
-        }
-      }
-    `,
+    finalizeItemMutation,
     {
-      onCompleted: () => {
-        alert({
-          variant: 'success',
-          autohide: true,
-          message: 'Registration finalized.',
-        });
+      onCompleted: ({ finalizeItem }) => {
+        const { errors } = finalizeItem;
+        if (errors.length !== 0) {
+          alert({
+            variant: 'danger',
+            title: 'Error sending message',
+            message: errors.join('\n'),
+          });
+        } else {
+          alert({
+            variant: 'success',
+            autohide: true,
+            message: 'Registration finalized.',
+          });
+        }
       },
       onError: (err) => {
         alert({
@@ -221,7 +236,7 @@ const FinalizeButton: React.FC<{
           mutate({
             variables: {
               input: {
-                registrationId,
+                id: registrationId,
               },
             },
           });
@@ -318,7 +333,11 @@ const ClearButton: React.FC<{
   );
 };
 
-const ShowAnomaly: React.FC = (props) => {
+const ShowAnomaly: React.FC<{
+  replyTo: (userId: string) => void;
+  examId: string;
+  anomalyKey: exams_anomaly$key;
+}> = (props) => {
   const {
     replyTo,
     examId,
@@ -361,7 +380,6 @@ const ShowAnomaly: React.FC = (props) => {
         <Button
           variant="info"
           onClick={() => {
-            console.log('user', anomaly.registration.user);
             replyTo(anomaly.registration.id);
           }}
         >
@@ -389,7 +407,7 @@ const newAnomalySubscriptionSpec = graphql`
 `;
 
 const ShowAnomalies: React.FC<{
-  replyTo: (userId: number) => void;
+  replyTo: (userId: string) => void;
   exam: exams_anomalies$key;
 }> = (props) => {
   const {
@@ -463,51 +481,45 @@ const FinalizeRegs: React.FC<{
     recipientOptions[0].options[0],
   );
   const [showModal, setShowModal] = useState(false);
-  const [loading, setLoading] = useState(false);
   const openModal = useCallback(() => setShowModal(true), []);
   const closeModal = useCallback(() => setShowModal(false), []);
+  const [mutate, { loading }] = useMutation(
+    finalizeItemMutation,
+    {
+      onCompleted: ({ finalizeItem }) => {
+        const { errors } = finalizeItem;
+        if (errors.length !== 0) {
+          alert({
+            variant: 'danger',
+            title: 'Error sending message',
+            message: errors.join('\n'),
+          });
+        } else {
+          closeModal();
+          alert({
+            variant: 'success',
+            title: 'Finalization successful',
+            message: `Finalized '${selectedRecipient.label}'.`,
+            autohide: true,
+          });
+        }
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: `Error finalizing '${selectedRecipient.label}'`,
+          message: err.message,
+        });
+      },
+    },
+  );
   const finalize = () => {
-    setLoading(true);
-    let type;
-    switch (selectedRecipient.value.type) {
-      case MessageType.Exam:
-        type = 'EXAM';
-        break;
-      case MessageType.Room:
-        type = 'ROOM';
-        break;
-      case MessageType.Direct:
-        type = 'USER';
-        break;
-      case MessageType.Version:
-        type = 'VERSION';
-        break;
-      default:
-        throw new ExhaustiveSwitchError(selectedRecipient.value.type);
-    }
-    doFinalize(examId, {
-      type,
-      id: selectedRecipient.value.id,
-    }).then((res) => {
-      if (res.success !== true) {
-        throw new Error(res.reason);
-      }
-      closeModal();
-      setLoading(false);
-      alert({
-        variant: 'success',
-        autohide: true,
-        title: 'Finalization successful',
-        message: `Finalized '${selectedRecipient.label}'.`,
-      });
-      setLoading(false);
-    }).catch((err) => {
-      setLoading(false);
-      alert({
-        variant: 'danger',
-        title: `Error finalizing '${selectedRecipient.label}'`,
-        message: err.message,
-      });
+    mutate({
+      variables: {
+        input: {
+          id: selectedRecipient.value.id,
+        },
+      },
     });
   };
   return (

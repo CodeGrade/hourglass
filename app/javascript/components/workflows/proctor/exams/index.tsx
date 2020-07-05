@@ -46,10 +46,10 @@ import environment from '@hourglass/relay/environment';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { useFragment, useMutation, useSubscription } from 'relay-hooks';
 import { ConnectionHandler } from 'relay-runtime';
+import { RangeAddConfig } from 'relay-runtime/lib/mutations/RelayDeclarativeMutationConfig';
 
 import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
 import { exams_recipients$key, exams_recipients$data } from './__generated__/exams_recipients.graphql';
-
 import { exams_anomalies$key } from './__generated__/exams_anomalies.graphql';
 import { exams_anomaly$key } from './__generated__/exams_anomaly.graphql';
 import { examsFinalizeItemMutation } from './__generated__/examsFinalizeItemMutation.graphql';
@@ -436,20 +436,21 @@ const ShowAnomalies: React.FC<{
     `,
     exam,
   );
+  const config: RangeAddConfig = {
+    type: 'RANGE_ADD',
+    parentID: res.id,
+    connectionInfo: [{
+      key: 'Exam_anomalies',
+      rangeBehavior: 'append',
+    }],
+    edgeName: 'anomalyEdge',
+  };
   const subscriptionObject = useMemo(() => ({
     subscription: newAnomalySubscriptionSpec,
     variables: {
       examRailsId: res.railsId,
     },
-    configs: [{
-      type: 'RANGE_ADD',
-      parentID: res.id,
-      connectionInfo: [{
-        key: 'Exam_anomalies',
-        rangeBehavior: 'append',
-      }],
-      edgeName: 'anomalyEdge',
-    }],
+    configs: [config],
   }), [res.railsId]);
   useSubscription<examsNewAnomalySubscription>(subscriptionObject);
   return (

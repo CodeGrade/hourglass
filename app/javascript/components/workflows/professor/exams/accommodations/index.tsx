@@ -7,30 +7,26 @@ import {
   Form,
   Table,
 } from 'react-bootstrap';
-import {
-  useParams,
-} from 'react-router-dom';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import Icon from '@student/exams/show/components/Icon';
-import { Accommodation } from '@hourglass/common/api/professor/accommodations';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { BsPencilSquare } from 'react-icons/bs';
 import { AlertContext } from '@hourglass/common/alerts';
 import { FaTrash } from 'react-icons/fa';
-import destroyAccommodation from '@hourglass/common/api/professor/accommodations/destroy';
 import Select from 'react-select';
-import { Registration, useRegistrationsIndex } from '@hourglass/common/api/professor/registrations';
-import Loading from '@hourglass/common/loading';
-import { createAccommodation } from '@hourglass/common/api/professor/accommodations/create';
 import { DateTime } from 'luxon';
 import { useMutation, graphql, useFragment } from 'relay-hooks';
+import { ConnectionHandler } from 'relay-runtime';
+
 import { accommodations_all$key } from './__generated__/accommodations_all.graphql';
 import { accommodations_accommodation$key } from './__generated__/accommodations_accommodation.graphql';
-import { ConnectionHandler } from 'relay-runtime';
 import { accommodations_regsWithout$key } from './__generated__/accommodations_regsWithout.graphql';
+import { accommodationsCreateMutation } from './__generated__/accommodationsCreateMutation.graphql';
+import { accommodationsUpdateMutation } from './__generated__/accommodationsUpdateMutation.graphql';
+import { accommodationsDestroyMutation } from './__generated__/accommodationsDestroyMutation.graphql';
 
 const AccommodationEditor: React.FC<{
+  disabled?: boolean;
   submit: (startTime: DateTime, extraTime: number) => void;
   cancel: () => void;
   newStartTime: DateTime;
@@ -38,6 +34,7 @@ const AccommodationEditor: React.FC<{
   displayName: string;
 }> = (props) => {
   const {
+    disabled = false,
     submit,
     cancel,
     displayName,
@@ -53,6 +50,7 @@ const AccommodationEditor: React.FC<{
       </td>
       <td>
         <DateTimePicker
+          disabled={disabled}
           onChange={setStartTime}
           value={startTime}
           nullable
@@ -60,6 +58,7 @@ const AccommodationEditor: React.FC<{
       </td>
       <td>
         <Form.Control
+          disabled={disabled}
           type="number"
           min={0}
           value={extraTime}
@@ -68,12 +67,14 @@ const AccommodationEditor: React.FC<{
       </td>
       <td align="right" className="text-nowrap">
         <Button
+          disabled={disabled}
           variant="secondary"
           onClick={cancel}
         >
           Cancel
         </Button>
         <Button
+          disabled={disabled}
           variant="primary"
           className="ml-2"
           onClick={() => submit(startTime, extraTime)}
@@ -114,7 +115,8 @@ const SingleAccommodation: React.FC<{
   const edit = useCallback(() => setEditing(true), []);
   const stopEdit = useCallback(() => setEditing(false), []);
   const { alert } = useContext(AlertContext);
-  const [destroy, { loading: destroyLoading }] = useMutation( // TODO: update registrationsWithoutAccommodation
+  // TODO: update registrationsWithoutAccommodation
+  const [destroy, { loading: destroyLoading }] = useMutation<accommodationsDestroyMutation>(
     graphql`
     mutation accommodationsDestroyMutation($input: DestroyAccommodationInput!) {
       destroyAccommodation(input: $input) {
@@ -143,7 +145,7 @@ const SingleAccommodation: React.FC<{
       },
       updater: (store) => {
         const payload = store.getRootField('destroyAccommodation');
-        const deletedId = payload.getValue<string>('deletedId');
+        const deletedId = payload.getValue('deletedId');
         const exam = store.get(examId);
         const conn = ConnectionHandler.getConnection(exam, 'Exam_accommodations');
         ConnectionHandler.deleteNode(conn, deletedId);
@@ -151,7 +153,7 @@ const SingleAccommodation: React.FC<{
       },
     },
   );
-  const [update, { loading: updateLoading }] = useMutation(
+  const [update, { loading: updateLoading }] = useMutation<accommodationsUpdateMutation>(
     graphql`
     mutation accommodationsUpdateMutation($input: UpdateAccommodationInput!) {
       updateAccommodation(input: $input) {
@@ -196,11 +198,15 @@ const SingleAccommodation: React.FC<{
       },
     });
   };
+  const loading = destroyLoading || updateLoading;
   if (editing) {
     return (
       <AccommodationEditor
+        disabled={loading}
         displayName={accommodation.registration.user.displayName}
-        newStartTime={accommodation.newStartTime ? DateTime.fromISO(accommodation.newStartTime) : undefined}
+        newStartTime={accommodation.newStartTime ? (
+          DateTime.fromISO(accommodation.newStartTime)
+        ) : undefined}
         percentTimeExpansion={accommodation.percentTimeExpansion}
         cancel={stopEdit}
         submit={submit}
@@ -222,6 +228,7 @@ const SingleAccommodation: React.FC<{
       <td className="align-middle">{accommodation.percentTimeExpansion}</td>
       <td align="right" className="text-nowrap">
         <Button
+          disabled={loading}
           variant="danger"
           onClick={() => {
             destroy({
@@ -239,6 +246,7 @@ const SingleAccommodation: React.FC<{
           </span>
         </Button>
         <Button
+          disabled={loading}
           variant="primary"
           className="ml-2"
           onClick={edit}
@@ -264,7 +272,6 @@ const NewAccommodation: React.FC<{
   const {
     exam,
   } = props;
-  const { examId } = useParams();
   const [selected, setSelected] = useState<Selection>(null);
   const { alert } = useContext(AlertContext);
   const regsNoAccommodation = useFragment(
@@ -291,7 +298,7 @@ const NewAccommodation: React.FC<{
     label: node.user.displayName,
     value: node.id,
   }));
-  const [create, { loading }] = useMutation(
+  const [create, { loading }] = useMutation<accommodationsCreateMutation>(
     graphql`
     mutation accommodationsCreateMutation($input: CreateAccommodationInput!) {
       createAccommodation(input: $input) {
@@ -308,7 +315,7 @@ const NewAccommodation: React.FC<{
     }
     `,
     {
-      onCompleted: ({ createAccommodation }) => {
+      onCompleted: () => {
         setSelected(null);
         alert({
           variant: 'success',
@@ -318,7 +325,6 @@ const NewAccommodation: React.FC<{
         });
       },
       onError: (errors) => {
-        console.log(errors);
         alert({
           variant: 'danger',
           title: 'Error creating accommodation',
@@ -361,6 +367,7 @@ const NewAccommodation: React.FC<{
   return (
     <InputGroup>
       <Select
+        disabled={loading}
         isClearable
         value={selected}
         onChange={setSelected}
@@ -371,7 +378,7 @@ const NewAccommodation: React.FC<{
         <Button
           onClick={submit}
           variant="success"
-          disabled={!selected}
+          disabled={!selected || loading}
         >
           Create accommodation
         </Button>
@@ -390,7 +397,7 @@ const ManageAccommodations: React.FC<{
     graphql`
     fragment accommodations_all on Exam {
       id
-      ...accommodations_regsWithout 
+      ...accommodations_regsWithout
       accommodations(first: 100) @connection(key: "Exam_accommodations", filters: []) {
         edges {
           node {

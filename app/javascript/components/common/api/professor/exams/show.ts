@@ -17,7 +17,6 @@ interface Server {
   start: string;
   end: string;
   versions: Version[];
-  checklist: Checklist;
 }
 
 export enum ChecklistItemStatus {

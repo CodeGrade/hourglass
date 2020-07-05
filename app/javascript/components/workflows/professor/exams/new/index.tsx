@@ -3,8 +3,15 @@ import { useParams, useHistory } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import { useMutation, graphql } from 'relay-hooks';
 import { DateTime } from 'luxon';
-import { Card, Form, Row, Col, Button } from 'react-bootstrap';
+import {
+  Card,
+  Form,
+  Row,
+  Col,
+  Button,
+} from 'react-bootstrap';
 import DateTimePicker from './DateTimePicker';
+import { newExamMutation } from './__generated__/newExamMutation.graphql';
 
 const NewExamForm: React.FC<{
   courseId: string;
@@ -13,7 +20,7 @@ const NewExamForm: React.FC<{
   const { courseId } = props;
   const { alert } = useContext(AlertContext);
   const history = useHistory();
-  const [mutate, { loading }] = useMutation(
+  const [mutate, { loading }] = useMutation<newExamMutation>(
     graphql`
     mutation newExamMutation($input: CreateExamInput!) {
       createExam(input: $input) {
@@ -57,6 +64,7 @@ const NewExamForm: React.FC<{
             </Form.Label>
             <Col>
               <Form.Control
+                disabled={loading}
                 type="input"
                 value={name}
                 onChange={(e): void => setName(e.target.value)}
@@ -64,6 +72,7 @@ const NewExamForm: React.FC<{
             </Col>
             <span className="float-right">
               <Button
+                disabled={loading}
                 variant="danger"
                 onClick={(): void => {
                   history.push(`/courses/${courseRailsId}`);
@@ -72,6 +81,7 @@ const NewExamForm: React.FC<{
                 Cancel
               </Button>
               <Button
+                disabled={loading}
                 variant="success"
                 className="ml-2"
                 onClick={(): void => {
@@ -97,6 +107,7 @@ const NewExamForm: React.FC<{
             <Form.Label column sm={2}>Start time:</Form.Label>
             <Col>
               <DateTimePicker
+                disabled={loading}
                 value={start}
                 maxValue={end}
                 onChange={setStart}
@@ -107,6 +118,7 @@ const NewExamForm: React.FC<{
             <Form.Label column sm={2}>End time:</Form.Label>
             <Col>
               <DateTimePicker
+                disabled={loading}
                 value={end}
                 minValue={start}
                 onChange={setEnd}
@@ -117,6 +129,7 @@ const NewExamForm: React.FC<{
             <Form.Label column sm={2}>Duration (minutes):</Form.Label>
             <Col>
               <Form.Control
+                disabled={loading}
                 type="number"
                 value={duration / 60.0}
                 onChange={(e): void => setDuration(Number(e.target.value) * 60)}

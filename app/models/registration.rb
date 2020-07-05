@@ -27,6 +27,8 @@ class Registration < ApplicationRecord
     errors.add(:room, 'needs to be part of the correct exam')
   end
 
+  scope :without_accommodation, -> { includes(:accommodation).where(accommodations: { id: nil }) }
+
   # TIMELINE EXPLANATION
   #
   # EXAM OVERALL:

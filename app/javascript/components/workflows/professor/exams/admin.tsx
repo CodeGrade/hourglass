@@ -14,13 +14,7 @@ import {
   useLocation,
   Link,
 } from 'react-router-dom';
-import {
-  Response as ShowResponse,
-  Version,
-  Checklist,
-  ChecklistItemStatus,
-} from '@hourglass/common/api/professor/exams/show';
-import { ExhaustiveSwitchError, useRefresher } from '@hourglass/common/helpers';
+import { useRefresher } from '@hourglass/common/helpers';
 import {
   Card,
   Collapse,
@@ -61,7 +55,7 @@ import AssignSeating from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
 import ErrorBoundary from '@hourglass/common/boundary';
-import { BsPencilSquare } from 'react-icons/bs';
+import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { QueryRenderer, graphql } from 'react-relay';
@@ -70,6 +64,9 @@ import { useFragment, useMutation } from 'relay-hooks';
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
 import { admin_examInfo$key } from './__generated__/admin_examInfo.graphql';
 import { adminUpdateExamMutation } from './__generated__/adminUpdateExamMutation.graphql';
+import { ChecklistItemStatus, admin_checklist$key } from './__generated__/admin_checklist.graphql';
+import { admin_versionInfo$key } from './__generated__/admin_versionInfo.graphql';
+import { admin_version$key } from './__generated__/admin_version.graphql';
 
 export interface ExamUpdateInfo {
   name: string;
@@ -78,23 +75,28 @@ export interface ExamUpdateInfo {
   duration: number;
 }
 
-const Loaded: React.FC<{
-  refresh: () => void;
-  response: ShowResponse;
+const ExamInformation: React.FC<{
   exam: admin_examInfo$key;
-  examID: string;
 }> = (props) => {
   const {
-    refresh,
-    response,
     exam,
-    examID,
   } = props;
-  const { examId } = useParams();
   const { alert } = useContext(AlertContext);
   const [editing, setEditing] = useState(false);
   const flipEditing = useCallback(() => setEditing((e) => !e), []);
-  const onError = (emsg) => {
+  const examInfo = useFragment<admin_examInfo$key>(
+    graphql`
+    fragment admin_examInfo on Exam {
+      id
+      name
+      startTime
+      endTime
+      duration
+    }
+    `,
+    exam,
+  );
+  const onError = (emsg: string) => {
     alert({
       variant: 'danger',
       title: 'Error saving exam info.',
@@ -133,52 +135,42 @@ const Loaded: React.FC<{
       },
     },
   );
+  const startTime = DateTime.fromISO(examInfo.startTime);
+  const endTime = DateTime.fromISO(examInfo.endTime);
   return (
-    <>
-      <Form.Group>
-        {editing ? (
-          <ExamInfoEditor
-            exam={exam}
-            onCancel={flipEditing}
-            onSubmit={(info) => {
-              mutate({
-                variables: {
-                  input: {
-                    examId: examID,
-                    name: info.name,
-                    duration: info.duration,
-                    startTime: info.start,
-                    endTime: info.end,
-                  },
+    <Form.Group>
+      {editing ? (
+        <ExamInfoEditor
+          disabled={loading}
+          name={examInfo.name}
+          startTime={startTime}
+          endTime={endTime}
+          duration={examInfo.duration}
+          onCancel={flipEditing}
+          onSubmit={(info) => {
+            mutate({
+              variables: {
+                input: {
+                  examId: examInfo.id,
+                  name: info.name,
+                  duration: info.duration,
+                  startTime: info.start,
+                  endTime: info.end,
                 },
-              });
-            }}
-          />
-        ) : (
-          <ExamInfoViewer
-            onEdit={flipEditing}
-            response={response}
-          />
-        )}
-      </Form.Group>
-      <Form.Group>
-        <TabbedChecklist
-          refresh={refresh}
-          examId={examId}
-          checklist={response.checklist}
-          versions={response.versions}
-          examName={response.name}
+              },
+            });
+          }}
         />
-      </Form.Group>
-      <Form.Group>
-        <Link to={`/exams/${examId}/proctoring`}>
-          <Button variant="success">Proctor!</Button>
-        </Link>
-        <Link to={`/exams/${examId}/submissions`}>
-          <Button className="ml-2" variant="primary">View submissions</Button>
-        </Link>
-      </Form.Group>
-    </>
+      ) : (
+        <ExamInfoViewer
+          onClickEdit={flipEditing}
+          name={examInfo.name}
+          startTime={startTime}
+          endTime={endTime}
+          duration={examInfo.duration}
+        />
+      )}
+    </Form.Group>
   );
 };
 
@@ -192,20 +184,21 @@ const ChecklistIcon: React.FC<{
   } = props;
   let contents;
   switch (status) {
-    case ChecklistItemStatus.Warning:
+    case 'WARNING':
       contents = <Icon I={MdWarning} className="text-warning" />;
       break;
-    case ChecklistItemStatus.NA:
+    case 'NA':
       contents = <Icon I={MdDoNotDisturb} />;
       break;
-    case ChecklistItemStatus.Complete:
+    case 'COMPLETE':
       contents = <Icon I={FaCheck} className="text-success" />;
       break;
-    case ChecklistItemStatus.NotStarted:
+    case 'NOT_STARTED':
       contents = <Icon I={FaTimes} className="text-danger" />;
       break;
     default:
-      throw new ExhaustiveSwitchError(status);
+      contents = <Icon I={BsFillQuestionCircleFill} className="text-danger" />;
+      break;
   }
   return (
     <Tooltip message={reason}>
@@ -217,27 +210,18 @@ const ChecklistIcon: React.FC<{
 };
 
 const TabbedChecklist: React.FC<{
-  refresh: () => void;
+  exam: admin_checklist$key;
   examId: number;
-  checklist: Checklist;
-  examName: string;
-  versions: Version[];
 }> = (props) => {
   const {
-    refresh,
+    exam,
     examId,
-    checklist,
-    examName,
-    versions,
   } = props;
   return (
     <Switch>
       <Route path="/exams/:examId/admin/:tabName">
         <PreFlightChecklist
-          refresh={refresh}
-          checklist={checklist}
-          examName={examName}
-          versions={versions}
+          exam={exam}
         />
       </Route>
       <Route>
@@ -248,21 +232,42 @@ const TabbedChecklist: React.FC<{
 };
 
 const PreFlightChecklist: React.FC<{
-  refresh: () => void;
-  checklist: Checklist;
-  examName: string;
-  versions: Version[];
+  exam: admin_checklist$key;
 }> = (props) => {
   const {
-    refresh,
-    checklist,
-    examName,
-    versions,
+    exam,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment admin_checklist on Exam {
+      ...admin_versionInfo
+      ...accommodations_all
+      name
+      checklist {
+        rooms {
+          reason
+          status
+        }
+        staff {
+          reason
+          status
+        }
+        seating {
+          reason
+          status
+        }
+        versions {
+          reason
+          status
+        }
+      }
+    }
+    `,
+    exam,
+  );
+  const { checklist } = res;
   const history = useHistory();
   const { examId, tabName } = useParams();
-  const location = useLocation();
-  useEffect(refresh, [location.pathname]);
   return (
     <>
       <h1>Pre-flight Checklist</h1>
@@ -353,11 +358,7 @@ const PreFlightChecklist: React.FC<{
         <Tab.Content className="border border-top-0 rounded-bottom p-3">
           <Tab.Pane eventKey="edit-versions">
             <ErrorBoundary>
-              <VersionInfo
-                refresh={refresh}
-                examName={examName}
-                versions={versions}
-              />
+              <VersionInfo exam={res} />
             </ErrorBoundary>
           </Tab.Pane>
           <Tab.Pane eventKey="rooms">
@@ -382,7 +383,7 @@ const PreFlightChecklist: React.FC<{
           </Tab.Pane>
           <Tab.Pane eventKey="accommodations">
             <ErrorBoundary>
-              <ManageAccommodations />
+              <ManageAccommodations exam={res} />
             </ErrorBoundary>
           </Tab.Pane>
         </Tab.Content>
@@ -416,27 +417,28 @@ export function useTabRefresher(currentTab: string): [number, () => void] {
 }
 
 const ExamInfoViewer: React.FC<{
-  onEdit: () => void;
-  response: ShowResponse;
+  onClickEdit: () => void;
+  name: string;
+  startTime: DateTime;
+  endTime: DateTime;
+  duration: number;
 }> = (props) => {
   const {
-    onEdit,
-    response,
-  } = props;
-  const {
-    start,
-    end,
+    onClickEdit,
+    name,
+    startTime,
+    endTime,
     duration,
-  } = response;
+  } = props;
   return (
     <Card>
       <Card.Body>
         <h1>
-          {response.name}
+          {name}
           <span className="float-right">
             <Button
               variant="primary"
-              onClick={onEdit}
+              onClick={onClickEdit}
             >
               <Icon I={BsPencilSquare} />
               <span className="ml-2">Edit</span>
@@ -445,11 +447,11 @@ const ExamInfoViewer: React.FC<{
         </h1>
         <Row>
           <Form.Label column sm={2}>Starts:</Form.Label>
-          <ReadableDate value={start} showTime />
+          <ReadableDate value={startTime} showTime />
         </Row>
         <Row>
           <Form.Label column sm={2}>Ends:</Form.Label>
-          <ReadableDate value={end} showTime />
+          <ReadableDate value={endTime} showTime />
         </Row>
         <Row>
           <Form.Label column sm={2}>Duration:</Form.Label>
@@ -461,30 +463,27 @@ const ExamInfoViewer: React.FC<{
 };
 
 export const ExamInfoEditor: React.FC<{
-  exam: admin_examInfo$key;
+  disabled: boolean;
   onSubmit: (info: ExamUpdateInfo) => void;
   onCancel: () => void;
+  name: string;
+  startTime: DateTime;
+  endTime: DateTime;
+  duration: number;
 }> = (props) => {
   const {
-    exam,
+    disabled,
     onSubmit,
     onCancel,
+    name: defaultName,
+    startTime: defaultStartTime,
+    endTime: defaultEndTime,
+    duration: defaultDuration,
   } = props;
-  const examInfo = useFragment<admin_examInfo$key>(
-    graphql`
-    fragment admin_examInfo on Exam {
-      name
-      startTime
-      endTime
-      duration
-    }
-    `,
-    exam,
-  );
-  const [name, setName] = useState<string>(examInfo.name);
-  const [start, setStart] = useState<DateTime>(DateTime.fromISO(examInfo.startTime));
-  const [end, setEnd] = useState<DateTime>(DateTime.fromISO(examInfo.endTime));
-  const [duration, setDuration] = useState<number>(examInfo.duration);
+  const [name, setName] = useState<string>(defaultName);
+  const [start, setStart] = useState<DateTime>(defaultStartTime);
+  const [end, setEnd] = useState<DateTime>(defaultEndTime);
+  const [duration, setDuration] = useState<number>(defaultDuration);
 
   return (
     <Card className="mb-4">
@@ -495,6 +494,7 @@ export const ExamInfoEditor: React.FC<{
           </Form.Label>
           <Col>
             <Form.Control
+              disabled={disabled}
               type="input"
               value={name}
               onChange={(e): void => setName(e.target.value)}
@@ -502,12 +502,14 @@ export const ExamInfoEditor: React.FC<{
           </Col>
           <span className="float-right">
             <Button
+              disabled={disabled}
               variant="danger"
               onClick={(): void => onCancel()}
             >
               Cancel
             </Button>
             <Button
+              disabled={disabled}
               variant="success"
               className="ml-2"
               onClick={(): void => {
@@ -528,6 +530,7 @@ export const ExamInfoEditor: React.FC<{
           <Form.Label column sm={2}>Start time:</Form.Label>
           <Col>
             <DateTimePicker
+              disabled={disabled}
               value={start}
               maxValue={end}
               onChange={setStart}
@@ -538,6 +541,7 @@ export const ExamInfoEditor: React.FC<{
           <Form.Label column sm={2}>End time:</Form.Label>
           <Col>
             <DateTimePicker
+              disabled={disabled}
               value={end}
               minValue={start}
               onChange={setEnd}
@@ -548,6 +552,7 @@ export const ExamInfoEditor: React.FC<{
           <Form.Label column sm={2}>Duration (minutes):</Form.Label>
           <Col>
             <Form.Control
+              disabled={disabled}
               type="number"
               value={duration / 60.0}
               onChange={(e): void => setDuration(Number(e.target.value) * 60)}
@@ -560,15 +565,23 @@ export const ExamInfoEditor: React.FC<{
 };
 
 const VersionInfo: React.FC<{
-  examName: string;
-  versions: Version[];
-  refresh: () => void;
+  exam: admin_versionInfo$key;
 }> = (props) => {
   const {
-    examName,
-    versions,
-    refresh,
+    exam,
   } = props;
+  const res = useFragment<admin_versionInfo$key>(
+    graphql`
+    fragment admin_versionInfo on Exam {
+      name
+      examVersions {
+        id
+        ...admin_version
+      }
+    }
+    `,
+    exam,
+  );
   const { alert } = useContext(AlertContext);
   const { examId } = useParams();
   const history = useHistory();
@@ -586,8 +599,8 @@ const VersionInfo: React.FC<{
               const { files } = event.target;
               const [f] = files;
               if (!f) return;
-              importVersion(examId, f).then((res) => {
-                history.push(`/exams/${examId}/versions/${res.id}/edit`);
+              importVersion(examId, f).then((innerRes) => {
+                history.push(`/exams/${examId}/versions/${innerRes.id}/edit`);
                 alert({
                   variant: 'success',
                   autohide: true,
@@ -614,8 +627,8 @@ const VersionInfo: React.FC<{
           <Button
             variant="success"
             onClick={(): void => {
-              createVersion(examId).then((res) => {
-                history.push(`/exams/${examId}/versions/${res.id}/edit`);
+              createVersion(examId).then((innerRes) => {
+                history.push(`/exams/${examId}/versions/${innerRes.id}/edit`);
               }).catch((err) => {
                 alert({
                   variant: 'danger',
@@ -630,12 +643,11 @@ const VersionInfo: React.FC<{
         </div>
       </h2>
       <ul>
-        {versions.map((v) => (
+        {res.examVersions.map((v) => (
           <li key={v.id}>
             <ShowVersion
               version={v}
-              examName={examName}
-              refresh={refresh}
+              examName={res.name}
             />
           </li>
         ))}
@@ -645,15 +657,26 @@ const VersionInfo: React.FC<{
 };
 
 const ShowVersion: React.FC<{
-  version: Version;
+  version: admin_version$key;
   examName: string;
-  refresh: () => void;
 }> = (props) => {
   const {
     version,
     examName,
-    refresh,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment admin_version on ExamVersion {
+      id
+      railsId
+      name
+      policies
+      anyStarted
+      contents
+    }
+    `,
+    version,
+  );
   const { examId } = useParams();
   const { alert } = useContext(AlertContext);
   const [preview, setPreview] = useState(false);
@@ -666,7 +689,7 @@ const ShowVersion: React.FC<{
           onKeyPress={(): void => setPreview((o) => !o)}
           tabIndex={0}
         >
-          {version.name}
+          {res.name}
           {preview ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
         </span>
         <div className="float-right">
@@ -676,31 +699,30 @@ const ShowVersion: React.FC<{
             title="Export"
           >
             <Dropdown.Item
-              href={`/api/professor/versions/${version.id}/export_file`}
+              href={`/api/professor/versions/${res.railsId}/export_file`}
             >
               Export as single file
             </Dropdown.Item>
             <Dropdown.Item
-              href={`/api/professor/versions/${version.id}/export_archive`}
+              href={`/api/professor/versions/${res.railsId}/export_archive`}
             >
               Export as archive
             </Dropdown.Item>
           </DropdownButton>
           <LinkButton
             variant="info"
-            to={`/exams/${examId}/versions/${version.id}/edit`}
+            to={`/exams/${examId}/versions/${res.railsId}/edit`}
             className="mr-2"
           >
             Edit
           </LinkButton>
           <TooltipButton
             variant="danger"
-            disabled={version.anyStarted}
+            disabled={res.anyStarted}
             disabledMessage="Students have already started taking this exam version"
             cursorClass="cursor-not-allowed"
             onClick={(): void => {
-              deleteVersion(version.id).then(() => {
-                refresh();
+              deleteVersion(res.railsId).then(() => {
                 alert({
                   variant: 'success',
                   autohide: true,
@@ -725,9 +747,9 @@ const ShowVersion: React.FC<{
           railsExam={{
             id: examId,
             name: examName,
-            policies: version.policies,
+            policies: res.policies,
           }}
-          contents={version.contents}
+          contents={JSON.parse(res.contents)}
         />
       </ErrorBoundary>
     </>
@@ -766,16 +788,6 @@ const PreviewVersion: React.FC<{
   );
 };
 
-function mkV(gql) {
-  return {
-    id: gql.railsId,
-    name: gql.name,
-    policies: gql.policies,
-    contents: JSON.parse(gql.contents),
-    anyStarted: gql.anyStarted,
-  };
-}
-
 const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
   return (
@@ -784,37 +796,13 @@ const ExamAdmin: React.FC = () => {
       query={graphql`
         query adminExamQuery($examRailsId: Int!) {
           exam(railsId: $examRailsId) {
-            ...admin_examInfo
             id
             name
             startTime
             endTime
             duration
-            examVersions {
-              railsId
-              name
-              policies
-              anyStarted
-              contents
-            }
-            checklist {
-              rooms {
-                reason
-                status
-              }
-              staff {
-                reason
-                status
-              }
-              seating {
-                reason
-                status
-              }
-              versions {
-                reason
-                status
-              }
-            }
+            ...admin_examInfo
+            ...admin_checklist
           }
         }
         `}
@@ -830,19 +818,21 @@ const ExamAdmin: React.FC = () => {
         }
         return (
           <DocumentTitle title={props.exam.name}>
-            <Loaded
-              exam={props.exam}
-              refresh={() => undefined}
-              examID={props.exam.id}
-              response={{
-                name: props.exam.name,
-                start: DateTime.fromISO(props.exam.startTime),
-                end: DateTime.fromISO(props.exam.endTime),
-                duration: props.exam.duration,
-                versions: props.exam.examVersions.map(mkV),
-                checklist: props.exam.checklist,
-              }}
-            />
+            <ExamInformation exam={props.exam} />
+            <Form.Group>
+              <TabbedChecklist
+                exam={props.exam}
+                examId={examId}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Link to={`/exams/${examId}/proctoring`}>
+                <Button variant="success">Proctor!</Button>
+              </Link>
+              <Link to={`/exams/${examId}/submissions`}>
+                <Button className="ml-2" variant="primary">View submissions</Button>
+              </Link>
+            </Form.Group>
           </DocumentTitle>
         );
       }}

@@ -53,6 +53,9 @@ import { exams_recipients$key } from './__generated__/exams_recipients.graphql';
 
 import { exams_anomalies$key } from './__generated__/exams_anomalies.graphql';
 import { exams_anomaly$key } from './__generated__/exams_anomaly.graphql';
+import { examsFinalizeItemMutation } from './__generated__/examsFinalizeItemMutation.graphql';
+import { examsDestroyAnomalyMutation } from './__generated__/examsDestroyAnomalyMutation.graphql';
+import { examsSendMessageMutation } from './__generated__/examsSendMessageMutation.graphql';
 
 export interface Recipient {
   type: MessageType.Direct | MessageType.Room | MessageType.Version | MessageType.Exam;
@@ -196,7 +199,7 @@ const FinalizeButton: React.FC<{
     regFinal,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation(
+  const [mutate, { loading }] = useMutation<examsFinalizeItemMutation>(
     finalizeItemMutation,
     {
       onCompleted: ({ finalizeItem }) => {
@@ -258,7 +261,7 @@ const ClearButton: React.FC<{
     anomalyId,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation(
+  const [mutate, { loading }] = useMutation<examsDestroyAnomalyMutation>(
     graphql`
     mutation examsDestroyAnomalyMutation($input: DestroyAnomalyInput!) {
       destroyAnomaly(input: $input) {
@@ -483,7 +486,7 @@ const FinalizeRegs: React.FC<{
   const [showModal, setShowModal] = useState(false);
   const openModal = useCallback(() => setShowModal(true), []);
   const closeModal = useCallback(() => setShowModal(false), []);
-  const [mutate, { loading }] = useMutation(
+  const [mutate, { loading }] = useMutation<examsFinalizeItemMutation>(
     finalizeItemMutation,
     {
       onCompleted: ({ finalizeItem }) => {
@@ -1195,7 +1198,7 @@ const SendMessageButton: React.FC<{
     onSuccess,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation(
+  const [mutate, { loading }] = useMutation<examsSendMessageMutation>(
     graphql`
       mutation examsSendMessageMutation($input: SendMessageInput!) {
         sendMessage(input: $input) {

@@ -34,6 +34,8 @@ module Types
 
     field :questions, [Types::QuestionType], null: false
 
+    field :accommodations, Types::AccommodationType.connection_type, null: false
+
     field :registration, Types::RegistrationType, null: true do
       argument :id, ID, required: true
     end
@@ -55,6 +57,11 @@ module Types
     field :final_registrations, [Types::RegistrationType], null: false
     def final_registrations
       object.registrations.final
+    end
+
+    field :registrations_without_accommodation, Types::RegistrationType.connection_type, null: false
+    def registrations_without_accommodation
+      object.registrations.without_accommodation
     end
 
     field :my_registration, Types::RegistrationType, null: true

@@ -16,6 +16,7 @@ import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
 import { FaTimes } from 'react-icons/fa';
 
 interface DateTimeProps {
+  disabled?: boolean;
   value?: DateTime;
   minValue?: DateTime;
   maxValue?: DateTime;
@@ -43,6 +44,7 @@ const timeZones = {
 
 const DateTimePicker: React.FC<DateTimeProps> = (props) => {
   const {
+    disabled = false,
     value,
     minValue,
     maxValue,
@@ -63,6 +65,7 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
       {value && nullable && (
         <InputGroup.Append>
           <Button
+            disabled={disabled}
             size="sm"
             variant="link"
             className="text-dark border"
@@ -75,7 +78,10 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
       <Dropdown
         as={InputGroup.Append}
       >
-        <Dropdown.Toggle id="choose-time">
+        <Dropdown.Toggle
+          id="choose-time"
+          disabled={disabled}
+        >
           <BsCalendar />
         </Dropdown.Toggle>
         <Dropdown.Menu
@@ -83,6 +89,7 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
           className="p-0 d-flex flex-grow-1 DateTimeCustom"
         >
           <DatePicker
+            disabled={disabled}
             inline
             selected={value?.toJSDate()}
             calendarClassName="NestedDatePicker"
@@ -97,6 +104,7 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
           <TimePicker
             time={value?.toFormat('hh:mm a')}
             onChange={(time): void => {
+              if (disabled) return;
               if (onChange) {
                 onChange(mergeDateTime(
                   value ?? DateTime.local(),
@@ -119,6 +127,7 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
                     active={timeZone === tzName}
                     action
                     onClick={(): void => {
+                      if (disabled) return;
                       if (onChange) {
                         onChange(
                           (value ?? DateTime.local()).setZone(tzName, { keepLocalTime: true }),

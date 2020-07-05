@@ -10,14 +10,12 @@ import {
 import {
   useParams,
 } from 'react-router-dom';
-import { useTabRefresher } from '@hourglass/workflows/professor/exams/admin';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import Icon from '@student/exams/show/components/Icon';
-import { Accommodation, useAccommodationsIndex } from '@hourglass/common/api/professor/accommodations';
+import { Accommodation } from '@hourglass/common/api/professor/accommodations';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { BsPencilSquare } from 'react-icons/bs';
-import { updateAccommodation } from '@hourglass/common/api/professor/accommodations/update';
 import { AlertContext } from '@hourglass/common/alerts';
 import { FaTrash } from 'react-icons/fa';
 import destroyAccommodation from '@hourglass/common/api/professor/accommodations/destroy';
@@ -26,23 +24,32 @@ import { Registration, useRegistrationsIndex } from '@hourglass/common/api/profe
 import Loading from '@hourglass/common/loading';
 import { createAccommodation } from '@hourglass/common/api/professor/accommodations/create';
 import { DateTime } from 'luxon';
+import { useMutation, graphql, useFragment } from 'relay-hooks';
+import { accommodations_all$key } from './__generated__/accommodations_all.graphql';
+import { accommodations_accommodation$key } from './__generated__/accommodations_accommodation.graphql';
+import { ConnectionHandler } from 'relay-runtime';
+import { accommodations_regsWithout$key } from './__generated__/accommodations_regsWithout.graphql';
 
 const AccommodationEditor: React.FC<{
   submit: (startTime: DateTime, extraTime: number) => void;
   cancel: () => void;
-  accommodation: Accommodation;
+  newStartTime: DateTime;
+  percentTimeExpansion: number;
+  displayName: string;
 }> = (props) => {
   const {
     submit,
     cancel,
-    accommodation,
+    displayName,
+    newStartTime,
+    percentTimeExpansion,
   } = props;
-  const [startTime, setStartTime] = useState(accommodation.newStartTime);
-  const [extraTime, setExtraTime] = useState(accommodation.percentTimeExpansion);
+  const [startTime, setStartTime] = useState(newStartTime);
+  const [extraTime, setExtraTime] = useState(percentTimeExpansion);
   return (
     <tr>
       <td className="align-middle">
-        {accommodation.registration.user.displayName}
+        {displayName}
       </td>
       <td>
         <DateTimePicker
@@ -79,66 +86,122 @@ const AccommodationEditor: React.FC<{
 };
 
 const SingleAccommodation: React.FC<{
-  refresh: () => void;
-  accommodation: Accommodation;
+  examId: string;
+  accommodationKey: accommodations_accommodation$key;
 }> = (props) => {
   const {
-    refresh,
-    accommodation,
+    examId,
+    accommodationKey,
   } = props;
+  const accommodation = useFragment(
+    graphql`
+    fragment accommodations_accommodation on Accommodation {
+      id
+      railsId
+      newStartTime
+      percentTimeExpansion
+      registration {
+        id
+        user {
+          displayName
+        }
+      }
+    }
+    `,
+    accommodationKey,
+  );
   const [editing, setEditing] = useState(false);
   const edit = useCallback(() => setEditing(true), []);
   const stopEdit = useCallback(() => setEditing(false), []);
   const { alert } = useContext(AlertContext);
-  const destroy = () => {
-    destroyAccommodation(accommodation.id).then((res) => {
-      if (res.success !== true) {
-        throw new Error(res.reason);
+  const [destroy, { loading: destroyLoading }] = useMutation( // TODO: update registrationsWithoutAccommodation
+    graphql`
+    mutation accommodationsDestroyMutation($input: DestroyAccommodationInput!) {
+      destroyAccommodation(input: $input) {
+        deletedId
+        errors
       }
-      refresh();
-      alert({
-        variant: 'success',
-        title: 'Successfully deleted accommodation',
-        autohide: true,
-        message: `Accommodation for '${accommodation.registration.user.displayName}' deleted.`,
-      });
-    }).catch((err) => {
-      alert({
-        variant: 'danger',
-        title: 'Error deleting accommodation',
-        message: err.message,
-      });
-    });
-  };
+    }
+    `,
+    {
+      onCompleted: ({ destroyAccommodation }) => {
+        const { errors } = destroyAccommodation;
+        if (errors.length !== 0) {
+          alert({
+            variant: 'danger',
+            title: 'Error deleting accommodation',
+            message: errors.join('\n'),
+          });
+        } else {
+          alert({
+            variant: 'success',
+            title: 'Successfully deleted accommodation',
+            autohide: true,
+            message: `Accommodation for '${accommodation.registration.user.displayName}' deleted.`,
+          });
+        }
+      },
+      updater: (store) => {
+        const payload = store.getRootField('destroyAccommodation');
+        const deletedId = payload.getValue<string>('deletedId');
+        const exam = store.get(examId);
+        const conn = ConnectionHandler.getConnection(exam, 'Exam_accommodations');
+        ConnectionHandler.deleteNode(conn, deletedId);
+        store.delete(deletedId);
+      },
+    },
+  );
+  const [update, { loading: updateLoading }] = useMutation(
+    graphql`
+    mutation accommodationsUpdateMutation($input: UpdateAccommodationInput!) {
+      updateAccommodation(input: $input) {
+        errors
+        accommodation {
+          id
+          newStartTime
+          percentTimeExpansion
+        }
+      }
+    }
+    `,
+    {
+      onCompleted: ({ updateAccommodation }) => {
+        setEditing(false);
+        const { errors } = updateAccommodation;
+        if (errors.length !== 0) {
+          alert({
+            variant: 'danger',
+            title: 'Error updating accommodation',
+            message: errors.join('\n'),
+          });
+        } else {
+          alert({
+            variant: 'success',
+            title: 'Successfully updated accommodation',
+            autohide: true,
+            message: `Accommodation for '${accommodation.registration.user.displayName}' updated.`,
+          });
+        }
+      },
+    },
+  );
   const submit = (newStartTime: DateTime, percentTimeExpansion: number) => {
-    updateAccommodation(accommodation.id, {
-      newStartTime,
-      percentTimeExpansion,
-    }).then((res) => {
-      if (res.success !== true) {
-        throw new Error(res.reason);
-      }
-      setEditing(false);
-      refresh();
-      alert({
-        variant: 'success',
-        title: 'Successfully updated accommodation',
-        autohide: true,
-        message: `Accommodation for '${accommodation.registration.user.displayName}' updated.`,
-      });
-    }).catch((err) => {
-      setEditing(false);
-      alert({
-        variant: 'danger',
-        title: 'Error updating accommodation',
-        message: err.message,
-      });
+    update({
+      variables: {
+        input: {
+          accommodationId: accommodation.id,
+          newStartTime: newStartTime?.toISO(),
+          percentTimeExpansion,
+        },
+      },
     });
   };
   if (editing) {
     return (
       <AccommodationEditor
-        accommodation={accommodation}
+        displayName={accommodation.registration.user.displayName}
+        newStartTime={accommodation.newStartTime ? DateTime.fromISO(accommodation.newStartTime) : undefined}
+        percentTimeExpansion={accommodation.percentTimeExpansion}
         cancel={stopEdit}
         submit={submit}
       />
@@ -151,7 +214,7 @@ const SingleAccommodation: React.FC<{
       </td>
       <td className="align-middle">
         {accommodation.newStartTime ? (
-          <ReadableDate showTime value={accommodation.newStartTime} />
+          <ReadableDate showTime value={DateTime.fromISO(accommodation.newStartTime)} />
         ) : (
           <i>Not set.</i>
         )}
@@ -160,7 +223,15 @@ const SingleAccommodation: React.FC<{
       <td align="right" className="text-nowrap">
         <Button
           variant="danger"
-          onClick={destroy}
+          onClick={() => {
+            destroy({
+              variables: {
+                input: {
+                  accommodationId: accommodation.id,
+                },
+              },
+            });
+          }}
         >
           <Icon I={FaTrash} size="1.25em" />
           <span className="ml-2">
@@ -182,49 +253,108 @@ const SingleAccommodation: React.FC<{
   );
 };
 
-const NewAccommodationLoaded: React.FC<{
-  accommodations: Accommodation[];
-  registrations: Registration[];
-  refresh: () => void;
+interface Selection {
+  label: string;
+  value: string;
+}
+
+const NewAccommodation: React.FC<{
+  exam: accommodations_regsWithout$key;
 }> = (props) => {
   const {
-    accommodations,
-    registrations,
-    refresh,
+    exam,
   } = props;
   const { examId } = useParams();
   const [selected, setSelected] = useState<Selection>(null);
   const { alert } = useContext(AlertContext);
-  const accs = new Set();
-  accommodations.forEach((a) => accs.add(a.registration.id));
-  const options = registrations
-    .sort((a, b) => a.displayName.localeCompare(b.displayName))
-    .map((r) => ({
-      label: r.displayName,
-      value: r.id,
-    }))
-    .filter((r) => !accs.has(r.value));
+  const regsNoAccommodation = useFragment(
+    graphql`
+    fragment accommodations_regsWithout on Exam {
+      id
+      registrationsWithoutAccommodation(first: 100) @connection(key: "Exam_registrationsWithoutAccommodation", filters: []) {
+        edges {
+          node {
+            id
+            user {
+              displayName
+            }
+          }
+        }
+      }
+    }
+    `,
+    exam,
+  );
+  const sorted = [...regsNoAccommodation.registrationsWithoutAccommodation.edges].sort(
+    (a, b) => a.node.user.displayName.localeCompare(b.node.user.displayName),
+  ).map(({ node }) => ({
+    label: node.user.displayName,
+    value: node.id,
+  }));
+  const [create, { loading }] = useMutation(
+    graphql`
+    mutation accommodationsCreateMutation($input: CreateAccommodationInput!) {
+      createAccommodation(input: $input) {
+        accommodation {
+          ...accommodations_accommodation
+        }
+        accommodationEdge {
+          node {
+            id
+          }
+        }
+        registrationId
+      }
+    }
+    `,
+    {
+      onCompleted: ({ createAccommodation }) => {
+        setSelected(null);
+        alert({
+          variant: 'success',
+          title: 'Successfully created accommodation',
+          autohide: true,
+          message: `Accommodation for '${selected.label}' created.`,
+        });
+      },
+      onError: (errors) => {
+        console.log(errors);
+        alert({
+          variant: 'danger',
+          title: 'Error creating accommodation',
+          message: errors[0]?.message,
+        });
+      },
+      configs: [
+        {
+          type: 'RANGE_ADD',
+          parentID: regsNoAccommodation.id,
+          connectionInfo: [{
+            key: 'Exam_accommodations',
+            rangeBehavior: 'append',
+          }],
+          edgeName: 'accommodationEdge',
+        },
+        {
+          type: 'RANGE_DELETE',
+          parentID: regsNoAccommodation.id,
+          connectionKeys: [{
+            key: 'Exam_registrationsWithoutAccommodation',
+          }],
+          pathToConnection: ['exam', 'registrationsWithoutAccommodation'],
+          deletedIDFieldName: 'registrationId',
+        },
+      ],
+    },
+  );
   const submit = () => {
     if (!selected) return;
-    createAccommodation(examId, selected.value).then((result) => {
-      if (result.success !== true) {
-        throw new Error(result.reason);
-      }
-      refresh();
-      setSelected(null);
-      alert({
-        variant: 'success',
-        title: 'Successfully created accommodation',
-        autohide: true,
-        message: `Accommodation for '${selected.label}' created.`,
-      });
-    }).catch((err) => {
-      refresh();
-      alert({
-        variant: 'danger',
-        title: 'Error creating accommodation',
-        message: err.message,
-      });
+    create({
+      variables: {
+        input: {
+          registrationId: selected.value,
+        },
+      },
     });
   };
 
@@ -235,7 +365,7 @@ const NewAccommodationLoaded: React.FC<{
         value={selected}
         onChange={setSelected}
         className="flex-grow-1"
-        options={options}
+        options={sorted}
       />
       <InputGroup.Append>
         <Button
@@ -250,59 +380,39 @@ const NewAccommodationLoaded: React.FC<{
   );
 };
 
-interface Selection {
-  label: string;
-  value: number;
-}
-
-const NewAccommodation: React.FC<{
-  accommodations: Accommodation[];
-  refresh: () => void;
+const ManageAccommodations: React.FC<{
+  exam: accommodations_all$key;
 }> = (props) => {
   const {
-    accommodations,
-    refresh,
+    exam,
   } = props;
-  const { examId } = useParams();
-  const res = useRegistrationsIndex(examId);
-  switch (res.type) {
-    case 'ERROR':
-      return (
-        <span className="text-danger">
-          <p>
-            Something went wrong.
-          </p>
-          <small>
-            {res.text}
-          </small>
-        </span>
-      );
-    case 'LOADING':
-    case 'RESULT':
-      return (
-        <Loading loading={res.type === 'LOADING'}>
-          <NewAccommodationLoaded
-            refresh={refresh}
-            accommodations={accommodations}
-            registrations={res.type === 'RESULT' ? res.response.registrations : []}
-          />
-        </Loading>
-      );
-    default:
-      throw new ExhaustiveSwitchError(res);
-  }
-};
-
-const Loaded: React.FC<{
-  refresh: () => void;
-  accommodations: Accommodation[];
-}> = (props) => {
-  const {
-    refresh,
-    accommodations,
-  } = props;
-  accommodations.sort(
-    (a, b) => a.registration.user.displayName.localeCompare(b.registration.user.displayName),
+  const res = useFragment(
+    graphql`
+    fragment accommodations_all on Exam {
+      id
+      ...accommodations_regsWithout 
+      accommodations(first: 100) @connection(key: "Exam_accommodations", filters: []) {
+        edges {
+          node {
+            id
+            registration {
+              user {
+                displayName
+              }
+            }
+            ...accommodations_accommodation
+          }
+        }
+      }
+    }
+    `,
+    exam,
+  );
+  const { accommodations } = res;
+  const sorted = [...accommodations.edges].sort(
+    (a, b) => a.node.registration.user.displayName.localeCompare(
+      b.node.registration.user.displayName,
+    ),
   );
   return (
     <>
@@ -318,46 +428,23 @@ const Loaded: React.FC<{
             </tr>
           </thead>
           <tbody>
-            {accommodations.map((acc) => (
-              <SingleAccommodation refresh={refresh} key={acc.id} accommodation={acc} />
+            {sorted.map((edge) => (
+              <SingleAccommodation
+                examId={res.id}
+                key={edge.node.id}
+                accommodationKey={edge.node}
+              />
             ))}
           </tbody>
         </Table>
       </Form.Group>
       <Form.Group as={Row}>
         <Col>
-          <NewAccommodation accommodations={accommodations} refresh={refresh} />
+          <NewAccommodation exam={res} />
         </Col>
       </Form.Group>
     </>
   );
-};
-
-const ManageAccommodations: React.FC = () => {
-  const { examId } = useParams();
-  const [refresher, refresh] = useTabRefresher('accommodations');
-  const response = useAccommodationsIndex(examId, [refresher]);
-  switch (response.type) {
-    case 'ERROR':
-      return (
-        <span className="text-danger">
-          <p>{response.text}</p>
-          <small>{response.status}</small>
-        </span>
-      );
-    case 'LOADING':
-    case 'RESULT':
-      return (
-        <Loading loading={response.type === 'LOADING'}>
-          <Loaded
-            refresh={refresh}
-            accommodations={response.type === 'LOADING' ? [] : response.response.accommodations}
-          />
-        </Loading>
-      );
-    default:
-      throw new ExhaustiveSwitchError(response);
-  }
 };
 
 export default ManageAccommodations;

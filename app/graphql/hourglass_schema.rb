@@ -27,6 +27,8 @@ class HourglassSchema < GraphQL::Schema
 
   def self.resolve_type(type, obj, ctx)
     case obj
+    when Accommodation
+      Types::AccommodationType
     when Anomaly
       Types::AnomalyType
     when Course

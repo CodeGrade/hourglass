@@ -39,7 +39,6 @@ import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
 import './index.scss';
 import { BsListCheck } from 'react-icons/bs';
-import { doFinalize } from '@hourglass/common/api/proctor/exams/finalize';
 import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
 import { QueryRenderer, graphql } from 'react-relay';
 import environment from '@hourglass/relay/environment';
@@ -49,13 +48,15 @@ import { useFragment, useMutation, useSubscription } from 'relay-hooks';
 import { ConnectionHandler } from 'relay-runtime';
 
 import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
-import { exams_recipients$key } from './__generated__/exams_recipients.graphql';
+import { exams_recipients$key, exams_recipients$data } from './__generated__/exams_recipients.graphql';
 
 import { exams_anomalies$key } from './__generated__/exams_anomalies.graphql';
 import { exams_anomaly$key } from './__generated__/exams_anomaly.graphql';
 import { examsFinalizeItemMutation } from './__generated__/examsFinalizeItemMutation.graphql';
 import { examsDestroyAnomalyMutation } from './__generated__/examsDestroyAnomalyMutation.graphql';
 import { examsSendMessageMutation } from './__generated__/examsSendMessageMutation.graphql';
+import { examsNewAnomalySubscription } from './__generated__/examsNewAnomalySubscription.graphql';
+import { exams_messages$key } from './__generated__/exams_messages.graphql';
 
 export interface Recipient {
   type: MessageType.Direct | MessageType.Room | MessageType.Version | MessageType.Exam;
@@ -79,6 +80,7 @@ enum MessageType {
 
 interface DirectMessage {
   type: MessageType.Direct;
+  id: string;
   time: DateTime;
   body: string;
   sender: {
@@ -86,7 +88,7 @@ interface DirectMessage {
     displayName: string;
   };
   registration: {
-    id: number;
+    id: string;
     user: {
       displayName: string;
     };
@@ -96,10 +98,10 @@ interface DirectMessage {
 interface Question {
   type: MessageType.Question;
   time: DateTime;
-  id: number;
+  id: string;
   body: string;
   registration: {
-    id: number;
+    id: string;
     user: {
       displayName: string;
     };
@@ -109,7 +111,7 @@ interface Question {
 interface VersionAnnouncement {
   type: MessageType.Version;
   time: DateTime;
-  id: number;
+  id: string;
   version: {
     name: string;
   };
@@ -119,7 +121,7 @@ interface VersionAnnouncement {
 interface RoomAnnouncement {
   type: MessageType.Room;
   time: DateTime;
-  id: number;
+  id: string;
   room: {
     name: string;
   };
@@ -128,7 +130,7 @@ interface RoomAnnouncement {
 
 interface ExamAnnouncement {
   type: MessageType.Exam;
-  id: number;
+  id: string;
   body: string;
   time: DateTime;
 }
@@ -449,7 +451,7 @@ const ShowAnomalies: React.FC<{
       edgeName: 'anomalyEdge',
     }],
   }), [res.railsId]);
-  useSubscription(subscriptionObject);
+  useSubscription<examsNewAnomalySubscription>(subscriptionObject);
   return (
     <>
       {res.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
@@ -472,11 +474,9 @@ const formatGroupLabel = (data) => {
 };
 
 const FinalizeRegs: React.FC<{
-  examId: number;
   recipientOptions: RecipientOptions;
 }> = (props) => {
   const {
-    examId,
     recipientOptions,
   } = props;
   const { alert } = useContext(AlertContext);
@@ -590,15 +590,13 @@ const FinalizeRegs: React.FC<{
 };
 
 const ExamAnomalies: React.FC<{
-  replyTo: (userId: number) => void;
+  replyTo: (userId: string) => void;
   recipientOptions: RecipientOptions;
-  examId: number;
   exam: exams_anomalies$key;
 }> = (props) => {
   const {
     replyTo,
     recipientOptions,
-    examId,
     exam,
   } = props;
   return (
@@ -623,7 +621,7 @@ const ExamAnomalies: React.FC<{
           </div>
         </div>
         <div>
-          <FinalizeRegs examId={examId} recipientOptions={recipientOptions} />
+          <FinalizeRegs recipientOptions={recipientOptions} />
         </div>
       </div>
     </div>
@@ -695,7 +693,7 @@ const ShowRoomAnnouncement: React.FC<{
 
 const ShowQuestion: React.FC<{
   question: Question;
-  replyTo: (userId: number) => void;
+  replyTo: (regId: string) => void;
 }> = (props) => {
   const {
     question,
@@ -754,7 +752,7 @@ const ShowDirectMessage: React.FC<{
 
 const SingleMessage: React.FC<{
   message: Message;
-  replyTo: (userId: number) => void;
+  replyTo: (regId: string) => void;
 }> = (props) => {
   const {
     message,
@@ -779,7 +777,7 @@ const SingleMessage: React.FC<{
 type FilterVals = { value: string; label: string; };
 
 const ShowMessages: React.FC<{
-  replyTo: (userId: number) => void;
+  replyTo: (regId: string) => void;
   receivedOnly?: boolean;
   sentOnly?: boolean;
   sent: DirectMessage[];
@@ -847,9 +845,9 @@ const ShowMessages: React.FC<{
     all = all.filter((m) => {
       switch (m.type) {
         case MessageType.Direct:
-          return m.recipient.displayName === filter.value;
+          return m.registration.user.displayName === filter.value;
         case MessageType.Question:
-          return m.sender.displayName === filter.value;
+          return m.registration.user.displayName === filter.value;
         case MessageType.Room:
           return m.room.name === filter.value;
         case MessageType.Version:
@@ -922,7 +920,7 @@ const Loaded: React.FC<{
   selectedRecipient: MessageFilterOption;
   setSelectedRecipient: (option: MessageFilterOption) => void;
   messageRef: React.Ref<HTMLTextAreaElement>;
-  replyTo: (userId: number) => void;
+  replyTo: (regId: string) => void;
   examId: string;
   response: Response;
   recipientOptions: RecipientOptions;
@@ -1061,9 +1059,9 @@ const ExamMessages: React.FC<{
   selectedRecipient: MessageFilterOption;
   setSelectedRecipient: (option: MessageFilterOption) => void;
   messageRef: React.Ref<HTMLTextAreaElement>;
-  replyTo: (userId: number) => void;
+  replyTo: (registrationId: string) => void;
   recipientOptions: RecipientOptions;
-  exam: any;
+  exam: exams_messages$key;
 }> = (props) => {
   const {
     selectedRecipient,
@@ -1078,7 +1076,6 @@ const ExamMessages: React.FC<{
       fragment exams_messages on Exam {
         id
         versionAnnouncements {
-          railsId
           id
           createdAt
           body
@@ -1088,7 +1085,6 @@ const ExamMessages: React.FC<{
         }
         roomAnnouncements {
           id
-          railsId
           createdAt
           body
           room {
@@ -1097,12 +1093,10 @@ const ExamMessages: React.FC<{
         }
         examAnnouncements {
           id
-          railsId
           createdAt
           body
         }
         questions {
-          railsId
           id
           createdAt
           registration {
@@ -1114,7 +1108,6 @@ const ExamMessages: React.FC<{
           body
         }
         messages {
-          railsId
           id
           body
           createdAt
@@ -1140,7 +1133,7 @@ const ExamMessages: React.FC<{
       response={{
         sent: res.messages.map((msg) => ({
           type: MessageType.Direct,
-          id: msg.railsId,
+          id: msg.id,
           body: msg.body,
           sender: msg.sender,
           registration: msg.registration,
@@ -1148,27 +1141,27 @@ const ExamMessages: React.FC<{
         })),
         questions: res.questions.map((question) => ({
           type: MessageType.Question,
-          id: question.railsId,
+          id: question.id,
           body: question.body,
           registration: question.registration,
           time: DateTime.fromISO(question.createdAt),
         })),
         version: res.versionAnnouncements.map((va) => ({
           type: MessageType.Version,
-          id: va.railsId,
+          id: va.id,
           body: va.body,
           version: va.examVersion,
           time: DateTime.fromISO(va.createdAt),
         })),
         exam: res.examAnnouncements.map((ea) => ({
           type: MessageType.Exam,
-          id: ea.railsId,
+          id: ea.id,
           body: ea.body,
           time: DateTime.fromISO(ea.createdAt),
         })),
         room: res.roomAnnouncements.map((ra) => ({
           type: MessageType.Room,
-          id: ra.railsId,
+          id: ra.id,
           body: ra.body,
           room: ra.room,
           time: DateTime.fromISO(ra.createdAt),
@@ -1324,13 +1317,13 @@ const SendMessage: React.FC<{
 };
 
 const SplitViewLoaded: React.FC<{
-  exam: exam_anomalies$key;
-  examId: number;
+  examId: string;
+  exam: exams_recipients$data;
   recipients: SplitRecipients;
 }> = (props) => {
   const {
-    exam,
     examId,
+    exam,
     recipients,
   } = props;
   const { alert } = useContext(AlertContext);
@@ -1342,7 +1335,7 @@ const SplitViewLoaded: React.FC<{
         label: 'Entire exam',
         value: {
           type: MessageType.Exam,
-          id: exam.id,
+          id: examId,
           name: 'Entire exam',
         },
       }],
@@ -1390,7 +1383,6 @@ const SplitViewLoaded: React.FC<{
         <ExamAnomalies
           exam={exam}
           recipientOptions={recipientOptions}
-          examId={examId}
           replyTo={replyTo}
         />
       </Col>
@@ -1398,7 +1390,6 @@ const SplitViewLoaded: React.FC<{
         <ExamMessages
           exam={exam}
           recipientOptions={recipientOptions}
-          examId={examId}
           selectedRecipient={selectedRecipient}
           setSelectedRecipient={setSelectedRecipient}
           messageRef={messageRef}
@@ -1419,6 +1410,9 @@ const ProctoringSplitView: React.FC<{
   const res = useFragment<exams_recipients$key>(
     graphql`
     fragment exams_recipients on Exam {
+      ...exams_anomalies
+      ...exams_messages
+      id
       examVersions {
         id
         name
@@ -1440,24 +1434,33 @@ const ProctoringSplitView: React.FC<{
   );
   return (
     <SplitViewLoaded
-      exam={exam}
-      examId={examId}
+      exam={res}
+      examId={res.id}
       recipients={{
-        versions: res.examVersions.map((ev) => ({
-          type: MessageType.Version,
-          id: ev.id,
-          name: ev.name,
-        })).sort((a, b) => a.name.localeCompare(b.name)),
-        students: res.registrations.map((registration) => ({
-          type: MessageType.Direct,
-          id: registration.id,
-          name: registration.user.displayName,
-        })).sort((a, b) => a.name.localeCompare(b.name)),
-        rooms: res.rooms.map((room) => ({
-          type: MessageType.Room,
-          id: room.id,
-          name: room.name,
-        })).sort((a, b) => a.name.localeCompare(b.name)),
+        versions: res.examVersions.map((ev) => {
+          const r: Recipient = {
+            type: MessageType.Version,
+            id: ev.id,
+            name: ev.name,
+          };
+          return r;
+        }).sort((a, b) => a.name.localeCompare(b.name)),
+        students: res.registrations.map((registration) => {
+          const r: Recipient = {
+            type: MessageType.Direct,
+            id: registration.id,
+            name: registration.user.displayName,
+          };
+          return r;
+        }).sort((a, b) => a.name.localeCompare(b.name)),
+        rooms: res.rooms.map((room) => {
+          const r: Recipient = {
+            type: MessageType.Room,
+            id: room.id,
+            name: room.name,
+          };
+          return r;
+        }).sort((a, b) => a.name.localeCompare(b.name)),
       }}
     />
   );
@@ -1474,8 +1477,6 @@ const ExamProctoring: React.FC = () => {
         query examsProctorQuery($examRailsId: Int!) {
           exam(railsId: $examRailsId) {
             ...exams_recipients
-            ...exams_anomalies
-            ...exams_messages
             name
             id
           }

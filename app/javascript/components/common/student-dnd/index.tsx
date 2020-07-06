@@ -28,6 +28,7 @@ import { TabEditButton } from '@hourglass/workflows/professor/exams/admin';
 import '@professor/exams/list-columns.scss';
 import { useFragment, graphql, useMutation } from 'relay-hooks';
 import { studentDnd$key } from './__generated__/studentDnd.graphql';
+import { studentDndUpdateMutation } from './__generated__/studentDndUpdateMutation.graphql';
 
 interface Section {
   id: string;
@@ -251,7 +252,7 @@ const StudentDNDForm: React.FC<
   const cancel = useCallback(() => {
     history.goBack();
   }, [history]);
-  const [mutate, { loading }] = useMutation(
+  const [mutate, { loading }] = useMutation<studentDndUpdateMutation>(
     graphql`
     mutation studentDndUpdateMutation($input: UpdateStudentSeatingInput!) {
       updateStudentSeating(input: $input) {

@@ -8,7 +8,7 @@ class MessageTest < ActiveSupport::TestCase
     assert msg.valid?
     assert msg.save
     assert msg.sender.sent_messages.include? msg
-    assert msg.recipient.received_messages.include? msg
+    assert msg.registration.messages.include? msg
   end
 
   test 'should not save message without sender' do
@@ -23,9 +23,8 @@ class MessageTest < ActiveSupport::TestCase
     msg = build(
       :message,
       {
-        exam: e,
         sender: reg.user,
-        recipient: reg2.user,
+        registration: reg2,
         body: 'hi',
       }
     )

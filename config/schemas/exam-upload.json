@@ -19,7 +19,7 @@
     },
     "Policy": {
       "type": "string",
-      "enum": ["ignore-lockdown", "tolerate-windowed"]
+      "enum": ["IGNORE_LOCKDOWN", "TOLERATE_WINDOWED"]
     },
     "Version": {
       "type": "object",

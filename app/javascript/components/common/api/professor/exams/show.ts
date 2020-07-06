@@ -6,7 +6,7 @@ import { DateTime } from 'luxon';
 export interface Version {
   id: number;
   name: string;
-  policies: Policy[];
+  policies: readonly Policy[];
   contents: ContentsState;
   anyStarted: boolean;
 }

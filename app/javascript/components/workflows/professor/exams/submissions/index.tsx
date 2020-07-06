@@ -87,7 +87,7 @@ const ExamSubmission: React.FC = () => {
         }
         return (
           <>
-            <h1>{`Submission by ${props.exam.registration.user.displayName}`}</h1>
+            <h1>{`Submission by ${props.exam.railsRegistration.user.displayName}`}</h1>
             <ExamViewer
               railsExam={{
                 id: 0,
@@ -95,8 +95,8 @@ const ExamSubmission: React.FC = () => {
                 policies: [],
               }}
               contents={{
-                exam: JSON.parse(props.exam.registration.examVersion.contents).exam,
-                answers: JSON.parse(props.exam.registration.currentAnswers),
+                exam: JSON.parse(props.exam.railsRegistration.examVersion.contents).exam,
+                answers: JSON.parse(props.exam.railsRegistration.currentAnswers),
               }}
             />
           </>

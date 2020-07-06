@@ -48,7 +48,10 @@ const listeners: {
   },
 ];
 
-export function installListeners(policies: Policy[], detected: AnomalyDetected): AnomalyListener[] {
+export function installListeners(
+  policies: readonly Policy[],
+  detected: AnomalyDetected,
+): AnomalyListener[] {
   if (policyPermits(policies, Policy.ignoreLockdown)) return [];
 
   const handlers = listeners.map(({ event, handler }) => {

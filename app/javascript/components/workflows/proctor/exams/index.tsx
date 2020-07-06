@@ -1404,7 +1404,6 @@ const SplitViewLoaded: React.FC<{
 const ProctoringSplitView: React.FC<{
   exam: exams_recipients$key;
 }> = (props) => {
-  const { examId } = useParams();
   const {
     exam,
   } = props;

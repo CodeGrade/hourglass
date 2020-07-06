@@ -244,6 +244,8 @@ const PreFlightChecklist: React.FC<{
       ...accommodations_all
       ...allocateVersions
       ...roomsIndex
+      ...assignStaff
+      ...studentDnd
       name
       checklist {
         rooms {
@@ -370,7 +372,7 @@ const PreFlightChecklist: React.FC<{
           </Tab.Pane>
           <Tab.Pane eventKey="staff">
             <ErrorBoundary>
-              <AssignStaff />
+              <AssignStaff examKey={res} />
             </ErrorBoundary>
           </Tab.Pane>
           <Tab.Pane eventKey="versions">
@@ -380,7 +382,7 @@ const PreFlightChecklist: React.FC<{
           </Tab.Pane>
           <Tab.Pane eventKey="seating">
             <ErrorBoundary>
-              <AssignSeating />
+              <AssignSeating examKey={res} />
             </ErrorBoundary>
           </Tab.Pane>
           <Tab.Pane eventKey="accommodations">

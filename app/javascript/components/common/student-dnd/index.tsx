@@ -26,28 +26,28 @@ import {
 import { AlertContext } from '@hourglass/common/alerts';
 import { TabEditButton } from '@hourglass/workflows/professor/exams/admin';
 import '@professor/exams/list-columns.scss';
+import { useFragment, graphql, useMutation } from 'relay-hooks';
+import { studentDnd$key } from './__generated__/studentDnd.graphql';
 
 interface Section {
-  id: number;
+  id: string;
   title: string;
-  students: Student[];
+  students: readonly Student[];
 }
 
 interface Student {
-  id: number;
-  username: string;
+  id: string;
   displayName: string;
 }
 
 interface Room {
-  id: number;
+  id: string;
   name: string;
   students: Student[];
-  proctors: Student[];
 }
 
 interface FormContextType {
-  sections: Section[];
+  sections: readonly Section[];
 }
 
 const FormContext = React.createContext<FormContextType>({
@@ -159,7 +159,7 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
 };
 
 interface RoomsProps {
-  addSectionToRoom: (section: Section, roomId: number) => void;
+  addSectionToRoom: (section: Section, roomId: string) => void;
 }
 
 const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
@@ -209,15 +209,22 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
   );
 };
 
-const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
+interface StudentDNDFormExtraProps {
+  examId: string;
+}
+
+const StudentDNDForm: React.FC<
+  InjectedFormProps<FormValues, StudentDNDFormExtraProps> & StudentDNDFormExtraProps
+> = (props) => {
   const {
+    examId,
     handleSubmit,
     reset,
     pristine,
     change,
   } = props;
-  const { examId } = useParams();
-  const addSectionToRoom = (section: Section, roomId: number): void => {
+  const { examId: examRailsId } = useParams();
+  const addSectionToRoom = (section: Section, roomId: string): void => {
     change('all', ({ unassigned, rooms }) => ({
       unassigned: unassigned.filter((unassignedStudent: Student) => (
         !section.students.find((student) => student.id === unassignedStudent.id)
@@ -244,32 +251,56 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const cancel = useCallback(() => {
     history.goBack();
   }, [history]);
+  const [mutate, { loading }] = useMutation(
+    graphql`
+    mutation studentDndUpdateMutation($input: UpdateStudentSeatingInput!) {
+      updateStudentSeating(input: $input) {
+        exam {
+          ...admin_checklist
+        }
+      }
+    }
+    `,
+    {
+      onCompleted: () => {
+        history.push(`/exams/${examRailsId}/admin/seating`);
+        alert({
+          variant: 'success',
+          autohide: true,
+          message: 'Room assignments successfully created.',
+        });
+      },
+      onError: (errs) => {
+        alert({
+          variant: 'danger',
+          title: 'Room assignments not created.',
+          message: errs[0]?.message,
+        });
+      },
+    },
+  );
   return (
     <form
       onSubmit={handleSubmit(({ all }) => {
-        const rooms = {};
+        const rooms: {
+          roomId: string;
+          studentIds: string[];
+        }[] = [];
         all.rooms.forEach((room) => {
-          rooms[room.id] = room.students.map((s) => s.id);
+          rooms.push({
+            roomId: room.id,
+            studentIds: room.students.map((s) => s.id),
+          });
         });
-        const body = {
-          unassigned: all.unassigned.map((s) => s.id),
-          rooms,
-        };
-        // updateAll(examId, body).then((result) => {
-        //   if (result.created === false) throw new Error(result.reason);
-        //   history.push(`/exams/${examId}/admin/seating`);
-        //   alert({
-        //     variant: 'success',
-        //     autohide: true,
-        //     message: 'Room assignments successfully created.',
-        //   });
-        // }).catch((e) => {
-        //   alert({
-        //     variant: 'danger',
-        //     title: 'Room assignments not created.',
-        //     message: e.message,
-        //   });
-        // });
+        mutate({
+          variables: {
+            input: {
+              examId,
+              unassignedStudentIds: all.unassigned.map((s) => s.id),
+              studentRoomUpdates: rooms,
+            },
+          },
+        });
       })}
     >
       <FormSection name="all">
@@ -277,6 +308,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           Edit Seating Assignments
           <span className="float-right">
             <Button
+              disabled={loading}
               variant="danger"
               className={pristine && 'd-none'}
               onClick={reset}
@@ -284,6 +316,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               Reset
             </Button>
             <Button
+              disabled={loading}
               variant="secondary"
               className="ml-2"
               onClick={cancel}
@@ -291,6 +324,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               Cancel
             </Button>
             <Button
+              disabled={loading}
               variant="primary"
               className="ml-2"
               type="submit"
@@ -318,13 +352,15 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
 };
 
 interface RoomAssignmentProps {
-  sections: Section[];
-  unassigned: Student[];
-  rooms: Room[];
+  examId: string;
+  sections: readonly Section[];
+  unassigned: readonly Student[];
+  rooms: readonly Room[];
 }
 
 const Editable: React.FC<RoomAssignmentProps> = (props) => {
   const {
+    examId,
     sections,
     unassigned,
     rooms,
@@ -333,6 +369,7 @@ const Editable: React.FC<RoomAssignmentProps> = (props) => {
     <Provider store={store}>
       <FormContext.Provider value={{ sections }}>
         <DNDForm
+          examId={examId}
           initialValues={{
             all: {
               unassigned,
@@ -394,71 +431,90 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
   );
 };
 
-const Loaded: React.FC<RoomAssignmentProps> = (props) => {
+interface FormValues {
+  all: {
+    unassigned: readonly Student[];
+    rooms: readonly Room[];
+  };
+}
+
+const DNDForm = reduxForm<FormValues, StudentDNDFormExtraProps>({
+  form: 'student-dnd',
+})(StudentDNDForm);
+
+const AssignSeating: React.FC<{
+  examKey: studentDnd$key;
+}> = (props) => {
   const {
-    sections,
-    unassigned,
-    rooms,
+    examKey,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment studentDnd on Exam {
+      id
+      course {
+        sections {
+          id
+          title
+          students {
+            id
+            displayName
+          }
+        }
+      }
+      registrationsWithoutRooms {
+        user {
+          id
+          displayName
+        }
+      }
+      rooms {
+        id
+        name
+        registrations {
+          user {
+            id
+            displayName
+          }
+        }
+      }
+    }
+    `,
+    examKey,
+  );
+
   return (
     <Row>
       <Col>
         <Switch>
           <Route path="/exams/:examId/admin/seating/edit">
             <Editable
-              sections={sections}
-              unassigned={unassigned}
-              rooms={rooms}
+              examId={res.id}
+              sections={res.course.sections}
+              unassigned={res.registrationsWithoutRooms.map((reg) => reg.user)}
+              rooms={res.rooms.map((r) => ({
+                id: r.id,
+                name: r.name,
+                students: r.registrations.map((reg) => reg.user),
+              }))}
             />
           </Route>
           <Route>
             <Readonly
-              sections={sections}
-              unassigned={unassigned}
-              rooms={rooms}
+              examId={res.id}
+              sections={res.course.sections}
+              unassigned={res.registrationsWithoutRooms.map((reg) => reg.user)}
+              rooms={res.rooms.map((r) => ({
+                id: r.id,
+                name: r.name,
+                students: r.registrations.map((reg) => reg.user),
+              }))}
             />
           </Route>
         </Switch>
       </Col>
     </Row>
   );
-};
-
-interface FormValues {
-  all: {
-    unassigned: Student[];
-    rooms: Room[];
-  };
-}
-
-const DNDForm = reduxForm({
-  form: 'student-dnd',
-})(StudentDNDForm);
-
-const AssignSeating: React.FC = () => {
-  const { examId } = useParams();
-  return (
-    <p>
-      TODO
-      {examId}
-    </p>
-  );
-  // const response = useRoomsIndex(examId, [refresher]);
-  // switch (response.type) {
-  //   case 'ERROR':
-  //     return <p className="text-danger">{response.text}</p>;
-  //   case 'LOADING':
-  //     return <p>Loading...</p>;
-  //   case 'RESULT':
-  //     return (
-  //       <Loaded
-  //         sections={response.response.sections}
-  //         unassigned={response.response.unassigned}
-  //         rooms={response.response.rooms}
-  //       />
-  //     );
-  //   default:
-  //     throw new ExhaustiveSwitchError(response);
 };
 
 export default AssignSeating;

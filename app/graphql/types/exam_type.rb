@@ -65,8 +65,10 @@ module Types
     end
 
     field :registrations_without_rooms, [Types::RegistrationType], null: false
+    field :proctor_registrations_without_rooms, [Types::ProctorRegistrationType], null: false
 
     field :unassigned_students, [Types::UserType], null: false
+    field :unassigned_staff, [Types::UserType], null: false
 
     field :my_registration, Types::RegistrationType, null: true
     def my_registration

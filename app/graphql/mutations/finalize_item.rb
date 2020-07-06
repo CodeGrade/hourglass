@@ -5,19 +5,33 @@ module Mutations
     field :exam, Types::ExamType, null: true
     field :errors, [String], null: false
 
-    # def authorized?(id:, **args)
-    #   reg = ProctorRegistration.find_by(
-    #     user: context[:current_user],
-    #     exam: registration.exam,
-    #   )
-    #   return true if reg
-    #   prof_reg = ProfessorCourseRegistration.find_by(
-    #     user: context[:current_user],
-    #     course: registration.exam.course,
-    #   )
-    #   return true if prof_reg
-    #   return false, { errors: ['You do not have permission.'] }
-    # end
+    def authorized?(id:, **args)
+      obj = HourglassSchema.object_from_id(id, context)
+      exam =
+        case obj
+        when Exam
+          obj
+        when ExamVersion
+          obj.exam
+        when Room
+          obj.exam
+        when Registration
+          obj.exam
+        else
+          return false, { errors: ['Invalid target.'] }
+        end
+      return true if ProctorRegistration.find_by(
+        user: context[:current_user],
+        exam: exam,
+      )
+
+      return true if ProfessorCourseRegistration.find_by(
+        user: context[:current_user],
+        course: exam.course,
+      )
+
+      [false, { errors: ['You do not have permission.'] }]
+    end
 
     def resolve(id:)
       obj = HourglassSchema.object_from_id(id, context)
@@ -49,7 +63,7 @@ module Mutations
       else
         {
           exam: nil,
-          errors: ['Invalid finalization target.']
+          errors: ['Invalid finalization target.'],
         }
       end
     end

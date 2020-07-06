@@ -2,7 +2,7 @@
 
 require 'test_helper'
 
-class ExamsControllerTest < ActionDispatch::IntegrationTest
+class FinalizationTest < ActionDispatch::IntegrationTest
   def setup
     @professor_course_registration = create(:professor_course_registration)
     @course = @professor_course_registration.course
@@ -12,8 +12,15 @@ class ExamsControllerTest < ActionDispatch::IntegrationTest
     @room = create(:room, exam: @exam)
     @registration = create(:registration, exam_version: @version, room: @room)
     @student = @registration.user
-    sign_in @prof
   end
+
+  FINALIZE_ITEM_QUERY = <<-GRAPHQL
+    mutation finalizeItem($input: FinalizeItemInput!) {
+      finalizeItem(input: $input) {
+        errors
+      }
+    }
+  GRAPHQL
 
   # TODO test all four 'already finalized' messages
   # TODO test invalid type
@@ -26,15 +33,11 @@ class ExamsControllerTest < ActionDispatch::IntegrationTest
     assert_not @version.finalized?
     assert_not @registration.final?
     assert_not @room.finalized?
-    post finalize_api_proctor_exam_path(@exam), as: :json, params: {
-      'target' => {
-        'type' => 'EXAM',
-        'id' => @exam.id,
-      },
-    }
-    assert_response :success
-    expected = { 'success' => true }
-    assert_equal expected, JSON.parse(response.body)
+    result = HourglassSchema.do_mutation!(FINALIZE_ITEM_QUERY, @prof, {
+      id: HourglassSchema.id_from_object(@exam, Types::ExamType, {}),
+    })
+
+    assert_equal [], result['data']['finalizeItem']['errors']
     @registration.reload
     @room.reload
     @version.reload
@@ -51,15 +54,11 @@ class ExamsControllerTest < ActionDispatch::IntegrationTest
     assert_not @version.finalized?
     assert_not @registration.final?
     assert_not @room.finalized?
-    post finalize_api_proctor_exam_path(@exam), as: :json, params: {
-      'target' => {
-        'type' => 'VERSION',
-        'id' => @version.id,
-      },
-    }
-    assert_response :success
-    expected = { 'success' => true }
-    assert_equal expected, JSON.parse(response.body)
+    result = HourglassSchema.do_mutation!(FINALIZE_ITEM_QUERY, @prof, {
+      id: HourglassSchema.id_from_object(@version, Types::ExamVersionType, {}),
+    })
+
+    assert_equal [], result['data']['finalizeItem']['errors']
     @registration.reload
     @room.reload
     @version.reload
@@ -72,15 +71,11 @@ class ExamsControllerTest < ActionDispatch::IntegrationTest
     # TODO students in different rooms
     assert_not @registration.final?
     assert_not @room.finalized?
-    post finalize_api_proctor_exam_path(@exam), as: :json, params: {
-      'target' => {
-        'type' => 'ROOM',
-        'id' => @room.id,
-      },
-    }
-    assert_response :success
-    expected = { 'success' => true }
-    assert_equal expected, JSON.parse(response.body)
+    result = HourglassSchema.do_mutation!(FINALIZE_ITEM_QUERY, @prof, {
+      id: HourglassSchema.id_from_object(@room, Types::RoomType, {}),
+    })
+
+    assert_equal [], result['data']['finalizeItem']['errors']
     @registration.reload
     @room.reload
     assert @registration.final?
@@ -89,15 +84,11 @@ class ExamsControllerTest < ActionDispatch::IntegrationTest
 
   test 'finalize user' do
     assert_not @registration.final?
-    post finalize_api_proctor_exam_path(@exam), as: :json, params: {
-      'target' => {
-        'type' => 'USER',
-        'id' => @student.id,
-      },
-    }
-    assert_response :success
-    expected = { 'success' => true }
-    assert_equal expected, JSON.parse(response.body)
+    result = HourglassSchema.do_mutation!(FINALIZE_ITEM_QUERY, @prof, {
+      id: HourglassSchema.id_from_object(@registration, Types::RegistrationType, {}),
+    })
+
+    assert_equal [], result['data']['finalizeItem']['errors']
     @registration.reload
     assert @registration.final?
   end

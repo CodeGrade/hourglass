@@ -4,41 +4,56 @@ import { useResponse as showVersion } from '@hourglass/common/api/professor/exam
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Editor from '@professor/exams/new/editor';
 import { useAlert } from '@hourglass/common/alerts';
+import { useQuery, graphql } from 'relay-hooks';
+import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
+import { ContentsState, Policy } from '@hourglass/workflows/student/exams/show/types';
 
 const EditExamVersion: React.FC = () => {
   const { versionId } = useParams();
-  const res = showVersion(versionId);
+  const realRes = useQuery<editVersionQuery>(
+    graphql`
+    query editVersionQuery($examVersionRailsId: Int!) {
+      examVersion(railsId: $examVersionRailsId) {
+        railsId
+        name
+        policies
+        contents
+        anyStarted
+      }
+    }
+    `,
+    {
+      examVersionRailsId: Number(versionId),
+    },
+  );
   useAlert(
     {
       variant: 'warning',
       title: 'Students have already started taking this version',
       message: 'Changing the questions will likely result in nonsensical answers, and changing the structure of this version will result in undefined behavior. Be careful!',
     },
-    res.type === 'RESULT' && res.response.anyStarted,
-    [res.type],
+    realRes.props?.examVersion?.anyStarted,
+    [realRes.props?.examVersion?.anyStarted],
   );
-  switch (res.type) {
-    case 'ERROR':
-    case 'LOADING':
-      return <p>Loading...</p>;
-    case 'RESULT': {
-      const version = res.response;
-      if (!version) return <p>No such version.</p>;
-      return (
-        <Editor
-          exam={version.contents.exam}
-          answers={version.contents.answers}
-          railsExamVersion={{
-            name: version.name,
-            id: version.id,
-            policies: version.policies,
-          }}
-        />
-      );
-    }
-    default:
-      throw new ExhaustiveSwitchError(res);
+  if (realRes.error) {
+    throw realRes.error;
   }
+  if (!realRes.props) {
+    return <p>Loading...</p>;
+  }
+  const { examVersion } = realRes.props;
+  const parsedContents = JSON.parse(examVersion.contents) as ContentsState;
+  return (
+    <Editor
+      exam={parsedContents.exam}
+      answers={parsedContents.answers}
+      railsExamVersion={{
+        name: examVersion.name,
+        id: examVersion.railsId,
+        policies: examVersion.policies as readonly Policy[],
+      }}
+    />
+  );
 };
 
 export default EditExamVersion;

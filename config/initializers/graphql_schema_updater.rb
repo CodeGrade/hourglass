@@ -2,7 +2,7 @@ reloader = ActiveSupport::FileUpdateChecker.new([], {
   Rails.root.join('app/graphql/types').to_s => ['rb'],
   Rails.root.join('app/graphql/mutations').to_s => ['rb']
 }) do
-  write_schema!
+  HourglassSchema.write_json!
 end
 
 Rails.application.config.to_prepare do

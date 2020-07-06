@@ -18,6 +18,14 @@ module Types
       Exam.find(rails_id)
     end
 
+    field :exam_version, ExamVersionType, null: false do
+      argument :rails_id, Integer, required: true
+    end
+
+    def exam_version(rails_id:)
+      ExamVersion.find(rails_id)
+    end
+
     field :course, CourseType, null: false do
       argument :rails_id, Integer, required: true
     end

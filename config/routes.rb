@@ -14,7 +14,7 @@ Rails.application.routes.draw do
           resources :exams, param: 'exam_id', only: [:show] do
             member do
               resources :registrations, param: 'registration_id', only: [:index]
-              resources :versions, param: 'version_id', only: [:index, :show, :create, :update, :destroy] do
+              resources :versions, param: 'version_id', only: [:index, :create, :update, :destroy] do
                 collection do
                   post :import
                   post :update_all

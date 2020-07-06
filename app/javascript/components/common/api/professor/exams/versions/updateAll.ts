@@ -1,5 +1,4 @@
 import { hitApi } from '@hourglass/common/types/api';
-import { Student } from './index';
 
 export type Response = Good | Bad;
 
@@ -13,9 +12,9 @@ interface Bad {
 }
 
 interface Body {
-  unassigned: Array<Student['id']>;
+  unassigned: number[]; // student IDs
   versions: {
-    [versionId: number]: Array<Student['id']>;
+    [versionId: number]: number[]; // student IDs
   };
 }
 

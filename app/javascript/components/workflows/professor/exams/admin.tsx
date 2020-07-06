@@ -242,6 +242,7 @@ const PreFlightChecklist: React.FC<{
     fragment admin_checklist on Exam {
       ...admin_versionInfo
       ...accommodations_all
+      ...allocateVersions
       name
       checklist {
         rooms {
@@ -373,7 +374,7 @@ const PreFlightChecklist: React.FC<{
           </Tab.Pane>
           <Tab.Pane eventKey="versions">
             <ErrorBoundary>
-              <AllocateVersions />
+              <AllocateVersions examKey={res} />
             </ErrorBoundary>
           </Tab.Pane>
           <Tab.Pane eventKey="seating">

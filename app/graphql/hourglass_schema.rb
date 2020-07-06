@@ -53,6 +53,8 @@ class HourglassSchema < GraphQL::Schema
       Types::RoomAnnouncementType
     when Room
       Types::RoomType
+    when Section
+      Types::SectionType
     when StaffRegistration
       Types::StaffRegistrationType
     when User

@@ -15,5 +15,8 @@ module Types
 
     field :exams, [Types::ExamType], null: false
     delegate :exams, to: :object
+
+    field :sections, [Types::SectionType], null: false
+    delegate :sections, to: :object
   end
 end

@@ -14,5 +14,7 @@ jobs:
           node-version: 10
       - name: Install yarn packages
         run: yarn install --frozen-lockfile
+      - name: Compile relay queries
+        run: yarn run relay
       - name: Lint
         run: yarn lint

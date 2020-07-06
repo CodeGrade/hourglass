@@ -1,4 +1,4 @@
-name: Rails Tests
+name: CI
 on:
   push:
     branches: [ master ]
@@ -19,7 +19,15 @@ jobs:
       run: |
         nix-shell --run 'start_postgres'
         nix-shell --run 'rails db:setup'
+    - name: Write graphql schema file
+      run: nix-shell --run 'rails graphql:update_schema'
+    - name: Compile relay queries
+      run: nix-shell --run 'yarn run relay'
+    - name: Typecheck
+      run: nix-shell --run 'yarn run typecheck'
     - name: Lint factories
       run: nix-shell --run 'rails factory_bot:lint'
     - name: Run tests
       run: nix-shell --run 'rails test'
+    - name: Lint
+      run: nix-shell --run 'yarn run lint'

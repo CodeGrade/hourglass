@@ -1,12 +1,11 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useResponse as showVersion } from '@hourglass/common/api/professor/exams/versions/show';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import Editor from '@professor/exams/new/editor';
 import { useAlert } from '@hourglass/common/alerts';
 import { useQuery, graphql } from 'relay-hooks';
-import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
 import { ContentsState, Policy } from '@hourglass/workflows/student/exams/show/types';
+
+import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
 
 const EditExamVersion: React.FC = () => {
   const { versionId } = useParams();

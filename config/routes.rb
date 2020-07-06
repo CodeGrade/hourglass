@@ -13,7 +13,6 @@ Rails.application.routes.draw do
           post :sync
           resources :exams, param: 'exam_id', only: [:show] do
             member do
-              resources :registrations, param: 'registration_id', only: [:index]
               resources :versions, param: 'version_id', only: [:index, :create, :update, :destroy] do
                 collection do
                   post :import

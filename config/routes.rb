@@ -16,7 +16,6 @@ Rails.application.routes.draw do
               resources :versions, param: 'version_id', only: [:create, :update, :destroy] do
                 collection do
                   post :import
-                  post :update_all
                 end
                 member do
                   get :export_file

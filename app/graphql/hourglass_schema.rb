@@ -71,4 +71,10 @@ class HourglassSchema < GraphQL::Schema
       f.write(execute(GraphQL::Introspection::INTROSPECTION_QUERY).to_json)
     end
   end
+
+  def self.do_mutation!(mutation_query, user, input)
+    execute(mutation_query, context: { current_user: user }, variables: {
+      input: input,
+    })
+  end
 end

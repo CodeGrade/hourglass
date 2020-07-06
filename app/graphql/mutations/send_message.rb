@@ -5,6 +5,32 @@ module Mutations
 
     field :errors, [String], null: false
 
+    def authorized?(recipient_id:, **_args)
+      obj = HourglassSchema.object_from_id(recipient_id, context)
+      exam = case obj
+             when Exam
+               obj
+             when ExamVersion
+               obj.exam
+             when Room
+               obj.exam
+             when Registration
+               obj.exam
+             else
+               return false, { errors: ['Invalid recipient.'] }
+             end
+      return true if ProctorRegistration.find_by(
+        user: context[:current_user],
+        exam: exam,
+      )
+      return true if ProfessorCourseRegistration.find_by(
+        user: context[:current_user],
+        course: exam.course,
+      )
+
+      [false, { errors: ['You do not have permission.'] }]
+    end
+
     def resolve(recipient_id:, message:)
       obj = HourglassSchema.object_from_id(recipient_id, context)
       case obj

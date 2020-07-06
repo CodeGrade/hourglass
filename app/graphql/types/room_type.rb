@@ -8,6 +8,8 @@ module Types
 
     # field :exam_id, Integer, null: false
     field :name, String, null: false
+    field :registrations, [Types::RegistrationType], null: false
+    field :proctor_registrations, [Types::ProctorRegistrationType], null: false
     # field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     # field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
   end

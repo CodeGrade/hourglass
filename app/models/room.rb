@@ -2,8 +2,8 @@
 
 class Room < ApplicationRecord
   belongs_to :exam
-  has_many :registrations, dependent: :destroy
-  has_many :proctor_registrations, dependent: :destroy
+  has_many :registrations, dependent: :restrict_with_error
+  has_many :proctor_registrations, dependent: :restrict_with_error
   has_many :room_announcements, dependent: :destroy
 
   validates :exam, presence: true
@@ -23,9 +23,5 @@ class Room < ApplicationRecord
 
   def has_registrations?
     registrations.exists?
-  end
-
-  def has_users?
-    has_staff? || has_registrations?
   end
 end

@@ -64,6 +64,8 @@ module Types
       object.registrations.without_accommodation
     end
 
+    field :registrations_without_rooms, [Types::RegistrationType], null: false
+
     field :unassigned_students, [Types::UserType], null: false
 
     field :my_registration, Types::RegistrationType, null: true

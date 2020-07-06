@@ -476,7 +476,6 @@ const DND: React.FC<{
   const {
     examKey,
   } = props;
-  const { examId } = useParams();
   const res = useFragment(
     graphql`
     fragment assignStaff on Exam {

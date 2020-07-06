@@ -243,6 +243,7 @@ const PreFlightChecklist: React.FC<{
       ...admin_versionInfo
       ...accommodations_all
       ...allocateVersions
+      ...roomsIndex
       name
       checklist {
         rooms {
@@ -364,7 +365,7 @@ const PreFlightChecklist: React.FC<{
           </Tab.Pane>
           <Tab.Pane eventKey="rooms">
             <ErrorBoundary>
-              <EditExamRooms />
+              <EditExamRooms examKey={res} />
             </ErrorBoundary>
           </Tab.Pane>
           <Tab.Pane eventKey="staff">

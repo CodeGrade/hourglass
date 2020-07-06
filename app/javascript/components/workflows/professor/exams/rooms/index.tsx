@@ -1,13 +1,10 @@
 import React, { useCallback, useMemo, useContext } from 'react';
-import { Room, useResponse as indexRooms } from '@hourglass/common/api/professor/rooms/index';
-import { updateAll, Body } from '@hourglass/common/api/professor/rooms/updateAllRooms';
 import {
   useParams,
   useHistory,
   Switch,
   Route,
 } from 'react-router-dom';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   Button,
   Form,
@@ -31,56 +28,45 @@ import { Provider } from 'react-redux';
 import store from '@hourglass/common/student-dnd/store';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
-import { useTabRefresher, TabEditButton } from '@professor/exams/admin';
+import { TabEditButton } from '@professor/exams/admin';
+import { useMutation, graphql, useFragment } from 'relay-hooks';
 
-const EditExamRooms: React.FC = () => {
-  const { examId } = useParams();
-  const [refresher] = useTabRefresher('rooms');
-  const response = indexRooms(examId, [refresher]);
-  switch (response.type) {
-    case 'ERROR':
-      return <p className="text-danger">{response.status}</p>;
-    case 'LOADING':
-      return <p>Loading...</p>;
-    case 'RESULT':
-      return <Loaded rooms={response.response.rooms} />;
-    default:
-      throw new ExhaustiveSwitchError(response);
-  }
-};
+import { roomsIndex, roomsIndex$key } from './__generated__/roomsIndex.graphql';
+import { roomsUpdateMutation } from './__generated__/roomsUpdateMutation.graphql';
 
-export default EditExamRooms;
-
-function createInitialValues(rooms: Room[]): FormValues {
-  return {
-    rooms: rooms.map(({
-      name,
-      id,
-      students,
-      proctors,
-    }) => ({
-      name,
-      id,
-      numRegs: students.length + proctors.length,
-    })),
-  };
-}
-
-const Loaded: React.FC<{
-  rooms: Room[];
+const EditExamRooms: React.FC<{
+  examKey: roomsIndex$key;
 }> = (props) => {
   const {
-    rooms,
+    examKey,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment roomsIndex on Exam {
+      id
+      rooms {
+        id
+        name
+        registrations {
+          id
+        }
+        proctorRegistrations {
+          id
+        }
+      }
+    }
+    `,
+    examKey,
+  );
   return (
     <Row>
       <Col>
         <Switch>
           <Route path="/exams/:examId/admin/rooms/edit">
-            <Editable rooms={rooms} />
+            <Editable examId={res.id} rooms={res.rooms} />
           </Route>
           <Route>
-            <Readonly rooms={rooms} />
+            <Readonly rooms={res.rooms} />
           </Route>
         </Switch>
       </Col>
@@ -88,16 +74,36 @@ const Loaded: React.FC<{
   );
 };
 
+export default EditExamRooms;
+
+function createInitialValues(rooms: roomsIndex['rooms']): FormValues {
+  return {
+    rooms: rooms.map(({
+      name,
+      id,
+      registrations,
+      proctorRegistrations,
+    }) => ({
+      name,
+      id,
+      hasRegs: registrations.length + proctorRegistrations.length !== 0,
+    })),
+  };
+}
+
 const Editable: React.FC<{
-  rooms: Room[];
+  examId: string;
+  rooms: roomsIndex['rooms'];
 }> = (props) => {
   const {
+    examId,
     rooms,
   } = props;
   const initialValues = useMemo(() => createInitialValues(rooms), [rooms]);
   return (
     <Provider store={store}>
       <EditExamRoomsForm
+        examId={examId}
         initialValues={initialValues}
       />
     </Provider>
@@ -105,7 +111,7 @@ const Editable: React.FC<{
 };
 
 const Readonly: React.FC<{
-  rooms: Room[];
+  rooms: roomsIndex['rooms'];
 }> = (props) => {
   const {
     rooms,
@@ -148,33 +154,37 @@ const EditRoomName: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
-const renderRoom = (member: string, index: number, fields: FieldArrayFieldsProps<FormRoom>) => (
-  <FormSection
-    name={member}
-    key={index}
-  >
-    <li className="list-unstyled">
-      <Form.Group as={Row}>
-        <Col className="d-flex">
-          <Field name="name" component={EditRoomName} />
-          <TooltipButton
-            variant="danger"
-            onClick={() => fields.remove(index)}
-            disabled={fields.get(index).numRegs !== 0}
-            disabledMessage="This room has registered users."
-            size="lg"
-            className="text-nowrap ml-2"
-          >
-            <Icon I={FaTrash} />
-            <span className="ml-1">
-              Delete
-            </span>
-          </TooltipButton>
-        </Col>
-      </Form.Group>
-    </li>
-  </FormSection>
-);
+const renderRoom = (member: string, index: number, fields: FieldArrayFieldsProps<FormRoom>) => {
+  const current = fields.get(index);
+  const disabled = 'hasRegs' in current && current.hasRegs;
+  return (
+    <FormSection
+      name={member}
+      key={index}
+    >
+      <li className="list-unstyled">
+        <Form.Group as={Row}>
+          <Col className="d-flex">
+            <Field name="name" component={EditRoomName} />
+            <TooltipButton
+              variant="danger"
+              onClick={() => fields.remove(index)}
+              disabled={disabled}
+              disabledMessage="This room has registered users."
+              size="lg"
+              className="text-nowrap ml-2"
+            >
+              <Icon I={FaTrash} />
+              <span className="ml-1">
+                Delete
+              </span>
+            </TooltipButton>
+          </Col>
+        </Form.Group>
+      </li>
+    </FormSection>
+  );
+};
 
 const ShowRooms: React.FC<WrappedFieldArrayProps<FormRoom>> = (props) => {
   const {
@@ -183,7 +193,6 @@ const ShowRooms: React.FC<WrappedFieldArrayProps<FormRoom>> = (props) => {
   const addRoom = useCallback(() => {
     fields.push({
       name: '',
-      numRegs: 0,
     });
   }, [fields]);
   return (
@@ -205,18 +214,26 @@ const ShowRooms: React.FC<WrappedFieldArrayProps<FormRoom>> = (props) => {
   );
 };
 
+interface RoomUpdate {
+  roomId: string;
+  name: string;
+}
+
+interface Body {
+  updatedRooms: RoomUpdate[];
+  deletedRoomIds: string[];
+  newRooms: string[];
+}
+
 function transformForSubmit(initValues: Partial<FormValues>, values: FormValues): Body {
   const { rooms } = values;
   const { rooms: initRooms } = initValues;
-  const updatedRooms: {
-    id: number;
-    name: string;
-  }[] = rooms.reduce((acc, room) => {
-    if (room.id !== undefined) {
+  const updatedRooms: RoomUpdate[] = rooms.reduce((acc, room) => {
+    if ('id' in room) {
       return [
         ...acc,
         {
-          id: room.id,
+          roomId: room.id,
           name: room.name,
         },
       ];
@@ -224,46 +241,90 @@ function transformForSubmit(initValues: Partial<FormValues>, values: FormValues)
     return acc;
   }, []);
   const newRooms = rooms.filter((r) => !('id' in r));
-  const deletedRooms = initRooms.filter((ir) => !rooms.find((r) => r.id === ir.id));
+  const deletedRooms = initRooms.filter<FormChangedRoom>((ir): ir is FormChangedRoom => {
+    if (!('id' in ir)) {
+      return false;
+    }
+    return !rooms.find((r) => {
+      if (!('id' in r)) {
+        return false;
+      }
+      return r.id === ir.id;
+    });
+  });
   return {
     updatedRooms,
     newRooms: newRooms.map((r) => r.name),
-    deletedRooms: deletedRooms.map((r) => r.id),
+    deletedRoomIds: deletedRooms.map((r) => r.id),
   };
 }
 
-const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
+interface ExamRoomsFormExtraProps {
+  examId: string;
+}
+
+const ExamRoomsForm: React.FC<
+  InjectedFormProps<FormValues, ExamRoomsFormExtraProps> & ExamRoomsFormExtraProps
+> = (props) => {
   const {
+    examId,
     pristine,
     reset,
     handleSubmit,
     initialValues,
   } = props;
-  const { examId } = useParams();
+  const { examId: examRailsId } = useParams();
   const { alert } = useContext(AlertContext);
   const history = useHistory();
   const cancel = useCallback(() => {
     history.goBack();
   }, [history]);
+  const [mutate, { loading }] = useMutation<roomsUpdateMutation>(
+    graphql`
+    mutation roomsUpdateMutation($input: UpdateExamRoomsInput!) {
+      updateExamRooms(input: $input) {
+        exam {
+          ...admin_checklist
+        }
+      }
+    }
+    `,
+    {
+      onCompleted: () => {
+        history.push(`/exams/${examRailsId}/admin/rooms`);
+        alert({
+          variant: 'success',
+          autohide: true,
+          message: 'Rooms saved successfully.',
+        });
+      },
+      onError: (errs) => {
+        alert({
+          autohide: true,
+          variant: 'danger',
+          title: 'Failed saving rooms.',
+          message: errs[0]?.message,
+        });
+      },
+    },
+  );
   return (
     <form
       onSubmit={handleSubmit((values) => {
-        const body = transformForSubmit(initialValues, values);
-        updateAll(examId, body).then((res) => {
-          if (res.created === false) throw new Error(res.reason);
-          history.push(`/exams/${examId}/admin/rooms`);
-          alert({
-            variant: 'success',
-            autohide: true,
-            message: 'Rooms saved successfully.',
-          });
-        }).catch((err) => {
-          alert({
-            autohide: true,
-            variant: 'danger',
-            title: 'Failed saving rooms.',
-            message: err.message,
-          });
+        const {
+          updatedRooms,
+          newRooms,
+          deletedRoomIds,
+        } = transformForSubmit(initialValues, values);
+        mutate({
+          variables: {
+            input: {
+              examId,
+              updatedRooms,
+              newRooms,
+              deletedRoomIds,
+            },
+          },
         });
       })}
     >
@@ -271,6 +332,7 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
         Edit Rooms
         <span className="float-right">
           <Button
+            disabled={loading}
             className={pristine ? 'd-none' : ''}
             variant="danger"
             onClick={reset}
@@ -278,6 +340,7 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
             Reset
           </Button>
           <Button
+            disabled={loading}
             className="ml-2"
             variant="secondary"
             onClick={cancel}
@@ -285,6 +348,7 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
             Cancel
           </Button>
           <Button
+            disabled={loading}
             className="ml-2"
             variant="primary"
             type="submit"
@@ -298,16 +362,22 @@ const ExamRoomsForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   );
 };
 
-interface FormRoom {
-  id?: number;
+interface FormNewRoom {
   name: string;
-  numRegs: number;
 }
+
+interface FormChangedRoom {
+  name: string;
+  id: string;
+  hasRegs: boolean;
+}
+
+type FormRoom = FormChangedRoom | FormNewRoom;
 
 interface FormValues {
   rooms: FormRoom[];
 }
 
-const EditExamRoomsForm = reduxForm({
+const EditExamRoomsForm = reduxForm<FormValues, ExamRoomsFormExtraProps>({
   form: 'room-editor',
 })(ExamRoomsForm);

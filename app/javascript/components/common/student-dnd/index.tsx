@@ -18,22 +18,33 @@ import {
 import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
 import {
-  useResponse as useRoomsIndex,
-  Student,
-  Room,
-  Section,
-} from '@hourglass/common/api/professor/rooms';
-import { updateAll } from '@hourglass/common/api/professor/rooms/updateAll';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import {
   useHistory,
   useParams,
   Route,
   Switch,
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import { useTabRefresher, TabEditButton } from '@hourglass/workflows/professor/exams/admin';
+import { TabEditButton } from '@hourglass/workflows/professor/exams/admin';
 import '@professor/exams/list-columns.scss';
+
+interface Section {
+  id: number;
+  title: string;
+  students: Student[];
+}
+
+interface Student {
+  id: number;
+  username: string;
+  displayName: string;
+}
+
+interface Room {
+  id: number;
+  name: string;
+  students: Student[];
+  proctors: Student[];
+}
 
 interface FormContextType {
   sections: Section[];
@@ -244,21 +255,21 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           unassigned: all.unassigned.map((s) => s.id),
           rooms,
         };
-        updateAll(examId, body).then((result) => {
-          if (result.created === false) throw new Error(result.reason);
-          history.push(`/exams/${examId}/admin/seating`);
-          alert({
-            variant: 'success',
-            autohide: true,
-            message: 'Room assignments successfully created.',
-          });
-        }).catch((e) => {
-          alert({
-            variant: 'danger',
-            title: 'Room assignments not created.',
-            message: e.message,
-          });
-        });
+        // updateAll(examId, body).then((result) => {
+        //   if (result.created === false) throw new Error(result.reason);
+        //   history.push(`/exams/${examId}/admin/seating`);
+        //   alert({
+        //     variant: 'success',
+        //     autohide: true,
+        //     message: 'Room assignments successfully created.',
+        //   });
+        // }).catch((e) => {
+        //   alert({
+        //     variant: 'danger',
+        //     title: 'Room assignments not created.',
+        //     message: e.message,
+        //   });
+        // });
       })}
     >
       <FormSection name="all">
@@ -426,24 +437,28 @@ const DNDForm = reduxForm({
 
 const AssignSeating: React.FC = () => {
   const { examId } = useParams();
-  const [refresher] = useTabRefresher('seating');
-  const response = useRoomsIndex(examId, [refresher]);
-  switch (response.type) {
-    case 'ERROR':
-      return <p className="text-danger">{response.text}</p>;
-    case 'LOADING':
-      return <p>Loading...</p>;
-    case 'RESULT':
-      return (
-        <Loaded
-          sections={response.response.sections}
-          unassigned={response.response.unassigned}
-          rooms={response.response.rooms}
-        />
-      );
-    default:
-      throw new ExhaustiveSwitchError(response);
-  }
+  return (
+    <p>
+      TODO
+      {examId}
+    </p>
+  );
+  // const response = useRoomsIndex(examId, [refresher]);
+  // switch (response.type) {
+  //   case 'ERROR':
+  //     return <p className="text-danger">{response.text}</p>;
+  //   case 'LOADING':
+  //     return <p>Loading...</p>;
+  //   case 'RESULT':
+  //     return (
+  //       <Loaded
+  //         sections={response.response.sections}
+  //         unassigned={response.response.unassigned}
+  //         rooms={response.response.rooms}
+  //       />
+  //     );
+  //   default:
+  //     throw new ExhaustiveSwitchError(response);
 };
 
 export default AssignSeating;

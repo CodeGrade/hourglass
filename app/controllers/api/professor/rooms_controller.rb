@@ -6,26 +6,6 @@ module Api
       before_action :find_exam_and_course
       before_action :require_prof_reg
 
-      def index
-        render json: {
-          unassigned: @exam.registrations_without_rooms.includes(:user).map do |reg|
-            serialize_student reg.user
-          end,
-          rooms: @exam.rooms.includes(registrations: [:user], proctor_registrations: [:user]).map do |room|
-            serialize_room_regs room
-          end,
-          sections: @exam.course.sections.includes(:staff).map do |section|
-            {
-              id: section.id,
-              title: section.title,
-              students: section.registered_students_for(@exam).map do |student|
-                serialize_student student
-              end,
-            }
-          end,
-        }
-      end
-
       def staff_regs
         render json: {
           unassigned: @exam.unassigned_staff.map do |s|
@@ -47,31 +27,6 @@ module Api
             }
           end,
         }
-      end
-
-      def update_all_rooms
-        body = params.permit(deletedRooms: [], newRooms: [], updatedRooms: [:id, :name])
-        Room.transaction do
-          body[:deletedRooms].each do |id|
-            room = @exam.rooms.find_by!(id: id)
-            raise "'#{room.name}' has users. Please remove them before deleting it." if room.has_users?
-
-            room.destroy!
-          end
-
-          body[:updatedRooms].each do |r|
-            room = @exam.rooms.find_by!(id: r['id'])
-            room.update!(name: r['name'])
-          end
-
-          body[:newRooms].each do |name|
-            room = Room.create(exam: @exam, name: name)
-            room.save!
-          end
-        end
-        render json: { created: true }
-      rescue StandardError => e
-        render json: { created: false, reason: e.message }
       end
 
       def update_all

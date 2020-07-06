@@ -22,9 +22,8 @@ Rails.application.routes.draw do
                   get :export_archive
                 end
               end
-              resources :rooms, param: 'room_id', only: [:index] do
+              resources :rooms, param: 'room_id', only: [] do
                 collection do
-                  post :update_all_rooms
                   get :staff_regs
                   post :update_all_staff
                   post :update_all

@@ -22,13 +22,6 @@ Rails.application.routes.draw do
                   get :export_archive
                 end
               end
-              resources :rooms, param: 'room_id', only: [] do
-                collection do
-                  get :staff_regs
-                  post :update_all_staff
-                  post :update_all
-                end
-              end
             end
           end
         end

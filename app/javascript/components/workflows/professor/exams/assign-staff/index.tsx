@@ -18,26 +18,21 @@ import {
 import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
 import {
-  useResponse as useStaffRegs,
-  Student,
-  Room,
-  Section,
-} from '@hourglass/common/api/professor/rooms/staffRegs';
-import { updateAll } from '@hourglass/common/api/professor/rooms/updateAllStaff';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import {
   useHistory,
   useParams,
   Switch,
   Route,
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import Loading from '@hourglass/common/loading';
-import { useTabRefresher, TabEditButton } from '../admin';
+import { useFragment, graphql, useMutation } from 'relay-hooks';
+import { TabEditButton } from '../admin';
 import '../list-columns.scss';
 
+import { assignStaff, assignStaff$key } from './__generated__/assignStaff.graphql';
+import { assignStaffUpdateMutation } from './__generated__/assignStaffUpdateMutation.graphql';
+
 interface FormContextType {
-  sections: Section[];
+  sections: assignStaff['course']['sections'];
 }
 
 const FormContext = React.createContext<FormContextType>({
@@ -45,6 +40,11 @@ const FormContext = React.createContext<FormContextType>({
 });
 
 type ItemTypes = DropStudent;
+
+interface Student {
+  id: string;
+  displayName: string;
+}
 
 interface DropStudent {
   type: 'STUDENT';
@@ -148,11 +148,19 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
   );
 };
 
-interface RoomsProps {
-  addSectionToRoom: (section: Section, roomId: number) => void;
+type Section = assignStaff['course']['sections'][number];
+
+interface FormRoom {
+  id: string;
+  name: string;
+  proctors: Student[];
 }
 
-const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
+interface RoomsProps {
+  addSectionToRoom: (section: Section, roomId: string) => void;
+}
+
+const Rooms: React.FC<WrappedFieldArrayProps<FormRoom> & RoomsProps> = (props) => {
   const {
     fields,
     addSectionToRoom,
@@ -199,27 +207,34 @@ const Rooms: React.FC<WrappedFieldArrayProps<Room> & RoomsProps> = (props) => {
   );
 };
 
-const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
+interface StaffSeatingFormExtraProps {
+  examId: string;
+}
+
+const StaffSeatingForm: React.FC<
+  InjectedFormProps<FormValues, StaffSeatingFormExtraProps> & StaffSeatingFormExtraProps
+> = (props) => {
   const {
+    examId,
     handleSubmit,
     reset,
     pristine,
     change,
   } = props;
-  const { examId } = useParams();
-  const addSectionToRoom = (section: Section, roomId: number): void => {
+  const { examId: examRailsId } = useParams();
+  const addSectionToRoom = (section: Section, roomId: string): void => {
     change('all', ({ unassigned, rooms }) => ({
       unassigned: unassigned.filter((unassignedStudent: Student) => (
-        !section.students.find((student) => student.id === unassignedStudent.id)
+        !section.staff.find((student) => student.id === unassignedStudent.id)
       )),
-      rooms: rooms.map((room: Room) => {
-        const filtered = room.proctors.filter((roomStudent) => (
-          !section.students.find((student) => student.id === roomStudent.id)
+      rooms: rooms.map((room: FormRoom) => {
+        const filtered = room.proctors.filter((user) => (
+          !section.staff.find((student) => student.id === user.id)
         ));
         if (room.id === roomId) {
           return {
             ...room,
-            proctors: filtered.concat(section.students),
+            proctors: filtered.concat(section.staff),
           };
         }
         return {
@@ -234,32 +249,56 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const cancel = useCallback(() => {
     history.goBack();
   }, [history]);
+  const [mutate, { loading }] = useMutation<assignStaffUpdateMutation>(
+    graphql`
+    mutation assignStaffUpdateMutation($input: UpdateStaffSeatingInput!) {
+      updateStaffSeating(input: $input) {
+        exam {
+          ...admin_checklist
+        }
+      }
+    }
+    `,
+    {
+      onCompleted: () => {
+        history.push(`/exams/${examRailsId}/admin/staff`);
+        alert({
+          autohide: true,
+          variant: 'success',
+          message: 'Room assignments successfully created.',
+        });
+      },
+      onError: (errs) => {
+        alert({
+          variant: 'danger',
+          title: 'Room assignments not created.',
+          message: errs[0]?.message,
+        });
+      },
+    },
+  );
   return (
     <form
       onSubmit={handleSubmit(({ all }) => {
-        const rooms = {};
+        const rooms: {
+          roomId: string;
+          proctorIds: string[];
+        }[] = [];
         all.rooms.forEach((room) => {
-          rooms[room.id] = room.proctors.map((s) => s.id);
+          rooms.push({
+            roomId: room.id,
+            proctorIds: room.proctors.map((u) => u.id),
+          });
         });
-        const body = {
-          unassigned: all.unassigned.map((s) => s.id),
-          proctors: all.proctors.map((s) => s.id),
-          rooms,
-        };
-        updateAll(examId, body).then((result) => {
-          if (result.created === false) throw new Error(result.reason);
-          history.push(`/exams/${examId}/admin/staff`);
-          alert({
-            autohide: true,
-            variant: 'success',
-            message: 'Room assignments successfully created.',
-          });
-        }).catch((e) => {
-          alert({
-            variant: 'danger',
-            title: 'Room assignments not created.',
-            message: e.message,
-          });
+        mutate({
+          variables: {
+            input: {
+              examId,
+              unassignedProctorIds: all.unassigned.map((s) => s.id),
+              proctorsWithoutRoomIds: all.proctors.map((s) => s.id),
+              proctorRegistrationUpdates: rooms,
+            },
+          },
         });
       })}
     >
@@ -268,6 +307,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           Edit Staff Registrations
           <span className="float-right">
             <Button
+              disabled={loading}
               variant="danger"
               className={pristine && 'd-none'}
               onClick={reset}
@@ -275,6 +315,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               Reset
             </Button>
             <Button
+              disabled={loading}
               variant="secondary"
               className="ml-2"
               onClick={cancel}
@@ -282,6 +323,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               Cancel
             </Button>
             <Button
+              disabled={loading}
               variant="primary"
               className="ml-2"
               type="submit"
@@ -314,25 +356,27 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
 
 interface FormValues {
   all: {
-    unassigned: Student[];
-    proctors: Student[];
-    rooms: Room[];
+    unassigned: readonly Student[];
+    proctors: readonly Student[];
+    rooms: FormRoom[];
   };
 }
 
-const DNDForm = reduxForm({
+const DNDForm = reduxForm<FormValues, StaffSeatingFormExtraProps>({
   form: 'staff-dnd',
-})(StudentDNDForm);
+})(StaffSeatingForm);
 
 interface StaffAssignmentProps {
-  sections: Section[];
-  unassigned: Student[];
-  proctors: Student[];
-  rooms: Room[];
+  examId: string;
+  sections: assignStaff['course']['sections'];
+  unassigned: assignStaff['unassignedStaff'];
+  proctors: assignStaff['proctorRegistrationsWithoutRooms'];
+  rooms: assignStaff['rooms'];
 }
 
 const Editable: React.FC<StaffAssignmentProps> = (props) => {
   const {
+    examId,
     sections,
     unassigned,
     proctors,
@@ -342,11 +386,16 @@ const Editable: React.FC<StaffAssignmentProps> = (props) => {
     <Provider store={store}>
       <FormContext.Provider value={{ sections }}>
         <DNDForm
+          examId={examId}
           initialValues={{
             all: {
               unassigned,
-              proctors,
-              rooms,
+              proctors: proctors.map((p) => p.user),
+              rooms: rooms.map((r) => ({
+                id: r.id,
+                name: r.name,
+                proctors: r.proctorRegistrations.map((p) => p.user),
+              })),
             },
           }}
         />
@@ -391,8 +440,8 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
           ) : (
             <ul className="list-unstyled column-count-4">
               {proctors.map((s) => (
-                <li key={s.id} className="fixed-col-width">
-                  <span>{s.displayName}</span>
+                <li key={s.user.id} className="fixed-col-width">
+                  <span>{s.user.displayName}</span>
                 </li>
               ))}
             </ul>
@@ -403,13 +452,13 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
         <Form.Group key={r.id}>
           <h3>{r.name}</h3>
           <div className="border px-2 flex-fill rounded">
-            {r.proctors.length === 0 ? (
+            {r.proctorRegistrations.length === 0 ? (
               <p>No proctors</p>
             ) : (
               <ul className="list-unstyled column-count-4">
-                {r.proctors.map((p) => (
-                  <li key={p.id} className="fixed-col-width">
-                    <span>{p.displayName}</span>
+                {r.proctorRegistrations.map((p) => (
+                  <li key={p.user.id} className="fixed-col-width">
+                    <span>{p.user.displayName}</span>
                   </li>
                 ))}
               </ul>
@@ -421,61 +470,96 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
   );
 };
 
-const Loaded: React.FC<StaffAssignmentProps> = (props) => {
+const DND: React.FC<{
+  examKey: assignStaff$key;
+}> = (props) => {
   const {
-    sections,
-    unassigned,
-    proctors,
-    rooms,
+    examKey,
   } = props;
+  const { examId } = useParams();
+  const res = useFragment(
+    graphql`
+    fragment assignStaff on Exam {
+      id
+      unassignedStaff {
+        id
+        displayName
+      }
+      rooms {
+        id
+        name
+        proctorRegistrations {
+          id
+          user {
+            id
+            displayName
+          }
+        }
+      }
+      course {
+        sections {
+          id
+          title
+          staff {
+            id
+            displayName
+          }
+        }
+      }
+      proctorRegistrationsWithoutRooms {
+        user {
+          id
+          displayName
+        }
+      }
+    }
+    `,
+    examKey,
+  );
   return (
     <Row>
       <Col>
         <Switch>
           <Route path="/exams/:examId/admin/staff/edit">
             <Editable
-              sections={sections}
-              unassigned={unassigned}
-              proctors={proctors}
-              rooms={rooms}
+              examId={res.id}
+              sections={res.course.sections}
+              unassigned={res.unassignedStaff}
+              proctors={res.proctorRegistrationsWithoutRooms}
+              rooms={res.rooms}
             />
           </Route>
           <Route>
             <Readonly
-              sections={sections}
-              unassigned={unassigned}
-              proctors={proctors}
-              rooms={rooms}
+              examId={res.id}
+              sections={res.course.sections}
+              unassigned={res.unassignedStaff}
+              proctors={res.proctorRegistrationsWithoutRooms}
+              rooms={res.rooms}
             />
           </Route>
         </Switch>
       </Col>
     </Row>
   );
-};
-
-const DND: React.FC = () => {
-  const { examId } = useParams();
-  const [refresher] = useTabRefresher('staff');
-  const response = useStaffRegs(examId, [refresher]);
-  switch (response.type) {
-    case 'ERROR':
-      return <p className="text-danger">{`${response.text} (${response.status})`}</p>;
-    case 'LOADING':
-    case 'RESULT':
-      return (
-        <Loading loading={response.type === 'LOADING'}>
-          <Loaded
-            sections={response.type === 'LOADING' ? [] : response.response.sections}
-            unassigned={response.type === 'LOADING' ? [] : response.response.unassigned}
-            proctors={response.type === 'LOADING' ? [] : response.response.proctors}
-            rooms={response.type === 'LOADING' ? [] : response.response.rooms}
-          />
-        </Loading>
-      );
-    default:
-      throw new ExhaustiveSwitchError(response);
-  }
+  // switch (response.type) {
+  //   case 'ERROR':
+  //     return <p className="text-danger">{`${response.text} (${response.status})`}</p>;
+  //   case 'LOADING':
+  //   case 'RESULT':
+  //     return (
+  //       <Loading loading={response.type === 'LOADING'}>
+  //         <Loaded
+  //           sections={response.type === 'LOADING' ? [] : response.response.sections}
+  //           unassigned={response.type === 'LOADING' ? [] : response.response.unassigned}
+  //           proctors={response.type === 'LOADING' ? [] : response.response.proctors}
+  //           rooms={response.type === 'LOADING' ? [] : response.response.rooms}
+  //         />
+  //       </Loading>
+  //     );
+  //   default:
+  //     throw new ExhaustiveSwitchError(response);
+  // }
 };
 
 export default DND;

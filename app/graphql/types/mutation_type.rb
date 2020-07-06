@@ -1,5 +1,7 @@
 module Types
   class MutationType < Types::BaseObject
+    field :update_student_seating, mutation: Mutations::UpdateStudentSeating
+    field :update_staff_seating, mutation: Mutations::UpdateStaffSeating
     field :update_exam_rooms, mutation: Mutations::UpdateExamRooms
     field :update_version_registrations, mutation: Mutations::UpdateVersionRegistrations
     field :destroy_accommodation, mutation: Mutations::DestroyAccommodation

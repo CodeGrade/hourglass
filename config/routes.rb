@@ -2,10 +2,9 @@
 
 Rails.application.routes.draw do
   mount ActionCable.server => '/cable'
-  post "/graphql", to: "graphql#execute"
-  if Rails.env.development?
-    get "/graphiql", to: "graphql#graphiql"
-  end
+  post '/graphql', to: 'graphql#execute'
+  get '/graphiql', to: 'graphql#graphiql' if Rails.env.development?
+
   namespace :api do
     namespace :professor do
       resources :courses, shallow: true, param: 'course_id', only: [] do

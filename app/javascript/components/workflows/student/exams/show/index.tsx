@@ -9,6 +9,7 @@ import {
   RailsUser,
   RailsRegistration,
   RailsCourse,
+  Policy,
 } from '@student/exams/show/types';
 import ExamTaker from '@student/exams/show/containers/ExamTaker';
 import ExamSubmitted from '@student/exams/show/components/ExamSubmitted';
@@ -133,7 +134,7 @@ const ShowExam: React.FC = () => {
         const railsExam: RailsExamVersion = {
           id: props.exam.railsId,
           name: props.exam.name,
-          policies: props.exam.myRegistration.examVersion.policies,
+          policies: props.exam.myRegistration.examVersion.policies as Policy[],
         };
         const railsRegistration: RailsRegistration = {
           id: props.exam.myRegistration.railsId,

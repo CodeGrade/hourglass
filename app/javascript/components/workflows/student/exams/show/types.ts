@@ -5,7 +5,7 @@ import { DateTime } from 'luxon';
 export interface RailsExamVersion {
   id: number;
   name: string;
-  readonly policies: Policy[];
+  policies: readonly Policy[];
 }
 
 export interface RailsExam {
@@ -632,16 +632,11 @@ export interface AnomalyListener {
   handler: (e: Event) => void;
 }
 
-/**
- * Security policies:
- * - `'ignore-lockdown'`: don't install anomaly handlers
- * - `'tolerate-windowed'`: allow the browser to not be fullscreen
- */
 export enum Policy {
-  ignoreLockdown = 'ignore-lockdown',
-  tolerateWindowed = 'tolerate-windowed',
+  ignoreLockdown = 'IGNORE_LOCKDOWN',
+  tolerateWindowed = 'TOLERATE_WINDOWED',
 }
 
-export function policyPermits(policy: Policy[], query: Policy): boolean {
+export function policyPermits(policy: readonly Policy[], query: Policy): boolean {
   return policy.find((p) => p === query) !== undefined;
 }

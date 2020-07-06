@@ -36,7 +36,7 @@ import {
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
-import { RailsExamVersion, ContentsState } from '@student/exams/show/types';
+import { RailsExamVersion, ContentsState, Policy } from '@student/exams/show/types';
 import { Editor as CodeMirrorEditor } from 'codemirror';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
@@ -694,7 +694,7 @@ const ShowVersion: React.FC<{
         </span>
         <div className="float-right">
           <DropdownButton
-            id={`version-${version.id}-export-button`}
+            id={`version-${res.id}-export-button`}
             className="d-inline-block mr-2"
             title="Export"
           >
@@ -747,7 +747,7 @@ const ShowVersion: React.FC<{
           railsExam={{
             id: examId,
             name: examName,
-            policies: res.policies,
+            policies: res.policies as Policy[],
           }}
           contents={JSON.parse(res.contents)}
         />

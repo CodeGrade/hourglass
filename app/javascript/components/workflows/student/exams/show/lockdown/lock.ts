@@ -5,7 +5,7 @@ import { isCovered, isFullscreen, openFullscreen } from './helpers';
  * Lock down the client browser.
  * @throws Error if lockdown fails
  */
-export default async function lock(policies: Policy[]): Promise<void> {
+export default async function lock(policies: readonly Policy[]): Promise<void> {
   if (policyPermits(policies, Policy.tolerateWindowed)) return;
 
   // browser detection

@@ -6,6 +6,7 @@ module.exports = {
   exclude: ['**/node_modules/**', '**/__mocks__/**', '**/__generated__/**'],
   extensions: ['ts', 'tsx'],
   language: 'typescript',
+  noFutureProofEnums: true,
   customScalars: {
     ISO8601DateTime: 'string',
   },

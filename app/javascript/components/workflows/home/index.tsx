@@ -119,8 +119,12 @@ const Home: React.FC = () => (
         }
         return (
           <>
-            <ShowRegistrations registrations={props.me.registrations.nodes} />
-            <ShowProfRegs professorCourseRegistrations={props.me.professorCourseRegistrations.nodes} />
+            <ShowRegistrations
+              registrations={props.me.registrations.nodes}
+            />
+            <ShowProfRegs
+              professorCourseRegistrations={props.me.professorCourseRegistrations.nodes}
+            />
           </>
         );
       }}

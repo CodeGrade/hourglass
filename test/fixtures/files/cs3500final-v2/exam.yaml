@@ -1,8 +1,8 @@
 {
   "info": {
     "policies": [
-      "ignore-lockdown",
-      "tolerate-windowed"
+      "IGNORE_LOCKDOWN",
+      "TOLERATE_WINDOWED"
     ],
     "answers": [
       [

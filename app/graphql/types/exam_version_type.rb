@@ -13,7 +13,7 @@ module Types
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
-    field :policies, [String], null: false
+    field :policies, [Types::LockdownPolicyType], null: false
     delegate :policies, to: :object
 
     field :any_started, Boolean, null: false

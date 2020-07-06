@@ -63,4 +63,10 @@ class HourglassSchema < GraphQL::Schema
       raise("Unexpected object: #{obj}")
     end
   end
+
+  def self.write_json!
+    File.open('app/javascript/relay/data/schema.json', 'w') do |f|
+      f.write(execute(GraphQL::Introspection::INTROSPECTION_QUERY).to_json)
+    end
+  end
 end

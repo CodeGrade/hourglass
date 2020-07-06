@@ -4,16 +4,18 @@ import {
   RecordSource,
   Store,
   Observable,
+  SubscribeFunction,
+  FetchFunction,
 } from 'relay-runtime';
 import { getCSRFToken } from '@hourglass/workflows/student/exams/show/helpers';
 import ActionCable from 'actioncable';
 import createHandler from 'graphql-ruby-client/dist/subscriptions/createHandler';
 
-function fetchQuery(
+const fetchQuery: FetchFunction = async (
   operation,
   variables,
-) {
-  return fetch('/graphql', {
+) => (
+  fetch('/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -23,8 +25,8 @@ function fetchQuery(
       query: operation.text,
       variables,
     }),
-  }).then((response) => response.json());
-}
+  }).then((response) => response.json())
+);
 
 const cable = ActionCable.createConsumer();
 
@@ -32,7 +34,7 @@ const subscriptionHandler = createHandler({
   cable,
 });
 
-const handleSubscribe = (operation, variables, cacheConfig) => (
+const handleSubscribe: SubscribeFunction = (operation, variables, cacheConfig) => (
   Observable.create((sink) => {
     subscriptionHandler(operation, variables, cacheConfig, {
       onNext: sink.next,

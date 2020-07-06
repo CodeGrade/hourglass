@@ -10,6 +10,7 @@
     "jsx": "preserve",
     "allowSyntheticDefaultImports": true,
     "baseUrl": "app/javascript/components",
+    "skipLibCheck": true,
     "paths": {
       "@hourglass/*": ["./*"],
       "@student/*": ["./workflows/student/*"],

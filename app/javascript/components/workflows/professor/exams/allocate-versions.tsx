@@ -245,7 +245,7 @@ const StudentDNDForm: React.FC<
     mutation allocateVersionsMutation($input: UpdateVersionRegistrationsInput!) {
       updateVersionRegistrations(input: $input) {
         exam {
-          ...allocateVersions
+          ...admin_checklist
         }
       }
     }

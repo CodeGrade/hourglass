@@ -17,14 +17,7 @@ import {
 } from 'redux-form';
 import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
-import {
-  useResponse as useVersionsIndex,
-  Version,
-  Section,
-  Student,
-} from '@hourglass/common/api/professor/exams/versions';
 import { updateAll } from '@hourglass/common/api/professor/exams/versions/updateAll';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   useHistory,
   useParams,
@@ -32,11 +25,18 @@ import {
   Route,
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import { useTabRefresher, TabEditButton } from './admin';
 import './list-columns.scss';
+import { useFragment, graphql } from 'relay-hooks';
+
+import { TabEditButton } from './admin';
+import { allocateVersions$key, allocateVersions } from './__generated__/allocateVersions.graphql';
+
+type Section = allocateVersions['course']['sections'][number];
+type Student = allocateVersions['unassignedStudents'][number];
+type Version = allocateVersions['examVersions'][number];
 
 interface FormContextType {
-  sections: Section[];
+  sections: readonly Section[];
 }
 
 const FormContext = React.createContext<FormContextType>({
@@ -133,7 +133,7 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
           return (
             <li
               className="mx-1 fixed-col-width"
-              key={`${member}-${student.id}`}
+              key={`${member}-${student.railsId}`}
             >
               <DraggableStudent
                 student={student}
@@ -162,22 +162,22 @@ const Versions: React.FC<WrappedFieldArrayProps<Version> & VersionsProps> = (pro
       {fields.map((member, index) => {
         const room = fields.get(index);
         return (
-          <Form.Group key={room.id}>
+          <Form.Group key={room.railsId}>
             <FormSection name={member}>
               <h3>
                 {room.name}
                 <span className="float-right">
                   <DropdownButton
                     title="Add entire section"
-                    id={`version-dnd-add-section-${room.id}`}
+                    id={`version-dnd-add-section-${room.railsId}`}
                     size="sm"
                     className="mb-2"
                   >
                     {sections.map((s) => (
                       <Dropdown.Item
-                        key={s.id}
+                        key={s.railsId}
                         onClick={(): void => {
-                          addSectionToVersion(s, room.id);
+                          addSectionToVersion(s, room.railsId);
                         }}
                       >
                         {s.title}
@@ -209,13 +209,13 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const addSectionToVersion = (section: Section, versionId: number): void => {
     change('all', ({ unassigned, versions }) => ({
       unassigned: unassigned.filter((unassignedStudent: Student) => (
-        !section.students.find((student) => student.id === unassignedStudent.id)
+        !section.students.find((student) => student.railsId === unassignedStudent.railsId)
       )),
       versions: versions.map((version: Version) => {
         const filtered = version.students.filter((versionStudent) => (
-          !section.students.find((student) => student.id === versionStudent.id)
+          !section.students.find((student) => student.railsId === versionStudent.railsId)
         ));
-        if (version.id === versionId) {
+        if (version.railsId === versionId) {
           return {
             ...version,
             students: filtered.concat(section.students),
@@ -238,10 +238,10 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
       onSubmit={handleSubmit(({ all }) => {
         const versions = {};
         all.versions.forEach((version) => {
-          versions[version.id] = version.students.map((s) => s.id);
+          versions[version.railsId] = version.students.map((s) => s.railsId);
         });
         const body = {
-          unassigned: all.unassigned.map((s) => s.id),
+          unassigned: all.unassigned.map((s) => s.railsId),
           versions,
         };
         updateAll(examId, body).then((result) => {
@@ -307,9 +307,9 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
 };
 
 interface VersionAssignmentProps {
-  sections: Section[];
-  unassigned: Student[];
-  versions: Version[];
+  sections: readonly Section[];
+  unassigned: readonly Student[];
+  versions: readonly Version[];
 }
 
 const Editable: React.FC<VersionAssignmentProps> = (props) => {
@@ -354,7 +354,7 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
             {unassigned.length === 0 ? (
               <p>No students</p>
             ) : unassigned.map((s) => (
-              <li key={s.id} className="fixed-col-width">
+              <li key={s.railsId} className="fixed-col-width">
                 <span>{s.displayName}</span>
               </li>
             ))}
@@ -362,7 +362,7 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
         </div>
       </Form.Group>
       {versions.map((v) => (
-        <Form.Group key={v.id}>
+        <Form.Group key={v.railsId}>
           <h3>{v.name}</h3>
           <div className="border px-2 flex-fill rounded">
             {v.students.length === 0 ? (
@@ -370,7 +370,7 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
             ) : (
               <ul className="list-unstyled column-count-4">
                 {v.students.map((s) => (
-                  <li key={s.id} className="fixed-col-width">
+                  <li key={s.railsId} className="fixed-col-width">
                     <span>{s.displayName}</span>
                   </li>
                 ))}
@@ -424,26 +424,51 @@ const DNDForm = reduxForm({
   form: 'version-dnd',
 })(StudentDNDForm);
 
-const DND: React.FC = () => {
-  const { examId } = useParams();
-  const [refresher] = useTabRefresher('versions');
-  const response = useVersionsIndex(examId, [refresher]);
-  switch (response.type) {
-    case 'ERROR':
-      return <p className="text-danger">{response.text}</p>;
-    case 'LOADING':
-      return <p>Loading...</p>;
-    case 'RESULT':
-      return (
-        <Loaded
-          sections={response.response.sections}
-          unassigned={response.response.unassigned}
-          versions={response.response.versions}
-        />
-      );
-    default:
-      throw new ExhaustiveSwitchError(response);
-  }
+const DND: React.FC<{
+  examKey: allocateVersions$key;
+}> = (props) => {
+  const {
+    examKey,
+  } = props;
+  const res = useFragment(
+    graphql`
+    fragment allocateVersions on Exam {
+      course {
+        sections {
+          railsId
+          title
+          students {
+            railsId
+            username
+            displayName
+          }
+        }
+      }
+      unassignedStudents {
+        railsId
+        username
+        displayName
+      }
+      examVersions {
+        railsId
+        name
+        students {
+          railsId
+          username
+          displayName
+        }
+      }
+    }
+    `,
+    examKey,
+  );
+  return (
+    <Loaded
+      sections={res.course.sections}
+      unassigned={res.unassignedStudents}
+      versions={res.examVersions}
+    />
+  );
 };
 
 export default DND;

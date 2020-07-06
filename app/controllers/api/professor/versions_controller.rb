@@ -14,28 +14,6 @@ module Api
         render json: @version.serialize
       end
 
-      def index
-        version_regs = @exam.registrations.group_by(&:exam_version)
-        render json: {
-          versions: @exam.exam_versions.map do |version|
-            regs = version_regs[version] || []
-            serialize_version_regs version, regs
-          end,
-          unassigned: @exam.unassigned_students.map do |s|
-            serialize_student s
-          end,
-          sections: @exam.course.sections.map do |section|
-            {
-              id: section.id,
-              title: section.title,
-              students: section.students.map do |student|
-                serialize_student student
-              end,
-            }
-          end,
-        }
-      end
-
       def update
         version = params[:version].permit!.to_h
         updated = @version.update!(
@@ -156,24 +134,6 @@ module Api
 
       def no_started_regs
         head :conflict if @version.any_started?
-      end
-
-      def serialize_student(user)
-        {
-          id: user.id,
-          displayName: user.display_name,
-          username: user.username,
-        }
-      end
-
-      def serialize_version_regs(version, regs)
-        {
-          id: version.id,
-          name: version.name,
-          students: regs.map(&:user).map do |s|
-            serialize_student s
-          end,
-        }
       end
     end
   end

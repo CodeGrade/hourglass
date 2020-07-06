@@ -16,6 +16,11 @@ module Types
     field :policies, [Types::LockdownPolicyType], null: false
     delegate :policies, to: :object
 
+    field :students, [Types::UserType], null: false
+    def students
+      object.users
+    end
+
     field :any_started, Boolean, null: false
     def any_started
       object.any_started?

@@ -64,6 +64,8 @@ module Types
       object.registrations.without_accommodation
     end
 
+    field :unassigned_students, [Types::UserType], null: false
+
     field :my_registration, Types::RegistrationType, null: true
     def my_registration
       object.registrations.find_by(user: context[:current_user])

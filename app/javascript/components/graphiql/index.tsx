@@ -1,22 +1,26 @@
 import * as React from 'react';
 
-import GraphiQL from 'graphiql';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import GraphiQL from 'graphiql/dist/index';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Fetcher } from 'graphiql/dist/components/GraphiQL';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import 'graphiql/graphiql.min.css';
+
 import { getCSRFToken } from '@hourglass/workflows/student/exams/show/helpers';
-// import './index.css';
 
 const URL = '/graphql';
 
-async function graphQLFetcher(graphQLParams: any) {
-  return fetch(URL, {
+const graphQLFetcher: Fetcher = async (graphQLParams) => (
+  fetch(URL, {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
       'X-CSRF-Token': getCSRFToken(),
     },
     body: JSON.stringify(graphQLParams),
-  }).then((response) => response.json());
-}
+  }).then((response) => response.json())
+);
 
 const defaultQuery = `
 {

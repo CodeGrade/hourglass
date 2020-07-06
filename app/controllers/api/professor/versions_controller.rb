@@ -73,45 +73,6 @@ module Api
         render json: {}
       end
 
-      def update_all
-        body = params.permit(versions: {}, unassigned: [])
-        body[:unassigned].each do |id|
-          user = @exam.course.students.find { |u| u.id == id }
-          raise "Invalid user ID requested (#{id})" if user.nil?
-
-          student_reg = @exam.registrations.find_by(user_id: id)
-          next unless student_reg
-
-          if student_reg.started?
-            raise "Cannot delete registration for '#{user.display_name}' since they have already started."
-          end
-
-          student_reg.destroy!
-        end
-        body[:versions].each do |version_id, student_ids|
-          student_ids.each do |id|
-            user = @exam.course.students.find { |u| u.id == id }
-            raise "Invalid user ID requested (#{id})" if user.nil?
-
-            student_reg = @exam.registrations.find_or_initialize_by(user: user)
-            next if student_reg.exam_version_id == version_id.to_i
-
-            raise "Cannot update already started student '#{user.display_name}'" if student_reg.started?
-
-            student_reg.exam_version_id = version_id
-            student_reg.save!
-          end
-        end
-        render json: {
-          created: true,
-        }
-      rescue StandardError => e
-        render json: {
-          created: false,
-          reason: e.message,
-        }
-      end
-
       def export_file
         fname = @version.name.gsub(/ /, '-') + '.json'
         send_data @version.export_json, type: :json, disposition: 'attachment', filename: fname

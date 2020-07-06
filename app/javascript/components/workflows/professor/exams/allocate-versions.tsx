@@ -17,7 +17,6 @@ import {
 } from 'redux-form';
 import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
-import { updateAll } from '@hourglass/common/api/professor/exams/versions/updateAll';
 import {
   useHistory,
   useParams,
@@ -26,10 +25,11 @@ import {
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import './list-columns.scss';
-import { useFragment, graphql } from 'relay-hooks';
+import { useFragment, graphql, useMutation } from 'relay-hooks';
 
 import { TabEditButton } from './admin';
 import { allocateVersions$key, allocateVersions } from './__generated__/allocateVersions.graphql';
+import { allocateVersionsMutation } from './__generated__/allocateVersionsMutation.graphql';
 
 type Section = allocateVersions['course']['sections'][number];
 type Student = allocateVersions['unassignedStudents'][number];
@@ -198,14 +198,21 @@ const Versions: React.FC<WrappedFieldArrayProps<Version> & VersionsProps> = (pro
   );
 };
 
-const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
+interface StudentDNDFormExtraProps {
+  examId: string;
+}
+
+const StudentDNDForm: React.FC<
+  InjectedFormProps<FormValues, StudentDNDFormExtraProps> & StudentDNDFormExtraProps
+> = (props) => {
   const {
+    examId,
     handleSubmit,
     reset,
     pristine,
     change,
   } = props;
-  const { examId } = useParams();
+  const { examId: examRailsId } = useParams();
   const addSectionToVersion = (section: Section, versionId: number): void => {
     change('all', ({ unassigned, versions }) => ({
       unassigned: unassigned.filter((unassignedStudent: Student) => (
@@ -233,31 +240,52 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
   const cancel = useCallback(() => {
     history.goBack();
   }, [history]);
+  const [mutate, { loading }] = useMutation<allocateVersionsMutation>(
+    graphql`
+    mutation allocateVersionsMutation($input: UpdateVersionRegistrationsInput!) {
+      updateVersionRegistrations(input: $input) {
+        exam {
+          ...allocateVersions
+        }
+      }
+    }
+    `,
+    {
+      onCompleted: () => {
+        history.push(`/exams/${examRailsId}/admin/versions`);
+        alert({
+          variant: 'success',
+          autohide: true,
+          message: 'Versions successfully allocated.',
+        });
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Allocations not created.',
+          message: err[0]?.message,
+        });
+      },
+    },
+  );
   return (
     <form
       onSubmit={handleSubmit(({ all }) => {
-        const versions = {};
+        const versions = [];
         all.versions.forEach((version) => {
-          versions[version.railsId] = version.students.map((s) => s.railsId);
+          versions.push({
+            versionId: version.railsId,
+            studentIds: version.students.map((s) => s.railsId),
+          });
         });
-        const body = {
-          unassigned: all.unassigned.map((s) => s.railsId),
-          versions,
-        };
-        updateAll(examId, body).then((result) => {
-          if (result.created === false) throw new Error(result.reason);
-          history.push(`/exams/${examId}/admin/versions`);
-          alert({
-            variant: 'success',
-            autohide: true,
-            message: 'Versions successfully allocated.',
-          });
-        }).catch((e) => {
-          alert({
-            variant: 'danger',
-            title: 'Allocations not created.',
-            message: e.message,
-          });
+        mutate({
+          variables: {
+            input: {
+              examId,
+              unassigned: all.unassigned.map((s) => s.railsId),
+              versions,
+            },
+          },
         });
       })}
     >
@@ -266,6 +294,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
           Edit Version Allocations
           <span className="float-right">
             <Button
+              disabled={loading}
               variant="danger"
               className={pristine && 'd-none'}
               onClick={reset}
@@ -273,6 +302,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               Reset
             </Button>
             <Button
+              disabled={loading}
               variant="secondary"
               className="ml-2"
               onClick={cancel}
@@ -280,6 +310,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
               Cancel
             </Button>
             <Button
+              disabled={loading}
               variant="primary"
               className="ml-2"
               type="submit"
@@ -307,6 +338,7 @@ const StudentDNDForm: React.FC<InjectedFormProps<FormValues>> = (props) => {
 };
 
 interface VersionAssignmentProps {
+  examId: string;
   sections: readonly Section[];
   unassigned: readonly Student[];
   versions: readonly Version[];
@@ -314,6 +346,7 @@ interface VersionAssignmentProps {
 
 const Editable: React.FC<VersionAssignmentProps> = (props) => {
   const {
+    examId,
     sections,
     unassigned,
     versions,
@@ -322,10 +355,11 @@ const Editable: React.FC<VersionAssignmentProps> = (props) => {
     <Provider store={store}>
       <FormContext.Provider value={{ sections }}>
         <DNDForm
+          examId={examId}
           initialValues={{
             all: {
-              unassigned,
-              versions,
+              unassigned: [...unassigned],
+              versions: [...versions],
             },
           }}
         />
@@ -385,6 +419,7 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
 
 const Loaded: React.FC<VersionAssignmentProps> = (props) => {
   const {
+    examId,
     sections,
     unassigned,
     versions,
@@ -395,6 +430,7 @@ const Loaded: React.FC<VersionAssignmentProps> = (props) => {
         <Switch>
           <Route path="/exams/:examId/admin/versions/edit">
             <Editable
+              examId={examId}
               sections={sections}
               unassigned={unassigned}
               versions={versions}
@@ -402,6 +438,7 @@ const Loaded: React.FC<VersionAssignmentProps> = (props) => {
           </Route>
           <Route>
             <Readonly
+              examId={examId}
               unassigned={unassigned}
               versions={versions}
               sections={sections}
@@ -420,7 +457,7 @@ interface FormValues {
   };
 }
 
-const DNDForm = reduxForm({
+const DNDForm = reduxForm<FormValues, { examId: string }>({
   form: 'version-dnd',
 })(StudentDNDForm);
 
@@ -433,6 +470,7 @@ const DND: React.FC<{
   const res = useFragment(
     graphql`
     fragment allocateVersions on Exam {
+      id
       course {
         sections {
           railsId
@@ -464,6 +502,7 @@ const DND: React.FC<{
   );
   return (
     <Loaded
+      examId={res.id}
       sections={res.course.sections}
       unassigned={res.unassignedStudents}
       versions={res.examVersions}

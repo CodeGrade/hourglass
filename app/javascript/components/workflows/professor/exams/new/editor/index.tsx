@@ -393,7 +393,7 @@ const ExamEditor: React.FC<
   } = props;
   const { alert } = useContext(AlertContext);
   const history = useHistory();
-  const { examId, versionId: versionRailsId } = useParams();
+  const { examId } = useParams();
   const [update, { loading: saveLoading }] = useMutation(
     UPDATE_EXAM_VERSION,
     {
@@ -435,6 +435,7 @@ const ExamEditor: React.FC<
       },
     },
   );
+  const loading = saveLoading || autosaveLoading;
   useEffect(() => {
     const timer = setInterval(() => {
       handleSubmit((values) => {
@@ -504,6 +505,7 @@ const ExamEditor: React.FC<
         </FormSection>
         <div className="my-2 float-right">
           <Button
+            disabled={loading}
             variant="danger"
             className={pristine ? 'd-none' : 'mr-2'}
             onClick={reset}
@@ -511,6 +513,7 @@ const ExamEditor: React.FC<
             Reset
           </Button>
           <Button
+            disabled={loading}
             variant="success"
             type="submit"
           >

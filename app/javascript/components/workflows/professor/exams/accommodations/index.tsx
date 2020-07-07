@@ -16,7 +16,6 @@ import { FaTrash } from 'react-icons/fa';
 import Select from 'react-select';
 import { DateTime } from 'luxon';
 import { useMutation, graphql, useFragment } from 'relay-hooks';
-import { ConnectionHandler } from 'relay-runtime';
 
 import { accommodations_all$key } from './__generated__/accommodations_all.graphql';
 import { accommodations_accommodation$key } from './__generated__/accommodations_accommodation.graphql';

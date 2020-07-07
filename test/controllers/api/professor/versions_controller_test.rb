@@ -20,7 +20,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     created = exam.exam_versions.first
     ev = create(:exam_version, :cs3500_v1)
     assert_equal ev.info, created.info
-    assert_equal ev.files, create.files
+    assert_equal ev.files, created.files
   end
 
   test 'should export exam version single file' do

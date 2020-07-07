@@ -5,7 +5,6 @@ module Mutations
     argument :percent_time_expansion, Integer, required: true
 
     field :accommodation, Types::AccommodationType, null: true
-    field :errors, [String], null: false
 
     def authorized?(accommodation:, **_args)
       return true if ProfessorCourseRegistration.find_by(
@@ -18,11 +17,9 @@ module Mutations
 
     def resolve(accommodation:, **args)
       updated = accommodation.update(args)
-      if updated
-        { accommodation: accommodation, errors: [] }
-      else
-        { accommodation: nil, errors: accommodation.errors.full_messages }
-      end
+      raise GraphQL::ExecutionError, accommodation.errors.full_messages unless updated
+
+      { accommodation: accommodation }
     end
   end
 end

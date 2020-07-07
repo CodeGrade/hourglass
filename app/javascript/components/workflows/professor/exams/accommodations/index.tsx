@@ -172,7 +172,6 @@ const SingleAccommodation: React.FC<{
     graphql`
     mutation accommodationsUpdateMutation($input: UpdateAccommodationInput!) {
       updateAccommodation(input: $input) {
-        errors
         accommodation {
           id
           newStartTime
@@ -182,23 +181,22 @@ const SingleAccommodation: React.FC<{
     }
     `,
     {
-      onCompleted: ({ updateAccommodation }) => {
+      onCompleted: () => {
         setEditing(false);
-        const { errors } = updateAccommodation;
-        if (errors.length !== 0) {
-          alert({
-            variant: 'danger',
-            title: 'Error updating accommodation',
-            message: errors.join('\n'),
-          });
-        } else {
-          alert({
-            variant: 'success',
-            title: 'Successfully updated accommodation',
-            autohide: true,
-            message: `Accommodation for '${accommodation.registration.user.displayName}' updated.`,
-          });
-        }
+        alert({
+          variant: 'success',
+          title: 'Successfully updated accommodation',
+          autohide: true,
+          message: `Accommodation for '${accommodation.registration.user.displayName}' updated.`,
+        });
+      },
+      onError: (errs) => {
+        setEditing(false);
+        alert({
+          variant: 'danger',
+          title: 'Error updating accommodation',
+          message: errs[0]?.message,
+        });
       },
     },
   );

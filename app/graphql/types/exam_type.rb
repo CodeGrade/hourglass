@@ -74,5 +74,10 @@ module Types
     def my_registration
       object.registrations.find_by(user: context[:current_user])
     end
+
+    field :exam_version_upload_url, String, null: false
+    def exam_version_upload_url
+      Rails.application.routes.url_helpers.import_api_professor_versions_path(object)
+    end
   end
 end

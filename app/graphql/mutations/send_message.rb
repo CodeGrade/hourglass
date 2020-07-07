@@ -68,7 +68,7 @@ module Mutations
         )
       else
         return {
-          errors: ['Invalid message recipient.']
+          errors: ['Invalid message recipient.'],
         }
       end
       {

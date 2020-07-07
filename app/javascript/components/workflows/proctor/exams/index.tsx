@@ -458,7 +458,6 @@ const ShowAnomalies: React.FC<{
     configs: [config],
   }), [res.id]);
   useSubscription<examsNewAnomalySubscription>(subscriptionObject);
-  const disabled = isLoading();
   return (
     <>
       {res.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}

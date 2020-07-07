@@ -3,77 +3,60 @@ module Mutations
     argument :recipient_id, ID, required: true
     argument :message, String, required: true
 
-    field :errors, [String], null: false
-
     def authorized?(recipient_id:, **_args)
       obj = HourglassSchema.object_from_id(recipient_id, context)
-      exam = case obj
-             when Exam
-               obj
-             when ExamVersion
-               obj.exam
-             when Room
-               obj.exam
-             when Registration
-               obj.exam
-             else
-               return false, { errors: ['Invalid recipient.'] }
-             end
-      return true if ProctorRegistration.find_by(
-        user: context[:current_user],
-        exam: exam,
-      )
-      return true if ProfessorCourseRegistration.find_by(
-        user: context[:current_user],
-        course: exam.course,
-      )
+      exam = exam_for_obj(obj)
+      return true if ProctorRegistration.find_by(user: context[:current_user], exam: exam)
+      return true if ProfessorCourseRegistration.find_by(user: context[:current_user], course: exam.course)
 
-      [false, { errors: ['You do not have permission.'] }]
+      raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
     def resolve(recipient_id:, message:)
       obj = HourglassSchema.object_from_id(recipient_id, context)
+      exam = exam_for_obj(obj)
+      msg = new_msg_for_obj(obj, context, message)
+      saved = msg.save
+      raise GraphQL::ExecutionError, exam.errors.full_messages.to_sentence unless saved
+
+      trigger_subscription(exam)
+      {}
+    end
+
+    private
+
+    def trigger_subscription(exam)
+      HourglassSchema.subscriptions.trigger(
+        :message_was_sent,
+        { exam_id: HourglassSchema.id_from_object(exam, Types::ExamType, context) },
+        exam,
+      )
+    end
+
+    def new_msg_for_obj(obj, context, message)
       case obj
       when Exam
-        msg = ExamAnnouncement.new(exam: obj, body: message)
-        msg.save!
-        HourglassSchema.subscriptions.trigger(
-          :message_was_sent,
-          { exam_id: HourglassSchema.id_from_object(obj, Types::ExamType, context) },
-          obj,
-        )
+        ExamAnnouncement.new(exam: obj, body: message)
       when ExamVersion
-        msg = VersionAnnouncement.new(exam_version: obj, body: message)
-        msg.save!
-        HourglassSchema.subscriptions.trigger(
-          :message_was_sent,
-          { exam_id: HourglassSchema.id_from_object(obj.exam, Types::ExamType, context) },
-          obj.exam,
-        )
+        VersionAnnouncement.new(exam_version: obj, body: message)
       when Room
-        msg = RoomAnnouncement.new(room: obj, body: message)
-        msg.save!
-        HourglassSchema.subscriptions.trigger(
-          :message_was_sent,
-          { exam_id: HourglassSchema.id_from_object(obj.exam, Types::ExamType, context) },
-          obj.exam,
-        )
+        RoomAnnouncement.new(room: obj, body: message)
       when Registration
-        msg = Message.new(sender: context[:current_user], registration: obj, body: message)
-        msg.save!
-        HourglassSchema.subscriptions.trigger(
-          :message_was_sent,
-          { exam_id: HourglassSchema.id_from_object(obj.exam, Types::ExamType, context) },
-          obj.exam,
-        )
+        Message.new(sender: context[:current_user], registration: obj, body: message)
       else
-        return {
-          errors: ['Invalid message recipient.'],
-        }
+        raise GraphQL::ExecutionError, 'Invalid message recipient.'
       end
-      {
-        errors: [],
-      }
+    end
+
+    def exam_for_obj(obj)
+      case obj
+      when Exam
+        obj
+      when ExamVersion, Room, Registration
+        obj.exam
+      else
+        raise GraphQL::ExecutionError, 'Invalid message recipient.'
+      end
     end
   end
 end

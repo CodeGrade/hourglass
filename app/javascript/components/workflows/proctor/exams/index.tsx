@@ -1159,33 +1159,24 @@ const SendMessageButton: React.FC<{
     graphql`
       mutation examsSendMessageMutation($input: SendMessageInput!) {
         sendMessage(input: $input) {
-          errors
+          clientMutationId
         }
       }
     `,
     {
-      onCompleted: ({ sendMessage }) => {
-        const { errors } = sendMessage;
-        if (errors.length !== 0) {
-          alert({
-            variant: 'danger',
-            title: 'Error sending message',
-            message: errors.join('\n'),
-          });
-        } else {
-          alert({
-            variant: 'success',
-            message: 'Message sent.',
-            autohide: true,
-          });
-          onSuccess();
-        }
+      onCompleted: () => {
+        alert({
+          variant: 'success',
+          message: 'Message sent.',
+          autohide: true,
+        });
+        onSuccess();
       },
-      onError: (err) => {
+      onError: (errs) => {
         alert({
           variant: 'danger',
           title: 'Error sending message',
-          message: err.message,
+          message: errs[0]?.message,
         });
       },
     },

@@ -4,17 +4,16 @@ class Subscriptions::MessageWasSent < Subscriptions::BaseSubscription
   payload_type Types::ExamType
 
   def authorized?(exam:)
-    reg = ProctorRegistration.find_by(
+    return true if ProctorRegistration.find_by(
       user: context[:current_user],
       exam: exam,
     )
-    return true if reg
-    prof_reg = ProfessorCourseRegistration.find_by(
+    return true if ProfessorCourseRegistration.find_by(
       user: context[:current_user],
       course: exam.course,
     )
-    return true if prof_reg
-    return false, { errors: ['You do not have permission.'] }
+
+    raise GraphQL::ExecutionError, 'You do not have permission.'
   end
 
   def subscribe(exam:)

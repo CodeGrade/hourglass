@@ -258,7 +258,6 @@ const ClearButton: React.FC<{
     mutation examsDestroyAnomalyMutation($input: DestroyAnomalyInput!) {
       destroyAnomaly(input: $input) {
         deletedId
-        errors
       }
     }
     `,
@@ -272,27 +271,18 @@ const ClearButton: React.FC<{
         pathToConnection: ['exam', 'anomalies'],
         deletedIDFieldName: 'deletedId',
       }],
-      onCompleted: ({ destroyAnomaly }) => {
-        const { errors } = destroyAnomaly;
-        if (errors.length !== 0) {
-          alert({
-            variant: 'danger',
-            title: 'Error clearing anomaly',
-            message: errors.join('\n'),
-          });
-        } else {
-          alert({
-            variant: 'success',
-            message: 'Anomaly cleared.',
-            autohide: true,
-          });
-        }
+      onCompleted: () => {
+        alert({
+          variant: 'success',
+          message: 'Anomaly cleared.',
+          autohide: true,
+        });
       },
-      onError: (err) => {
+      onError: (errs) => {
         alert({
           variant: 'danger',
           title: 'Error clearing anomaly',
-          message: err.message,
+          message: errs[0]?.message,
         });
       },
     },

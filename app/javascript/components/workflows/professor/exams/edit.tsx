@@ -13,6 +13,7 @@ const EditExamVersion: React.FC = () => {
     graphql`
     query editVersionQuery($examVersionRailsId: Int!) {
       examVersion(railsId: $examVersionRailsId) {
+        id
         railsId
         name
         policies
@@ -44,6 +45,7 @@ const EditExamVersion: React.FC = () => {
   const parsedContents = JSON.parse(examVersion.contents) as ContentsState;
   return (
     <Editor
+      examVersionId={examVersion.id}
       exam={parsedContents.exam}
       answers={parsedContents.answers}
       railsExamVersion={{

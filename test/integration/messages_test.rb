@@ -17,7 +17,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
   SEND_MESSAGE_QUERY = <<-GRAPHQL
     mutation sendMessage($input: SendMessageInput!) {
       sendMessage(input: $input) {
-        errors
+        clientMutationId
       }
     }
   GRAPHQL
@@ -29,7 +29,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
       message: 'Test announcement',
     })
 
-    assert_equal 1, result['data']['sendMessage']['errors'].length
+    assert_equal 1, result['errors'].length
     @exam.reload
     assert_equal 0, @exam.exam_announcements.length
   end
@@ -41,7 +41,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
       message: 'Test announcement',
     })
 
-    assert_equal 1, result['data']['sendMessage']['errors'].length
+    assert_equal 1, result['errors'].length
     @exam.reload
     assert_equal 0, @exam.exam_announcements.length
   end
@@ -53,7 +53,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
       message: 'Test announcement',
     })
 
-    assert_equal [], result['data']['sendMessage']['errors']
+    assert_not result['errors']
     @exam.reload
     assert_equal 1, @exam.exam_announcements.length
   end
@@ -65,7 +65,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
       message: 'Test message',
     })
 
-    assert_equal [], result['data']['sendMessage']['errors']
+    assert_not result['errors']
     @version.reload
     assert_equal 1, @version.version_announcements.length
   end
@@ -77,7 +77,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
       message: 'Test room message',
     })
 
-    assert_equal [], result['data']['sendMessage']['errors']
+    assert_not result['errors']
     @room.reload
     assert_equal 1, @room.room_announcements.length
   end
@@ -89,7 +89,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
       message: 'Test student message',
     })
 
-    assert_equal [], result['data']['sendMessage']['errors']
+    assert_not result['errors']
     @registration.reload
     assert_equal 1, @registration.messages.length
   end

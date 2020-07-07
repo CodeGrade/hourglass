@@ -1,7 +1,11 @@
-class Types::RoomUpdate < Types::BaseInputObject
-  description 'Update a room name.'
-  argument :room_id, ID, required: true, loads: Types::RoomType
-  argument :name, String, required: true
+# frozen_string_literal: true
+
+module Types
+  class RoomUpdate < Types::BaseInputObject
+    description 'Update a room name.'
+    argument :room_id, ID, required: true, loads: Types::RoomType
+    argument :name, String, required: true
+  end
 end
 
 module Mutations
@@ -12,6 +16,28 @@ module Mutations
     argument :updated_rooms, [Types::RoomUpdate], required: true
 
     field :exam, Types::ExamType, null: false
+
+    def authorized?(exam:, **_args)
+      return true if ProfessorCourseRegistration.find_by(
+        user: context[:current_user],
+        course: exam.course,
+      )
+
+      [false, { errors: ['You do not have permission.'] }]
+    end
+
+    def resolve(exam:, deleted_rooms:, new_rooms:, updated_rooms:)
+      Room.transaction do
+        delete_rooms(deleted_rooms)
+        create_rooms(exam, new_rooms)
+        update_rooms(updated_rooms)
+      end
+      {
+        exam: exam,
+      }
+    end
+
+    private
 
     def update_rooms(updates)
       updates.each do |update|
@@ -30,17 +56,6 @@ module Mutations
         destroyed = r.destroy
         raise GraphQL::ExecutionError, r.errors.full_messages.to_sentence unless destroyed
       end
-    end
-
-    def resolve(exam:, deleted_rooms:, new_rooms:, updated_rooms:)
-      Room.transaction do
-        delete_rooms(deleted_rooms)
-        create_rooms(exam, new_rooms)
-        update_rooms(updated_rooms)
-      end
-      {
-        exam: exam,
-      }
     end
   end
 end

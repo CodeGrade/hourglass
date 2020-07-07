@@ -1,7 +1,11 @@
-class Types::VersionAssignment < Types::BaseInputObject
-  description 'Assignment for students to a version.'
-  argument :version_id, Integer, required: true
-  argument :student_ids, [Integer], required: true
+# frozen_string_literal: true
+
+module Types
+  class VersionAssignment < Types::BaseInputObject
+    description 'Assignment for students to a version.'
+    argument :version_id, Integer, required: true
+    argument :student_ids, [Integer], required: true
+  end
 end
 
 module Mutations
@@ -11,6 +15,25 @@ module Mutations
     argument :versions, [Types::VersionAssignment], required: true, description: 'Version assignments to create.'
 
     field :exam, Types::ExamType, null: false
+
+    def authorized?(exam:, **_args)
+      return true if ProfessorCourseRegistration.find_by(
+        user: context[:current_user],
+        course: exam.course,
+      )
+
+      [false, { errors: ['You do not have permission.'] }]
+    end
+
+    def resolve(exam:, unassigned:, versions:)
+      delete_unassigned! exam, unassigned
+      assign_versions! exam, versions
+      {
+        exam: exam,
+      }
+    end
+
+    private
 
     def delete_unassigned!(exam, unassigned)
       unassigned.each do |id|
@@ -51,14 +74,6 @@ module Mutations
       versions.each do |item|
         assign_version!(exam, item[:version_id], item[:student_ids])
       end
-    end
-
-    def resolve(exam:, unassigned:, versions:)
-      delete_unassigned! exam, unassigned
-      assign_versions! exam, versions
-      {
-        exam: exam,
-      }
     end
   end
 end

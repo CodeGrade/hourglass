@@ -15,9 +15,7 @@ module Mutations
 
     def resolve(course:)
       context[:bottlenose_api].sync_course_regs(course)
-      {
-        course: course,
-      }
+      { course: course }
     rescue Bottlenose::UnauthorizedError => e
       raise GraphQL::ExecutionError, e.message
     rescue Bottlenose::ApiError => e

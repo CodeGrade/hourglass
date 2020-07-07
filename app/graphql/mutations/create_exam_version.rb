@@ -13,6 +13,16 @@ module Mutations
       [false, { errors: ['You do not have permission.'] }]
     end
 
+    def resolve(exam:)
+      version = new_empty_version(exam)
+      saved = version.save
+      raise GraphQL::ExecutionError, version.errors.full_messages.to_sentence unless saved
+
+      { exam_version: version }
+    end
+
+    private
+
     def new_empty_version(exam)
       n = exam.exam_versions.length + 1
       ExamVersion.new(
@@ -21,14 +31,6 @@ module Mutations
         files: [],
         info: { policies: [], answers: [], contents: { reference: [], questions: [] } },
       )
-    end
-
-    def resolve(exam:)
-      version = new_empty_version(exam)
-      saved = version.save
-      raise GraphQL::ExecutionError, version.errors.full_messages.to_sentence unless saved
-
-      { exam_version: version }
     end
   end
 end

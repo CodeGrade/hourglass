@@ -1,7 +1,9 @@
-class Types::ProctorRegistrationUpdate < Types::BaseInputObject
-  description 'Assign all staff members to proctor the given room.'
-  argument :room_id, ID, required: true, loads: Types::RoomType
-  argument :proctor_ids, [ID], required: true, loads: Types::UserType
+module Types
+  class ProctorRegistrationUpdate < Types::BaseInputObject
+    description 'Assign all staff members to proctor the given room.'
+    argument :room_id, ID, required: true, loads: Types::RoomType
+    argument :proctor_ids, [ID], required: true, loads: Types::UserType
+  end
 end
 
 module Mutations
@@ -12,6 +14,28 @@ module Mutations
     argument :proctor_registration_updates, [Types::ProctorRegistrationUpdate], required: true
 
     field :exam, Types::ExamType, null: false
+
+    def authorized?(exam:, **_args)
+      return true if ProfessorCourseRegistration.find_by(
+        user: context[:current_user],
+        course: exam.course,
+      )
+
+      [false, { errors: ['You do not have permission.'] }]
+    end
+
+    def resolve(exam:, unassigned_proctors:, proctors_without_rooms:, proctor_registration_updates:)
+      ProctorRegistration.transaction do
+        delete_unassigned(exam, unassigned_proctors)
+        remove_rooms(exam, proctors_without_rooms)
+        do_updates(exam, proctor_registration_updates)
+      end
+      {
+        exam: exam,
+      }
+    end
+
+    private
 
     def delete_unassigned(exam, proctors)
       proctors.each do |user|
@@ -43,17 +67,6 @@ module Mutations
           raise GraphQL::ExecutionError, proctor_reg.errors.full_messages.to_sentence unless saved
         end
       end
-    end
-
-    def resolve(exam:, unassigned_proctors:, proctors_without_rooms:, proctor_registration_updates:)
-      ProctorRegistration.transaction do
-        delete_unassigned(exam, unassigned_proctors)
-        remove_rooms(exam, proctors_without_rooms)
-        do_updates(exam, proctor_registration_updates)
-      end
-      {
-        exam: exam,
-      }
     end
   end
 end

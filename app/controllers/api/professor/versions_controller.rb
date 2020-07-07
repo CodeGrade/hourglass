@@ -3,7 +3,7 @@
 module Api
   module Professor
     class VersionsController < ProfessorController
-      before_action :find_version, only: [:show, :update, :destroy, :export_file, :export_archive]
+      before_action :find_version, only: [:show, :destroy, :export_file, :export_archive]
       before_action :find_exam_and_course
 
       before_action :require_prof_reg
@@ -12,25 +12,6 @@ module Api
 
       def show
         render json: @version.serialize
-      end
-
-      def update
-        version = params[:version].permit!.to_h
-        updated = @version.update!(
-          {
-            name: version[:name],
-            info: version[:info],
-            files: version[:files],
-          }
-        )
-        render json: {
-          updated: true,
-        }
-      rescue StandardError => e
-        render json: {
-          updated: false,
-          reason: e.message,
-        }
       end
 
       def import

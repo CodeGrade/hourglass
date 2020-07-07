@@ -39,7 +39,6 @@ import {
   FieldArray,
 } from 'redux-form';
 import { Provider, connect } from 'react-redux';
-import { Version, versionUpdate, Response } from '@hourglass/common/api/professor/exams/versions/update';
 import { useParams, useHistory } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import store from '@professor/exams/new/editor/store';
@@ -50,8 +49,24 @@ import EditReference from '@professor/exams/new/editor/components/Reference';
 import FileUploader from '@professor/exams/new/editor/components/FileUploader';
 import ShowQuestions from '@professor/exams/new/editor/components/ShowQuestions';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
+import { useMutation, graphql } from 'relay-hooks';
+
+export interface Version {
+  name: string;
+  info: {
+    policies: RailsExamVersion['policies'];
+    answers: AnswersState['answers'];
+    contents: {
+      instructions: ExamVersion['instructions'];
+      questions: ExamVersion['questions'];
+      reference: ExamVersion['reference'];
+    };
+  };
+  files: ExamVersion['files'];
+}
 
 export interface ExamEditorProps {
+  examVersionId: string;
   exam: ExamVersion;
   railsExamVersion: RailsExamVersion;
   answers: AnswersState;
@@ -150,6 +165,7 @@ function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): E
 
 const Editor: React.FC<ExamEditorProps> = (props) => {
   const {
+    examVersionId,
     exam,
     answers,
     railsExamVersion,
@@ -157,6 +173,7 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
   return (
     <Provider store={store}>
       <ExamEditorForm
+        examVersionId={examVersionId}
         initialValues={{
           all: {
             name: railsExamVersion.name,
@@ -351,78 +368,118 @@ function transformForSubmit(values: FormValues): Version {
   };
 }
 
-const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
+const UPDATE_EXAM_VERSION = graphql`
+mutation editorUpdateExamVersionMutation($input: UpdateExamVersionInput!) {
+  updateExamVersion(input: $input) {
+    examVersion {
+      id
+    }
+  }
+}
+`;
+
+interface ExamEditorExtraProps {
+  examVersionId: string;
+}
+
+const ExamEditor: React.FC<
+  InjectedFormProps<FormValues, ExamEditorExtraProps> & ExamEditorExtraProps
+> = (props) => {
   const {
+    examVersionId,
     pristine,
     reset,
     handleSubmit,
   } = props;
   const { alert } = useContext(AlertContext);
   const history = useHistory();
-  const { examId, versionId } = useParams();
-  const doSubmit: () => Promise<Response> = async () => new Promise((resolve, reject) => {
-    handleSubmit((values) => {
-      const version = transformForSubmit(values);
-      versionUpdate(versionId, { version }).then(resolve).catch(reject);
-    })();
-  });
-  const autosave = () => {
-    doSubmit().then((res) => {
-      if (res.updated === true) {
+  const { examId, versionId: versionRailsId } = useParams();
+  const [update, { loading: saveLoading }] = useMutation(
+    UPDATE_EXAM_VERSION,
+    {
+      onCompleted: () => {
+        history.push(`/exams/${examId}/admin`);
+        alert({
+          variant: 'success',
+          autohide: true,
+          message: 'Exam version updated successfully.',
+        });
+      },
+      onError: (errs) => {
+        alert({
+          variant: 'danger',
+          title: 'Exam version not updated.',
+          message: <pre>{errs[0]?.message}</pre>,
+        });
+      },
+    },
+  );
+  const [autosave, { loading: autosaveLoading }] = useMutation(
+    UPDATE_EXAM_VERSION,
+    {
+      onCompleted: () => {
         alert({
           variant: 'success',
           title: 'Autosaved',
           message: 'Exam version saved automatically.',
           autohide: true,
         });
-      } else {
+      },
+      onError: (errs) => {
         alert({
           variant: 'danger',
-          title: 'Not Autosaved',
-          message: <pre>{res.reason}</pre>,
+          title: 'Error doing autosave',
+          message: <pre>{errs[0]?.message}</pre>,
           autohide: true,
         });
-      }
-    }).catch((err) => {
-      alert({
-        variant: 'danger',
-        title: 'Error saving.',
-        message: err.message,
-      });
-    });
-  };
+      },
+    },
+  );
   useEffect(() => {
-    const timer = setInterval(autosave, 20000);
+    const timer = setInterval(() => {
+      handleSubmit((values) => {
+        const {
+          name,
+          info,
+          files,
+        } = transformForSubmit(values);
+        autosave({
+          variables: {
+            input: {
+              examVersionId,
+              name,
+              info: JSON.stringify(info),
+              files: JSON.stringify(files),
+            },
+          },
+        });
+      })();
+    }, 20000);
     return () => {
       clearInterval(timer);
     };
-  }, [alert, autosave]);
+  }, [handleSubmit]);
   return (
     <form
       onSubmit={(e): void => {
         e.preventDefault();
-        doSubmit().then((res) => {
-          if (res.updated === false) {
-            alert({
-              variant: 'danger',
-              title: 'Exam version not updated.',
-              message: <pre>{res.reason}</pre>,
-            });
-          } else {
-            history.push(`/exams/${examId}/admin`);
-            alert({
-              variant: 'success',
-              autohide: true,
-              message: 'Exam version updated successfully.',
-            });
-          }
-        }).catch((err) => {
-          alert({
-            variant: 'danger',
-            title: 'Error autosaving.',
-            message: err.message,
+        handleSubmit((values) => {
+          const {
+            name,
+            info,
+            files,
+          } = transformForSubmit(values);
+          update({
+            variables: {
+              input: {
+                examVersionId,
+                name,
+                info: JSON.stringify(info),
+                files: JSON.stringify(files),
+              },
+            },
           });
-        });
+        })();
       }}
     >
       <FormSection name="all">
@@ -465,6 +522,6 @@ const ExamEditor: React.FC<InjectedFormProps<FormValues>> = (props) => {
   );
 };
 
-const ExamEditorForm = reduxForm({
+const ExamEditorForm = reduxForm<FormValues, ExamEditorExtraProps>({
   form: 'version-editor',
 })(ExamEditor);

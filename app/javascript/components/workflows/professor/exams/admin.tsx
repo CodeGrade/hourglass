@@ -44,7 +44,6 @@ import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { DateTime } from 'luxon';
-import { importVersion } from '@hourglass/common/api/professor/exams/versions/import';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
 import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
 import EditExamRooms from '@professor/exams/rooms';
@@ -67,6 +66,7 @@ import { admin_versionInfo$key } from './__generated__/admin_versionInfo.graphql
 import { admin_version$key } from './__generated__/admin_version.graphql';
 import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMutation.graphql';
 import { adminDestroyVersionMutation } from './__generated__/adminDestroyVersionMutation.graphql';
+import { uploadFile } from '@hourglass/common/types/api';
 
 export interface ExamUpdateInfo {
   name: string;
@@ -579,6 +579,7 @@ const VersionInfo: React.FC<{
     fragment admin_versionInfo on Exam {
       id
       name
+      examVersionUploadUrl
       examVersions(first: 100) @connection(key: "Exam_examVersions", filters: []) {
         edges {
           node {
@@ -632,7 +633,7 @@ const VersionInfo: React.FC<{
               const { files } = event.target;
               const [f] = files;
               if (!f) return;
-              importVersion(examRailsId, f).then((innerRes) => {
+              uploadFile<{ id: number; }>(res.examVersionUploadUrl, f).then((innerRes) => {
                 history.push(`/exams/${examRailsId}/versions/${innerRes.id}/edit`);
                 alert({
                   variant: 'success',

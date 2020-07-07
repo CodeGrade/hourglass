@@ -123,3 +123,12 @@ export function useApiResponse<Server, Res = Server>(
     response: response as unknown as Res,
   };
 }
+
+export function uploadFile<Response>(url: string, file: File): Promise<Response> {
+  const data = new FormData();
+  data.append('upload', file);
+  return hitApi<Response>(url, {
+    method: 'POST',
+    body: data,
+  }, false);
+}

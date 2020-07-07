@@ -12,6 +12,8 @@ class Anomaly < ApplicationRecord
   delegate :exam, to: :registration
 
   def trigger_subscription
-    HourglassSchema.subscriptions.trigger(:anomaly_was_created, { exam_rails_id: exam.id }, self)
+    # TODO: move this to anomaly mutation
+    exam_id = HourglassSchema.id_from_object(exam, Types::ExamType, {})
+    HourglassSchema.subscriptions.trigger(:anomaly_was_created, { exam_id: exam_id }, self)
   end
 end

@@ -44,8 +44,12 @@ import { QueryRenderer, graphql } from 'react-relay';
 import environment from '@hourglass/relay/environment';
 
 import DocumentTitle from '@hourglass/common/documentTitle';
-import { useFragment, useMutation, useSubscription } from 'relay-hooks';
-import { ConnectionHandler } from 'relay-runtime';
+import {
+  useFragment,
+  useMutation,
+  useSubscription,
+  usePagination,
+} from 'relay-hooks';
 import { RangeAddConfig } from 'relay-runtime/lib/mutations/RelayDeclarativeMutationConfig';
 
 import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
@@ -369,8 +373,8 @@ const ShowAnomaly: React.FC<{
 };
 
 const newAnomalySubscriptionSpec = graphql`
-  subscription examsNewAnomalySubscription($examRailsId: Int!) {
-    anomalyWasCreated(examRailsId: $examRailsId) {
+  subscription examsNewAnomalySubscription($examId: ID!) {
+    anomalyWasCreated(examId: $examId) {
       anomaly {
         ...exams_anomaly
       }
@@ -383,6 +387,27 @@ const newAnomalySubscriptionSpec = graphql`
   }
 `;
 
+const paginationConfig = {
+  getVariables(_props, { count, cursor }, fragmentVariables) {
+    return {
+      count,
+      cursor,
+      examId: fragmentVariables.examId,
+    };
+  },
+  query: graphql`
+  query examsAnomalyPaginationQuery(
+    $count: Int!
+    $cursor: String
+    $examId: ID!
+  ) {
+    exam: node(id: $examId) {
+      ...exams_anomalies @arguments(count: $count, cursor: $cursor)
+    }
+  }
+  `,
+};
+
 const ShowAnomalies: React.FC<{
   replyTo: (userId: string) => void;
   exam: exams_anomalies$key;
@@ -391,12 +416,20 @@ const ShowAnomalies: React.FC<{
     replyTo,
     exam,
   } = props;
-  const res = useFragment(
+  const { alert } = useContext(AlertContext);
+  const [res, { isLoading, hasMore, loadMore }] = usePagination(
     graphql`
-      fragment exams_anomalies on Exam {
+      fragment exams_anomalies on Exam
+      @argumentDefinitions(
+        count: { type: "Int", defaultValue: 20 }
+        cursor: { type: "String" }
+      ) {
         id
         railsId
-        anomalies(first: 100) @connection(key: "Exam_anomalies", filters: []) {
+        anomalies(
+          first: $count
+          after: $cursor
+        ) @connection(key: "Exam_anomalies", filters: []) {
           edges {
             node {
               id
@@ -413,24 +446,52 @@ const ShowAnomalies: React.FC<{
     parentID: res.id,
     connectionInfo: [{
       key: 'Exam_anomalies',
-      rangeBehavior: 'append',
+      rangeBehavior: 'prepend',
     }],
     edgeName: 'anomalyEdge',
   };
   const subscriptionObject = useMemo(() => ({
     subscription: newAnomalySubscriptionSpec,
     variables: {
-      examRailsId: res.railsId,
+      examId: res.id,
     },
     configs: [config],
-  }), [res.railsId]);
+  }), [res.id]);
   useSubscription<examsNewAnomalySubscription>(subscriptionObject);
+  const disabled = isLoading();
   return (
     <>
       {res.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
       {res.anomalies.edges.map((edge) => (
         <ShowAnomaly key={edge.node.id} replyTo={replyTo} examId={res.id} anomalyKey={edge.node} />
       ))}
+      {hasMore() && (
+        <tr>
+          <td colSpan={4} className="text-center">
+            <Button
+              onClick={() => {
+                if (!hasMore() || isLoading()) return;
+                loadMore(
+                  paginationConfig,
+                  10,
+                  (error) => {
+                    if (!error) return;
+                    alert({
+                      variant: 'danger',
+                      title: 'Error fetching additional anomalies.',
+                      message: error.message,
+                    });
+                  },
+                  {},
+                );
+              }}
+              variant="success"
+            >
+              Load more...
+            </Button>
+          </td>
+        </tr>
+      )}
     </>
   );
 };
@@ -1432,8 +1493,8 @@ const ExamProctoring: React.FC = () => {
     <QueryRenderer<examsProctorQuery>
       environment={environment}
       query={graphql`
-        query examsProctorQuery($examRailsId: Int!) {
-          exam(railsId: $examRailsId) {
+        query examsProctorQuery($examId: ID!) {
+          exam(id: $examId) {
             ...exams_recipients
             name
             id
@@ -1441,7 +1502,7 @@ const ExamProctoring: React.FC = () => {
         }
         `}
       variables={{
-        examRailsId: Number(examId),
+        examId,
       }}
       render={({ error, props }) => {
         if (error) {

@@ -11,11 +11,18 @@ module Types
     end
 
     field :exam, ExamType, null: false do
-      argument :rails_id, Integer, required: true
+      argument :rails_id, Int, required: false
+      argument :id, ID, required: false
     end
 
-    def exam(rails_id:)
-      Exam.find(rails_id)
+    def exam(rails_id: nil, id: nil)
+      if rails_id
+        Exam.find(rails_id)
+      elsif id
+        HourglassSchema.object_from_id(id, context)
+      else
+        raise GraphQL::ExecutionError, 'Bad exam ID.'
+      end
     end
 
     field :exam_version, ExamVersionType, null: false do

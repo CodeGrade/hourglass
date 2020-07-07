@@ -97,18 +97,10 @@ const ExamInformation: React.FC<{
     `,
     exam,
   );
-  const onError = (emsg: string) => {
-    alert({
-      variant: 'danger',
-      title: 'Error saving exam info.',
-      message: emsg,
-    });
-  };
   const [mutate, { loading }] = useMutation<adminUpdateExamMutation>(
     graphql`
       mutation adminUpdateExamMutation($input: UpdateExamInput!) {
         updateExam(input: $input) {
-          errors
           exam {
             name
             duration
@@ -119,19 +111,19 @@ const ExamInformation: React.FC<{
       }
     `,
     {
-      onError: (err) => {
-        onError(err.message);
-      },
-      onCompleted: ({ updateExam }) => {
-        if (updateExam.errors.length !== 0) {
-          onError(updateExam.errors.join('\n'));
-          return;
-        }
+      onCompleted: () => {
         setEditing(false);
         alert({
           variant: 'success',
           autohide: true,
           message: 'Exam info saved.',
+        });
+      },
+      onError: (errs) => {
+        alert({
+          variant: 'danger',
+          title: 'Error saving exam info.',
+          message: errs[0]?.message,
         });
       },
     },

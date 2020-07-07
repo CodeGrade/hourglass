@@ -7,7 +7,6 @@ module Mutations
     argument :end_time, GraphQL::Types::ISO8601DateTime, required: true
 
     field :exam, Types::ExamType, null: true
-    field :errors, [String], null: false
 
     def authorized?(exam:, **_args)
       return true if ProfessorCourseRegistration.find_by(
@@ -18,13 +17,11 @@ module Mutations
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
-    def resolve(exam:, name:, duration:, start_time:, end_time:)
-      updated = exam.update(name: name, duration: duration, start_time: start_time, end_time: end_time)
-      if updated
-        { exam: exam, errors: [] }
-      else
-        { exam: nil, errors: exam.errors.full_messages }
-      end
+    def resolve(exam:, **args)
+      updated = exam.update(args)
+      raise GraphQL::ExecutionError, exam.errors.full_messages.to_sentence unless updated
+
+      { exam: exam }
     end
   end
 end

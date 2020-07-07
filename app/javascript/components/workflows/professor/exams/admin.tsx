@@ -58,6 +58,8 @@ import DocumentTitle from '@hourglass/common/documentTitle';
 import { QueryRenderer, graphql } from 'react-relay';
 import environment from '@hourglass/relay/environment';
 import { useFragment, useMutation } from 'relay-hooks';
+import { uploadFile } from '@hourglass/common/types/api';
+
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
 import { admin_examInfo$key } from './__generated__/admin_examInfo.graphql';
 import { adminUpdateExamMutation } from './__generated__/adminUpdateExamMutation.graphql';
@@ -66,7 +68,6 @@ import { admin_versionInfo$key } from './__generated__/admin_versionInfo.graphql
 import { admin_version$key } from './__generated__/admin_version.graphql';
 import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMutation.graphql';
 import { adminDestroyVersionMutation } from './__generated__/adminDestroyVersionMutation.graphql';
-import { uploadFile } from '@hourglass/common/types/api';
 
 export interface ExamUpdateInfo {
   name: string;

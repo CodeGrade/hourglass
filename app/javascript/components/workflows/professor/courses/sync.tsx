@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import { useParams } from 'react-router-dom';
 import { useMutation, graphql } from 'relay-hooks';
 import { Button } from 'react-bootstrap';
 import { AlertContext } from '@hourglass/common/alerts';
@@ -16,7 +15,7 @@ const SyncCourse: React.FC<{
       <DoSync courseId={courseId} />
     </>
   );
-}
+};
 
 export default SyncCourse;
 

@@ -5,7 +5,6 @@ module Mutations
     field :deletedId, ID, null: false
     field :registration_edge, Types::RegistrationType.edge_type, null: false
     field :registration, Types::RegistrationType, null: false
-    field :errors, [String], null: false
 
     def authorized?(accommodation:)
       return true if ProfessorCourseRegistration.find_by(
@@ -24,7 +23,9 @@ module Mutations
         item: reg,
         context: context,
       )
-      accommodation.destroy!
+      destroyed = accommodation.destroy
+      raise GraphQL::ExecutionError, accommodation.errors.full_messages.to_sentence unless destroyed
+
       {
         deletedId: HourglassSchema.id_from_object(accommodation, Types::AccommodationType, context),
         registration_edge: range_add.edge,

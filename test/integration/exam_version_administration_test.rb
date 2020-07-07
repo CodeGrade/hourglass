@@ -18,6 +18,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
       createExamVersion(input: $input) {
         examVersion {
           id
+          name
         }
       }
     }
@@ -31,26 +32,27 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
-  def try_update(ver, user:)
-    new_name = 'New Version Name'
+  def try_update(ver, new_name:, user:)
     HourglassSchema.do_mutation!(UPDATE_EXAM_VERSION, user, {
       examVersionId: HourglassSchema.id_from_object(ver, Types::ExamVersionType, {}),
       name: new_name,
-      info: ver.info.to_s,
-      files: ver.files.to_s,
+      info: ver.info.to_json,
+      files: ver.files.to_json,
     })
   end
 
   def assert_updatable(ver, user:)
-    result = try_update(ver, user: user)
-    assert_equal 0, result['errors'].length
+    new_name = 'New version name'
+    result = try_update(ver, new_name: new_name, user: user)
+    assert_not result['errors']
     ver.reload
     assert_equal new_name, ver.name
   end
 
   def assert_not_updatable(ver, user:)
     old_name = ver.name
-    result = try_update(ver, user: user)
+    result = try_update(ver, new_name: old_name + '!', user: user)
+    assert result['errors']
     assert_not result['errors'].empty?
     ver.reload
     assert_equal old_name, ver.name
@@ -65,6 +67,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
 
   def assert_not_destroyable(ver, user:)
     result = try_destroy(ver, user: user)
+    assert result['errors']
     assert_not result['errors'].empty?
     ver.reload
     assert_not ver.destroyed?
@@ -114,56 +117,36 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
     assert_match(/permission/, result['errors'][0]['message'])
   end
 
-  # test 'should create new exam version' do
-  #   reg = create(:professor_course_registration)
-  #   exam = create(:exam, course: reg.course)
-  #   sign_in reg.user
-  #   post api_professor_versions_path(exam)
-  #   assert_response :success
-  #   parsed = JSON.parse(response.body)
-  #   expected = {
-  #     'name' => "#{exam.name} Version 1",
-  #     'policies' => [],
-  #     'contents' => {
-  #       'exam' => {
-  #         'questions' => [],
-  #         'reference' => [],
-  #         'instructions' => {
-  #           'type' => 'HTML',
-  #           'value' => '',
-  #         },
-  #         'files' => [],
-  #       },
-  #       'answers' => { 'answers' => [] },
-  #     },
-  #     'anyStarted' => false,
-  #   }
-  #   assert_equal expected, parsed.except('id')
-  #   assert parsed['id'].integer?
-  # end
+  test 'should create new exam version' do
+    reg = create(:professor_course_registration)
+    exam = create(:exam, course: reg.course)
+    result = HourglassSchema.do_mutation!(CREATE_EXAM_VERSION, reg.user, {
+      examId: HourglassSchema.id_from_object(exam, Types::ExamType, {}),
+    })
+    assert_not result['errors']
+    expected_name = "#{exam.name} Version 1"
+    assert_equal expected_name, result['data']['createExamVersion']['examVersion']['name']
+  end
 
-  # test 'should update exam version' do
-  #   ver = create(:exam_version)
-  #   reg = create(:professor_course_registration, course: ver.exam.course)
-  #   sign_in reg.user
-  #   assert_updatable ver
-  # end
+  test 'should update exam version' do
+    ver = create(:exam_version)
+    reg = create(:professor_course_registration, course: ver.exam.course)
+    assert_updatable ver, user: reg.user
+  end
 
-  # test 'should update exam version with started submissions' do
-  #   exam = create(:exam, :with_started_submissions)
-  #   ver = exam.exam_versions.first
-  #   reg = create(:professor_course_registration, course: ver.exam.course)
-  #   sign_in reg.user
-  #   assert_updatable ver
-  # end
+  test 'should update exam version with started submissions' do
+    exam = create(:exam, :with_started_submissions)
+    ver = exam.exam_versions.first
+    reg = create(:professor_course_registration, course: ver.exam.course)
+    assert_updatable ver, user: reg.user
+  end
 
-  # test 'should update exam version with finished submissions' do
-  #   exam = create(:exam, :with_finished_submissions)
-  #   ver = exam.exam_versions.first
-  #   reg = create(:professor_course_registration, course: ver.exam.course)
-  #   sign_in reg.user
-  #   assert_updatable ver
-  # end
+  test 'should update exam version with finished submissions' do
+    exam = create(:exam, :with_finished_submissions)
+    ver = exam.exam_versions.first
+    reg = create(:professor_course_registration, course: ver.exam.course)
+    assert_updatable ver, user: reg.user
+  end
 
   test 'should destroy exam version' do
     ver = create(:exam_version)
@@ -175,100 +158,25 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
     assert_equal 0, exam.exam_versions.length
   end
 
-  # test 'should not destroy exam version with started registrations' do
-  #   exam = create(:exam, :with_started_submissions)
-  #   ver = exam.exam_versions.first
-  #   reg = create(:professor_course_registration, course: exam.course)
-  #   prof = reg.user
-  #   sign_in prof
-  #   delete api_professor_version_path(ver)
-  #   assert_response :conflict
-  #   ver.reload
-  #   assert_not ver.destroyed?
-  # end
+  test 'should not destroy exam version with started registrations' do
+    exam = create(:exam, :with_started_submissions)
+    ver = exam.exam_versions.first
+    reg = create(:professor_course_registration, course: exam.course)
+    prof = reg.user
+    result = assert_not_destroyable ver, user: prof
+    assert_match(/started/, result['errors'][0]['message'])
+    ver.reload
+    assert_not ver.destroyed?
+  end
 
-  # test 'should not destroy exam version with final registrations' do
-  #   exam = create(:exam, :with_finished_submissions)
-  #   ver = exam.exam_versions.first
-  #   reg = create(:professor_course_registration, course: exam.course)
-  #   prof = reg.user
-  #   sign_in prof
-  #   delete api_professor_version_path(ver)
-  #   assert_response :conflict
-  #   ver.reload
-  #   assert_not ver.destroyed?
-  # end
-
-  # test 'should import exam version' do
-  #   exam = create(:exam)
-  #   reg = create(:professor_course_registration, course: exam.course)
-  #   assert_equal 0, exam.exam_versions.length
-  #   sign_in reg.user
-  #   UploadTestHelper.with_test_uploaded_fixture_zip 'cs3500final-v1' do |upload|
-  #     post import_api_professor_versions_path(exam), params: {
-  #       upload: upload,
-  #     }
-  #   end
-  #   assert_response :created
-  #   exam.reload
-  #   assert_equal 1, exam.exam_versions.length
-
-  #   created = exam.exam_versions.first
-  #   ev = create(:exam_version, :cs3500_v1)
-  #   assert_equal ev.info, exam.exam_versions.first.info
-  #   assert_equal ev.files, exam.exam_versions.first.files
-  # end
-
-  # test 'should export exam version single file' do
-  #   ev = create(:exam_version)
-  #   reg = create(:professor_course_registration, course: ev.exam.course)
-  #   sign_in reg.user
-
-  #   get export_file_api_professor_version_path(ev)
-  #   parsed = JSON.parse(response.body)
-  #   assert_equal ev.info, parsed['info']
-  #   assert_equal ev.files, parsed['files']
-  # end
-
-  # test 'should not export exam version single file for student' do
-  #   ev = create(:exam_version)
-  #   reg = create(:registration, exam: ev.exam)
-  #   sign_in reg.user
-
-  #   get export_file_api_professor_version_path(ev)
-  #   assert_response :forbidden
-  #   assert_empty response.body
-  # end
-
-  # test 'should export exam version archive' do
-  #   ev = create(:exam_version)
-  #   exam = ev.exam
-  #   assert_equal 1, exam.exam_versions.length
-  #   reg = create(:professor_course_registration, course: ev.exam.course)
-  #   sign_in reg.user
-
-  #   get export_archive_api_professor_version_path(ev)
-  #   assert_response :success
-  #   assert_not_empty response.body
-
-  #   Tempfile.create do |zip|
-  #     zip.write response.body
-  #     zip.rewind
-  #     up = Upload.new(Rack::Test::UploadedFile.new(zip, 'application/zip'))
-  #     new_ev = create(:exam_version, :cs2500_v1, upload: up)
-  #     assert_equal ev.info, new_ev.info
-  #     assert_equal ev.files, new_ev.files
-  #   end
-  # end
-
-  # test 'should not export exam version archive for student' do
-  #   ev = create(:exam_version)
-  #   exam = ev.exam
-  #   reg = create(:registration, exam: exam)
-  #   sign_in reg.user
-
-  #   get export_archive_api_professor_version_path(ev)
-  #   assert_response :forbidden
-  #   assert_empty response.body
-  # end
+  test 'should not destroy exam version with final registrations' do
+    exam = create(:exam, :with_finished_submissions)
+    ver = exam.exam_versions.first
+    reg = create(:professor_course_registration, course: exam.course)
+    prof = reg.user
+    result = assert_not_destroyable ver, user: prof
+    assert_match(/finished/, result['errors'][0]['message'])
+    ver.reload
+    assert_not ver.destroyed?
+  end
 end

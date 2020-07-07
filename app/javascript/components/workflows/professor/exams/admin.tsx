@@ -42,7 +42,6 @@ import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
-import createVersion from '@hourglass/common/api/professor/exams/versions/create';
 import deleteVersion from '@hourglass/common/api/professor/exams/versions/delete';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { DateTime } from 'luxon';
@@ -67,6 +66,7 @@ import { adminUpdateExamMutation } from './__generated__/adminUpdateExamMutation
 import { ChecklistItemStatus, admin_checklist$key } from './__generated__/admin_checklist.graphql';
 import { admin_versionInfo$key } from './__generated__/admin_versionInfo.graphql';
 import { admin_version$key } from './__generated__/admin_version.graphql';
+import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMutation.graphql';
 
 export interface ExamUpdateInfo {
   name: string;
@@ -577,6 +577,7 @@ const VersionInfo: React.FC<{
   const res = useFragment<admin_versionInfo$key>(
     graphql`
     fragment admin_versionInfo on Exam {
+      id
       name
       examVersions {
         id
@@ -587,9 +588,33 @@ const VersionInfo: React.FC<{
     exam,
   );
   const { alert } = useContext(AlertContext);
-  const { examId } = useParams();
+  const { examId: examRailsId } = useParams();
   const history = useHistory();
   const fileInputRef = createRef<HTMLInputElement>();
+  const [createVersion, { loading }] = useMutation<adminCreateVersionMutation>(
+    graphql`
+    mutation adminCreateVersionMutation($input: CreateExamVersionInput!) {
+      createExamVersion(input: $input) {
+        examVersion {
+          railsId
+          id
+        }
+      }
+    }
+    `,
+    {
+      onCompleted: ({ createExamVersion }) => {
+        history.push(`/exams/${examRailsId}/versions/${createExamVersion.examVersion.railsId}/edit`);
+      },
+      onError: (errs) => {
+        alert({
+          variant: 'danger',
+          title: 'Exam version not created.',
+          message: errs[0]?.message,
+        });
+      },
+    },
+  );
   return (
     <>
       <h2>
@@ -603,8 +628,8 @@ const VersionInfo: React.FC<{
               const { files } = event.target;
               const [f] = files;
               if (!f) return;
-              importVersion(examId, f).then((innerRes) => {
-                history.push(`/exams/${examId}/versions/${innerRes.id}/edit`);
+              importVersion(examRailsId, f).then((innerRes) => {
+                history.push(`/exams/${examRailsId}/versions/${innerRes.id}/edit`);
                 alert({
                   variant: 'success',
                   autohide: true,
@@ -620,6 +645,7 @@ const VersionInfo: React.FC<{
             }}
           />
           <Button
+            disabled={loading}
             className="mr-2"
             variant="success"
             onClick={(): void => {
@@ -629,16 +655,15 @@ const VersionInfo: React.FC<{
             Import Version
           </Button>
           <Button
+            disabled={loading}
             variant="success"
             onClick={(): void => {
-              createVersion(examId).then((innerRes) => {
-                history.push(`/exams/${examId}/versions/${innerRes.id}/edit`);
-              }).catch((err) => {
-                alert({
-                  variant: 'danger',
-                  title: 'Exam version not created.',
-                  message: err.message,
-                });
+              createVersion({
+                variables: {
+                  input: {
+                    examId: res.id,
+                  },
+                },
               });
             }}
           >

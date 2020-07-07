@@ -30,7 +30,7 @@ module Api
       def question
         q_params = params.require(:question).permit(:body)
         q = Question.new body: q_params[:body], exam: @exam, sender: current_user
-        # TODO:
+        # TODO: trigger subscription (in mutation that hasn't been created yet)
         # HourglassSchema.subscriptions.trigger(
         #   :message_was_sent, 
         #   { exam_id: HourglassSchema.id_from_object(exam) },

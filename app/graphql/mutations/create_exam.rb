@@ -9,22 +9,17 @@ module Mutations
     field :exam, Types::ExamType, null: true
     field :errors, [String], null: false
 
-    def authorized?(course:, **args)
+    def authorized?(course:, **_args)
       return true if ProfessorCourseRegistration.find_by(
         user: context[:current_user],
         course: course,
       )
-      return false, { errors: ['You do not have permission.'] }
+
+      [false, { errors: ['You do not have permission.'] }]
     end
 
-    def resolve(course:, name:, duration:, start_time:, end_time:)
-      exam = Exam.new(
-        name: name,
-        course: course,
-        start_time: start_time,
-        end_time: end_time,
-        duration: duration,
-      )
+    def resolve(**args)
+      exam = Exam.new(args)
       if exam.save
         {
           exam: exam,
@@ -33,7 +28,7 @@ module Mutations
       else
         {
           exam: nil,
-          errors: exam.errors.full_messages
+          errors: exam.errors.full_messages,
         }
       end
     end

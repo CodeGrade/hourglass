@@ -1,7 +1,11 @@
-class Types::StudentRoomUpdate < Types::BaseInputObject
-  description 'Assign all given students to proctor the given room.'
-  argument :room_id, ID, required: true, loads: Types::RoomType
-  argument :student_ids, [ID], required: true, loads: Types::UserType
+# frozen_string_literal: true
+
+module Types
+  class StudentRoomUpdate < Types::BaseInputObject
+    description 'Assign all given students to proctor the given room.'
+    argument :room_id, ID, required: true, loads: Types::RoomType
+    argument :student_ids, [ID], required: true, loads: Types::UserType
+  end
 end
 
 module Mutations
@@ -11,6 +15,15 @@ module Mutations
     argument :student_room_updates, [Types::StudentRoomUpdate], required: true
 
     field :exam, Types::ExamType, null: false
+
+    def authorized?(exam:, **_args)
+      return true if ProfessorCourseRegistration.find_by(
+        user: context[:current_user],
+        course: exam.course,
+      )
+
+      [false, { errors: ['You do not have permission.'] }]
+    end
 
     def resolve(exam:, unassigned_students:, student_room_updates:)
       Registration.transaction do

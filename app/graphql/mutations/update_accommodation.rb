@@ -17,7 +17,8 @@ module Mutations
     end
 
     def resolve(accommodation:, **args)
-      if accommodation.update(args)
+      updated = accommodation.update(args)
+      if updated
         { accommodation: accommodation, errors: [] }
       else
         { accommodation: nil, errors: accommodation.errors.full_messages }

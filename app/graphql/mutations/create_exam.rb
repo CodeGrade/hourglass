@@ -15,7 +15,7 @@ module Mutations
         course: course,
       )
 
-      [false, { errors: ['You do not have permission.'] }]
+      raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
     def resolve(**args)

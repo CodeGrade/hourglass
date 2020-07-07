@@ -8,11 +8,11 @@ module Mutations
     def authorized?(id:, **_args)
       obj = HourglassSchema.object_from_id(id, context)
       exam = exam_for_obj(obj)
-      return false, { errors: ['Invalid target.'] } unless exam
+      raise GraphQL::ExecutionError, 'Invalid target.' unless exam
       return true if ProctorRegistration.find_by(user: context[:current_user], exam: exam)
       return true if ProfessorCourseRegistration.find_by(user: context[:current_user], course: exam.course)
 
-      [false, { errors: ['You do not have permission.'] }]
+      raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
     def resolve(id:)

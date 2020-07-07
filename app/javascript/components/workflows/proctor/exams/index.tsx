@@ -181,7 +181,6 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
 const finalizeItemMutation = graphql`
 mutation examsFinalizeItemMutation($input: FinalizeItemInput!) {
   finalizeItem(input: $input) {
-    errors
     exam {
       registrations {
         id
@@ -204,27 +203,18 @@ const FinalizeButton: React.FC<{
   const [mutate, { loading }] = useMutation<examsFinalizeItemMutation>(
     finalizeItemMutation,
     {
-      onCompleted: ({ finalizeItem }) => {
-        const { errors } = finalizeItem;
-        if (errors.length !== 0) {
-          alert({
-            variant: 'danger',
-            title: 'Error sending message',
-            message: errors.join('\n'),
-          });
-        } else {
-          alert({
-            variant: 'success',
-            autohide: true,
-            message: 'Registration finalized.',
-          });
-        }
+      onCompleted: () => {
+        alert({
+          variant: 'success',
+          autohide: true,
+          message: 'Registration finalized.',
+        });
       },
-      onError: (err) => {
+      onError: (errs) => {
         alert({
           variant: 'danger',
           title: 'Error finalizing registration',
-          message: err.message,
+          message: errs[0]?.message,
         });
       },
     },
@@ -490,29 +480,20 @@ const FinalizeRegs: React.FC<{
   const [mutate, { loading }] = useMutation<examsFinalizeItemMutation>(
     finalizeItemMutation,
     {
-      onCompleted: ({ finalizeItem }) => {
-        const { errors } = finalizeItem;
-        if (errors.length !== 0) {
-          alert({
-            variant: 'danger',
-            title: 'Error sending message',
-            message: errors.join('\n'),
-          });
-        } else {
-          closeModal();
-          alert({
-            variant: 'success',
-            title: 'Finalization successful',
-            message: `Finalized '${selectedRecipient.label}'.`,
-            autohide: true,
-          });
-        }
+      onCompleted: () => {
+        closeModal();
+        alert({
+          variant: 'success',
+          title: 'Finalization successful',
+          message: `Finalized '${selectedRecipient.label}'.`,
+          autohide: true,
+        });
       },
-      onError: (err) => {
+      onError: (errs) => {
         alert({
           variant: 'danger',
           title: `Error finalizing '${selectedRecipient.label}'`,
-          message: err.message,
+          message: errs[0]?.message,
         });
       },
     },

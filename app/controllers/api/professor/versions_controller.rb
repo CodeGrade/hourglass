@@ -49,25 +49,6 @@ module Api
         }, status: :created
       end
 
-      def create
-        n = @exam.exam_versions.length + 1
-        @version = ExamVersion.create(
-          exam: @exam,
-          name: "#{@exam.name} Version #{n}",
-          files: [],
-          info: {
-            policies: [],
-            answers: [],
-            contents: {
-              reference: [],
-              questions: [],
-            },
-          }
-        )
-        @version.save!
-        render json: @version.serialize
-      end
-
       def destroy
         @version.destroy!
         render json: {}

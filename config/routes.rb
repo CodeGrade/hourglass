@@ -11,7 +11,7 @@ Rails.application.routes.draw do
         member do
           resources :exams, param: 'exam_id', only: [] do
             member do
-              resources :versions, param: 'version_id', only: [:destroy] do
+              resources :versions, param: 'version_id', only: [] do
                 collection do
                   post :import
                 end

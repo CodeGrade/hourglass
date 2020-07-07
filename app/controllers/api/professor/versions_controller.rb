@@ -3,16 +3,10 @@
 module Api
   module Professor
     class VersionsController < ProfessorController
-      before_action :find_version, only: [:show, :destroy, :export_file, :export_archive]
+      before_action :find_version, only: [:export_file, :export_archive]
       before_action :find_exam_and_course
 
       before_action :require_prof_reg
-
-      before_action :no_started_regs, only: [:destroy]
-
-      def show
-        render json: @version.serialize
-      end
 
       def import
         uploaded_file = params.require(:upload)
@@ -28,11 +22,6 @@ module Api
         render json: {
           id: @version.id,
         }, status: :created
-      end
-
-      def destroy
-        @version.destroy!
-        render json: {}
       end
 
       def export_file
@@ -51,12 +40,6 @@ module Api
           ArchiveUtils.create_zip zip_path, Dir.glob(contents_path.join('**'))
           send_data File.read(zip_path), type: :zip, disposition: 'attachment', filename: fname
         end
-      end
-
-      private
-
-      def no_started_regs
-        head :conflict if @version.any_started?
       end
     end
   end

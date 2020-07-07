@@ -42,7 +42,6 @@ import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
-import deleteVersion from '@hourglass/common/api/professor/exams/versions/delete';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { DateTime } from 'luxon';
 import { importVersion } from '@hourglass/common/api/professor/exams/versions/import';
@@ -67,6 +66,7 @@ import { ChecklistItemStatus, admin_checklist$key } from './__generated__/admin_
 import { admin_versionInfo$key } from './__generated__/admin_versionInfo.graphql';
 import { admin_version$key } from './__generated__/admin_version.graphql';
 import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMutation.graphql';
+import { adminDestroyVersionMutation } from './__generated__/adminDestroyVersionMutation.graphql';
 
 export interface ExamUpdateInfo {
   name: string;
@@ -579,9 +579,13 @@ const VersionInfo: React.FC<{
     fragment admin_versionInfo on Exam {
       id
       name
-      examVersions {
-        id
-        ...admin_version
+      examVersions(first: 100) @connection(key: "Exam_examVersions", filters: []) {
+        edges {
+          node {
+            id
+            ...admin_version
+          }
+        }
       }
     }
     `,
@@ -672,10 +676,11 @@ const VersionInfo: React.FC<{
         </div>
       </h2>
       <ul>
-        {res.examVersions.map((v) => (
-          <li key={v.id}>
+        {res.examVersions.edges.map(({ node: version }) => (
+          <li key={version.id}>
             <ShowVersion
-              version={v}
+              examId={res.id}
+              version={version}
               examName={res.name}
             />
           </li>
@@ -686,10 +691,12 @@ const VersionInfo: React.FC<{
 };
 
 const ShowVersion: React.FC<{
+  examId: string;
   version: admin_version$key;
   examName: string;
 }> = (props) => {
   const {
+    examId,
     version,
     examName,
   } = props;
@@ -706,9 +713,45 @@ const ShowVersion: React.FC<{
     `,
     version,
   );
-  const { examId } = useParams();
+  const { examId: examRailsId } = useParams();
   const { alert } = useContext(AlertContext);
   const [preview, setPreview] = useState(false);
+  const [mutate, { loading }] = useMutation<adminDestroyVersionMutation>(
+    graphql`
+    mutation adminDestroyVersionMutation($input: DestroyExamVersionInput!) {
+      destroyExamVersion(input: $input) {
+        deletedId
+      }
+    }
+    `,
+    {
+      onCompleted: () => {
+        alert({
+          variant: 'success',
+          autohide: true,
+          message: 'Version deleted successfully.',
+        });
+      },
+      onError: (errs) => {
+        alert({
+          variant: 'danger',
+          title: 'Error deleting version.',
+          message: errs[0]?.message,
+        });
+      },
+      configs: [
+        {
+          type: 'RANGE_DELETE',
+          parentID: examId,
+          connectionKeys: [{
+            key: 'Exam_examVersions',
+          }],
+          pathToConnection: ['exam', 'examVersions'],
+          deletedIDFieldName: 'deletedId',
+        },
+      ],
+    },
+  );
   return (
     <>
       <h3 className="flex-grow-1">
@@ -723,46 +766,44 @@ const ShowVersion: React.FC<{
         </span>
         <div className="float-right">
           <DropdownButton
+            disabled={loading}
             id={`version-${res.id}-export-button`}
             className="d-inline-block mr-2"
             title="Export"
           >
             <Dropdown.Item
+              disabled={loading}
               href={`/api/professor/versions/${res.railsId}/export_file`}
             >
               Export as single file
             </Dropdown.Item>
             <Dropdown.Item
+              disabled={loading}
               href={`/api/professor/versions/${res.railsId}/export_archive`}
             >
               Export as archive
             </Dropdown.Item>
           </DropdownButton>
           <LinkButton
+            disabled={loading}
             variant="info"
-            to={`/exams/${examId}/versions/${res.railsId}/edit`}
+            to={`/exams/${examRailsId}/versions/${res.railsId}/edit`}
             className="mr-2"
           >
             Edit
           </LinkButton>
           <TooltipButton
             variant="danger"
-            disabled={res.anyStarted}
+            disabled={res.anyStarted || loading}
             disabledMessage="Students have already started taking this exam version"
             cursorClass="cursor-not-allowed"
             onClick={(): void => {
-              deleteVersion(res.railsId).then(() => {
-                alert({
-                  variant: 'success',
-                  autohide: true,
-                  message: 'Version deleted successfully.',
-                });
-              }).catch((err) => {
-                alert({
-                  variant: 'danger',
-                  title: 'Error deleting version.',
-                  message: err.message,
-                });
+              mutate({
+                variables: {
+                  input: {
+                    examVersionId: res.id,
+                  },
+                },
               });
             }}
           >
@@ -774,7 +815,7 @@ const ShowVersion: React.FC<{
         <PreviewVersion
           open={preview}
           railsExam={{
-            id: examId,
+            id: examRailsId,
             name: examName,
             policies: res.policies as Policy[],
           }}

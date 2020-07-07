@@ -9,6 +9,11 @@ class ExamVersion < ApplicationRecord
   has_many :registrations, dependent: :destroy
   has_many :version_announcements, dependent: :destroy
 
+  has_many :started_registrations, -> { where.not start_time: nil }, {
+    class_name: 'Registration',
+    dependent: :restrict_with_error, inverse_of: 'exam_version'
+  }
+
   has_many :users, through: :registrations
   has_many :anomalies, through: :registrations
 

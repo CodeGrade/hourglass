@@ -99,7 +99,7 @@ const ShowCourse: React.FC = () => {
             </Route>
             <Route path="/courses/:courseId/sync" exact>
               <DocumentTitle title={`Sync - ${props.course.title}`}>
-                <SyncCourse />
+                <SyncCourse courseId={props.course.id} />
               </DocumentTitle>
             </Route>
             <Route path="/courses/:courseId/new" exact>

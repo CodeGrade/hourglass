@@ -1,31 +1,72 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useParams } from 'react-router-dom';
-import { useResponse as useCourseSync } from '@hourglass/common/api/professor/courses/sync';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { useMutation, graphql } from 'relay-hooks';
+import { Button } from 'react-bootstrap';
+import { AlertContext } from '@hourglass/common/alerts';
 
-const SyncCourse: React.FC = () => (
-  <>
-    <h2>Sync with Bottlenose</h2>
-    <DoSync />
-  </>
-);
+import { syncMutation } from './__generated__/syncMutation.graphql';
+
+const SyncCourse: React.FC<{
+  courseId: string;
+}> = (props) => {
+  const { courseId } = props;
+  return (
+    <>
+      <h2>Sync with Bottlenose</h2>
+      <DoSync courseId={courseId} />
+    </>
+  );
+}
 
 export default SyncCourse;
 
-const DoSync: React.FC = () => {
-  const { courseId } = useParams();
-  const res = useCourseSync(courseId);
-  switch (res.type) {
-    case 'ERROR':
-      return <p>Hourglass error.</p>;
-    case 'LOADING':
-      return <p>Loading...</p>;
-    case 'RESULT':
-      if (res.response.synced === false) {
-        return <p className="text-danger">{res.response.reason}</p>;
+const DoSync: React.FC<{
+  courseId: string;
+}> = (props) => {
+  const { courseId } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<syncMutation>(
+    graphql`
+    mutation syncMutation($input: SyncCourseToBottlenoseInput!) {
+      syncCourseToBottlenose(input: $input) {
+        course {
+          title
+        }
       }
-      return <p>Synced.</p>;
-    default:
-      throw new ExhaustiveSwitchError(res);
-  }
+    }
+    `,
+    {
+      onCompleted: ({ syncCourseToBottlenose }) => {
+        alert({
+          variant: 'success',
+          title: 'Course synced',
+          message: `${syncCourseToBottlenose.course.title} was synced successfully.`,
+        });
+      },
+      onError: (errs) => {
+        alert({
+          variant: 'danger',
+          title: 'Error syncing course',
+          message: errs[0]?.message,
+        });
+      },
+    },
+  );
+  return (
+    <Button
+      disabled={loading}
+      variant="danger"
+      onClick={() => {
+        mutate({
+          variables: {
+            input: {
+              courseId,
+            },
+          },
+        });
+      }}
+    >
+      Really sync
+    </Button>
+  );
 };

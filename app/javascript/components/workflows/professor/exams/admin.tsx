@@ -892,7 +892,7 @@ const ExamAdmin: React.FC = () => {
               />
             </Form.Group>
             <Form.Group>
-              <Link to={`/exams/${examId}/proctoring`}>
+              <Link to={`/exams/${props.exam.id}/proctoring`}>
                 <Button variant="success">Proctor!</Button>
               </Link>
               <Link to={`/exams/${examId}/submissions`}>

@@ -709,6 +709,8 @@ const ShowVersion: React.FC<{
       policies
       anyStarted
       contents
+      fileExportUrl
+      archiveExportUrl
     }
     `,
     version,
@@ -773,13 +775,13 @@ const ShowVersion: React.FC<{
           >
             <Dropdown.Item
               disabled={loading}
-              href={`/api/professor/versions/${res.railsId}/export_file`}
+              href={res.fileExportUrl}
             >
               Export as single file
             </Dropdown.Item>
             <Dropdown.Item
               disabled={loading}
-              href={`/api/professor/versions/${res.railsId}/export_archive`}
+              href={res.archiveExportUrl}
             >
               Export as archive
             </Dropdown.Item>

@@ -30,5 +30,15 @@ module Types
     def contents
       object.old_contents.to_json
     end
+
+    field :file_export_url, String, null: false
+    def file_export_url
+      Rails.application.routes.url_helpers.export_file_api_professor_version_path(object)
+    end
+
+    field :archive_export_url, String, null: false
+    def archive_export_url
+      Rails.application.routes.url_helpers.export_archive_api_professor_version_path(object)
+    end
   end
 end

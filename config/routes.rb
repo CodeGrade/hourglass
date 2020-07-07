@@ -9,7 +9,6 @@ Rails.application.routes.draw do
     namespace :professor do
       resources :courses, shallow: true, param: 'course_id', only: [] do
         member do
-          post :sync
           resources :exams, param: 'exam_id', only: [:show] do
             member do
               resources :versions, param: 'version_id', only: [:create, :update, :destroy] do

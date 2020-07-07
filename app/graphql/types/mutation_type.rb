@@ -1,5 +1,6 @@
 module Types
   class MutationType < Types::BaseObject
+    field :sync_course_to_bottlenose, mutation: Mutations::SyncCourseToBottlenose
     field :update_student_seating, mutation: Mutations::UpdateStudentSeating
     field :update_staff_seating, mutation: Mutations::UpdateStaffSeating
     field :update_exam_rooms, mutation: Mutations::UpdateExamRooms

@@ -3,6 +3,8 @@ module Mutations
     argument :accommodation_id, ID, required: true, loads: Types::AccommodationType
 
     field :deletedId, ID, null: false
+    field :registration_edge, Types::RegistrationType.edge_type, null: false
+    field :registration, Types::RegistrationType, null: false
     field :errors, [String], null: false
 
     def authorized?(accommodation:)
@@ -15,9 +17,18 @@ module Mutations
     end
 
     def resolve(accommodation:)
+      reg = accommodation.registration
+      range_add = GraphQL::Relay::RangeAdd.new(
+        parent: accommodation.exam,
+        collection: accommodation.exam.registrations,
+        item: reg,
+        context: context,
+      )
       accommodation.destroy!
       {
         deletedId: HourglassSchema.id_from_object(accommodation, Types::AccommodationType, context),
+        registration_edge: range_add.edge,
+        registration: reg,
         errors: [],
       }
     end

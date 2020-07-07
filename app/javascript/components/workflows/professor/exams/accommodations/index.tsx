@@ -120,6 +120,14 @@ const SingleAccommodation: React.FC<{
     graphql`
     mutation accommodationsDestroyMutation($input: DestroyAccommodationInput!) {
       destroyAccommodation(input: $input) {
+        registrationEdge {
+          node {
+            id
+            user {
+              displayName
+            }
+          }
+        }
         deletedId
         errors
       }
@@ -143,14 +151,26 @@ const SingleAccommodation: React.FC<{
           });
         }
       },
-      updater: (store) => {
-        const payload = store.getRootField('destroyAccommodation');
-        const deletedId = payload.getValue('deletedId');
-        const exam = store.get(examId);
-        const conn = ConnectionHandler.getConnection(exam, 'Exam_accommodations');
-        ConnectionHandler.deleteNode(conn, deletedId);
-        store.delete(deletedId);
-      },
+      configs: [
+        {
+          type: 'RANGE_ADD',
+          parentID: examId,
+          connectionInfo: [{
+            key: 'Exam_registrationsWithoutAccommodation',
+            rangeBehavior: 'append',
+          }],
+          edgeName: 'registrationEdge',
+        },
+        {
+          type: 'RANGE_DELETE',
+          parentID: examId,
+          connectionKeys: [{
+            key: 'Exam_accommodations',
+          }],
+          pathToConnection: ['exam', 'accommodations'],
+          deletedIDFieldName: 'deletedId',
+        },
+      ],
     },
   );
   const [update, { loading: updateLoading }] = useMutation<accommodationsUpdateMutation>(

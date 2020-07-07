@@ -56,6 +56,16 @@ class ExamVersion < ApplicationRecord
     }
   end
 
+  def self.new_empty(exam)
+    n = exam.exam_versions.length + 1
+    new(
+      exam: exam,
+      name: "#{exam.name} Version #{n}",
+      files: [],
+      info: { policies: [], answers: [], contents: { reference: [], questions: [] } },
+    )
+  end
+
   def any_started?
     registrations.started.exists?
   end

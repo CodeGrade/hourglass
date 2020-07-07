@@ -10,27 +10,15 @@ module Mutations
         course: exam.course,
       )
 
-      [false, { errors: ['You do not have permission.'] }]
+      raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
     def resolve(exam:)
-      version = new_empty_version(exam)
+      version = ExamVersion.new_empty(exam)
       saved = version.save
       raise GraphQL::ExecutionError, version.errors.full_messages.to_sentence unless saved
 
       { exam_version: version }
-    end
-
-    private
-
-    def new_empty_version(exam)
-      n = exam.exam_versions.length + 1
-      ExamVersion.new(
-        exam: exam,
-        name: "#{exam.name} Version #{n}",
-        files: [],
-        info: { policies: [], answers: [], contents: { reference: [], questions: [] } },
-      )
     end
   end
 end

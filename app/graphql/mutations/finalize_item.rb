@@ -3,7 +3,6 @@ module Mutations
     argument :id, ID, required: true
 
     field :exam, Types::ExamType, null: true
-    field :errors, [String], null: false
 
     def authorized?(id:, **_args)
       obj = HourglassSchema.object_from_id(id, context)
@@ -19,9 +18,7 @@ module Mutations
       obj = HourglassSchema.object_from_id(id, context)
       obj.finalize!
       exam = exam_for_obj(obj)
-      return { exam: nil, errors: ['Invalid finalization target.'] } unless exam
-
-      { exam: exam, errors: [] }
+      { exam: exam }
     end
 
     private
@@ -32,6 +29,8 @@ module Mutations
         obj
       when ExamVersion, Room, Registration
         obj.exam
+      else
+        raise GraphQL::ExecutionError, 'Invalid finalization target'
       end
     end
   end

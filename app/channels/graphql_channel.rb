@@ -19,7 +19,7 @@ class GraphqlChannel < ApplicationCable::Channel
       query: query,
       context: context,
       variables: variables,
-      operation_name: operation_name
+      operation_name: operation_name,
     })
 
     payload = {

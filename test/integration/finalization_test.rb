@@ -17,7 +17,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
   FINALIZE_ITEM_QUERY = <<-GRAPHQL
     mutation finalizeItem($input: FinalizeItemInput!) {
       finalizeItem(input: $input) {
-        errors
+        clientMutationId
       }
     }
   GRAPHQL
@@ -37,7 +37,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
       id: HourglassSchema.id_from_object(@exam, Types::ExamType, {}),
     })
 
-    assert_equal [], result['data']['finalizeItem']['errors']
+    assert_not result['errors']
     @registration.reload
     @room.reload
     @version.reload
@@ -58,7 +58,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
       id: HourglassSchema.id_from_object(@version, Types::ExamVersionType, {}),
     })
 
-    assert_equal [], result['data']['finalizeItem']['errors']
+    assert_not result['errors']
     @registration.reload
     @room.reload
     @version.reload
@@ -75,7 +75,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
       id: HourglassSchema.id_from_object(@room, Types::RoomType, {}),
     })
 
-    assert_equal [], result['data']['finalizeItem']['errors']
+    assert_not result['errors']
     @registration.reload
     @room.reload
     assert @registration.final?
@@ -88,7 +88,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
       id: HourglassSchema.id_from_object(@registration, Types::RegistrationType, {}),
     })
 
-    assert_equal [], result['data']['finalizeItem']['errors']
+    assert_not result['errors']
     @registration.reload
     assert @registration.final?
   end

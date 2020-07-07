@@ -1,12 +1,11 @@
 class Subscriptions::AnomalyWasCreated < Subscriptions::BaseSubscription
-  argument :exam_rails_id, Integer, required: true
+  argument :exam_id, ID, required: true, loads: Types::ExamType
 
-  field :anomaly, Types::AnomalyType, null: true
-  field :anomaliesConnection, Types::AnomalyType.connection_type, null: true
-  field :anomalyEdge, Types::AnomalyType.edge_type, null: true
+  field :anomaly, Types::AnomalyType, null: false
+  field :anomalies_connection, Types::AnomalyType.connection_type, null: false
+  field :anomaly_edge, Types::AnomalyType.edge_type, null: false
 
-  def authorized?(exam_rails_id:)
-    exam = Exam.find_by!(id: exam_rails_id)
+  def authorized?(exam:)
     return true if ProctorRegistration.find_by(
       user: context[:current_user],
       exam: exam,
@@ -19,21 +18,17 @@ class Subscriptions::AnomalyWasCreated < Subscriptions::BaseSubscription
     raise GraphQL::ExecutionError, 'You do not have permission.'
   end
 
-  def update(exam_rails_id:)
-    exam = Exam.find_by(id: exam_rails_id)
-    raise GraphQL::ExecutionError, 'Invalid exam.' unless exam
+  def subscribe(**_args)
+    :no_content
+  end
 
-    range_add = GraphQL::Relay::RangeAdd.new(
-      parent: exam,
-      collection: exam.anomalies,
-      item: object,
-      context: context,
-    )
+  def update(exam:)
+    range_add = GraphQL::Relay::RangeAdd.new(parent: exam, collection: exam.anomalies, item: object, context: context)
 
     {
       anomaly: object,
-      anomaliesConnection: range_add.connection,
-      anomalyEdge: range_add.edge,
+      anomalies_connection: range_add.connection,
+      anomaly_edge: range_add.edge,
     }
   end
 end

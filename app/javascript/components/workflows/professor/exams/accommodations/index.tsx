@@ -291,7 +291,7 @@ const NewAccommodation: React.FC<{
     graphql`
     fragment accommodations_regsWithout on Exam {
       id
-      registrationsWithoutAccommodation(first: 100) @connection(key: "Exam_registrationsWithoutAccommodation", filters: []) {
+      registrationsWithoutAccommodation(first: 100000) @connection(key: "Exam_registrationsWithoutAccommodation", filters: []) {
         edges {
           node {
             id

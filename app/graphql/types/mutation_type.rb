@@ -1,5 +1,6 @@
 module Types
   class MutationType < Types::BaseObject
+    field :destroy_exam_version, mutation: Mutations::DestroyExamVersion
     field :update_exam_version, mutation: Mutations::UpdateExamVersion
     field :create_exam_version, mutation: Mutations::CreateExamVersion
     field :sync_course_to_bottlenose, mutation: Mutations::SyncCourseToBottlenose

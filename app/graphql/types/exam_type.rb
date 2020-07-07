@@ -15,7 +15,7 @@ module Types
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
     field :course, Types::CourseType, null: false
-    field :exam_versions, [Types::ExamVersionType], null: false
+    field :exam_versions, Types::ExamVersionType.connection_type, null: false
 
     field :students, [Types::UserType], null: false
     field :rooms, [Types::RoomType], null: false

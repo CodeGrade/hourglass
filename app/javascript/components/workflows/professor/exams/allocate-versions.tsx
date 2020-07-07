@@ -33,7 +33,7 @@ import { allocateVersionsMutation } from './__generated__/allocateVersionsMutati
 
 type Section = allocateVersions['course']['sections'][number];
 type Student = allocateVersions['unassignedStudents'][number];
-type Version = allocateVersions['examVersions'][number];
+type Version = allocateVersions['examVersions']['edges'][number]['node'];
 
 interface FormContextType {
   sections: readonly Section[];
@@ -487,13 +487,17 @@ const DND: React.FC<{
         username
         displayName
       }
-      examVersions {
-        railsId
-        name
-        students {
-          railsId
-          username
-          displayName
+      examVersions(first: 100) @connection(key: "Exam_examVersions", filters: []) {
+        edges {
+          node {
+            railsId
+            name
+            students {
+              railsId
+              username
+              displayName
+            }
+          }
         }
       }
     }
@@ -505,7 +509,7 @@ const DND: React.FC<{
       examId={res.id}
       sections={res.course.sections}
       unassigned={res.unassignedStudents}
-      versions={res.examVersions}
+      versions={res.examVersions.edges.map((e) => e.node)}
     />
   );
 };

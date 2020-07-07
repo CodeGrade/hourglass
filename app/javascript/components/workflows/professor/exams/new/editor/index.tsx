@@ -190,7 +190,7 @@ export default Editor;
 interface FormValues {
   all: {
     name: string;
-    policies: Policy[];
+    policies: readonly Policy[];
     exam: ExamVersionWithAnswers;
   };
 }

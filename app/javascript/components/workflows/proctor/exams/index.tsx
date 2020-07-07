@@ -1413,9 +1413,13 @@ const ProctoringSplitView: React.FC<{
       ...exams_anomalies
       ...exams_messages
       id
-      examVersions {
-        id
-        name
+      examVersions(first: 100) @connection(key: "Exam_examVersions", filters: []) {
+        edges {
+          node {
+            id
+            name
+          }
+        }
       }
       registrations {
         id
@@ -1437,7 +1441,7 @@ const ProctoringSplitView: React.FC<{
       exam={res}
       examId={res.id}
       recipients={{
-        versions: res.examVersions.map((ev) => {
+        versions: res.examVersions.edges.map(({ node: ev }) => {
           const r: Recipient = {
             type: MessageType.Version,
             id: ev.id,

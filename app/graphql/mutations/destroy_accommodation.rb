@@ -6,15 +6,9 @@ module Mutations
     field :errors, [String], null: false
 
     def authorized?(accommodation:)
-      exam = accommodation.exam
-      return true if ProctorRegistration.find_by(
-        user: context[:current_user],
-        exam: exam,
-      )
-
       return true if ProfessorCourseRegistration.find_by(
         user: context[:current_user],
-        course: exam.course,
+        course: accommodation.exam.course,
       )
 
       [false, { errors: ['You do not have permission.'] }]

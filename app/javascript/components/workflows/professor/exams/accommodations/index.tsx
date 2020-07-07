@@ -114,7 +114,6 @@ const SingleAccommodation: React.FC<{
   const edit = useCallback(() => setEditing(true), []);
   const stopEdit = useCallback(() => setEditing(false), []);
   const { alert } = useContext(AlertContext);
-  // TODO: update registrationsWithoutAccommodation
   const [destroy, { loading: destroyLoading }] = useMutation<accommodationsDestroyMutation>(
     graphql`
     mutation accommodationsDestroyMutation($input: DestroyAccommodationInput!) {
@@ -128,27 +127,24 @@ const SingleAccommodation: React.FC<{
           }
         }
         deletedId
-        errors
       }
     }
     `,
     {
-      onCompleted: ({ destroyAccommodation }) => {
-        const { errors } = destroyAccommodation;
-        if (errors.length !== 0) {
-          alert({
-            variant: 'danger',
-            title: 'Error deleting accommodation',
-            message: errors.join('\n'),
-          });
-        } else {
-          alert({
-            variant: 'success',
-            title: 'Successfully deleted accommodation',
-            autohide: true,
-            message: `Accommodation for '${accommodation.registration.user.displayName}' deleted.`,
-          });
-        }
+      onCompleted: () => {
+        alert({
+          variant: 'success',
+          title: 'Successfully deleted accommodation',
+          autohide: true,
+          message: `Accommodation for '${accommodation.registration.user.displayName}' deleted.`,
+        });
+      },
+      onError: (errs) => {
+        alert({
+          variant: 'danger',
+          title: 'Error deleting accommodation',
+          message: errs[0]?.message,
+        });
       },
       configs: [
         {

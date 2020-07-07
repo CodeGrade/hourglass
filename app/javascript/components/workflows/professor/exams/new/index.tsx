@@ -24,7 +24,6 @@ const NewExamForm: React.FC<{
     graphql`
     mutation newExamMutation($input: CreateExamInput!) {
       createExam(input: $input) {
-        errors
         exam {
           railsId
         }
@@ -33,16 +32,15 @@ const NewExamForm: React.FC<{
     `,
     {
       onCompleted: ({ createExam }) => {
-        const { exam, errors } = createExam;
-        if (errors.length !== 0) {
-          alert({
-            variant: 'danger',
-            title: 'Error creating exam.',
-            message: errors.join('\n'),
-          });
-        } else {
-          history.push(`/exams/${exam.railsId}/admin`);
-        }
+        const { exam } = createExam;
+        history.push(`/exams/${exam.railsId}/admin`);
+      },
+      onError: (errs) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating exam.',
+          message: errs[0]?.message,
+        });
       },
     },
   );

@@ -6,8 +6,7 @@ module Mutations
     argument :start_time, GraphQL::Types::ISO8601DateTime, required: true
     argument :end_time, GraphQL::Types::ISO8601DateTime, required: true
 
-    field :exam, Types::ExamType, null: true
-    field :errors, [String], null: false
+    field :exam, Types::ExamType, null: false
 
     def authorized?(course:, **_args)
       return true if ProfessorCourseRegistration.find_by(
@@ -20,17 +19,10 @@ module Mutations
 
     def resolve(**args)
       exam = Exam.new(args)
-      if exam.save
-        {
-          exam: exam,
-          errors: [],
-        }
-      else
-        {
-          exam: nil,
-          errors: exam.errors.full_messages,
-        }
-      end
+      saved = exam.save
+      raise GraphQL::ExecutionError, exam.errors.full_messages.to_sentence unless saved
+
+      { exam: exam }
     end
   end
 end

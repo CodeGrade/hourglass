@@ -263,23 +263,15 @@ const ClearButton: React.FC<{
     }
     `,
     {
-      // configs: [{
-      //   type: 'RANGE_DELETE',
-      //   parentID: examId,
-      //   connectionKeys: [{
-      //     key: 'Exam_anomalies',
-      //   }],
-      //   pathToConnection: ['exam', 'anomalies'],
-      //   deletedIDFieldName: 'deletedId',
-      // }],
-      updater: (store) => {
-        const payload = store.getRootField('destroyAnomaly');
-        const deletedId = payload.getValue('deletedId');
-        const exam = store.get(examId);
-        const conn = ConnectionHandler.getConnection(exam, 'Exam_anomalies');
-        ConnectionHandler.deleteNode(conn, deletedId);
-        store.delete(deletedId);
-      },
+      configs: [{
+        type: 'RANGE_DELETE',
+        parentID: examId,
+        connectionKeys: [{
+          key: 'Exam_anomalies',
+        }],
+        pathToConnection: ['exam', 'anomalies'],
+        deletedIDFieldName: 'deletedId',
+      }],
       onCompleted: ({ destroyAnomaly }) => {
         const { errors } = destroyAnomaly;
         if (errors.length !== 0) {

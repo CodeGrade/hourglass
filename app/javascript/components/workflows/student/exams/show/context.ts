@@ -7,6 +7,7 @@ import {
   AnswersState,
   FileRef,
 } from '@student/exams/show/types';
+import { DateTime } from 'luxon';
 
 interface ExamContext {
   files: ExamFile[];
@@ -17,6 +18,8 @@ export const ExamContext = createContext<ExamContext>({} as ExamContext);
 interface RailsContext {
   railsExam: RailsExamVersion;
   anomalous: boolean;
+  over: boolean;
+  lastSnapshotTime: DateTime;
   railsUser: RailsUser;
 }
 export const RailsContext = createContext<RailsContext>({} as RailsContext);

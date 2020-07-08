@@ -28,6 +28,8 @@ interface ShowExamProps {
 
   anomalous: boolean;
 
+  over: boolean;
+
   // Whether the exam is complete.
   final: boolean;
 
@@ -39,18 +41,24 @@ const Exam: React.FC<ShowExamProps> = (props) => {
     railsUser,
     railsExam,
     anomalous,
+    over,
     final,
     lastSnapshot,
   } = props;
   const railsContext = React.useMemo(() => ({
     railsExam,
     anomalous,
+    over,
     railsUser,
+    lastSnapshotTime: lastSnapshot,
   }), [
+    // TODO: move railsExam fields up
+    // NOTE: no good way to check array-equality of policies here
     ...Object.values(railsExam),
     anomalous,
-    // NOTE: no good way to check array-equality of policies here
+    over,
     ...Object.values(railsUser),
+    lastSnapshot.toISO(),
   ]);
   return (
     <RailsContext.Provider value={railsContext}>
@@ -80,6 +88,7 @@ const ShowExam: React.FC = () => {
               final
               lastSnapshotTime
               anomalous
+              over
               examVersion {
                 policies
               }
@@ -126,14 +135,15 @@ const ShowExam: React.FC = () => {
           name: props.exam.name,
           policies: props.exam.myRegistration.examVersion.policies as Policy[],
         };
-        const { final, lastSnapshotTime } = props.exam.myRegistration;
+        const { final, over, anomalous, lastSnapshotTime } = props.exam.myRegistration;
         const lastSnapshot = lastSnapshotTime ? DateTime.fromISO(lastSnapshotTime) : undefined;
         return (
           <DocumentTitle title={props.exam.name}>
             <Exam
               railsUser={railsUser}
               railsExam={railsExam}
-              anomalous={props.exam.myRegistration.anomalous}
+              over={over}
+              anomalous={anomalous}
               final={final}
               lastSnapshot={lastSnapshot}
             />

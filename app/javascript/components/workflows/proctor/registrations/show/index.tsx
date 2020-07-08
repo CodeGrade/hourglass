@@ -13,13 +13,11 @@ import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
 
 interface ExamViewerProps {
-  railsExam: RailsExamVersion;
   contents: ContentsState;
 }
 
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {
   const {
-    railsExam,
     contents,
   } = props;
   const {
@@ -36,28 +34,26 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
   return (
     <ExamContext.Provider value={{ files, fmap }}>
       <ExamViewerContext.Provider value={{ answers }}>
-        <RailsContext.Provider value={{ railsExam }}>
-          <ExamFilesContext.Provider value={{ references: reference }}>
-            <div>
-              {answers.scratch && (
-                <div>
-                  <span>Scratch space:</span>
-                  <Scratch
-                    value={answers.scratch}
-                    disabled
-                  />
-                </div>
-              )}
-              {instructions && <HTML value={instructions} />}
-              {reference.length !== 0 && <FileViewer references={reference} />}
+        <ExamFilesContext.Provider value={{ references: reference }}>
+          <div>
+            {answers.scratch && (
               <div>
-                <DisplayQuestions
-                  questions={questions}
+                <span>Scratch space:</span>
+                <Scratch
+                  value={answers.scratch}
+                  disabled
                 />
               </div>
+            )}
+            {instructions && <HTML value={instructions} />}
+            {reference.length !== 0 && <FileViewer references={reference} />}
+            <div>
+              <DisplayQuestions
+                questions={questions}
+              />
             </div>
-          </ExamFilesContext.Provider>
-        </RailsContext.Provider>
+          </div>
+        </ExamFilesContext.Provider>
       </ExamViewerContext.Provider>
     </ExamContext.Provider>
   );

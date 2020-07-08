@@ -36,7 +36,7 @@ import {
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
-import { RailsExamVersion, ContentsState, Policy } from '@student/exams/show/types';
+import { ContentsState } from '@student/exams/show/types';
 import { Editor as CodeMirrorEditor } from 'codemirror';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
@@ -586,7 +586,6 @@ const VersionInfo: React.FC<{
     exam,
   );
   const { alert } = useContext(AlertContext);
-  const { examId: examRailsId } = useParams();
   const history = useHistory();
   const fileInputRef = createRef<HTMLInputElement>();
   const [createVersion, { loading }] = useMutation<adminCreateVersionMutation>(
@@ -594,7 +593,6 @@ const VersionInfo: React.FC<{
     mutation adminCreateVersionMutation($input: CreateExamVersionInput!) {
       createExamVersion(input: $input) {
         examVersion {
-          railsId
           id
         }
       }
@@ -602,7 +600,7 @@ const VersionInfo: React.FC<{
     `,
     {
       onCompleted: ({ createExamVersion }) => {
-        history.push(`/exams/${examRailsId}/versions/${createExamVersion.examVersion.railsId}/edit`);
+        history.push(`/exams/${res.id}/versions/${createExamVersion.examVersion.id}/edit`);
       },
       onError: (errs) => {
         alert({
@@ -627,7 +625,7 @@ const VersionInfo: React.FC<{
               const [f] = files;
               if (!f) return;
               uploadFile<{ id: number; }>(res.examVersionUploadUrl, f).then((innerRes) => {
-                history.push(`/exams/${examRailsId}/versions/${innerRes.id}/edit`);
+                history.push(`/exams/${res.id}/versions/${innerRes.id}/edit`);
                 alert({
                   variant: 'success',
                   autohide: true,
@@ -675,7 +673,6 @@ const VersionInfo: React.FC<{
             <ShowVersion
               examId={res.id}
               version={version}
-              examName={res.name}
             />
           </li>
         ))}
@@ -687,18 +684,15 @@ const VersionInfo: React.FC<{
 const ShowVersion: React.FC<{
   examId: string;
   version: admin_version$key;
-  examName: string;
 }> = (props) => {
   const {
     examId,
     version,
-    examName,
   } = props;
   const res = useFragment(
     graphql`
     fragment admin_version on ExamVersion {
       id
-      railsId
       name
       policies
       anyStarted
@@ -709,7 +703,6 @@ const ShowVersion: React.FC<{
     `,
     version,
   );
-  const { examId: examRailsId } = useParams();
   const { alert } = useContext(AlertContext);
   const [preview, setPreview] = useState(false);
   const [mutate, { loading }] = useMutation<adminDestroyVersionMutation>(
@@ -783,7 +776,7 @@ const ShowVersion: React.FC<{
           <LinkButton
             disabled={loading}
             variant="info"
-            to={`/exams/${examRailsId}/versions/${res.railsId}/edit`}
+            to={`/exams/${examId}/versions/${res.id}/edit`}
             className="mr-2"
           >
             Edit
@@ -810,11 +803,6 @@ const ShowVersion: React.FC<{
       <ErrorBoundary>
         <PreviewVersion
           open={preview}
-          railsExam={{
-            id: examRailsId,
-            name: examName,
-            policies: res.policies as Policy[],
-          }}
           contents={JSON.parse(res.contents)}
         />
       </ErrorBoundary>
@@ -829,12 +817,10 @@ interface CodeMirroredElement extends Element {
 const PreviewVersion: React.FC<{
   open: boolean;
   contents: ContentsState;
-  railsExam: RailsExamVersion;
 }> = (props) => {
   const {
     open,
     contents,
-    railsExam,
   } = props;
   useEffect(() => {
     if (!open) return;
@@ -846,7 +832,6 @@ const PreviewVersion: React.FC<{
     <Collapse in={open}>
       <div className="border p-2">
         <ExamViewer
-          railsExam={railsExam}
           contents={contents}
         />
       </div>
@@ -860,8 +845,8 @@ const ExamAdmin: React.FC = () => {
     <QueryRenderer<adminExamQuery>
       environment={environment}
       query={graphql`
-        query adminExamQuery($examRailsId: Int!) {
-          exam(railsId: $examRailsId) {
+        query adminExamQuery($examId: ID!) {
+          exam(id: $examId) {
             id
             name
             startTime
@@ -873,11 +858,16 @@ const ExamAdmin: React.FC = () => {
         }
         `}
       variables={{
-        examRailsId: Number(examId),
+        examId,
       }}
       render={({ error, props }) => {
         if (error) {
-          return <p>Error</p>;
+          return (
+            <>
+              <p>Error</p>
+              <p>{error.message}</p>
+            </>
+          );
         }
         if (!props) {
           return <p>Loading...</p>;
@@ -895,7 +885,7 @@ const ExamAdmin: React.FC = () => {
               <Link to={`/exams/${props.exam.id}/proctoring`}>
                 <Button variant="success">Proctor!</Button>
               </Link>
-              <Link to={`/exams/${examId}/submissions`}>
+              <Link to={`/exams/${props.exam.id}/submissions`}>
                 <Button className="ml-2" variant="primary">View submissions</Button>
               </Link>
             </Form.Group>

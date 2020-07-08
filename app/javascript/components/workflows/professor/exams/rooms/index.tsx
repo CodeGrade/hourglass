@@ -273,7 +273,6 @@ const ExamRoomsForm: React.FC<
     handleSubmit,
     initialValues,
   } = props;
-  const { examId: examRailsId } = useParams();
   const { alert } = useContext(AlertContext);
   const history = useHistory();
   const cancel = useCallback(() => {
@@ -291,7 +290,7 @@ const ExamRoomsForm: React.FC<
     `,
     {
       onCompleted: () => {
-        history.push(`/exams/${examRailsId}/admin/rooms`);
+        history.push(`/exams/${examId}/admin/rooms`);
         alert({
           variant: 'success',
           autohide: true,

@@ -36,22 +36,6 @@ module Types
 
     field :accommodations, Types::AccommodationType.connection_type, null: false
 
-    field :registration, Types::RegistrationType, null: true do
-      argument :id, ID, required: true
-    end
-
-    def registration(id:)
-      HourglassSchema.object_from_id(id, context)
-    end
-
-    field :rails_registration, Types::RegistrationType, null: true do
-      argument :rails_id, Integer, required: true
-    end
-
-    def rails_registration(rails_id:)
-      object.registrations.find_by(id: rails_id)
-    end
-
     field :registrations, [Types::RegistrationType], null: false
 
     field :final_registrations, [Types::RegistrationType], null: false

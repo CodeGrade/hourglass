@@ -17,10 +17,10 @@ const ExamSubmissions: React.FC = () => {
     <QueryRenderer<submissionsAllQuery>
       environment={environment}
       query={graphql`
-        query submissionsAllQuery($examRailsId: Int!) {
-          exam(railsId: $examRailsId) {
+        query submissionsAllQuery($examId: ID!) {
+          exam(id: $examId) {
             finalRegistrations {
-              railsId
+              id
               user {
                 displayName
               }
@@ -29,7 +29,7 @@ const ExamSubmissions: React.FC = () => {
         }
         `}
       variables={{
-        examRailsId: Number(examId),
+        examId,
       }}
       render={({ error, props }) => {
         if (error) {
@@ -41,8 +41,8 @@ const ExamSubmissions: React.FC = () => {
         return (
           <ul>
             {props.exam.finalRegistrations.map((reg) => (
-              <li key={reg.railsId}>
-                <Link to={`/exams/${examId}/submissions/${reg.railsId}`}>
+              <li key={reg.id}>
+                <Link to={`/exams/${examId}/submissions/${reg.id}`}>
                   {reg.user.displayName}
                 </Link>
               </li>
@@ -55,28 +55,25 @@ const ExamSubmissions: React.FC = () => {
 };
 
 const ExamSubmission: React.FC = () => {
-  const { examId, registrationId } = useParams();
+  const { registrationId } = useParams();
   return (
     <QueryRenderer<submissionsOneQuery>
       environment={environment}
       query={graphql`
-        query submissionsOneQuery($examRailsId: Int!, $registrationRailsId: Int!) {
-          exam(railsId: $examRailsId) {
-            railsRegistration(railsId: $registrationRailsId) {
-              currentAnswers
-              user {
-                displayName
-              }
-              examVersion {
-                contents
-              }
+        query submissionsOneQuery($registrationId: ID!) {
+          registration(id: $registrationId) {
+            currentAnswers
+            user {
+              displayName
+            }
+            examVersion {
+              contents
             }
           }
         }
         `}
       variables={{
-        examRailsId: Number(examId),
-        registrationRailsId: Number(registrationId),
+        registrationId,
       }}
       render={({ error, props }) => {
         if (error) {
@@ -87,7 +84,7 @@ const ExamSubmission: React.FC = () => {
         }
         return (
           <>
-            <h1>{`Submission by ${props.exam.railsRegistration.user.displayName}`}</h1>
+            <h1>{`Submission by ${props.registration.user.displayName}`}</h1>
             <ExamViewer
               railsExam={{
                 id: 0,
@@ -95,8 +92,8 @@ const ExamSubmission: React.FC = () => {
                 policies: [],
               }}
               contents={{
-                exam: JSON.parse(props.exam.railsRegistration.examVersion.contents).exam,
-                answers: JSON.parse(props.exam.railsRegistration.currentAnswers),
+                exam: JSON.parse(props.registration.examVersion.contents).exam,
+                answers: JSON.parse(props.registration.currentAnswers),
               }}
             />
           </>

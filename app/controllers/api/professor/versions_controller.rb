@@ -16,11 +16,11 @@ module Api
           exam: @exam,
           name: "#{@exam.name} Version #{n}",
           files: upload.files,
-          info: upload.info
+          info: upload.info,
         )
         @version.save!
         render json: {
-          id: @version.id,
+          id: HourglassSchema.id_from_object(@version, Types::ExamVersionType, {}),
         }, status: :created
       end
 

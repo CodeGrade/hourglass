@@ -425,7 +425,6 @@ const ShowAnomalies: React.FC<{
         cursor: { type: "String" }
       ) {
         id
-        railsId
         anomalies(
           first: $count
           after: $cursor

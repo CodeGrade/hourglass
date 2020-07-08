@@ -97,7 +97,6 @@ const SingleAccommodation: React.FC<{
     graphql`
     fragment accommodations_accommodation on Accommodation {
       id
-      railsId
       newStartTime
       percentTimeExpansion
       registration {

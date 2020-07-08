@@ -9,12 +9,11 @@ import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
 
 const EditExamVersion: React.FC = () => {
   const { versionId } = useParams();
-  const realRes = useQuery<editVersionQuery>(
+  const res = useQuery<editVersionQuery>(
     graphql`
-    query editVersionQuery($examVersionRailsId: Int!) {
-      examVersion(railsId: $examVersionRailsId) {
+    query editVersionQuery($examVersionId: ID!) {
+      examVersion(id: $examVersionId) {
         id
-        railsId
         name
         policies
         contents
@@ -23,7 +22,7 @@ const EditExamVersion: React.FC = () => {
     }
     `,
     {
-      examVersionRailsId: Number(versionId),
+      examVersionId: versionId,
     },
   );
   useAlert(
@@ -32,27 +31,24 @@ const EditExamVersion: React.FC = () => {
       title: 'Students have already started taking this version',
       message: 'Changing the questions will likely result in nonsensical answers, and changing the structure of this version will result in undefined behavior. Be careful!',
     },
-    realRes.props?.examVersion?.anyStarted,
-    [realRes.props?.examVersion?.anyStarted],
+    res.props?.examVersion?.anyStarted,
+    [res.props?.examVersion?.anyStarted],
   );
-  if (realRes.error) {
-    throw realRes.error;
+  if (res.error) {
+    throw res.error;
   }
-  if (!realRes.props) {
+  if (!res.props) {
     return <p>Loading...</p>;
   }
-  const { examVersion } = realRes.props;
-  const parsedContents = JSON.parse(examVersion.contents) as ContentsState;
+  const { examVersion } = res.props;
+  const parsedContents: ContentsState = JSON.parse(examVersion.contents);
   return (
     <Editor
       examVersionId={examVersion.id}
       exam={parsedContents.exam}
+      versionName={examVersion.name}
+      versionPolicies={examVersion.policies as readonly Policy[]}
       answers={parsedContents.answers}
-      railsExamVersion={{
-        name: examVersion.name,
-        id: examVersion.railsId,
-        policies: examVersion.policies as readonly Policy[],
-      }}
     />
   );
 };

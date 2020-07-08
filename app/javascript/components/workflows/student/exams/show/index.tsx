@@ -77,11 +77,11 @@ const ShowExam: React.FC = () => {
     <QueryRenderer<showQuery>
       environment={environment}
       query={graphql`
-        query showQuery($railsId: Int!) {
+        query showQuery($examId: ID!) {
           me {
             displayName
           }
-          exam(railsId: $railsId) {
+          exam(id: $examId) {
             railsId
             name
             course {
@@ -100,7 +100,7 @@ const ShowExam: React.FC = () => {
         }
         `}
       variables={{
-        railsId: Number(examId),
+        examId,
       }}
       render={({ error, props }) => {
         if (error) {

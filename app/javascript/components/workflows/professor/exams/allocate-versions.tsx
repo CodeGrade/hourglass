@@ -133,7 +133,7 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
           return (
             <li
               className="mx-1 fixed-col-width"
-              key={`${member}-${student.railsId}`}
+              key={`${member}-${student.id}`}
             >
               <DraggableStudent
                 student={student}
@@ -148,7 +148,7 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
 };
 
 interface VersionsProps {
-  addSectionToVersion: (section: Section, roomId: number) => void;
+  addSectionToVersion: (section: Section, roomId: string) => void;
 }
 
 const Versions: React.FC<WrappedFieldArrayProps<Version> & VersionsProps> = (props) => {
@@ -162,22 +162,22 @@ const Versions: React.FC<WrappedFieldArrayProps<Version> & VersionsProps> = (pro
       {fields.map((member, index) => {
         const room = fields.get(index);
         return (
-          <Form.Group key={room.railsId}>
+          <Form.Group key={room.id}>
             <FormSection name={member}>
               <h3>
                 {room.name}
                 <span className="float-right">
                   <DropdownButton
                     title="Add entire section"
-                    id={`version-dnd-add-section-${room.railsId}`}
+                    id={`version-dnd-add-section-${room.id}`}
                     size="sm"
                     className="mb-2"
                   >
                     {sections.map((s) => (
                       <Dropdown.Item
-                        key={s.railsId}
+                        key={s.id}
                         onClick={(): void => {
-                          addSectionToVersion(s, room.railsId);
+                          addSectionToVersion(s, room.id);
                         }}
                       >
                         {s.title}
@@ -212,17 +212,16 @@ const StudentDNDForm: React.FC<
     pristine,
     change,
   } = props;
-  const { examId: examRailsId } = useParams();
-  const addSectionToVersion = (section: Section, versionId: number): void => {
+  const addSectionToVersion = (section: Section, versionId: string): void => {
     change('all', ({ unassigned, versions }) => ({
       unassigned: unassigned.filter((unassignedStudent: Student) => (
-        !section.students.find((student) => student.railsId === unassignedStudent.railsId)
+        !section.students.find((student) => student.id === unassignedStudent.id)
       )),
       versions: versions.map((version: Version) => {
         const filtered = version.students.filter((versionStudent) => (
-          !section.students.find((student) => student.railsId === versionStudent.railsId)
+          !section.students.find((student) => student.id === versionStudent.id)
         ));
-        if (version.railsId === versionId) {
+        if (version.id === versionId) {
           return {
             ...version,
             students: filtered.concat(section.students),
@@ -252,7 +251,7 @@ const StudentDNDForm: React.FC<
     `,
     {
       onCompleted: () => {
-        history.push(`/exams/${examRailsId}/admin/versions`);
+        history.push(`/exams/${examId}/admin/versions`);
         alert({
           variant: 'success',
           autohide: true,
@@ -274,15 +273,15 @@ const StudentDNDForm: React.FC<
         const versions = [];
         all.versions.forEach((version) => {
           versions.push({
-            versionId: version.railsId,
-            studentIds: version.students.map((s) => s.railsId),
+            versionId: version.id,
+            studentIds: version.students.map((s) => s.id),
           });
         });
         mutate({
           variables: {
             input: {
               examId,
-              unassigned: all.unassigned.map((s) => s.railsId),
+              unassigned: all.unassigned.map((s) => s.id),
               versions,
             },
           },
@@ -388,7 +387,7 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
             {unassigned.length === 0 ? (
               <p>No students</p>
             ) : unassigned.map((s) => (
-              <li key={s.railsId} className="fixed-col-width">
+              <li key={s.id} className="fixed-col-width">
                 <span>{s.displayName}</span>
               </li>
             ))}
@@ -396,7 +395,7 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
         </div>
       </Form.Group>
       {versions.map((v) => (
-        <Form.Group key={v.railsId}>
+        <Form.Group key={v.id}>
           <h3>{v.name}</h3>
           <div className="border px-2 flex-fill rounded">
             {v.students.length === 0 ? (
@@ -404,7 +403,7 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
             ) : (
               <ul className="list-unstyled column-count-4">
                 {v.students.map((s) => (
-                  <li key={s.railsId} className="fixed-col-width">
+                  <li key={s.id} className="fixed-col-width">
                     <span>{s.displayName}</span>
                   </li>
                 ))}
@@ -473,27 +472,27 @@ const DND: React.FC<{
       id
       course {
         sections {
-          railsId
+          id
           title
           students {
-            railsId
+            id
             username
             displayName
           }
         }
       }
       unassignedStudents {
-        railsId
+        id
         username
         displayName
       }
       examVersions(first: 100) @connection(key: "Exam_examVersions", filters: []) {
         edges {
           node {
-            railsId
+            id
             name
             students {
-              railsId
+              id
               username
               displayName
             }

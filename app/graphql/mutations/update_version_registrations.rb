@@ -3,15 +3,15 @@
 module Types
   class VersionAssignment < Types::BaseInputObject
     description 'Assignment for students to a version.'
-    argument :version_id, Integer, required: true
-    argument :student_ids, [Integer], required: true
+    argument :version_id, ID, required: true, loads: Types::ExamVersionType
+    argument :student_ids, [ID], required: true, loads: Types::UserType
   end
 end
 
 module Mutations
   class UpdateVersionRegistrations < BaseMutation
     argument :exam_id, ID, required: true, loads: Types::ExamType
-    argument :unassigned, [Integer], required: true, description: 'Students to unassign.'
+    argument :unassigned, [ID], required: true, description: 'Students to unassign.'
     argument :versions, [Types::VersionAssignment], required: true, description: 'Version assignments to create.'
 
     field :exam, Types::ExamType, null: false
@@ -36,12 +36,9 @@ module Mutations
     private
 
     def delete_unassigned!(exam, unassigned)
-      unassigned.each do |id|
-        user = exam.course.students.find { |u| u.id == id }
-        raise "Invalid user ID requested (#{id})" if user.nil?
-
-        student_reg = exam.registrations.find_by(user_id: id)
-        next unless student_reg
+      unassigned.each do |user|
+        student_reg = exam.registrations.find_by(user: user)
+        raise GraphQL::ExecutionError, "Invalid user ID requested (#{id})" unless student_reg
 
         if student_reg.started?
           err = "Cannot delete registration for '#{user.display_name}' since they have already started."
@@ -51,28 +48,26 @@ module Mutations
       end
     end
 
-    def assign_student!(exam, version_id, student_id)
-      user = exam.course.students.find { |u| u.id == student_id }
-      raise "Invalid student ID requested (#{student_id})" if user.nil?
+    def assign_student!(exam, version, student)
+      student_reg = exam.registrations.find_or_initialize_by(user: student)
+      return if student_reg.exam_version == version
 
-      student_reg = exam.registrations.find_or_initialize_by(user: user)
-      return if student_reg.exam_version_id == version_id
+      err = "Cannot update already started student '#{student.display_name}'"
+      raise GraphQL::ExecutionError, err if student_reg.started?
 
-      raise "Cannot update already started student '#{user.display_name}'" if student_reg.started?
-
-      student_reg.exam_version_id = version_id
+      student_reg.exam_version = version
       student_reg.save!
     end
 
-    def assign_version!(exam, version_id, student_ids)
-      student_ids.each do |id|
-        assign_student!(exam, version_id, id)
+    def assign_version!(exam, version, students)
+      students.each do |student|
+        assign_student!(exam, version, student)
       end
     end
 
     def assign_versions!(exam, versions)
       versions.each do |item|
-        assign_version!(exam, item[:version_id], item[:student_ids])
+        assign_version!(exam, item[:version], item[:students])
       end
     end
   end

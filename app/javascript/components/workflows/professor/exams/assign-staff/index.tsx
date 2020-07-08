@@ -221,7 +221,6 @@ const StaffSeatingForm: React.FC<
     pristine,
     change,
   } = props;
-  const { examId: examRailsId } = useParams();
   const addSectionToRoom = (section: Section, roomId: string): void => {
     change('all', ({ unassigned, rooms }) => ({
       unassigned: unassigned.filter((unassignedStudent: Student) => (
@@ -261,7 +260,7 @@ const StaffSeatingForm: React.FC<
     `,
     {
       onCompleted: () => {
-        history.push(`/exams/${examRailsId}/admin/staff`);
+        history.push(`/exams/${examId}/admin/staff`);
         alert({
           autohide: true,
           variant: 'success',

@@ -4,6 +4,8 @@ import { RailsContext } from '@student/exams/show/context';
 import AnomalousMessagingContainer from '@student/exams/show/containers/AnomalousMessaging';
 import ErrorBoundary from '@hourglass/common/boundary';
 import { HitApiError } from '@hourglass/common/types/api';
+import ReadableDate from '@hourglass/common/ReadableDate';
+import { DateTime } from 'luxon';
 
 const ShowMessaging: React.FC<{
   examQuestionsUrl: string;
@@ -49,8 +51,29 @@ const PreStart: React.FC<PreStartProps> = (props) => {
   const {
     railsExam,
     anomalous,
+    over,
+    lastSnapshotTime,
   } = useContext(RailsContext);
-  // TODO: check over? and show a similar warning
+  if (over) {
+    return (
+      <div>
+        <h1>{railsExam.name}</h1>
+        <Alert variant="danger">
+          <i>
+            <p>
+              Your exam period is over.
+            </p>
+            {lastSnapshotTime && (
+              <>
+                {'Your submission was saved: '}
+                <ReadableDate showTime value={lastSnapshotTime} />
+              </>
+            )}
+          </i>
+        </Alert>
+      </div>
+    );
+  }
   if (anomalous) {
     return (
       <div>

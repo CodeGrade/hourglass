@@ -23,6 +23,11 @@ module Types
       object.anomalous?
     end
 
+    field :over, Boolean, null: false
+    def over
+      object.over?
+    end
+
     field :final, Boolean, null: false
     def final
       object.final?

@@ -55,11 +55,9 @@ module Api
       rescue DoubleLoginException => e
         registration = Registration.find_by(
           user_id: e.user.id,
-          exam_id: params[:exam_id]
+          exam_id: params[:exam_id],
         )
-        if registration
-          Anomaly.create(registration: registration, reason: e.message)
-        end
+        Anomaly.create(registration: registration, reason: e.message) if registration
         render json: { lockout: true, reason: e.message }
       end
 
@@ -94,9 +92,9 @@ module Api
         {
           type: 'CONTENTS',
           exam: {
-            questions: version.contents['questions'],
-            reference: version.contents['reference'],
-            instructions: version.contents['instructions'],
+            questions: version.questions,
+            reference: version.reference,
+            instructions: version.instructions,
             files: version.files,
           },
           time: {
@@ -177,7 +175,7 @@ module Api
               end
             end
           end,
-          scratch: params[:answers][:scratch],  
+          scratch: params[:answers][:scratch],
         }.stringify_keys
       end
     end

@@ -6,14 +6,6 @@ class ApiController < ApplicationController
 
   before_action :require_current_user
 
-  def me
-    render json: {
-      user: {
-        displayName: current_user.display_name,
-      },
-    }
-  end
-
   private
 
   def require_current_user
@@ -24,40 +16,6 @@ class ApiController < ApplicationController
     @exam ||= Exam.find_by(id: params[:exam_id])
     @course ||= @exam.course
     return unless @exam.nil?
-
-    head :forbidden
-  end
-
-  def find_course
-    @course ||= Course.find_by(id: params[:course_id])
-    return unless @course.nil?
-
-    head :forbidden
-  end
-
-  def find_accommodation
-    @accommodation ||= Accommodation.find_by(id: params[:accommodation_id])
-    @exam = @accommodation.exam
-    return unless @accommodation.nil?
-
-    head :forbidden
-  end
-
-  def find_registration_and_exam_and_course
-    @registration ||= Registration.find_by(id: params[:registration_id])
-    @exam ||= @registration.exam
-    @course ||= @exam.course
-    return unless @registration.nil?
-
-    head :forbidden
-  end
-
-  def find_anomaly
-    @anomaly ||= Anomaly.find_by(id: params[:anomaly_id])
-    @registration ||= @anomaly.registration
-    @exam ||= @anomaly.exam
-    @course ||= @exam.course
-    return unless @anomaly.nil?
 
     head :forbidden
   end
@@ -77,31 +35,8 @@ class ApiController < ApplicationController
     head :forbidden
   end
 
-  def require_proctor_reg
-    @proctor_registration ||= ProctorRegistration.find_by(
-      user: current_user,
-      exam: @exam
-    )
-    return unless @proctor_registration.nil?
-
-    require_prof_reg
-  end
-
-  def require_staff_reg
-    @staff_registration ||= StaffRegistration.find_by(
-      user: current_user,
-      section: @course.sections
-    )
-    return unless @staff_registration.nil?
-
-    require_prof_reg
-  end
-
   def require_prof_reg
-    @professor_course_registration ||= ProfessorCourseRegistration.find_by(
-      user: current_user,
-      course: @course
-    )
+    @professor_course_registration ||= ProfessorCourseRegistration.find_by(user: current_user, course: @course)
     return unless @professor_course_registration.nil?
 
     head :forbidden

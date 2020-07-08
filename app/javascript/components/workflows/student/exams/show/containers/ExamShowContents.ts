@@ -5,11 +5,10 @@ import {
   ExamVersion,
   MSTP,
   MDTP,
-  RailsExamVersion,
 } from '@student/exams/show/types';
 
 interface OwnProps {
-  railsExam: RailsExamVersion;
+  examTakeUrl: string;
 }
 
 const mapStateToProps: MSTP<{exam: ExamVersion}, OwnProps> = (state) => ({
@@ -21,10 +20,10 @@ const mapDispatchToProps: MDTP<{
   submit: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   save: (): void => {
-    dispatch(saveSnapshot(ownProps.railsExam.takeUrl));
+    dispatch(saveSnapshot(ownProps.examTakeUrl));
   },
   submit: (): void => {
-    dispatch(submitExam(ownProps.railsExam.takeUrl));
+    dispatch(submitExam(ownProps.examTakeUrl));
   },
 });
 

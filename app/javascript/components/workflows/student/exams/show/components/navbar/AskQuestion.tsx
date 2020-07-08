@@ -7,7 +7,6 @@ import {
   ProfQuestion,
   ProfQuestionStatus,
 } from '@student/exams/show/types';
-import { RailsContext } from '@student/exams/show/context';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { IconType } from 'react-icons';
 import {
@@ -68,7 +67,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
 interface AskQuestionProps {
   disabled?: boolean;
   questions: ProfQuestion[];
-  onSubmit: (examQuestionsUrl: string, body: string) => void;
+  onSubmit: (body: string) => void;
 }
 
 const AskQuestion: React.FC<AskQuestionProps> = (props) => {
@@ -77,9 +76,6 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
     questions,
     onSubmit,
   } = props;
-  const {
-    railsExam,
-  } = useContext(RailsContext);
 
   const anySending = questions.some((q) => q.status === 'SENDING');
 
@@ -101,7 +97,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
         variant="success"
         disabled={anySending || valEmpty || disabled}
         onClick={(): void => {
-          onSubmit(railsExam.questionsUrl, val);
+          onSubmit(val);
           setVal('');
         }}
       >

@@ -9,7 +9,6 @@ import {
 } from 'react-bootstrap';
 import {
   ExamVersion,
-  RailsExamVersion,
   AnswersState,
   Policy,
   ExamFile,
@@ -54,7 +53,7 @@ import { useMutation, graphql } from 'relay-hooks';
 export interface Version {
   name: string;
   info: {
-    policies: RailsExamVersion['policies'];
+    policies: readonly Policy[];
     answers: AnswersState['answers'];
     contents: {
       instructions: ExamVersion['instructions'];

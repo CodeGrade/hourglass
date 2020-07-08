@@ -1,26 +1,45 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import ExamNavbar from '@student/exams/show/containers/navbar';
 import RegularNavbar from '@hourglass/common/navbar';
 import { Row, Col, Container } from 'react-bootstrap';
-import { RailsContext } from '@student/exams/show/context';
 import ExamShowContents from '@student/exams/show/containers/ExamShowContents';
 import PreStart from '@student/exams/show/containers/PreStart';
 import './ExamTaker.scss';
+import { useFragment, graphql } from 'relay-hooks';
+
+import { ExamTaker$key } from './__generated__/ExamTaker.graphql';
+import { Policy } from '../types';
 
 interface ExamTakerProps {
+  examKey: ExamTaker$key;
   ready: boolean;
 }
 
 const ExamTaker: React.FC<ExamTakerProps> = (props) => {
   const {
+    examKey,
     ready,
   } = props;
-  const {
-    railsExam,
-  } = useContext(RailsContext);
+  const res = useFragment(
+    graphql`
+    fragment ExamTaker on Exam {
+      ...PreStart
+      ...ExamShowContents
+      ...navbar
+      id
+      takeUrl
+      myRegistration {
+        examVersion {
+          policies
+        }
+      }
+    }
+    `,
+    examKey,
+  );
   const body = ready ? (
     <div id="exam-taker" className="d-flex">
-      <ExamNavbar />
+      <ExamNavbar examKey={res} />
       <Container fluid className="flex-fill transition">
         <Row
           id="exam-body"
@@ -28,7 +47,8 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
         >
           <Col>
             <ExamShowContents
-              railsExam={railsExam}
+              examKey={res}
+              examTakeUrl={res.takeUrl}
             />
           </Col>
         </Row>
@@ -38,7 +58,11 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
     <>
       <RegularNavbar />
       <Container>
-        <PreStart railsExam={railsExam} />
+        <PreStart
+          examKey={res}
+          policies={res.myRegistration.examVersion.policies as readonly Policy[]}
+          examTakeUrl={res.takeUrl}
+        />
       </Container>
     </>
   );

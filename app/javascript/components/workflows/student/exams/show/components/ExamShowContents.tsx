@@ -1,17 +1,21 @@
-import React, { useEffect, useContext, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import {
-  ExamVersion,
+  ExamVersion, Policy,
 } from '@student/exams/show/types';
 import { createMap } from '@student/exams/show/files';
-import { ExamContext, RailsContext, ExamFilesContext } from '@student/exams/show/context';
+import { ExamContext, ExamFilesContext } from '@student/exams/show/context';
 import useAnomalyListeners from '@student/exams/show/lockdown/anomaly';
 import HTML from '@student/exams/show/components/HTML';
 import { Row, Col } from 'react-bootstrap';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import ShowQuestion from '@student/exams/show/containers/ShowQuestion';
 import { BlockNav } from '@hourglass/workflows';
+import { useFragment, graphql } from 'relay-hooks';
+
+import { ExamShowContents$key } from './__generated__/ExamShowContents.graphql';
 
 interface ExamShowContentsProps {
+  examKey: ExamShowContents$key;
   exam: ExamVersion;
   save: () => void;
   submit: () => void;
@@ -21,10 +25,25 @@ const INTERVAL = 10000;
 
 const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const {
+    examKey,
     exam,
     save,
     submit,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment ExamShowContents on Exam {
+      name
+      takeUrl
+      myRegistration {
+        examVersion {
+          policies
+        }
+      }
+    }
+    `,
+    examKey,
+  );
   const leave = useCallback(() => {
     submit();
   }, [submit]);
@@ -34,7 +53,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
       clearInterval(timer);
     };
   }, [save]);
-  useAnomalyListeners();
+  useAnomalyListeners(res.takeUrl, res.myRegistration.examVersion.policies as readonly Policy[]);
   const {
     questions,
     instructions,
@@ -42,7 +61,6 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     files,
   } = exam;
   const fmap = createMap(files);
-  const { railsExam } = useContext(RailsContext);
   return (
     <ExamContext.Provider value={{ files, fmap }}>
       <BlockNav
@@ -50,7 +68,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
         message="Are you sure you want to navigate away? Your exam will be submitted."
       />
       <ExamFilesContext.Provider value={{ references: reference }}>
-        <h1>{railsExam.name}</h1>
+        <h1>{res.name}</h1>
         <HTML value={instructions} />
         {reference.length !== 0 && <FileViewer references={reference} />}
         <Row>
@@ -63,6 +81,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
                 question={q}
                 qnum={i}
                 lastQuestion={i === questions.length - 1}
+                examTakeUrl={res.takeUrl}
               />
             ))}
           </Col>

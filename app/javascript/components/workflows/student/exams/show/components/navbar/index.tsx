@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import SnapshotInfo from '@student/exams/show/containers/SnapshotInfo';
 import LockdownInfo from '@student/exams/show/containers/LockdownInfo';
-import { RailsContext } from '@student/exams/show/context';
 import './index.css';
 import {
   Accordion,
@@ -22,8 +21,11 @@ import RenderIcon from '@student/exams/show/components/Icon';
 import { TimeInfo } from '@student/exams/show/types';
 import TimeRemaining from '@student/exams/show/components/navbar/TimeRemaining';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
+import { useFragment, graphql } from 'relay-hooks';
+import { navbar$key } from './__generated__/navbar.graphql';
 
 interface NavAccordionProps {
+  examQuestionsUrl: string;
   expanded: boolean;
   onSectionClick: (eventKey: string) => void;
   openSection: string;
@@ -31,6 +33,7 @@ interface NavAccordionProps {
 
 const NavAccordion: React.FC<NavAccordionProps> = (props) => {
   const {
+    examQuestionsUrl,
     expanded,
     onSectionClick,
     openSection,
@@ -68,19 +71,33 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
         onSectionClick={onSectionClick}
         eventKey="askq"
       >
-        <AskQuestion />
+        <AskQuestion examQuestionsUrl={examQuestionsUrl} />
       </NavAccordionItem>
     </Accordion>
   );
 };
 
 const ExamNavbar: React.FC<{
+  examKey: navbar$key;
   time: TimeInfo;
 }> = (props) => {
   const {
+    examKey,
     time,
   } = props;
-  const { railsUser } = useContext(RailsContext);
+  const res = useFragment(
+    graphql`
+    fragment navbar on Exam {
+      questionsUrl
+      myRegistration {
+        user {
+          displayName
+        }
+      }
+    }
+    `,
+    examKey,
+  );
   const [expanded, setExpanded] = useState(false);
   const [openSection, setOpenSection] = useState('');
   const [openTimer, setOpenTimer] = useState('');
@@ -138,7 +155,7 @@ const ExamNavbar: React.FC<{
             <span className="flex-fill">
               <span className="d-flex w-100 align-items-center">
                 <h6 className="my-0">
-                  {railsUser.displayName}
+                  {res.myRegistration.user.displayName}
                 </h6>
                 <span className="flex-fill" />
                 <span className="ml-2">
@@ -154,6 +171,7 @@ const ExamNavbar: React.FC<{
       </div>
       <div className="mt-4 flex-fill overflow-auto">
         <NavAccordion
+          examQuestionsUrl={res.questionsUrl}
           onSectionClick={(eventKey): void => {
             if (expanded) {
               if (openSection === eventKey) {

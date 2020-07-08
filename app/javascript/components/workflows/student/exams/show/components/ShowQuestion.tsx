@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { QuestionInfo } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import Part from '@student/exams/show/components/Part';
@@ -9,9 +9,10 @@ import {
   BottomScrollspy,
 } from '@student/exams/show/containers/scrollspy/Question';
 import SubmitButton from '@student/exams/show/containers/SubmitButton';
-import { RailsContext, QuestionFilesContext } from '@student/exams/show/context';
+import { QuestionFilesContext } from '@student/exams/show/context';
 
 interface ShowQuestionProps {
+  examTakeUrl: string;
   question: QuestionInfo;
   qnum: number;
   paginated: boolean;
@@ -23,6 +24,7 @@ interface ShowQuestionProps {
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const {
+    examTakeUrl,
     question,
     qnum,
     paginated,
@@ -41,9 +43,6 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     parts,
     separateSubparts,
   } = question;
-  const {
-    railsExam,
-  } = useContext(RailsContext);
   const split = paginated && separateSubparts;
   const isCurrent = selectedQuestion === qnum;
   const active = !paginated || isCurrent;
@@ -100,7 +99,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               </div>
               {showSubmit && (
                 <div className="text-center">
-                  <SubmitButton examTakeUrl={railsExam.takeUrl} />
+                  <SubmitButton examTakeUrl={examTakeUrl} />
                 </div>
               )}
             </div>

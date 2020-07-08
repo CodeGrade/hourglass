@@ -2,18 +2,6 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
 
-export interface RailsExamVersion {
-  name: string;
-  takeUrl: string;
-  messagesUrl: string;
-  questionsUrl: string;
-  policies: readonly Policy[];
-}
-
-export interface RailsRegistration {
-  anomalous: boolean;
-}
-
 export type ExamTakerAction =
   LoadExamAction |
   LockdownAction |
@@ -321,10 +309,6 @@ export interface MessagesOpenedAction {
 export interface MessageReceivedAction {
   type: 'MESSAGE_RECEIVED';
   msg: ExamMessage;
-}
-
-export interface RailsUser {
-  displayName: string;
 }
 
 export enum SnapshotStatus {

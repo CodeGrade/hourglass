@@ -4,11 +4,13 @@ import AskQuestion from '@student/exams/show/containers/navbar/AskQuestion';
 import { ExamMessagesStandalone } from '@student/exams/show/containers/navbar/ExamMessages';
 
 const AnomalousMessaging: React.FC<{
+  examQuestionsUrl: string;
   disabled: boolean;
   refreshMessages: () => void;
   loadQuestions: () => void;
 }> = (props) => {
   const {
+    examQuestionsUrl,
     disabled,
     refreshMessages,
     loadQuestions,
@@ -29,7 +31,10 @@ const AnomalousMessaging: React.FC<{
             <Card.Title>
               <h2>Ask a question</h2>
             </Card.Title>
-            <AskQuestion disabled={disabled} />
+            <AskQuestion
+              disabled={disabled}
+              examQuestionsUrl={examQuestionsUrl}
+            />
           </Card.Body>
         </Card>
       </Col>

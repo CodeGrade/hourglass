@@ -4,20 +4,21 @@ import {
   LockdownStatus,
   ExamTakerState,
   MDTP,
-  RailsExamVersion,
   MSTP,
+  Policy,
 } from '@student/exams/show/types';
 import { doTryLockdown } from '@student/exams/show/actions';
 
 interface OwnProps {
-  railsExam: RailsExamVersion;
+  policies: readonly Policy[];
+  examTakeUrl: string;
 }
 
 const mapDispatchToProps: MDTP<{
   onClick: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   onClick: (): void => {
-    dispatch(doTryLockdown(ownProps.railsExam));
+    dispatch(doTryLockdown(ownProps.policies, ownProps.examTakeUrl));
   },
 });
 

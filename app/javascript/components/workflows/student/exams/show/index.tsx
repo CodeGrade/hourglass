@@ -8,7 +8,6 @@ import {
   RailsExamVersion,
   RailsUser,
   RailsRegistration,
-  RailsCourse,
   Policy,
 } from '@student/exams/show/types';
 import ExamTaker from '@student/exams/show/containers/ExamTaker';
@@ -31,9 +30,6 @@ interface ShowExamProps {
   // Information about the registration.
   railsRegistration: RailsRegistration;
 
-  // Information about the course.
-  railsCourse: RailsCourse;
-
   // Whether the exam is complete.
   final: boolean;
 
@@ -45,7 +41,6 @@ const Exam: React.FC<ShowExamProps> = (props) => {
     railsUser,
     railsExam,
     railsRegistration,
-    railsCourse,
     final,
     lastSnapshot,
   } = props;
@@ -53,14 +48,12 @@ const Exam: React.FC<ShowExamProps> = (props) => {
     railsExam,
     railsRegistration,
     railsUser,
-    railsCourse,
   }), [
     railsExam.name,
     railsExam.id,
     // NOTE: no good way to check array-equality of policies here
     ...Object.values(railsRegistration),
     ...Object.values(railsUser),
-    ...Object.values(railsCourse),
   ]);
   return (
     <RailsContext.Provider value={railsContext}>
@@ -84,9 +77,6 @@ const ShowExam: React.FC = () => {
           exam(id: $examId) {
             railsId
             name
-            course {
-              railsId
-            }
             myRegistration {
               railsId
               final
@@ -140,9 +130,6 @@ const ShowExam: React.FC = () => {
           id: props.exam.myRegistration.railsId,
           anomalous: props.exam.myRegistration.anomalous,
         };
-        const railsCourse: RailsCourse = {
-          id: props.exam.course.railsId,
-        };
         const { final, lastSnapshotTime } = props.exam.myRegistration;
         const lastSnapshot = lastSnapshotTime ? DateTime.fromISO(lastSnapshotTime) : undefined;
         return (
@@ -150,7 +137,6 @@ const ShowExam: React.FC = () => {
             <Exam
               railsUser={railsUser}
               railsExam={railsExam}
-              railsCourse={railsCourse}
               railsRegistration={railsRegistration}
               final={final}
               lastSnapshot={lastSnapshot}

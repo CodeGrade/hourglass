@@ -5,7 +5,6 @@ import {
   RailsExamVersion,
   RailsRegistration,
   RailsUser,
-  RailsCourse,
   AnswersState,
   FileRef,
 } from '@student/exams/show/types';
@@ -20,7 +19,6 @@ interface RailsContext {
   railsExam?: RailsExamVersion;
   railsRegistration?: RailsRegistration;
   railsUser?: RailsUser;
-  railsCourse?: RailsCourse;
 }
 export const RailsContext = createContext<RailsContext>({} as RailsContext);
 

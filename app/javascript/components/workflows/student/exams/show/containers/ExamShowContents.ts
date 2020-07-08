@@ -6,11 +6,9 @@ import {
   MSTP,
   MDTP,
   RailsExamVersion,
-  RailsCourse,
 } from '@student/exams/show/types';
 
 interface OwnProps {
-  railsCourse: RailsCourse;
   railsExam: RailsExamVersion;
 }
 
@@ -23,10 +21,10 @@ const mapDispatchToProps: MDTP<{
   submit: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   save: (): void => {
-    dispatch(saveSnapshot(ownProps.railsCourse.id, ownProps.railsExam.id));
+    dispatch(saveSnapshot(ownProps.railsExam.id));
   },
   submit: (): void => {
-    dispatch(submitExam(ownProps.railsCourse.id, ownProps.railsExam.id));
+    dispatch(submitExam(ownProps.railsExam.id));
   },
 });
 

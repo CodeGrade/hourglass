@@ -13,8 +13,13 @@ class Accommodation < ApplicationRecord
 
   delegate :user, to: :registration
   delegate :exam, to: :registration
+  delegate :course, to: :exam
 
   def factor
     (percent_time_expansion.to_f / 100.0) + 1.0
+  end
+
+  def visible_to?(check_user)
+    course.professors.exists? check_user.id
   end
 end

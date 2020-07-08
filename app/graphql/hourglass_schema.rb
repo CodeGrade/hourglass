@@ -68,7 +68,8 @@ class HourglassSchema < GraphQL::Schema
 
   def self.unauthorized_object(error)
     # Add a top-level error to the response instead of returning nil:
-    raise GraphQL::ExecutionError, 'You do not have permission.'
+    typ = error.type.graphql_name
+    raise GraphQL::ExecutionError, "You do not have permission to view that #{typ}."
   end
 
   def self.write_json!

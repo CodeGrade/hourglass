@@ -6,6 +6,10 @@ module Types
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 
+    def self.authorized?(object, context)
+      super && object.visible_to?(context[:current_user])
+    end
+
     description 'Accommodates a student with additional time.'
 
     field :registration, Types::RegistrationType, null: false

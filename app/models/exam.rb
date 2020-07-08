@@ -26,8 +26,6 @@ class Exam < ApplicationRecord
   validate :end_after_start
   validate :duration_valid
 
-  enum checklist_status: [:na, :complete, :warning, :not_started]
-
   delegate :professors, to: :course
 
   def duration

@@ -10,6 +10,7 @@ import { QueryRenderer, graphql } from 'react-relay';
 import environment from '@hourglass/relay/environment';
 import { submissionsAllQuery } from './__generated__/submissionsAllQuery.graphql';
 import { submissionsOneQuery } from './__generated__/submissionsOneQuery.graphql';
+import { AnswersState, ExamFile, HTMLVal, FileRef, QuestionInfo, ContentsState } from '@hourglass/workflows/student/exams/show/types';
 
 const ExamSubmissions: React.FC = () => {
   const { examId } = useParams();
@@ -67,7 +68,11 @@ const ExamSubmission: React.FC = () => {
               displayName
             }
             examVersion {
-              contents
+              questions
+              reference
+              instructions
+              files
+              answers
             }
           }
         }
@@ -82,20 +87,21 @@ const ExamSubmission: React.FC = () => {
         if (!props) {
           return <p>Loading...</p>;
         }
+        const { registration } = props;
+        const { examVersion, currentAnswers } = registration;
+        const parsedContents: ContentsState = {
+          exam: {
+            questions: examVersion.questions as QuestionInfo[],
+            reference: examVersion.reference as FileRef[],
+            instructions: examVersion.instructions as HTMLVal,
+            files: examVersion.files as ExamFile[],
+          },
+          answers: currentAnswers as AnswersState,
+        };
         return (
           <>
             <h1>{`Submission by ${props.registration.user.displayName}`}</h1>
-            <ExamViewer
-              railsExam={{
-                id: 0,
-                name: 'not used',
-                policies: [],
-              }}
-              contents={{
-                exam: JSON.parse(props.registration.examVersion.contents).exam,
-                answers: JSON.parse(props.registration.currentAnswers),
-              }}
-            />
+            <ExamViewer contents={parsedContents} />
           </>
         );
       }}

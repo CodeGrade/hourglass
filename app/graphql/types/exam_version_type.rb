@@ -6,9 +6,9 @@ module Types
     field :name, String, null: false
     # field :files, Types::JsonbType, null: false
     # field :info, Types::JsonbType, null: false
-    field :exam_id, Integer, null: false
-    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
-    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+    # field :exam_id, Integer, null: false
+    # field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+    # field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
     field :policies, [Types::LockdownPolicyType], null: false
     delegate :policies, to: :object
@@ -23,10 +23,15 @@ module Types
       object.any_started?
     end
 
-    field :contents, String, null: false
-    def contents
-      object.old_contents.to_json
-    end
+    field :questions, GraphQL::Types::JSON, null: false
+
+    field :reference, GraphQL::Types::JSON, null: false
+
+    field :instructions, GraphQL::Types::JSON, null: false
+
+    field :answers, GraphQL::Types::JSON, null: false
+
+    field :files, GraphQL::Types::JSON, null: false
 
     field :file_export_url, String, null: false
     def file_export_url

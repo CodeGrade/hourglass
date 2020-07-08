@@ -14,8 +14,8 @@ module Types
     field :registrations, Types::RegistrationType.connection_type, null: false
     delegate :registrations, to: :object
 
-    field :isMe, Boolean, null: false
-    def isMe
+    field :is_me, Boolean, null: false
+    def is_me
       object == context[:current_user]
     end
 

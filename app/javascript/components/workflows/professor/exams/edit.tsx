@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import Editor from '@professor/exams/new/editor';
 import { useAlert } from '@hourglass/common/alerts';
 import { useQuery, graphql } from 'relay-hooks';
-import { ContentsState, Policy } from '@hourglass/workflows/student/exams/show/types';
+import { ContentsState, Policy, QuestionInfo, FileRef, HTMLVal, ExamFile, AnswersState, AnswerState } from '@hourglass/workflows/student/exams/show/types';
 
 import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
 
@@ -16,7 +16,11 @@ const EditExamVersion: React.FC = () => {
         id
         name
         policies
-        contents
+        questions
+        reference
+        instructions
+        files
+        answers
         anyStarted
       }
     }
@@ -41,7 +45,18 @@ const EditExamVersion: React.FC = () => {
     return <p>Loading...</p>;
   }
   const { examVersion } = res.props;
-  const parsedContents: ContentsState = JSON.parse(examVersion.contents);
+  const parsedContents: ContentsState = {
+    exam: {
+      questions: examVersion.questions as QuestionInfo[],
+      reference: examVersion.reference as FileRef[],
+      instructions: examVersion.instructions as HTMLVal,
+      files: examVersion.files as ExamFile[],
+    },
+    answers: {
+      answers: examVersion.answers as AnswerState[][][],
+      scratch: '',
+    },
+  };
   return (
     <Editor
       examVersionId={examVersion.id}

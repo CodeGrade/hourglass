@@ -33,8 +33,8 @@ module Types
       object.final?
     end
 
-    field :last_snapshot_time, GraphQL::Types::ISO8601DateTime, null: true
-    def last_snapshot_time
+    field :last_snapshot, GraphQL::Types::ISO8601DateTime, null: true
+    def last_snapshot
       object.snapshots.last&.created_at
     end
   end

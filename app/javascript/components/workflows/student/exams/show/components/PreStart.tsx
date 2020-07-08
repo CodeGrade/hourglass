@@ -52,7 +52,7 @@ const PreStart: React.FC<PreStartProps> = (props) => {
     railsExam,
     anomalous,
     over,
-    lastSnapshotTime,
+    lastSnapshot,
   } = useContext(RailsContext);
   if (over) {
     return (
@@ -63,10 +63,10 @@ const PreStart: React.FC<PreStartProps> = (props) => {
             <p>
               Your exam period is over.
             </p>
-            {lastSnapshotTime && (
+            {lastSnapshot && (
               <>
                 {'Your submission was saved: '}
-                <ReadableDate showTime value={lastSnapshotTime} />
+                <ReadableDate showTime value={lastSnapshot} />
               </>
             )}
           </i>

@@ -50,7 +50,7 @@ const Exam: React.FC<ShowExamProps> = (props) => {
     anomalous,
     over,
     railsUser,
-    lastSnapshotTime: lastSnapshot,
+    lastSnapshot,
   }), [
     // TODO: move railsExam fields up
     // NOTE: no good way to check array-equality of policies here
@@ -86,7 +86,7 @@ const ShowExam: React.FC = () => {
             name
             myRegistration {
               final
-              lastSnapshotTime
+              lastSnapshot
               anomalous
               over
               examVersion {
@@ -135,8 +135,13 @@ const ShowExam: React.FC = () => {
           name: props.exam.name,
           policies: props.exam.myRegistration.examVersion.policies as Policy[],
         };
-        const { final, over, anomalous, lastSnapshotTime } = props.exam.myRegistration;
-        const lastSnapshot = lastSnapshotTime ? DateTime.fromISO(lastSnapshotTime) : undefined;
+        const {
+          final,
+          over,
+          anomalous,
+          lastSnapshot,
+        } = props.exam.myRegistration;
+        const parsedLastSnapshot = lastSnapshot ? DateTime.fromISO(lastSnapshot) : undefined;
         return (
           <DocumentTitle title={props.exam.name}>
             <Exam
@@ -145,7 +150,7 @@ const ShowExam: React.FC = () => {
               over={over}
               anomalous={anomalous}
               final={final}
-              lastSnapshot={lastSnapshot}
+              lastSnapshot={parsedLastSnapshot}
             />
           </DocumentTitle>
         );

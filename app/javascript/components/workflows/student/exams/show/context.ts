@@ -2,27 +2,15 @@ import { createContext } from 'react';
 import {
   FileMap,
   ExamFile,
-  RailsExamVersion,
-  RailsUser,
   AnswersState,
   FileRef,
 } from '@student/exams/show/types';
-import { DateTime } from 'luxon';
 
 interface ExamContext {
   files: ExamFile[];
   fmap: FileMap;
 }
 export const ExamContext = createContext<ExamContext>({} as ExamContext);
-
-interface RailsContext {
-  railsExam: RailsExamVersion;
-  anomalous: boolean;
-  over: boolean;
-  lastSnapshot: DateTime;
-  railsUser: RailsUser;
-}
-export const RailsContext = createContext<RailsContext>({} as RailsContext);
 
 interface ExamViewerContext {
   answers: AnswersState;

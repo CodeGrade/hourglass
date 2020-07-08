@@ -13,7 +13,6 @@ import {
   UpdateAnswerAction,
   StartExamResponse,
   LoadExamAction,
-  RailsExamVersion,
   LockdownFailedAction,
   Thunk,
   policyPermits,
@@ -261,17 +260,18 @@ export function doLoad(examTakeUrl: string): Thunk {
 }
 
 export function doTryLockdown(
-  exam: RailsExamVersion,
+  policies: readonly Policy[],
+  examTakeUrl: string,
 ): Thunk {
   return (dispatch): void => {
-    lock(exam.policies).then(() => {
+    lock(policies).then(() => {
       window.history.pushState({}, document.title);
-      if (policyPermits(exam.policies, Policy.ignoreLockdown)) {
+      if (policyPermits(policies, Policy.ignoreLockdown)) {
         dispatch(lockdownIgnored());
       } else {
         dispatch(lockedDown());
       }
-      dispatch(doLoad(exam.takeUrl));
+      dispatch(doLoad(examTakeUrl));
     }).catch((err) => {
       dispatch(lockdownFailed(err.message));
     });

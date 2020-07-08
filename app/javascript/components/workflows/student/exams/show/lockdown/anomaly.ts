@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { getCSRFToken } from '@student/exams/show/helpers';
-import { RailsContext } from '@student/exams/show/context';
-import { AnomalyDetected } from '@student/exams/show/types';
+import { AnomalyDetected, Policy } from '@student/exams/show/types';
 import { installListeners, removeListeners } from './listeners';
 
 function lockOut(): void {
@@ -38,15 +37,12 @@ const anom = (examTakeUrl: string) => (reason: string): void => {
 /**
  * React hook to install anomaly listeners.
  */
-export default function useAnomalyListeners(): void {
-  const {
-    railsExam,
-  } = useContext(RailsContext);
-  const {
-    policies,
-  } = railsExam;
+export default function useAnomalyListeners(
+  examTakeUrl: string,
+  policies: readonly Policy[],
+): void {
   const [lst, setLst] = useState([]);
-  const anomalyDetected: AnomalyDetected = anom(railsExam.takeUrl);
+  const anomalyDetected: AnomalyDetected = anom(examTakeUrl);
   useEffect(() => {
     setLst(installListeners(policies, anomalyDetected));
     return (): void => {

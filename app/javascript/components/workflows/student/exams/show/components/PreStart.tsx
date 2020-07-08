@@ -1,11 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { Button, Alert } from 'react-bootstrap';
-import { RailsContext } from '@student/exams/show/context';
 import AnomalousMessagingContainer from '@student/exams/show/containers/AnomalousMessaging';
 import ErrorBoundary from '@hourglass/common/boundary';
 import { HitApiError } from '@hourglass/common/types/api';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { DateTime } from 'luxon';
+import { useFragment, graphql } from 'relay-hooks';
+import { PreStart$key } from './__generated__/PreStart.graphql';
 
 const ShowMessaging: React.FC<{
   examQuestionsUrl: string;
@@ -40,6 +41,7 @@ interface PreStartProps {
   onClick: () => void;
   isError: boolean;
   errorMsg?: string;
+  examKey: PreStart$key;
 }
 
 const PreStart: React.FC<PreStartProps> = (props) => {
@@ -47,26 +49,42 @@ const PreStart: React.FC<PreStartProps> = (props) => {
     onClick,
     isError,
     errorMsg,
+    examKey,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment PreStart on Exam {
+      name
+      messagesUrl
+      questionsUrl
+      myRegistration {
+        anomalous
+        over
+        lastSnapshot
+      }
+    }
+    `,
+    examKey,
+  );
   const {
-    railsExam,
     anomalous,
     over,
     lastSnapshot,
-  } = useContext(RailsContext);
+  } = res.myRegistration;
   if (over) {
+    const parsed = lastSnapshot ? DateTime.fromISO(lastSnapshot) : undefined;
     return (
       <div>
-        <h1>{railsExam.name}</h1>
+        <h1>{res.name}</h1>
         <Alert variant="danger">
           <i>
             <p>
               Your exam period is over.
             </p>
-            {lastSnapshot && (
+            {parsed && (
               <>
                 {'Your submission was saved: '}
-                <ReadableDate showTime value={lastSnapshot} />
+                <ReadableDate showTime value={parsed} />
               </>
             )}
           </i>
@@ -77,7 +95,7 @@ const PreStart: React.FC<PreStartProps> = (props) => {
   if (anomalous) {
     return (
       <div>
-        <h1>{railsExam.name}</h1>
+        <h1>{res.name}</h1>
         <Alert variant="danger">
           <i>
             You have been locked out of this exam.
@@ -86,8 +104,8 @@ const PreStart: React.FC<PreStartProps> = (props) => {
         </Alert>
         <ErrorBoundary>
           <ShowMessaging
-            examMessagesUrl={railsExam.messagesUrl}
-            examQuestionsUrl={railsExam.questionsUrl}
+            examMessagesUrl={res.messagesUrl}
+            examQuestionsUrl={res.questionsUrl}
           />
         </ErrorBoundary>
       </div>
@@ -95,7 +113,7 @@ const PreStart: React.FC<PreStartProps> = (props) => {
   }
   return (
     <div>
-      <h1>{railsExam.name}</h1>
+      <h1>{res.name}</h1>
       <p>Click the following button to enter secure mode and begin the exam.</p>
       <Button
         variant="success"

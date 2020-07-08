@@ -8,13 +8,7 @@ export interface RailsExamVersion {
   policies: readonly Policy[];
 }
 
-export interface RailsExam {
-  id: number;
-  name: string;
-}
-
 export interface RailsRegistration {
-  id: number;
   anomalous: boolean;
 }
 

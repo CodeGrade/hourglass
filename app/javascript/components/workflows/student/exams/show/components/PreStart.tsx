@@ -13,7 +13,7 @@ const ShowMessaging: React.FC<{
     <>
       {error && (
         <span className="text-danger">
-          <p>{error.name}</p>
+          <p>Error retrieving questions</p>
           <small>{error.message}</small>
         </span>
       )}
@@ -42,9 +42,10 @@ const PreStart: React.FC<PreStartProps> = (props) => {
   } = props;
   const {
     railsExam,
-    railsRegistration,
+    anomalous,
   } = useContext(RailsContext);
-  if (railsRegistration.anomalous) {
+  // TODO: check over? and show a similar warning
+  if (anomalous) {
     return (
       <div>
         <h1>{railsExam.name}</h1>

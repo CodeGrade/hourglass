@@ -26,6 +26,18 @@ class ExamVersion < ApplicationRecord
     message: ->(errors) { errors },
   }
 
+  def visible_to?(user)
+    students_and_staff.exists? user.id
+  end
+
+  def students_and_staff
+    exam.proctors_and_professors.or(students)
+  end
+
+  def students
+    User.where(id: registrations.select(:user_id))
+  end
+
   def policies
     info['policies']
   end

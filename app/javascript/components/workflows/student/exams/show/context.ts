@@ -19,7 +19,7 @@ interface RailsContext {
   railsExam: RailsExamVersion;
   anomalous: boolean;
   over: boolean;
-  lastSnapshotTime: DateTime;
+  lastSnapshot: DateTime;
   railsUser: RailsUser;
 }
 export const RailsContext = createContext<RailsContext>({} as RailsContext);

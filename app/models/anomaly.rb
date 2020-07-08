@@ -16,4 +16,8 @@ class Anomaly < ApplicationRecord
     exam_id = HourglassSchema.id_from_object(exam, Types::ExamType, {})
     HourglassSchema.subscriptions.trigger(:anomaly_was_created, { exam_id: exam_id }, self)
   end
+
+  def visible_to?(check_user)
+    exam.proctors_and_professors.exists? check_user.id
+  end
 end

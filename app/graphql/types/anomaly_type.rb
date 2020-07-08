@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
 module Types
-  # TODO: should only be visible to profs of the course and proctors of the exam
   class AnomalyType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id
+
+    def self.authorized?(object, context)
+      super && object.visible_to?(context[:current_user])
+    end
 
     field :reason, String, null: false
 

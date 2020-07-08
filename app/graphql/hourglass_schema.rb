@@ -66,6 +66,11 @@ class HourglassSchema < GraphQL::Schema
     end
   end
 
+  def self.unauthorized_object(error)
+    # Add a top-level error to the response instead of returning nil:
+    raise GraphQL::ExecutionError, 'You do not have permission.'
+  end
+
   def self.write_json!
     File.open('app/javascript/relay/data/schema.json', 'w') do |f|
       f.write(execute(GraphQL::Introspection::INTROSPECTION_QUERY).to_json)

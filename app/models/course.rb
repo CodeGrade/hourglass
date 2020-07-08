@@ -24,7 +24,15 @@ class Course < ApplicationRecord
     User.where(id: professor_course_registrations.select(:user_id))
   end
 
+  def all_users
+    students.or(staff).or(professors)
+  end
+
   def has_staff?
     staff_registrations.exists?
+  end
+
+  def user_member?(user)
+    all_users.exists? user.id
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Types
   class MutationType < Types::BaseObject
     field :destroy_exam_version, mutation: Mutations::DestroyExamVersion

@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Types
+  # TODO: should only be visible to the students in the version, or exam.can_proctor?
   class VersionAnnouncementType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id

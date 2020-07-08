@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 module Types
   class CourseType < Types::BaseObject
+    # TODO: should only be visible to profs of the course
+
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 

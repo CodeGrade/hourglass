@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Types
+  # TODO: should only be visible to profs of the course, proctors of the exam, and user
   class RegistrationType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id

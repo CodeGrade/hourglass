@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Types
   class LockdownPolicyType < Types::BaseEnum
     value 'IGNORE_LOCKDOWN', "don't install anomaly handlers"

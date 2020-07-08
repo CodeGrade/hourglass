@@ -21,10 +21,10 @@ const mapDispatchToProps: MDTP<{
   submit: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   save: (): void => {
-    dispatch(saveSnapshot(ownProps.railsExam.id));
+    dispatch(saveSnapshot(ownProps.railsExam.takeUrl));
   },
   submit: (): void => {
-    dispatch(submitExam(ownProps.railsExam.id));
+    dispatch(submitExam(ownProps.railsExam.takeUrl));
   },
 });
 

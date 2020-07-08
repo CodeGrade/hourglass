@@ -47,8 +47,7 @@ const Exam: React.FC<ShowExamProps> = (props) => {
     anomalous,
     railsUser,
   }), [
-    railsExam.name,
-    railsExam.id,
+    ...Object.values(railsExam),
     anomalous,
     // NOTE: no good way to check array-equality of policies here
     ...Object.values(railsUser),
@@ -73,7 +72,9 @@ const ShowExam: React.FC = () => {
             displayName
           }
           exam(id: $examId) {
-            railsId
+            takeUrl
+            questionsUrl
+            messagesUrl
             name
             myRegistration {
               final
@@ -119,7 +120,9 @@ const ShowExam: React.FC = () => {
           displayName: props.me.displayName,
         };
         const railsExam: RailsExamVersion = {
-          id: props.exam.railsId,
+          takeUrl: props.exam.takeUrl,
+          questionsUrl: props.exam.questionsUrl,
+          messagesUrl: props.exam.messagesUrl,
           name: props.exam.name,
           policies: props.exam.myRegistration.examVersion.policies as Policy[],
         };

@@ -11,9 +11,9 @@ interface Server {
 }
 
 export async function getAllQuestions(
-  examId: number,
+  examQuestionsUrl: string,
 ): Promise<Response> {
-  const res = await hitApi<Server>(`/api/student/exams/${examId}/questions`);
+  const res = await hitApi<Server>(examQuestionsUrl);
   return {
     questions: convertQs(res.questions),
   };

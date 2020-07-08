@@ -18,10 +18,10 @@ interface LastMessageIDs {
 }
 
 export function getLatestMessages(
-  examId: number,
+  examMessagesUrl: string,
   lastMessageIds: LastMessageIDs,
 ): Promise<Response> {
-  return hitApi(`/api/student/exams/${examId}/messages`, {
+  return hitApi(examMessagesUrl, {
     method: 'POST',
     body: JSON.stringify({
       lastMessageIds,

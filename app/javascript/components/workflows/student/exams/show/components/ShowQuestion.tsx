@@ -100,9 +100,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               </div>
               {showSubmit && (
                 <div className="text-center">
-                  <SubmitButton
-                    examID={railsExam.id}
-                  />
+                  <SubmitButton examTakeUrl={railsExam.takeUrl} />
                 </div>
               )}
             </div>

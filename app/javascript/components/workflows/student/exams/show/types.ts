@@ -3,8 +3,10 @@ import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
 
 export interface RailsExamVersion {
-  id: number;
   name: string;
+  takeUrl: string;
+  messagesUrl: string;
+  questionsUrl: string;
   policies: readonly Policy[];
 }
 

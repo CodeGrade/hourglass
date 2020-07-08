@@ -5,21 +5,17 @@ Rails.application.routes.draw do
   post '/graphql', to: 'graphql#execute'
   get '/graphiql', to: 'graphql#graphiql' if Rails.env.development?
 
-  namespace :api do
+  namespace :api, shallow: true do
     namespace :professor do
-      resources :courses, shallow: true, param: 'course_id', only: [] do
+      resources :exams, param: 'exam_id', only: [] do
         member do
-          resources :exams, param: 'exam_id', only: [] do
+          resources :versions, param: 'version_id', only: [] do
+            collection do
+              post :import
+            end
             member do
-              resources :versions, param: 'version_id', only: [] do
-                collection do
-                  post :import
-                end
-                member do
-                  get :export_file
-                  get :export_archive
-                end
-              end
+              get :export_file
+              get :export_archive
             end
           end
         end

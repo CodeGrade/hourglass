@@ -10,3 +10,6 @@ Layout/FirstHashElementIndentation:
 Style/Documentation:
   Exclude:
     - app/graphql/**/*
+Metrics/BlockLength:
+  Exclude:
+    - config/routes.rb

@@ -26,14 +26,19 @@ module Types
       object.any_started?
     end
 
+    # TODO: just visible to staff
     field :questions, GraphQL::Types::JSON, null: false
 
+    # TODO: just visible to staff
     field :reference, GraphQL::Types::JSON, null: false
 
+    # TODO: just visible to staff
     field :instructions, GraphQL::Types::JSON, null: false
 
+    # TODO: just visible to staff
     field :answers, GraphQL::Types::JSON, null: false
 
+    # TODO: just visible to staff
     field :files, GraphQL::Types::JSON, null: false
 
     field :file_export_url, String, null: false

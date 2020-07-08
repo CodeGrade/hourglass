@@ -3,9 +3,6 @@ module Types
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 
-    field :rails_id, Integer, null: false
-    delegate :id, to: :object, prefix: :rails
-
     field :registration, Types::RegistrationType, null: false
     field :new_start_time, GraphQL::Types::ISO8601DateTime, null: true
     field :percent_time_expansion, Integer, null: false

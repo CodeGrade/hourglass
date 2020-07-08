@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Types
   class ChecklistItemStatusType < Types::BaseEnum
     value 'NOT_STARTED', value: :not_started

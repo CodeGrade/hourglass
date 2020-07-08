@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Types
   class ExamType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
@@ -11,12 +13,11 @@ module Types
     delegate :id, to: :object, prefix: :rails
 
     field :name, String, null: false
-    field :bottlenose_assignment_id, Integer, null: true
     field :duration, Integer, null: false
     field :start_time, GraphQL::Types::ISO8601DateTime, null: false
     field :end_time, GraphQL::Types::ISO8601DateTime, null: false
-    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
-    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+    # field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+    # field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
     field :course, Types::CourseType, null: false
     field :exam_versions, Types::ExamVersionType.connection_type, null: false

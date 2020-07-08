@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Types
+  # TODO: should only be visible to proctors of exam, reg.user, course profs
   class MessageType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id

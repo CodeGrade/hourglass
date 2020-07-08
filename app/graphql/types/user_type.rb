@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Types
+  # TODO: should only be visible to the user, or staff for one of their courses
   class UserType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id

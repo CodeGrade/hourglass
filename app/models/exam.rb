@@ -46,6 +46,15 @@ class Exam < ApplicationRecord
     User.where(id: registrations.select(:user_id))
   end
 
+  def proctors
+    User.where(id: proctor_registrations.select(:user_id))
+  end
+
+  # All students and proctors registered for the exam.
+  def all_registered_users
+    students.or(proctors)
+  end
+
   def unassigned_students
     student_regs_by_id = registrations.group_by(&:user_id)
     course.students.reject do |s|
@@ -226,5 +235,13 @@ class Exam < ApplicationRecord
     return unless end_time <= start_time
 
     errors.add(:end_time, 'must be later than start time')
+  end
+
+  def all_with_proctoring_permission
+    proctors.or(course.professors)
+  end
+
+  def can_proctor?(user)
+    all_with_proctoring_permission.exists? user.id
   end
 end

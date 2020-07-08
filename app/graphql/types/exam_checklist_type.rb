@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Types
   class ExamChecklistType < Types::BaseObject
     field :rooms, Types::ExamChecklistSectionType, null: false

@@ -7,7 +7,6 @@ import { useParams, Redirect } from 'react-router-dom';
 import {
   RailsExamVersion,
   RailsUser,
-  RailsRegistration,
   Policy,
 } from '@student/exams/show/types';
 import ExamTaker from '@student/exams/show/containers/ExamTaker';
@@ -27,8 +26,7 @@ interface ShowExamProps {
   // Information about the exam.
   railsExam: RailsExamVersion;
 
-  // Information about the registration.
-  railsRegistration: RailsRegistration;
+  anomalous: boolean;
 
   // Whether the exam is complete.
   final: boolean;
@@ -40,19 +38,19 @@ const Exam: React.FC<ShowExamProps> = (props) => {
   const {
     railsUser,
     railsExam,
-    railsRegistration,
+    anomalous,
     final,
     lastSnapshot,
   } = props;
   const railsContext = React.useMemo(() => ({
     railsExam,
-    railsRegistration,
+    anomalous,
     railsUser,
   }), [
     railsExam.name,
     railsExam.id,
+    anomalous,
     // NOTE: no good way to check array-equality of policies here
-    ...Object.values(railsRegistration),
     ...Object.values(railsUser),
   ]);
   return (
@@ -78,7 +76,6 @@ const ShowExam: React.FC = () => {
             railsId
             name
             myRegistration {
-              railsId
               final
               lastSnapshotTime
               anomalous
@@ -126,10 +123,6 @@ const ShowExam: React.FC = () => {
           name: props.exam.name,
           policies: props.exam.myRegistration.examVersion.policies as Policy[],
         };
-        const railsRegistration: RailsRegistration = {
-          id: props.exam.myRegistration.railsId,
-          anomalous: props.exam.myRegistration.anomalous,
-        };
         const { final, lastSnapshotTime } = props.exam.myRegistration;
         const lastSnapshot = lastSnapshotTime ? DateTime.fromISO(lastSnapshotTime) : undefined;
         return (
@@ -137,7 +130,7 @@ const ShowExam: React.FC = () => {
             <Exam
               railsUser={railsUser}
               railsExam={railsExam}
-              railsRegistration={railsRegistration}
+              anomalous={props.exam.myRegistration.anomalous}
               final={final}
               lastSnapshot={lastSnapshot}
             />

@@ -3,7 +3,6 @@ import {
   FileMap,
   ExamFile,
   RailsExamVersion,
-  RailsRegistration,
   RailsUser,
   AnswersState,
   FileRef,
@@ -16,9 +15,9 @@ interface ExamContext {
 export const ExamContext = createContext<ExamContext>({} as ExamContext);
 
 interface RailsContext {
-  railsExam?: RailsExamVersion;
-  railsRegistration?: RailsRegistration;
-  railsUser?: RailsUser;
+  railsExam: RailsExamVersion;
+  anomalous: boolean;
+  railsUser: RailsUser;
 }
 export const RailsContext = createContext<RailsContext>({} as RailsContext);
 

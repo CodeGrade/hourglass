@@ -2,7 +2,9 @@
 
 module Types
   class CourseType < Types::BaseObject
-    # TODO: should only be visible to profs of the course
+    def self.authorized?(object, context)
+      super && object.visible_to?(context[:current_user])
+    end
 
     implements GraphQL::Types::Relay::Node
     global_id_field :id

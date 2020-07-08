@@ -32,7 +32,11 @@ class Course < ApplicationRecord
     staff_registrations.exists?
   end
 
-  def user_member?(user)
-    all_users.exists? user.id
+  def user_member?(check_user)
+    all_users.exists? check_user.id
+  end
+
+  def visible_to?(check_user)
+    professors.exists? check_user.id
   end
 end

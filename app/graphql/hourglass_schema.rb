@@ -8,7 +8,11 @@ class HourglassSchema < GraphQL::Schema
   use GraphQL::Execution::Interpreter
   use GraphQL::Analysis::AST
 
-  use GraphQL::Guard.new
+  use GraphQL::Guard.new(
+    not_authorized: lambda do |type, field|
+      GraphQL::ExecutionError.new("Not authorized to access #{type}.#{field}")
+    end,
+  )
 
   # Add built-in connections for pagination
   use GraphQL::Pagination::Connections
@@ -16,11 +20,11 @@ class HourglassSchema < GraphQL::Schema
   use GraphQL::Subscriptions::ActionCableSubscriptions
 
   # Create UUIDs by joining the type name & ID, then base64-encoding it
-  def self.id_from_object(object, type_definition, query_ctx)
+  def self.id_from_object(object, type_definition, _query_ctx)
     GraphQL::Schema::UniqueWithinType.encode(type_definition.graphql_name, object.id)
   end
 
-  def self.object_from_id(id, query_ctx)
+  def self.object_from_id(id, _query_ctx)
     type_name, item_id = GraphQL::Schema::UniqueWithinType.decode(id)
     # Now, based on `type_name` and `item_id`
     # find an object in your application

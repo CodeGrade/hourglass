@@ -20,4 +20,8 @@ class ProctorRegistration < ApplicationRecord
 
     errors.add(:room, 'needs to be part of the correct exam')
   end
+
+  def visible_to?(check_user)
+    course.professors.or(User.where(id: user.id)).exists? check_user.id
+  end
 end

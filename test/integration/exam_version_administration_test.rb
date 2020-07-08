@@ -135,15 +135,13 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'should update exam version with started submissions' do
-    exam = create(:exam, :with_started_submissions)
-    ver = exam.exam_versions.first
+    ver = create(:exam_version, :with_started_submissions)
     reg = create(:professor_course_registration, course: ver.exam.course)
     assert_updatable ver, user: reg.user
   end
 
   test 'should update exam version with finished submissions' do
-    exam = create(:exam, :with_finished_submissions)
-    ver = exam.exam_versions.first
+    ver = create(:exam_version, :with_finished_submissions)
     reg = create(:professor_course_registration, course: ver.exam.course)
     assert_updatable ver, user: reg.user
   end
@@ -159,9 +157,8 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'should not destroy exam version with started registrations' do
-    exam = create(:exam, :with_started_submissions)
-    ver = exam.exam_versions.first
-    reg = create(:professor_course_registration, course: exam.course)
+    ver = create(:exam_version, :with_started_submissions)
+    reg = create(:professor_course_registration, course: ver.exam.course)
     prof = reg.user
     result = assert_not_destroyable ver, user: prof
     assert_match(/started/, result['errors'][0]['message'])
@@ -170,9 +167,8 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   end
 
   test 'should not destroy exam version with final registrations' do
-    exam = create(:exam, :with_finished_submissions)
-    ver = exam.exam_versions.first
-    reg = create(:professor_course_registration, course: exam.course)
+    ver = create(:exam_version, :with_finished_submissions)
+    reg = create(:professor_course_registration, course: ver.exam.course)
     prof = reg.user
     result = assert_not_destroyable ver, user: prof
     assert_match(/finished/, result['errors'][0]['message'])

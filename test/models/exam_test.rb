@@ -8,7 +8,8 @@ class ExamTest < ActiveSupport::TestCase
   end
 
   test 'build exam with finished students' do
-    exam = build(:exam, :with_finished_submissions, submissions_count: 10)
+    ver = build(:exam_version, :with_finished_submissions, submissions_count: 10)
+    exam = ver.exam
     assert exam.valid?
     assert 10, exam.registrations.count
     assert exam.registrations.all?(&:finished)

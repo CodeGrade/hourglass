@@ -56,7 +56,8 @@ class RegistrationTest < ActiveSupport::TestCase
     start_time = DateTime.now
     end_time = start_time + 20.minutes
     exam = build(:exam, duration: 8.minutes, start_time: start_time, end_time: end_time)
-    reg = build(:registration, :early_start, exam: exam)
+    ver = build(:exam_version, exam: exam)
+    reg = build(:registration, :early_start, exam_version: ver)
     assert_equal 0, reg.accommodated_extra_duration
     assert_equal 8.minutes, reg.accommodated_duration
 

@@ -44,7 +44,8 @@ class AccommodationTest < ActiveSupport::TestCase
     start_time = DateTime.now
     end_time = start_time + 20.minutes
     exam = build(:exam, duration: 8.minutes, start_time: start_time, end_time: end_time)
-    reg = build(:registration, :early_start, exam: exam)
+    exam_version = build(:exam_version, exam: exam)
+    reg = build(:registration, :early_start, exam_version: exam_version)
     acc = build(:accommodation, registration: reg, percent_time_expansion: 25)
     extra_duration = 2.minutes
     assert_equal extra_duration, reg.accommodated_extra_duration

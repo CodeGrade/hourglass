@@ -68,7 +68,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
 interface AskQuestionProps {
   disabled?: boolean;
   questions: ProfQuestion[];
-  onSubmit: (examID: number, body: string) => void;
+  onSubmit: (examQuestionsUrl: string, body: string) => void;
 }
 
 const AskQuestion: React.FC<AskQuestionProps> = (props) => {
@@ -101,7 +101,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
         variant="success"
         disabled={anySending || valEmpty || disabled}
         onClick={(): void => {
-          onSubmit(railsExam.id, val);
+          onSubmit(railsExam.questionsUrl, val);
           setVal('');
         }}
       >

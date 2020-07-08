@@ -5,7 +5,8 @@ import { loadMessages, loadQuestions } from '@student/exams/show/actions';
 import { HitApiError } from '@hourglass/common/types/api';
 
 interface OwnProps {
-  examId: number;
+  examMessagesUrl: string;
+  examQuestionsUrl: string;
   onError: (error: HitApiError) => void;
   onSuccess: () => void;
   disabled: boolean;
@@ -17,11 +18,11 @@ const mapDispatchToProps: MDTP<{
 }, OwnProps> = (dispatch, ownProps) => ({
   refreshMessages: () => {
     const { onError, onSuccess } = ownProps;
-    dispatch(loadMessages(ownProps.examId, onSuccess, onError));
+    dispatch(loadMessages(ownProps.examMessagesUrl, onSuccess, onError));
   },
   loadQuestions: () => {
     const { onError, onSuccess } = ownProps;
-    dispatch(loadQuestions(ownProps.examId, onSuccess, onError));
+    dispatch(loadQuestions(ownProps.examQuestionsUrl, onSuccess, onError));
   },
 });
 

@@ -6,8 +6,13 @@ import ErrorBoundary from '@hourglass/common/boundary';
 import { HitApiError } from '@hourglass/common/types/api';
 
 const ShowMessaging: React.FC<{
-  examId: number;
-}> = ({ examId }) => {
+  examQuestionsUrl: string;
+  examMessagesUrl: string;
+}> = (props) => {
+  const {
+    examQuestionsUrl,
+    examMessagesUrl,
+  } = props;
   const [error, setError] = useState<HitApiError>(undefined);
   return (
     <>
@@ -19,9 +24,10 @@ const ShowMessaging: React.FC<{
       )}
       <AnomalousMessagingContainer
         disabled={!!error}
-        examId={examId}
         onError={setError}
         onSuccess={() => setError(undefined)}
+        examQuestionsUrl={examQuestionsUrl}
+        examMessagesUrl={examMessagesUrl}
       />
     </>
   );
@@ -56,7 +62,10 @@ const PreStart: React.FC<PreStartProps> = (props) => {
           </i>
         </Alert>
         <ErrorBoundary>
-          <ShowMessaging examId={railsExam.id} />
+          <ShowMessaging
+            examMessagesUrl={railsExam.messagesUrl}
+            examQuestionsUrl={railsExam.questionsUrl}
+          />
         </ErrorBoundary>
       </div>
     );

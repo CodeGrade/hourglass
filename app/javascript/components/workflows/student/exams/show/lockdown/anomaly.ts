@@ -14,10 +14,9 @@ function lockOut(): void {
  * @param examID the ID of the current exam
  * @param registrationID the ID of the current registration
  */
-const anom = (examID: number) => (reason: string): void => {
+const anom = (examTakeUrl: string) => (reason: string): void => {
   // TODO use event argument?
-  const anomalyPath = `/api/student/exams/${examID}/take`;
-  fetch(anomalyPath, {
+  fetch(examTakeUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -47,7 +46,7 @@ export default function useAnomalyListeners(): void {
     policies,
   } = railsExam;
   const [lst, setLst] = useState([]);
-  const anomalyDetected: AnomalyDetected = anom(railsExam.id);
+  const anomalyDetected: AnomalyDetected = anom(railsExam.takeUrl);
   useEffect(() => {
     setLst(installListeners(policies, anomalyDetected));
     return (): void => {

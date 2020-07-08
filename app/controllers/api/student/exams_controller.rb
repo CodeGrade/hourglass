@@ -21,13 +21,13 @@ module Api
         end
       end
 
-      def questions
+      def all_questions
         render json: {
           questions: all_questions,
         }
       end
 
-      def question
+      def ask_question
         q_params = params.require(:question).permit(:body)
         q = Question.new body: q_params[:body], registration: @registration
         # TODO: trigger subscription (in mutation that hasn't been created yet)

@@ -70,12 +70,11 @@ export function questionSucceeded(id: number): QuestionSucceededAction {
   };
 }
 
-export function askQuestion(examID: number, body: string): Thunk {
+export function askQuestion(examQuestionsUrl: string, body: string): Thunk {
   return (dispatch, getState): void => {
     const qID = getState().questions.lastId + 1;
     dispatch(questionAsked(qID, body));
-    const url = `/api/student/exams/${examID}/question`;
-    fetch(url, {
+    fetch(examQuestionsUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -217,10 +216,9 @@ export function updateScratch(val: string): UpdateScratchAction {
   };
 }
 
-export function doLoad(examID: number): Thunk {
+export function doLoad(examTakeUrl: string): Thunk {
   return (dispatch): void => {
-    const url = `/api/student/exams/${examID}/take`;
-    fetch(url, {
+    fetch(examTakeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -273,7 +271,7 @@ export function doTryLockdown(
       } else {
         dispatch(lockedDown());
       }
-      dispatch(doLoad(exam.id));
+      dispatch(doLoad(exam.takeUrl));
     }).catch((err) => {
       dispatch(lockdownFailed(err.message));
     });
@@ -342,19 +340,19 @@ export function setQuestions(questions: ProfQuestion[]): SetQuestionsAction {
 }
 
 export function loadQuestions(
-  examId: number,
+  examQuestionsUrl: string,
   onSuccess: () => void,
   onError: (err: HitApiError) => void,
 ): Thunk {
   return (dispatch): void => {
-    getAllQuestions(examId).then((res) => {
+    getAllQuestions(examQuestionsUrl).then((res) => {
       dispatch(setQuestions(res.questions));
     }).then(() => onSuccess).catch(onError);
   };
 }
 
 export function loadMessages(
-  examId: number,
+  examMessagesUrl: string,
   onSuccess: () => void,
   onError: (err: HitApiError) => void,
 ): Thunk {
@@ -366,13 +364,13 @@ export function loadMessages(
       version: lastMessageId(state.messages.messages.version),
       exam: lastMessageId(state.messages.messages.exam),
     };
-    getLatestMessages(examId, lastMessageIds).then((res) => {
+    getLatestMessages(examMessagesUrl, lastMessageIds).then((res) => {
       dispatch(receiveMessages(res.messages));
     }).then(() => onSuccess()).catch(onError);
   };
 }
 
-export function saveSnapshot(examID: number): Thunk {
+export function saveSnapshot(examTakeUrl: string): Thunk {
   return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
     if (state.snapshot.status === SnapshotStatus.SUCCESS) {
@@ -386,8 +384,7 @@ export function saveSnapshot(examID: number): Thunk {
       exam: lastMessageId(state.messages.messages.exam),
     };
 
-    const url = `/api/student/exams/${examID}/take`;
-    fetch(url, {
+    fetch(examTakeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -426,12 +423,11 @@ export function saveSnapshot(examID: number): Thunk {
   };
 }
 
-export function submitExam(examID: number): Thunk {
+export function submitExam(examTakeUrl: string): Thunk {
   return (_dispatch, getState): void => {
     const state = getState();
     const { answers } = state.contents;
-    const url = `/api/student/exams/${examID}/take`;
-    fetch(url, {
+    fetch(examTakeUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

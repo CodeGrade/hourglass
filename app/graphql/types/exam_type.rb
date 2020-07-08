@@ -7,9 +7,6 @@ module Types
 
     guard Guards::VISIBILITY
 
-    field :rails_id, Integer, null: false
-    delegate :id, to: :object, prefix: :rails
-
     field :name, String, null: false
     field :duration, Integer, null: false
     field :start_time, GraphQL::Types::ISO8601DateTime, null: false
@@ -65,6 +62,23 @@ module Types
     field :exam_version_upload_url, String, null: false
     def exam_version_upload_url
       Rails.application.routes.url_helpers.import_api_professor_versions_path(object)
+    end
+
+    field :take_url, String, null: false
+    def take_url
+      Rails.application.routes.url_helpers.take_api_student_exam_path(object)
+    end
+
+    # TODO: remove in favor of subscription and mutation
+    field :messages_url, String, null: false
+    def messages_url
+      Rails.application.routes.url_helpers.messages_api_student_exam_path(object)
+    end
+
+    # TODO: remove in favor of subscription and mutation
+    field :questions_url, String, null: false
+    def questions_url
+      Rails.application.routes.url_helpers.questions_api_student_exam_path(object)
     end
   end
 end

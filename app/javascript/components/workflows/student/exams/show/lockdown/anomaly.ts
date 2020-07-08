@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getCSRFToken } from '@student/exams/show/helpers';
 import { AnomalyDetected, Policy } from '@student/exams/show/types';
 import { installListeners, removeListeners } from './listeners';

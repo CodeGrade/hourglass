@@ -19,7 +19,6 @@ import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
 import {
   useHistory,
-  useParams,
   Route,
   Switch,
 } from 'react-router-dom';

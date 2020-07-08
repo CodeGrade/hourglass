@@ -3,7 +3,15 @@ import { useParams } from 'react-router-dom';
 import Editor from '@professor/exams/new/editor';
 import { useAlert } from '@hourglass/common/alerts';
 import { useQuery, graphql } from 'relay-hooks';
-import { ContentsState, Policy, QuestionInfo, FileRef, HTMLVal, ExamFile, AnswersState, AnswerState } from '@hourglass/workflows/student/exams/show/types';
+import {
+  ContentsState,
+  Policy,
+  QuestionInfo,
+  FileRef,
+  HTMLVal,
+  ExamFile,
+  AnswerState,
+} from '@hourglass/workflows/student/exams/show/types';
 
 import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
 

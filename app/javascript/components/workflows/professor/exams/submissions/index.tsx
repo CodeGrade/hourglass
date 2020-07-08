@@ -8,9 +8,17 @@ import {
 import ExamViewer from '@hourglass/workflows/proctor/registrations/show';
 import { QueryRenderer, graphql } from 'react-relay';
 import environment from '@hourglass/relay/environment';
+import {
+  AnswersState,
+  ExamFile,
+  HTMLVal,
+  FileRef,
+  QuestionInfo,
+  ContentsState,
+} from '@hourglass/workflows/student/exams/show/types';
+
 import { submissionsAllQuery } from './__generated__/submissionsAllQuery.graphql';
 import { submissionsOneQuery } from './__generated__/submissionsOneQuery.graphql';
-import { AnswersState, ExamFile, HTMLVal, FileRef, QuestionInfo, ContentsState } from '@hourglass/workflows/student/exams/show/types';
 
 const ExamSubmissions: React.FC = () => {
   const { examId } = useParams();

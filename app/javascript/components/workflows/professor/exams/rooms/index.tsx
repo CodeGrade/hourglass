@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useContext } from 'react';
 import {
-  useParams,
   useHistory,
   Switch,
   Route,

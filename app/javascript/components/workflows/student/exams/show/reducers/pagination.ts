@@ -80,7 +80,7 @@ export default (state: PaginationState = {
         if (!q.separateSubparts) pageCoords.push(thisQ);
         // Only include parts if there are multiple of them,
         // or if the solo part isn't anonymous
-        if (q.parts.length > 1 || q.parts[0].name) {
+        if (q.parts.length > 1 || q.parts[0]?.name) {
           q.parts.forEach((_p, pnum) => {
             const thisP = {
               question: qnum,

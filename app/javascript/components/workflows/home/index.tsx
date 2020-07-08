@@ -19,7 +19,7 @@ const ShowRegistrations: React.FC<{
     fragment home_studentregs on Registration @relay(plural: true) {
       id
       exam {
-        railsId
+        id
         name
       }
     }
@@ -33,7 +33,7 @@ const ShowRegistrations: React.FC<{
       <ul>
         {res.map((reg) => (
           <li key={reg.id}>
-            <Link to={`/exams/${reg.exam.railsId}`}>
+            <Link to={`/exams/${reg.exam.id}`}>
               {reg.exam.name}
             </Link>
           </li>
@@ -54,7 +54,6 @@ const ShowProfRegs: React.FC<{
     fragment home_profregs on ProfessorCourseRegistration @relay(plural: true) {
       course {
         id
-        railsId
         title
       }
     }
@@ -71,7 +70,7 @@ const ShowProfRegs: React.FC<{
             key={course.id}
           >
             <Link
-              to={`/courses/${course.railsId}`}
+              to={`/courses/${course.id}`}
             >
               {course.title}
             </Link>

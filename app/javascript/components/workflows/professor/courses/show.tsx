@@ -19,7 +19,7 @@ const CourseExams: React.FC<{
   const res = useFragment(
     graphql`
     fragment show_courseExams on Exam @relay(plural: true) {
-      railsId
+      id
       name
     }
     `,
@@ -30,9 +30,9 @@ const CourseExams: React.FC<{
       <h2>Exams</h2>
       <ul>
         {res.map((exam) => (
-          <li key={exam.railsId}>
+          <li key={exam.id}>
             <Link
-              to={`/exams/${exam.railsId}/admin`}
+              to={`/exams/${exam.id}/admin`}
             >
               {exam.name}
             </Link>
@@ -49,8 +49,8 @@ const ShowCourse: React.FC = () => {
     <QueryRenderer<showCourseQuery>
       environment={environment}
       query={graphql`
-        query showCourseQuery($railsId: Int!) {
-          course(railsId: $railsId) {
+        query showCourseQuery($courseId: ID!) {
+          course(id: $courseId) {
             title
             id
             exams {
@@ -60,7 +60,7 @@ const ShowCourse: React.FC = () => {
         }
         `}
       variables={{
-        railsId: Number(courseId),
+        courseId,
       }}
       render={({ error, props }) => {
         if (error) {

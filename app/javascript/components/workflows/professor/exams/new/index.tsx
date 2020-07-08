@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import { useMutation, graphql } from 'relay-hooks';
 import { DateTime } from 'luxon';
@@ -16,7 +16,6 @@ import { newExamMutation } from './__generated__/newExamMutation.graphql';
 const NewExamForm: React.FC<{
   courseId: string;
 }> = (props) => {
-  const { courseId: courseRailsId } = useParams();
   const { courseId } = props;
   const { alert } = useContext(AlertContext);
   const history = useHistory();
@@ -25,7 +24,7 @@ const NewExamForm: React.FC<{
     mutation newExamMutation($input: CreateExamInput!) {
       createExam(input: $input) {
         exam {
-          railsId
+          id
         }
       }
     }
@@ -33,7 +32,7 @@ const NewExamForm: React.FC<{
     {
       onCompleted: ({ createExam }) => {
         const { exam } = createExam;
-        history.push(`/exams/${exam.railsId}/admin`);
+        history.push(`/exams/${exam.id}/admin`);
       },
       onError: (errs) => {
         alert({
@@ -73,7 +72,7 @@ const NewExamForm: React.FC<{
                 disabled={loading}
                 variant="danger"
                 onClick={(): void => {
-                  history.push(`/courses/${courseRailsId}`);
+                  history.push(`/courses/${courseId}`);
                 }}
               >
                 Cancel

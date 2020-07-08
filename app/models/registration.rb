@@ -15,6 +15,7 @@ class Registration < ApplicationRecord
   validates :user, presence: true
   validates :exam_version, presence: true
   validate :room_version_same_exam
+  validate :user_in_course
 
   delegate :exam, to: :exam_version
   delegate :course, to: :exam
@@ -25,6 +26,12 @@ class Registration < ApplicationRecord
     return if room.exam == exam_version.exam
 
     errors.add(:room, 'needs to be part of the correct exam')
+  end
+
+  def user_in_course
+    return if course.students.include? user
+
+    errors.add(:user, 'needs to be registered for the course')
   end
 
   scope :without_accommodation, -> { includes(:accommodation).where(accommodations: { id: nil }) }

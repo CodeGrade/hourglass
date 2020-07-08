@@ -11,57 +11,35 @@ module Types
     end
 
     field :exam, ExamType, null: false do
-      argument :rails_id, Int, required: false
-      argument :id, ID, required: false
+      argument :id, ID, required: true
     end
 
-    def exam(rails_id: nil, id: nil)
-      if rails_id
-        Exam.find(rails_id)
-      elsif id
-        HourglassSchema.object_from_id(id, context)
-      else
-        raise GraphQL::ExecutionError, 'Bad exam ID.'
-      end
+    def exam(id:)
+      HourglassSchema.object_from_id(id, context)
     end
 
     field :exam_version, ExamVersionType, null: false do
-      argument :rails_id, Integer, required: true
+      argument :id, ID, required: true
     end
 
-    def exam_version(rails_id:)
-      ExamVersion.find(rails_id)
+    def exam_version(id:)
+      HourglassSchema.object_from_id(id, context)
+    end
+
+    field :registration, Types::RegistrationType, null: true do
+      argument :id, ID, required: true
+    end
+
+    def registration(id:)
+      HourglassSchema.object_from_id(id, context)
     end
 
     field :course, CourseType, null: false do
-      argument :rails_id, Integer, required: true
+      argument :id, ID, required: true
     end
 
-    def course(rails_id:)
-      Course.find(rails_id)
+    def course(id:)
+      HourglassSchema.object_from_id(id, context)
     end
-
-    # field :courses, [CourseType], null: false
-    # def courses
-    #   Course.all
-    # end
-
-    # field :users, [UserType], null: false
-    # def users
-    #   User.all
-    # end
-
-    # field :registrations, [RegistrationType], null: false
-    # def registrations
-    #   Registration.all
-    # end
-
-    # field :user, UserType, null: false do
-    #   argument :username, String, required: true
-    # end
-
-    # def user(username:)
-    #   User.find_by(username: username)
-    # end
   end
 end

@@ -65,13 +65,6 @@ export interface Version {
   files: ExamVersion['files'];
 }
 
-export interface ExamEditorProps {
-  examVersionId: string;
-  exam: ExamVersion;
-  railsExamVersion: RailsExamVersion;
-  answers: AnswersState;
-}
-
 function transformATAReverse(
   ata: AllThatApplyInfo,
   answer: AllThatApplyState,
@@ -163,12 +156,21 @@ function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): E
   };
 }
 
+export interface ExamEditorProps {
+  examVersionId: string;
+  exam: ExamVersion;
+  versionName: string;
+  versionPolicies: readonly Policy[];
+  answers: AnswersState;
+}
+
 const Editor: React.FC<ExamEditorProps> = (props) => {
   const {
     examVersionId,
     exam,
+    versionName,
+    versionPolicies,
     answers,
-    railsExamVersion,
   } = props;
   return (
     <Provider store={store}>
@@ -176,8 +178,8 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
         examVersionId={examVersionId}
         initialValues={{
           all: {
-            name: railsExamVersion.name,
-            policies: railsExamVersion.policies,
+            name: versionName,
+            policies: versionPolicies,
             exam: examWithAnswers(exam, answers.answers),
           },
         }}

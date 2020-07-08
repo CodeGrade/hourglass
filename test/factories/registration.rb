@@ -3,15 +3,11 @@
 FactoryBot.define do
   factory :registration do
     transient do
-      exam { create(:exam) }
+      student_registration { create(:student_registration, course: exam_version.exam.course) }
     end
 
-    user
-    exam_version { create(:exam_version, exam: exam) }
-
-    trait :in_room do
-      room { create(:room, exam: exam) }
-    end
+    user { student_registration.user }
+    exam_version
 
     # Student starts at the start of their window
     trait :early_start do

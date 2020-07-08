@@ -36,7 +36,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should not export exam version single file for student' do
     ev = create(:exam_version)
-    reg = create(:registration, exam: ev.exam)
+    reg = create(:registration, exam_version: ev)
     sign_in reg.user
 
     get export_file_api_professor_version_path(ev)
@@ -67,8 +67,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should not export exam version archive for student' do
     ev = create(:exam_version)
-    exam = ev.exam
-    reg = create(:registration, exam: exam)
+    reg = create(:registration, exam_version: ev)
     sign_in reg.user
 
     get export_archive_api_professor_version_path(ev)

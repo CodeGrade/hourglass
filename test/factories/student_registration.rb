@@ -2,7 +2,11 @@
 
 FactoryBot.define do
   factory :student_registration do
+    transient do
+      course { create(:course) }
+    end
+
     user
-    section
+    section { create(:section, course: course) }
   end
 end

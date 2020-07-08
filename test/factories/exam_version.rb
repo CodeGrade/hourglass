@@ -36,6 +36,24 @@ FactoryBot.define do
       end
     end
 
+    trait :with_finished_submissions do
+      transient do
+        submissions_count { 5 }
+      end
+      after(:create) do |ev, context|
+        create_list(:registration, context.submissions_count, :done, exam_version: ev)
+      end
+    end
+
+    trait :with_started_submissions do
+      transient do
+        submissions_count { 5 }
+      end
+      after(:create) do |ev, context|
+        create_list(:registration, context.submissions_count, :early_start, exam_version: ev)
+      end
+    end
+
     exam
     files { upload.files }
     info { upload.info }

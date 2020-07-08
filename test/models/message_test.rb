@@ -17,9 +17,10 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   test 'students cannot send messages to other students' do
-    e = build(:exam)
-    reg = build(:registration, exam: e)
-    reg2 = build(:registration, exam: e)
+    exam = build(:exam)
+    ev = build(:exam_version, exam: exam)
+    reg = build(:registration, exam_version: ev)
+    reg2 = build(:registration, exam_version: ev)
     msg = build(
       :message,
       {

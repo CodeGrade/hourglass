@@ -13,10 +13,6 @@ export interface RailsExam {
   name: string;
 }
 
-export interface RailsCourse {
-  id: number;
-}
-
 export interface RailsRegistration {
   id: number;
   anomalous: boolean;

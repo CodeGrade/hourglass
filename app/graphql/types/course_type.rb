@@ -2,15 +2,12 @@
 
 module Types
   class CourseType < Types::BaseObject
-    def self.authorized?(object, context)
-      super && object.visible_to?(context[:current_user])
-    end
-
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 
-    field :rails_id, Integer, null: false
-    delegate :id, to: :object, prefix: :rails
+    def self.authorized?(object, context)
+      super && object.visible_to?(context[:current_user])
+    end
 
     field :title, String, null: false
     # field :last_sync, GraphQL::Types::ISO8601DateTime, null: true

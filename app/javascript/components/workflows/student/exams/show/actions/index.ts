@@ -33,7 +33,6 @@ import {
   NextQuestionAction,
   ActivateWaypointsAction,
   Policy,
-  RailsCourse,
   TimeInfo,
   RailsExamMessage,
   SetQuestionsAction,
@@ -71,7 +70,7 @@ export function questionSucceeded(id: number): QuestionSucceededAction {
   };
 }
 
-export function askQuestion(courseID: number, examID: number, body: string): Thunk {
+export function askQuestion(examID: number, body: string): Thunk {
   return (dispatch, getState): void => {
     const qID = getState().questions.lastId + 1;
     dispatch(questionAsked(qID, body));
@@ -218,7 +217,7 @@ export function updateScratch(val: string): UpdateScratchAction {
   };
 }
 
-export function doLoad(courseID: number, examID: number): Thunk {
+export function doLoad(examID: number): Thunk {
   return (dispatch): void => {
     const url = `/api/student/exams/${examID}/take`;
     fetch(url, {
@@ -264,7 +263,6 @@ export function doLoad(courseID: number, examID: number): Thunk {
 }
 
 export function doTryLockdown(
-  course: RailsCourse,
   exam: RailsExamVersion,
 ): Thunk {
   return (dispatch): void => {
@@ -275,7 +273,7 @@ export function doTryLockdown(
       } else {
         dispatch(lockedDown());
       }
-      dispatch(doLoad(course.id, exam.id));
+      dispatch(doLoad(exam.id));
     }).catch((err) => {
       dispatch(lockdownFailed(err.message));
     });
@@ -374,7 +372,7 @@ export function loadMessages(
   };
 }
 
-export function saveSnapshot(courseID: number, examID: number): Thunk {
+export function saveSnapshot(examID: number): Thunk {
   return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
     if (state.snapshot.status === SnapshotStatus.SUCCESS) {
@@ -428,7 +426,7 @@ export function saveSnapshot(courseID: number, examID: number): Thunk {
   };
 }
 
-export function submitExam(courseID: number, examID: number): Thunk {
+export function submitExam(examID: number): Thunk {
   return (_dispatch, getState): void => {
     const state = getState();
     const { answers } = state.contents;

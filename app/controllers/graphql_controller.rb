@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Handles all incoming GraphQL queries.
 class GraphqlController < ApplicationController
   # If accessing from outside this domain, nullify the session
   # This allows for outside API access while preventing CSRF attacks,
@@ -11,6 +14,8 @@ class GraphqlController < ApplicationController
   end
 
   def execute
+    raise GraphQL::ExecutionError, 'You need to log in.' unless current_user
+
     variables = ensure_hash(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]

@@ -31,7 +31,11 @@ class ExamVersion < ApplicationRecord
   end
 
   def students_and_staff
-    exam.proctors_and_professors.or(students)
+    staff.or(students)
+  end
+
+  def staff
+    exam.proctors_and_professors
   end
 
   def students
@@ -48,6 +52,10 @@ class ExamVersion < ApplicationRecord
 
   def answers
     info['answers']
+  end
+
+  def contents_visible_to?(check_user)
+    staff.exists? check_user.id
   end
 
   def questions

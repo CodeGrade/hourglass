@@ -26,20 +26,27 @@ module Types
       object.any_started?
     end
 
-    # TODO: just visible to staff
-    field :questions, GraphQL::Types::JSON, null: false
+    CONTENTS_GUARD = ->(obj, _args, ctx) { obj.object.contents_visible_to?(ctx[:current_user]) }
 
-    # TODO: just visible to staff
-    field :reference, GraphQL::Types::JSON, null: false
+    field :questions, GraphQL::Types::JSON, null: false do
+      guard CONTENTS_GUARD
+    end
 
-    # TODO: just visible to staff
-    field :instructions, GraphQL::Types::JSON, null: false
+    field :reference, GraphQL::Types::JSON, null: false do
+      guard CONTENTS_GUARD
+    end
 
-    # TODO: just visible to staff
-    field :answers, GraphQL::Types::JSON, null: false
+    field :instructions, GraphQL::Types::JSON, null: false do
+      guard CONTENTS_GUARD
+    end
 
-    # TODO: just visible to staff
-    field :files, GraphQL::Types::JSON, null: false
+    field :answers, GraphQL::Types::JSON, null: false do
+      guard CONTENTS_GUARD
+    end
+
+    field :files, GraphQL::Types::JSON, null: false do
+      guard CONTENTS_GUARD
+    end
 
     field :file_export_url, String, null: false
     def file_export_url

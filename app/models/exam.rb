@@ -58,7 +58,7 @@ class Exam < ApplicationRecord
   def unassigned_students
     student_regs_by_id = registrations.group_by(&:user_id)
     course.students.reject do |s|
-      student_regs_by_id.has_key? s.id
+      student_regs_by_id.key? s.id
     end
   end
 
@@ -196,6 +196,14 @@ class Exam < ApplicationRecord
     }
   end
 
+  def proctors_and_professors
+    proctors.or(course.professors)
+  end
+
+  def visible_to?(user)
+    course.user_member?(user)
+  end
+
   private
 
   def direct_recipients
@@ -235,13 +243,5 @@ class Exam < ApplicationRecord
     return unless end_time <= start_time
 
     errors.add(:end_time, 'must be later than start time')
-  end
-
-  def all_with_proctoring_permission
-    proctors.or(course.professors)
-  end
-
-  def can_proctor?(user)
-    all_with_proctoring_permission.exists? user.id
   end
 end

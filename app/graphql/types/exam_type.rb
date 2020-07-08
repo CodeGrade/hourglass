@@ -6,7 +6,7 @@ module Types
     global_id_field :id
 
     def self.authorized?(object, context)
-      super && object.course.user_member?(context[:current_user])
+      super && object.visible_to?(context[:current_user])
     end
 
     field :rails_id, Integer, null: false

@@ -11,7 +11,7 @@ end
 module Mutations
   class UpdateVersionRegistrations < BaseMutation
     argument :exam_id, ID, required: true, loads: Types::ExamType
-    argument :unassigned, [ID], required: true, description: 'Students to unassign.'
+    argument :unassigned, [ID], required: true, loads: Types::UserType, description: 'Students to unassign.'
     argument :versions, [Types::VersionAssignment], required: true, description: 'Version assignments to create.'
 
     field :exam, Types::ExamType, null: false
@@ -38,7 +38,7 @@ module Mutations
     def delete_unassigned!(exam, unassigned)
       unassigned.each do |user|
         student_reg = exam.registrations.find_by(user: user)
-        raise GraphQL::ExecutionError, "Invalid user ID requested (#{id})" unless student_reg
+        next unless student_reg
 
         if student_reg.started?
           err = "Cannot delete registration for '#{user.display_name}' since they have already started."

@@ -3,9 +3,6 @@ module Types
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 
-    field :rails_id, Integer, null: false
-    delegate :id, to: :object, prefix: :rails
-
     field :name, String, null: false
     # field :files, Types::JsonbType, null: false
     # field :info, Types::JsonbType, null: false

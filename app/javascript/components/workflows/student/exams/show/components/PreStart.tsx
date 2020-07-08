@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { Button, Alert } from 'react-bootstrap';
 import AnomalousMessagingContainer from '@student/exams/show/containers/AnomalousMessaging';
 import ErrorBoundary from '@hourglass/common/boundary';

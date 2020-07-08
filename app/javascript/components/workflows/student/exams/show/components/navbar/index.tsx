@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import SnapshotInfo from '@student/exams/show/containers/SnapshotInfo';
 import LockdownInfo from '@student/exams/show/containers/LockdownInfo';
 import './index.css';

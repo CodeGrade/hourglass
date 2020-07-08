@@ -5,9 +5,7 @@ module Types
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 
-    def self.authorized?(object, context)
-      super && object.visible_to?(context[:current_user])
-    end
+    guard Guards::VISIBILITY
 
     field :exam_version, Types::ExamVersionType, null: false
     # field :exam_version_id, Integer, null: false

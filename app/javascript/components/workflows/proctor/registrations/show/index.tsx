@@ -1,10 +1,9 @@
 import React from 'react';
-import { RailsExamVersion, ContentsState } from '@student/exams/show/types';
+import { ContentsState } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import {
   ExamContext,
   ExamViewerContext,
-  RailsContext,
   ExamFilesContext,
 } from '@student/exams/show/context';
 import { createMap } from '@student/exams/show/files';

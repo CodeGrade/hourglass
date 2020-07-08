@@ -36,7 +36,7 @@ import {
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
-import { ContentsState } from '@student/exams/show/types';
+import { ContentsState, QuestionInfo, FileRef, HTMLVal, ExamFile, AnswerState } from '@student/exams/show/types';
 import { Editor as CodeMirrorEditor } from 'codemirror';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
@@ -696,9 +696,13 @@ const ShowVersion: React.FC<{
       name
       policies
       anyStarted
-      contents
       fileExportUrl
       archiveExportUrl
+      questions
+      reference
+      instructions
+      files
+      answers
     }
     `,
     version,
@@ -741,6 +745,18 @@ const ShowVersion: React.FC<{
       ],
     },
   );
+  const parsedContents: ContentsState = {
+    exam: {
+      questions: res.questions as QuestionInfo[],
+      reference: res.reference as FileRef[],
+      instructions: res.instructions as HTMLVal,
+      files: res.files as ExamFile[],
+    },
+    answers: {
+      answers: res.answers as AnswerState[][][],
+      scratch: '',
+    },
+  };
   return (
     <>
       <h3 className="flex-grow-1">
@@ -803,7 +819,7 @@ const ShowVersion: React.FC<{
       <ErrorBoundary>
         <PreviewVersion
           open={preview}
-          contents={JSON.parse(res.contents)}
+          contents={parsedContents}
         />
       </ErrorBoundary>
     </>

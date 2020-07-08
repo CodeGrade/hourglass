@@ -38,6 +38,18 @@ class ExamVersion < ApplicationRecord
     info['answers']
   end
 
+  def questions
+    contents['questions']
+  end
+
+  def reference
+    contents['reference'] || []
+  end
+
+  def instructions
+    contents['instructions'] || { type: 'HTML', value: '' }
+  end
+
   def default_answers
     def_answers = answers.map do |ans_q|
       ans_q.map do |ans_p|
@@ -110,39 +122,5 @@ class ExamVersion < ApplicationRecord
         raise 'Bad file'
       end
     end
-  end
-
-  def old_contents
-    {
-      exam: {
-        questions: contents['questions'],
-        reference: contents['reference'] || [],
-        instructions: contents['instructions'] || { type: 'HTML', value: '' },
-        files: files,
-      },
-      answers: {
-        answers: answers,
-      },
-    }
-  end
-
-  def serialize
-    {
-      id: id,
-      name: name,
-      policies: policies,
-      contents: {
-        exam: {
-          questions: contents['questions'],
-          reference: contents['reference'] || [],
-          instructions: contents['instructions'] || { type: 'HTML', value: '' },
-          files: files,
-        },
-        answers: {
-          answers: answers,
-        },
-      },
-      anyStarted: any_started?,
-    }
   end
 end

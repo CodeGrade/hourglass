@@ -16,10 +16,7 @@ module Types
     field :exam, Types::ExamType, null: false
     field :exam_version, Types::ExamVersionType, null: false
 
-    field :current_answers, String, null: false
-    def current_answers
-      object.current_answers.to_json
-    end
+    field :current_answers, GraphQL::Types::JSON, null: false
 
     field :anomalous, Boolean, null: false
     def anomalous

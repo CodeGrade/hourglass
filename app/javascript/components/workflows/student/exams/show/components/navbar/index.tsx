@@ -15,17 +15,19 @@ import { GiOpenBook } from 'react-icons/gi';
 import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 import JumpTo from '@student/exams/show/containers/navbar/JumpTo';
 import Scratch from '@student/exams/show/containers/navbar/Scratch';
-import ExamMessages from '@student/exams/show/containers/navbar/ExamMessages';
-import AskQuestion from '@student/exams/show/containers/navbar/AskQuestion';
+import ExamMessages from '@student/exams/show/components/navbar/ExamMessages';
+import AskQuestion from '@student/exams/show/components/navbar/AskQuestion';
 import RenderIcon from '@student/exams/show/components/Icon';
 import { TimeInfo } from '@student/exams/show/types';
 import TimeRemaining from '@student/exams/show/components/navbar/TimeRemaining';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { useFragment, graphql } from 'relay-hooks';
+
 import { navbar$key } from './__generated__/navbar.graphql';
+import { navbar_accordion$key } from './__generated__/navbar_accordion.graphql';
 
 interface NavAccordionProps {
-  examQuestionsUrl: string;
+  examKey: navbar_accordion$key;
   expanded: boolean;
   onSectionClick: (eventKey: string) => void;
   openSection: string;
@@ -33,11 +35,20 @@ interface NavAccordionProps {
 
 const NavAccordion: React.FC<NavAccordionProps> = (props) => {
   const {
-    examQuestionsUrl,
+    examKey,
     expanded,
     onSectionClick,
     openSection,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment navbar_accordion on Exam {
+      ...AskQuestion
+      ...ExamMessages_navbar
+    }
+    `,
+    examKey,
+  );
   return (
     <Accordion
       activeKey={openSection}
@@ -52,6 +63,7 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
         <JumpTo />
       </NavAccordionItem>
       <ExamMessages
+        examKey={res}
         expanded={expanded}
         onSectionClick={onSectionClick}
       />
@@ -71,7 +83,7 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
         onSectionClick={onSectionClick}
         eventKey="askq"
       >
-        <AskQuestion examQuestionsUrl={examQuestionsUrl} />
+        <AskQuestion examKey={res} />
       </NavAccordionItem>
     </Accordion>
   );
@@ -88,7 +100,7 @@ const ExamNavbar: React.FC<{
   const res = useFragment(
     graphql`
     fragment navbar on Exam {
-      questionsUrl
+      ...navbar_accordion
       myRegistration {
         user {
           displayName
@@ -171,7 +183,7 @@ const ExamNavbar: React.FC<{
       </div>
       <div className="mt-4 flex-fill overflow-auto">
         <NavAccordion
-          examQuestionsUrl={res.questionsUrl}
+          examKey={res}
           onSectionClick={(eventKey): void => {
             if (expanded) {
               if (openSection === eventKey) {

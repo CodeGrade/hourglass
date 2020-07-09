@@ -21,33 +21,6 @@ module Api
         end
       end
 
-      def all_questions
-        render json: {
-          questions: all_questions,
-        }
-      end
-
-      def ask_question
-        q_params = params.require(:question).permit(:body)
-        q = Question.new body: q_params[:body], registration: @registration
-        # TODO: trigger subscription (in mutation that hasn't been created yet)
-        # HourglassSchema.subscriptions.trigger(
-        #   :message_was_sent,
-        #   { exam_id: HourglassSchema.id_from_object(exam) },
-        #   exam,
-        # )
-        render json: {
-          success: q.save,
-          messages: q.errors.full_messages,
-        }
-      end
-
-      def messages
-        render json: {
-          messages: messages_to_send,
-        }
-      end
-
       private
 
       def require_current_user_unique_session
@@ -102,24 +75,6 @@ module Api
             ends: @registration.accommodated_end_time,
           },
           answers: answers,
-          messages: {
-            personal: @registration.private_messages.map(&:serialize),
-            room: @registration.room&.room_announcements&.map(&:serialize) || [],
-            version: version.version_announcements.map(&:serialize),
-            exam: @exam.exam_announcements.map(&:serialize),
-          },
-          questions: all_questions,
-        }
-      end
-
-      def messages_to_send
-        last_message_ids = params.require(:lastMessageIds).permit(:personal, :room, :version, :exam)
-        version = @registration.exam_version
-        {
-          personal: after(@registration.private_messages, last_message_ids[:personal]).map(&:serialize),
-          room: after(@registration.room&.room_announcements, last_message_ids[:room]).map(&:serialize),
-          version: after(version.version_announcements, last_message_ids[:version]).map(&:serialize),
-          exam: after(@exam.exam_announcements, last_message_ids[:exam]).map(&:serialize),
         }
       end
 
@@ -127,15 +82,8 @@ module Api
         answers = answer_params
         saved = @registration.save_answers(answers)
         {
-          lockout: !saved,
-          messages: messages_to_send,
+          lockout: !saved
         }
-      end
-
-      def after(arr, last_id)
-        return [] unless arr
-
-        arr.where('id > ?', last_id)
       end
 
       def check_over
@@ -154,12 +102,6 @@ module Api
         return unless @registration.final?
 
         head :locked
-      end
-
-      # Returns all of the questions the current user has asked for this exam.
-      def all_questions
-        qs = @registration.my_questions.order(created_at: :desc)
-        qs.map(&:serialize)
       end
 
       def answer_params

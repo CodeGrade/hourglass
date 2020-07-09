@@ -17,15 +17,8 @@ import {
   Thunk,
   policyPermits,
   UpdateScratchAction,
-  ExamMessage,
-  MessageReceivedAction,
-  MessagesOpenedAction,
   AnswersState,
   ExamVersion,
-  QuestionAskedAction,
-  QuestionFailedAction,
-  QuestionSucceededAction,
-  ProfQuestion,
   SpyQuestionAction,
   PaginationCoordinates,
   PrevQuestionAction,
@@ -33,85 +26,10 @@ import {
   ActivateWaypointsAction,
   Policy,
   TimeInfo,
-  RailsExamMessage,
-  SetQuestionsAction,
 } from '@student/exams/show/types';
-import {
-  getCSRFToken,
-  convertMsgs,
-  convertQs,
-} from '@student/exams/show/helpers';
 import lock from '@student/exams/show/lockdown/lock';
 import { DateTime } from 'luxon';
-import { getLatestMessages } from '@hourglass/common/api/student/exams/messages';
-import { getAllQuestions } from '@hourglass/common/api/student/exams/questions';
-import { HitApiError } from '@hourglass/common/types/api';
-
-export function questionAsked(id: number, body: string): QuestionAskedAction {
-  return {
-    type: 'QUESTION_ASKED',
-    id,
-    body,
-  };
-}
-
-export function questionFailed(id: number): QuestionFailedAction {
-  return {
-    type: 'QUESTION_FAILED',
-    id,
-  };
-}
-
-export function questionSucceeded(id: number): QuestionSucceededAction {
-  return {
-    type: 'QUESTION_SUCCEEDED',
-    id,
-  };
-}
-
-export function askQuestion(examQuestionsUrl: string, body: string): Thunk {
-  return (dispatch, getState): void => {
-    const qID = getState().questions.lastId + 1;
-    dispatch(questionAsked(qID, body));
-    fetch(examQuestionsUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': getCSRFToken(),
-      },
-      credentials: 'same-origin',
-      body: JSON.stringify({
-        task: 'question',
-        question: {
-          body,
-        },
-      }),
-    })
-      .then((res) => res.json() as Promise<{success: boolean}>)
-      .then((res) => {
-        if (!res.success) {
-          throw new Error('Problem saving question.');
-        }
-        dispatch(questionSucceeded(qID));
-      })
-      .catch((_reason) => {
-        dispatch(questionFailed(qID));
-      });
-  };
-}
-
-export function messageReceived(msg: ExamMessage): MessageReceivedAction {
-  return {
-    type: 'MESSAGE_RECEIVED',
-    msg,
-  };
-}
-
-export function messagesOpened(): MessagesOpenedAction {
-  return {
-    type: 'MESSAGES_OPENED',
-  };
-}
+import { getCSRFToken } from '../helpers';
 
 export function togglePagination(): TogglePaginationAction {
   return {
@@ -175,21 +93,12 @@ export function loadExam(
   exam: ExamVersion,
   time: TimeInfo,
   answers: AnswersState,
-  messages: {
-    personal: ExamMessage[];
-    room: ExamMessage[];
-    version: ExamMessage[];
-    exam: ExamMessage[];
-  },
-  questions: ProfQuestion[],
 ): LoadExamAction {
   return {
     type: 'LOAD_EXAM',
     exam,
     time,
     answers,
-    messages,
-    questions,
   };
 }
 
@@ -237,21 +146,12 @@ export function doLoad(examTakeUrl: string): Thunk {
             time,
             exam,
             answers,
-            messages,
-            questions,
           } = result;
           const newTime: TimeInfo = {
             began: DateTime.fromISO(time.began),
             ends: DateTime.fromISO(time.ends),
           };
-          const newMsgs = {
-            personal: convertMsgs(messages.personal),
-            room: convertMsgs(messages.room),
-            version: convertMsgs(messages.version),
-            exam: convertMsgs(messages.exam),
-          };
-          const newQs = convertQs(questions);
-          dispatch(loadExam(exam, newTime, answers, newMsgs, newQs));
+          dispatch(loadExam(exam, newTime, answers));
         }
       }).catch((err) => {
         dispatch(lockdownFailed(`Error starting exam: ${err.message}`));
@@ -302,74 +202,6 @@ function snapshotSaving(): SnapshotSaving {
   };
 }
 
-function lastMessageId(messages: ExamMessage[]): number {
-  return messages.reduce((newest, m) => (m.id > newest ? m.id : newest), 0);
-}
-
-function receiveMessages(
-  messages: {
-    personal: RailsExamMessage[];
-    room: RailsExamMessage[];
-    version: RailsExamMessage[];
-    exam: RailsExamMessage[];
-  },
-): Thunk {
-  return (dispatch): void => {
-    const newMsgs = {
-      personal: convertMsgs(messages.personal),
-      room: convertMsgs(messages.room),
-      version: convertMsgs(messages.version),
-      exam: convertMsgs(messages.exam),
-    };
-    [
-      ...newMsgs.personal,
-      ...newMsgs.room,
-      ...newMsgs.version,
-      ...newMsgs.exam,
-    ].forEach((msg) => {
-      dispatch(messageReceived(msg));
-    });
-  };
-}
-
-export function setQuestions(questions: ProfQuestion[]): SetQuestionsAction {
-  return {
-    type: 'SET_QUESTIONS',
-    questions,
-  };
-}
-
-export function loadQuestions(
-  examQuestionsUrl: string,
-  onSuccess: () => void,
-  onError: (err: HitApiError) => void,
-): Thunk {
-  return (dispatch): void => {
-    getAllQuestions(examQuestionsUrl).then((res) => {
-      dispatch(setQuestions(res.questions));
-    }).then(() => onSuccess).catch(onError);
-  };
-}
-
-export function loadMessages(
-  examMessagesUrl: string,
-  onSuccess: () => void,
-  onError: (err: HitApiError) => void,
-): Thunk {
-  return (dispatch, getState): void => {
-    const state: ExamTakerState = getState();
-    const lastMessageIds = {
-      personal: lastMessageId(state.messages.messages.personal),
-      room: lastMessageId(state.messages.messages.room),
-      version: lastMessageId(state.messages.messages.version),
-      exam: lastMessageId(state.messages.messages.exam),
-    };
-    getLatestMessages(examMessagesUrl, lastMessageIds).then((res) => {
-      dispatch(receiveMessages(res.messages));
-    }).then(() => onSuccess()).catch(onError);
-  };
-}
-
 export function saveSnapshot(examTakeUrl: string): Thunk {
   return (dispatch, getState): void => {
     const state: ExamTakerState = getState();
@@ -377,12 +209,6 @@ export function saveSnapshot(examTakeUrl: string): Thunk {
       dispatch(snapshotSaving());
     }
     const { answers } = state.contents;
-    const lastMessageIds = {
-      personal: lastMessageId(state.messages.messages.personal),
-      room: lastMessageId(state.messages.messages.room),
-      version: lastMessageId(state.messages.messages.version),
-      exam: lastMessageId(state.messages.messages.exam),
-    };
 
     fetch(examTakeUrl, {
       method: 'POST',
@@ -393,7 +219,6 @@ export function saveSnapshot(examTakeUrl: string): Thunk {
       body: JSON.stringify({
         task: 'snapshot',
         answers,
-        lastMessageIds,
       }),
       credentials: 'same-origin',
     })
@@ -406,14 +231,12 @@ export function saveSnapshot(examTakeUrl: string): Thunk {
       .then((result) => {
         const {
           lockout,
-          messages,
         } = result;
         if (lockout) {
           const error = 'Locked out of exam.';
           dispatch(snapshotFailure(error));
           window.location.href = '/';
         } else {
-          dispatch(receiveMessages(messages));
           dispatch(snapshotSuccess());
         }
       }).catch((err) => {

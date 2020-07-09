@@ -68,17 +68,5 @@ module Types
     def take_url
       Rails.application.routes.url_helpers.take_api_student_exam_path(object)
     end
-
-    # TODO: remove in favor of subscription and mutation
-    field :messages_url, String, null: false
-    def messages_url
-      Rails.application.routes.url_helpers.messages_api_student_exam_path(object)
-    end
-
-    # TODO: remove in favor of subscription and mutation
-    field :questions_url, String, null: false
-    def questions_url
-      Rails.application.routes.url_helpers.questions_api_student_exam_path(object)
-    end
   end
 end

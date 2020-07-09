@@ -1,41 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Alert } from 'react-bootstrap';
-import AnomalousMessagingContainer from '@student/exams/show/containers/AnomalousMessaging';
+import AnomalousMessaging from '@student/exams/show/components/AnomalousMessaging';
 import ErrorBoundary from '@hourglass/common/boundary';
-import { HitApiError } from '@hourglass/common/types/api';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { DateTime } from 'luxon';
 import { useFragment, graphql } from 'relay-hooks';
+import { AllAlerts } from '@hourglass/common/alerts';
+
 import { PreStart$key } from './__generated__/PreStart.graphql';
-
-const ShowMessaging: React.FC<{
-  examQuestionsUrl: string;
-  examMessagesUrl: string;
-}> = (props) => {
-  const {
-    examQuestionsUrl,
-    examMessagesUrl,
-  } = props;
-  const [error, setError] = useState<HitApiError>(undefined);
-  return (
-    <>
-      {error && (
-        <span className="text-danger">
-          <p>Error retrieving questions</p>
-          <small>{error.message}</small>
-        </span>
-      )}
-      <AnomalousMessagingContainer
-        disabled={!!error}
-        onError={setError}
-        onSuccess={() => setError(undefined)}
-        examQuestionsUrl={examQuestionsUrl}
-        examMessagesUrl={examMessagesUrl}
-      />
-    </>
-  );
-};
-
 
 interface PreStartProps {
   onClick: () => void;
@@ -54,9 +26,8 @@ const PreStart: React.FC<PreStartProps> = (props) => {
   const res = useFragment(
     graphql`
     fragment PreStart on Exam {
+      ...AnomalousMessaging
       name
-      messagesUrl
-      questionsUrl
       myRegistration {
         anomalous
         over
@@ -94,21 +65,20 @@ const PreStart: React.FC<PreStartProps> = (props) => {
   }
   if (anomalous) {
     return (
-      <div>
-        <h1>{res.name}</h1>
-        <Alert variant="danger">
-          <i>
-            You have been locked out of this exam.
-            Please contact an instructor, either in a message below, in person, or via email.
-          </i>
-        </Alert>
-        <ErrorBoundary>
-          <ShowMessaging
-            examMessagesUrl={res.messagesUrl}
-            examQuestionsUrl={res.questionsUrl}
-          />
-        </ErrorBoundary>
-      </div>
+      <AllAlerts>
+        <div>
+          <h1>{res.name}</h1>
+          <Alert variant="danger">
+            <i>
+              You have been locked out of this exam.
+              Please contact an instructor, either in a message below, in person, or via email.
+            </i>
+          </Alert>
+          <ErrorBoundary>
+            <AnomalousMessaging examKey={res} />
+          </ErrorBoundary>
+        </div>
+      </AllAlerts>
     );
   }
   return (

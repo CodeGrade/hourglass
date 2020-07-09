@@ -1,5 +1,5 @@
-import React from 'react';
-import { ExamMessage, AllExamMessages } from '@student/exams/show/types';
+import React, { useState } from 'react';
+import { ExamMessage } from '@student/exams/show/types';
 import { Media } from 'react-bootstrap';
 import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
@@ -9,14 +9,9 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import Icon from '@student/exams/show/components/Icon';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
-
-interface ExamMessagesProps {
-  lastViewed: DateTime;
-  expanded: boolean;
-  messages: AllExamMessages;
-  onMessagesOpened: () => void;
-  onSectionClick: (eventKey: string) => void;
-}
+import { useFragment, graphql } from 'relay-hooks';
+import { ExamMessages_all$key } from './__generated__/ExamMessages_all.graphql';
+import { ExamMessages_navbar$key } from './__generated__/ExamMessages_navbar.graphql';
 
 export interface MessageProps {
   icon: IconType;
@@ -52,27 +47,83 @@ export const ShowMessage: React.FC<MessageProps> = (props) => {
 };
 
 export const ShowExamMessages: React.FC<{
+  examKey: ExamMessages_all$key;
   lastViewed: DateTime;
-  messages: AllExamMessages;
   onMessagesOpened: () => void;
 }> = (props) => {
   const {
+    examKey,
     lastViewed,
-    messages,
     onMessagesOpened,
   } = props;
-  const {
-    personal,
-    exam,
-    version,
-    room,
-  } = messages;
+  const res = useFragment(
+    graphql`
+    fragment ExamMessages_all on Exam {
+      examAnnouncements {
+        id
+        createdAt
+        body
+      }
+      myRegistration {
+        room {
+          roomAnnouncements {
+            id
+            createdAt
+            body
+          }
+        }
+        examVersion {
+          versionAnnouncements {
+            id
+            createdAt
+            body
+          }
+        }
+        messages {
+          edges {
+            node {
+              id
+              createdAt
+              body
+            }
+          }
+        }
+      }
+    }
+    `,
+    examKey,
+  );
+  const personal: ExamMessage[] = res.myRegistration.messages.edges.map(({ node }) => ({
+    type: 'personal',
+    id: node.id,
+    body: node.body,
+    createdAt: DateTime.fromISO(node.createdAt),
+  }));
+  const room: ExamMessage[] = res.myRegistration.room?.roomAnnouncements.map((ra) => ({
+    type: 'room',
+    id: ra.id,
+    body: ra.body,
+    createdAt: DateTime.fromISO(ra.createdAt),
+  })) ?? [];
+  const version: ExamMessage[] = res.myRegistration.examVersion.versionAnnouncements.map((va) => ({
+    type: 'version',
+    id: va.id,
+    body: va.body,
+    createdAt: DateTime.fromISO(va.createdAt),
+  }));
+  const exam: ExamMessage[] = res.examAnnouncements.map((ea) => ({
+    type: 'exam',
+    id: ea.id,
+    body: ea.body,
+    createdAt: DateTime.fromISO(ea.createdAt),
+  }));
+
   const all: Array<ExamMessage> = personal
     .concat(exam)
     .concat(version)
     .concat(room);
-  all.sort((a, b) => b.time.diff(a.time).milliseconds);
-  const idx = all.findIndex((msg) => msg.time < lastViewed);
+  all.sort((a, b) => b.createdAt.diff(a.createdAt).milliseconds);
+  const idx = all.findIndex((msg) => msg.createdAt < lastViewed);
   const earlier = idx === -1 ? [] : all.slice(idx);
   const later = idx === -1 ? all : all.slice(0, idx);
   const dividerClass = later.length === 0 ? 'd-none' : '';
@@ -94,7 +145,7 @@ export const ShowExamMessages: React.FC<{
               body={msg.body}
               icon={msg.type === 'personal' ? MdMessage : GiBugleCall}
               tooltip={msg.type === 'personal' ? 'Sent only to you' : 'Announcement'}
-              time={msg.time}
+              time={msg.createdAt}
             />
           </div>
         ))}
@@ -106,25 +157,73 @@ export const ShowExamMessages: React.FC<{
           body={msg.body}
           icon={msg.type === 'personal' ? MdMessage : GiBugleCall}
           tooltip={msg.type === 'personal' ? 'Sent only to you' : 'Announcement'}
-          time={msg.time}
+          time={msg.createdAt}
         />
       ))}
     </>
   );
 };
 
+interface ExamMessagesProps {
+  examKey: ExamMessages_navbar$key;
+  expanded: boolean;
+  onSectionClick: (eventKey: string) => void;
+}
+
 const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   const {
-    lastViewed,
+    examKey,
     expanded,
-    messages,
-    onMessagesOpened,
     onSectionClick,
   } = props;
-  const unread: boolean = Object.values(messages).reduce((acc, msgs: ExamMessage[]) => (
-    acc || msgs.reduce((innerAcc, msg) => (innerAcc || msg.time > lastViewed), false)
-  ), false);
-  const classes = unread ? 'bg-warning text-dark' : undefined;
+  const [lastViewed, setLastViewed] = useState(DateTime.fromSeconds(0));
+  const res = useFragment(
+    graphql`
+    fragment ExamMessages_navbar on Exam {
+      ...ExamMessages_all
+      examAnnouncements {
+        createdAt
+      }
+      myRegistration {
+        room {
+          roomAnnouncements {
+            createdAt
+          }
+        }
+        examVersion {
+          versionAnnouncements {
+            createdAt
+          }
+        }
+        messages {
+          edges {
+            node {
+              createdAt
+            }
+          }
+        }
+      }
+    }
+    `,
+    examKey,
+  );
+  const dates: DateTime[] = res
+    .examAnnouncements.map(({ createdAt }) => DateTime.fromISO(createdAt))
+    .concat(
+      res.myRegistration.room?.roomAnnouncements.map(
+        ({ createdAt }) => DateTime.fromISO(createdAt),
+      ) ?? [],
+    )
+    .concat(
+      res.myRegistration.examVersion.versionAnnouncements.map(
+        ({ createdAt }) => DateTime.fromISO(createdAt),
+      ),
+    )
+    .concat(res.myRegistration.messages.edges.map(({ node }) => DateTime.fromISO(node.createdAt)));
+
+  const anyUnread: boolean = dates.reduce((acc, date) => (acc || date > lastViewed), false);
+  const classes = anyUnread ? 'bg-warning text-dark' : undefined;
+
   return (
     <NavAccordionItem
       expanded={expanded}
@@ -135,9 +234,11 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
       onSectionClick={onSectionClick}
     >
       <ShowExamMessages
+        examKey={res}
         lastViewed={lastViewed}
-        messages={messages}
-        onMessagesOpened={onMessagesOpened}
+        onMessagesOpened={() => {
+          setLastViewed(DateTime.local());
+        }}
       />
     </NavAccordionItem>
   );

@@ -10,7 +10,9 @@ interface OwnProps {
 const mapDispatchToProps: MDTP<{
   submit: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
-  submit: (): void => dispatch(submitExam(ownProps.examTakeUrl)),
+  submit: (): void => {
+    dispatch(submitExam(ownProps.examTakeUrl));
+  },
 });
 
 export default connect(null, mapDispatchToProps)(SubmitButton);

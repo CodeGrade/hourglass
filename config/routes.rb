@@ -26,9 +26,6 @@ Rails.application.routes.draw do
       resources :exams, param: 'exam_id', only: [] do
         member do
           post :take
-          post :questions, to: 'exams#ask_question'
-          get :questions, to: 'exams#all_questions'
-          post :messages
         end
       end
     end

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ExamMessage } from '@student/exams/show/types';
 import { Media } from 'react-bootstrap';
 import { DateTime } from 'luxon';
@@ -9,7 +9,7 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import Icon from '@student/exams/show/components/Icon';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
-import { useFragment, graphql } from 'relay-hooks';
+import { useFragment, graphql, useSubscription } from 'relay-hooks';
 import { ExamMessages_all$key } from './__generated__/ExamMessages_all.graphql';
 import { ExamMessages_navbar$key } from './__generated__/ExamMessages_navbar.graphql';
 
@@ -46,6 +46,14 @@ export const ShowMessage: React.FC<MessageProps> = (props) => {
   );
 };
 
+const newMessageSubscriptionSpec = graphql`
+  subscription ExamMessagesSubscription($examId: ID!) {
+    messageWasSent(examId: $examId) {
+      ...ExamMessages_all
+    }
+  }
+`;
+
 export const ShowExamMessages: React.FC<{
   examKey: ExamMessages_all$key;
   lastViewed: DateTime;
@@ -59,6 +67,7 @@ export const ShowExamMessages: React.FC<{
   const res = useFragment(
     graphql`
     fragment ExamMessages_all on Exam {
+      id
       examAnnouncements {
         id
         createdAt
@@ -93,6 +102,14 @@ export const ShowExamMessages: React.FC<{
     `,
     examKey,
   );
+  const subscriptionObject = useMemo(() => ({
+    subscription: newMessageSubscriptionSpec,
+    variables: {
+      examId: res.id,
+    },
+  }), [res.id]);
+  useSubscription(subscriptionObject);
+
   const personal: ExamMessage[] = res.myRegistration.messages.edges.map(({ node }) => ({
     type: 'personal',
     id: node.id,

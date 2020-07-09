@@ -14,6 +14,12 @@ A `shell.nix` is provided which should get you a reproducible environment for ru
 
 It will also setup postgres to store data locally. Once in the `nix-shell` environment, run `bundle install` to install gems locally. You can then run `start_postgres` and `stop_postgres` to control the local postgres server.
 
+## Webpack and relay dev servers
+
+Webpack is configured with Hot Module Reloading, start the dev server with `yarn webpack-dev`.
+
+The relay dev server can be started with `yarn relay-dev`.
+
 ## Manual Database setup
 
 Hourglass expects postgresql.

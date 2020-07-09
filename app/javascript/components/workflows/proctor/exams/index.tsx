@@ -385,6 +385,14 @@ const newAnomalySubscriptionSpec = graphql`
   }
 `;
 
+const anomalyDestroyedSubscriptionSpec = graphql`
+  subscription examsAnomalyDestroyedSubscription($examId: ID!) {
+    anomalyWasDestroyed(examId: $examId) {
+      deletedId
+    }
+  }
+`;
+
 const paginationConfig = {
   getVariables(_props, { count, cursor }, fragmentVariables) {
     return {
@@ -454,6 +462,23 @@ const ShowAnomalies: React.FC<{
       edgeName: 'anomalyEdge',
     }],
   }), [res.id]));
+
+  useSubscription(useMemo(() => ({
+    subscription: anomalyDestroyedSubscriptionSpec,
+    variables: {
+      examId: res.id,
+    },
+    configs: [{
+      type: 'RANGE_DELETE',
+      parentID: res.id,
+      connectionKeys: [{
+        key: 'Exam_anomalies',
+      }],
+      pathToConnection: ['exam', 'anomalies'],
+      deletedIDFieldName: 'deletedId',
+    }],
+  }), [res.id]));
+
   return (
     <>
       {res.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}

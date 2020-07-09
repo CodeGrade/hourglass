@@ -2,7 +2,7 @@ module Mutations
   class DestroyAnomaly < BaseMutation
     argument :anomaly_id, ID, required: true, loads: Types::AnomalyType
 
-    field :deletedId, ID, null: false
+    field :deleted_id, ID, null: false
 
     def authorized?(anomaly:, **_args)
       exam = anomaly.exam
@@ -23,8 +23,10 @@ module Mutations
       destroyed = anomaly.destroy
       raise GraphQL::ExecutionError, anomaly.errors.full_messages.to_sentence unless destroyed
 
-      # TODO: HourglassSchema.subscriptions.trigger(:anomaly_was_destroyed, { exam_rails_id: exam.id }, exam)
-      { deletedId: HourglassSchema.id_from_object(anomaly, Types::AnomalyType, context) }
+      deleted_id = HourglassSchema.id_from_object(anomaly, Types::AnomalyType, context)
+      exam_id = HourglassSchema.id_from_object(anomaly.exam, Types::ExamType, context)
+      HourglassSchema.subscriptions.trigger(:anomaly_was_destroyed, { exam_id: exam_id }, deleted_id)
+      { deleted_id: deleted_id }
     end
   end
 end

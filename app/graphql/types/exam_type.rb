@@ -11,10 +11,10 @@ module Types
     field :duration, Integer, null: false
     field :start_time, GraphQL::Types::ISO8601DateTime, null: false
     field :end_time, GraphQL::Types::ISO8601DateTime, null: false
-    # field :created_at, GraphQL::Types::ISO8601DateTime, null: false
-    # field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
-    field :course, Types::CourseType, null: false
+    field :course, Types::CourseType, null: false do
+      guard ->(obj, _args, ctx) { obj.object.course.professors.exists? ctx[:current_user].id }
+    end
     field :exam_versions, Types::ExamVersionType.connection_type, null: false
 
     field :students, [Types::UserType], null: false

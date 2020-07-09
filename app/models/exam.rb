@@ -198,8 +198,8 @@ class Exam < ApplicationRecord
     proctors.or(course.professors)
   end
 
-  def visible_to?(user)
-    course.user_member?(user)
+  def visible_to?(check_user)
+    proctors.or(course.professors).or(students).exists? check_user.id
   end
 
   private

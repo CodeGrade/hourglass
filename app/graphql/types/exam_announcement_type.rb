@@ -1,9 +1,9 @@
 module Types
   class ExamAnnouncementType < Types::BaseObject
-    # TODO: should only be visible to users of the course
-
     implements GraphQL::Types::Relay::Node
     global_id_field :id
+
+    guard Guards::VISIBILITY
 
     field :exam_id, Integer, null: false
     field :body, String, null: false

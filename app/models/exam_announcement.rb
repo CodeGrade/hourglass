@@ -7,6 +7,8 @@ class ExamAnnouncement < ApplicationRecord
   validates :exam, presence: true
   validates :body, presence: true
 
+  delegate :visible_to?, to: :exam
+
   def serialize
     {
       id: id,

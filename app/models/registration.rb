@@ -133,4 +133,8 @@ class Registration < ApplicationRecord
   def private_messages
     messages
   end
+
+  def visible_to?(check_user)
+    exam.proctors_and_professors.or(User.where(id: user.id)).exists? check_user.id
+  end
 end

@@ -8,9 +8,7 @@ module Types
     guard Guards::VISIBILITY
 
     field :title, String, null: false
-    # field :last_sync, GraphQL::Types::ISO8601DateTime, null: true
     field :active, Boolean, null: false
-    # field :bottlenose_id, Integer, null: false
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 

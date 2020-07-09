@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 
 module Types
-  # TODO: should only be visible to profs of the course, proctors of the exam, and user
   class RegistrationType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 
+    guard Guards::VISIBILITY
+
     field :room, Types::RoomType, null: true
     field :start_time, GraphQL::Types::ISO8601DateTime, null: true
     field :end_time, GraphQL::Types::ISO8601DateTime, null: true
-    # field :created_at, GraphQL::Types::ISO8601DateTime, null: false
-    # field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
     field :user, Types::UserType, null: false
     field :exam, Types::ExamType, null: false

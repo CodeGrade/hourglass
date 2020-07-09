@@ -38,6 +38,8 @@ module Types
 
     field :course, CourseType, null: false do
       argument :id, ID, required: true
+
+      guard ->(obj, _, ctx) { obj.object.professors.exists? ctx[:current_user].id }
     end
 
     def course(id:)

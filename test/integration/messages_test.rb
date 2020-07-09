@@ -22,18 +22,6 @@ class MessagesTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
-  test 'send exam message as no one does not work' do
-    assert_equal 0, @exam.exam_announcements.length
-    result = HourglassSchema.do_mutation!(SEND_MESSAGE_QUERY, nil, {
-      recipientId: HourglassSchema.id_from_object(@exam, Types::ExamType, {}),
-      message: 'Test announcement',
-    })
-
-    assert_equal 1, result['errors'].length
-    @exam.reload
-    assert_equal 0, @exam.exam_announcements.length
-  end
-
   test 'send exam message as student does not work' do
     assert_equal 0, @exam.exam_announcements.length
     result = HourglassSchema.do_mutation!(SEND_MESSAGE_QUERY, @student, {

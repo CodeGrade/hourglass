@@ -14,6 +14,7 @@ class MessageTest < ActiveSupport::TestCase
   test 'should not save message without sender' do
     msg = build(:message, sender: nil)
     assert_not msg.save
+    assert_match(/Sender must exist/, msg.errors.full_messages.to_sentence)
   end
 
   test 'students cannot send messages to other students' do
@@ -30,7 +31,7 @@ class MessageTest < ActiveSupport::TestCase
       }
     )
     assert_not msg.valid?
-    assert_match(/must be a professor/, msg.errors[:sender].first)
+    assert_match(/must be a proctor or professor/, msg.errors[:sender].first)
     assert_not msg.save
   end
 end

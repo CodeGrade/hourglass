@@ -13,7 +13,7 @@ const AnomalousMessaging: React.FC<{
   const {
     examKey,
   } = props;
-  const [lastViewed, setLastViewed] = useState(DateTime.fromSeconds(0));
+  const [lastViewed, setLastViewed] = useState(DateTime.local());
   const res = useFragment(
     graphql`
     fragment AnomalousMessaging on Exam {

@@ -39,9 +39,7 @@ const RegularNavbar: React.FC<{
   const res = useFragment(
     graphql`
     fragment navbar_me on User {
-      createdAt
       displayName
-      id
     }
     `,
     me,

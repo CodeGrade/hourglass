@@ -44,13 +44,22 @@ class Exam < ApplicationRecord
     User.where(id: registrations.select(:user_id))
   end
 
+  # TODO: has_many through
   def proctors
     User.where(id: proctor_registrations.select(:user_id))
+  end
+
+  def proctors_and_professors
+    proctors.or(professors)
   end
 
   # All students and proctors registered for the exam.
   def all_registered_users
     students.or(proctors)
+  end
+
+  def everyone
+    students.or(proctors).or(professors)
   end
 
   def unassigned_students
@@ -186,50 +195,11 @@ class Exam < ApplicationRecord
     }
   end
 
-  def message_recipients
-    {
-      students: direct_recipients,
-      versions: version_recipients,
-      rooms: room_recipients,
-    }
-  end
-
-  def proctors_and_professors
-    proctors.or(course.professors)
-  end
-
   def visible_to?(check_user)
-    proctors.or(course.professors).or(students).exists? check_user.id
+    everyone.exists? check_user.id
   end
 
   private
-
-  def direct_recipients
-    students.order(:display_name).map do |s|
-      {
-        id: s.id,
-        name: s.display_name,
-      }
-    end
-  end
-
-  def version_recipients
-    exam_versions.order(:name).map do |ev|
-      {
-        id: ev.id,
-        name: ev.name,
-      }
-    end
-  end
-
-  def room_recipients
-    rooms.order(:name).map do |room|
-      {
-        id: room.id,
-        name: room.name,
-      }
-    end
-  end
 
   def duration_valid
     return unless duration > time_window

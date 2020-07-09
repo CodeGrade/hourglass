@@ -8,4 +8,5 @@ class RoomAnnouncement < ApplicationRecord
   validates :body, presence: true
 
   delegate :exam, to: :room
+  delegate :visible_to?, to: :room
 end

@@ -25,7 +25,13 @@ const fetchQuery: FetchFunction = async (
       query: operation.text,
       variables,
     }),
-  }).then((response) => response.json())
+  }).then(async (response) => {
+    const json = await response.json();
+    if (!response.ok) {
+      throw new Error(response.statusText);
+    }
+    return json;
+  })
 );
 
 const cable = ActionCable.createConsumer();

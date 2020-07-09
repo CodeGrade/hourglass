@@ -12,7 +12,5 @@ class Section < ApplicationRecord
 
   validates :course, presence: true
 
-  def registered_students_for(exam)
-    exam.registrations.where(user: students).includes(:user).map(&:user)
-  end
+  delegate :professors, to: :course
 end

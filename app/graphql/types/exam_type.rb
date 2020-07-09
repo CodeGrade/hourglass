@@ -13,25 +13,40 @@ module Types
     field :end_time, GraphQL::Types::ISO8601DateTime, null: false
 
     field :course, Types::CourseType, null: false do
-      guard ->(obj, _args, ctx) { obj.object.course.professors.exists? ctx[:current_user].id }
+      guard Guards::PROFESSORS
     end
-    field :exam_versions, Types::ExamVersionType.connection_type, null: false
 
-    field :students, [Types::UserType], null: false
-    field :rooms, [Types::RoomType], null: false
+    field :exam_versions, Types::ExamVersionType.connection_type, null: false do
+      guard Guards::PROFESSORS
+    end
 
-    field :checklist, Types::ExamChecklistType, null: false
+    field :rooms, [Types::RoomType], null: false do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
 
-    field :anomalies, Types::AnomalyType.connection_type, null: false
+    field :checklist, Types::ExamChecklistType, null: false do
+      guard Guards::PROFESSORS
+    end
 
-    field :messages, Types::MessageType.connection_type, null: false
+    field :anomalies, Types::AnomalyType.connection_type, null: false do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
 
-    field :version_announcements, Types::VersionAnnouncementType.connection_type, null: false
+    field :messages, Types::MessageType.connection_type, null: false do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
+
+    field :version_announcements, Types::VersionAnnouncementType.connection_type, null: false do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
+
     def version_announcements
       object.version_announcements.order(created_at: :desc)
     end
 
-    field :room_announcements, Types::RoomAnnouncementType.connection_type, null: false
+    field :room_announcements, Types::RoomAnnouncementType.connection_type, null: false do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
     def room_announcements
       object.room_announcements.order(created_at: :desc)
     end
@@ -41,37 +56,59 @@ module Types
       object.exam_announcements.order(created_at: :desc)
     end
 
-    field :questions, Types::QuestionType.connection_type, null: false
+    field :questions, Types::QuestionType.connection_type, null: false do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
     def questions
       object.questions.order(created_at: :desc)
     end
 
-    field :accommodations, Types::AccommodationType.connection_type, null: false
+    field :accommodations, Types::AccommodationType.connection_type, null: false do
+      guard Guards::PROFESSORS
+    end
 
-    field :registrations, [Types::RegistrationType], null: false
+    field :registrations, [Types::RegistrationType], null: false do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
 
-    field :final_registrations, [Types::RegistrationType], null: false
+    field :final_registrations, [Types::RegistrationType], null: false do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
     def final_registrations
       object.registrations.final
     end
 
-    field :registrations_without_accommodation, Types::RegistrationType.connection_type, null: false
+    field :registrations_without_accommodation, Types::RegistrationType.connection_type, null: false do
+      guard Guards::PROFESSORS
+    end
     def registrations_without_accommodation
       object.registrations.without_accommodation
     end
 
-    field :registrations_without_rooms, [Types::RegistrationType], null: false
-    field :proctor_registrations_without_rooms, [Types::ProctorRegistrationType], null: false
+    field :registrations_without_rooms, [Types::RegistrationType], null: false do
+      guard Guards::PROFESSORS
+    end
 
-    field :unassigned_students, [Types::UserType], null: false
-    field :unassigned_staff, [Types::UserType], null: false
+    field :proctor_registrations_without_rooms, [Types::ProctorRegistrationType], null: false do
+      guard Guards::PROFESSORS
+    end
+
+    field :unassigned_students, [Types::UserType], null: false do
+      guard Guards::PROFESSORS
+    end
+
+    field :unassigned_staff, [Types::UserType], null: false do
+      guard Guards::PROFESSORS
+    end
 
     field :my_registration, Types::RegistrationType, null: true
     def my_registration
       object.registrations.find_by(user: context[:current_user])
     end
 
-    field :exam_version_upload_url, String, null: false
+    field :exam_version_upload_url, String, null: false do
+      guard Guards::PROFESSORS
+    end
     def exam_version_upload_url
       Rails.application.routes.url_helpers.import_api_professor_versions_path(object)
     end

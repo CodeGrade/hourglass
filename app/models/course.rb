@@ -24,6 +24,10 @@ class Course < ApplicationRecord
     User.where(id: professor_course_registrations.select(:user_id))
   end
 
+  def all_staff
+    staff.or(professors)
+  end
+
   def all_users
     students.or(staff).or(professors)
   end

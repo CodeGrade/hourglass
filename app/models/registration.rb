@@ -18,6 +18,7 @@ class Registration < ApplicationRecord
   validate :user_in_course
 
   delegate :exam, to: :exam_version
+  delegate :proctors_and_professors, to: :exam
   delegate :course, to: :exam
 
   def room_version_same_exam
@@ -135,6 +136,6 @@ class Registration < ApplicationRecord
   end
 
   def visible_to?(check_user)
-    exam.proctors_and_professors.or(User.where(id: user.id)).exists? check_user.id
+    proctors_and_professors.or(User.where(id: user.id)).exists? check_user.id
   end
 end

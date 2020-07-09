@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@student/exams/show/context';
 import {
@@ -171,17 +171,18 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
     versionPolicies,
     answers,
   } = props;
+  const initialValues = useMemo(() => ({
+    all: {
+      name: versionName,
+      policies: versionPolicies,
+      exam: examWithAnswers(exam, answers.answers),
+    },
+  }), [versionName, versionPolicies, answers.answers, exam]);
   return (
     <Provider store={store}>
       <ExamEditorForm
         examVersionId={examVersionId}
-        initialValues={{
-          all: {
-            name: versionName,
-            policies: versionPolicies,
-            exam: examWithAnswers(exam, answers.answers),
-          },
-        }}
+        initialValues={initialValues}
       />
     </Provider>
   );
@@ -223,19 +224,16 @@ const FormContextProvider: React.FC<{
     examRef,
     children,
   } = props;
-  const fmap = createMap(files);
+  const examContextVal = useMemo(() => ({
+    files,
+    fmap: createMap(files),
+  }), [files]);
+  const examFilesContextVal = useMemo(() => ({
+    references: examRef,
+  }), [examRef]);
   return (
-    <ExamContext.Provider
-      value={{
-        files,
-        fmap,
-      }}
-    >
-      <ExamFilesContext.Provider
-        value={{
-          references: examRef,
-        }}
-      >
+    <ExamContext.Provider value={examContextVal}>
+      <ExamFilesContext.Provider value={examFilesContextVal}>
         {children}
       </ExamFilesContext.Provider>
     </ExamContext.Provider>

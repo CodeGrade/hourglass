@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import {
   Col,
@@ -340,9 +340,7 @@ const StudentDNDForm: React.FC<
           <FieldArray
             name="rooms"
             component={Rooms}
-            props={{
-              addSectionToRoom,
-            }}
+            addSectionToRoom={addSectionToRoom}
           />
         </Form.Group>
       </FormSection>
@@ -364,17 +362,19 @@ const Editable: React.FC<RoomAssignmentProps> = (props) => {
     unassigned,
     rooms,
   } = props;
+  const contextVal = useMemo(() => ({ sections }), [sections]);
+  const initialValues = useMemo(() => ({
+    all: {
+      unassigned,
+      rooms,
+    },
+  }), [unassigned, rooms]);
   return (
     <Provider store={store}>
-      <FormContext.Provider value={{ sections }}>
+      <FormContext.Provider value={contextVal}>
         <DNDForm
           examId={examId}
-          initialValues={{
-            all: {
-              unassigned,
-              rooms,
-            },
-          }}
+          initialValues={initialValues}
         />
       </FormContext.Provider>
     </Provider>

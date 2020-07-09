@@ -41,6 +41,10 @@ const toolbarOptions = [
   ['clean'], // remove formatting button
 ];
 
+const modules = {
+  toolbar: toolbarOptions,
+};
+
 const formatOptions = [
   'background', 'color', 'bold', 'italic', 'underline', 'font', 'code', 'size', 'strike', 'script',
   // NO 'link'
@@ -73,9 +77,7 @@ const CustomEditor: React.FC<CustomEditorProps> = (props) => {
       placeholder={placeholder}
       value={value}
       formats={formatOptions}
-      modules={{
-        toolbar: toolbarOptions,
-      }}
+      modules={modules}
       onChange={filteredOnChange}
     />
   );

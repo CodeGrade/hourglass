@@ -1,4 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, {
+  useState,
+  useContext,
+  useMemo,
+  useCallback,
+} from 'react';
 import {
   FileRef,
   ExamFile,
@@ -79,6 +84,8 @@ const Group: React.FC<GroupProps<FileRefOption>> = (props) => {
   );
 };
 
+const COMPONENTS = { Group };
+
 const FilePickerSelect: React.FC<FilePickerProps> = (props) => {
   const {
     children,
@@ -86,25 +93,63 @@ const FilePickerSelect: React.FC<FilePickerProps> = (props) => {
     selected = [],
     onChange,
   } = props;
-  const allIds = createMap(options);
-  const allOptions = Object.keys(allIds).map((relPath) => ({
-    label: relPath,
-    value: {
-      type: allIds[relPath].filedir,
-      path: relPath,
-    },
-  }));
+  const selectOptions = useMemo(() => {
+    const allIds = createMap(options);
+    const allOptions = Object.keys(allIds).map((relPath) => ({
+      label: relPath,
+      value: {
+        type: allIds[relPath].filedir,
+        path: relPath,
+      },
+    }));
+    // This extra array is necessary to wrap all the options
+    // within a group, so that our Group can extract the properties
+    // we want for our FilePicker, ignoring the options of this Select.
+    // We still need a non-empty array of selected values,
+    // or else the bubbles won't show up in the select control.
+    return [{ options: allOptions }];
+  }, [options]);
+  const value = useMemo(() => (
+    selected.map((s) => ({
+      label: s.path,
+      // This toString is needed because otherwise some CSS
+      // mangler tries to convert this value directly to a string
+      // to be used as a key, and then we get duplicate keys
+      // since they're all [object Object]
+      value: { ...s, toString: ((): string => s.path) },
+    }))
+  ), [selected]);
+
+  const selectOnChange = useCallback((_value, action): void => {
+    // These actions only come from interacting with the
+    // Select part, not our FilePicker part.
+    switch (action.action) {
+      case 'pop-value':
+      case 'remove-value': {
+        const newSel = [...selected];
+        const oldFIdx = selected.findIndex((f) => f.path === action.removedValue.value.path);
+        if (oldFIdx !== -1) newSel.splice(oldFIdx, 1);
+        onChange(newSel);
+        break;
+      }
+      case 'clear':
+        onChange([]);
+        break;
+      case 'set-value': {
+        onChange([action.option.value]);
+        break;
+      }
+      default:
+        break;
+    }
+  }, [selected, onChange]);
+
   return (
     <>
       {children}
       <Select
-        // This extra array is necessary to wrap all the options
-        // within a group, so that our Group can extract the properties
-        // we want for our FilePicker, ignoring the options of this Select.
-        // We still need a non-empty array of selected values,
-        // or else the bubbles won't show up in the select control.
-        options={[{ options: allOptions }]}
-        components={{ Group }}
+        options={selectOptions}
+        components={COMPONENTS}
         // Pass-along props to FilePicker
         files={options}
         selected={selected}
@@ -115,37 +160,8 @@ const FilePickerSelect: React.FC<FilePickerProps> = (props) => {
         hideSelectedOptions={false}
         closeMenuOnSelect={false}
         blurInputOnSelect={false}
-        value={selected.map((s) => ({
-          label: s.path,
-          // This toString is needed because otherwise some CSS
-          // mangler tries to convert this value directly to a string
-          // to be used as a key, and then we get duplicate keys
-          // since they're all [object Object]
-          value: { ...s, toString: ((): string => s.path) },
-        }))}
-        onChange={(_value, action): void => {
-          // These actions only come from interacting with the
-          // Select part, not our FilePicker part.
-          switch (action.action) {
-            case 'pop-value':
-            case 'remove-value': {
-              const newSel = [...selected];
-              const oldFIdx = selected.findIndex((f) => f.path === action.removedValue.value.path);
-              if (oldFIdx !== -1) newSel.splice(oldFIdx, 1);
-              onChange(newSel);
-              break;
-            }
-            case 'clear':
-              onChange([]);
-              break;
-            case 'set-value': {
-              onChange([action.option.value]);
-              break;
-            }
-            default:
-              break;
-          }
-        }}
+        value={value}
+        onChange={selectOnChange}
       />
     </>
   );

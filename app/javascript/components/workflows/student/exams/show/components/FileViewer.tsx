@@ -1,4 +1,10 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, {
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+  useMemo,
+} from 'react';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
@@ -69,35 +75,40 @@ const FileContents: React.FC<FileContentsProps> = (props) => {
       ch: 0,
     };
   }
-  const handleLineClick = (num: number): void => {
+  const handleLineClick = useCallback((num: number): void => {
     if (onChangeLine) {
       onChangeLine(num + 1);
     }
-  };
+  }, [onChangeLine]);
+  const rp = useMemo(() => [...refreshProps, f], [refreshProps, f]);
+  const handleGutterClick = useCallback((ed, lineNum): void => {
+    handleLineClick(lineNum);
+    ed.setCursor(lineNum);
+  }, [handleLineClick]);
+  const editorOptions = useMemo(() => ({
+    styleActiveLine: !!selectedLine,
+  }), [selectedLine]);
+  const handleCursor = useCallback((ed, pos): void => {
+    if (ed.hasFocus()) handleLineClick(pos.line);
+  }, [handleLineClick]);
+  const handleFocus = useCallback((ed): void => {
+    const { line } = ed.getCursor();
+    handleLineClick(line);
+  }, [handleLineClick]);
   if (f?.filedir === 'file') {
     return (
       <Editor
         readOnly
-        refreshProps={[...refreshProps, f]}
+        refreshProps={rp}
         language={f.type}
         value={f.contents}
         markDescriptions={f.marks}
-        valueUpdate={[...refreshProps, f]}
-        onGutterClick={(_ed, lineNum): void => {
-          handleLineClick(lineNum);
-          _ed.setCursor(lineNum);
-        }}
-        options={{
-          styleActiveLine: !!selectedLine,
-        }}
+        valueUpdate={rp}
+        onGutterClick={handleGutterClick}
+        options={editorOptions}
         cursor={cursor}
-        onCursor={(ed, pos): void => {
-          if (ed.hasFocus()) handleLineClick(pos.line);
-        }}
-        onFocus={(ed): void => {
-          const { line } = ed.getCursor();
-          handleLineClick(line);
-        }}
+        onCursor={handleCursor}
+        onFocus={handleFocus}
       />
     );
   }

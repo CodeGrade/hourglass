@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ContentsState } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import {
@@ -29,11 +29,20 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     reference,
     questions,
   } = exam;
-  const fmap = createMap(files);
+  const examContextVal = useMemo(() => ({
+    files,
+    fmap: createMap(files),
+  }), [files]);
+  const examViewerContextVal = useMemo(() => ({
+    answers,
+  }), [answers]);
+  const examFilesContextVal = useMemo(() => ({
+    references: reference,
+  }), [reference]);
   return (
-    <ExamContext.Provider value={{ files, fmap }}>
-      <ExamViewerContext.Provider value={{ answers }}>
-        <ExamFilesContext.Provider value={{ references: reference }}>
+    <ExamContext.Provider value={examContextVal}>
+      <ExamViewerContext.Provider value={examViewerContextVal}>
+        <ExamFilesContext.Provider value={examFilesContextVal}>
           <div>
             {answers.scratch && (
               <div>

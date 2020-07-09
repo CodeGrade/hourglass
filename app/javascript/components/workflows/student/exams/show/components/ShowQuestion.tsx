@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { QuestionInfo } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import Part from '@student/exams/show/components/Part';
@@ -51,8 +51,11 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
+  const questionFilesContextVal = useMemo(() => ({
+    references: reference,
+  }), [reference]);
   return (
-    <QuestionFilesContext.Provider value={{ references: reference }}>
+    <QuestionFilesContext.Provider value={questionFilesContextVal}>
       <div className={classes}>
         <TopScrollspy
           question={qnum}

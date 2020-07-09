@@ -7,11 +7,15 @@ export interface HTMLProps {
 
 const HTML: React.FC<HTMLProps> = (props) => {
   const { value } = props;
+  const theHTML = {
+    __html: value?.value ?? '',
+  };
+
   return (
     <div
       className="no-hover"
       // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: value?.value ?? '' }}
+      dangerouslySetInnerHTML={theHTML}
     />
   );
 };

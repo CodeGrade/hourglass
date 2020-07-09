@@ -1362,47 +1362,54 @@ const ExamMessages: React.FC<{
     `,
     exam,
   );
+  const response: Response = useMemo(() => ({
+    sent: res.messages.edges.map(({ node: msg }) => ({
+      type: MessageType.Direct,
+      id: msg.id,
+      body: msg.body,
+      sender: msg.sender,
+      registration: msg.registration,
+      time: DateTime.fromISO(msg.createdAt),
+    })),
+    questions: res.questions.edges.map(({ node: question }) => ({
+      type: MessageType.Question,
+      id: question.id,
+      body: question.body,
+      registration: question.registration,
+      time: DateTime.fromISO(question.createdAt),
+    })),
+    version: res.versionAnnouncements.edges.map(({ node: va }) => ({
+      type: MessageType.Version,
+      id: va.id,
+      body: va.body,
+      version: va.examVersion,
+      time: DateTime.fromISO(va.createdAt),
+    })),
+    exam: res.examAnnouncements.edges.map(({ node: ea }) => ({
+      type: MessageType.Exam,
+      id: ea.id,
+      body: ea.body,
+      time: DateTime.fromISO(ea.createdAt),
+    })),
+    room: res.roomAnnouncements.edges.map(({ node: ra }) => ({
+      type: MessageType.Room,
+      id: ra.id,
+      body: ra.body,
+      room: ra.room,
+      time: DateTime.fromISO(ra.createdAt),
+    })),
+  }), [
+    res.messages,
+    res.questions,
+    res.versionAnnouncements,
+    res.examAnnouncements,
+    res.roomAnnouncements,
+  ]);
   return (
     <Loaded
       examId={res.id}
       recipientOptions={recipientOptions}
-      response={{
-        sent: res.messages.edges.map(({ node: msg }) => ({
-          type: MessageType.Direct,
-          id: msg.id,
-          body: msg.body,
-          sender: msg.sender,
-          registration: msg.registration,
-          time: DateTime.fromISO(msg.createdAt),
-        })),
-        questions: res.questions.edges.map(({ node: question }) => ({
-          type: MessageType.Question,
-          id: question.id,
-          body: question.body,
-          registration: question.registration,
-          time: DateTime.fromISO(question.createdAt),
-        })),
-        version: res.versionAnnouncements.edges.map(({ node: va }) => ({
-          type: MessageType.Version,
-          id: va.id,
-          body: va.body,
-          version: va.examVersion,
-          time: DateTime.fromISO(va.createdAt),
-        })),
-        exam: res.examAnnouncements.edges.map(({ node: ea }) => ({
-          type: MessageType.Exam,
-          id: ea.id,
-          body: ea.body,
-          time: DateTime.fromISO(ea.createdAt),
-        })),
-        room: res.roomAnnouncements.edges.map(({ node: ra }) => ({
-          type: MessageType.Room,
-          id: ra.id,
-          body: ra.body,
-          room: ra.room,
-          time: DateTime.fromISO(ra.createdAt),
-        })),
-      }}
+      response={response}
       selectedRecipient={selectedRecipient}
       setSelectedRecipient={setSelectedRecipient}
       messageRef={messageRef}
@@ -1662,36 +1669,37 @@ const ProctoringSplitView: React.FC<{
     `,
     exam,
   );
+  const recipients: SplitRecipients = useMemo(() => ({
+    versions: res.examVersions.edges.map(({ node: ev }) => {
+      const r: Recipient = {
+        type: MessageType.Version,
+        id: ev.id,
+        name: ev.name,
+      };
+      return r;
+    }).sort((a, b) => a.name.localeCompare(b.name)),
+    students: res.registrations.map((registration) => {
+      const r: Recipient = {
+        type: MessageType.Direct,
+        id: registration.id,
+        name: registration.user.displayName,
+      };
+      return r;
+    }).sort((a, b) => a.name.localeCompare(b.name)),
+    rooms: res.rooms.map((room) => {
+      const r: Recipient = {
+        type: MessageType.Room,
+        id: room.id,
+        name: room.name,
+      };
+      return r;
+    }).sort((a, b) => a.name.localeCompare(b.name)),
+  }), [res.examVersions, res.registrations, res.rooms]);
   return (
     <SplitViewLoaded
       exam={res}
       examId={res.id}
-      recipients={{
-        versions: res.examVersions.edges.map(({ node: ev }) => {
-          const r: Recipient = {
-            type: MessageType.Version,
-            id: ev.id,
-            name: ev.name,
-          };
-          return r;
-        }).sort((a, b) => a.name.localeCompare(b.name)),
-        students: res.registrations.map((registration) => {
-          const r: Recipient = {
-            type: MessageType.Direct,
-            id: registration.id,
-            name: registration.user.displayName,
-          };
-          return r;
-        }).sort((a, b) => a.name.localeCompare(b.name)),
-        rooms: res.rooms.map((room) => {
-          const r: Recipient = {
-            type: MessageType.Room,
-            id: room.id,
-            name: room.name,
-          };
-          return r;
-        }).sort((a, b) => a.name.localeCompare(b.name)),
-      }}
+      recipients={recipients}
     />
   );
 };

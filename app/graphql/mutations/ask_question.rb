@@ -20,11 +20,23 @@ module Mutations
       saved = q.save
       raise GraphQL::ExecutionError, q.errors_full_messages.to_sentence unless saved
 
+      trigger_subscription(registration.exam, q)
+
       range_add = GraphQL::Relay::RangeAdd.new({
         parent: registration, collection: registration.questions, item: q, context: context
       })
 
       { question: q, questions_connection: range_add.connection, question_edge: range_add.edge }
+    end
+
+    private
+
+    def trigger_subscription(exam, question)
+      HourglassSchema.subscriptions.trigger(
+        :question_was_asked,
+        { exam_id: HourglassSchema.id_from_object(exam, Types::ExamType, context) },
+        question,
+      )
     end
   end
 end

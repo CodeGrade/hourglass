@@ -1,16 +1,24 @@
-class Subscriptions::MessageWasSent < Subscriptions::BaseSubscription
-  argument :exam_id, ID, required: true, loads: Types::ExamType
+# frozen_string_literal: true
 
-  # TODO: just send the message and edge
-  payload_type Types::ExamType
+module Subscriptions
+  class MessageWasSent < Subscriptions::BaseSubscription
+    argument :exam_id, ID, required: true, loads: Types::ExamType
 
-  def authorized?(exam:)
-    return true if exam.students.or(exam.proctors).or(exam.professors).exists? context[:current_user].id
+    field :message, Types::MessageType, null: false
+    field :messages_edge, Types::MessageType.edge_type, null: false
 
-    raise GraphQL::ExecutionError, 'You do not have permission.'
-  end
+    def authorized?(exam:)
+      return true if exam.proctors.or(exam.professors).exists? context[:current_user].id
 
-  def subscribe(exam:)
-    exam
+      raise GraphQL::ExecutionError, 'You do not have permission.'
+    end
+
+    def update(exam:)
+      range_add = GraphQL::Relay::RangeAdd.new(parent: exam, collection: exam.messages, item: object, context: context)
+      {
+        message: object,
+        messages_edge: range_add.edge,
+      }
+    end
   end
 end

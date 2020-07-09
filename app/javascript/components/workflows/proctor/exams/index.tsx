@@ -440,23 +440,22 @@ const ShowAnomalies: React.FC<{
     `,
     exam,
   );
-  const config: RangeAddConfig = {
-    type: 'RANGE_ADD',
-    parentID: res.id,
-    connectionInfo: [{
-      key: 'Exam_anomalies',
-      rangeBehavior: 'prepend',
-    }],
-    edgeName: 'anomalyEdge',
-  };
-  const subscriptionObject = useMemo(() => ({
+
+  useSubscription(useMemo(() => ({
     subscription: newAnomalySubscriptionSpec,
     variables: {
       examId: res.id,
     },
-    configs: [config],
-  }), [res.id]);
-  useSubscription<examsNewAnomalySubscription>(subscriptionObject);
+    configs: [{
+      type: 'RANGE_ADD',
+      parentID: res.id,
+      connectionInfo: [{
+        key: 'Exam_anomalies',
+        rangeBehavior: 'prepend',
+      }],
+      edgeName: 'anomalyEdge',
+    }],
+  }), [res.id]));
   return (
     <>
       {res.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
@@ -934,7 +933,49 @@ enum MessagesTab {
 const newMessageSubscriptionSpec = graphql`
   subscription examsNewMessageSubscription($examId: ID!) {
     messageWasSent(examId: $examId) {
-      ...exams_messages
+      message {
+        id
+        body
+        createdAt
+        sender {
+          isMe
+          displayName
+        }
+        registration {
+          id
+          user {
+            displayName
+          }
+        }
+      }
+      messagesEdge {
+        node {
+          id
+        }
+      }
+    }
+  }
+`;
+
+const newQuestionSubscriptionSpec = graphql`
+  subscription examsNewQuestionSubscription($examId: ID!) {
+    questionWasAsked(examId: $examId) {
+      question {
+        id
+        createdAt
+        registration {
+          id
+          user {
+            displayName
+          }
+        }
+        body
+      }
+      questionsEdge {
+        node {
+          id
+        }
+      }
     }
   }
 `;
@@ -964,13 +1005,38 @@ const Loaded: React.FC<{
     room,
     exam,
   } = response;
-  const subscriptionObject = useMemo(() => ({
+  useSubscription(useMemo(() => ({
     subscription: newMessageSubscriptionSpec,
     variables: {
       examId,
     },
-  }), [examId]);
-  useSubscription(subscriptionObject);
+    configs: [{
+      type: 'RANGE_ADD',
+      parentID: examId,
+      connectionInfo: [{
+        key: 'Exam_messages',
+        rangeBehavior: 'prepend',
+      }],
+      edgeName: 'messagesEdge',
+    }],
+  }), [examId]));
+
+  useSubscription(useMemo(() => ({
+    subscription: newQuestionSubscriptionSpec,
+    variables: {
+      examId,
+    },
+    configs: [{
+      type: 'RANGE_ADD',
+      parentID: examId,
+      connectionInfo: [{
+        key: 'Exam_questions',
+        rangeBehavior: 'prepend',
+      }],
+      edgeName: 'questionsEdge',
+    }],
+  }), [examId]));
+
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
 
   return (
@@ -1119,29 +1185,37 @@ const ExamMessages: React.FC<{
           createdAt
           body
         }
-        questions {
-          id
-          createdAt
-          registration {
-            id
-            user {
-              displayName
+        questions(first: 30) @connection(key: "Exam_questions", filters: []) { # TODO: paginate
+          edges {
+            node {
+              id
+              createdAt
+              registration {
+                id
+                user {
+                  displayName
+                }
+              }
+              body
             }
           }
-          body
         }
-        messages {
-          id
-          body
-          createdAt
-          sender {
-            isMe
-            displayName
-          }
-          registration {
-            id
-            user {
-              displayName
+        messages(first: 30) @connection(key: "Exam_messages", filters: []) {
+          edges {
+            node {
+              id
+              body
+              createdAt
+              sender {
+                isMe
+                displayName
+              }
+              registration {
+                id
+                user {
+                  displayName
+                }
+              }
             }
           }
         }
@@ -1154,7 +1228,7 @@ const ExamMessages: React.FC<{
       examId={res.id}
       recipientOptions={recipientOptions}
       response={{
-        sent: res.messages.map((msg) => ({
+        sent: res.messages.edges.map(({ node: msg }) => ({
           type: MessageType.Direct,
           id: msg.id,
           body: msg.body,
@@ -1162,7 +1236,7 @@ const ExamMessages: React.FC<{
           registration: msg.registration,
           time: DateTime.fromISO(msg.createdAt),
         })),
-        questions: res.questions.map((question) => ({
+        questions: res.questions.edges.map(({ node: question }) => ({
           type: MessageType.Question,
           id: question.id,
           body: question.body,

@@ -7,9 +7,7 @@ import { useParams, Redirect } from 'react-router-dom';
 import ExamTaker from '@student/exams/show/containers/ExamTaker';
 import ExamSubmitted from '@student/exams/show/components/ExamSubmitted';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import { QueryRenderer } from 'react-relay';
-import environment from '@hourglass/relay/environment';
-import { graphql, useFragment } from 'relay-hooks';
+import { graphql, useFragment, useQuery } from 'relay-hooks';
 
 import { showQuery } from './__generated__/showQuery.graphql';
 import { showExam$key } from './__generated__/showExam.graphql';
@@ -44,56 +42,49 @@ const Exam: React.FC<ShowExamProps> = (props) => {
 
 const ShowExam: React.FC = () => {
   const { examId } = useParams();
+  const res = useQuery<showQuery>(
+    graphql`
+    query showQuery($examId: ID!) {
+      exam(id: $examId) {
+        name
+        myRegistration {
+          id
+        }
+        ...showExam
+      }
+    }
+    `,
+    { examId },
+  );
+  if (res.error) {
+    return (
+      <>
+        <RegularNavbar />
+        <Container>
+          <span className="text-danger">{res.error.message}</span>
+        </Container>
+      </>
+    );
+  }
+  if (!res.props) {
+    return (
+      <>
+        <RegularNavbar />
+        <Container>
+          <p>Loading...</p>
+        </Container>
+      </>
+    );
+  }
+  if (!res.props.exam.myRegistration) {
+    return (
+      <Redirect to="/" />
+    );
+  }
   return (
-    <QueryRenderer<showQuery>
-      environment={environment}
-      query={graphql`
-        query showQuery($examId: ID!) {
-          exam(id: $examId) {
-            name
-            myRegistration {
-              id
-            }
-            ...showExam
-          }
-        }
-        `}
-      variables={{
-        examId,
-      }}
-      render={({ error, props }) => {
-        if (error) {
-          return (
-            <>
-              <RegularNavbar />
-              <Container>
-                <span className="text-danger">{error.message}</span>
-              </Container>
-            </>
-          );
-        }
-        if (!props) {
-          return (
-            <>
-              <RegularNavbar />
-              <Container>
-                <p>Loading...</p>
-              </Container>
-            </>
-          );
-        }
-        if (!props.exam.myRegistration) {
-          return (
-            <Redirect to="/" />
-          );
-        }
-        return (
-          <DocumentTitle title={props.exam.name}>
-            <Exam examKey={props.exam} />
-          </DocumentTitle>
-        );
-      }}
-    />
+    <DocumentTitle title={res.props.exam.name}>
+      <Exam examKey={res.props.exam} />
+    </DocumentTitle>
   );
 };
 

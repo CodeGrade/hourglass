@@ -4,9 +4,8 @@ import { Button } from 'react-bootstrap';
 import NewExam from '@professor/exams/new';
 import SyncCourse from '@professor/courses/sync';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import { QueryRenderer, graphql } from 'react-relay';
-import environment from '@hourglass/relay/environment';
-import { useFragment } from 'relay-hooks';
+import { graphql } from 'react-relay';
+import { useFragment, useQuery } from 'relay-hooks';
 import { showCourseQuery } from './__generated__/showCourseQuery.graphql';
 import { show_courseExams$key } from './__generated__/show_courseExams.graphql';
 
@@ -45,72 +44,65 @@ const CourseExams: React.FC<{
 
 const ShowCourse: React.FC = () => {
   const { courseId } = useParams();
+  const res = useQuery<showCourseQuery>(
+    graphql`
+    query showCourseQuery($courseId: ID!) {
+      course(id: $courseId) {
+        title
+        id
+        exams {
+          ...show_courseExams
+        }
+      }
+    }
+    `,
+    { courseId },
+  );
+  if (res.error) {
+    return <p>Error</p>;
+  }
+  if (!res.props) {
+    return <p>Loading...</p>;
+  }
   return (
-    <QueryRenderer<showCourseQuery>
-      environment={environment}
-      query={graphql`
-        query showCourseQuery($courseId: ID!) {
-          course(id: $courseId) {
-            title
-            id
-            exams {
-              ...show_courseExams
-            }
-          }
-        }
-        `}
-      variables={{
-        courseId,
-      }}
-      render={({ error, props }) => {
-        if (error) {
-          return <p>Error</p>;
-        }
-        if (!props) {
-          return <p>Loading...</p>;
-        }
-        return (
-          <>
-            <div className="d-flex align-items-center justify-content-between">
-              <h1>
-                {props.course.title}
-              </h1>
-              <div>
-                <Link to={`/courses/${courseId}/sync`}>
-                  <Button
-                    variant="danger"
-                  >
-                    Sync
-                  </Button>
-                </Link>
-                <Link to={`/courses/${courseId}/new`} className="ml-1">
-                  <Button
-                    variant="success"
-                  >
-                    New Exam
-                  </Button>
-                </Link>
-              </div>
-            </div>
-            <Route path="/courses/:courseId" exact>
-              <DocumentTitle title={props.course.title}>
-                <CourseExams courseExams={props.course.exams} />
-              </DocumentTitle>
-            </Route>
-            <Route path="/courses/:courseId/sync" exact>
-              <DocumentTitle title={`Sync - ${props.course.title}`}>
-                <SyncCourse courseId={props.course.id} />
-              </DocumentTitle>
-            </Route>
-            <Route path="/courses/:courseId/new" exact>
-              <DocumentTitle title={`New Exam - ${props.course.title}`}>
-                <NewExam courseId={props.course.id} />
-              </DocumentTitle>
-            </Route>
-          </>
-        );
-      }}
-    />
+    <>
+      <div className="d-flex align-items-center justify-content-between">
+        <h1>
+          {res.props.course.title}
+        </h1>
+        <div>
+          <Link to={`/courses/${courseId}/sync`}>
+            <Button
+              variant="danger"
+            >
+              Sync
+            </Button>
+          </Link>
+          <Link to={`/courses/${courseId}/new`} className="ml-1">
+            <Button
+              variant="success"
+            >
+              New Exam
+            </Button>
+          </Link>
+        </div>
+      </div>
+      <Route path="/courses/:courseId" exact>
+        <DocumentTitle title={res.props.course.title}>
+          <CourseExams courseExams={res.props.course.exams} />
+        </DocumentTitle>
+      </Route>
+      <Route path="/courses/:courseId/sync" exact>
+        <DocumentTitle title={`Sync - ${res.props.course.title}`}>
+          <SyncCourse courseId={res.props.course.id} />
+        </DocumentTitle>
+      </Route>
+      <Route path="/courses/:courseId/new" exact>
+        <DocumentTitle title={`New Exam - ${res.props.course.title}`}>
+          <NewExam courseId={res.props.course.id} />
+        </DocumentTitle>
+      </Route>
+    </>
   );
 };
 

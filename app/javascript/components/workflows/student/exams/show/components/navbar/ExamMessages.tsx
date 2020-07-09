@@ -150,7 +150,7 @@ export const ShowExamMessages: React.FC<{
     graphql`
     fragment ExamMessages_all on Exam {
       id
-      examAnnouncements(first: 10) @connection(key: "ExamMessages_examAnnouncements", filters: []) { # TODO: paginate
+      examAnnouncements(first: 100000) @connection(key: "ExamMessages_examAnnouncements", filters: []) { # TODO: paginate
         edges {
           node {
             id
@@ -163,7 +163,7 @@ export const ShowExamMessages: React.FC<{
         id
         room {
           id
-          roomAnnouncements(first: 10) @connection(key: "ExamMessages_roomAnnouncements", filters: []) { # TODO: paginate
+          roomAnnouncements(first: 100000) @connection(key: "ExamMessages_roomAnnouncements", filters: []) { # TODO: paginate
             edges {
               node {
                 id
@@ -175,7 +175,7 @@ export const ShowExamMessages: React.FC<{
         }
         examVersion {
           id
-          versionAnnouncements(first: 10) @connection(key: "ExamMessages_versionAnnouncements", filters: []) { # TODO: paginate
+          versionAnnouncements(first: 100000) @connection(key: "ExamMessages_versionAnnouncements", filters: []) { # TODO: paginate
             edges {
               node {
                 id
@@ -185,7 +185,7 @@ export const ShowExamMessages: React.FC<{
             }
           }
         }
-        messages(first: 10) @connection(key: "ExamMessages_messages", filters: []) { # TODO: paginate
+        messages(first: 100000) @connection(key: "ExamMessages_messages", filters: []) { # TODO: paginate
           edges {
             node {
               id
@@ -358,7 +358,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
     graphql`
     fragment ExamMessages_navbar on Exam {
       ...ExamMessages_all
-      examAnnouncements(first: 10) @connection(key: "ExamMessages_examAnnouncements", filters: []) { # TODO: paginate
+      examAnnouncements(first: 100000) @connection(key: "ExamMessages_examAnnouncements", filters: []) { # TODO: paginate
         edges {
           node {
             createdAt
@@ -367,7 +367,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
       }
       myRegistration {
         room {
-          roomAnnouncements(first: 10) @connection(key: "ExamMessages_roomAnnouncements", filters: []) { # TODO: paginate
+          roomAnnouncements(first: 100000) @connection(key: "ExamMessages_roomAnnouncements", filters: []) { # TODO: paginate
             edges {
               node {
                 createdAt
@@ -376,7 +376,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
           }
         }
         examVersion {
-          versionAnnouncements(first: 10) @connection(key: "ExamMessages_versionAnnouncements", filters: []) { # TODO: paginate
+          versionAnnouncements(first: 100000) @connection(key: "ExamMessages_versionAnnouncements", filters: []) { # TODO: paginate
             edges {
               node {
                 createdAt
@@ -384,7 +384,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
             }
           }
         }
-        messages(first: 10) @connection(key: "ExamMessages_messages", filters: []) { # TODO: paginate
+        messages(first: 100000) @connection(key: "ExamMessages_messages", filters: []) { # TODO: paginate
           edges {
             node {
               createdAt

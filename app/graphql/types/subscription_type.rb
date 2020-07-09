@@ -3,6 +3,7 @@
 module Types
   class SubscriptionType < GraphQL::Schema::Object
     field :anomaly_was_created, subscription: Subscriptions::AnomalyWasCreated
+    field :anomaly_was_destroyed, subscription: Subscriptions::AnomalyWasDestroyed
 
     field :message_received, subscription: Subscriptions::MessageReceived
     field :message_was_sent, subscription: Subscriptions::MessageWasSent

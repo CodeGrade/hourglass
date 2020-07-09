@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Form,
   Card,
@@ -63,8 +63,9 @@ const PartPoints: React.FC<WrappedFieldProps> = (props) => {
 const PartReferenceProvider: React.FC<WrappedFieldProps> = (props) => {
   const { input, children } = props;
   const { value: references } = input;
+  const val = useMemo(() => ({ references }), [references]);
   return (
-    <PartFilesContext.Provider value={{ references }}>
+    <PartFilesContext.Provider value={val}>
       {children}
     </PartFilesContext.Provider>
   );
@@ -150,7 +151,7 @@ const Part: React.FC<{
             name="reference"
             component={PartReferenceProvider}
           >
-            <FieldArray name="body" component={ShowBodyItems} props={{ qnum, pnum }} />
+            <FieldArray name="body" component={ShowBodyItems} qnum={qnum} pnum={pnum} />
           </Field>
         </Card.Body>
       </FormSection>

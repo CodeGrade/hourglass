@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import {
   Col,
@@ -325,9 +325,7 @@ const StudentDNDForm: React.FC<
           <FieldArray
             name="versions"
             component={Versions}
-            props={{
-              addSectionToVersion,
-            }}
+            addSectionToVersion={addSectionToVersion}
           />
         </Form.Group>
       </FormSection>
@@ -349,17 +347,21 @@ const Editable: React.FC<VersionAssignmentProps> = (props) => {
     unassigned,
     versions,
   } = props;
+  const contextVal = useMemo(() => ({
+    sections,
+  }), [sections]);
+  const initialValues = useMemo(() => ({
+    all: {
+      unassigned,
+      versions,
+    },
+  }), [unassigned, versions]);
   return (
     <Provider store={store}>
-      <FormContext.Provider value={{ sections }}>
+      <FormContext.Provider value={contextVal}>
         <DNDForm
           examId={examId}
-          initialValues={{
-            all: {
-              unassigned: [...unassigned],
-              versions: [...versions],
-            },
-          }}
+          initialValues={initialValues}
         />
       </FormContext.Provider>
     </Provider>
@@ -450,8 +452,8 @@ const Loaded: React.FC<VersionAssignmentProps> = (props) => {
 
 interface FormValues {
   all: {
-    unassigned: Student[];
-    versions: Version[];
+    unassigned: readonly Student[];
+    versions: readonly Version[];
   };
 }
 

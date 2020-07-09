@@ -15,10 +15,10 @@ import {
   QuestionInfo,
   ContentsState,
 } from '@hourglass/workflows/student/exams/show/types';
+import { useQuery } from 'relay-hooks';
 
 import { submissionsAllQuery } from './__generated__/submissionsAllQuery.graphql';
 import { submissionsOneQuery } from './__generated__/submissionsOneQuery.graphql';
-import { useQuery } from 'relay-hooks';
 
 const ExamSubmissions: React.FC = () => {
   const { examId } = useParams();

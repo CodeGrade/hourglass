@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import {
   ExamVersion, Policy,
 } from '@student/exams/show/types';
@@ -60,14 +60,20 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     reference,
     files,
   } = exam;
-  const fmap = createMap(files);
+  const examContextVal = useMemo(() => ({
+    files,
+    fmap: createMap(files),
+  }), [files]);
+  const examFilesContextVal = useMemo(() => ({
+    references: reference,
+  }), [reference]);
   return (
-    <ExamContext.Provider value={{ files, fmap }}>
+    <ExamContext.Provider value={examContextVal}>
       <BlockNav
         onLeave={leave}
         message="Are you sure you want to navigate away? Your exam will be submitted."
       />
-      <ExamFilesContext.Provider value={{ references: reference }}>
+      <ExamFilesContext.Provider value={examFilesContextVal}>
         <h1>{res.name}</h1>
         <HTML value={instructions} />
         {reference.length !== 0 && <FileViewer references={reference} />}

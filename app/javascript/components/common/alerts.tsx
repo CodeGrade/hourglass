@@ -1,7 +1,13 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useMemo,
+} from 'react';
 import { AlertProps, Toast } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import './alerts.scss';
+import { DateTime } from 'luxon';
 
 interface HGAlert {
   title?: string;
@@ -11,7 +17,7 @@ interface HGAlert {
 }
 
 interface HGAlertWithID extends HGAlert {
-  id: number;
+  time: number;
 }
 
 const ShowAlert: React.FC<{
@@ -51,7 +57,7 @@ const ShowAlerts: React.FC<{
   <div id="allAlerts">
     {alerts.map((alert) => (
       <ShowAlert
-        key={alert.id}
+        key={alert.time}
         alert={alert}
       />
     ))}
@@ -65,25 +71,21 @@ interface AlertContext {
 export const AlertContext = React.createContext<AlertContext>({} as AlertContext);
 
 export const AllAlerts: React.FC = ({ children }) => {
-  const [lastId, setLastId] = useState(0);
   const [alerts, setAlerts] = useState<HGAlertWithID[]>([]);
-  const addAlert = React.useCallback((alert) => {
-    setAlerts((a) => a.concat([{
-      id: lastId,
-      ...alert,
-    }]));
-    setLastId((i) => i + 1);
-  }, [lastId]);
+  const val = useMemo<AlertContext>(() => ({
+    alert: (alert) => {
+      setAlerts((a) => a.concat([{
+        time: DateTime.local().toMillis(),
+        ...alert,
+      }]));
+    },
+  }), []);
   const history = useHistory();
   useEffect(() => history.listen((_) => {
     setAlerts([]);
   }), [history]);
   return (
-    <AlertContext.Provider
-      value={{
-        alert: addAlert,
-      }}
-    >
+    <AlertContext.Provider value={val}>
       <ShowAlerts alerts={alerts} />
       {children}
     </AlertContext.Provider>
@@ -98,5 +100,5 @@ export const useAlert = (
   const { alert } = useContext(AlertContext);
   useEffect(() => {
     if (condition) alert(msg);
-  }, [condition, ...(deps ?? [])]);
+  }, [condition, alert, ...(deps ?? [])]);
 };

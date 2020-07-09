@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { PartInfo } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
@@ -42,8 +42,11 @@ const Part: React.FC<PartProps> = (props) => {
   } = part;
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
+  const partFilesContextVal = useMemo(() => ({
+    references: reference,
+  }), [reference]);
   return (
-    <PartFilesContext.Provider value={{ references: reference }}>
+    <PartFilesContext.Provider value={partFilesContextVal}>
       <div
         onFocus={(): void => {
           spyQuestion(qnum, pnum);

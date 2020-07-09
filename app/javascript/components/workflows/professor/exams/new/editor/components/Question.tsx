@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Form,
   Card,
@@ -18,6 +18,17 @@ import {
 import { QuestionFilesContext } from '@student/exams/show/context';
 import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
 import EditReference from '@professor/exams/new/editor/components/Reference';
+import { YesNoInfo } from '@student/exams/show/types';
+
+const SEP_SUB_YESNO: YesNoInfo = {
+  type: 'YesNo',
+  yesLabel: 'Yes',
+  noLabel: 'No',
+  prompt: {
+    type: 'HTML',
+    value: '',
+  },
+};
 
 const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
   const {
@@ -34,18 +45,8 @@ const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
         <YesNo
           className="bg-white rounded"
           value={!!value}
-          info={{
-            type: 'YesNo',
-            yesLabel: 'Yes',
-            noLabel: 'No',
-            prompt: {
-              type: 'HTML',
-              value: '',
-            },
-          }}
-          onChange={(newVal): void => {
-            onChange(newVal);
-          }}
+          info={SEP_SUB_YESNO}
+          onChange={onChange}
         />
       </Col>
     </>
@@ -55,8 +56,9 @@ const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
 const QuestionReferenceProvider: React.FC<WrappedFieldProps> = (props) => {
   const { input, children } = props;
   const { value: references } = input;
+  const val = useMemo(() => ({ references }), [references]);
   return (
-    <QuestionFilesContext.Provider value={{ references }}>
+    <QuestionFilesContext.Provider value={val}>
       {children}
     </QuestionFilesContext.Provider>
   );
@@ -140,7 +142,7 @@ const Question: React.FC<{
             name="reference"
             component={QuestionReferenceProvider}
           >
-            <FieldArray name="parts" component={ShowParts} props={{ qnum }} />
+            <FieldArray name="parts" component={ShowParts} qnum={qnum} />
           </Field>
         </Card.Body>
       </FormSection>

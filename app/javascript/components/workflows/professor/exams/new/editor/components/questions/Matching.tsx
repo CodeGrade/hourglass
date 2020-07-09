@@ -20,6 +20,7 @@ import {
 } from 'redux-form';
 import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
 import { MatchingPromptWithAnswer } from '@student/exams/show/types';
+import './Matching.css';
 
 interface MatchingProps {
   qnum: number;
@@ -194,7 +195,7 @@ const OnePrompt: React.FC<{
             placeholder="Enter a new prompt"
           />
         </Col>
-        <div className="float-right" style={{ width: 85 }}>
+        <div className="float-right match-box">
           <Field
             name="answer"
             component={ChooseRightAnswer}

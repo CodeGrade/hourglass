@@ -1,4 +1,4 @@
-import React, { useContext, useCallback } from 'react';
+import React, { useContext, useCallback, useMemo } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import {
   Col,
@@ -220,7 +220,7 @@ const StaffSeatingForm: React.FC<
     pristine,
     change,
   } = props;
-  const addSectionToRoom = (section: Section, roomId: string): void => {
+  const addSectionToRoom = useCallback((section: Section, roomId: string): void => {
     change('all', ({ unassigned, rooms }) => ({
       unassigned: unassigned.filter((unassignedStudent: Student) => (
         !section.staff.find((student) => student.id === unassignedStudent.id)
@@ -241,7 +241,7 @@ const StaffSeatingForm: React.FC<
         };
       }),
     }));
-  };
+  }, [change]);
   const history = useHistory();
   const { alert } = useContext(AlertContext);
   const cancel = useCallback(() => {
@@ -342,9 +342,7 @@ const StaffSeatingForm: React.FC<
           <FieldArray
             name="rooms"
             component={Rooms}
-            props={{
-              addSectionToRoom,
-            }}
+            addSectionToRoom={addSectionToRoom}
           />
         </Form.Group>
       </FormSection>
@@ -380,22 +378,24 @@ const Editable: React.FC<StaffAssignmentProps> = (props) => {
     proctors,
     rooms,
   } = props;
+  const contextVal = useMemo(() => ({ sections }), [sections]);
+  const initialValues = useMemo(() => ({
+    all: {
+      unassigned,
+      proctors: proctors.map((p) => p.user),
+      rooms: rooms.map((r) => ({
+        id: r.id,
+        name: r.name,
+        proctors: r.proctorRegistrations.map((p) => p.user),
+      })),
+    },
+  }), [unassigned, proctors, rooms]);
   return (
     <Provider store={store}>
-      <FormContext.Provider value={{ sections }}>
+      <FormContext.Provider value={contextVal}>
         <DNDForm
           examId={examId}
-          initialValues={{
-            all: {
-              unassigned,
-              proctors: proctors.map((p) => p.user),
-              rooms: rooms.map((r) => ({
-                id: r.id,
-                name: r.name,
-                proctors: r.proctorRegistrations.map((p) => p.user),
-              })),
-            },
-          }}
+          initialValues={initialValues}
         />
       </FormContext.Provider>
     </Provider>

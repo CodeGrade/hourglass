@@ -5,7 +5,7 @@ import {
 } from 'react-bootstrap';
 import { MdCloudDone } from 'react-icons/md';
 import { ShowMessage } from '@student/exams/show/components/navbar/ExamMessages';
-import { useFragment, graphql, useMutation } from 'relay-hooks';
+import { useFragment, graphql, useMutation, usePagination } from 'relay-hooks';
 import { DateTime } from 'luxon';
 import { AlertContext } from '@hourglass/common/alerts';
 
@@ -119,6 +119,27 @@ const SendQuestion: React.FC<{
   );
 };
 
+const questionPaginationConfig = {
+  getVariables(_props, { count, cursor }, fragmentVariables) {
+    return {
+      count,
+      cursor,
+      examId: fragmentVariables.examId,
+    };
+  },
+  query: graphql`
+  query AskQuestionPaginationQuery(
+    $count: Int!
+    $cursor: String
+    $examId: ID!
+  ) {
+    exam: node(id: $examId) {
+      ...AskQuestion @arguments(count: $count, cursor: $cursor)
+    }
+  }
+  `,
+};
+
 interface AskQuestionProps {
   examKey: AskQuestion$key;
 }
@@ -127,14 +148,19 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
   const {
     examKey,
   } = props;
-  // TODO: paginate
-  const res = useFragment(
+  const { alert } = useContext(AlertContext);
+  const [res, { isLoading, hasMore, loadMore }] = usePagination(
     graphql`
-    fragment AskQuestion on Exam {
+    fragment AskQuestion on Exam
+    @argumentDefinitions(
+      count: { type: "Int", defaultValue: 10 }
+      cursor: { type: "String" }
+    ) {
       myRegistration {
         id
         questions(
-          first: 10
+          first: $count
+          after: $cursor
         ) @connection(key: "AskQuestion_questions", filters: []) {
           edges {
             node {
@@ -157,13 +183,38 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
       {edges.length === 0 && (
         <i>No questions sent.</i>
       )}
-      <ul className="p-0">
+      <ul className="p-0 list-unstyled">
         {edges.map(({ node }) => (
           <ShowQuestion
             key={node.id}
             qKey={node}
           />
         ))}
+        {hasMore() && (
+          <li className="text-center">
+            <Button
+              onClick={() => {
+                if (!hasMore() || isLoading()) return;
+                loadMore(
+                  questionPaginationConfig,
+                  10,
+                  (error) => {
+                    if (!error) return;
+                    alert({
+                      variant: 'danger',
+                      title: 'Error fetching additional questions.',
+                      message: error.message,
+                    });
+                  },
+                  {},
+                );
+              }}
+              variant="success"
+            >
+              Load more...
+            </Button>
+          </li>
+        )}
       </ul>
     </div>
   );

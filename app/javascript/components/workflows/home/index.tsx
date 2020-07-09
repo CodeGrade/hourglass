@@ -1,9 +1,8 @@
 import React from 'react';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { Link } from 'react-router-dom';
-import environment from '@hourglass/relay/environment';
-import { useFragment, graphql } from 'relay-hooks';
-import { QueryRenderer } from 'react-relay';
+import { useFragment, graphql, useQuery } from 'relay-hooks';
+
 import { homeQuery } from './__generated__/homeQuery.graphql';
 import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
 import { home_profregs$key } from './__generated__/home_profregs.graphql';
@@ -81,53 +80,48 @@ const ShowProfRegs: React.FC<{
   );
 };
 
-const Home: React.FC = () => (
-  <DocumentTitle title="My Exams">
-    <QueryRenderer<homeQuery>
-      environment={environment}
-      query={graphql`
-        query homeQuery {
-          me {
-            registrations {
-              nodes {
-                ...home_studentregs
-              }
-            }
-            professorCourseRegistrations {
-              nodes {
-                ...home_profregs
-              }
-            }
+const Home: React.FC = () => {
+  const res = useQuery<homeQuery>(
+    graphql`
+    query homeQuery {
+      me {
+        registrations {
+          nodes {
+            ...home_studentregs
           }
         }
-        `}
-      variables={{}}
-      render={({ error, props }) => {
-        if (error) {
-          return <p>Error</p>;
+        professorCourseRegistrations {
+          nodes {
+            ...home_profregs
+          }
         }
-        if (!props) {
-          return <p>Loading...</p>;
-        }
-        const allEmpty = (
-          props.me.registrations.nodes.length === 0
-          && props.me.professorCourseRegistrations.nodes.length === 0
-        );
-        if (allEmpty) {
-          return <p>You have no registrations.</p>;
-        }
-        return (
-          <>
-            <ShowRegistrations
-              registrations={props.me.registrations.nodes}
-            />
-            <ShowProfRegs
-              professorCourseRegistrations={props.me.professorCourseRegistrations.nodes}
-            />
-          </>
-        );
-      }}
-    />
-  </DocumentTitle>
-);
+      }
+    }
+    `,
+  );
+  if (res.error) {
+    return <p>Error</p>;
+  }
+  if (!res.props) {
+    return <p>Loading...</p>;
+  }
+  const allEmpty = (
+    res.props.me.registrations.nodes.length === 0
+    && res.props.me.professorCourseRegistrations.nodes.length === 0
+  );
+  if (allEmpty) {
+    return <p>You have no registrations.</p>;
+  }
+  return (
+    <DocumentTitle title="My Exams">
+      <ShowRegistrations
+        registrations={res.props.me.registrations.nodes}
+      />
+      <ShowProfRegs
+        professorCourseRegistrations={res.props.me.professorCourseRegistrations.nodes}
+      />
+    </DocumentTitle>
+  );
+};
+
 export default Home;

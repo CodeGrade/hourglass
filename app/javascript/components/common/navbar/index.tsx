@@ -9,7 +9,8 @@ import { Link } from 'react-router-dom';
 import environment from '@hourglass/relay/environment';
 import { QueryRenderer, graphql } from 'react-relay';
 import { useFragment } from 'relay-hooks';
-import { navbarQuery, navbarQueryResponse } from './__generated__/navbarQuery.graphql';
+import { navbarQuery } from './__generated__/navbarQuery.graphql';
+
 import { navbar_me$key } from './__generated__/navbar_me.graphql';
 
 function logOut(): void {
@@ -30,13 +31,13 @@ function logOut(): void {
 
 const RegularNavbar: React.FC<{
   className?: string
-  me: navbarQueryResponse['me'];
+  me: navbar_me$key;
 }> = (props) => {
   const {
     me,
     className,
   } = props;
-  const res = useFragment<navbar_me$key>(
+  const res = useFragment(
     graphql`
     fragment navbar_me on User {
       createdAt

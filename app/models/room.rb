@@ -9,6 +9,9 @@ class Room < ApplicationRecord
   validates :exam, presence: true
   validates :name, presence: true
 
+  delegate :professors, to: :exam
+  delegate :proctors_and_professors, to: :exam
+
   def finalized?
     registrations.in_progress.empty?
   end
@@ -27,5 +30,9 @@ class Room < ApplicationRecord
 
   def students
     User.where(id: registrations.select(:user_id))
+  end
+
+  def visible_to?(check_user)
+    proctors_and_professors.or(students).exists? check_user.id
   end
 end

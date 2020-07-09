@@ -12,6 +12,7 @@ class ProctorRegistration < ApplicationRecord
   validate :room_in_exam
 
   delegate :course, to: :exam
+  delegate :professors, to: :exam
 
   def room_in_exam
     return unless room
@@ -22,6 +23,6 @@ class ProctorRegistration < ApplicationRecord
   end
 
   def visible_to?(check_user)
-    course.professors.or(User.where(id: user.id)).exists? check_user.id
+    professors.or(User.where(id: user.id)).exists? check_user.id
   end
 end

@@ -7,4 +7,6 @@ class ProfessorCourseRegistration < ApplicationRecord
 
   validates :course, presence: true
   validates :user, presence: true
+
+  delegate :professors, to: :course
 end

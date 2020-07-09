@@ -161,6 +161,7 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
     tooltip,
     time,
     body,
+    children,
   } = props;
   return (
     <Media>
@@ -172,6 +173,7 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
           <i className="text-muted">
             {`${tooltip} (${time.toLocaleString(DateTime.TIME_SIMPLE)})`}
           </i>
+          {children}
         </p>
         <p className="wrap-anywhere">{body}</p>
       </Media.Body>
@@ -750,24 +752,21 @@ const ShowQuestion: React.FC<{
   } = question;
   const reply = useCallback(() => replyTo(registration.id), [registration.id]);
   return (
-    <div className="d-flex">
-      <ShowMessage
-        icon={MdMessage}
-        tooltip={`Received from ${registration.user.displayName}`}
-        body={body}
-        time={time}
-      />
-      <div className="flex-grow-1" />
-      <span className="align-self-center mr-2">
-        <Button
-          variant="info"
-          onClick={reply}
-        >
-          <Icon I={MdSend} />
-          Reply
-        </Button>
-      </span>
-    </div>
+    <ShowMessage
+      icon={MdMessage}
+      tooltip={`Received from ${registration.user.displayName}`}
+      body={body}
+      time={time}
+    >
+      <Button
+        className="text-nowrap float-right"
+        variant="info"
+        onClick={reply}
+      >
+        <Icon I={MdSend} />
+        Reply
+      </Button>
+    </ShowMessage>
   );
 };
 
@@ -927,7 +926,7 @@ const ShowMessages: React.FC<{
         </Col>
       </Form.Group>
       <div className="content-wrapper h-100">
-        <div className="content overflow-auto-y">
+        <div className="content overflow-auto-y pr-3">
           <div className={dividerClass}>
             <NewMessages onClick={resetLastViewed} />
             {later.map((m) => (

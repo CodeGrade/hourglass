@@ -18,6 +18,7 @@ class User < ApplicationRecord
   has_many :staff_registrations, dependent: :destroy
   has_many :proctor_registrations, dependent: :destroy
 
+  has_many :courses, through: :registrations
   has_many :messages, through: :registrations
   has_many :sent_messages,
            foreign_key: 'sender',

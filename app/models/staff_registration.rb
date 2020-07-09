@@ -9,4 +9,9 @@ class StaffRegistration < ApplicationRecord
   validates :user, presence: true
 
   delegate :course, to: :section
+  delegate :professors, to: :course
+
+  def visible_to?(check_user)
+    professors.or(User.where(id: user)).exists? check_user.id
+  end
 end

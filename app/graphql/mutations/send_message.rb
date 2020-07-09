@@ -6,8 +6,7 @@ module Mutations
     def authorized?(recipient_id:, **_args)
       obj = HourglassSchema.object_from_id(recipient_id, context)
       exam = exam_for_obj(obj)
-      return true if ProctorRegistration.find_by(user: context[:current_user], exam: exam)
-      return true if ProfessorCourseRegistration.find_by(user: context[:current_user], course: exam.course)
+      return true if exam.proctors_and_professors.exists? context[:current_user].id
 
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end

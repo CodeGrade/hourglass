@@ -54,6 +54,7 @@ module Api
         { lockout: !saved }
       end
 
+      # TODO: add policies
       def start_exam!
         if @registration.start_time.nil?
           @registration.update(start_time: DateTime.now)

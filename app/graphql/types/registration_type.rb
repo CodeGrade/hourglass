@@ -15,7 +15,9 @@ module Types
     field :exam, Types::ExamType, null: false
     field :exam_version, Types::ExamVersionType, null: false
 
-    field :current_answers, GraphQL::Types::JSON, null: false
+    field :current_answers, GraphQL::Types::JSON, null: false do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
 
     field :anomalous, Boolean, null: false
     def anomalous

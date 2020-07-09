@@ -14,6 +14,9 @@ class ExamVersion < ApplicationRecord
 
   validates :exam, presence: true
 
+  delegate :professors, to: :exam
+  delegate :proctors_and_professors, to: :exam
+
   EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save.json').to_s
   validates :info, presence: true, json: {
     schema: -> { EXAM_SAVE_SCHEMA },
@@ -27,15 +30,11 @@ class ExamVersion < ApplicationRecord
   }
 
   def visible_to?(user)
-    students_and_staff.exists? user.id
+    everyone.exists? user.id
   end
 
-  def students_and_staff
-    staff.or(students)
-  end
-
-  def staff
-    exam.proctors_and_professors
+  def everyone
+    proctors_and_professors.or(students)
   end
 
   def students
@@ -52,10 +51,6 @@ class ExamVersion < ApplicationRecord
 
   def answers
     info['answers']
-  end
-
-  def contents_visible_to?(check_user)
-    staff.exists? check_user.id
   end
 
   def questions

@@ -10,6 +10,5 @@ module Types
     field :user, Types::UserType, null: false
 
     field :exam, ExamType, null: false
-    delegate :exam, to: :object
   end
 end

@@ -930,6 +930,26 @@ enum MessagesTab {
   Sent = 'sent',
 }
 
+const newVersionAnnouncementSubscriptionSpec = graphql`
+  subscription examsNewVersionAnnouncementSubscription($examId: ID!) {
+    versionAnnouncementWasSent(examId: $examId) {
+      versionAnnouncement {
+        id
+        createdAt
+        body
+        examVersion {
+          name
+        }
+      }
+      versionAnnouncementsEdge {
+        node {
+          id
+        }
+      }
+    }
+  }
+`;
+
 const newExamAnnouncementSubscriptionSpec = graphql`
   subscription examsNewAnnouncementSubscription($examId: ID!) {
     examAnnouncementWasSent(examId: $examId) {
@@ -1071,6 +1091,22 @@ const Loaded: React.FC<{
     }],
   }), [examId]));
 
+  useSubscription(useMemo(() => ({
+    subscription: newVersionAnnouncementSubscriptionSpec,
+    variables: {
+      examId,
+    },
+    configs: [{
+      type: 'RANGE_ADD',
+      parentID: examId,
+      connectionInfo: [{
+        key: 'Exam_versionAnnouncements',
+        rangeBehavior: 'prepend',
+      }],
+      edgeName: 'versionAnnouncementsEdge',
+    }],
+  }), [examId]));
+
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
 
   return (
@@ -1198,12 +1234,16 @@ const ExamMessages: React.FC<{
     graphql`
       fragment exams_messages on Exam {
         id
-        versionAnnouncements {
-          id
-          createdAt
-          body
-          examVersion {
-            name
+        versionAnnouncements(first: 30) @connection(key: "Exam_versionAnnouncements", filters: []) { # TODO: paginate
+          edges {
+            node {
+              id
+              createdAt
+              body
+              examVersion {
+                name
+              }
+            }
           }
         }
         roomAnnouncements {
@@ -1281,7 +1321,7 @@ const ExamMessages: React.FC<{
           registration: question.registration,
           time: DateTime.fromISO(question.createdAt),
         })),
-        version: res.versionAnnouncements.map((va) => ({
+        version: res.versionAnnouncements.edges.map(({ node: va }) => ({
           type: MessageType.Version,
           id: va.id,
           body: va.body,

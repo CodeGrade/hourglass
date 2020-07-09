@@ -47,7 +47,12 @@ module Mutations
           message,
         )
       when VersionAnnouncement
-        # TODO: profs
+        # profs
+        HourglassSchema.subscriptions.trigger(
+          :version_announcement_was_sent,
+          { exam_id: HourglassSchema.id_from_object(message.exam_version.exam, Types::ExamType, context) },
+          message,
+        )
         # students
         HourglassSchema.subscriptions.trigger(
           :version_announcement_received,

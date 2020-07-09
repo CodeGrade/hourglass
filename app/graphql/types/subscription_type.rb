@@ -8,5 +8,6 @@ module Types
     field :question_was_asked, subscription: Subscriptions::QuestionWasAsked
     field :exam_announcement_was_sent, subscription: Subscriptions::ExamAnnouncementWasSent
     field :version_announcement_received, subscription: Subscriptions::VersionAnnouncementReceived
+    field :version_announcement_was_sent, subscription: Subscriptions::VersionAnnouncementWasSent
   end
 end

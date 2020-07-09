@@ -18,11 +18,6 @@ class Subscriptions::AnomalyWasCreated < Subscriptions::BaseSubscription
     raise GraphQL::ExecutionError, 'You do not have permission.'
   end
 
-  def subscribe(**_args)
-    # TODO: this still errors
-    {}
-  end
-
   def update(exam:)
     range_add = GraphQL::Relay::RangeAdd.new(parent: exam, collection: exam.anomalies, item: object, context: context)
 

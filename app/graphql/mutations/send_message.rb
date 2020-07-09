@@ -19,18 +19,28 @@ module Mutations
       saved = msg.save
       raise GraphQL::ExecutionError, exam.errors.full_messages.to_sentence unless saved
 
-      trigger_subscription(exam)
+      trigger_subscription(exam, msg)
       {}
     end
 
     private
 
-    def trigger_subscription(exam)
-      HourglassSchema.subscriptions.trigger(
-        :message_was_sent,
-        { exam_id: HourglassSchema.id_from_object(exam, Types::ExamType, context) },
-        exam,
-      )
+    def trigger_subscription(exam, message)
+      case message
+      when Message
+        # Tell other profs a message was sent
+        HourglassSchema.subscriptions.trigger(
+          :message_was_sent,
+          { exam_id: HourglassSchema.id_from_object(exam, Types::ExamType, context) },
+          message,
+        )
+        # Tell the student they received a message
+        HourglassSchema.subscriptions.trigger(
+          :message_received,
+          { registration_id: HourglassSchema.id_from_object(message.registration, Types::RegistrationType, context) },
+          message,
+        )
+      end
     end
 
     def new_msg_for_obj(obj, context, message)

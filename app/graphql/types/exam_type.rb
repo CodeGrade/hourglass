@@ -24,7 +24,7 @@ module Types
 
     field :anomalies, Types::AnomalyType.connection_type, null: false
 
-    field :messages, [Types::MessageType], null: false
+    field :messages, Types::MessageType.connection_type, null: false
 
     field :version_announcements, [Types::VersionAnnouncementType], null: false
 
@@ -32,7 +32,7 @@ module Types
 
     field :exam_announcements, [Types::ExamAnnouncementType], null: false
 
-    field :questions, [Types::QuestionType], null: false
+    field :questions, Types::QuestionType.connection_type, null: false
 
     field :accommodations, Types::AccommodationType.connection_type, null: false
 

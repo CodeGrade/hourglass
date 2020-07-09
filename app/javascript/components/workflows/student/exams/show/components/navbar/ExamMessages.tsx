@@ -46,10 +46,19 @@ export const ShowMessage: React.FC<MessageProps> = (props) => {
   );
 };
 
-const newMessageSubscriptionSpec = graphql`
-  subscription ExamMessagesSubscription($examId: ID!) {
-    messageWasSent(examId: $examId) {
-      ...ExamMessages_all
+const messageReceivedSubscriptionSpec = graphql`
+  subscription ExamMessagesSubscription($registrationId: ID!) {
+    messageReceived(registrationId: $registrationId) {
+      message {
+        id
+        createdAt
+        body
+      }
+      messagesEdge {
+        node {
+          id
+        }
+      }
     }
   }
 `;
@@ -74,6 +83,7 @@ export const ShowExamMessages: React.FC<{
         body
       }
       myRegistration {
+        id
         room {
           roomAnnouncements {
             id
@@ -88,7 +98,7 @@ export const ShowExamMessages: React.FC<{
             body
           }
         }
-        messages {
+        messages(first: 10) @connection(key: "ExamMessages_messages", filters: []) { # TODO: paginate
           edges {
             node {
               id
@@ -102,13 +112,21 @@ export const ShowExamMessages: React.FC<{
     `,
     examKey,
   );
-  const subscriptionObject = useMemo(() => ({
-    subscription: newMessageSubscriptionSpec,
+  useSubscription(useMemo(() => ({
+    subscription: messageReceivedSubscriptionSpec,
     variables: {
-      examId: res.id,
+      registrationId: res.myRegistration.id,
     },
-  }), [res.id]);
-  useSubscription(subscriptionObject);
+    configs: [{
+      type: 'RANGE_ADD',
+      parentID: res.myRegistration.id,
+      connectionInfo: [{
+        key: 'ExamMessages_messages',
+        rangeBehavior: 'prepend',
+      }],
+      edgeName: 'messagesEdge',
+    }],
+  }), [res.id]));
 
   const personal: ExamMessage[] = res.myRegistration.messages.edges.map(({ node }) => ({
     type: 'personal',
@@ -212,7 +230,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
             createdAt
           }
         }
-        messages {
+        messages(first: 10) @connection(key: "ExamMessages_messages", filters: []) { # TODO: paginate
           edges {
             node {
               createdAt

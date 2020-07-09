@@ -26,7 +26,7 @@ module Types
 
     field :messages, Types::MessageType.connection_type, null: false
 
-    field :version_announcements, [Types::VersionAnnouncementType], null: false
+    field :version_announcements, Types::VersionAnnouncementType.connection_type, null: false
 
     field :room_announcements, [Types::RoomAnnouncementType], null: false
 

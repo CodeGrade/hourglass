@@ -266,18 +266,22 @@ export const ShowExamMessages: React.FC<{
     body: node.body,
     createdAt: DateTime.fromISO(node.createdAt),
   }));
-  const room: ExamMessage[] = res.myRegistration.room?.roomAnnouncements.edges.map(({ node: ra }) => ({
-    type: 'room',
-    id: ra.id,
-    body: ra.body,
-    createdAt: DateTime.fromISO(ra.createdAt),
-  })) ?? [];
-  const version: ExamMessage[] = res.myRegistration.examVersion.versionAnnouncements.edges.map(({ node: va }) => ({
-    type: 'version',
-    id: va.id,
-    body: va.body,
-    createdAt: DateTime.fromISO(va.createdAt),
-  }));
+  const room: ExamMessage[] = res.myRegistration.room?.roomAnnouncements.edges.map(
+    ({ node: ra }) => ({
+      type: 'room',
+      id: ra.id,
+      body: ra.body,
+      createdAt: DateTime.fromISO(ra.createdAt),
+    }),
+  ) ?? [];
+  const version: ExamMessage[] = res.myRegistration.examVersion.versionAnnouncements.edges.map(
+    ({ node: va }) => ({
+      type: 'version',
+      id: va.id,
+      body: va.body,
+      createdAt: DateTime.fromISO(va.createdAt),
+    }),
+  );
   const exam: ExamMessage[] = res.examAnnouncements.edges.map(({ node: ea }) => ({
     type: 'exam',
     id: ea.id,
@@ -389,13 +393,13 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   const dates: DateTime[] = res
     .examAnnouncements.edges.map(({ node: { createdAt } }) => DateTime.fromISO(createdAt))
     .concat(
-      res.myRegistration.room?.roomAnnouncements.map(
-        ({ createdAt }) => DateTime.fromISO(createdAt),
+      res.myRegistration.room?.roomAnnouncements.edges.map(
+         ({ node: { createdAt } }) => DateTime.fromISO(createdAt),
       ) ?? [],
     )
     .concat(
-      res.myRegistration.examVersion.versionAnnouncements.map(
-        ({ createdAt }) => DateTime.fromISO(createdAt),
+      res.myRegistration.examVersion.versionAnnouncements.edges.map(
+        ({ node: { createdAt } }) => DateTime.fromISO(createdAt),
       ),
     )
     .concat(res.myRegistration.messages.edges.map(({ node }) => DateTime.fromISO(node.createdAt)));

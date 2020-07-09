@@ -50,7 +50,6 @@ import {
   useSubscription,
   usePagination,
 } from 'relay-hooks';
-import { RangeAddConfig } from 'relay-runtime/lib/mutations/RelayDeclarativeMutationConfig';
 
 import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
 import { exams_recipients$key, exams_recipients$data } from './__generated__/exams_recipients.graphql';
@@ -59,7 +58,6 @@ import { exams_anomaly$key } from './__generated__/exams_anomaly.graphql';
 import { examsFinalizeItemMutation } from './__generated__/examsFinalizeItemMutation.graphql';
 import { examsDestroyAnomalyMutation } from './__generated__/examsDestroyAnomalyMutation.graphql';
 import { examsSendMessageMutation } from './__generated__/examsSendMessageMutation.graphql';
-import { examsNewAnomalySubscription } from './__generated__/examsNewAnomalySubscription.graphql';
 import { exams_messages$key } from './__generated__/exams_messages.graphql';
 
 export interface Recipient {

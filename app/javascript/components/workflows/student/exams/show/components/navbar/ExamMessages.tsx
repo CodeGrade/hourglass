@@ -9,10 +9,16 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import Icon from '@student/exams/show/components/Icon';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
-import { useFragment, graphql, useSubscription, useRelayEnvironment } from 'relay-hooks';
+import {
+  useFragment,
+  graphql,
+  useSubscription,
+  useRelayEnvironment,
+} from 'relay-hooks';
+import { GraphQLSubscriptionConfig, requestSubscription, OperationType } from 'relay-runtime';
+
 import { ExamMessages_all$key } from './__generated__/ExamMessages_all.graphql';
 import { ExamMessages_navbar$key } from './__generated__/ExamMessages_navbar.graphql';
-import { GraphQLSubscriptionConfig, requestSubscription, OperationType } from 'relay-runtime';
 
 export interface MessageProps {
   icon: IconType;

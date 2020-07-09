@@ -30,7 +30,7 @@ module Types
 
     field :room_announcements, [Types::RoomAnnouncementType], null: false
 
-    field :exam_announcements, [Types::ExamAnnouncementType], null: false
+    field :exam_announcements, Types::ExamAnnouncementType.connection_type, null: false
 
     field :questions, Types::QuestionType.connection_type, null: false
 

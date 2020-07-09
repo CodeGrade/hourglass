@@ -40,15 +40,14 @@ import { IconType } from 'react-icons';
 import './index.scss';
 import { BsListCheck } from 'react-icons/bs';
 import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
-import { QueryRenderer, graphql } from 'react-relay';
-import environment from '@hourglass/relay/environment';
-
+import { graphql } from 'react-relay';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import {
   useFragment,
   useMutation,
   useSubscription,
   usePagination,
+  useQuery,
 } from 'relay-hooks';
 
 import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
@@ -1702,51 +1701,44 @@ const ExamProctoring: React.FC = () => {
   const {
     examId,
   } = useParams();
+  const res = useQuery<examsProctorQuery>(
+    graphql`
+    query examsProctorQuery($examId: ID!) {
+      exam(id: $examId) {
+        ...exams_recipients
+        name
+        id
+      }
+    }
+    `,
+    { examId },
+  );
+  if (res.error) {
+    return <p>Error</p>;
+  }
+  if (!res.props) {
+    return <p>Loading...</p>;
+  }
   return (
-    <QueryRenderer<examsProctorQuery>
-      environment={environment}
-      query={graphql`
-        query examsProctorQuery($examId: ID!) {
-          exam(id: $examId) {
-            ...exams_recipients
-            name
-            id
-          }
-        }
-        `}
-      variables={{
-        examId,
-      }}
-      render={({ error, props }) => {
-        if (error) {
-          return <p>Error</p>;
-        }
-        if (!props) {
-          return <p>Loading...</p>;
-        }
-        return (
-          <DocumentTitle title={`${props.exam.name} - Proctoring`}>
-            <Container fluid>
-              <div className="wrapper vh-100">
-                <div className="inner-wrapper">
-                  <RegularNavbar className="row" />
-                  <Row>
-                    <Col>
-                      <h1>{props.exam.name}</h1>
-                    </Col>
-                  </Row>
-                  <div className="content-wrapper">
-                    <div className="content h-100">
-                      <ProctoringSplitView exam={props.exam} />
-                    </div>
-                  </div>
-                </div>
+    <DocumentTitle title={`${res.props.exam.name} - Proctoring`}>
+      <Container fluid>
+        <div className="wrapper vh-100">
+          <div className="inner-wrapper">
+            <RegularNavbar className="row" />
+            <Row>
+              <Col>
+                <h1>{res.props.exam.name}</h1>
+              </Col>
+            </Row>
+            <div className="content-wrapper">
+              <div className="content h-100">
+                <ProctoringSplitView exam={res.props.exam} />
               </div>
-            </Container>
-          </DocumentTitle>
-        );
-      }}
-    />
+            </div>
+          </div>
+        </div>
+      </Container>
+    </DocumentTitle>
   );
 };
 

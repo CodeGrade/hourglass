@@ -62,9 +62,12 @@ import ErrorBoundary from '@hourglass/common/boundary';
 import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import { QueryRenderer, graphql } from 'react-relay';
-import environment from '@hourglass/relay/environment';
-import { useFragment, useMutation } from 'relay-hooks';
+import {
+  graphql,
+  useFragment,
+  useMutation,
+  useQuery,
+} from 'relay-hooks';
 import { uploadFile } from '@hourglass/common/types/api';
 
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
@@ -864,58 +867,51 @@ const PreviewVersion: React.FC<{
 
 const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
+  const res = useQuery<adminExamQuery>(
+    graphql`
+    query adminExamQuery($examId: ID!) {
+      exam(id: $examId) {
+        id
+        name
+        startTime
+        endTime
+        duration
+        ...admin_examInfo
+        ...admin_checklist
+      }
+    }
+    `,
+    { examId },
+  );
+  if (res.error) {
+    return (
+      <>
+        <p>Error</p>
+        <p>{res.error.message}</p>
+      </>
+    );
+  }
+  if (!res.props) {
+    return <p>Loading...</p>;
+  }
   return (
-    <QueryRenderer<adminExamQuery>
-      environment={environment}
-      query={graphql`
-        query adminExamQuery($examId: ID!) {
-          exam(id: $examId) {
-            id
-            name
-            startTime
-            endTime
-            duration
-            ...admin_examInfo
-            ...admin_checklist
-          }
-        }
-        `}
-      variables={{
-        examId,
-      }}
-      render={({ error, props }) => {
-        if (error) {
-          return (
-            <>
-              <p>Error</p>
-              <p>{error.message}</p>
-            </>
-          );
-        }
-        if (!props) {
-          return <p>Loading...</p>;
-        }
-        return (
-          <DocumentTitle title={props.exam.name}>
-            <ExamInformation exam={props.exam} />
-            <Form.Group>
-              <TabbedChecklist
-                exam={props.exam}
-                examId={examId}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Link to={`/exams/${props.exam.id}/proctoring`}>
-                <Button variant="success">Proctor!</Button>
-              </Link>
-              <Link to={`/exams/${props.exam.id}/submissions`}>
-                <Button className="ml-2" variant="primary">View submissions</Button>
-              </Link>
-            </Form.Group>
-          </DocumentTitle>
-        );
-      }}
-    />
+    <DocumentTitle title={res.props.exam.name}>
+      <ExamInformation exam={res.props.exam} />
+      <Form.Group>
+        <TabbedChecklist
+          exam={res.props.exam}
+          examId={examId}
+        />
+      </Form.Group>
+      <Form.Group>
+        <Link to={`/exams/${res.props.exam.id}/proctoring`}>
+          <Button variant="success">Proctor!</Button>
+        </Link>
+        <Link to={`/exams/${res.props.exam.id}/submissions`}>
+          <Button className="ml-2" variant="primary">View submissions</Button>
+        </Link>
+      </Form.Group>
+    </DocumentTitle>
   );
 };
 

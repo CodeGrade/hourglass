@@ -14,7 +14,7 @@ class Message < ApplicationRecord
   delegate :proctors_and_professors, to: :exam
   delegate :visible_to?, to: :registration
 
-  validate :sent_by_proctor
+  validate :sent_by_proctor, if: :sender
 
   def sent_by_proctor
     return if exam.proctors_and_professors.exists? sender.id

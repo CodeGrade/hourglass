@@ -96,6 +96,7 @@ const SendQuestion: React.FC<{
   return (
     <>
       <Form.Control
+        maxLength={2000}
         value={val}
         onChange={(event): void => {
           setVal(event.target.value);

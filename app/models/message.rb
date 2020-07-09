@@ -7,7 +7,7 @@ class Message < ApplicationRecord
 
   validates :sender, presence: true
   validates :registration, presence: true
-  validates :body, presence: true
+  validates :body, presence: true, length: { maximum: 2000 }
 
   delegate :exam, to: :registration
 

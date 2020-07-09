@@ -47,7 +47,7 @@ export const ShowMessage: React.FC<MessageProps> = (props) => {
       </span>
       <Media.Body>
         <p className="m-0"><i className="text-muted">{`(sent ${time.toLocaleString(DateTime.TIME_SIMPLE)})`}</i></p>
-        <p>{body}</p>
+        <p className="wrap-anywhere">{body}</p>
       </Media.Body>
     </Media>
   );

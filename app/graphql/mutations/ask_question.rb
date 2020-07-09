@@ -18,7 +18,7 @@ module Mutations
     def resolve(registration:, body:)
       q = Question.new(registration: registration, body: body)
       saved = q.save
-      raise GraphQL::ExecutionError, q.errors_full_messages.to_sentence unless saved
+      raise GraphQL::ExecutionError, q.errors.full_messages.to_sentence unless saved
 
       trigger_subscription(registration.exam, q)
 

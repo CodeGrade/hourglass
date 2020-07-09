@@ -127,6 +127,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
   const {
     examKey,
   } = props;
+  // TODO: paginate
   const res = useFragment(
     graphql`
     fragment AskQuestion on Exam {

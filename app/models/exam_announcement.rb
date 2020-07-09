@@ -8,13 +8,4 @@ class ExamAnnouncement < ApplicationRecord
   validates :body, presence: true
 
   delegate :visible_to?, to: :exam
-
-  def serialize
-    {
-      id: id,
-      body: body,
-      time: created_at,
-      type: 'exam',
-    }
-  end
 end

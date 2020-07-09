@@ -80,6 +80,24 @@ const newExamAnnouncementSubscriptionSpec = graphql`
   }
 `;
 
+const versionAnnouncementReceivedSpec = graphql`
+  subscription ExamMessagesNewVersionAnnouncementSubscription($examVersionId: ID!) {
+    versionAnnouncementReceived(examVersionId: $examVersionId) {
+      versionAnnouncement {
+        id
+        createdAt
+        body
+      }
+      versionAnnouncementsEdge {
+        node {
+          id
+        }
+      }
+    }
+  }
+`;
+
+
 export const ShowExamMessages: React.FC<{
   examKey: ExamMessages_all$key;
   lastViewed: DateTime;
@@ -113,10 +131,15 @@ export const ShowExamMessages: React.FC<{
           }
         }
         examVersion {
-          versionAnnouncements {
-            id
-            createdAt
-            body
+          id
+          versionAnnouncements(first: 10) @connection(key: "ExamMessages_versionAnnouncements", filters: []) { # TODO: paginate
+            edges {
+              node {
+                id
+                createdAt
+                body
+              }
+            }
           }
         }
         messages(first: 10) @connection(key: "ExamMessages_messages", filters: []) { # TODO: paginate
@@ -165,6 +188,23 @@ export const ShowExamMessages: React.FC<{
     }],
   }), [res.id]));
 
+  useSubscription(useMemo(() => ({
+    subscription: versionAnnouncementReceivedSpec,
+    variables: {
+      examVersionId: res.myRegistration.examVersion.id,
+    },
+    configs: [{
+      type: 'RANGE_ADD',
+      parentID: res.myRegistration.examVersion.id,
+      connectionInfo: [{
+        key: 'ExamMessages_versionAnnouncements',
+        rangeBehavior: 'prepend',
+      }],
+      edgeName: 'versionAnnouncementsEdge',
+    }],
+  }), [res.id]));
+
+
   const personal: ExamMessage[] = res.myRegistration.messages.edges.map(({ node }) => ({
     type: 'personal',
     id: node.id,
@@ -177,7 +217,7 @@ export const ShowExamMessages: React.FC<{
     body: ra.body,
     createdAt: DateTime.fromISO(ra.createdAt),
   })) ?? [];
-  const version: ExamMessage[] = res.myRegistration.examVersion.versionAnnouncements.map((va) => ({
+  const version: ExamMessage[] = res.myRegistration.examVersion.versionAnnouncements.edges.map(({ node: va }) => ({
     type: 'version',
     id: va.id,
     body: va.body,
@@ -267,8 +307,12 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
           }
         }
         examVersion {
-          versionAnnouncements {
-            createdAt
+          versionAnnouncements(first: 10) @connection(key: "ExamMessages_versionAnnouncements", filters: []) { # TODO: paginate
+            edges {
+              node {
+                createdAt
+              }
+            }
           }
         }
         messages(first: 10) @connection(key: "ExamMessages_messages", filters: []) { # TODO: paginate

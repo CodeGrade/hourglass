@@ -1,6 +1,6 @@
 <% @page_title = "Log in" %>
 
-<%= react_component 'common/navbar' %>
+<%= react_component 'common/navbar/NotLoggedIn' %>
 <div class="container">
   <% unless flash.empty? %>
     <% flash.each do |key, value| %>

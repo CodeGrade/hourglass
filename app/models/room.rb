@@ -24,4 +24,8 @@ class Room < ApplicationRecord
   def has_registrations?
     registrations.exists?
   end
+
+  def students
+    User.where(id: registrations.select(:user_id))
+  end
 end

@@ -27,12 +27,24 @@ module Types
     field :messages, Types::MessageType.connection_type, null: false
 
     field :version_announcements, Types::VersionAnnouncementType.connection_type, null: false
+    def version_announcements
+      object.version_announcements.order(created_at: :desc)
+    end
 
-    field :room_announcements, [Types::RoomAnnouncementType], null: false
+    field :room_announcements, Types::RoomAnnouncementType.connection_type, null: false
+    def room_announcements
+      object.room_announcements.order(created_at: :desc)
+    end
 
     field :exam_announcements, Types::ExamAnnouncementType.connection_type, null: false
+    def exam_announcements
+      object.exam_announcements.order(created_at: :desc)
+    end
 
     field :questions, Types::QuestionType.connection_type, null: false
+    def questions
+      object.questions.order(created_at: :desc)
+    end
 
     field :accommodations, Types::AccommodationType.connection_type, null: false
 

@@ -174,7 +174,7 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
             {`${tooltip} (${time.toLocaleString(DateTime.TIME_SIMPLE)})`}
           </i>
         </p>
-        <p>{body}</p>
+        <p className="wrap-anywhere">{body}</p>
       </Media.Body>
     </Media>
   );

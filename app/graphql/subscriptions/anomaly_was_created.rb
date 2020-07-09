@@ -19,7 +19,8 @@ class Subscriptions::AnomalyWasCreated < Subscriptions::BaseSubscription
   end
 
   def subscribe(**_args)
-    :no_content
+    # TODO: this still errors
+    {}
   end
 
   def update(exam:)

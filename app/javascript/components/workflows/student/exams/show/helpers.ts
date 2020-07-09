@@ -1,11 +1,3 @@
-import {
-  RailsExamMessage,
-  ExamMessage,
-  RailsExamQuestion,
-  ProfQuestion,
-} from '@student/exams/show/types';
-import { DateTime } from 'luxon';
-
 export function getCSRFToken(): string {
   const elem: HTMLMetaElement = document.querySelector('[name=csrf-token]');
   return elem?.content ?? '';
@@ -42,19 +34,4 @@ export function scrollToQuestion(qnum: number, pnum?: number, smooth?: boolean):
   } else {
     scrollToElem(`question-${qnum}`, smooth);
   }
-}
-
-export function convertMsgs(msgs: RailsExamMessage[]): ExamMessage[] {
-  return msgs.map((m) => ({
-    ...m,
-    time: DateTime.fromISO(m.time),
-  }));
-}
-
-export function convertQs(qs: RailsExamQuestion[]): ProfQuestion[] {
-  return qs.map((m) => ({
-    ...m,
-    status: 'SENT',
-    time: DateTime.fromISO(m.time),
-  }));
 }

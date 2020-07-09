@@ -57,5 +57,7 @@ module Types
     def archive_export_url
       Rails.application.routes.url_helpers.export_archive_api_professor_version_path(object)
     end
+
+    field :version_announcements, [Types::VersionAnnouncementType], null: false
   end
 end

@@ -7,9 +7,7 @@ export type ExamTakerAction =
   LockdownAction |
   PaginationAction |
   ContentsAction |
-  SnapshotAction |
-  MessagesAction |
-  ProfQuestionAction;
+  SnapshotAction;
 
 export type Thunk = ThunkAction<void, ExamTakerState, unknown, ExamTakerAction>;
 export type ExamTakerDispatch = ThunkDispatch<ExamTakerState, unknown, ExamTakerAction>;
@@ -26,13 +24,6 @@ export interface AnomalousReponse {
   type: 'ANOMALOUS';
 }
 
-interface RailsAllExamMessages {
-  personal: RailsExamMessage[];
-  room: RailsExamMessage[];
-  version: RailsExamMessage[];
-  exam: RailsExamMessage[];
-}
-
 export interface ContentsResponse {
   type: 'CONTENTS';
 
@@ -41,10 +32,6 @@ export interface ContentsResponse {
   exam: ExamVersion;
 
   answers: AnswersState;
-
-  messages: RailsAllExamMessages;
-
-  questions: RailsExamQuestion[];
 }
 
 export interface RailsExamQuestion {
@@ -129,8 +116,6 @@ export interface LoadExamAction {
   exam: ExamVersion;
   time: TimeInfo;
   answers: AnswersState;
-  messages: AllExamMessages;
-  questions: ProfQuestion[];
 }
 
 export type ContentsAction = UpdateAnswerAction | UpdateScratchAction;
@@ -171,7 +156,6 @@ export interface SnapshotFailure {
 
 export interface SnapshotSaveResult {
   lockout: boolean;
-  messages: RailsAllExamMessages;
 }
 
 export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure;
@@ -222,93 +206,17 @@ export interface ExamTakerState {
   // Pagination information.
   pagination: PaginationState;
 
-  // Professor messages / anouncements.
-  messages: MessagesState;
-
-  // Questions the current user has sent to professors.
-  questions: ProfQuestionState;
-
   // The current state of saving snapshots.
   snapshot: SnapshotState;
-}
-
-export interface ProfQuestionState {
-  lastId: number;
-  questions: ProfQuestion[];
-}
-
-export interface ProfQuestion {
-  id: number;
-
-  time: DateTime;
-
-  status: ProfQuestionStatus;
-
-  body: string;
-}
-
-export type ProfQuestionStatus = 'SENDING' | 'FAILED' | 'SENT';
-
-export type ProfQuestionAction =
-  SetQuestionsAction |
-  QuestionAskedAction | QuestionFailedAction | QuestionSucceededAction;
-
-export interface SetQuestionsAction {
-  type: 'SET_QUESTIONS';
-  questions: ProfQuestion[];
-}
-
-export interface QuestionAskedAction {
-  type: 'QUESTION_ASKED';
-  id: number;
-  body: string;
-}
-
-export interface QuestionFailedAction {
-  type: 'QUESTION_FAILED';
-  id: number;
-}
-
-export interface QuestionSucceededAction {
-  type: 'QUESTION_SUCCEEDED';
-  id: number;
-}
-
-export interface MessagesState {
-  lastView: DateTime;
-
-  messages: AllExamMessages;
 }
 
 export type ExamMessageType = 'personal' | 'room' | 'version' | 'exam';
 
 export interface ExamMessage {
-  body: string;
-
-  time: DateTime;
-
+  id: string;
   type: ExamMessageType;
-
-  // Rails ID of the message.
-  id: number;
-}
-
-export interface AllExamMessages {
-  personal: ExamMessage[];
-  room: ExamMessage[];
-  version: ExamMessage[];
-  exam: ExamMessage[];
-}
-
-export type MessagesAction = MessageReceivedAction | MessagesOpenedAction;
-
-export interface MessagesOpenedAction {
-  type: 'MESSAGES_OPENED';
-}
-
-export interface MessageReceivedAction {
-  type: 'MESSAGE_RECEIVED';
-  msg: ExamMessage;
+  body: string;
+  createdAt: DateTime;
 }
 
 export enum SnapshotStatus {

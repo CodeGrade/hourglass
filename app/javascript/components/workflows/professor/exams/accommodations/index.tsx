@@ -410,7 +410,7 @@ const ManageAccommodations: React.FC<{
     fragment accommodations_all on Exam {
       id
       ...accommodations_regsWithout
-      accommodations(first: 100) @connection(key: "Exam_accommodations", filters: []) {
+      accommodations(first: 100000) @connection(key: "Exam_accommodations", filters: []) {
         edges {
           node {
             id

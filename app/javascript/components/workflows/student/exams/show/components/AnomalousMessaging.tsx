@@ -1,28 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, Row, Col } from 'react-bootstrap';
-import AskQuestion from '@student/exams/show/containers/navbar/AskQuestion';
-import { ExamMessagesStandalone } from '@student/exams/show/containers/navbar/ExamMessages';
+import AskQuestion from '@student/exams/show/components/navbar/AskQuestion';
+import { ShowExamMessages } from '@student/exams/show/components/navbar/ExamMessages';
+import { DateTime } from 'luxon';
+import { useFragment, graphql } from 'relay-hooks';
+
+import { AnomalousMessaging$key } from './__generated__/AnomalousMessaging.graphql';
 
 const AnomalousMessaging: React.FC<{
-  examQuestionsUrl: string;
-  disabled: boolean;
-  refreshMessages: () => void;
-  loadQuestions: () => void;
+  examKey: AnomalousMessaging$key;
 }> = (props) => {
   const {
-    examQuestionsUrl,
-    disabled,
-    refreshMessages,
-    loadQuestions,
+    examKey,
   } = props;
-  useEffect(() => {
-    loadQuestions();
-    refreshMessages();
-    const timer = setInterval(refreshMessages, 5000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+  const [lastViewed, setLastViewed] = useState(DateTime.fromSeconds(0));
+  const res = useFragment(
+    graphql`
+    fragment AnomalousMessaging on Exam {
+      ...AskQuestion
+      ...ExamMessages_all
+    }
+    `,
+    examKey,
+  );
   return (
     <Row>
       <Col>
@@ -31,10 +31,7 @@ const AnomalousMessaging: React.FC<{
             <Card.Title>
               <h2>Ask a question</h2>
             </Card.Title>
-            <AskQuestion
-              disabled={disabled}
-              examQuestionsUrl={examQuestionsUrl}
-            />
+            <AskQuestion examKey={res} />
           </Card.Body>
         </Card>
       </Col>
@@ -44,7 +41,13 @@ const AnomalousMessaging: React.FC<{
             <Card.Title>
               <h2>Received Messages</h2>
             </Card.Title>
-            <ExamMessagesStandalone disabled={disabled} />
+            <ShowExamMessages
+              examKey={res}
+              lastViewed={lastViewed}
+              onMessagesOpened={() => {
+                setLastViewed(DateTime.local());
+              }}
+            />
           </Card.Body>
         </Card>
       </Col>

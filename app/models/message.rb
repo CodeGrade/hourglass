@@ -18,13 +18,4 @@ class Message < ApplicationRecord
 
     errors.add(:sender, 'must be a professor')
   end
-
-  def serialize
-    {
-      id: id,
-      body: body,
-      time: created_at,
-      type: 'personal',
-    }
-  end
 end

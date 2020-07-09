@@ -8,13 +8,4 @@ class RoomAnnouncement < ApplicationRecord
   validates :body, presence: true
 
   delegate :exam, to: :room
-
-  def serialize
-    {
-      id: id,
-      body: body,
-      time: created_at,
-      type: 'room',
-    }
-  end
 end

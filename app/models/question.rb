@@ -8,12 +8,4 @@ class Question < ApplicationRecord
 
   validates :registration, presence: true
   validates :body, presence: true, length: { maximum: 2000 }
-
-  def serialize
-    {
-      body: body,
-      time: created_at,
-      id: id,
-    }
-  end
 end

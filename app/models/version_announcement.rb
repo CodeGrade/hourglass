@@ -12,13 +12,4 @@ class VersionAnnouncement < ApplicationRecord
   def visible_to?(check_user)
     exam.proctors_and_professors.or(exam_version.students).exists? check_user.id
   end
-
-  def serialize
-    {
-      id: id,
-      body: body,
-      time: created_at,
-      type: 'version',
-    }
-  end
 end

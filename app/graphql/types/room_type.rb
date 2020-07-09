@@ -10,6 +10,6 @@ module Types
     field :registrations, [Types::RegistrationType], null: false
     field :proctor_registrations, [Types::ProctorRegistrationType], null: false
 
-    field :room_announcements, [Types::RoomAnnouncementType], null: false
+    field :room_announcements, Types::RoomAnnouncementType.connection_type, null: false
   end
 end

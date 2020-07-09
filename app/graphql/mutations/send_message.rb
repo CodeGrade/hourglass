@@ -59,6 +59,19 @@ module Mutations
           { exam_version_id: HourglassSchema.id_from_object(message.exam_version, Types::ExamVersionType, context) },
           message,
         )
+      when RoomAnnouncement
+        # profs
+        HourglassSchema.subscriptions.trigger(
+          :room_announcement_was_sent,
+          { exam_id: HourglassSchema.id_from_object(message.room.exam, Types::ExamType, context) },
+          message,
+        )
+        # students
+        HourglassSchema.subscriptions.trigger(
+          :room_announcement_received,
+          { room_id: HourglassSchema.id_from_object(message.room, Types::RoomType, context) },
+          message,
+        )
       end
     end
 

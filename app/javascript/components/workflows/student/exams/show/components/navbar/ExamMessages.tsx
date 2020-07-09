@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ExamMessage } from '@student/exams/show/types';
 import { Media } from 'react-bootstrap';
 import { DateTime } from 'luxon';
@@ -9,9 +9,10 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import Icon from '@student/exams/show/components/Icon';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
-import { useFragment, graphql, useSubscription } from 'relay-hooks';
+import { useFragment, graphql, useSubscription, useRelayEnvironment } from 'relay-hooks';
 import { ExamMessages_all$key } from './__generated__/ExamMessages_all.graphql';
 import { ExamMessages_navbar$key } from './__generated__/ExamMessages_navbar.graphql';
+import { GraphQLSubscriptionConfig, requestSubscription, OperationType } from 'relay-runtime';
 
 export interface MessageProps {
   icon: IconType;
@@ -97,6 +98,37 @@ const versionAnnouncementReceivedSpec = graphql`
   }
 `;
 
+const roomAnnouncementReceivedSpec = graphql`
+  subscription ExamMessagesNewRoomAnnouncementSubscription($roomId: ID!) {
+    roomAnnouncementReceived(roomId: $roomId) {
+      roomAnnouncement {
+        id
+        createdAt
+        body
+      }
+      roomAnnouncementsEdge {
+        node {
+          id
+        }
+      }
+    }
+  }
+`;
+
+function useConditionalSubscription<TSubscriptionPayload extends OperationType>(
+  config: GraphQLSubscriptionConfig<TSubscriptionPayload>,
+  condition: boolean,
+): void {
+  const environment = useRelayEnvironment();
+
+  useEffect(() => {
+    if (condition) {
+      const { dispose } = requestSubscription(environment, config);
+      return dispose;
+    }
+    return () => undefined;
+  }, [condition, environment, config]);
+}
 
 export const ShowExamMessages: React.FC<{
   examKey: ExamMessages_all$key;
@@ -124,10 +156,15 @@ export const ShowExamMessages: React.FC<{
       myRegistration {
         id
         room {
-          roomAnnouncements {
-            id
-            createdAt
-            body
+          id
+          roomAnnouncements(first: 10) @connection(key: "ExamMessages_roomAnnouncements", filters: []) { # TODO: paginate
+            edges {
+              node {
+                id
+                createdAt
+                body
+              }
+            }
           }
         }
         examVersion {
@@ -202,8 +239,26 @@ export const ShowExamMessages: React.FC<{
       }],
       edgeName: 'versionAnnouncementsEdge',
     }],
-  }), [res.id]));
+  }), [res.myRegistration.examVersion.id]));
 
+  useConditionalSubscription(
+    useMemo(() => ({
+      subscription: roomAnnouncementReceivedSpec,
+      variables: {
+        roomId: res.myRegistration.room?.id,
+      },
+      configs: [{
+        type: 'RANGE_ADD',
+        parentID: res.myRegistration.room?.id,
+        connectionInfo: [{
+          key: 'ExamMessages_roomAnnouncements',
+          rangeBehavior: 'prepend',
+        }],
+        edgeName: 'roomAnnouncementsEdge',
+      }],
+    }), [res.myRegistration.room?.id]),
+    !!res.myRegistration.room,
+  );
 
   const personal: ExamMessage[] = res.myRegistration.messages.edges.map(({ node }) => ({
     type: 'personal',
@@ -211,7 +266,7 @@ export const ShowExamMessages: React.FC<{
     body: node.body,
     createdAt: DateTime.fromISO(node.createdAt),
   }));
-  const room: ExamMessage[] = res.myRegistration.room?.roomAnnouncements.map((ra) => ({
+  const room: ExamMessage[] = res.myRegistration.room?.roomAnnouncements.edges.map(({ node: ra }) => ({
     type: 'room',
     id: ra.id,
     body: ra.body,
@@ -302,8 +357,12 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
       }
       myRegistration {
         room {
-          roomAnnouncements {
-            createdAt
+          roomAnnouncements(first: 10) @connection(key: "ExamMessages_roomAnnouncements", filters: []) { # TODO: paginate
+            edges {
+              node {
+                createdAt
+              }
+            }
           }
         }
         examVersion {

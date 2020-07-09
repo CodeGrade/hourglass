@@ -930,6 +930,26 @@ enum MessagesTab {
   Sent = 'sent',
 }
 
+const newRoomAnnouncementSubscriptionSpec = graphql`
+  subscription examsNewRoomAnnouncementSubscription($examId: ID!) {
+    roomAnnouncementWasSent(examId: $examId) {
+      roomAnnouncement {
+        id
+        createdAt
+        body
+        room {
+          name
+        }
+      }
+      roomAnnouncementsEdge {
+        node {
+          id
+        }
+      }
+    }
+  }
+`;
+
 const newVersionAnnouncementSubscriptionSpec = graphql`
   subscription examsNewVersionAnnouncementSubscription($examId: ID!) {
     versionAnnouncementWasSent(examId: $examId) {
@@ -1107,6 +1127,22 @@ const Loaded: React.FC<{
     }],
   }), [examId]));
 
+  useSubscription(useMemo(() => ({
+    subscription: newRoomAnnouncementSubscriptionSpec,
+    variables: {
+      examId,
+    },
+    configs: [{
+      type: 'RANGE_ADD',
+      parentID: examId,
+      connectionInfo: [{
+        key: 'Exam_roomAnnouncements',
+        rangeBehavior: 'prepend',
+      }],
+      edgeName: 'roomAnnouncementsEdge',
+    }],
+  }), [examId]));
+
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
 
   return (
@@ -1246,12 +1282,16 @@ const ExamMessages: React.FC<{
             }
           }
         }
-        roomAnnouncements {
-          id
-          createdAt
-          body
-          room {
-            name
+        roomAnnouncements(first: 30) @connection(key: "Exam_roomAnnouncements", filters: []) { # TODO: paginate
+          edges {
+            node {
+              id
+              createdAt
+              body
+              room {
+                name
+              }
+            }
           }
         }
         examAnnouncements(first: 30) @connection(key: "Exam_examAnnouncements", filters: []) { # TODO: paginate
@@ -1334,7 +1374,7 @@ const ExamMessages: React.FC<{
           body: ea.body,
           time: DateTime.fromISO(ea.createdAt),
         })),
-        room: res.roomAnnouncements.map((ra) => ({
+        room: res.roomAnnouncements.edges.map(({ node: ra }) => ({
           type: MessageType.Room,
           id: ra.id,
           body: ra.body,

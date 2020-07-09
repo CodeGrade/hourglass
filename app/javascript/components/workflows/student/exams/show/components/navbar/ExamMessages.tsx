@@ -63,6 +63,23 @@ const messageReceivedSubscriptionSpec = graphql`
   }
 `;
 
+const newExamAnnouncementSubscriptionSpec = graphql`
+  subscription ExamMessagesNewAnnouncementSubscription($examId: ID!) {
+    examAnnouncementWasSent(examId: $examId) {
+      examAnnouncement {
+        id
+        createdAt
+        body
+      }
+      examAnnouncementsEdge {
+        node {
+          id
+        }
+      }
+    }
+  }
+`;
+
 export const ShowExamMessages: React.FC<{
   examKey: ExamMessages_all$key;
   lastViewed: DateTime;
@@ -77,10 +94,14 @@ export const ShowExamMessages: React.FC<{
     graphql`
     fragment ExamMessages_all on Exam {
       id
-      examAnnouncements {
-        id
-        createdAt
-        body
+      examAnnouncements(first: 10) @connection(key: "ExamMessages_examAnnouncements", filters: []) { # TODO: paginate
+        edges {
+          node {
+            id
+            createdAt
+            body
+          }
+        }
       }
       myRegistration {
         id
@@ -128,6 +149,22 @@ export const ShowExamMessages: React.FC<{
     }],
   }), [res.id]));
 
+  useSubscription(useMemo(() => ({
+    subscription: newExamAnnouncementSubscriptionSpec,
+    variables: {
+      examId: res.id,
+    },
+    configs: [{
+      type: 'RANGE_ADD',
+      parentID: res.id,
+      connectionInfo: [{
+        key: 'ExamMessages_examAnnouncements',
+        rangeBehavior: 'prepend',
+      }],
+      edgeName: 'examAnnouncementsEdge',
+    }],
+  }), [res.id]));
+
   const personal: ExamMessage[] = res.myRegistration.messages.edges.map(({ node }) => ({
     type: 'personal',
     id: node.id,
@@ -146,7 +183,7 @@ export const ShowExamMessages: React.FC<{
     body: va.body,
     createdAt: DateTime.fromISO(va.createdAt),
   }));
-  const exam: ExamMessage[] = res.examAnnouncements.map((ea) => ({
+  const exam: ExamMessage[] = res.examAnnouncements.edges.map(({ node: ea }) => ({
     type: 'exam',
     id: ea.id,
     body: ea.body,
@@ -216,8 +253,12 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
     graphql`
     fragment ExamMessages_navbar on Exam {
       ...ExamMessages_all
-      examAnnouncements {
-        createdAt
+      examAnnouncements(first: 10) @connection(key: "ExamMessages_examAnnouncements", filters: []) { # TODO: paginate
+        edges {
+          node {
+            createdAt
+          }
+        }
       }
       myRegistration {
         room {
@@ -243,7 +284,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
     examKey,
   );
   const dates: DateTime[] = res
-    .examAnnouncements.map(({ createdAt }) => DateTime.fromISO(createdAt))
+    .examAnnouncements.edges.map(({ node: { createdAt } }) => DateTime.fromISO(createdAt))
     .concat(
       res.myRegistration.room?.roomAnnouncements.map(
         ({ createdAt }) => DateTime.fromISO(createdAt),

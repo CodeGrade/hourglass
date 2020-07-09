@@ -40,6 +40,12 @@ module Mutations
           { registration_id: HourglassSchema.id_from_object(message.registration, Types::RegistrationType, context) },
           message,
         )
+      when ExamAnnouncement
+        HourglassSchema.subscriptions.trigger(
+          :exam_announcement_was_sent,
+          { exam_id: HourglassSchema.id_from_object(exam, Types::ExamType, context) },
+          message,
+        )
       end
     end
 

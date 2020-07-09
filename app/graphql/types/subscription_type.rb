@@ -6,5 +6,6 @@ module Types
     field :message_was_sent, subscription: Subscriptions::MessageWasSent
     field :message_received, subscription: Subscriptions::MessageReceived
     field :question_was_asked, subscription: Subscriptions::QuestionWasAsked
+    field :exam_announcement_was_sent, subscription: Subscriptions::ExamAnnouncementWasSent
   end
 end

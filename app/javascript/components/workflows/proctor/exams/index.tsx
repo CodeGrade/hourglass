@@ -930,6 +930,24 @@ enum MessagesTab {
   Sent = 'sent',
 }
 
+const newExamAnnouncementSubscriptionSpec = graphql`
+  subscription examsNewAnnouncementSubscription($examId: ID!) {
+    examAnnouncementWasSent(examId: $examId) {
+      examAnnouncement {
+        id
+        createdAt
+        body
+      }
+      examAnnouncementsEdge {
+        node {
+          id
+        }
+      }
+    }
+  }
+`;
+
+
 const newMessageSubscriptionSpec = graphql`
   subscription examsNewMessageSubscription($examId: ID!) {
     messageWasSent(examId: $examId) {
@@ -1034,6 +1052,22 @@ const Loaded: React.FC<{
         rangeBehavior: 'prepend',
       }],
       edgeName: 'questionsEdge',
+    }],
+  }), [examId]));
+
+  useSubscription(useMemo(() => ({
+    subscription: newExamAnnouncementSubscriptionSpec,
+    variables: {
+      examId,
+    },
+    configs: [{
+      type: 'RANGE_ADD',
+      parentID: examId,
+      connectionInfo: [{
+        key: 'Exam_examAnnouncements',
+        rangeBehavior: 'prepend',
+      }],
+      edgeName: 'examAnnouncementsEdge',
     }],
   }), [examId]));
 
@@ -1180,10 +1214,14 @@ const ExamMessages: React.FC<{
             name
           }
         }
-        examAnnouncements {
-          id
-          createdAt
-          body
+        examAnnouncements(first: 30) @connection(key: "Exam_examAnnouncements", filters: []) { # TODO: paginate
+          edges {
+            node {
+              id
+              createdAt
+              body
+            }
+          }
         }
         questions(first: 30) @connection(key: "Exam_questions", filters: []) { # TODO: paginate
           edges {
@@ -1250,7 +1288,7 @@ const ExamMessages: React.FC<{
           version: va.examVersion,
           time: DateTime.fromISO(va.createdAt),
         })),
-        exam: res.examAnnouncements.map((ea) => ({
+        exam: res.examAnnouncements.edges.map(({ node: ea }) => ({
           type: MessageType.Exam,
           id: ea.id,
           body: ea.body,

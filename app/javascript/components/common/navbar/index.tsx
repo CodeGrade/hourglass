@@ -6,12 +6,11 @@ import {
 } from 'react-bootstrap';
 import { getCSRFToken } from '@student/exams/show/helpers';
 import { Link } from 'react-router-dom';
-import environment from '@hourglass/relay/environment';
-import { QueryRenderer, graphql } from 'react-relay';
-import { useFragment } from 'relay-hooks';
+import { graphql, useFragment, useQuery } from 'relay-hooks';
 import { navbarQuery } from './__generated__/navbarQuery.graphql';
 
 import { navbar_me$key } from './__generated__/navbar_me.graphql';
+import NotLoggedIn from './NotLoggedIn';
 
 function logOut(): void {
   const url = '/users/sign_out';
@@ -78,39 +77,24 @@ const RegularNavbar: React.FC<{
   );
 };
 
-const NavbarLogin: React.FC = () => (
-  <Navbar
-    bg="light"
-    expand="md"
-  >
-    <Navbar.Brand>
-      <a href="/">Hourglass</a>
-    </Navbar.Brand>
-  </Navbar>
-);
-
 const RN: React.FC<{
   className?: string;
-}> = ({ className }) => (
-  <QueryRenderer<navbarQuery>
-    environment={environment}
-    query={graphql`
-      query navbarQuery {
-        me {
-          ...navbar_me
-        }
+}> = ({ className }) => {
+  const res = useQuery<navbarQuery>(
+    graphql`
+    query navbarQuery {
+      me {
+        ...navbar_me
       }
-      `}
-    variables={{}}
-    render={({ error, props }) => {
-      if (error || !props) {
-        return <NavbarLogin />;
-      }
-      return (
-        <RegularNavbar className={className} me={props.me} />
-      );
-    }}
-  />
-);
+    }
+    `,
+  );
+  if (res.error || !res.props) {
+    return <NotLoggedIn />;
+  }
+  return (
+    <RegularNavbar className={className} me={res.props.me} />
+  );
+};
 
 export default RN;

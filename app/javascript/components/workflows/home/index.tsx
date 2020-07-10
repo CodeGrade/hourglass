@@ -9,11 +9,14 @@ import {
 } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
 import Select from 'react-select';
+import { Button } from 'react-bootstrap';
+import LinkButton from '@hourglass/common/linkbutton';
 
 import { homeQuery } from './__generated__/homeQuery.graphql';
 import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
 import { home_profregs$key } from './__generated__/home_profregs.graphql';
 import { home_proctorregs$key } from './__generated__/home_proctorregs.graphql';
+import { home_staffregs$key } from './__generated__/home_staffregs.graphql';
 
 const ShowRegistrations: React.FC<{
   registrations: home_studentregs$key;
@@ -79,6 +82,53 @@ const ShowProctorRegs: React.FC<{
               {reg.exam.name}
             </Link>
           </li>
+        ))}
+      </ul>
+    </>
+  );
+};
+
+const ShowStaffRegs: React.FC<{
+  staffRegistrations: home_staffregs$key;
+}> = (props) => {
+  const {
+    staffRegistrations,
+  } = props;
+  const regs = useFragment(
+    graphql`
+    fragment home_staffregs on StaffRegistration @relay(plural: true) {
+      id
+      course {
+        exams {
+          id
+          name
+        }
+      }
+    }
+    `,
+    staffRegistrations,
+  );
+  if (regs.length === 0) return null;
+  return (
+    <>
+      <h1>Exams to Grade</h1>
+      <ul>
+        {regs.map((r) => (
+          <React.Fragment key={r.id}>
+            {r.course.exams.map((exam) => (
+              <li
+                key={exam.id}
+              >
+                <h2>{exam.name}</h2>
+                <LinkButton to={`/exams/${exam.id}/grading`} variant="success">
+                  Start Grading
+                </LinkButton>
+                <Button className="ml-2" disabled>
+                  Re-grade
+                </Button>
+              </li>
+            ))}
+          </React.Fragment>
         ))}
       </ul>
     </>
@@ -194,6 +244,11 @@ const Home: React.FC = () => {
             ...home_studentregs
           }
         }
+        staffRegistrations {
+          nodes {
+            ...home_staffregs
+          }
+        }
         proctorRegistrations {
           nodes {
             ...home_proctorregs
@@ -218,6 +273,7 @@ const Home: React.FC = () => {
     res.props.me.registrations.nodes.length === 0
     && res.props.me.professorCourseRegistrations.nodes.length === 0
     && res.props.me.proctorRegistrations.nodes.length === 0
+    && res.props.me.staffRegistrations.nodes.length === 0
   );
   return (
     <DocumentTitle title="My Exams">
@@ -231,6 +287,9 @@ const Home: React.FC = () => {
       />
       <ShowProctorRegs
         proctorRegistrations={res.props.me.proctorRegistrations.nodes}
+      />
+      <ShowStaffRegs
+        staffRegistrations={res.props.me.staffRegistrations.nodes}
       />
       <ShowProfRegs
         professorCourseRegistrations={res.props.me.professorCourseRegistrations.nodes}

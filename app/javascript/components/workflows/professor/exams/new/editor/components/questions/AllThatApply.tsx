@@ -26,13 +26,6 @@ interface AllThatApplyProps {
   bnum: number;
 }
 
-// TODO: add this upstream
-declare module 'redux-form' {
-  interface FieldArrayFieldsProps<FieldValue> {
-    splice: (index: number, removeNum: number | null, value: FieldValue) => void;
-  }
-}
-
 const EditAnswer: React.FC<WrappedFieldProps> = (props) => {
   const { input } = props;
   const {

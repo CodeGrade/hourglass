@@ -17,7 +17,7 @@ import 'codemirror/mode/css/css';
 import 'codemirror/mode/xml/xml';
 import 'codemirror/mode/yaml/yaml';
 import 'codemirror/mode/htmlmixed/htmlmixed';
-import React, { useEffect, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UnControlled as UnControlledCodeMirror, IUnControlledCodeMirror } from 'react-codemirror2';
 import { MarkDescription } from '@student/exams/show/types';
 import './ExamCodeBox.css';
@@ -118,7 +118,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
   }, [instance, ...valueUpdate]);
 
   // EFFECT: refresh the instance if any item in refreshProps changes
-  useLayoutEffect(() => {
+  useEffect(() => {
     setTimeout(() => {
       if (instance) {
         if (cursor) {

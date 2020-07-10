@@ -30,7 +30,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
   };
   return (
     <div>
-      <div><HTML value={prompt} /></div>
+      <HTML value={prompt} />
       <i>(Select one of the following responses)</i>
       <Form.Group>
         {options.map((option, idx) => (

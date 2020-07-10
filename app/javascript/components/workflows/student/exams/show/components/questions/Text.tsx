@@ -22,11 +22,7 @@ const Text: React.FC<TextProps> = (props) => {
   const { prompt } = info;
   return (
     <>
-      <Row>
-        <Col>
-          <HTML value={prompt} />
-        </Col>
-      </Row>
+      <HTML value={prompt} />
       <Row>
         <Col>
           <Form.Control

@@ -175,14 +175,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
   return (
     <Row>
       <Col>
-        {prompt
-         && (
-         <Row>
-           <Col sm={12}>
-             <HTML value={prompt} />
-           </Col>
-         </Row>
-         )}
+        <HTML value={prompt} />
         <Row className="mt-2 align-items-baseline">
           <Col>
             <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />

@@ -26,7 +26,7 @@ const YesNo: React.FC<YesNoProps> = (props) => {
   } = info;
   return (
     <div>
-      <div><HTML value={prompt} /></div>
+      <HTML value={prompt} />
       <ToggleButtonGroup
         name="tbg"
         type="radio"

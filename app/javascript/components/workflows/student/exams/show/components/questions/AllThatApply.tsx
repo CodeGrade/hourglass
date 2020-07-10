@@ -53,7 +53,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
   );
   return (
     <div>
-      <div><HTML value={prompt} /></div>
+      <HTML value={prompt} />
       {body}
     </div>
   );

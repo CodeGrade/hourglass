@@ -12,6 +12,7 @@ import {
   ExamFile,
   AnswerState,
 } from '@hourglass/workflows/student/exams/show/types';
+import { RenderError } from '@hourglass/common/boundary';
 
 import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
 
@@ -47,7 +48,7 @@ const EditExamVersion: React.FC = () => {
     [res.props?.examVersion?.anyStarted],
   );
   if (res.error) {
-    throw res.error;
+    return <RenderError error={res.error} />;
   }
   if (!res.props) {
     return <p>Loading...</p>;

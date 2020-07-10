@@ -57,7 +57,7 @@ import ManageAccommodations from '@professor/exams/accommodations';
 import AssignSeating from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
-import ErrorBoundary from '@hourglass/common/boundary';
+import ErrorBoundary, { RenderError } from '@hourglass/common/boundary';
 import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
@@ -874,12 +874,7 @@ const ExamAdmin: React.FC = () => {
     { examId },
   );
   if (res.error) {
-    return (
-      <>
-        <p>Error</p>
-        <p>{res.error.message}</p>
-      </>
-    );
+    return <RenderError error={res.error} />;
   }
   if (!res.props) {
     return <p>Loading...</p>;

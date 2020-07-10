@@ -49,6 +49,7 @@ import {
   usePagination,
   useQuery,
 } from 'relay-hooks';
+import { RenderError } from '@hourglass/common/boundary';
 
 import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
 import { exams_recipients$key, exams_recipients$data } from './__generated__/exams_recipients.graphql';
@@ -1721,7 +1722,7 @@ const ExamProctoring: React.FC = () => {
     { examId },
   );
   if (res.error) {
-    return <p>Error</p>;
+    return <RenderError error={res.error} />;
   }
   if (!res.props) {
     return <p>Loading...</p>;

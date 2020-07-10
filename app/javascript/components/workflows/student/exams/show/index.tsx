@@ -8,6 +8,7 @@ import ExamTaker from '@student/exams/show/containers/ExamTaker';
 import ExamSubmitted from '@student/exams/show/components/ExamSubmitted';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { graphql, useFragment, useQuery } from 'relay-hooks';
+import { RenderError } from '@hourglass/common/boundary';
 
 import { showQuery } from './__generated__/showQuery.graphql';
 import { showExam$key } from './__generated__/showExam.graphql';
@@ -61,7 +62,7 @@ const ShowExam: React.FC = () => {
       <>
         <RegularNavbar />
         <Container>
-          <span className="text-danger">{res.error.message}</span>
+          <RenderError error={res.error} />;
         </Container>
       </>
     );

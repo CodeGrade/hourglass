@@ -6,6 +6,8 @@ import SyncCourse from '@professor/courses/sync';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { graphql } from 'react-relay';
 import { useFragment, useQuery } from 'relay-hooks';
+import { RenderError } from '@hourglass/common/boundary';
+
 import { showCourseQuery } from './__generated__/showCourseQuery.graphql';
 import { show_courseExams$key } from './__generated__/show_courseExams.graphql';
 
@@ -59,7 +61,7 @@ const ShowCourse: React.FC = () => {
     { courseId },
   );
   if (res.error) {
-    return <p>Error</p>;
+    return <RenderError error={res.error} />;
   }
   if (!res.props) {
     return <p>Loading...</p>;

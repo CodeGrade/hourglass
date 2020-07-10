@@ -6,6 +6,7 @@ import { useFragment, graphql, useQuery } from 'relay-hooks';
 import { homeQuery } from './__generated__/homeQuery.graphql';
 import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
 import { home_profregs$key } from './__generated__/home_profregs.graphql';
+import { RenderError } from '@hourglass/common/boundary';
 
 const ShowRegistrations: React.FC<{
   registrations: home_studentregs$key;
@@ -100,7 +101,7 @@ const Home: React.FC = () => {
     `,
   );
   if (res.error) {
-    return <p>Error</p>;
+    return <RenderError error={res.error} />;
   }
   if (!res.props) {
     return <p>Loading...</p>;

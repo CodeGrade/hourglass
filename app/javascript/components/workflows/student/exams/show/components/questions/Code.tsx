@@ -3,6 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 import { CodeInfo, CodeState } from '@student/exams/show/types';
 import { ExamContext } from '@student/exams/show/context';
 import { Editor } from '../ExamCodeBox';
+import HTML from '../HTML';
 
 interface CodeProps {
   refreshProps?: React.DependencyList;
@@ -22,7 +23,7 @@ const Code: React.FC<CodeProps> = (props) => {
     disabled,
     autosize = false,
   } = props;
-  const { lang, initial } = info;
+  const { lang, initial, prompt } = info;
   const { fmap } = useContext(ExamContext);
   let text = state?.text ?? undefined;
   let marks = state?.marks ?? undefined;
@@ -44,6 +45,7 @@ const Code: React.FC<CodeProps> = (props) => {
   return (
     <Row>
       <Col>
+        <HTML value={prompt} />
         <Editor
           refreshProps={refreshProps}
           disabled={disabled}

@@ -59,12 +59,21 @@ const RN: React.FC<{
         <Navbar.Text
           className="mr-2"
         >
-          <span>{res.props.me.displayName}</span>
-          {res.props.impersonating && (
-            <i className="ml-2">(impersonating)</i>
-          )}
+          <span>
+            {res.props.impersonating && 'Impersonating '}
+            {res.props.me.displayName}
+          </span>
         </Navbar.Text>
         <Form inline>
+          {res.props.impersonating && (
+            <Button
+              className="mr-2"
+              variant="outline-danger"
+              // TODO: onClick
+            >
+              Stop impersonating
+            </Button>
+          )}
           <Button
             variant="outline-danger"
             onClick={logOut}

@@ -62,7 +62,7 @@ const ShowExam: React.FC = () => {
       <>
         <RegularNavbar />
         <Container>
-          <RenderError error={res.error} />;
+          <RenderError error={res.error} />
         </Container>
       </>
     );

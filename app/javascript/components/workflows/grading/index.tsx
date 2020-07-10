@@ -54,6 +54,8 @@ import {
 import { useQuery, useFragment, graphql } from 'relay-hooks';
 
 import { grading_one$key } from './__generated__/grading_one.graphql';
+import { QuestionName } from '../student/exams/show/components/ShowQuestion';
+import { PartName } from '../student/exams/show/components/Part';
 
 const Feedback: React.FC<{
   variant: AlertProps['variant'];
@@ -313,7 +315,7 @@ const Grade: React.FC<{
           <div key={qnum}>
             <Row>
               <Col sm={{ span: 6, offset: 3 }}>
-                <h2>{`Q ${qnum + 1}`}</h2>
+                <h2><QuestionName qnum={qnum} name={q.name} /></h2>
               </Col>
             </Row>
             {q.parts.map((p, pnum) => (
@@ -321,7 +323,7 @@ const Grade: React.FC<{
               <div key={pnum}>
                 <Row>
                   <Col sm={{ span: 6, offset: 3 }}>
-                    <h3>{`P ${pnum + 1}`}</h3>
+                    <h3><PartName pnum={pnum} name={p.name} /></h3>
                   </Col>
                 </Row>
                 {p.body.map((b, bnum) => {

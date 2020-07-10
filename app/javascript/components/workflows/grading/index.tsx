@@ -180,7 +180,7 @@ const GradeBodyItem: React.FC<{
   switch (info.type) {
     case 'HTML':
       return (
-        <HTML value={info} />
+        <PromptRow prompt={info} />
       );
     case 'Code':
       return (
@@ -311,11 +311,19 @@ const Grade: React.FC<{
         {questions.map((q, qnum) => (
           // eslint-disable-next-line react/no-array-index-key
           <div key={qnum}>
-            <h2>{`Q ${qnum + 1}`}</h2>
+            <Row>
+              <Col sm={{ span: 6, offset: 3 }}>
+                <h2>{`Q ${qnum + 1}`}</h2>
+              </Col>
+            </Row>
             {q.parts.map((p, pnum) => (
               // eslint-disable-next-line react/no-array-index-key
               <div key={pnum}>
-                <h3>{`P ${pnum + 1}`}</h3>
+                <Row>
+                  <Col sm={{ span: 6, offset: 3 }}>
+                    <h3>{`P ${pnum + 1}`}</h3>
+                  </Col>
+                </Row>
                 {p.body.map((b, bnum) => {
                   const studentAns = currentAnswers.answers[qnum][pnum][bnum];
                   const studentAnswer = isNoAns(studentAns) ? undefined : studentAns;
@@ -384,7 +392,7 @@ const GradeOnePart: React.FC = () => {
       </Col>
       <Col className="overflow-auto-y">
         <Row>
-          <Col>
+          <Col sm={{ span: 6, offset: 3 }}>
             <h1>{res.props.registration.exam.name}</h1>
           </Col>
         </Row>

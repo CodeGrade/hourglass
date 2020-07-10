@@ -2,6 +2,7 @@
 
 module Types
   class MutationType < Types::BaseObject
+    field :impersonate_user, mutation: Mutations::ImpersonateUser
     field :ask_question, mutation: Mutations::AskQuestion
     field :destroy_exam_version, mutation: Mutations::DestroyExamVersion
     field :update_exam_version, mutation: Mutations::UpdateExamVersion

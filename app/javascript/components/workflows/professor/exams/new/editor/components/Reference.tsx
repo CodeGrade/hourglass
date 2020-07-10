@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import {
   Form,
   Col,
@@ -6,6 +6,18 @@ import {
 import { WrappedFieldProps } from 'redux-form';
 import { ExamContext } from '@student/exams/show/context';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
+import { FileRef } from '@hourglass/workflows/student/exams/show/types';
+
+function useEffectSkipFirst(effect: React.EffectCallback, deps?: React.DependencyList) {
+  const ranOnce = useRef(false);
+  useEffect(() => {
+    if (!ranOnce.current) {
+      ranOnce.current = true;
+      return () => undefined;
+    }
+    return effect();
+  }, deps);
+}
 
 const EditReference: React.FC<{
   label: string;
@@ -17,8 +29,16 @@ const EditReference: React.FC<{
   const {
     value,
     onChange,
+  }: {
+    value: FileRef[];
+    onChange: (newVal: FileRef[]) => void;
   } = input;
-  const { files } = useContext(ExamContext);
+  const { files, fmap } = useContext(ExamContext);
+  useEffectSkipFirst(() => {
+    // Filter out references that no longer exist.
+    const filtered = value.filter((fileRef) => (fileRef.path in fmap));
+    onChange(filtered);
+  }, [fmap]);
   return (
     <>
       <Form.Label column sm={2}>

@@ -204,7 +204,8 @@ class Exam < ApplicationRecord
   def duration_valid
     return unless duration > time_window
 
-    errors.add(:duration, "can't be longer than the duration between start and end times")
+    mins = (time_window / 60.0).to_i
+    errors.add(:duration, "can't be longer than the duration between start and end times (#{mins} minutes)")
   end
 
   def end_after_start

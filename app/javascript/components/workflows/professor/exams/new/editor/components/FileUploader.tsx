@@ -70,7 +70,10 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
       <Col sm={12}>
         <Collapse in={open}>
           <div className="border">
-            <VeryControlledFileViewer files={value} />
+            <VeryControlledFileViewer
+              deps={[open]}
+              files={value}
+            />
           </div>
         </Collapse>
       </Col>

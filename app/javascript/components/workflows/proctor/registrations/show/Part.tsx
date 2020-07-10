@@ -8,6 +8,7 @@ import { PartFilesContext } from '@student/exams/show/context';
 import { alphabetIdx } from '@hourglass/common/helpers';
 
 interface PartProps {
+  refreshCodeMirrorsDeps: React.DependencyList;
   part: PartInfo;
   qnum: number;
   pnum: number;
@@ -16,6 +17,7 @@ interface PartProps {
 
 const Part: React.FC<PartProps> = (props) => {
   const {
+    refreshCodeMirrorsDeps,
     part,
     qnum,
     pnum,
@@ -48,12 +50,20 @@ const Part: React.FC<PartProps> = (props) => {
           </h3>
         )}
         {description?.value && <HTML value={description} />}
-        {reference.length !== 0 && <FileViewer references={reference} />}
+        {reference.length !== 0 && (
+          <FileViewer
+            references={reference}
+            refreshProps={refreshCodeMirrorsDeps}
+          />
+        )}
         {body.map((b, i) => (
           // Body numbers are STATIC.
           // eslint-disable-next-line react/no-array-index-key
           <div className="p-2 bodyitem" key={i}>
-            <DisplayBody body={b} qnum={qnum} pnum={pnum} bnum={i} />
+            <DisplayBody
+              body={b} qnum={qnum} pnum={pnum} bnum={i}
+              refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+            />
           </div>
         ))}
       </div>

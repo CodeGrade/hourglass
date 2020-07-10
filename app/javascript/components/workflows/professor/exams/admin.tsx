@@ -836,10 +836,6 @@ const ShowVersion: React.FC<{
   );
 };
 
-interface CodeMirroredElement extends Element {
-  CodeMirror: CodeMirrorEditor;
-}
-
 const PreviewVersion: React.FC<{
   open: boolean;
   contents: ContentsState;
@@ -848,17 +844,12 @@ const PreviewVersion: React.FC<{
     open,
     contents,
   } = props;
-  useEffect(() => {
-    if (!open) return;
-    document.querySelectorAll('.CodeMirror').forEach((cm) => {
-      setTimeout(() => (cm as CodeMirroredElement).CodeMirror.refresh());
-    });
-  }, [open]);
   return (
     <Collapse in={open}>
       <div className="border p-2">
         <ExamViewer
           contents={contents}
+          refreshCodeMirrorsDeps={[open]}
         />
       </div>
     </Collapse>

@@ -8,17 +8,25 @@ import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatchi
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import HTML from '@student/exams/show/components/HTML';
-import { BodyProps } from '@student/exams/show/components/Body';
 import {
   CodeState, TextState, YesNoState, MultipleChoiceState,
-  MatchingState, AllThatApplyState, CodeTagState,
+  MatchingState, AllThatApplyState, CodeTagState, BodyItem,
 } from '@student/exams/show/types';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import Prompted from '@proctor/registrations/show/questions/Prompted';
 
+export interface BodyProps {
+  refreshCodeMirrorsDeps: React.DependencyList;
+  body: BodyItem;
+  qnum: number;
+  pnum: number;
+  bnum: number;
+}
+
 const DisplayBody: React.FC<BodyProps> = (props) => {
   const {
+    refreshCodeMirrorsDeps,
     body,
     qnum,
     pnum,
@@ -36,7 +44,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     case 'Code':
       return (
         <Prompted prompt={body.prompt}>
-          <Code info={body} value={value as CodeState} disabled autosize />
+          <Code info={body} value={value as CodeState} disabled autosize refreshProps={refreshCodeMirrorsDeps} />
         </Prompted>
       );
     case 'AllThatApply':

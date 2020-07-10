@@ -13,7 +13,7 @@ import Scratch from '@student/exams/show/components/navbar/Scratch';
 
 interface ExamViewerProps {
   contents: ContentsState;
-  refreshCodeMirrorsDeps: React.DependencyList;
+  refreshCodeMirrorsDeps?: React.DependencyList;
 }
 
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {

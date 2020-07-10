@@ -858,7 +858,6 @@ const PreviewVersion: React.FC<{
 
 const StartGradingButton: React.FC = () => {
   const { examId } = useParams();
-  const { alert } = useContext(AlertContext);
   const history = useHistory();
   return (
     <Button

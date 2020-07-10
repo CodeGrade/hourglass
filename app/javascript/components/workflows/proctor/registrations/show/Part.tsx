@@ -5,7 +5,7 @@ import { FileViewer } from '@student/exams/show/components/FileViewer';
 import DisplayBody from '@proctor/registrations/show/DisplayBody';
 import '@student/exams/show/components/Part.css';
 import { PartFilesContext } from '@student/exams/show/context';
-import { alphabetIdx } from '@hourglass/common/helpers';
+import { PartName } from '@student/exams/show/components/Part';
 
 interface PartProps {
   refreshCodeMirrorsDeps: React.DependencyList;
@@ -24,10 +24,7 @@ const Part: React.FC<PartProps> = (props) => {
     anonymous,
   } = props;
   const {
-    name = {
-      type: 'HTML',
-      value: `Part ${alphabetIdx(pnum)}`,
-    },
+    name,
     reference,
     description,
     points,
@@ -39,16 +36,14 @@ const Part: React.FC<PartProps> = (props) => {
   return (
     <PartFilesContext.Provider value={contextVal}>
       <div>
-        {anonymous || (
-          <h3 id={`question-${qnum}-part-${pnum}`}>
-            <div className="d-inline-block">
-              <HTML value={name} />
-            </div>
+        <h3 id={`question-${qnum}-part-${pnum}`}>
+          {anonymous || (
             <small className="float-right text-muted">
               {subtitle}
             </small>
-          </h3>
-        )}
+          )}
+          <PartName name={name} pnum={pnum} />
+        </h3>
         {description?.value && <HTML value={description} />}
         {reference.length !== 0 && (
           <FileViewer

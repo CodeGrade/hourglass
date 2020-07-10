@@ -4,6 +4,7 @@ import HTML from '@student/exams/show/components/HTML';
 import Part from '@proctor/registrations/show/Part';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import { QuestionFilesContext } from '@student/exams/show/context';
+import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 
 interface ShowQuestionProps {
   refreshCodeMirrorsDeps: React.DependencyList;
@@ -18,10 +19,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     qnum,
   } = props;
   const {
-    name = {
-      type: 'HTML',
-      value: `Question ${qnum + 1}`,
-    },
+    name,
     reference,
     description,
     parts,
@@ -35,14 +33,12 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     <QuestionFilesContext.Provider value={contextVal}>
       <div>
         <h1>
-          <div className="d-inline-block">
-            <HTML value={name} />
-          </div>
           {singlePart && (
             <small className="float-right text-muted">
               {subtitle}
             </small>
           )}
+          <QuestionName name={name} qnum={qnum} />
         </h1>
         <HTML value={description} />
         {reference.length !== 0 && (

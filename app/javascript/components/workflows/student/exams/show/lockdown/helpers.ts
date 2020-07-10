@@ -5,9 +5,9 @@ export function isCovered(): boolean {
 }
 
 export function isFullscreen(): boolean {
-  const maximized = window.outerHeight === window.screen.height;
-  const fullheight = window.innerHeight === window.outerHeight;
-  const fullWidth = window.innerWidth === window.outerWidth;
+  const maximized = window.outerHeight >= window.screen.height;
+  const fullheight = window.innerHeight >= window.outerHeight;
+  const fullWidth = window.innerWidth >= window.outerWidth;
   return maximized && fullheight && fullWidth;
 }
 

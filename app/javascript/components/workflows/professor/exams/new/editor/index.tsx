@@ -404,11 +404,11 @@ const ExamEditor: React.FC<
           message: 'Exam version updated successfully.',
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Exam version not updated.',
-          message: <pre>{errs[0]?.message}</pre>,
+          message: <pre>{err.message}</pre>,
         });
       },
     },
@@ -424,11 +424,11 @@ const ExamEditor: React.FC<
           autohide: true,
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error doing autosave',
-          message: <pre>{errs[0]?.message}</pre>,
+          message: <pre>{err.message}</pre>,
           autohide: true,
         });
       },

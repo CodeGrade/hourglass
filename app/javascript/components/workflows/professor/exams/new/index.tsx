@@ -34,11 +34,11 @@ const NewExamForm: React.FC<{
         const { exam } = createExam;
         history.push(`/exams/${exam.id}/admin`);
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error creating exam.',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },

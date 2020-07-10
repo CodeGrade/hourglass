@@ -82,11 +82,11 @@ const SendQuestion: React.FC<{
       onCompleted: () => {
         setVal('');
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error asking question',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },

@@ -213,11 +213,11 @@ const FinalizeButton: React.FC<{
           message: 'Registration finalized.',
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error finalizing registration',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },
@@ -281,11 +281,11 @@ const ClearButton: React.FC<{
           autohide: true,
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error clearing anomaly',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },
@@ -553,11 +553,11 @@ const FinalizeRegs: React.FC<{
           autohide: true,
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: `Error finalizing '${selectedRecipient.label}'`,
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },
@@ -1451,11 +1451,11 @@ const SendMessageButton: React.FC<{
         });
         onSuccess();
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error sending message',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },

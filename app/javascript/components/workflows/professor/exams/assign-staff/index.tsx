@@ -266,11 +266,11 @@ const StaffSeatingForm: React.FC<
           message: 'Room assignments successfully created.',
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Room assignments not created.',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },

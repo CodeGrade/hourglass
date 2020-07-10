@@ -61,7 +61,10 @@ const Part: React.FC<PartProps> = (props) => {
           // eslint-disable-next-line react/no-array-index-key
           <div className="p-2 bodyitem" key={i}>
             <DisplayBody
-              body={b} qnum={qnum} pnum={pnum} bnum={i}
+              body={b}
+              qnum={qnum}
+              pnum={pnum}
+              bnum={i}
               refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
             />
           </div>

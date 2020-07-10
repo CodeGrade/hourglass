@@ -44,7 +44,6 @@ import {
   ExamFile,
   AnswerState,
 } from '@student/exams/show/types';
-import { Editor as CodeMirrorEditor } from 'codemirror';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { AlertContext } from '@hourglass/common/alerts';

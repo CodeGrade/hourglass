@@ -44,7 +44,13 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     case 'Code':
       return (
         <Prompted prompt={body.prompt}>
-          <Code info={body} value={value as CodeState} disabled autosize refreshProps={refreshCodeMirrorsDeps} />
+          <Code
+            info={body}
+            value={value as CodeState}
+            disabled
+            autosize
+            refreshProps={refreshCodeMirrorsDeps}
+          />
         </Prompted>
       );
     case 'AllThatApply':

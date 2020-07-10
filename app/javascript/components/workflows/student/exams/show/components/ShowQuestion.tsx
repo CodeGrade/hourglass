@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { QuestionInfo } from '@student/exams/show/types';
+import { QuestionInfo, HTMLVal } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import Part from '@student/exams/show/components/Part';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
@@ -22,6 +22,18 @@ interface ShowQuestionProps {
   lastQuestion?: boolean;
 }
 
+export const QuestionName: React.FC<{ qnum: number; name?: HTMLVal }> = ({ qnum, name }) => {
+  if (name === undefined || name.value === '') {
+    return <div className="d-inline-block">{`Question ${qnum + 1}`}</div>;
+  }
+  return (
+    <>
+      <span className="d-inline-block mr-2">{`Question ${qnum + 1}: `}</span>
+      <HTML value={name} className="d-inline-block" />
+    </>
+  );
+};
+
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const {
     examTakeUrl,
@@ -34,10 +46,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     lastQuestion = false,
   } = props;
   const {
-    name = {
-      type: 'HTML',
-      value: `Question ${qnum + 1}`,
-    },
+    name,
     reference,
     description,
     parts,
@@ -47,7 +56,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const isCurrent = selectedQuestion === qnum;
   const active = !paginated || isCurrent;
   const classes = active ? '' : 'd-none';
-  const singlePart = parts.length === 1 && !parts[0].name;
+  const singlePart = parts.length === 1 && parts[0].name.value === '';
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
@@ -62,12 +71,12 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           separateSubparts={separateSubparts}
         />
         <h1 id={`question-${qnum}`}>
-          <HTML value={name} />
           {singlePart && (
             <small className="float-right text-muted">
               {subtitle}
             </small>
           )}
+          <QuestionName name={name} qnum={qnum} />
         </h1>
         <HTML value={description} />
         {reference.length !== 0 && <FileViewer references={reference} />}

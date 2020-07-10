@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { PartInfo } from '@student/exams/show/types';
+import { PartInfo, HTMLVal } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import {
@@ -21,6 +21,18 @@ interface PartProps {
   spyQuestion?: (question: number, pnum?: number) => void;
 }
 
+export const PartName: React.FC<{ pnum: number; name?: HTMLVal }> = ({ pnum, name }) => {
+  if (name === undefined || name.value === '') {
+    return <div className="d-inline-block">{`Part ${alphabetIdx(pnum)}`}</div>;
+  }
+  return (
+    <>
+      <span className="d-inline-block mr-2">{`Part ${alphabetIdx(pnum)}: `}</span>
+      <HTML value={name} className="d-inline-block" />
+    </>
+  );
+};
+
 const Part: React.FC<PartProps> = (props) => {
   const {
     part,
@@ -31,10 +43,7 @@ const Part: React.FC<PartProps> = (props) => {
     spyQuestion,
   } = props;
   const {
-    name = {
-      type: 'HTML',
-      value: `Part ${alphabetIdx(pnum)}`,
-    },
+    name,
     reference,
     description,
     points,
@@ -59,14 +68,14 @@ const Part: React.FC<PartProps> = (props) => {
             separateSubparts={separateSubparts}
           />
         )}
-        {anonymous || (
-          <h3 id={`question-${qnum}-part-${pnum}`}>
-            <HTML value={name} />
+        <h3 id={`question-${qnum}-part-${pnum}`}>
+          {anonymous || (
             <small className="float-right text-muted">
               {subtitle}
             </small>
-          </h3>
-        )}
+          )}
+          <PartName name={name} pnum={pnum} />
+        </h3>
         <div><HTML value={description} /></div>
         {reference.length !== 0 && <FileViewer references={reference} />}
         {body.map((b, i) => (

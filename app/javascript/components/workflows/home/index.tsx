@@ -2,11 +2,11 @@ import React from 'react';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { Link } from 'react-router-dom';
 import { useFragment, graphql, useQuery } from 'relay-hooks';
+import { RenderError } from '@hourglass/common/boundary';
 
 import { homeQuery } from './__generated__/homeQuery.graphql';
 import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
 import { home_profregs$key } from './__generated__/home_profregs.graphql';
-import { RenderError } from '@hourglass/common/boundary';
 
 const ShowRegistrations: React.FC<{
   registrations: home_studentregs$key;

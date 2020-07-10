@@ -5,8 +5,8 @@ import {
   Button,
 } from 'react-bootstrap';
 import { getCSRFToken } from '@student/exams/show/helpers';
-import { Link } from 'react-router-dom';
-import { graphql, useQuery } from 'relay-hooks';
+import { Link, useHistory } from 'react-router-dom';
+import { graphql, useQuery, useMutation } from 'relay-hooks';
 import { navbarQuery } from './__generated__/navbarQuery.graphql';
 import NotLoggedIn from './NotLoggedIn';
 
@@ -40,6 +40,22 @@ const RN: React.FC<{
     }
     `,
   );
+  const history = useHistory();
+  const [stopImpersonating, { loading }] = useMutation(
+    graphql`
+    mutation navbarStopImpersonatingMutation {
+      stopImpersonating(input: {}) {
+        success
+      }
+    }
+    `,
+    {
+      onCompleted: () => {
+        history.push('/');
+        res.retry();
+      },
+    },
+  );
   if (res.error || !res.props) {
     return <NotLoggedIn />;
   }
@@ -67,9 +83,14 @@ const RN: React.FC<{
         <Form inline>
           {res.props.impersonating && (
             <Button
+              disabled={loading}
               className="mr-2"
               variant="outline-danger"
-              // TODO: onClick
+              onClick={() => {
+                stopImpersonating({
+                  variables: {},
+                });
+              }}
             >
               Stop impersonating
             </Button>

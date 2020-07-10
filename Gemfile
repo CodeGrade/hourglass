@@ -30,6 +30,8 @@ gem 'headless' # needed to run Racket, and xvfb-run (the shell script) merges st
 
 gem 'rubyzip'
 
+gem 'pretender'
+
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production

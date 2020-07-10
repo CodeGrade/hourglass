@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Row,
   Col,
@@ -21,26 +21,27 @@ interface FileUploaderProps {
 
 const FileUploader: React.FC<FileUploaderProps> = (props) => {
   const { value, onChange } = props;
-  const [file, setFile] = useState<File>(undefined);
-  const [open, setOpen] = useState(false);
   const noFiles = value === undefined || value.length === 0;
-  useEffect(() => {
-    if (!file) return;
-    handleZip(file).then(onChange);
-  }, [file]);
-  const curLabel = file?.name ?? (noFiles ? 'Choose a file' : 'Saved files');
+  const [fileLabel, setFileLabel] = useState<string>(noFiles ? 'Choose a file' : 'Saved files');
+  const [open, setOpen] = useState(false);
+  const fileInput = useRef<HTMLInputElement>();
   return (
     <Form.Group as={Row}>
       <Col sm={12}>
         <p>All exam files</p>
         <InputGroup>
           <Form.File
+            ref={fileInput}
             onChange={(e): void => {
-              const { files: uploaded } = e.target;
+              const { target } = e;
+              const { files: uploaded } = target;
               const upload = uploaded[0];
-              if (upload) setFile(upload);
+              if (!upload) return;
+              handleZip(upload).then(onChange).then(() => {
+                setFileLabel(upload.name);
+              });
             }}
-            label={curLabel}
+            label={fileLabel}
             accept="application/zip"
             custom
           />
@@ -50,8 +51,11 @@ const FileUploader: React.FC<FileUploaderProps> = (props) => {
               disabled={noFiles}
               onClick={(): void => {
                 setOpen(false);
-                setFile(undefined);
+                setFileLabel('Choose a file');
                 onChange([]);
+                if (fileInput.current) {
+                  fileInput.current.value = null;
+                }
               }}
             >
               Clear files

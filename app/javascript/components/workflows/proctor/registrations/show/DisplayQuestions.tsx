@@ -3,11 +3,13 @@ import { QuestionInfo } from '@student/exams/show/types';
 import ShowQuestion from '@proctor/registrations/show/ShowQuestion';
 
 interface DisplayQuestionsProps {
+  refreshCodeMirrorsDeps: React.DependencyList;
   questions: QuestionInfo[];
 }
 
 const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
   const {
+    refreshCodeMirrorsDeps,
     questions,
   } = props;
   return (
@@ -19,6 +21,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           key={i}
           question={q}
           qnum={i}
+          refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
         />
       ))}
     </>

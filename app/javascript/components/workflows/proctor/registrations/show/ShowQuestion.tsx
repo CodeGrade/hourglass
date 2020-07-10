@@ -6,12 +6,14 @@ import { FileViewer } from '@student/exams/show/components/FileViewer';
 import { QuestionFilesContext } from '@student/exams/show/context';
 
 interface ShowQuestionProps {
+  refreshCodeMirrorsDeps: React.DependencyList;
   question: QuestionInfo;
   qnum: number;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const {
+    refreshCodeMirrorsDeps,
     question,
     qnum,
   } = props;
@@ -43,7 +45,12 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           )}
         </h1>
         <HTML value={description} />
-        {reference.length !== 0 && <FileViewer references={reference} />}
+        {reference.length !== 0 && (
+          <FileViewer
+            references={reference}
+            refreshProps={refreshCodeMirrorsDeps}
+          />
+        )}
         {parts.map((p, i) => (
           <Part
             // Part numbers are STATIC.
@@ -53,6 +60,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             part={p}
             pnum={i}
             qnum={qnum}
+            refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
           />
         ))}
       </div>

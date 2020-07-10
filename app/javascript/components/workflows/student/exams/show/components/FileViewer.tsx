@@ -151,10 +151,15 @@ const FileTree: React.FC<FileTreeProps> = (props) => {
 interface FileViewerProps {
   references: FileRef[];
   alwaysShowTreeView?: boolean;
+  refreshProps?: React.DependencyList;
 }
 
 export const FileViewer: React.FC<FileViewerProps> = (props) => {
-  const { references, alwaysShowTreeView = false } = props;
+  const {
+    references,
+    alwaysShowTreeView = false,
+    refreshProps,
+  } = props;
   const { fmap } = useContext(ExamContext);
   const filteredFiles = getFilesForRefs(fmap, references);
   const first = firstFile(filteredFiles);
@@ -177,6 +182,7 @@ export const FileViewer: React.FC<FileViewerProps> = (props) => {
         <FileContents
           fmap={fmap}
           selectedFile={selectedID}
+          refreshProps={refreshProps}
         />
       </Col>
     </Row>
@@ -239,9 +245,11 @@ export const ControlledFileViewer: React.FC<ControlledFileViewerProps> = (props)
 
 export const VeryControlledFileViewer: React.FC<{
   files: ExamFile[];
+  deps?: React.DependencyList;
 }> = (props) => {
   const {
     files,
+    deps,
   } = props;
   const fmap = createMap(files);
   const [selectedID, setSelectedID] = useState('');
@@ -264,6 +272,7 @@ export const VeryControlledFileViewer: React.FC<{
         <FileContents
           fmap={fmap}
           selectedFile={selectedID}
+          refreshProps={deps}
         />
       </Col>
     </Row>

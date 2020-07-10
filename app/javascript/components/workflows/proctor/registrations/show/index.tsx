@@ -13,11 +13,13 @@ import Scratch from '@student/exams/show/components/navbar/Scratch';
 
 interface ExamViewerProps {
   contents: ContentsState;
+  refreshCodeMirrorsDeps: React.DependencyList;
 }
 
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {
   const {
     contents,
+    refreshCodeMirrorsDeps,
   } = props;
   const {
     exam,
@@ -54,9 +56,15 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
               </div>
             )}
             {instructions && <HTML value={instructions} />}
-            {reference.length !== 0 && <FileViewer references={reference} />}
+            {reference.length !== 0 && (
+              <FileViewer
+                refreshProps={refreshCodeMirrorsDeps}
+                references={reference}
+              />
+            )}
             <div>
               <DisplayQuestions
+                refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
                 questions={questions}
               />
             </div>

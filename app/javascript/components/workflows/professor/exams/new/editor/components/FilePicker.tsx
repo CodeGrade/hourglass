@@ -198,7 +198,10 @@ export const FilePickerSelectWithPreview: React.FC<FilePickerProps> = (props) =>
       </InputGroup>
       <Collapse in={open && !noFiles}>
         <div className="border">
-          <VeryControlledFileViewer files={filteredFiles} />
+          <VeryControlledFileViewer
+            deps={[open]}
+            files={filteredFiles}
+          />
         </div>
       </Collapse>
     </>

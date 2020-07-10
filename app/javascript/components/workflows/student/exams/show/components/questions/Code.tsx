@@ -5,6 +5,7 @@ import { ExamContext } from '@student/exams/show/context';
 import { Editor } from '../ExamCodeBox';
 
 interface CodeProps {
+  refreshProps?: React.DependencyList;
   info: CodeInfo;
   value: CodeState;
   onChange?: (newVal: CodeState) => void;
@@ -14,6 +15,7 @@ interface CodeProps {
 
 const Code: React.FC<CodeProps> = (props) => {
   const {
+    refreshProps,
     info,
     value: state,
     onChange,
@@ -43,6 +45,7 @@ const Code: React.FC<CodeProps> = (props) => {
     <Row>
       <Col>
         <Editor
+          refreshProps={refreshProps}
           disabled={disabled}
           autosize={autosize}
           value={text}

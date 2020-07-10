@@ -138,4 +138,12 @@ class ExamVersion < ApplicationRecord
       end
     end
   end
+
+  def qp_pairs
+    questions.each_with_index.map do |q, qnum|
+      q['parts'].each_with_index.map do |_, pnum|
+        [qnum, pnum]
+      end
+    end.flatten(1)
+  end
 end

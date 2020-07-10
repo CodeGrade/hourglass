@@ -10,6 +10,7 @@ class Exam < ApplicationRecord
   has_many :exam_announcements, dependent: :destroy
 
   has_many :registrations, through: :exam_versions
+  has_many :grading_locks, through: :registrations
   has_many :messages, through: :registrations
   has_many :questions, through: :registrations
   has_many :accommodations, through: :registrations
@@ -192,6 +193,24 @@ class Exam < ApplicationRecord
       seating: seating_checklist,
       versions: versions_checklist,
     }
+  end
+
+  def initialize_grading_locks!(reset = false)
+    pairs_by_version = exam_versions.map { |v| [v.id, v.qp_pairs] }.to_h
+    GradingLock.transaction do
+      GradingLock.where(registration: registrations).destroy_all if reset
+      finalized_registrations.each do |registration|
+        pairs_by_version[registration.exam_version_id].each do |qnum, pnum|
+          GradingLock.find_or_create_by(registration: registration, qnum: qnum, pnum: pnum)
+        end
+      end
+    end
+  end
+
+  def finalize_registrations_that_have_run_out_of_time!
+    registrations.in_progress.each do |r|
+      r.finalize! if r.over?
+    end
   end
 
   def visible_to?(check_user)

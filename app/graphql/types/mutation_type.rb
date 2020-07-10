@@ -4,6 +4,12 @@ module Types
   class MutationType < Types::BaseObject
     field :stop_impersonating, mutation: Mutations::StopImpersonating
     field :impersonate_user, mutation: Mutations::ImpersonateUser
+
+    field :commence_grading, mutation: Mutations::CommenceGrading
+    field :acquire_grading_lock, mutation: Mutations::AcquireGradingLock
+    field :release_grading_lock, mutation: Mutations::ReleaseGradingLock
+    field :release_all_grading_locks, mutation: Mutations::ReleaseAllGradingLocks
+
     field :ask_question, mutation: Mutations::AskQuestion
     field :destroy_exam_version, mutation: Mutations::DestroyExamVersion
     field :update_exam_version, mutation: Mutations::UpdateExamVersion

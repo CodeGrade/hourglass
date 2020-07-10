@@ -105,6 +105,8 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.index [:room_id, :user_id], unique: true
       t.index [:user_id, :room_id], unique: true
 
+      t.jsonb :grades
+
       t.datetime :start_time
       t.datetime :end_time
 
@@ -177,6 +179,18 @@ class CreateSchema < ActiveRecord::Migration[6.0]
     create_table :snapshots do |t|
       t.references :registration, null: false, foreign_key: true
       t.jsonb :answers, null: false
+
+      t.timestamps
+    end
+
+    create_table :grading_locks do |t|
+      t.references :registration, null: false, foreign_key: true
+      t.references :grader, foreign_key: { to_table: 'users' }
+
+      t.integer :qnum, null: false
+      t.integer :pnum, null: false
+
+      t.index [:registration_id, :qnum, :pnum], unique: true
 
       t.timestamps
     end

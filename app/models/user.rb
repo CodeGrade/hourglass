@@ -27,6 +27,12 @@ class User < ApplicationRecord
            dependent: :destroy,
            inverse_of: 'sender'
 
+  has_many :grading_locks,
+           foreign_key: 'grader',
+           class_name: 'GradingLock',
+           dependent: :destroy,
+           inverse_of: 'grader'
+
   def self.from_omniauth(auth)
     user = where(username: auth.uid).first_or_initialize
     user.display_name = auth.info.display_name

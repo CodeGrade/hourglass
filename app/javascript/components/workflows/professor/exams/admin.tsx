@@ -856,6 +856,31 @@ const PreviewVersion: React.FC<{
   );
 };
 
+const StartGradingButton: React.FC = () => {
+  const { examId } = useParams();
+  const { alert } = useContext(AlertContext);
+  const history = useHistory();
+  return (
+    <Button
+      variant="success"
+      onClick={async () => {
+        // try {
+        //   await startGrading(examId);
+        //   history.push(`/exams/${examId}/grading`);
+        // } catch (e) {
+        //   alert({
+        //     variant: 'danger',
+        //     title: 'Could not start grading',
+        //     message: e.message,
+        //   });
+        // }
+      }}
+    >
+      Grade!
+    </Button>
+  );
+};
+
 const ExamAdmin: React.FC = () => {
   const { examId } = useParams();
   const res = useQuery<adminExamQuery>(
@@ -891,8 +916,9 @@ const ExamAdmin: React.FC = () => {
       </Form.Group>
       <Form.Group>
         <Link to={`/exams/${res.props.exam.id}/proctoring`}>
-          <Button variant="success">Proctor!</Button>
+          <Button className="mr-2" variant="success">Proctor!</Button>
         </Link>
+        <StartGradingButton />
         <Link to={`/exams/${res.props.exam.id}/submissions`}>
           <Button className="ml-2" variant="primary">View submissions</Button>
         </Link>

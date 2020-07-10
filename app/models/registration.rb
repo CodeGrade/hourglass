@@ -11,11 +11,21 @@ class Registration < ApplicationRecord
   has_many :messages, dependent: :destroy
   has_many :questions, dependent: :destroy
   has_one :accommodation, dependent: :destroy
+  has_many :grading_locks, dependent: :destroy
 
   validates :user, presence: true
   validates :exam_version, presence: true
   validate :room_version_same_exam
   validate :user_in_course
+
+  GRADES_SCHEMA = Rails.root.join('config/schemas/grades.json').to_s
+  validates :grades, {
+    if: ->(obj) { !obj.grades.nil? },
+    json: {
+      schema: -> { GRADES_SCHEMA },
+      message: ->(errors) { errors },
+    },
+  }
 
   delegate :exam, to: :exam_version
   delegate :proctors_and_professors, to: :exam

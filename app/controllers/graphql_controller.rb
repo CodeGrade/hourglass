@@ -23,6 +23,7 @@ class GraphqlController < ApplicationController
       current_user: current_user,
       true_user: true_user,
       impersonate_user: ->(user) { impersonate_user(user) },
+      stop_impersonating_user: -> { stop_impersonating_user },
       bottlenose_api: bottlenose_api,
     }
     result = HourglassSchema.execute(query, variables: variables, context: context, operation_name: operation_name)

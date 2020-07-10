@@ -6,10 +6,8 @@ import {
 } from 'react-bootstrap';
 import { getCSRFToken } from '@student/exams/show/helpers';
 import { Link } from 'react-router-dom';
-import { graphql, useFragment, useQuery } from 'relay-hooks';
+import { graphql, useQuery } from 'relay-hooks';
 import { navbarQuery } from './__generated__/navbarQuery.graphql';
-
-import { navbar_me$key } from './__generated__/navbar_me.graphql';
 import NotLoggedIn from './NotLoggedIn';
 
 function logOut(): void {
@@ -28,22 +26,23 @@ function logOut(): void {
   });
 }
 
-const RegularNavbar: React.FC<{
-  className?: string
-  me: navbar_me$key;
-}> = (props) => {
-  const {
-    me,
-    className,
-  } = props;
-  const res = useFragment(
+
+const RN: React.FC<{
+  className?: string;
+}> = ({ className }) => {
+  const res = useQuery<navbarQuery>(
     graphql`
-    fragment navbar_me on User {
-      displayName
+    query navbarQuery {
+      impersonating
+      me {
+        displayName
+      }
     }
     `,
-    me,
   );
+  if (res.error || !res.props) {
+    return <NotLoggedIn />;
+  }
   return (
     <Navbar
       bg="light"
@@ -60,7 +59,10 @@ const RegularNavbar: React.FC<{
         <Navbar.Text
           className="mr-2"
         >
-          {res.displayName}
+          <span>{res.props.me.displayName}</span>
+          {res.props.impersonating && (
+            <i className="ml-2">(impersonating)</i>
+          )}
         </Navbar.Text>
         <Form inline>
           <Button
@@ -72,26 +74,6 @@ const RegularNavbar: React.FC<{
         </Form>
       </Navbar.Collapse>
     </Navbar>
-  );
-};
-
-const RN: React.FC<{
-  className?: string;
-}> = ({ className }) => {
-  const res = useQuery<navbarQuery>(
-    graphql`
-    query navbarQuery {
-      me {
-        ...navbar_me
-      }
-    }
-    `,
-  );
-  if (res.error || !res.props) {
-    return <NotLoggedIn />;
-  }
-  return (
-    <RegularNavbar className={className} me={res.props.me} />
   );
 };
 

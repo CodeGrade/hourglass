@@ -14,7 +14,7 @@ class GraphqlController < ApplicationController
   end
 
   def execute
-    raise GraphQL::ExecutionError, 'You need to log in.' unless current_user
+    return render json: { data: nil, errors: [{ message: 'You need to log in.' }] } unless current_user
 
     variables = ensure_hash(params[:variables])
     query = params[:query]

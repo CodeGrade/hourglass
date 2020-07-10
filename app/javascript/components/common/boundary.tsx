@@ -1,7 +1,16 @@
 import React from 'react';
 
+export const RenderError: React.FC<{
+  error: Error;
+}> = ({ error }) => (
+  <span className="text-danger">
+    <p>Something went wrong.</p>
+    <small>{error.message}</small>
+  </span>
+);
+
 interface ErrorState {
-  error?: string;
+  error?: Error;
 }
 
 type ErrorProps = Record<string, unknown>;
@@ -14,7 +23,7 @@ export default class ErrorBoundary extends React.Component<ErrorProps, ErrorStat
 
   static getDerivedStateFromError(error: Error): ErrorState {
     return {
-      error: error.message,
+      error,
     };
   }
 
@@ -22,14 +31,7 @@ export default class ErrorBoundary extends React.Component<ErrorProps, ErrorStat
     const { error } = this.state;
     if (error) {
       return (
-        <span className="text-danger">
-          <p>
-            Something went wrong.
-          </p>
-          <small>
-            {error}
-          </small>
-        </span>
+        <RenderError error={error} />
       );
     }
 

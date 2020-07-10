@@ -16,6 +16,7 @@ import {
   ContentsState,
 } from '@hourglass/workflows/student/exams/show/types';
 import { useQuery } from 'relay-hooks';
+import { RenderError } from '@hourglass/common/boundary';
 
 import { submissionsAllQuery } from './__generated__/submissionsAllQuery.graphql';
 import { submissionsOneQuery } from './__generated__/submissionsOneQuery.graphql';
@@ -38,7 +39,7 @@ const ExamSubmissions: React.FC = () => {
     { examId },
   );
   if (res.error) {
-    return <p>Error</p>;
+    return <RenderError error={res.error} />;
   }
   if (!res.props) {
     return <p>Loading...</p>;
@@ -79,7 +80,7 @@ const ExamSubmission: React.FC = () => {
     { registrationId },
   );
   if (res.error) {
-    return <p>Error</p>;
+    return <RenderError error={res.error} />;
   }
   if (!res.props) {
     return <p>Loading...</p>;

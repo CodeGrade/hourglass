@@ -173,7 +173,7 @@ export function doTryLockdown(
       }
       dispatch(doLoad(examTakeUrl));
     }).catch((err) => {
-      dispatch(lockdownFailed(err.message));
+      dispatch(lockdownFailed(err?.message ?? 'general failure'));
     });
   };
 }

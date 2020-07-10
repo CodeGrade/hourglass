@@ -296,12 +296,12 @@ const ExamRoomsForm: React.FC<
           message: 'Rooms saved successfully.',
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           autohide: true,
           variant: 'danger',
           title: 'Failed saving rooms.',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },

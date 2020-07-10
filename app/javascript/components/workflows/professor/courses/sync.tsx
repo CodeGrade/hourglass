@@ -42,11 +42,11 @@ const DoSync: React.FC<{
           message: `${syncCourseToBottlenose.course.title} was synced successfully.`,
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error syncing course',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },

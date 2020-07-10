@@ -138,11 +138,11 @@ const SingleAccommodation: React.FC<{
           message: `Accommodation for '${accommodation.registration.user.displayName}' deleted.`,
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error deleting accommodation',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
       configs: [
@@ -189,12 +189,12 @@ const SingleAccommodation: React.FC<{
           message: `Accommodation for '${accommodation.registration.user.displayName}' updated.`,
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         setEditing(false);
         alert({
           variant: 'danger',
           title: 'Error updating accommodation',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },
@@ -336,11 +336,11 @@ const NewAccommodation: React.FC<{
           message: `Accommodation for '${selected.label}' created.`,
         });
       },
-      onError: (errors) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error creating accommodation',
-          message: errors[0]?.message,
+          message: err.message,
         });
       },
       configs: [

@@ -129,11 +129,11 @@ const ExamInformation: React.FC<{
           message: 'Exam info saved.',
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error saving exam info.',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },
@@ -612,11 +612,11 @@ const VersionInfo: React.FC<{
       onCompleted: ({ createExamVersion }) => {
         history.push(`/exams/${res.id}/versions/${createExamVersion.examVersion.id}/edit`);
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Exam version not created.',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
     },
@@ -735,11 +735,11 @@ const ShowVersion: React.FC<{
           message: 'Version deleted successfully.',
         });
       },
-      onError: (errs) => {
+      onError: (err) => {
         alert({
           variant: 'danger',
           title: 'Error deleting version.',
-          message: errs[0]?.message,
+          message: err.message,
         });
       },
       configs: [

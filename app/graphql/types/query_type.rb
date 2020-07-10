@@ -7,6 +7,11 @@ module Types
     add_field(GraphQL::Types::Relay::NodeField)
     add_field(GraphQL::Types::Relay::NodesField)
 
+    field :impersonating, Boolean, null: false
+    def impersonating
+      context[:current_user] != context[:true_user]
+    end
+
     field :me, UserType, null: false
     def me
       context[:current_user]

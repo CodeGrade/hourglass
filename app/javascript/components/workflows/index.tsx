@@ -152,7 +152,7 @@ const Entry: React.FC = () => {
                   <ExamProctoring />
                 </AllAlerts>
               </Route>
-              <Route exact path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
+              <Route path="/exams/:examId/grading">
                 <DocumentTitle title="Grading">
                   <RegularNavbar />
                   <Container fluid>

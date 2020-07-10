@@ -864,16 +864,8 @@ const StartGradingButton: React.FC = () => {
     <Button
       variant="success"
       onClick={async () => {
-        // try {
-        //   await startGrading(examId);
-        //   history.push(`/exams/${examId}/grading`);
-        // } catch (e) {
-        //   alert({
-        //     variant: 'danger',
-        //     title: 'Could not start grading',
-        //     message: e.message,
-        //   });
-        // }
+        // TODO CommenceGrading, then
+        history.push(`/exams/${examId}/grading`);
       }}
     >
       Grade!

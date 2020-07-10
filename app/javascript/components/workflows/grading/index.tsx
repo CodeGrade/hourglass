@@ -45,7 +45,12 @@ import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatchi
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import Select from 'react-select';
-import { useParams } from 'react-router-dom';
+import {
+  Link,
+  useParams,
+  Switch,
+  Route,
+} from 'react-router-dom';
 import { useQuery, useFragment, graphql } from 'relay-hooks';
 
 import { grading_one$key } from './__generated__/grading_one.graphql';
@@ -344,7 +349,8 @@ const Grade: React.FC<{
   );
 };
 
-const Grading: React.FC = () => {
+const GradeOnePart: React.FC = () => {
+  // TODO: only show the one part
   const { registrationId, qnum, pnum } = useParams();
   const res = useQuery(
     graphql`
@@ -394,5 +400,24 @@ const Grading: React.FC = () => {
     </Row>
   );
 };
+
+const Grading: React.FC = () => (
+  <Switch>
+    <Route exact path="/exams/:examId/grading">
+      <p>
+        TODO: grading homepage that acquires a lock and redirects to grading the single part
+      </p>
+      <p>
+        {'for now, here is '}
+        <Link to="/exams/RXhhbS0x/grading/UmVnaXN0cmF0aW9uLTE=/0/0">
+          Registration 1 q0 p0
+        </Link>
+      </p>
+    </Route>
+    <Route path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
+      <GradeOnePart />
+    </Route>
+  </Switch>
+);
 
 export default Grading;

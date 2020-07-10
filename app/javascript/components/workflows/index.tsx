@@ -29,6 +29,7 @@ import { AllAlerts } from '@hourglass/common/alerts';
 import './index.scss';
 import ErrorBoundary from '@hourglass/common/boundary';
 import Home from '@hourglass/workflows/home';
+import Grading from '@hourglass/workflows/grading';
 
 import { RelayEnvironmentProvider } from 'relay-hooks';
 import environment from '@hourglass/relay/environment';
@@ -150,6 +151,14 @@ const Entry: React.FC = () => {
                 <AllAlerts>
                   <ExamProctoring />
                 </AllAlerts>
+              </Route>
+              <Route exact path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
+                <DocumentTitle title="Grading">
+                  <RegularNavbar />
+                  <Container fluid>
+                    <Grading />
+                  </Container>
+                </DocumentTitle>
               </Route>
               <Route path="/">
                 <ErrorBoundary>

@@ -48,5 +48,12 @@ module Types
     def course(id:)
       HourglassSchema.object_from_id(id, context)
     end
+
+    field :users, [UserType], null: false do
+      guard Guards::CURRENT_USER_ADMIN
+    end
+    def users
+      User.all
+    end
   end
 end

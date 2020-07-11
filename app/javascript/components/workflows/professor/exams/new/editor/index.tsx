@@ -210,7 +210,6 @@ function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
 
 const WrappedName = wrapInput(Name);
 const WrappedPolicies = wrapInput(Policies);
-const WrappedFileUploader = wrapInput(FileUploader);
 const WrappedInstructions = wrapInput(Instructions);
 
 export const formSelector = formValueSelector('version-editor');
@@ -489,7 +488,7 @@ const ExamEditor: React.FC<
           <FormContextProviderConnected>
             <Alert variant="info">
               <h3>Exam-wide information</h3>
-              <Field name="files" component={WrappedFileUploader} />
+              <Field name="files" component={FileUploader} />
               <Field name="instructions" component={WrappedInstructions} />
             </Alert>
             <Form.Group as={Row}>

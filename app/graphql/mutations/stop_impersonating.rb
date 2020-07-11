@@ -5,9 +5,9 @@ module Mutations
     field :success, Boolean, null: false
 
     def authorized?
-      return true if context[:true_user].admin?
+      return true if context[:true_user] != context[:current_user]
 
-      raise GraphQL::ExecutionError, 'You do not have permission.'
+      raise GraphQL::ExecutionError, 'You are not currently impersonating another user.'
     end
 
     def resolve

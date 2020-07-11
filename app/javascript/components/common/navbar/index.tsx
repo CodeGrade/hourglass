@@ -5,7 +5,7 @@ import {
   Button,
 } from 'react-bootstrap';
 import { getCSRFToken } from '@student/exams/show/helpers';
-import { Link, useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { graphql, useQuery, useMutation } from 'relay-hooks';
 import { navbarQuery } from './__generated__/navbarQuery.graphql';
 import NotLoggedIn from './NotLoggedIn';
@@ -40,7 +40,6 @@ const RN: React.FC<{
     }
     `,
   );
-  const history = useHistory();
   const [stopImpersonating, { loading }] = useMutation(
     graphql`
     mutation navbarStopImpersonatingMutation {
@@ -51,8 +50,7 @@ const RN: React.FC<{
     `,
     {
       onCompleted: () => {
-        history.push('/');
-        res.retry();
+        window.location.href = '/';
       },
     },
   );

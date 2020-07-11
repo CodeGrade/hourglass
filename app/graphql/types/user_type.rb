@@ -10,6 +10,7 @@ module Types
     field :nuid, Integer, null: true
     field :email, String, null: false
     field :image_url, String, null: true
+    field :admin, Boolean, null: false
 
     field :registrations, Types::RegistrationType.connection_type, null: false
 

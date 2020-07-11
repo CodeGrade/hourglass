@@ -8,6 +8,9 @@ import { ExamContext } from '@student/exams/show/context';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
 import { FileRef } from '@hourglass/workflows/student/exams/show/types';
 
+/**
+ * Like useEffect, but does not trigger on the initial render.
+ */
 function useEffectSkipFirst(effect: React.EffectCallback, deps?: React.DependencyList) {
   const ranOnce = useRef(false);
   useEffect(() => {
@@ -34,6 +37,8 @@ const EditReference: React.FC<{
     onChange: (newVal: FileRef[]) => void;
   } = input;
   const { files, fmap } = useContext(ExamContext);
+  // We don't need the effect on the initial render, because
+  // we assume the fileRefs that come from the database are valid.
   useEffectSkipFirst(() => {
     // Filter out references that no longer exist.
     const filtered = value.filter((fileRef) => (fileRef.path in fmap));

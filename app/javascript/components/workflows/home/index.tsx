@@ -8,7 +8,6 @@ import {
   useMutation,
 } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
-import { ListGroup, Button } from 'react-bootstrap';
 import Select from 'react-select';
 
 import { homeQuery } from './__generated__/homeQuery.graphql';

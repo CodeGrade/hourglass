@@ -21,7 +21,6 @@ const Tooltip: React.FC<TooltipProps> = (props) => {
   const tooltip = showTooltip
     ? (
       <BSTooltip
-        // TODO: id below for a11y
         id={null}
       >
         {message}

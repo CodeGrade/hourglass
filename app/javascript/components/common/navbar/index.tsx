@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Navbar,
   Form,
@@ -7,29 +7,27 @@ import {
 import { getCSRFToken } from '@student/exams/show/helpers';
 import { Link } from 'react-router-dom';
 import { graphql, useQuery, useMutation } from 'relay-hooks';
-import { navbarQuery } from './__generated__/navbarQuery.graphql';
+import { AlertContext } from '@hourglass/common/alerts';
 import NotLoggedIn from './NotLoggedIn';
 
-function logOut(): void {
+import { navbarQuery } from './__generated__/navbarQuery.graphql';
+
+async function logOut(): Promise<unknown> {
   const url = '/users/sign_out';
-  fetch(url, {
+  return fetch(url, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
       'X-CSRF-Token': getCSRFToken(),
     },
     credentials: 'same-origin',
-  }).then(() => {
-    window.location.href = '/';
-  }).catch(() => {
-    // TODO
   });
 }
-
 
 const RN: React.FC<{
   className?: string;
 }> = ({ className }) => {
+  const { alert } = useContext(AlertContext);
   const res = useQuery<navbarQuery>(
     graphql`
     query navbarQuery {
@@ -51,6 +49,13 @@ const RN: React.FC<{
     {
       onCompleted: () => {
         window.location.href = '/';
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error stopping impersonation',
+          message: err.message,
+        });
       },
     },
   );
@@ -95,7 +100,17 @@ const RN: React.FC<{
           )}
           <Button
             variant="outline-danger"
-            onClick={logOut}
+            onClick={() => {
+              logOut().then(() => {
+                window.location.href = '/';
+              }).catch((err) => {
+                alert({
+                  variant: 'danger',
+                  title: 'Error logging out',
+                  message: err.message,
+                });
+              });
+            }}
           >
             Log Out
           </Button>

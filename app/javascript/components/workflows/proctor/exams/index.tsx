@@ -1725,7 +1725,12 @@ const ExamProctoring: React.FC = () => {
     return <RenderError error={res.error} />;
   }
   if (!res.props) {
-    return <p>Loading...</p>;
+    return (
+      <Container fluid>
+        <RegularNavbar className="row" />
+        <p>Loading...</p>
+      </Container>
+    );
   }
   return (
     <DocumentTitle title={`${res.props.exam.name} - Proctoring`}>

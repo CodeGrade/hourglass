@@ -11,7 +11,8 @@
   "properties": {
     "policies": { "$ref": "#/definitions/Policies" },
     "answers": { "$ref": "#/definitions/ExamAnswers" },
-    "contents": { "$ref": "#/definitions/Contents" }
+    "contents": { "$ref": "#/definitions/Contents" },
+    "rubrics": { "$ref": "#/definitions/Rubrics" }
   },
   "definitions": {
     "ExamAnswers": {
@@ -212,6 +213,91 @@
     "BodyItemAnswers": {
       "type": "array",
       "items": { "$ref": "#/definitions/BodyItemAnswer" }
+    },
+    "Rubrics": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["for", "items"],
+          "properties": {
+            "for": { "enum": ["part"] },
+            "items": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/Rubric" }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["for", "items"],
+          "properties": {
+            "for": { "enum": ["bodyItems"] },
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/Rubric" }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Rubric": {
+      "anyOf": [
+        { "$ref": "#/definitions/ItemRubric" },
+        { "$ref": "#/definitions/ConditionalRubric" }
+      ]
+    },
+    "ConditionalRubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["condition", "rubrics"],
+      "properties": {
+        "condition": { "$ref": "#/definitions/HTML" },
+        "rubric": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/definitions/ConditionalRubric" },
+              { "$ref": "#/definitions/ItemRubric" }
+            ]
+          }
+        }
+      }
+    },
+    "ItemRubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["points", "label", "description"],
+      "properties": {
+        "points": { "type": "number" },
+        "description": { "$ref": "#/definitions/HTML" },
+        "label": { "type": "string" },
+        "mercy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scope", "limit"],
+          "properties": {
+            "scope": { "enum": ["exam", "question", "part"] },
+            "limit": { "type": "number" }
+          }
+        },
+        "presets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["description", "points"],
+            "properties": {
+              "points": { "type": "number" },
+              "description": { "$ref": "#/definitions/HTML" }
+            }
+          }
+        }
+      }
     },
     "BodyItemAnswer": {
       "anyOf": [

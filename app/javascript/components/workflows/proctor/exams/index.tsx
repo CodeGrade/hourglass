@@ -1292,7 +1292,7 @@ const ExamMessages: React.FC<{
     graphql`
       fragment exams_messages on Exam {
         id
-        versionAnnouncements(first: 100000) @connection(key: "Exam_versionAnnouncements", filters: []) { # TODO: paginate
+        versionAnnouncements(first: 100000) @connection(key: "Exam_versionAnnouncements", filters: []) {
           edges {
             node {
               id
@@ -1304,7 +1304,7 @@ const ExamMessages: React.FC<{
             }
           }
         }
-        roomAnnouncements(first: 100000) @connection(key: "Exam_roomAnnouncements", filters: []) { # TODO: paginate
+        roomAnnouncements(first: 100000) @connection(key: "Exam_roomAnnouncements", filters: []) {
           edges {
             node {
               id
@@ -1316,7 +1316,7 @@ const ExamMessages: React.FC<{
             }
           }
         }
-        examAnnouncements(first: 100000) @connection(key: "Exam_examAnnouncements", filters: []) { # TODO: paginate
+        examAnnouncements(first: 100000) @connection(key: "Exam_examAnnouncements", filters: []) {
           edges {
             node {
               id
@@ -1325,7 +1325,7 @@ const ExamMessages: React.FC<{
             }
           }
         }
-        questions(first: 100000) @connection(key: "Exam_questions", filters: []) { # TODO: paginate
+        questions(first: 100000) @connection(key: "Exam_questions", filters: []) {
           edges {
             node {
               id

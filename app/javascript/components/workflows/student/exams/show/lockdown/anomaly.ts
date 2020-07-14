@@ -13,7 +13,6 @@ function lockOut(): void {
  * @param registrationID the ID of the current registration
  */
 const anom = (examTakeUrl: string) => (reason: string): void => {
-  // TODO use event argument?
   fetch(examTakeUrl, {
     method: 'POST',
     headers: {

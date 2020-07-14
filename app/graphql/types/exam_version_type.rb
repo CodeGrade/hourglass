@@ -11,7 +11,6 @@ module Types
       guard Guards::PROCTORS_AND_PROFESSORS
     end
 
-    # TODO: move this to /take and lock this field down to proctors_and_profs
     field :policies, [Types::LockdownPolicyType], null: false
 
     field :students, [Types::UserType], null: false, method: :users do

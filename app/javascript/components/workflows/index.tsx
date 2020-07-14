@@ -8,7 +8,11 @@ import React, {
   useMemo,
 } from 'react';
 import RegularNavbar from '@hourglass/common/navbar';
-import { Container, Modal, Button } from 'react-bootstrap';
+import {
+  Container,
+  Modal,
+  Button,
+} from 'react-bootstrap';
 import {
   BrowserRouter,
   Route,
@@ -24,11 +28,11 @@ import EditExamVersion from '@professor/exams/edit';
 import { AllAlerts } from '@hourglass/common/alerts';
 import './index.scss';
 import ErrorBoundary from '@hourglass/common/boundary';
-import DocumentTitle from '@hourglass/common/documentTitle';
 import Home from '@hourglass/workflows/home';
 
 import { RelayEnvironmentProvider } from 'relay-hooks';
 import environment from '@hourglass/relay/environment';
+import FourOhFour from './FourOhFour';
 
 type CustomHandler = (b: boolean) => void;
 
@@ -132,35 +136,53 @@ const Entry: React.FC = () => {
                 </AllAlerts>
               </Route>
               <Route path="/">
-                <RegularNavbar />
-                <Container>
-                  <ErrorBoundary>
-                    <AllAlerts>
-                      <Switch>
-                        <Route exact path="/">
+                <ErrorBoundary>
+                  <Switch>
+                    <Route exact path="/">
+                      <AllAlerts>
+                        <RegularNavbar />
+                        <Container>
                           <Home />
-                        </Route>
-                        <Route path="/exams/:examId/admin">
+                        </Container>
+                      </AllAlerts>
+                    </Route>
+                    <Route path="/exams/:examId/admin">
+                      <AllAlerts>
+                        <RegularNavbar />
+                        <Container>
                           <ExamAdmin />
-                        </Route>
-                        <Route path="/exams/:examId/submissions">
+                        </Container>
+                      </AllAlerts>
+                    </Route>
+                    <Route path="/exams/:examId/submissions">
+                      <RegularNavbar />
+                      <AllAlerts>
+                        <Container>
                           <ExamSubmissions />
-                        </Route>
-                        <Route path="/exams/:examId/versions/:versionId/edit" exact>
+                        </Container>
+                      </AllAlerts>
+                    </Route>
+                    <Route path="/exams/:examId/versions/:versionId/edit" exact>
+                      <RegularNavbar />
+                      <AllAlerts>
+                        <Container>
                           <EditExamVersion />
-                        </Route>
-                        <Route path="/courses/:courseId">
+                        </Container>
+                      </AllAlerts>
+                    </Route>
+                    <Route path="/courses/:courseId">
+                      <RegularNavbar />
+                      <AllAlerts>
+                        <Container>
                           <ShowCourse />
-                        </Route>
-                        <Route path="*">
-                          <DocumentTitle title="Not found">
-                            404!
-                          </DocumentTitle>
-                        </Route>
-                      </Switch>
-                    </AllAlerts>
-                  </ErrorBoundary>
-                </Container>
+                        </Container>
+                      </AllAlerts>
+                    </Route>
+                    <Route path="*">
+                      <FourOhFour />
+                    </Route>
+                  </Switch>
+                </ErrorBoundary>
               </Route>
             </Switch>
           </BrowserRouter>

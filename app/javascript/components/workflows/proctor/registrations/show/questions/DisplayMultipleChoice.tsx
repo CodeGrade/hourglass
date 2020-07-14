@@ -2,7 +2,7 @@ import React from 'react';
 import { MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 
-interface MultipleChoiceProps {
+export interface MultipleChoiceProps {
   info: MultipleChoiceInfo;
   value: MultipleChoiceState;
 }

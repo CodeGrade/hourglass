@@ -5,7 +5,6 @@ import {
   Col,
   Button,
   Card,
-  Table,
   ButtonGroup,
   Alert,
   AlertProps,
@@ -124,7 +123,7 @@ const ItemRubric: React.FC = () => (
       <Col>
         <p>Suggested comments:</p>
         <div>
-          <Alert variant="warning" className="d-flex p-0">
+          <Alert variant="warning" className="p-0">
             <Tooltip
               showTooltip
               message="Click to apply this message"
@@ -133,7 +132,7 @@ const ItemRubric: React.FC = () => (
             </Tooltip>
             (-2 points) Some descriptive text...
           </Alert>
-          <Alert variant="warning" className="d-flex p-0">
+          <Alert variant="warning" className="p-0">
             <Tooltip
               showTooltip
               message="Click to apply this message"
@@ -142,7 +141,7 @@ const ItemRubric: React.FC = () => (
             </Tooltip>
             (-5 points) Some more descriptive text...
           </Alert>
-          <Alert variant="warning" className="d-flex p-0">
+          <Alert variant="warning" className="p-0">
             <Tooltip
               showTooltip
               message="Click to apply this message"
@@ -194,12 +193,7 @@ const ItemRubricEditor: React.FC = () => (
                 </Form.Group>
                 <Form.Group as={Col} sm={10}>
                   <Form.Label>Description</Form.Label>
-                  <CustomEditor
-                    className="bg-white"
-                    theme="bubble"
-                    value=""
-                    placeholder="Comment for students to see"
-                  />
+                  <Form.Control as="textarea" placeholder="Comment for students to see" rows={1} />
                 </Form.Group>
               </Row>
             </Alert>
@@ -249,7 +243,7 @@ const ConditionalRubricEditor: React.FC<{ depth: number }> = ({ depth }) => {
         <Form.Group as={Col}>
           <Form.Label>Condition</Form.Label>
           <CustomEditor
-            className="bg-white"
+            className="bg-white border-silver border"
             theme="bubble"
             value=""
             placeholder="Describe when to use this sub-rubric"
@@ -327,43 +321,39 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
   } = props;
   return (
     <Card>
-      <Card.Body className="p-0">
-        <Table>
-          <thead>
-            <tr>
-              <th className="w-50">Student</th>
-              <th className="w-50">Rubric</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <ShowStudent
-                  info={info}
-                  value={studentAnswer}
-                />
-              </td>
-              <td>
-                <ShowExpected
-                  info={info}
-                  value={expectedAnswer}
-                />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <ItemizedGrades />
-                <Feedback variant="success" />
-                <Feedback variant="danger" />
-              </td>
-              <td>
-                <EditRubric />
-                <hr />
-                <ShowRubric />
-              </td>
-            </tr>
-          </tbody>
-        </Table>
+      <Card.Body>
+        <Row>
+          <Col md={6}><b>Student</b></Col>
+          <Col md={6}><b>Rubric</b></Col>
+        </Row>
+        <hr />
+        <Row>
+          <Col md={6}>
+            <ShowStudent
+              info={info}
+              value={studentAnswer}
+            />
+          </Col>
+          <Col md={6}>
+            <ShowExpected
+              info={info}
+              value={expectedAnswer}
+            />
+          </Col>
+        </Row>
+        <hr />
+        <Row>
+          <Col>
+            <ItemizedGrades />
+            <Feedback variant="success" />
+            <Feedback variant="danger" />
+          </Col>
+          <Col md={6}>
+            <EditRubric />
+            <hr />
+            <ShowRubric />
+          </Col>
+        </Row>
       </Card.Body>
     </Card>
   );

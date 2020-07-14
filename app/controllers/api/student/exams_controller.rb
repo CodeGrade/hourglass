@@ -57,8 +57,6 @@ module Api
       def start_exam!
         if @registration.start_time.nil?
           @registration.update(start_time: DateTime.now)
-        else
-          # TODO: post-anomaly log back in..
         end
         answers = @registration.current_answers
         version = @registration.exam_version

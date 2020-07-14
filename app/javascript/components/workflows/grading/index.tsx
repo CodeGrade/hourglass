@@ -40,10 +40,11 @@ import { ExamViewerContext, ExamContext } from '@student/exams/show/context';
 import { createMap } from '@student/exams/show/files';
 import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
 import DisplayCodeTag from '@proctor/registrations/show/questions/DisplayCodeTag';
-import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
+import GradeYesNo from '@hourglass/workflows/grading/questions/GradeYesNo';
+import GradeMatching from '@hourglass/workflows/grading/questions/GradeMatching';
+import GradeMultipleChoice from '@hourglass/workflows/grading/questions/GradeMultipleChoice';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import Tooltip from '@student/exams/show/components/Tooltip';
@@ -60,6 +61,8 @@ import { grading_one$key } from './__generated__/grading_one.graphql';
 import { QuestionName } from '../student/exams/show/components/ShowQuestion';
 import { PartName } from '../student/exams/show/components/Part';
 import CustomEditor from '../professor/exams/new/editor/components/CustomEditor';
+import DisplayMatching from '../proctor/registrations/show/questions/DisplayMatching';
+import DisplayYesNo from '../proctor/registrations/show/questions/DisplayYesNo';
 
 const Feedback: React.FC<{
   variant: AlertProps['variant'];
@@ -407,6 +410,7 @@ const GradeBodyItem: React.FC<{
           <PromptRow prompt={info.prompt} />
           <AnswersRow
             info={info}
+            ShowStudent={GradeYesNo}
             ShowExpected={DisplayYesNo}
             studentAnswer={studentAnswer as YesNoState}
             expectedAnswer={expectedAnswer as YesNoState}
@@ -431,6 +435,7 @@ const GradeBodyItem: React.FC<{
           {/* <PromptRow prompt={info.prompt} /> */}
           <AnswersRow
             info={info}
+            ShowStudent={GradeMatching}
             ShowExpected={DisplayMatching}
             studentAnswer={studentAnswer as MatchingState}
             expectedAnswer={expectedAnswer as MatchingState}
@@ -455,6 +460,7 @@ const GradeBodyItem: React.FC<{
           <PromptRow prompt={info.prompt} />
           <AnswersRow
             info={info}
+            ShowStudent={GradeMultipleChoice}
             ShowExpected={DisplayMultipleChoice}
             studentAnswer={studentAnswer as MultipleChoiceState}
             expectedAnswer={expectedAnswer as MultipleChoiceState}

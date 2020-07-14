@@ -11,6 +11,9 @@ class Anomaly < ApplicationRecord
   delegate :user, to: :registration
   delegate :exam, to: :registration
 
+  scope :unforgiven, -> { where(forgiven: false) }
+  scope :forgiven, -> { where(forgiven: true) }
+
   def trigger_subscription
     exam_id = HourglassSchema.id_from_object(exam, Types::ExamType, {})
     HourglassSchema.subscriptions.trigger(:anomaly_was_created, { exam_id: exam_id }, self)

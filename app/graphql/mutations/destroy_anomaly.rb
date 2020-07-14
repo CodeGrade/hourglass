@@ -20,8 +20,8 @@ module Mutations
     end
 
     def resolve(anomaly:)
-      destroyed = anomaly.destroy
-      raise GraphQL::ExecutionError, anomaly.errors.full_messages.to_sentence unless destroyed
+      updated = anomaly.update(forgiven: true)
+      raise GraphQL::ExecutionError, anomaly.errors.full_messages.to_sentence unless updated
 
       deleted_id = HourglassSchema.id_from_object(anomaly, Types::AnomalyType, context)
       exam_id = HourglassSchema.id_from_object(anomaly.exam, Types::ExamType, context)

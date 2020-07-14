@@ -31,6 +31,9 @@ module Types
     field :anomalies, Types::AnomalyType.connection_type, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
+    def anomalies
+      object.anomalies.unforgiven
+    end
 
     field :messages, Types::MessageType.connection_type, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS

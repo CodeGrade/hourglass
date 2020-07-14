@@ -41,6 +41,6 @@ class Course < ApplicationRecord
   end
 
   def visible_to?(check_user)
-    professors.exists? check_user.id
+    all_staff.exists? check_user.id
   end
 end

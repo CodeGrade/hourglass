@@ -1,9 +1,19 @@
 .sidebar-small {
-  width: var(--sidebar-small);
+  transition: 0.35s max-width ease-in-out, 0.35s min-width ease-in-out;
+  min-width: var(--sidebar-small);
+  max-width: var(--sidebar-small);
 }
 
 .sidebar-expanded {
-  width: var(--sidebar-expanded);
+  transition: 0.35s max-width ease-in-out, 0.35s min-width ease-in-out;
+  min-width: var(--sidebar-expanded);
+  max-width: 50%;
+  resize: horizontal;
+  overflow: auto;
+}
+
+.mw-0 {
+  max-width: 0;
 }
 
 .collapse:not(.width):not(.show) {

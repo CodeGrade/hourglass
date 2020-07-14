@@ -36,7 +36,7 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
       onClick={(): void => onSectionClick(eventKey)}
     >
       <RenderIcon I={Icon} className="" />
-      <span aria-hidden="true" className="width-0">&nbsp;</span>
+      <span aria-hidden="true" className="mw-0">&nbsp;</span>
       <Collapse
         in={expanded}
         dimension="width"

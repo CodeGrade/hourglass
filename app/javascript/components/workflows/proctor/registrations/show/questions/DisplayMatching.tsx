@@ -6,7 +6,7 @@ import { MatchingInfo, MatchingState } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { alphabetIdx } from '@hourglass/common/helpers';
 
-interface MatchingProps {
+export interface MatchingProps {
   info: MatchingInfo;
   value: MatchingState;
 }

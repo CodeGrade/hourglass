@@ -5,6 +5,8 @@ Style/TrailingCommaInHashLiteral:
   EnforcedStyleForMultiline: comma
 Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: comma
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 Style/Documentation:

@@ -19,8 +19,10 @@ module Types
       object == context[:current_user]
     end
 
-    # field :staff_registrations, [Types::StaffRegistrationType], null: false
-    # field :proctor_registrations, [Types::ProctorRegistrationType], null: false
+    # field :staff_registrations, [Types::StaffRegistrationType], null: false # TODO: for grading
+    field :proctor_registrations, Types::ProctorRegistrationType.connection_type, null: false do
+      guard ->(obj, _, ctx) { obj.object == ctx[:current_user] }
+    end
 
     field :professor_course_registrations, Types::ProfessorCourseRegistrationType.connection_type, null: false do
       guard ->(obj, _, ctx) { obj.object == ctx[:current_user] }

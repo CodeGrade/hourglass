@@ -8,14 +8,13 @@ module Types
     guard Guards::VISIBILITY
 
     field :title, String, null: false
-    field :active, Boolean, null: false
-    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
-    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
-    field :exams, [Types::ExamType], null: false
-    delegate :exams, to: :object
+    field :exams, [Types::ExamType], null: false do
+      guard ->(obj, _, ctx) { obj.object.all_staff.exists? ctx[:current_user].id }
+    end
 
-    field :sections, [Types::SectionType], null: false
-    delegate :sections, to: :object
+    field :sections, [Types::SectionType], null: false do
+      guard Guards::PROFESSORS
+    end
   end
 end

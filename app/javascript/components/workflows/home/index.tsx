@@ -13,6 +13,7 @@ import { ListGroup, Button } from 'react-bootstrap';
 import { homeQuery } from './__generated__/homeQuery.graphql';
 import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
 import { home_profregs$key } from './__generated__/home_profregs.graphql';
+import { home_proctorregs$key } from './__generated__/home_proctorregs.graphql';
 
 const ShowRegistrations: React.FC<{
   registrations: home_studentregs$key;
@@ -40,6 +41,41 @@ const ShowRegistrations: React.FC<{
         {res.map((reg) => (
           <li key={reg.id}>
             <Link to={`/exams/${reg.exam.id}`}>
+              {reg.exam.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+};
+
+const ShowProctorRegs: React.FC<{
+  proctorRegistrations: home_proctorregs$key;
+}> = (props) => {
+  const {
+    proctorRegistrations,
+  } = props;
+  const res = useFragment(
+    graphql`
+    fragment home_proctorregs on ProctorRegistration @relay(plural: true) {
+      id
+      exam {
+        id
+        name
+      }
+    }
+    `,
+    proctorRegistrations,
+  );
+  if (res.length === 0) return null;
+  return (
+    <>
+      <h1>Proctor an Exam</h1>
+      <ul>
+        {res.map((reg) => (
+          <li key={reg.id}>
+            <Link to={`/exams/${reg.exam.id}/proctoring`}>
               {reg.exam.name}
             </Link>
           </li>
@@ -162,6 +198,11 @@ const Home: React.FC = () => {
             ...home_studentregs
           }
         }
+        proctorRegistrations {
+          nodes {
+            ...home_proctorregs
+          }
+        }
         professorCourseRegistrations {
           nodes {
             ...home_profregs
@@ -180,6 +221,7 @@ const Home: React.FC = () => {
   const allEmpty = (
     res.props.me.registrations.nodes.length === 0
     && res.props.me.professorCourseRegistrations.nodes.length === 0
+    && res.props.me.proctorRegistrations.nodes.length === 0
   );
   if (allEmpty) {
     return (
@@ -192,6 +234,9 @@ const Home: React.FC = () => {
     <DocumentTitle title="My Exams">
       <ShowRegistrations
         registrations={res.props.me.registrations.nodes}
+      />
+      <ShowProctorRegs
+        proctorRegistrations={res.props.me.proctorRegistrations.nodes}
       />
       <ShowProfRegs
         professorCourseRegistrations={res.props.me.professorCourseRegistrations.nodes}

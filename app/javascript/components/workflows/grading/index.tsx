@@ -473,6 +473,8 @@ const Grade: React.FC<{
 }> = (props) => {
   const {
     registrationKey,
+    qnum,
+    pnum,
   } = props;
   const res = useFragment(
     graphql`
@@ -503,45 +505,39 @@ const Grade: React.FC<{
   return (
     <ExamContext.Provider value={contextVal}>
       <ExamViewerContext.Provider value={viewerContextVal}>
-        {questions.map((q, qnum) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <div key={qnum}>
+        <div>
+          <Row>
+            <Col sm={{ span: 6, offset: 3 }}>
+              <h2><QuestionName qnum={qnum} name={questions[qnum].name} /></h2>
+            </Col>
+          </Row>
+          <div>
             <Row>
               <Col sm={{ span: 6, offset: 3 }}>
-                <h2><QuestionName qnum={qnum} name={q.name} /></h2>
+                <h3><PartName pnum={pnum} name={questions[qnum].parts[pnum].name} /></h3>
               </Col>
             </Row>
-            {q.parts.map((p, pnum) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <div key={pnum}>
-                <Row>
-                  <Col sm={{ span: 6, offset: 3 }}>
-                    <h3><PartName pnum={pnum} name={p.name} /></h3>
-                  </Col>
-                </Row>
-                {p.body.map((b, bnum) => {
-                  const studentAns = currentAnswers.answers[qnum][pnum][bnum];
-                  const studentAnswer = isNoAns(studentAns) ? undefined : studentAns;
+            {questions[qnum].parts[pnum].body.map((b, bnum) => {
+              const studentAns = currentAnswers.answers[qnum][pnum][bnum];
+              const studentAnswer = isNoAns(studentAns) ? undefined : studentAns;
 
-                  const ans = answers[qnum][pnum][bnum];
-                  const expectedAnswer = isNoAns(ans) ? undefined : ans;
-                  return (
-                    <GradeBodyItem
-                      // eslint-disable-next-line react/no-array-index-key
-                      key={bnum}
-                      info={b}
-                      studentAnswer={studentAnswer}
-                      expectedAnswer={expectedAnswer}
-                      qnum={qnum}
-                      pnum={pnum}
-                      bnum={bnum}
-                    />
-                  );
-                })}
-              </div>
-            ))}
+              const ans = answers[qnum][pnum][bnum];
+              const expectedAnswer = isNoAns(ans) ? undefined : ans;
+              return (
+                <GradeBodyItem
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={bnum}
+                  info={b}
+                  studentAnswer={studentAnswer}
+                  expectedAnswer={expectedAnswer}
+                  qnum={qnum}
+                  pnum={pnum}
+                  bnum={bnum}
+                />
+              );
+            })}
           </div>
-        ))}
+        </div>
         <Row>
           <Button>
             Next exam
@@ -593,8 +589,8 @@ const GradeOnePart: React.FC = () => {
         </Row>
         <Grade
           registrationKey={res.props.registration}
-          qnum={qnum}
-          pnum={pnum}
+          qnum={Number(qnum)}
+          pnum={Number(pnum)}
         />
       </Col>
       <Col sm="auto">

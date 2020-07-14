@@ -19,13 +19,18 @@ module Types
       object == context[:current_user]
     end
 
-    # field :staff_registrations, [Types::StaffRegistrationType], null: false # TODO: for grading
+    OBJECT_IS_CURRENT_USER = ->(obj, _, ctx) { obj.object == ctx[:current_user] }
+
+    field :staff_registrations, Types::StaffRegistrationType.connection_type, null: false do
+      guard OBJECT_IS_CURRENT_USER
+    end
+
     field :proctor_registrations, Types::ProctorRegistrationType.connection_type, null: false do
-      guard ->(obj, _, ctx) { obj.object == ctx[:current_user] }
+      guard OBJECT_IS_CURRENT_USER
     end
 
     field :professor_course_registrations, Types::ProfessorCourseRegistrationType.connection_type, null: false do
-      guard ->(obj, _, ctx) { obj.object == ctx[:current_user] }
+      guard OBJECT_IS_CURRENT_USER
     end
   end
 end

@@ -41,7 +41,7 @@ const listeners: {
     },
   },
   {
-    event: 'beforeunload',
+    event: 'unload',
     handler: (detected) => (e: Event): void => {
       detected('tried to navigate away', e);
     },

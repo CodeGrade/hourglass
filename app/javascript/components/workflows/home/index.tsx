@@ -9,6 +9,7 @@ import {
 } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
 import { ListGroup, Button } from 'react-bootstrap';
+import Select from 'react-select';
 
 import { homeQuery } from './__generated__/homeQuery.graphql';
 import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
@@ -123,6 +124,11 @@ const ShowProfRegs: React.FC<{
   );
 };
 
+interface ImpersonateVal {
+  label: string;
+  value: string;
+}
+
 const Admin: React.FC = () => {
   const res = useQuery(
     graphql`
@@ -154,35 +160,26 @@ const Admin: React.FC = () => {
   if (!res.props) {
     return <p>Loading...</p>;
   }
+  const userOptions: ImpersonateVal[] = res.props.users.map((user) => ({
+    label: user.displayName,
+    value: user.id,
+  }));
   return (
     <>
       <h1>Impersonation</h1>
-      <ListGroup>
-        {res.props.users.map((user) => (
-          <ListGroup.Item key={user.id}>
-            <span className="text-center">
-              {user.displayName}
-            </span>
-            <span className="float-right">
-              <Button
-                disabled={loading}
-                variant="success"
-                onClick={() => {
-                  impersonate({
-                    variables: {
-                      input: {
-                        userId: user.id,
-                      },
-                    },
-                  });
-                }}
-              >
-                Impersonate
-              </Button>
-            </span>
-          </ListGroup.Item>
-        ))}
-      </ListGroup>
+      <Select
+        isDisabled={loading}
+        options={userOptions}
+        onChange={(val: ImpersonateVal) => {
+          impersonate({
+            variables: {
+              input: {
+                userId: val.value,
+              },
+            },
+          });
+        }}
+      />
     </>
   );
 };

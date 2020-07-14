@@ -22,13 +22,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
-  # TODO: test all four 'already finalized' messages
-  # TODO test invalid type
-  # TODO test version ID for different exam
-
   test 'finalize exam' do
-    # TODO: students in different exams
-    # TODO test finalizes students not in rooms
     assert_not @exam.finalized?
     assert_not @version.finalized?
     assert_not @registration.final?
@@ -49,8 +43,6 @@ class FinalizationTest < ActionDispatch::IntegrationTest
   end
 
   test 'finalize version' do
-    # TODO: students in different versions
-    # TODO test finalizes students not in rooms
     assert_not @version.finalized?
     assert_not @registration.final?
     assert_not @room.finalized?
@@ -68,7 +60,6 @@ class FinalizationTest < ActionDispatch::IntegrationTest
   end
 
   test 'finalize room' do
-    # TODO: students in different rooms
     assert_not @registration.final?
     assert_not @room.finalized?
     result = HourglassSchema.do_mutation!(FINALIZE_ITEM_QUERY, @prof, {

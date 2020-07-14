@@ -28,7 +28,7 @@ module Bottlenose
       got = bottlenose_get("/api/courses/#{course.bottlenose_id}/registrations")
       got.each do |sec_id, sec_obj|
         sec = course.sections.find_or_initialize_by(bottlenose_id: sec_id)
-        sec.title = "#{sec_obj['type']} - #{sec_obj['meeting_time']}"
+        sec.title = "#{sec_obj['type']} - #{sec_obj['meeting_time']} (#{sec_obj['crn']})"
         sec.save!
         sec_obj['students'].each do |student|
           user = sync_user(student)

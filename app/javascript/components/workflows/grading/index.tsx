@@ -9,6 +9,8 @@ import {
   ButtonGroup,
   Alert,
   AlertProps,
+  DropdownButton,
+  Dropdown,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
@@ -16,6 +18,7 @@ import {
   FaThumbsDown,
   FaThumbsUp,
 } from 'react-icons/fa';
+import { MdFeedback } from 'react-icons/md';
 import Icon from '@student/exams/show/components/Icon';
 import {
   HTMLVal,
@@ -44,6 +47,7 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
+import Tooltip from '@student/exams/show/components/Tooltip';
 import Select from 'react-select';
 import {
   Link,
@@ -56,6 +60,7 @@ import { useQuery, useFragment, graphql } from 'relay-hooks';
 import { grading_one$key } from './__generated__/grading_one.graphql';
 import { QuestionName } from '../student/exams/show/components/ShowQuestion';
 import { PartName } from '../student/exams/show/components/Part';
+import CustomEditor from '../professor/exams/new/editor/components/CustomEditor';
 
 const Feedback: React.FC<{
   variant: AlertProps['variant'];
@@ -103,6 +108,200 @@ const PromptRow: React.FC<{
     </Col>
   </Row>
 );
+
+const ItemRubric: React.FC = () => (
+  <Alert variant="info" className="pb-0">
+    <Row>
+      <Col>
+        <ButtonGroup className="float-right">
+          <Button variant="outline-secondary" size="sm" disabled>rubric-item-label</Button>
+          <Button variant="outline-secondary" size="sm" disabled><i>5 points</i></Button>
+        </ButtonGroup>
+        <HTML value={{ type: 'HTML', value: 'Description of <i>item</i> goes here' }} />
+      </Col>
+    </Row>
+    <Row>
+      <Col>
+        <p>Suggested comments:</p>
+        <div>
+          <Alert variant="warning" className="d-flex p-0">
+            <Tooltip
+              showTooltip
+              message="Click to apply this message"
+            >
+              <Button variant="warning" size="sm" className="mr-2 align-self-center"><Icon I={MdFeedback} /></Button>
+            </Tooltip>
+            (-2 points) Some descriptive text...
+          </Alert>
+          <Alert variant="warning" className="d-flex p-0">
+            <Tooltip
+              showTooltip
+              message="Click to apply this message"
+            >
+              <Button variant="warning" size="sm" className="mr-2 align-self-center"><Icon I={MdFeedback} /></Button>
+            </Tooltip>
+            (-5 points) Some more descriptive text...
+          </Alert>
+          <Alert variant="warning" className="d-flex p-0">
+            <Tooltip
+              showTooltip
+              message="Click to apply this message"
+            >
+              <Button variant="warning" size="sm" className="mr-2 align-self-center"><Icon I={MdFeedback} /></Button>
+            </Tooltip>
+            (-0.5 points) Some other descriptive text...
+          </Alert>
+        </div>
+      </Col>
+    </Row>
+  </Alert>
+);
+
+const ItemRubricEditor: React.FC = () => (
+  <Alert variant="info" className="pb-0 px-3" dismissible>
+    <Alert.Heading>Item rubric</Alert.Heading>
+    <Row>
+      <Form.Group as={Col}>
+        <Form.Label>Label</Form.Label>
+        <Form.Control as="input" />
+      </Form.Group>
+      <Form.Group as={Col}>
+        <Form.Label>Maximum points</Form.Label>
+        <Form.Control step={0.5} type="number" min={0} />
+      </Form.Group>
+    </Row>
+    <Row>
+      <Form.Group as={Col}>
+        <Form.Label>Instructions</Form.Label>
+        <CustomEditor
+          className="bg-white"
+          theme="bubble"
+          value=""
+          placeholder="Describe what the grading rules are"
+        />
+      </Form.Group>
+    </Row>
+    <Row>
+      <Form.Group as={Col} className="mb-0">
+        <Form.Label>Presets</Form.Label>
+        <div>
+          {[1, 2, 3].map((i) => (
+            <Alert key={`preset-${i}`} variant="warning" className="pb-0" dismissible>
+              <Row>
+                <Form.Group as={Col} sm={2}>
+                  <Form.Label>Points</Form.Label>
+                  <Form.Control step={0.5} type="number" min={0} />
+                </Form.Group>
+                <Form.Group as={Col} sm={10}>
+                  <Form.Label>Description</Form.Label>
+                  <CustomEditor
+                    className="bg-white"
+                    theme="bubble"
+                    value=""
+                    placeholder="Comment for students to see"
+                  />
+                </Form.Group>
+              </Row>
+            </Alert>
+          ))}
+        </div>
+      </Form.Group>
+    </Row>
+  </Alert>
+);
+
+const ConditionalRubric: React.FC<{ depth: number }> = ({ depth }) => {
+  const variants: AlertProps['variant'][] = ['light', 'secondary', 'dark'];
+  const variant: AlertProps['variant'] = variants[depth] ?? 'primary';
+  return (
+    <Alert variant={variant} className="pb-0">
+      <Row>
+        <Col>
+          <HTML value={{ type: 'HTML', value: '<p>The description of this <b>sub-rubric</b></p>' }} />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          {depth <= 0 ? (
+            <>
+              <ItemRubric />
+              <ItemRubric />
+            </>
+          ) : (
+            <>
+              <ConditionalRubric depth={depth - 1} />
+              <ConditionalRubric depth={depth - 2} />
+            </>
+          )}
+        </Col>
+      </Row>
+    </Alert>
+  );
+};
+
+const ConditionalRubricEditor: React.FC<{ depth: number }> = ({ depth }) => {
+  const variants: AlertProps['variant'][] = ['light', 'secondary', 'dark'];
+  const variant: AlertProps['variant'] = variants[depth] ?? 'primary';
+  return (
+    <Alert variant={variant} className="pb-0 px-3" dismissible>
+      <Alert.Heading>Conditional rubric</Alert.Heading>
+      <Row>
+        <Form.Group as={Col}>
+          <Form.Label>Condition</Form.Label>
+          <CustomEditor
+            className="bg-white"
+            theme="bubble"
+            value=""
+            placeholder="Describe when to use this sub-rubric"
+          />
+        </Form.Group>
+      </Row>
+      <Row>
+        <Form.Group as={Col} className="mb-0">
+          <Form.Label>Use the following rubric:</Form.Label>
+          {depth <= 0 ? (
+            <>
+              <ItemRubricEditor />
+              <ItemRubricEditor />
+            </>
+          ) : (
+            <>
+              <ConditionalRubricEditor depth={depth - 1} />
+              <ConditionalRubricEditor depth={depth - 2} />
+            </>
+          )}
+        </Form.Group>
+      </Row>
+    </Alert>
+  );
+};
+
+const EditRubric: React.FC = () => (
+  <>
+    <ItemRubricEditor />
+    <ConditionalRubricEditor depth={2} />
+    <DropdownButton
+      id="add-rubric"
+      variant="secondary"
+      title="Add new rubric item..."
+    >
+      <Dropdown.Item>
+        Item rubric
+      </Dropdown.Item>
+      <Dropdown.Item>
+        Conditional rubric
+      </Dropdown.Item>
+    </DropdownButton>
+  </>
+);
+
+const ShowRubric: React.FC = () => (
+  <>
+    <ItemRubric />
+    <ConditionalRubric depth={2} />
+  </>
+);
+
 
 interface AnswersRowProps<T, V> {
   ShowStudent?: React.ComponentType<{
@@ -157,7 +356,11 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
                 <Feedback variant="success" />
                 <Feedback variant="danger" />
               </td>
-              <td>etc</td>
+              <td>
+                <EditRubric />
+                <hr />
+                <ShowRubric />
+              </td>
             </tr>
           </tbody>
         </Table>

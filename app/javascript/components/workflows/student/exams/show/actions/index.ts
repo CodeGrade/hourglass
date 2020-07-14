@@ -265,7 +265,9 @@ export function submitExam(examTakeUrl: string): Thunk {
       .then((result) => result.json() as Promise<SubmitResponse>)
       .then(() => {
         window.location.href = '/';
+      })
+      .catch(() => {
+        window.location.href = '/';
       });
-    // TODO: catch
   };
 }

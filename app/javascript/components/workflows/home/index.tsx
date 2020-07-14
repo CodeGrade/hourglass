@@ -119,32 +119,35 @@ const Admin: React.FC = () => {
     return <p>Loading...</p>;
   }
   return (
-    <ListGroup>
-      {res.props.users.map((user) => (
-        <ListGroup.Item key={user.id}>
-          <span className="text-center">
-            {user.displayName}
-          </span>
-          <span className="float-right">
-            <Button
-              disabled={loading}
-              variant="success"
-              onClick={() => {
-                impersonate({
-                  variables: {
-                    input: {
-                      userId: user.id,
+    <>
+      <h1>Impersonation</h1>
+      <ListGroup>
+        {res.props.users.map((user) => (
+          <ListGroup.Item key={user.id}>
+            <span className="text-center">
+              {user.displayName}
+            </span>
+            <span className="float-right">
+              <Button
+                disabled={loading}
+                variant="success"
+                onClick={() => {
+                  impersonate({
+                    variables: {
+                      input: {
+                        userId: user.id,
+                      },
                     },
-                  },
-                });
-              }}
-            >
-              Impersonate
-            </Button>
-          </span>
-        </ListGroup.Item>
-      ))}
-    </ListGroup>
+                  });
+                }}
+              >
+                Impersonate
+              </Button>
+            </span>
+          </ListGroup.Item>
+        ))}
+      </ListGroup>
+    </>
   );
 };
 
@@ -178,13 +181,6 @@ const Home: React.FC = () => {
     res.props.me.registrations.nodes.length === 0
     && res.props.me.professorCourseRegistrations.nodes.length === 0
   );
-  if (res.props.me.admin) {
-    return (
-      <DocumentTitle title="Admin">
-        <Admin />
-      </DocumentTitle>
-    );
-  }
   if (allEmpty) {
     return (
       <DocumentTitle title="Hourglass">
@@ -200,6 +196,9 @@ const Home: React.FC = () => {
       <ShowProfRegs
         professorCourseRegistrations={res.props.me.professorCourseRegistrations.nodes}
       />
+      {res.props.me.admin && (
+        <Admin />
+      )}
     </DocumentTitle>
   );
 };

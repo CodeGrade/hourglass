@@ -4,7 +4,6 @@ import { AnomalyDetected, Policy } from '@student/exams/show/types';
 import { installListeners, removeListeners } from './listeners';
 
 function lockOut(): void {
-  // TODO: redirect with flash
   window.location.href = '/';
 }
 

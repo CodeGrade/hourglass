@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   create_table "anomalies", force: :cascade do |t|
     t.bigint "registration_id", null: false
     t.string "reason", default: "", null: false
+    t.boolean "forgiven", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["registration_id"], name: "index_anomalies_on_registration_id"

@@ -133,6 +133,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
     create_table :anomalies do |t|
       t.references :registration, null: false, foreign_key: true
       t.string :reason, null: false, default: ''
+      t.boolean :forgiven, null: false, default: false
 
       t.timestamps
     end

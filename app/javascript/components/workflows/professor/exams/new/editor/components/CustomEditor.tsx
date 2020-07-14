@@ -64,9 +64,11 @@ const CustomEditor: React.FC<CustomEditorProps> = (props) => {
   } = props;
 
   const filteredOnChange = useCallback((val, delta, source, editor) => {
-    const quillBreak = new RegExp('<p><br></p>', 'g');
-    const filteredVal = val.replace(quillBreak, '');
-    onChange(filteredVal, delta, source, editor);
+    if (onChange) {
+      const quillBreak = new RegExp('<p><br></p>', 'g');
+      const filteredVal = val.replace(quillBreak, '');
+      onChange(filteredVal, delta, source, editor);
+    }
   }, [onChange]);
 
   return (

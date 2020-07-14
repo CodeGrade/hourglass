@@ -3,7 +3,7 @@ policies:
   - IGNORE_LOCKDOWN
   - TOLERATE_WINDOWED
 contents:
-  instructions: TODO
+  instructions: Exam instructions here...
   questions:
     - description: "Something to answer."
       separateSubparts: false

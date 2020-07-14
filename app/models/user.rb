@@ -20,6 +20,7 @@ class User < ApplicationRecord
 
   has_many :courses, through: :registrations
   has_many :messages, through: :registrations
+
   has_many :sent_messages,
            foreign_key: 'sender',
            class_name: 'Message',

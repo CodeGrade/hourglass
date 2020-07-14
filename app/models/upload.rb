@@ -175,7 +175,6 @@ class Upload
                 elsif b.key? 'Code'
                   initial = b['Code']['initial']
                   unless initial.nil?
-                    # TODO: check file ref validity
                     if initial.key? 'file'
                     #   filename = initial['file']
                     #   file = files[filename]

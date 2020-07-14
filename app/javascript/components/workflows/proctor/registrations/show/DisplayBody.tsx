@@ -82,7 +82,6 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
         </Prompted>
       );
     case 'Matching':
-      // TODO: prompt me
       return <DisplayMatching info={body} value={value as MatchingState} />;
     default:
       throw new ExhaustiveSwitchError(body);

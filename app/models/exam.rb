@@ -44,7 +44,6 @@ class Exam < ApplicationRecord
     User.where(id: registrations.select(:user_id))
   end
 
-  # TODO: has_many through
   def proctors
     User.where(id: proctor_registrations.select(:user_id))
   end

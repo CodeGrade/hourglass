@@ -154,7 +154,7 @@ const Entry: React.FC = () => {
                         </Route>
                         <Route path="*">
                           <DocumentTitle title="Not found">
-                            TODO: 404!
+                            404!
                           </DocumentTitle>
                         </Route>
                       </Switch>

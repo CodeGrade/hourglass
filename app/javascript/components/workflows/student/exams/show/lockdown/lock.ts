@@ -8,10 +8,6 @@ import { isCovered, isFullscreen, openFullscreen } from './helpers';
 export default async function lock(policies: readonly Policy[]): Promise<void> {
   if (policyPermits(policies, Policy.tolerateWindowed)) return;
 
-  // browser detection
-  // TODO: more robust browser detection, with version numbers:
-  //   https://github.com/lancedikson/bowser
-  // disallow mobile entirely!
   const isChrome = navigator.userAgent.search('Chrome') >= 0;
   const isFirefox = navigator.userAgent.search('Firefox') >= 0;
   if (!isChrome && !isFirefox) {

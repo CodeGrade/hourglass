@@ -17,7 +17,7 @@ module Types
     end
 
     field :exam_versions, Types::ExamVersionType.connection_type, null: false do
-      guard Guards::PROFESSORS
+      guard Guards::PROCTORS_AND_PROFESSORS
     end
 
     field :rooms, [Types::RoomType], null: false do

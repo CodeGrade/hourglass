@@ -75,6 +75,8 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
       <BlockNav
         onLeave={leave}
         message="Are you sure you want to navigate away? Your exam will be submitted."
+        stayText="Stay and continue working"
+        leaveText="Leave and submit exam"
       />
       <ExamFilesContext.Provider value={examFilesContextVal}>
         <h1>{res.name}</h1>

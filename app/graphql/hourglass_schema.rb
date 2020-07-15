@@ -68,7 +68,7 @@ class HourglassSchema < GraphQL::Schema
     when VersionAnnouncement
       Types::VersionAnnouncementType
     else
-      raise("Unexpected object: #{obj}")
+      raise("Unexpected object of type '#{type}': #{obj}")
     end
   end
 

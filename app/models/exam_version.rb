@@ -53,6 +53,10 @@ class ExamVersion < ApplicationRecord
     info['answers']
   end
 
+  def rubrics
+    info['rubrics']
+  end
+
   def questions
     contents['questions']
   end

@@ -110,16 +110,18 @@ class Upload
     }.compact
   end
 
-  def conditional_rubric(r)
+  def conditional_rubric(r, depth)
     {
       condition: make_html_val(r['condition']),
-      rubrics: r['rubrics'].map { |r| convert_rubric(r) },
+      rubrics: r['rubrics'].map { |r| convert_rubric(r, depth) },
     }
   end
 
-  def convert_rubric(r)
+  def convert_rubric(r, depth = 2)
+    raise 'Cannot nest rubric conditions that deeply.' if depth <= 0
+
     if r.key? 'condition'
-      conditional_rubric(r)
+      conditional_rubric(r, depth - 1)
     else
       item_rubric(r)
     end
@@ -175,22 +177,28 @@ class Upload
     end
 
     rubrics = contents['questions'].map do |q|
-      q['parts'].map do |p|
-        {
-          part: p['rubric']&.map do |r|
-            convert_rubric(r)
-          end || [],
-          body: p['body']&.map do |b|
-            if b.is_a? Hash
-              b.values.first['rubric']&.map do |r|
-                convert_rubric(r)
-              end || []
-            else
-              []
-            end
-          end || [],
-        }
-      end
+      {
+        parts: q['parts']&.map do |p|
+          {
+            part: p['rubric']&.map do |r|
+              convert_rubric(r)
+            end || [],
+            body: p['body']&.map do |b|
+              {
+                rubrics: (
+                  if b.is_a? Hash
+                    b.values.first['rubric']&.map do |r|
+                      convert_rubric(r)
+                    end || []
+                  else
+                    []
+                  end
+                ),
+              }
+            end || [],
+          }
+        end || [],
+      }
     end
 
     e_reference = contents['reference']&.map{|r| map_reference r} || []

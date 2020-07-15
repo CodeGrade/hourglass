@@ -219,8 +219,15 @@
       "items": { "$ref": "#/definitions/QuestionRubric" }
     },
     "QuestionRubric": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/PartRubric" }
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parts"],
+      "properties": {
+        "parts": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/PartRubric" }
+        }
+      }
     },
     "PartRubric": {
       "type": "object",
@@ -228,10 +235,19 @@
       "required": ["part", "body"],
       "properties": {
         "part": { "$ref": "#/definitions/Rubrics" },
-        "body": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/Rubrics" }
-        }
+        "body": { "$ref": "#/definitions/BodyRubrics" }
+      }
+    },
+    "BodyRubrics": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/BodyRubric" }
+    },
+    "BodyRubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rubrics"],
+      "properties": {
+        "rubrics": { "$ref": "#/definitions/Rubrics" }
       }
     },
     "Rubrics": {

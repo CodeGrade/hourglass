@@ -41,7 +41,7 @@ const listeners: {
     },
   },
   {
-    event: 'unload',
+    event: 'beforeunload',
     handler: (detected) => (e: Event): void => {
       detected('tried to navigate away', e);
     },
@@ -55,7 +55,10 @@ export function installListeners(
   if (policyPermits(policies, Policy.ignoreLockdown)) return [];
 
   const handlers = listeners.map(({ event, handler }) => {
-    const f = handler(detected);
+    const f: EventListener = (...args) => {
+      handler(detected)(...args);
+      window.removeEventListener(event, f);
+    };
     window.addEventListener(event, f);
     return {
       event,

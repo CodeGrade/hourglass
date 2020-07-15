@@ -246,7 +246,7 @@ export function saveSnapshot(examTakeUrl: string): Thunk {
   };
 }
 
-export function submitExam(examTakeUrl: string): Thunk {
+export function submitExam(examTakeUrl: string, cleanup: () => void): Thunk {
   return (_dispatch, getState): void => {
     const state = getState();
     const { answers } = state.contents;
@@ -264,9 +264,11 @@ export function submitExam(examTakeUrl: string): Thunk {
     })
       .then((result) => result.json() as Promise<SubmitResponse>)
       .then(() => {
+        cleanup();
         window.location.href = '/';
       })
       .catch(() => {
+        cleanup();
         window.location.href = '/';
       });
   };

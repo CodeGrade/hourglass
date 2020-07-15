@@ -5,13 +5,14 @@ import { MDTP } from '@student/exams/show/types';
 
 interface OwnProps {
   examTakeUrl: string;
+  cleanupBeforeSubmit: () => void;
 }
 
 const mapDispatchToProps: MDTP<{
   submit: () => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   submit: (): void => {
-    dispatch(submitExam(ownProps.examTakeUrl));
+    dispatch(submitExam(ownProps.examTakeUrl, ownProps.cleanupBeforeSubmit));
   },
 });
 

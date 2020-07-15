@@ -20,6 +20,7 @@ interface ShowQuestionProps {
   selectedPart?: number;
   spyQuestion?: (question: number, pnum?: number) => void;
   lastQuestion?: boolean;
+  cleanupBeforeSubmit: () => void;
 }
 
 export const QuestionName: React.FC<{ qnum: number; name?: HTMLVal }> = ({ qnum, name }) => {
@@ -44,6 +45,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     selectedPart,
     spyQuestion,
     lastQuestion = false,
+    cleanupBeforeSubmit,
   } = props;
   const {
     name,
@@ -111,7 +113,10 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               </div>
               {showSubmit && (
                 <div className="text-center">
-                  <SubmitButton examTakeUrl={examTakeUrl} />
+                  <SubmitButton
+                    examTakeUrl={examTakeUrl}
+                    cleanupBeforeSubmit={cleanupBeforeSubmit}
+                  />
                 </div>
               )}
             </div>

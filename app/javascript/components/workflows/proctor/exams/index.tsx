@@ -1175,7 +1175,7 @@ const Loaded: React.FC<{
           <Nav
             variant="tabs"
             activeKey={tabName}
-            onSelect={(key) => setTabName(key)}
+            onSelect={(key: MessagesTab) => setTabName(key)}
           >
             <Nav.Item>
               <Nav.Link

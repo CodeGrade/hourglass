@@ -1,7 +1,7 @@
 module Types
   class RubricPresetType < Types::BaseObject
     field :description, Types::HtmlType, null: false
-    field :points, Integer, null: false
+    field :points, Float, null: false
   end
 
   class MercyScopeType < Types::BaseEnum
@@ -16,7 +16,7 @@ module Types
   end
 
   class ItemRubricType < Types::BaseObject
-    field :points, Integer, null: false
+    field :points, Float, null: false
     field :label, String, null: false
     field :description, Types::HtmlType, null: false
     field :mercy, Types::MercyType, null: true

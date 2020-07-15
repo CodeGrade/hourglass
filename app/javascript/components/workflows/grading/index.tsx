@@ -63,6 +63,7 @@ import { PartName } from '../student/exams/show/components/Part';
 import CustomEditor from '../professor/exams/new/editor/components/CustomEditor';
 import DisplayMatching from '../proctor/registrations/show/questions/DisplayMatching';
 import DisplayYesNo from '../proctor/registrations/show/questions/DisplayYesNo';
+import { gradingRubric$key } from './__generated__/gradingRubric.graphql';
 
 const Feedback: React.FC<{
   variant: AlertProps['variant'];
@@ -111,53 +112,65 @@ const PromptRow: React.FC<{
   </Row>
 );
 
-const ItemRubric: React.FC = () => (
-  <Alert variant="info" className="pb-0">
-    <Row>
-      <Col>
-        <ButtonGroup className="float-right">
-          <Button variant="outline-secondary" size="sm" disabled>rubric-item-label</Button>
-          <Button variant="outline-secondary" size="sm" disabled><i>5 points</i></Button>
-        </ButtonGroup>
-        <HTML value={{ type: 'HTML', value: 'Description of <i>item</i> goes here' }} />
-      </Col>
-    </Row>
-    <Row>
-      <Col>
-        <p>Suggested comments:</p>
-        <div>
-          <Alert variant="warning" className="p-0">
-            <Tooltip
-              showTooltip
-              message="Click to apply this message"
-            >
-              <Button variant="warning" size="sm" className="mr-2 align-self-center"><Icon I={MdFeedback} /></Button>
-            </Tooltip>
-            (-2 points) Some descriptive text...
-          </Alert>
-          <Alert variant="warning" className="p-0">
-            <Tooltip
-              showTooltip
-              message="Click to apply this message"
-            >
-              <Button variant="warning" size="sm" className="mr-2 align-self-center"><Icon I={MdFeedback} /></Button>
-            </Tooltip>
-            (-5 points) Some more descriptive text...
-          </Alert>
-          <Alert variant="warning" className="p-0">
-            <Tooltip
-              showTooltip
-              message="Click to apply this message"
-            >
-              <Button variant="warning" size="sm" className="mr-2 align-self-center"><Icon I={MdFeedback} /></Button>
-            </Tooltip>
-            (-0.5 points) Some other descriptive text...
-          </Alert>
-        </div>
-      </Col>
-    </Row>
-  </Alert>
-);
+const ItemRubric: React.FC<{
+  itemRubricKey: any;
+}> = (props) => {
+  const {
+    itemRubricKey,
+  } = props;
+  const res = useFragment(
+    graphql`
+    fragment gradingItemRubric on ItemRubric {
+      label
+      description {
+        type
+        value
+      }
+      points
+      presets {
+        description {
+          type
+          value
+        }
+        points
+      }
+    }
+    `,
+    itemRubricKey,
+  );
+  return (
+    <Alert variant="info" className="pb-0">
+      <Row>
+        <Col>
+          <ButtonGroup className="float-right">
+            <Button variant="outline-secondary" size="sm" disabled>{res.label}</Button>
+            <Button variant="outline-secondary" size="sm" disabled><i>{res.points} points</i></Button>
+          </ButtonGroup>
+          <HTML value={res.description} />
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <p>Suggested comments:</p>
+          <div>
+            {res.presets.map((preset) => (
+              <Alert key={preset.description.value} variant="warning" className="p-0">
+                <Tooltip
+                  showTooltip
+                  message="Click to apply this message"
+                >
+                  <Button variant="warning" size="sm" className="mr-2 align-self-center"><Icon I={MdFeedback} /></Button>
+                </Tooltip>
+                {`(-${preset.points} points) `}
+                <HTML className="d-inline-block" value={preset.description} />
+              </Alert>
+            ))}
+          </div>
+        </Col>
+      </Row>
+    </Alert>
+  );
+};
 
 const ItemRubricEditor: React.FC = () => (
   <Alert variant="info" className="pb-0 px-3" dismissible>
@@ -292,12 +305,62 @@ const EditRubric: React.FC = () => (
   </>
 );
 
-const ShowRubric: React.FC = () => (
-  <>
-    <ItemRubric />
-    <ConditionalRubric depth={2} />
-  </>
-);
+const ShowRubric: React.FC<{
+  examVersionKey: gradingRubric$key;
+  qnum: number;
+  pnum: number;
+  bnum: number;
+}> = (props) => {
+  const {
+    examVersionKey,
+    qnum,
+    pnum,
+    bnum,
+  } = props;
+  const res = useFragment(
+    graphql`
+    fragment gradingRubric on ExamVersion {
+      id
+      rubrics {
+        parts {
+          part {
+            __typename
+            # ... on ConditionalRubric {
+            #   ...conditionalRubric
+            #   rubrics {
+            #     ... on ConditionalRubric {
+            #       ...conditionalRubric
+            #     }
+            #     ... on ItemRubric {
+            #       ...itemRubric
+            #     }
+            #   }
+            # }
+            ... on ItemRubric {
+              label
+              ...gradingItemRubric
+            }
+          }
+        }
+      }
+    }
+    `,
+    examVersionKey,
+  );
+  const partRubric = res.rubrics[qnum].parts[pnum].part;
+  // const body
+  return (
+    <>
+      {partRubric.map((rubric) => (
+        rubric.__typename === 'ItemRubric' ? (
+          <ItemRubric key={rubric.label} itemRubricKey={rubric} />
+        ) : (
+          <p>TODO: conditional</p>
+        )
+      ))}
+    </>
+  );
+};
 
 
 interface AnswersRowProps<T, V> {
@@ -312,6 +375,10 @@ interface AnswersRowProps<T, V> {
   info: T;
   studentAnswer: V;
   expectedAnswer: V;
+  examVersionKey: gradingRubric$key;
+  qnum: number;
+  pnum: number;
+  bnum: number;
 }
 
 const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
@@ -321,6 +388,10 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
     info,
     studentAnswer,
     expectedAnswer,
+    examVersionKey,
+    qnum,
+    pnum,
+    bnum,
   } = props;
   return (
     <Card>
@@ -352,9 +423,12 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
             <Feedback variant="danger" />
           </Col>
           <Col md={6}>
-            <EditRubric />
-            <hr />
-            <ShowRubric />
+            <ShowRubric
+              examVersionKey={examVersionKey}
+              qnum={qnum}
+              pnum={pnum}
+              bnum={bnum}
+            />
           </Col>
         </Row>
       </Card.Body>
@@ -369,11 +443,16 @@ const GradeBodyItem: React.FC<{
   qnum: number;
   pnum: number;
   bnum: number;
+  examVersionKey: gradingRubric$key;
 }> = (props) => {
   const {
     expectedAnswer,
     studentAnswer,
     info,
+    examVersionKey,
+    qnum,
+    pnum,
+    bnum,
   } = props;
   switch (info.type) {
     case 'HTML':
@@ -385,6 +464,10 @@ const GradeBodyItem: React.FC<{
         <>
           <PromptRow prompt={info.prompt} />
           <AnswersRow
+            examVersionKey={examVersionKey}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
             info={info}
             ShowExpected={DisplayCode}
             studentAnswer={studentAnswer as CodeState}
@@ -397,6 +480,10 @@ const GradeBodyItem: React.FC<{
         <>
           <PromptRow prompt={info.prompt} />
           <AnswersRow
+            examVersionKey={examVersionKey}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
             info={info}
             ShowExpected={DisplayCodeTag}
             studentAnswer={studentAnswer as CodeTagState}
@@ -409,6 +496,10 @@ const GradeBodyItem: React.FC<{
         <>
           <PromptRow prompt={info.prompt} />
           <AnswersRow
+            examVersionKey={examVersionKey}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
             info={info}
             ShowStudent={GradeYesNo}
             ShowExpected={DisplayYesNo}
@@ -422,6 +513,10 @@ const GradeBodyItem: React.FC<{
         <>
           <PromptRow prompt={info.prompt} />
           <AnswersRow
+            examVersionKey={examVersionKey}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
             info={info}
             ShowExpected={DisplayText}
             studentAnswer={studentAnswer as TextState}
@@ -434,6 +529,10 @@ const GradeBodyItem: React.FC<{
         <>
           {/* <PromptRow prompt={info.prompt} /> */}
           <AnswersRow
+            examVersionKey={examVersionKey}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
             info={info}
             ShowStudent={GradeMatching}
             ShowExpected={DisplayMatching}
@@ -447,6 +546,10 @@ const GradeBodyItem: React.FC<{
         <>
           <PromptRow prompt={info.prompt} />
           <AnswersRow
+            examVersionKey={examVersionKey}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
             info={info}
             ShowExpected={DisplayAllThatApply}
             studentAnswer={studentAnswer as AllThatApplyState}
@@ -459,6 +562,10 @@ const GradeBodyItem: React.FC<{
         <>
           <PromptRow prompt={info.prompt} />
           <AnswersRow
+            examVersionKey={examVersionKey}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
             info={info}
             ShowStudent={GradeMultipleChoice}
             ShowExpected={DisplayMultipleChoice}
@@ -487,6 +594,7 @@ const Grade: React.FC<{
     fragment grading_one on Registration {
       currentAnswers
       examVersion {
+        ...gradingRubric
         questions
         answers
         files
@@ -539,6 +647,7 @@ const Grade: React.FC<{
                   qnum={qnum}
                   pnum={pnum}
                   bnum={bnum}
+                  examVersionKey={res.examVersion}
                 />
               );
             })}

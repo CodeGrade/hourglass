@@ -18,7 +18,7 @@ interface ExamShowContentsProps {
   examKey: ExamShowContents$key;
   exam: ExamVersion;
   save: () => void;
-  submit: () => void;
+  submit: (cleanup: () => void) => void;
 }
 
 const INTERVAL = 10000;

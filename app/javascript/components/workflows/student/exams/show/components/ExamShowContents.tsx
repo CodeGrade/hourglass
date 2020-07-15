@@ -44,19 +44,19 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     `,
     examKey,
   );
+  const cleanupBeforeSubmit = useAnomalyListeners(
+    res.takeUrl,
+    res.myRegistration.examVersion.policies as readonly Policy[],
+  );
   const leave = useCallback(() => {
-    submit();
-  }, [submit]);
+    submit(cleanupBeforeSubmit);
+  }, [submit, cleanupBeforeSubmit]);
   useEffect(() => {
     const timer: number = window.setInterval(() => save(), INTERVAL);
     return (): void => {
       clearInterval(timer);
     };
   }, [save]);
-  const cleanupBeforeSubmit = useAnomalyListeners(
-    res.takeUrl,
-    res.myRegistration.examVersion.policies as readonly Policy[],
-  );
   const {
     questions,
     instructions,

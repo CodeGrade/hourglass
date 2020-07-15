@@ -17,13 +17,13 @@ const mapStateToProps: MSTP<{exam: ExamVersion}, OwnProps> = (state) => ({
 
 const mapDispatchToProps: MDTP<{
   save: () => void;
-  submit: () => void;
+  submit: (cleanup: () => void) => void;
 }, OwnProps> = (dispatch, ownProps) => ({
   save: (): void => {
     dispatch(saveSnapshot(ownProps.examTakeUrl));
   },
-  submit: (): void => {
-    dispatch(submitExam(ownProps.examTakeUrl));
+  submit: (cleanup: () => void): void => {
+    dispatch(submitExam(ownProps.examTakeUrl, cleanup));
   },
 });
 

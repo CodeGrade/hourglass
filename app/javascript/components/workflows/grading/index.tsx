@@ -63,7 +63,10 @@ import { PartName } from '../student/exams/show/components/Part';
 import CustomEditor from '../professor/exams/new/editor/components/CustomEditor';
 import DisplayMatching from '../proctor/registrations/show/questions/DisplayMatching';
 import DisplayYesNo from '../proctor/registrations/show/questions/DisplayYesNo';
-import { gradingRubric$key } from './__generated__/gradingRubric.graphql';
+import { gradingRubric$key, gradingRubric } from './__generated__/gradingRubric.graphql';
+import { gradingItemRubric$key } from './__generated__/gradingItemRubric.graphql';
+import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
+import { gradingNestedConditionalRubric$key } from './__generated__/gradingNestedConditionalRubric.graphql';
 
 const Feedback: React.FC<{
   variant: AlertProps['variant'];
@@ -113,7 +116,7 @@ const PromptRow: React.FC<{
 );
 
 const ItemRubric: React.FC<{
-  itemRubricKey: any;
+  itemRubricKey: gradingItemRubric$key;
 }> = (props) => {
   const {
     itemRubricKey,
@@ -144,7 +147,7 @@ const ItemRubric: React.FC<{
         <Col>
           <ButtonGroup className="float-right">
             <Button variant="outline-secondary" size="sm" disabled>{res.label}</Button>
-            <Button variant="outline-secondary" size="sm" disabled><i>{res.points} points</i></Button>
+            <Button variant="outline-secondary" size="sm" disabled><i>{`${res.points} points`}</i></Button>
           </ButtonGroup>
           <HTML value={res.description} />
         </Col>
@@ -153,7 +156,7 @@ const ItemRubric: React.FC<{
         <Col>
           <p>Suggested comments:</p>
           <div>
-            {res.presets.map((preset) => (
+            {res.presets?.map((preset) => (
               <Alert key={preset.description.value} variant="warning" className="p-0">
                 <Tooltip
                   showTooltip
@@ -220,29 +223,38 @@ const ItemRubricEditor: React.FC = () => (
   </Alert>
 );
 
-const ConditionalRubric: React.FC<{ depth: number }> = ({ depth }) => {
+const ConditionalRubric: React.FC<{
+  depth: number;
+  conditionalRubricKey: gradingConditionalRubric$key;
+}> = (props) => {
+  const {
+    depth,
+    conditionalRubricKey,
+    children,
+  } = props;
+  const res = useFragment(
+    graphql`
+      fragment gradingConditionalRubric on ConditionalRubric {
+        condition {
+          type
+          value
+        }
+      }
+    `,
+    conditionalRubricKey,
+  );
   const variants: AlertProps['variant'][] = ['light', 'secondary', 'dark'];
   const variant: AlertProps['variant'] = variants[depth] ?? 'primary';
   return (
     <Alert variant={variant} className="pb-0">
       <Row>
         <Col>
-          <HTML value={{ type: 'HTML', value: '<p>The description of this <b>sub-rubric</b></p>' }} />
+          <HTML value={res.condition} />
         </Col>
       </Row>
       <Row>
         <Col>
-          {depth <= 0 ? (
-            <>
-              <ItemRubric />
-              <ItemRubric />
-            </>
-          ) : (
-            <>
-              <ConditionalRubric depth={depth - 1} />
-              <ConditionalRubric depth={depth - 2} />
-            </>
-          )}
+          {children}
         </Col>
       </Row>
     </Alert>
@@ -305,6 +317,69 @@ const EditRubric: React.FC = () => (
   </>
 );
 
+const ShowNestedConditionalRubric: React.FC<{
+  conditionalRubricKey: gradingNestedConditionalRubric$key;
+}> = (props) => {
+  const {
+    conditionalRubricKey,
+  } = props;
+  const rubric = useFragment(
+    graphql`
+    fragment gradingNestedConditionalRubric on ConditionalRubric {
+      condition {
+        value
+      }
+      ...gradingConditionalRubric
+      rubrics {
+        __typename
+        ... on ConditionalRubric {
+          condition {
+            value
+          }
+          ...gradingConditionalRubric
+          rubrics {
+            ... on ItemRubric {
+              label
+              ...gradingItemRubric
+            }
+          }
+        }
+        ... on ItemRubric {
+          label
+          ...gradingItemRubric
+        }
+      }
+    }
+    `,
+    conditionalRubricKey,
+  );
+  return (
+    <ConditionalRubric key={rubric.condition.value} conditionalRubricKey={rubric} depth={2}>
+      {rubric.rubrics.map((innerRubric) => {
+        // eslint-disable-next-line no-underscore-dangle
+        if (innerRubric.__typename === 'ItemRubric') {
+          return <ItemRubric key={innerRubric.label} itemRubricKey={innerRubric} />;
+        }
+        // eslint-disable-next-line no-underscore-dangle
+        if (innerRubric.__typename === 'ConditionalRubric') {
+          return (
+            <ConditionalRubric
+              key={innerRubric.condition.value}
+              conditionalRubricKey={innerRubric}
+              depth={1}
+            >
+              {innerRubric.rubrics.map((innerInnerRubric) => (
+                <ItemRubric key={innerInnerRubric.label} itemRubricKey={innerInnerRubric} />
+              ))}
+            </ConditionalRubric>
+          );
+        }
+        return null;
+      })}
+    </ConditionalRubric>
+  );
+};
+
 const ShowRubric: React.FC<{
   examVersionKey: gradingRubric$key;
   qnum: number;
@@ -325,20 +400,30 @@ const ShowRubric: React.FC<{
         parts {
           part {
             __typename
-            # ... on ConditionalRubric {
-            #   ...conditionalRubric
-            #   rubrics {
-            #     ... on ConditionalRubric {
-            #       ...conditionalRubric
-            #     }
-            #     ... on ItemRubric {
-            #       ...itemRubric
-            #     }
-            #   }
-            # }
+            ... on ConditionalRubric {
+              condition {
+                value
+              }
+              ...gradingNestedConditionalRubric
+            }
             ... on ItemRubric {
               label
               ...gradingItemRubric
+            }
+          }
+          body {
+            rubrics {
+              __typename
+              ... on ConditionalRubric {
+                condition {
+                  value
+                }
+                ...gradingNestedConditionalRubric
+              }
+              ... on ItemRubric {
+                label
+                ...gradingItemRubric
+              }
             }
           }
         }
@@ -348,16 +433,24 @@ const ShowRubric: React.FC<{
     examVersionKey,
   );
   const partRubric = res.rubrics[qnum].parts[pnum].part;
-  // const body
+  const bodyRubric = res.rubrics[qnum].parts[pnum].body[bnum].rubrics;
+  const showRubric = (rubric: gradingRubric['rubrics'][number]['parts'][number]['part'][number]) => {
+    // eslint-disable-next-line no-underscore-dangle
+    if (rubric.__typename === 'ItemRubric') {
+      return <ItemRubric key={rubric.label} itemRubricKey={rubric} />;
+    }
+    // eslint-disable-next-line no-underscore-dangle
+    if (rubric.__typename === 'ConditionalRubric') {
+      return (
+        <ShowNestedConditionalRubric key={rubric.condition.value} conditionalRubricKey={rubric} />
+      );
+    }
+    return null;
+  };
   return (
     <>
-      {partRubric.map((rubric) => (
-        rubric.__typename === 'ItemRubric' ? (
-          <ItemRubric key={rubric.label} itemRubricKey={rubric} />
-        ) : (
-          <p>TODO: conditional</p>
-        )
-      ))}
+      {partRubric.map(showRubric)}
+      {bodyRubric.map(showRubric)}
     </>
   );
 };

@@ -38,6 +38,8 @@ type CustomHandler = (b: boolean) => void;
 
 interface BlockerContext {
   setCustomHandler: (f: () => CustomHandler) => void;
+  setCancelText: (str: string) => void;
+  setLeaveText: (str: string) => void;
 }
 
 const BlockerContext = React.createContext({} as BlockerContext);
@@ -45,16 +47,28 @@ const BlockerContext = React.createContext({} as BlockerContext);
 export const BlockNav: React.FC<{
   when?: boolean;
   message: string;
+  stayText: string;
+  leaveText: string;
   onStay?: () => void;
   onLeave?: () => void;
 }> = (props) => {
   const {
     when = true,
     message,
+    stayText,
+    leaveText,
     onStay,
     onLeave,
   } = props;
-  const { setCustomHandler } = useContext(BlockerContext);
+  const {
+    setCustomHandler,
+    setCancelText,
+    setLeaveText,
+  } = useContext(BlockerContext);
+  useEffect(() => {
+    setCancelText(stayText);
+    setLeaveText(leaveText);
+  }, [stayText, leaveText]);
   useEffect(() => {
     setCustomHandler(() => (b) => {
       if (b && onLeave) onLeave();
@@ -76,8 +90,10 @@ const Entry: React.FC = () => {
   const [transitioning, setTransitioning] = useState(false);
   const [transitionMessage, setTransitionMessage] = useState('');
   const [transitionCallback, setTransitionCallback] = useState(() => (_) => undefined);
+  const [cancelText, setCancelText] = useState<string>('Stay');
+  const [leaveText, setLeaveText] = useState<string>('Leave');
   const [customHandler, setCustomHandler] = useState<CustomHandler>(() => (_) => undefined);
-  const contextValue = useMemo(() => ({ setCustomHandler }), []);
+  const contextValue = useMemo(() => ({ setCustomHandler, setCancelText, setLeaveText }), []);
   return (
     <RelayEnvironmentProvider environment={environment}>
       <BlockerContext.Provider value={contextValue}>
@@ -112,7 +128,7 @@ const Entry: React.FC = () => {
                     customHandler(false);
                   }}
                 >
-                  Cancel
+                  {cancelText}
                 </Button>
                 <Button
                   variant="danger"
@@ -122,7 +138,7 @@ const Entry: React.FC = () => {
                     customHandler(true);
                   }}
                 >
-                  Leave
+                  {leaveText}
                 </Button>
               </Modal.Footer>
             </Modal>

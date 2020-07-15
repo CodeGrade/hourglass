@@ -219,15 +219,13 @@ const Home: React.FC = () => {
     && res.props.me.professorCourseRegistrations.nodes.length === 0
     && res.props.me.proctorRegistrations.nodes.length === 0
   );
-  if (allEmpty) {
-    return (
-      <DocumentTitle title="Hourglass">
-        <p>You have no registrations.</p>
-      </DocumentTitle>
-    );
-  }
   return (
     <DocumentTitle title="My Exams">
+      {allEmpty && (
+        <DocumentTitle title="Hourglass">
+          <p>You have no registrations.</p>
+        </DocumentTitle>
+      )}
       <ShowRegistrations
         registrations={res.props.me.registrations.nodes}
       />

@@ -99,7 +99,7 @@ class Registration < ApplicationRecord
   end
 
   def anomalous?
-    anomalies.unforgiven.size.positive?
+    !anomalies.unforgiven.empty?
   end
 
   scope :in_progress, -> { where(end_time: nil) }

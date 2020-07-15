@@ -95,6 +95,36 @@ class Upload
     arr.map { |i| make_html_val(i) }
   end
 
+  def item_rubric(r)
+    {
+      points: r['points'],
+      description: make_html_val(r['description']),
+      label: r['label'],
+      presets: r['presets']&.map do |preset|
+        {
+          points: preset['points'],
+          description: make_html_val(preset['description']),
+        }
+      end,
+      mercy: r['mercy']&.symbolize_keys,
+    }.compact
+  end
+
+  def conditional_rubric(r)
+    {
+      condition: make_html_val(r['condition']),
+      rubrics: r['rubrics'].map { |r| convert_rubric(r) },
+    }
+  end
+
+  def convert_rubric(r)
+    if r.key? 'condition'
+      conditional_rubric(r)
+    else
+      item_rubric(r)
+    end
+  end
+
   def parse_info(properties)
     contents = properties['contents']
     contents['questions'].each do |q|
@@ -141,6 +171,25 @@ class Upload
             end
           end
         end
+      end
+    end
+
+    rubrics = contents['questions'].map do |q|
+      q['parts'].map do |p|
+        {
+          part: p['rubric']&.map do |r|
+            convert_rubric(r)
+          end || [],
+          body: p['body']&.map do |b|
+            if b.is_a? Hash
+              b.values.first['rubric']&.map do |r|
+                convert_rubric(r)
+              end || []
+            else
+              []
+            end
+          end || [],
+        }
       end
     end
 
@@ -281,6 +330,7 @@ class Upload
         instructions: make_html_val(contents['instructions']),
       }.compact,
       answers: answers,
+      rubrics: rubrics,
     }
   end
 

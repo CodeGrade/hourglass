@@ -12,7 +12,7 @@
     "policies": { "$ref": "#/definitions/Policies" },
     "answers": { "$ref": "#/definitions/ExamAnswers" },
     "contents": { "$ref": "#/definitions/Contents" },
-    "rubrics": { "$ref": "#/definitions/Rubrics" }
+    "rubrics": { "$ref": "#/definitions/VersionRubric" }
   },
   "definitions": {
     "ExamAnswers": {
@@ -214,36 +214,29 @@
       "type": "array",
       "items": { "$ref": "#/definitions/BodyItemAnswer" }
     },
-    "Rubrics": {
-      "oneOf": [
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["for", "items"],
-          "properties": {
-            "for": { "enum": ["part"] },
-            "items": {
-              "type": "array",
-              "items": { "$ref": "#/definitions/Rubric" }
-            }
-          }
-        },
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["for", "items"],
-          "properties": {
-            "for": { "enum": ["bodyItems"] },
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "array",
-                "items": { "$ref": "#/definitions/Rubric" }
-              }
-            }
-          }
+    "VersionRubric": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/QuestionRubric" }
+    },
+    "QuestionRubric": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/PartRubric" }
+    },
+    "PartRubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["part", "body"],
+      "properties": {
+        "part": { "$ref": "#/definitions/Rubrics" },
+        "body": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Rubrics" }
         }
-      ]
+      }
+    },
+    "Rubrics": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Rubric" }
     },
     "Rubric": {
       "anyOf": [
@@ -257,15 +250,7 @@
       "required": ["condition", "rubrics"],
       "properties": {
         "condition": { "$ref": "#/definitions/HTML" },
-        "rubric": {
-          "type": "array",
-          "items": {
-            "anyOf": [
-              { "$ref": "#/definitions/ConditionalRubric" },
-              { "$ref": "#/definitions/ItemRubric" }
-            ]
-          }
-        }
+        "rubrics": { "$ref": "#/definitions/Rubrics" }
       }
     },
     "ItemRubric": {

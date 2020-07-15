@@ -18,6 +18,23 @@ contents:
           points: 16
           reference:
             - dir: "q1/p1"
+          rubric:
+            - points: 8
+              label: Style
+              description: <b>This</b> should be <i>stylish</i>.
+              presets:
+                - points: 2
+                  description: blah
+                - points: 8
+                  description: wow!
+            - points: 8
+              label: Function
+              description: <b>This</b> should <i>work</i>.
+              presets:
+                - points: 3
+                  description: three
+                - points: 5
+                  description: five pts
           body:
             - "Answer all of the following true/false questions."
             - TrueFalse:
@@ -56,6 +73,15 @@ contents:
                 initial:
                   file: "q1/all/src/packagetwo/Example2.java"
                 lang: "text/x-java"
+                rubric:
+                  - points: 11
+                    label: Style
+                    description: <b>This</b> should be <i>stylish</i>.
+                    presets:
+                      - points: 3
+                        description: blah
+                      - points: 8
+                        description: wow!
             - Code:
                 prompt: "Code with direct starter."
                 initial:
@@ -64,6 +90,27 @@ contents:
 
                     Empty line above.
                 lang: "text/x-java"
+                rubric:
+                  - condition: On Tuesdays
+                    rubrics:
+                      - points: 11
+                        label: Style
+                        description: <b>This</b> should be <i>stylish</i>.
+                        presets:
+                          - points: 3
+                            description: blah
+                          - points: 8
+                            description: wow!
+                  - condition: On Wednesdays
+                    rubrics:
+                      - points: 11
+                        label: Function
+                        description: <b>This</b> should be <i>functional</i>.
+                        presets:
+                          - points: 2
+                            description: blah
+                          - points: 9
+                            description: wow!
             - "<p>This is an interlude of <b>HTML</b> content</p>"
             - MultipleChoice:
                 prompt: "What does the code in PartB.java do?"
@@ -76,9 +123,17 @@ contents:
     - name: "Second Question Name"
       description: "Welcome to question 2. This is where the fun begins."
       parts:
-        - body:
+        - rubric:
+            - points: 1
+              label: "Q2P1 label"
+              description: "Part rubric"
+          body:
             - "This matching section concerns important information."
             - Matching:
+                rubric:
+                  - points: 2
+                    label: "Q2P1B2 label"
+                    description: "BodyItem rubric for matching"
                 promptsLabel: "Match <i>from here</i>.."
                 valuesLabel: "across <i>to here</i>."
                 prompts:

@@ -62,7 +62,58 @@
         "description": { "$ref": "#/definitions/HTML" },
         "points": { "type": "number" },
         "body": { "$ref": "#/definitions/BodyItems" },
-        "reference": { "$ref": "#/definitions/FileDirs" }
+        "reference": { "$ref": "#/definitions/FileDirs" },
+        "rubric": { "$ref": "#/definitions/Rubrics" }
+      }
+    },
+    "Rubrics": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Rubric" }
+    },
+    "Rubric": {
+      "anyOf": [
+        { "$ref": "#/definitions/ItemRubric" },
+        { "$ref": "#/definitions/ConditionalRubric" }
+      ]
+    },
+    "ConditionalRubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["condition", "rubrics"],
+      "properties": {
+        "condition": { "$ref": "#/definitions/HTML" },
+        "rubrics": { "$ref": "#/definitions/Rubrics" }
+      }
+    },
+    "ItemRubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["points", "label", "description"],
+      "properties": {
+        "points": { "type": "number" },
+        "description": { "$ref": "#/definitions/HTML" },
+        "label": { "type": "string" },
+        "mercy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["scope", "limit"],
+          "properties": {
+            "scope": { "enum": ["exam", "question", "part"] },
+            "limit": { "type": "number" }
+          }
+        },
+        "presets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["description", "points"],
+            "properties": {
+              "points": { "type": "number" },
+              "description": { "$ref": "#/definitions/HTML" }
+            }
+          }
+        }
       }
     },
     "FileDirs": {
@@ -125,7 +176,8 @@
           "properties": {
             "prompt": { "$ref": "#/definitions/HTML" },
             "lang": { "type": "string" },
-            "initial": { "$ref": "#/definitions/CodeInitial" }
+            "initial": { "$ref": "#/definitions/CodeInitial" },
+            "rubric": { "$ref": "#/definitions/Rubrics" }
           }
         }
       }
@@ -162,7 +214,8 @@
       "required": ["correctAnswer"],
       "properties": {
         "prompt": { "$ref": "#/definitions/HTML" },
-        "correctAnswer": { "type": "boolean" }
+        "correctAnswer": { "type": "boolean" },
+        "rubric": { "$ref": "#/definitions/Rubrics" }
       }
     },
     "TrueFalse": {
@@ -184,7 +237,8 @@
       "required": ["correctAnswer"],
       "properties": {
         "prompt": { "$ref": "#/definitions/HTML" },
-        "correctAnswer": { "type": "boolean" }
+        "correctAnswer": { "type": "boolean" },
+        "rubric": { "$ref": "#/definitions/Rubrics" }
       }
     },
     "MultipleChoice": {
@@ -199,7 +253,8 @@
           "properties": {
             "prompt": { "$ref": "#/definitions/HTML" },
             "options": { "$ref": "#/definitions/Options" },
-            "correctAnswer": { "$ref": "#/definitions/MultipleChoiceAnswer" }
+            "correctAnswer": { "$ref": "#/definitions/MultipleChoiceAnswer" },
+            "rubric": { "$ref": "#/definitions/Rubrics" }
           }
         }
       }
@@ -227,7 +282,8 @@
             "valuesLabel": { "$ref": "#/definitions/HTML" },
             "prompts": { "$ref": "#/definitions/Options" },
             "values": { "$ref": "#/definitions/Options" },
-            "correctAnswers": { "$ref": "#/definitions/MatchingAnswers" }
+            "correctAnswers": { "$ref": "#/definitions/MatchingAnswers" },
+            "rubric": { "$ref": "#/definitions/Rubrics" }
           }
         }
       }
@@ -251,7 +307,8 @@
           "required": ["options"],
           "properties": {
             "prompt": { "$ref": "#/definitions/HTML" },
-            "options": { "$ref": "#/definitions/ATAOptions" }
+            "options": { "$ref": "#/definitions/ATAOptions" },
+            "rubric": { "$ref": "#/definitions/Rubrics" }
           }
         }
       }
@@ -281,7 +338,8 @@
           "properties": {
             "prompt": { "$ref": "#/definitions/HTML" },
             "correctAnswer": { "$ref": "#/definitions/TagAnswer" },
-            "choices": { "enum": ["exam", "question", "part"] }
+            "choices": { "enum": ["exam", "question", "part"] },
+            "rubric": { "$ref": "#/definitions/Rubrics" }
           }
         }
       }
@@ -313,7 +371,8 @@
       "additionalProperties": false,
       "required": ["prompt"],
       "properties": {
-        "prompt": { "$ref": "#/definitions/HTML" }
+        "prompt": { "$ref": "#/definitions/HTML" },
+        "rubric": { "$ref": "#/definitions/Rubrics" }
       }
     }
   }

@@ -32,7 +32,9 @@ const Tooltip: React.FC<TooltipProps> = (props) => {
       overlay={tooltip}
       placement={placement}
     >
-      {children}
+      <>
+        {children}
+      </>
     </OverlayTrigger>
   );
 };

@@ -53,7 +53,10 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
       clearInterval(timer);
     };
   }, [save]);
-  useAnomalyListeners(res.takeUrl, res.myRegistration.examVersion.policies as readonly Policy[]);
+  const cleanupBeforeSubmit = useAnomalyListeners(
+    res.takeUrl,
+    res.myRegistration.examVersion.policies as readonly Policy[],
+  );
   const {
     questions,
     instructions,
@@ -88,6 +91,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
                 qnum={i}
                 lastQuestion={i === questions.length - 1}
                 examTakeUrl={res.takeUrl}
+                cleanupBeforeSubmit={cleanupBeforeSubmit}
               />
             ))}
           </Col>

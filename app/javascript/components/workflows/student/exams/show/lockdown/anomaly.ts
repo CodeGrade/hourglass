@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { getCSRFToken } from '@student/exams/show/helpers';
 import { AnomalyDetected, Policy } from '@student/exams/show/types';
 import { installListeners, removeListeners } from './listeners';
@@ -38,14 +38,16 @@ const anom = (examTakeUrl: string) => (reason: string): void => {
 export default function useAnomalyListeners(
   examTakeUrl: string,
   policies: readonly Policy[],
-): void {
-  const [lst, setLst] = useState([]);
+): (() => void) {
+  const lst = useRef([]);
   const anomalyDetected: AnomalyDetected = anom(examTakeUrl);
+  const remover = (): void => {
+    removeListeners(lst.current);
+    lst.current = [];
+  };
   useEffect(() => {
-    setLst(installListeners(policies, anomalyDetected));
-    return (): void => {
-      removeListeners(lst);
-      setLst([]);
-    };
+    lst.current = installListeners(policies, anomalyDetected);
+    return remover;
   }, []);
+  return remover;
 }

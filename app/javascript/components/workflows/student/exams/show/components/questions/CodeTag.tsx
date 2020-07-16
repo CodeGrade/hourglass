@@ -13,7 +13,7 @@ import {
   ExamFilesContext,
   QuestionFilesContext,
   PartFilesContext,
-} from '../../context';
+} from '@student/exams/show/context';
 
 interface CodeTagValProps {
   value: CodeTagState;

@@ -10,7 +10,7 @@ import './Part.css';
 import Body from '@student/exams/show/components/Body';
 import { alphabetIdx } from '@hourglass/common/helpers';
 import ErrorBoundary from '@hourglass/common/boundary';
-import { PartFilesContext } from '../context';
+import { PartFilesContext } from '@student/exams/show/context';
 
 interface PartProps {
   part: PartInfo;

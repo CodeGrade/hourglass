@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 import { AllThatApplyInfo, AllThatApplyState } from '@student/exams/show/types';
-import HTML from '../HTML';
+import HTML from '@student/exams/show/components/HTML';
 
 interface AllThatApplyProps {
   info: AllThatApplyInfo;

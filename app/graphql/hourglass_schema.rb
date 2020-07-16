@@ -45,6 +45,10 @@ class HourglassSchema < GraphQL::Schema
       Types::ExamType
     when ExamVersion
       Types::ExamVersionType
+    when GradingCheck
+      Types::GradingCheckType
+    when GradingComment
+      Types::GradingCommentType
     when Message
       Types::MessageType
     when ProctorRegistration

@@ -838,21 +838,86 @@ const NewComments: React.FC<{
 
 type GradingComment = grading_one$data['gradingComments']['edges'][number]['node'];
 
+const DESTROY_COMMENT_MUTATION = graphql`
+  mutation gradingDestroyCommentMutation($input: DestroyGradingCommentInput!) {
+    destroyGradingComment(input: $input) {
+      deletedId
+    }
+  }
+`;
+
+const SavedComment: React.FC<{
+  registrationId: string;
+  comment: GradingComment;
+}> = (props) => {
+  const {
+    registrationId,
+    comment,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const updateLoading = true; // TODO
+  const [mutateDestroy, { loading: destroyLoading }] = useMutation(
+    DESTROY_COMMENT_MUTATION,
+    {
+      configs: [{
+        type: 'RANGE_DELETE',
+        parentID: registrationId,
+        connectionKeys: [{
+          key: 'Registration_gradingComments',
+        }],
+        pathToConnection: ['registration', 'gradingComments'],
+        deletedIDFieldName: 'deletedId',
+      }],
+      onCompleted: () => {
+        alert({
+          variant: 'success',
+          message: 'Comment successfully deleted.',
+        });
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error deleting comment',
+          message: err.message,
+        });
+      },
+    },
+  );
+  const removeComment = () => {
+    mutateDestroy({
+      variables: {
+        input: {
+          gradingCommentId: comment.id,
+        },
+      },
+    });
+  };
+  return (
+    <Feedback
+      disabled={destroyLoading || updateLoading}
+      points={comment.points}
+      message={comment.message}
+      status={CommentSaveStatus.SAVED}
+      onRemove={removeComment}
+    />
+  );
+};
+
 const SavedComments: React.FC<{
   comments: GradingComment[];
+  registrationId: string;
 }> = (props) => {
   const {
     comments,
+    registrationId,
   } = props;
   return (
     <>
       {comments.map((comment) => (
-        <Feedback
+        <SavedComment
           key={comment.id}
-          disabled
-          points={comment.points}
-          message={comment.message}
-          status={CommentSaveStatus.SAVED}
+          comment={comment}
+          registrationId={registrationId}
         />
       ))}
     </>
@@ -876,6 +941,7 @@ const BodyItemGrades: React.FC<{
   return (
     <>
       <SavedComments
+        registrationId={registrationId}
         comments={comments}
       />
       <NewComments

@@ -12,6 +12,7 @@ module Types
 
     # field :create_grading_check, mutation: Mutations::CreateGradingCheck
     field :create_grading_comment, mutation: Mutations::CreateGradingComment
+    field :destroy_grading_comment, mutation: Mutations::DestroyGradingComment
 
     field :ask_question, mutation: Mutations::AskQuestion
     field :destroy_exam_version, mutation: Mutations::DestroyExamVersion

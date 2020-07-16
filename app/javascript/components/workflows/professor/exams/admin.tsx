@@ -51,7 +51,7 @@ import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { DateTime } from 'luxon';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
-import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
+import Tooltip from '@student/exams/show/components/Tooltip';
 import EditExamRooms from '@professor/exams/rooms';
 import ManageAccommodations from '@professor/exams/accommodations';
 import AssignSeating from '@hourglass/common/student-dnd';

@@ -40,9 +40,9 @@ import { ExamViewerContext, ExamContext } from '@student/exams/show/context';
 import { createMap } from '@student/exams/show/files';
 import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
 import DisplayCodeTag from '@proctor/registrations/show/questions/DisplayCodeTag';
-import GradeYesNo from '@hourglass/workflows/grading/questions/GradeYesNo';
-import GradeMatching from '@hourglass/workflows/grading/questions/GradeMatching';
-import GradeMultipleChoice from '@hourglass/workflows/grading/questions/GradeMultipleChoice';
+import GradeYesNo from '@grading/questions/GradeYesNo';
+import GradeMatching from '@grading/questions/GradeMatching';
+import GradeMultipleChoice from '@grading/questions/GradeMultipleChoice';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
@@ -298,7 +298,7 @@ const ConditionalRubricEditor: React.FC<{ depth: number }> = ({ depth }) => {
   );
 };
 
-const EditRubric: React.FC = () => (
+export const EditRubric: React.FC = () => (
   <>
     <ItemRubricEditor />
     <ConditionalRubricEditor depth={2} />

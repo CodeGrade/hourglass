@@ -7,7 +7,7 @@ import { Fetcher } from 'graphiql/dist/components/GraphiQL';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'graphiql/graphiql.min.css';
 
-import { getCSRFToken } from '@hourglass/workflows/student/exams/show/helpers';
+import { getCSRFToken } from '@student/exams/show/helpers';
 
 const URL = '/graphql';
 

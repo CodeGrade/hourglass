@@ -32,7 +32,7 @@ import Icon from '@student/exams/show/components/Icon';
 import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import Loading from '@hourglass/common/loading';
 import { AlertContext } from '@hourglass/common/alerts';
-import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
+import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';

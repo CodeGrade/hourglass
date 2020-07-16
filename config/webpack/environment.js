@@ -14,6 +14,7 @@ environment.plugins.prepend('Provide',
 const aliasConfig = {
   'jquery': 'jquery/src/jquery',
   '@hourglass': path.resolve(__dirname, '..', '..', 'app/javascript/components'),
+  '@grading': path.resolve(__dirname, '..', '..', 'app/javascript/components/workflows/grading'),
   '@student': path.resolve(__dirname, '..', '..', 'app/javascript/components/workflows/student'),
   '@proctor': path.resolve(__dirname, '..', '..', 'app/javascript/components/workflows/proctor'),
   '@professor': path.resolve(__dirname, '..', '..', 'app/javascript/components/workflows/professor'),

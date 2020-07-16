@@ -5,7 +5,7 @@ import {
   Route,
   Link,
 } from 'react-router-dom';
-import ExamViewer from '@hourglass/workflows/proctor/registrations/show';
+import ExamViewer from '@proctor/registrations/show';
 import { graphql } from 'react-relay';
 import {
   AnswersState,
@@ -14,7 +14,7 @@ import {
   FileRef,
   QuestionInfo,
   ContentsState,
-} from '@hourglass/workflows/student/exams/show/types';
+} from '@student/exams/show/types';
 import { useQuery } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
 

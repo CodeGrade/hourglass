@@ -1,7 +1,7 @@
 import React from 'react';
 import { MultipleChoiceProps } from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import HTML from '@student/exams/show/components/HTML';
-import ObjectiveGrade from '@hourglass/workflows/grading/questions/ObjectiveGrade';
+import ObjectiveGrade from '@grading/questions/ObjectiveGrade';
 
 
 const GradeMultipleChoice: React.FC<MultipleChoiceProps> = (props) => {

@@ -6,7 +6,7 @@ import {
 import { MatchingProps } from '@proctor/registrations/show/questions/DisplayMatching';
 import HTML from '@student/exams/show/components/HTML';
 import { alphabetIdx } from '@hourglass/common/helpers';
-import ObjectiveGrade from '@hourglass/workflows/grading/questions/ObjectiveGrade';
+import ObjectiveGrade from '@grading/questions/ObjectiveGrade';
 
 const GradeMatching: React.FC<MatchingProps> = (props) => {
   const {

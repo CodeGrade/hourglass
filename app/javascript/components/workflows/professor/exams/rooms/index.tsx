@@ -11,7 +11,7 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
+import Icon from '@student/exams/show/components/Icon';
 import { FaTrash, FaPlus } from 'react-icons/fa';
 import {
   reduxForm,
@@ -26,7 +26,7 @@ import {
 import { Provider } from 'react-redux';
 import store from '@hourglass/common/student-dnd/store';
 import { AlertContext } from '@hourglass/common/alerts';
-import TooltipButton from '@hourglass/workflows/student/exams/show/components/TooltipButton';
+import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { TabEditButton } from '@professor/exams/admin';
 import { useMutation, graphql, useFragment } from 'relay-hooks';
 

@@ -12,7 +12,7 @@ import TimePicker from 'react-timekeeper';
 import { DateTime } from 'luxon';
 import 'react-datepicker/dist/react-datepicker.css';
 import './DateTimePicker.scss';
-import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
+import Icon from '@student/exams/show/components/Icon';
 import { FaTimes } from 'react-icons/fa';
 
 interface DateTimeProps {

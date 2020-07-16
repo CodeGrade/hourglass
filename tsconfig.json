@@ -13,6 +13,7 @@
     "skipLibCheck": true,
     "paths": {
       "@hourglass/*": ["./*"],
+      "@grading/*": ["./workflows/grading/*"],
       "@student/*": ["./workflows/student/*"],
       "@proctor/*": ["./workflows/proctor/*"],
       "@professor/*": ["./workflows/professor/*"]

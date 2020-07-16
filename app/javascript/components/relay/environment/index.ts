@@ -7,7 +7,7 @@ import {
   SubscribeFunction,
   FetchFunction,
 } from 'relay-runtime';
-import { getCSRFToken } from '@hourglass/workflows/student/exams/show/helpers';
+import { getCSRFToken } from '@student/exams/show/helpers';
 import ActionCable from 'actioncable';
 import createHandler from 'graphql-ruby-client/dist/subscriptions/createHandler';
 

@@ -11,7 +11,7 @@ import {
   HTMLVal,
   ExamFile,
   AnswerState,
-} from '@hourglass/workflows/student/exams/show/types';
+} from '@student/exams/show/types';
 import { RenderError } from '@hourglass/common/boundary';
 
 import { editVersionQuery } from './__generated__/editVersionQuery.graphql';

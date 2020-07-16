@@ -6,7 +6,7 @@ import {
 import { WrappedFieldProps } from 'redux-form';
 import { ExamContext } from '@student/exams/show/context';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
-import { FileRef } from '@hourglass/workflows/student/exams/show/types';
+import { FileRef } from '@student/exams/show/types';
 
 /**
  * Like useEffect, but does not trigger on the initial render.

@@ -4,7 +4,7 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
-import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
+import Tooltip from '@student/exams/show/components/Tooltip';
 import './index.scss';
 
 export const NewMessages: React.FC<{

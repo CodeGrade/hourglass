@@ -29,7 +29,8 @@ import { AllAlerts } from '@hourglass/common/alerts';
 import './index.scss';
 import ErrorBoundary from '@hourglass/common/boundary';
 import Home from '@hourglass/workflows/home';
-import Grading from '@hourglass/workflows/grading';
+import Grading from '@grading/index';
+import DocumentTitle from '@hourglass/common/documentTitle';
 
 import { RelayEnvironmentProvider } from 'relay-hooks';
 import environment from '@hourglass/relay/environment';

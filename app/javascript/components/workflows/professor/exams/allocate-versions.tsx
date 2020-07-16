@@ -23,7 +23,6 @@ import {
   Route,
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import './list-columns.scss';
 import { useFragment, graphql, useMutation } from 'relay-hooks';
 
 import { TabEditButton } from './admin';

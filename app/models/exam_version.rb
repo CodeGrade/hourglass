@@ -70,6 +70,10 @@ class ExamVersion < ApplicationRecord
     contents['instructions'] || { type: 'HTML', value: '' }
   end
 
+  def total_points
+    questions.map{|q| q['parts'].map{|p| p['points']}.sum}.sum
+  end
+
   def default_answers
     def_answers = answers.map do |ans_q|
       ans_q.map do |ans_p|

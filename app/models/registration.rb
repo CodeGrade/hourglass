@@ -138,6 +138,10 @@ class Registration < ApplicationRecord
     Snapshot.create(registration: self, answers: answers)
   end
 
+  def current_score
+    exam_version.total_points + grading_checks.map(&:points).compact.sum + grading_checks.map(&:points).sum
+  end
+
   def my_questions
     questions
   end

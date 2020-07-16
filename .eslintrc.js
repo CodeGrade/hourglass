@@ -47,6 +47,12 @@ module.exports = {
         tsx: 'never',
       },
     ],
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: ['../*'],
+      },
+    ],
     camelcase: [
       'error',
       {

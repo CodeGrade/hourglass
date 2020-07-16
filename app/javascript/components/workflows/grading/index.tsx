@@ -191,7 +191,9 @@ const ItemRubric: React.FC<{
                   showTooltip
                   message="Click to apply this message"
                 >
-                  <Button variant="warning" size="sm" className="mr-2 align-self-center"><Icon I={MdFeedback} /></Button>
+                  <Button variant="warning" size="sm" className="mr-2 align-self-center">
+                    <Icon I={MdFeedback} />
+                  </Button>
                 </Tooltip>
                 {`(-${preset.points} points) `}
                 <HTML className="d-inline-block" value={preset.description} />

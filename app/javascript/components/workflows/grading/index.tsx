@@ -69,7 +69,7 @@ import { gradingConditionalRubric$key } from './__generated__/gradingConditional
 import { gradingNestedConditionalRubric$key } from './__generated__/gradingNestedConditionalRubric.graphql';
 
 const Feedback: React.FC<{
-  disabled: boolean;
+  disabled?: boolean;
   message: string;
   onChangeMessage?: (comment: string) => void;
   points: number;
@@ -77,7 +77,7 @@ const Feedback: React.FC<{
   onRemove?: () => void;
 }> = (props) => {
   const {
-    disabled,
+    disabled = false,
     points,
     onChangePoints,
     message,

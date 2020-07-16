@@ -88,6 +88,8 @@ import { gradingRubric$key, gradingRubric$data } from './__generated__/gradingRu
 import { gradingItemRubric$key, gradingItemRubric$data } from './__generated__/gradingItemRubric.graphql';
 import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
 import { gradingCreateCommentMutation } from './__generated__/gradingCreateCommentMutation.graphql';
+import { gradingDestroyCommentMutation } from './__generated__/gradingDestroyCommentMutation.graphql';
+import { gradingUpdateCommentMutation } from './__generated__/gradingUpdateCommentMutation.graphql';
 
 function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
@@ -211,6 +213,7 @@ const Feedback: React.FC<{
               <ShowStatusIcon error={error} status={status} />
             </span>
             <Button
+              disabled={disabled}
               className="ml-2"
               variant="outline-danger"
               size="sm"
@@ -728,14 +731,14 @@ const NewComment: React.FC<{
   );
 };
 
-interface NewComment {
+interface CommentVal {
   points: number;
   message: string;
   error?: string;
 }
 
 interface NewCommentMap {
-  [id: number]: NewComment;
+  [id: number]: CommentVal;
 }
 
 const NewComments: React.FC<{
@@ -846,6 +849,18 @@ const DESTROY_COMMENT_MUTATION = graphql`
   }
 `;
 
+const UPDATE_COMMENT_MUTATION = graphql`
+  mutation gradingUpdateCommentMutation($input: UpdateGradingCommentInput!) {
+    updateGradingComment(input: $input) {
+      gradingComment {
+        id
+        points
+        message
+      }
+    }
+  }
+`;
+
 const SavedComment: React.FC<{
   registrationId: string;
   comment: GradingComment;
@@ -855,8 +870,39 @@ const SavedComment: React.FC<{
     comment,
   } = props;
   const { alert } = useContext(AlertContext);
-  const updateLoading = true; // TODO
-  const [mutateDestroy, { loading: destroyLoading }] = useMutation(
+  const [error, setError] = useState<string>(null);
+  const [value, setValue] = useState<CommentVal>({
+    message: comment.message,
+    points: comment.points,
+  });
+  const [status, setStatus] = useState<CommentSaveStatus>(CommentSaveStatus.SAVED);
+  const onChangeMessage = (newMsg: string) => {
+    setStatus(CommentSaveStatus.DIRTY);
+    setValue((old) => ({
+      ...old,
+      message: newMsg,
+    }));
+  };
+  const onChangePoints = (newPoints: number) => {
+    setStatus(CommentSaveStatus.DIRTY);
+    setValue((old) => ({
+      ...old,
+      points: newPoints,
+    }));
+  };
+  const [mutateUpdate, { loading: updateLoading }] = useMutation<gradingUpdateCommentMutation>(
+    UPDATE_COMMENT_MUTATION,
+    {
+      onCompleted: () => {
+        setStatus(CommentSaveStatus.SAVED);
+      },
+      onError: (err) => {
+        setStatus(CommentSaveStatus.ERROR);
+        setError(err.message);
+      },
+    }
+  );
+  const [mutateDestroy, { loading: destroyLoading }] = useMutation<gradingDestroyCommentMutation>(
     DESTROY_COMMENT_MUTATION,
     {
       configs: [{
@@ -892,13 +938,28 @@ const SavedComment: React.FC<{
       },
     });
   };
+  const doUpdate = () => {
+    mutateUpdate({
+      variables: {
+        input: {
+          gradingCommentId: comment.id,
+          message: value.message,
+          points: value.points,
+        },
+      },
+    });
+  }
   return (
     <Feedback
       disabled={destroyLoading || updateLoading}
-      points={comment.points}
-      message={comment.message}
-      status={CommentSaveStatus.SAVED}
+      points={value.points}
+      onChangePoints={onChangePoints}
+      message={value.message}
+      onChangeMessage={onChangeMessage}
+      status={status}
       onRemove={removeComment}
+      onBlur={doUpdate}
+      error={error}
     />
   );
 };

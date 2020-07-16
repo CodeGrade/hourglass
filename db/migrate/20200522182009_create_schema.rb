@@ -194,5 +194,32 @@ class CreateSchema < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+
+    create_table :grading_comments do |t|
+      t.references :creator, null: false, foreign_key: { to_table: 'users' }
+      t.text :message, null: false
+      t.references :registration, null: false, foreign_key: true
+
+      t.integer :qnum, null: false
+      t.integer :pnum, null: false
+      t.integer :bnum, null: false
+
+      t.float :deduction, null: false
+
+      t.timestamps
+    end
+
+    create_table :grading_checks do |t|
+      t.references :creator, null: false, foreign_key: { to_table: 'users' }
+      t.references :registration, null: false, foreign_key: true
+
+      t.integer :qnum, null: false
+      t.integer :pnum, null: false
+      t.integer :bnum, null: false
+
+      t.float :deduction, null: true
+
+      t.timestamps
+    end
   end
 end

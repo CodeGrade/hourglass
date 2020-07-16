@@ -33,6 +33,18 @@ class User < ApplicationRecord
            dependent: :destroy,
            inverse_of: 'grader'
 
+  has_many :grading_checks,
+           foreign_key: 'creator',
+           class_name: 'GradingCheck',
+           dependent: :destroy,
+           inverse_of: 'creator'
+
+  has_many :grading_comments,
+           foreign_key: 'creator',
+           class_name: 'GradingComment',
+           dependent: :destroy,
+           inverse_of: 'creator'
+
   def self.from_omniauth(auth)
     user = where(username: auth.uid).first_or_initialize
     user.display_name = auth.info.display_name

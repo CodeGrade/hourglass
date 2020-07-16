@@ -12,6 +12,8 @@ class Registration < ApplicationRecord
   has_many :questions, dependent: :destroy
   has_one :accommodation, dependent: :destroy
   has_many :grading_locks, dependent: :destroy
+  has_many :grading_checks, dependent: :destroy
+  has_many :grading_comments, dependent: :destroy
 
   validates :user, presence: true
   validates :exam_version, presence: true

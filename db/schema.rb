@@ -72,6 +72,33 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.index ["course_id"], name: "index_exams_on_course_id"
   end
 
+  create_table "grading_checks", force: :cascade do |t|
+    t.bigint "creator_id", null: false
+    t.bigint "registration_id", null: false
+    t.integer "qnum", null: false
+    t.integer "pnum", null: false
+    t.integer "bnum", null: false
+    t.float "deduction"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["creator_id"], name: "index_grading_checks_on_creator_id"
+    t.index ["registration_id"], name: "index_grading_checks_on_registration_id"
+  end
+
+  create_table "grading_comments", force: :cascade do |t|
+    t.bigint "creator_id", null: false
+    t.text "message", null: false
+    t.bigint "registration_id", null: false
+    t.integer "qnum", null: false
+    t.integer "pnum", null: false
+    t.integer "bnum", null: false
+    t.float "deduction", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["creator_id"], name: "index_grading_comments_on_creator_id"
+    t.index ["registration_id"], name: "index_grading_comments_on_registration_id"
+  end
+
   create_table "grading_locks", force: :cascade do |t|
     t.bigint "registration_id", null: false
     t.bigint "grader_id"
@@ -229,6 +256,10 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   add_foreign_key "exam_announcements", "exams"
   add_foreign_key "exam_versions", "exams"
   add_foreign_key "exams", "courses"
+  add_foreign_key "grading_checks", "registrations"
+  add_foreign_key "grading_checks", "users", column: "creator_id"
+  add_foreign_key "grading_comments", "registrations"
+  add_foreign_key "grading_comments", "users", column: "creator_id"
   add_foreign_key "grading_locks", "registrations"
   add_foreign_key "grading_locks", "users", column: "grader_id"
   add_foreign_key "messages", "registrations"

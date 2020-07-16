@@ -204,7 +204,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.integer :pnum, null: false
       t.integer :bnum, null: false
 
-      t.float :deduction, null: false
+      t.float :points, null: false
 
       t.timestamps
     end
@@ -217,7 +217,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.integer :pnum, null: false
       t.integer :bnum, null: false
 
-      t.float :deduction, null: true
+      t.float :points, null: true
 
       t.timestamps
     end

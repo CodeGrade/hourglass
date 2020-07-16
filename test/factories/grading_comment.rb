@@ -11,7 +11,7 @@ FactoryBot.define do
 
     message { 'You answered incorrectly.' }
 
-    deduction { 10 }
+    points { 10 }
 
     qnum { 0 }
     pnum { 0 }

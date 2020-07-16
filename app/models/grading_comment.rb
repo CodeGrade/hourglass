@@ -11,9 +11,9 @@ class GradingComment < ApplicationRecord
   validates :registration, presence: true
   validates :message, presence: true
 
-  validates :deduction, presence: true, numericality: {
-    greater_than_or_equal_to: 0,
-  }
+  # negative - deduction
+  # positive - bonus
+  validates :points, presence: true, numericality: true
 
   validates :qnum, presence: true
   validates :pnum, presence: true
@@ -24,6 +24,6 @@ class GradingComment < ApplicationRecord
   def valid_qpb
     return if exam_version.questions.dig(qnum, 'parts', pnum, 'body', bnum)
 
-    errors.add(:base, 'must have valid question, part, and body item numbers')
+    errors.add(:base, 'Question, part, and body item numbers must be valid for the exam version.')
   end
 end

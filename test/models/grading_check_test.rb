@@ -18,17 +18,21 @@ class GradingCheckTest < ActiveSupport::TestCase
     assert @check.valid?
   end
 
-  test 'grading check with zero deduction is valid' do
-    assert build(:grading_check, deduction: 0).valid?
+  test 'grading check with zero points is valid' do
+    assert build(:grading_check, points: 0).valid?
   end
 
-  test 'grading check with negative deduction is invalid' do
-    assert_not build(:grading_check, deduction: -5).valid?
+  test 'grading check with bonus is valid' do
+    assert build(:grading_check, points: 5).valid?
+  end
+
+  test 'grading check with deduction is valid' do
+    assert build(:grading_check, points: -5).valid?
   end
 
   test 'invalid qnum' do
     bad = build(:grading_check, qnum: @version.questions.length)
     assert_not bad.valid?
-    assert_match(/valid question/, bad.errors.full_messages.to_sentence)
+    assert_match(/item numbers must be valid/, bad.errors.full_messages.to_sentence)
   end
 end

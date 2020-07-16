@@ -78,7 +78,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.integer "qnum", null: false
     t.integer "pnum", null: false
     t.integer "bnum", null: false
-    t.float "deduction"
+    t.float "points"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["creator_id"], name: "index_grading_checks_on_creator_id"
@@ -92,7 +92,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.integer "qnum", null: false
     t.integer "pnum", null: false
     t.integer "bnum", null: false
-    t.float "deduction", null: false
+    t.float "points", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["creator_id"], name: "index_grading_comments_on_creator_id"

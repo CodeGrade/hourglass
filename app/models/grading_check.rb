@@ -10,9 +10,10 @@ class GradingCheck < ApplicationRecord
   validates :creator, presence: true
   validates :registration, presence: true
 
-  validates :deduction, numericality: {
+  # negative - deduction
+  # positive - bonus
+  validates :points, numericality: {
     allow_nil: true,
-    greater_than_or_equal_to: 0,
   }
 
   validates :qnum, presence: true
@@ -24,7 +25,7 @@ class GradingCheck < ApplicationRecord
   def valid_qpb
     return if exam_version.questions.dig(qnum, 'parts', pnum, 'body', bnum)
 
-    errors.add(:base, 'must have valid question, part, and body item numbers')
+    errors.add(:base, 'Question, part, and body item numbers must be valid for the exam version.')
   end
 
   def correct?

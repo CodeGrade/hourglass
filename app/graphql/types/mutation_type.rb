@@ -10,6 +10,9 @@ module Types
     field :release_grading_lock, mutation: Mutations::ReleaseGradingLock
     field :release_all_grading_locks, mutation: Mutations::ReleaseAllGradingLocks
 
+    field :create_grading_check, mutation: Mutations::CreateGradingCheck
+    field :create_grading_comment, mutation: Mutations::CreateGradingComment
+
     field :ask_question, mutation: Mutations::AskQuestion
     field :destroy_exam_version, mutation: Mutations::DestroyExamVersion
     field :update_exam_version, mutation: Mutations::UpdateExamVersion

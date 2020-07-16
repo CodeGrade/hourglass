@@ -14,8 +14,6 @@ import {
 import {
   FaChevronCircleLeft,
   FaChevronCircleRight,
-  FaThumbsDown,
-  FaThumbsUp,
 } from 'react-icons/fa';
 import { MdFeedback } from 'react-icons/md';
 import Icon from '@student/exams/show/components/Icon';
@@ -62,6 +60,7 @@ import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import { RenderError } from '@hourglass/common/boundary';
+import ObjectiveGrade from '@grading/questions/ObjectiveGrade';
 
 import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
 import { gradingRubric$key, gradingRubric } from './__generated__/gradingRubric.graphql';
@@ -131,17 +130,6 @@ const Feedback: React.FC<{
     </Alert>
   );
 };
-
-const ItemizedGrades: React.FC = () => (
-  <ButtonGroup>
-    <Button variant="danger">
-      <Icon I={FaThumbsDown} />
-    </Button>
-    <Button variant="success">
-      <Icon I={FaThumbsUp} />
-    </Button>
-  </ButtonGroup>
-);
 
 const PromptRow: React.FC<{
   prompt: HTMLVal;
@@ -497,23 +485,16 @@ const BodyItemGrades: React.FC<{
   qnum: number;
   pnum: number;
   bnum: number;
-  checks: grading_one$data['gradingChecks'];
   comments: grading_one$data['gradingComments'];
 }> = (props) => {
   const {
     qnum,
     pnum,
     bnum,
-    checks,
     comments,
   } = props;
   return (
     <>
-      {checks.map((check) => (
-        <p key={check.id} className="bg-warning rounded">
-          TODO: gradingcheck with {check.points} points
-        </p>
-      ))}
       {comments.map((comment) => (
         <Feedback
           key={comment.id}
@@ -542,11 +523,12 @@ interface AnswersRowProps<T, V> {
   qnum: number;
   pnum: number;
   bnum: number;
-  checks: grading_one$data['gradingChecks'];
   comments: grading_one$data['gradingComments'];
 }
 
-const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
+function AnswersRow<T, V>(
+  props: React.PropsWithChildren<AnswersRowProps<T, V>>,
+): React.ReactElement<AnswersRowProps<T, V>> {
   const {
     ShowExpected,
     ShowStudent = ShowExpected,
@@ -557,8 +539,8 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
     qnum,
     pnum,
     bnum,
-    checks,
     comments,
+    children,
   } = props;
   return (
     <Card>
@@ -573,7 +555,9 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
             <ShowStudent
               info={info}
               value={studentAnswer}
-            />
+            >
+              {children}
+            </ShowStudent>
           </Col>
           <Col md={6}>
             <ShowExpected
@@ -589,7 +573,6 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
               qnum={qnum}
               pnum={pnum}
               bnum={bnum}
-              checks={checks}
               comments={comments}
             />
           </Col>
@@ -605,7 +588,7 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
       </Card.Body>
     </Card>
   );
-};
+}
 
 const GradeBodyItem: React.FC<{
   expectedAnswer: AnswerState;
@@ -615,7 +598,7 @@ const GradeBodyItem: React.FC<{
   pnum: number;
   bnum: number;
   examVersionKey: gradingRubric$key;
-  checks: grading_one$data['gradingChecks'];
+  check?: grading_one$data['gradingChecks'][number];
   comments: grading_one$data['gradingComments'];
 }> = (props) => {
   const {
@@ -626,7 +609,7 @@ const GradeBodyItem: React.FC<{
     qnum,
     pnum,
     bnum,
-    checks,
+    check,
     comments,
   } = props;
   switch (info.type) {
@@ -647,7 +630,6 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayCode}
             studentAnswer={studentAnswer as CodeState}
             expectedAnswer={expectedAnswer as CodeState}
-            checks={checks}
             comments={comments}
           />
         </>
@@ -665,7 +647,6 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayCodeTag}
             studentAnswer={studentAnswer as CodeTagState}
             expectedAnswer={expectedAnswer as CodeTagState}
-            checks={checks}
             comments={comments}
           />
         </>
@@ -684,7 +665,6 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayYesNo}
             studentAnswer={studentAnswer as YesNoState}
             expectedAnswer={expectedAnswer as YesNoState}
-            checks={checks}
             comments={comments}
           />
         </>
@@ -702,7 +682,6 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayText}
             studentAnswer={studentAnswer as TextState}
             expectedAnswer={expectedAnswer as TextState}
-            checks={checks}
             comments={comments}
           />
         </>
@@ -721,7 +700,6 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayMatching}
             studentAnswer={studentAnswer as MatchingState}
             expectedAnswer={expectedAnswer as MatchingState}
-            checks={checks}
             comments={comments}
           />
         </>
@@ -739,7 +717,6 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayAllThatApply}
             studentAnswer={studentAnswer as AllThatApplyState}
             expectedAnswer={expectedAnswer as AllThatApplyState}
-            checks={checks}
             comments={comments}
           />
         </>
@@ -758,7 +735,6 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayMultipleChoice}
             studentAnswer={studentAnswer as MultipleChoiceState}
             expectedAnswer={expectedAnswer as MultipleChoiceState}
-            checks={checks}
             comments={comments}
           />
         </>
@@ -841,7 +817,7 @@ const Grade: React.FC<{
 
               const ans = answers[qnum][pnum][bnum];
               const expectedAnswer = isNoAns(ans) ? undefined : ans;
-              const checks = res.gradingChecks.filter((check) => (
+              const check = res.gradingChecks.find((check) => (
                 check.qnum === qnum
                 && check.pnum === pnum
                 && check.bnum === bnum
@@ -862,7 +838,7 @@ const Grade: React.FC<{
                   pnum={pnum}
                   bnum={bnum}
                   examVersionKey={res.examVersion}
-                  checks={checks}
+                  check={check}
                   comments={comments}
                 />
               );

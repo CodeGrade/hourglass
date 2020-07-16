@@ -1,11 +1,11 @@
 import React from 'react';
 import { YesNoProps } from '@proctor/registrations/show/questions/DisplayYesNo';
-import ObjectiveGrade from '@grading/questions/ObjectiveGrade';
 
 const GradeYesNo: React.FC<YesNoProps> = (props) => {
   const {
     info,
     value,
+    children,
   } = props;
   const {
     yesLabel,
@@ -16,7 +16,7 @@ const GradeYesNo: React.FC<YesNoProps> = (props) => {
       <>
         <b>Answer: </b>
         <i>No answer given</i>
-        <ObjectiveGrade className="float-right" />
+        {children}
       </>
     );
   }
@@ -28,7 +28,7 @@ const GradeYesNo: React.FC<YesNoProps> = (props) => {
           ? yesLabel
           : noLabel}
       </span>
-      <ObjectiveGrade className="float-right" />
+      {children}
     </>
   );
 };

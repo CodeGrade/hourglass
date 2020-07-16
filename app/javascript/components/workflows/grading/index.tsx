@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo, useState } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import {
   Form,
   Row,
@@ -68,8 +68,20 @@ import { gradingItemRubric$key } from './__generated__/gradingItemRubric.graphql
 import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
 import { gradingNestedConditionalRubric$key } from './__generated__/gradingNestedConditionalRubric.graphql';
 
-const Feedback: React.FC = () => {
-  const [points, setPoints] = useState(null);
+const Feedback: React.FC<{
+  disabled: boolean;
+  comment: string;
+  onChangeComment?: (comment: string) => void;
+  points: number;
+  onChangePoints?: (pts: number) => void;
+}> = (props) => {
+  const {
+    disabled,
+    points,
+    onChangePoints,
+    comment,
+    onChangeComment,
+  } = props;
 
   let variant;
   if (points < 0) variant = 'danger';
@@ -85,23 +97,34 @@ const Feedback: React.FC = () => {
         <Form.Group as={Col} lg="auto">
           <Form.Label>Points</Form.Label>
           <Form.Control
+            disabled={disabled}
             step={0.5}
             type="number"
             value={points}
             onChange={(e) => {
-              setPoints(e.target.value);
+              if (onChangePoints) onChangePoints(Number(e.target.value));
             }}
           />
         </Form.Group>
         <Form.Group as={Col}>
           <Form.Label>Category</Form.Label>
-          <Select options={[]} />
+          <Select
+            isDisabled={disabled}
+            options={[]}
+          />
         </Form.Group>
       </Row>
       <Row>
         <Form.Group as={Col}>
           <Form.Label>Comment</Form.Label>
-          <Form.Control as="textarea" />
+          <Form.Control
+            as="textarea"
+            disabled={disabled}
+            value={comment}
+            onChange={(e) => {
+              if (onChangeComment) onChangeComment(e.target.value);
+            }}
+          />
         </Form.Group>
       </Row>
     </Alert>
@@ -490,13 +513,13 @@ const BodyItemGrades: React.FC<{
         checks:
         {JSON.stringify(checks)}
       </p>
-      <p>
-        comments:
-        {JSON.stringify(comments)}
-      </p>
-      {/* <ItemizedGrades /> */}
-      {/* <Feedback /> */}
-      {/* <Feedback /> */}
+      {comments.map((comment) => (
+        <Feedback
+          disabled
+          points={comment.points}
+          comment={comment.message}
+        />
+      ))}
     </>
   );
 };

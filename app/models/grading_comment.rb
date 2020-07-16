@@ -19,11 +19,18 @@ class GradingComment < ApplicationRecord
   validates :pnum, presence: true
   validates :bnum, presence: true
 
+  delegate :user, to: :registration
+  delegate :course, to: :exam_version
+
   validate :valid_qpb
 
   def valid_qpb
     return if exam_version.questions.dig(qnum, 'parts', pnum, 'body', bnum)
 
     errors.add(:base, 'Question, part, and body item numbers must be valid for the exam version.')
+  end
+
+  def visible_to?(check_user)
+    course.all_staff.or(User.where(id: user.id)).exists? check_user.id
   end
 end

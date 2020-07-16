@@ -16,6 +16,17 @@ module Types
     field :exam_version, Types::ExamVersionType, null: false
 
     field :current_answers, GraphQL::Types::JSON, null: false do
+      # TODO: should be staff and profs
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
+
+    field :grading_checks, [Types::GradingCheckType], null: false do
+      # TODO: should be staff and profs
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
+
+    field :grading_comments, [Types::GradingCommentType], null: false do
+      # TODO: should be staff and profs
       guard Guards::PROCTORS_AND_PROFESSORS
     end
 

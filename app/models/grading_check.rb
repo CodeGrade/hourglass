@@ -20,6 +20,9 @@ class GradingCheck < ApplicationRecord
   validates :pnum, presence: true
   validates :bnum, presence: true
 
+  delegate :user, to: :registration
+  delegate :course, to: :exam_version
+
   validate :valid_qpb
 
   def valid_qpb
@@ -30,5 +33,9 @@ class GradingCheck < ApplicationRecord
 
   def correct?
     deduction.nil?
+  end
+
+  def visible_to?(check_user)
+    course.all_staff.or(User.where(id: user.id)).exists? check_user.id
   end
 end

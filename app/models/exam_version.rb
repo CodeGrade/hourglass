@@ -14,6 +14,7 @@ class ExamVersion < ApplicationRecord
 
   validates :exam, presence: true
 
+  delegate :course, to: :exam
   delegate :professors, to: :exam
   delegate :proctors_and_professors, to: :exam
 

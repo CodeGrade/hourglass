@@ -62,7 +62,7 @@ import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 
-import { grading_one$key } from './__generated__/grading_one.graphql';
+import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
 import { gradingRubric$key, gradingRubric } from './__generated__/gradingRubric.graphql';
 import { gradingItemRubric$key } from './__generated__/gradingItemRubric.graphql';
 import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
@@ -469,6 +469,37 @@ const ShowRubric: React.FC<{
   );
 };
 
+const BodyItemGrades: React.FC<{
+  qnum: number;
+  pnum: number;
+  bnum: number;
+  checks: grading_one$data['gradingChecks'];
+  comments: grading_one$data['gradingComments'];
+}> = (props) => {
+  const {
+    qnum,
+    pnum,
+    bnum,
+    checks,
+    comments,
+  } = props;
+  return (
+    <>
+      <p>grades for {qnum},{pnum},{bnum}</p>
+      <p>
+        checks:
+        {JSON.stringify(checks)}
+      </p>
+      <p>
+        comments:
+        {JSON.stringify(comments)}
+      </p>
+      {/* <ItemizedGrades /> */}
+      {/* <Feedback /> */}
+      {/* <Feedback /> */}
+    </>
+  );
+};
 
 interface AnswersRowProps<T, V> {
   ShowStudent?: React.ComponentType<{
@@ -486,6 +517,8 @@ interface AnswersRowProps<T, V> {
   qnum: number;
   pnum: number;
   bnum: number;
+  checks: grading_one$data['gradingChecks'];
+  comments: grading_one$data['gradingComments'];
 }
 
 const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
@@ -499,6 +532,8 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
     qnum,
     pnum,
     bnum,
+    checks,
+    comments,
   } = props;
   return (
     <Card>
@@ -525,9 +560,13 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
         <hr />
         <Row>
           <Col>
-            <ItemizedGrades />
-            <Feedback />
-            <Feedback />
+            <BodyItemGrades
+              qnum={qnum}
+              pnum={pnum}
+              bnum={bnum}
+              checks={checks}
+              comments={comments}
+            />
           </Col>
           <Col md={6}>
             <ShowRubric
@@ -551,6 +590,8 @@ const GradeBodyItem: React.FC<{
   pnum: number;
   bnum: number;
   examVersionKey: gradingRubric$key;
+  checks: grading_one$data['gradingChecks'];
+  comments: grading_one$data['gradingComments'];
 }> = (props) => {
   const {
     expectedAnswer,
@@ -560,6 +601,8 @@ const GradeBodyItem: React.FC<{
     qnum,
     pnum,
     bnum,
+    checks,
+    comments,
   } = props;
   switch (info.type) {
     case 'HTML':
@@ -579,6 +622,8 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayCode}
             studentAnswer={studentAnswer as CodeState}
             expectedAnswer={expectedAnswer as CodeState}
+            checks={checks}
+            comments={comments}
           />
         </>
       );
@@ -595,6 +640,8 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayCodeTag}
             studentAnswer={studentAnswer as CodeTagState}
             expectedAnswer={expectedAnswer as CodeTagState}
+            checks={checks}
+            comments={comments}
           />
         </>
       );
@@ -612,6 +659,8 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayYesNo}
             studentAnswer={studentAnswer as YesNoState}
             expectedAnswer={expectedAnswer as YesNoState}
+            checks={checks}
+            comments={comments}
           />
         </>
       );
@@ -628,6 +677,8 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayText}
             studentAnswer={studentAnswer as TextState}
             expectedAnswer={expectedAnswer as TextState}
+            checks={checks}
+            comments={comments}
           />
         </>
       );
@@ -645,6 +696,8 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayMatching}
             studentAnswer={studentAnswer as MatchingState}
             expectedAnswer={expectedAnswer as MatchingState}
+            checks={checks}
+            comments={comments}
           />
         </>
       );
@@ -661,6 +714,8 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayAllThatApply}
             studentAnswer={studentAnswer as AllThatApplyState}
             expectedAnswer={expectedAnswer as AllThatApplyState}
+            checks={checks}
+            comments={comments}
           />
         </>
       );
@@ -678,6 +733,8 @@ const GradeBodyItem: React.FC<{
             ShowExpected={DisplayMultipleChoice}
             studentAnswer={studentAnswer as MultipleChoiceState}
             expectedAnswer={expectedAnswer as MultipleChoiceState}
+            checks={checks}
+            comments={comments}
           />
         </>
       );
@@ -700,6 +757,19 @@ const Grade: React.FC<{
     graphql`
     fragment grading_one on Registration {
       currentAnswers
+      gradingComments {
+        qnum
+        pnum
+        bnum
+        points
+        message
+      }
+      gradingChecks {
+        qnum
+        pnum
+        bnum
+        points
+      }
       examVersion {
         ...gradingRubric
         questions
@@ -744,6 +814,16 @@ const Grade: React.FC<{
 
               const ans = answers[qnum][pnum][bnum];
               const expectedAnswer = isNoAns(ans) ? undefined : ans;
+              const checks = res.gradingChecks.filter((check) => (
+                check.qnum === qnum
+                && check.pnum === pnum
+                && check.bnum === bnum
+              ));
+              const comments = res.gradingComments.filter((comment) => (
+                comment.qnum === qnum
+                && comment.pnum === pnum
+                && comment.bnum === bnum
+              ));
               return (
                 <GradeBodyItem
                   // eslint-disable-next-line react/no-array-index-key
@@ -755,6 +835,8 @@ const Grade: React.FC<{
                   pnum={pnum}
                   bnum={bnum}
                   examVersionKey={res.examVersion}
+                  checks={checks}
+                  comments={comments}
                 />
               );
             })}

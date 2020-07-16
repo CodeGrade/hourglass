@@ -9,6 +9,7 @@ interface TooltipProps {
   message: string;
   showTooltip?: boolean;
   placement?: OverlayTriggerProps['placement'];
+  children: React.ReactElement;
 }
 
 const Tooltip: React.FC<TooltipProps> = (props) => {
@@ -32,9 +33,7 @@ const Tooltip: React.FC<TooltipProps> = (props) => {
       overlay={tooltip}
       placement={placement}
     >
-      <>
-        {children}
-      </>
+      {children}
     </OverlayTrigger>
   );
 };

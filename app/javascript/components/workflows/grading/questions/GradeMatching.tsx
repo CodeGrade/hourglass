@@ -56,9 +56,6 @@ const GradeMatching: React.FC<MatchingProps> = (props) => {
               <span className="mr-2">{valueI === -1 ? 'None' : `Option ${valueI + 1}`}</span>
               <div className="d-inline-block">{valueI === -1 ? '' : <HTML value={values[valueI]} />}</div>
             </Col>
-            <Col sm="auto">
-              <ObjectiveGrade className="float-right" />
-            </Col>
           </Row>
         );
       })}

@@ -24,7 +24,6 @@ const GradeMultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
       <span className="btn btn-sm btn-outline-dark disabled">
         <HTML value={options[value]} />
       </span>
-      <ObjectiveGrade className="float-right" />
     </>
   );
 };

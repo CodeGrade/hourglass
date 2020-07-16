@@ -16,6 +16,7 @@ import {
   FaChevronCircleRight,
 } from 'react-icons/fa';
 import { MdFeedback } from 'react-icons/md';
+import { RiMessage2Line, RiChatDeleteLine, RiChatCheckLine } from 'react-icons/ri';
 import Icon from '@student/exams/show/components/Icon';
 import {
   HTMLVal,
@@ -68,6 +69,19 @@ import { gradingItemRubric$key, gradingItemRubric$data } from './__generated__/g
 import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
 import { gradingNestedConditionalRubric$key } from './__generated__/gradingNestedConditionalRubric.graphql';
 import { AlertContext } from '@hourglass/common/alerts';
+import { IconType } from 'react-icons';
+
+function variantForPoints(points: number): AlertProps['variant'] {
+  if (points < 0) return 'danger';
+  else if (points > 0) return 'success';
+  return 'warning';
+}
+
+function iconForPoints(points: number): IconType {
+  if (points < 0) return RiChatDeleteLine;
+  else if (points > 0) return RiChatCheckLine;
+  return RiMessage2Line;
+}
 
 const Feedback: React.FC<{
   disabled?: boolean;
@@ -85,12 +99,7 @@ const Feedback: React.FC<{
     onChangeMessage,
     onRemove,
   } = props;
-
-  let variant;
-  if (points < 0) variant = 'danger';
-  else if (points > 0) variant = 'success';
-  else variant = 'warning';
-
+  const variant = variantForPoints(points);
   return (
     <Alert
       variant={variant}
@@ -207,15 +216,17 @@ const ShowPreset: React.FC<{
       },
     },
   );
+  const variant = variantForPoints(preset.points);
+  const VariantIcon = iconForPoints(preset.points);
   return (
-    <Alert variant="warning" className="p-0">
+    <Alert variant={variant} className="p-0">
       <Tooltip
         showTooltip
         message="Click to apply this message"
       >
         <Button
           disabled={loading}
-          variant="warning"
+          variant={variant}
           size="sm"
           className="mr-2 align-self-center"
           onClick={(): void => {
@@ -233,10 +244,10 @@ const ShowPreset: React.FC<{
             });
           }}
         >
-          <Icon I={MdFeedback} />
+          <Icon I={VariantIcon} />
         </Button>
       </Tooltip>
-      {`(-${preset.points} points) `}
+      {`(${preset.points} points) `}
       <HTML className="d-inline-block" value={preset.description} />
     </Alert>
   );
@@ -704,9 +715,10 @@ const NewComments: React.FC<{
         );
       })}
       <Button
-        variant="success"
+        variant="primary"
         onClick={addNew}
       >
+        <Icon className="mr-2" I={RiMessage2Line} />
         Add new comment
       </Button>
     </>

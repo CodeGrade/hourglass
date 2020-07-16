@@ -1,4 +1,9 @@
-import React, { useMemo, useState, useRef, useContext } from 'react';
+import React, {
+  useMemo,
+  useState,
+  useRef,
+  useContext,
+} from 'react';
 import {
   Form,
   Row,
@@ -10,13 +15,15 @@ import {
   AlertProps,
   DropdownButton,
   Dropdown,
+  ButtonProps,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
   FaChevronCircleRight,
+  FaTrash,
 } from 'react-icons/fa';
-import { MdFeedback } from 'react-icons/md';
 import { RiMessage2Line, RiChatDeleteLine, RiChatCheckLine } from 'react-icons/ri';
+import { FiCheckSquare } from 'react-icons/fi';
 import Icon from '@student/exams/show/components/Icon';
 import {
   HTMLVal,
@@ -47,42 +54,105 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import Tooltip from '@student/exams/show/components/Tooltip';
-import Select from 'react-select';
 import {
   Link,
   useParams,
   Switch,
   Route,
 } from 'react-router-dom';
-import { useQuery, useFragment, graphql, useMutation } from 'relay-hooks';
+import {
+  useQuery,
+  useFragment,
+  graphql,
+  useMutation,
+} from 'relay-hooks';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import { RenderError } from '@hourglass/common/boundary';
-import ObjectiveGrade from '@grading/questions/ObjectiveGrade';
-
-import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
-import { gradingRubric$key, gradingRubric, gradingRubric$data } from './__generated__/gradingRubric.graphql';
-import { gradingItemRubric$key, gradingItemRubric$data } from './__generated__/gradingItemRubric.graphql';
-import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
-import { gradingNestedConditionalRubric$key } from './__generated__/gradingNestedConditionalRubric.graphql';
 import { AlertContext } from '@hourglass/common/alerts';
 import { IconType } from 'react-icons';
-import { BsArrowUpRight, BsArrowDownRight } from 'react-icons/bs';
+import {
+  BsArrowUpRight,
+  BsArrowDownRight,
+  BsPencilSquare,
+  BsXSquare,
+} from 'react-icons/bs';
+import { RangeAddConfig } from 'relay-runtime/lib/mutations/RelayDeclarativeMutationConfig';
+import TooltipButton from '@student/exams/show/components/TooltipButton';
+
+import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
+import { gradingRubric$key, gradingRubric$data } from './__generated__/gradingRubric.graphql';
+import { gradingItemRubric$key, gradingItemRubric$data } from './__generated__/gradingItemRubric.graphql';
+import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
+import { gradingCreateCommentMutation } from './__generated__/gradingCreateCommentMutation.graphql';
 
 function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
-  else if (points > 0) return 'success';
+  if (points > 0) return 'success';
   return 'warning';
 }
 
 function iconForPoints(points: number): IconType {
   if (points < 0) return RiChatDeleteLine;
-  else if (points > 0) return RiChatCheckLine;
+  if (points > 0) return RiChatCheckLine;
   return RiMessage2Line;
 }
+
+enum CommentSaveStatus {
+  SAVED = 'saved',
+  DIRTY = 'dirty',
+  ERROR = 'error',
+}
+
+const ShowStatusIcon: React.FC<{
+  status: CommentSaveStatus;
+  error?: string;
+}> = (props) => {
+  const {
+    status,
+    error,
+  } = props;
+  let StatusIcon: IconType;
+  let variant: ButtonProps['variant'];
+  switch (status) {
+    case CommentSaveStatus.SAVED:
+      StatusIcon = FiCheckSquare;
+      variant = 'success';
+      break;
+    case CommentSaveStatus.DIRTY:
+      StatusIcon = BsPencilSquare;
+      variant = 'warning';
+      break;
+    case CommentSaveStatus.ERROR:
+      StatusIcon = BsXSquare;
+      variant = 'danger';
+      break;
+    default:
+      throw new ExhaustiveSwitchError(status);
+  }
+  if (error) {
+    return (
+      <TooltipButton
+        disabled
+        disabledMessage={error}
+        variant={variant}
+        size="sm"
+      >
+        <span>
+          <Icon I={StatusIcon} />
+        </span>
+      </TooltipButton>
+    );
+  }
+  return (
+    <Button disabled variant={variant} size="sm">
+      <Icon I={StatusIcon} />
+    </Button>
+  );
+};
 
 const Feedback: React.FC<{
   disabled?: boolean;
@@ -91,6 +161,9 @@ const Feedback: React.FC<{
   points: number;
   onChangePoints?: (pts: number) => void;
   onRemove?: () => void;
+  onBlur?: AlertProps['onBlur'];
+  status: CommentSaveStatus;
+  error?: string;
 }> = (props) => {
   const {
     disabled = false,
@@ -99,13 +172,15 @@ const Feedback: React.FC<{
     message,
     onChangeMessage,
     onRemove,
+    onBlur,
+    status,
+    error,
   } = props;
   const variant = variantForPoints(points);
   return (
     <Alert
       variant={variant}
-      dismissible
-      onClose={onRemove}
+      onBlur={onBlur}
     >
       <Row>
         <Form.Group as={Col} lg="auto">
@@ -119,6 +194,22 @@ const Feedback: React.FC<{
               if (onChangePoints) onChangePoints(Number(e.target.value));
             }}
           />
+        </Form.Group>
+        <Form.Group className="ml-auto mr-3">
+          <Form.Label>Status</Form.Label>
+          <div>
+            <span>
+              <ShowStatusIcon error={error} status={status} />
+            </span>
+            <Button
+              className="ml-2"
+              variant="outline-danger"
+              size="sm"
+              onClick={onRemove}
+            >
+              <Icon I={FaTrash} />
+            </Button>
+          </div>
         </Form.Group>
       </Row>
       <Row>
@@ -150,6 +241,36 @@ const PromptRow: React.FC<{
 
 type GradingPreset = gradingItemRubric$data['presets'][number];
 
+const CREATE_COMMENT_MUTATION = graphql`
+  mutation gradingCreateCommentMutation($input: CreateGradingCommentInput!) {
+    createGradingComment(input: $input) {
+      gradingComment {
+        id
+        qnum
+        pnum
+        bnum
+        points
+        message
+      }
+      gradingCommentEdge {
+        node {
+          id
+        }
+      }
+    }
+  }
+`;
+
+const addCommentConfig = (registrationId: string): RangeAddConfig => ({
+  type: 'RANGE_ADD',
+  parentID: registrationId,
+  connectionInfo: [{
+    key: 'Registration_gradingComments',
+    rangeBehavior: 'append',
+  }],
+  edgeName: 'gradingCommentEdge',
+});
+
 const ShowPreset: React.FC<{
   preset: GradingPreset;
   registrationId: string;
@@ -165,42 +286,10 @@ const ShowPreset: React.FC<{
     bnum,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation(
-    graphql`
-    mutation gradingCreateCommentMutation($input: CreateGradingCommentInput!) {
-      createGradingComment(input: $input) {
-        gradingComment {
-          id
-          qnum
-          pnum
-          bnum
-          points
-          message
-        }
-        gradingCommentEdge {
-          node {
-            id
-          }
-        }
-      }
-    }
-    `,
+  const [mutate, { loading }] = useMutation<gradingCreateCommentMutation>(
+    CREATE_COMMENT_MUTATION,
     {
-      configs: [{
-        type: 'RANGE_ADD',
-        parentID: registrationId,
-        connectionInfo: [{
-          key: 'Registration_gradingComments',
-          rangeBehavior: 'append',
-        }],
-        edgeName: 'gradingCommentEdge',
-      }],
-      onCompleted: () => {
-        alert({
-          variant: 'success',
-          message: 'Comment successfully created.',
-        });
-      },
+      configs: [addCommentConfig(registrationId)],
       onError: (err) => {
         alert({
           variant: 'danger',
@@ -597,24 +686,35 @@ const ShowRubric: React.FC<{
 };
 
 const NewComment: React.FC<{
+  disabled?: boolean;
   message: string;
   points: number;
   onChange: (points: number, message: string) => void;
   onRemove: () => void;
+  onCreate: () => void;
+  error?: string;
 }> = (props) => {
   const {
+    disabled = false,
     message,
     points,
     onChange,
     onRemove,
+    onCreate,
+    error,
   } = props;
+  const status = error ? CommentSaveStatus.ERROR : CommentSaveStatus.DIRTY;
   return (
     <Feedback
+      disabled={disabled}
       points={points}
       onChangePoints={(pts) => onChange(pts, message)}
       message={message}
       onChangeMessage={(msg) => onChange(points, msg)}
       onRemove={onRemove}
+      onBlur={onCreate}
+      status={status}
+      error={error}
     />
   );
 };
@@ -622,6 +722,7 @@ const NewComment: React.FC<{
 interface NewComment {
   points: number;
   message: string;
+  error?: string;
 }
 
 interface NewCommentMap {
@@ -629,7 +730,17 @@ interface NewCommentMap {
 }
 
 const NewComments: React.FC<{
+  registrationId: string;
+  qnum: number;
+  pnum: number;
+  bnum: number;
 }> = (props) => {
+  const {
+    registrationId,
+    qnum,
+    pnum,
+    bnum,
+  } = props;
   const lastId = useRef<number>(0);
   const [commentMap, setCommentMap] = useState<NewCommentMap>({});
   const addNew = () => {
@@ -642,9 +753,15 @@ const NewComments: React.FC<{
     });
     lastId.current += 1;
   };
+  const [mutate, { loading }] = useMutation<gradingCreateCommentMutation>(
+    CREATE_COMMENT_MUTATION,
+    {
+      configs: [addCommentConfig(registrationId)],
+    },
+  );
   return (
     <>
-      {Object.entries(commentMap).map(([id, { message, points }]) => {
+      {Object.entries(commentMap).map(([id, { message, points, error }]) => {
         const onChange = (pts: number, msg: string) => {
           setCommentMap({
             ...commentMap,
@@ -659,13 +776,43 @@ const NewComments: React.FC<{
           delete newMap[id];
           setCommentMap(newMap);
         };
+        const setError = (errMsg: string) => {
+          setCommentMap({
+            ...commentMap,
+            [id]: {
+              ...commentMap[id],
+              error: errMsg,
+            },
+          });
+        };
+        const onCreate = () => {
+          mutate({
+            variables: {
+              input: {
+                registrationId,
+                qnum,
+                pnum,
+                bnum,
+                message,
+                points,
+              },
+            },
+          }).then(() => {
+            onRemove();
+          }).catch((err) => {
+            setError(err.message);
+          });
+        };
         return (
           <NewComment
             key={id}
+            disabled={loading}
             message={message}
             points={points}
             onChange={onChange}
             onRemove={onRemove}
+            onCreate={onCreate}
+            error={error}
           />
         );
       })}
@@ -682,16 +829,10 @@ const NewComments: React.FC<{
 
 type GradingComment = grading_one$data['gradingComments']['edges'][number]['node'];
 
-const BodyItemGrades: React.FC<{
-  qnum: number;
-  pnum: number;
-  bnum: number;
+const SavedComments: React.FC<{
   comments: GradingComment[];
 }> = (props) => {
   const {
-    qnum,
-    pnum,
-    bnum,
     comments,
   } = props;
   return (
@@ -702,9 +843,38 @@ const BodyItemGrades: React.FC<{
           disabled
           points={comment.points}
           message={comment.message}
+          status={CommentSaveStatus.SAVED}
         />
       ))}
-      <NewComments />
+    </>
+  );
+};
+
+const BodyItemGrades: React.FC<{
+  registrationId: string;
+  qnum: number;
+  pnum: number;
+  bnum: number;
+  comments: GradingComment[];
+}> = (props) => {
+  const {
+    registrationId,
+    qnum,
+    pnum,
+    bnum,
+    comments,
+  } = props;
+  return (
+    <>
+      <SavedComments
+        comments={comments}
+      />
+      <NewComments
+        registrationId={registrationId}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+      />
     </>
   );
 };
@@ -854,6 +1024,7 @@ function AnswersRow<T, V>(
         <Row>
           <Col>
             <BodyItemGrades
+              registrationId={registrationId}
               qnum={qnum}
               pnum={pnum}
               bnum={bnum}
@@ -897,7 +1068,6 @@ const GradeBodyItem: React.FC<{
     qnum,
     pnum,
     bnum,
-    check,
     comments,
     registrationId,
   } = props;
@@ -1125,11 +1295,13 @@ const Grade: React.FC<{
                 && c.pnum === pnum
                 && c.bnum === bnum
               ));
-              const comments = res.gradingComments.edges.map(({ node }) => node).filter((comment) => (
-                comment.qnum === qnum
-                && comment.pnum === pnum
-                && comment.bnum === bnum
-              ));
+              const comments = res.gradingComments.edges
+                .map(({ node }) => node)
+                .filter((comment) => (
+                  comment.qnum === qnum
+                  && comment.pnum === pnum
+                  && comment.bnum === bnum
+                ));
               return (
                 <GradeBodyItem
                   // eslint-disable-next-line react/no-array-index-key

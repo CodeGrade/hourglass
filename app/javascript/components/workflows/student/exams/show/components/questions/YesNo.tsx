@@ -1,7 +1,7 @@
 import React from 'react';
 import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { YesNoInfo } from '@student/exams/show/types';
-import HTML from '../HTML';
+import HTML from '@student/exams/show/components/HTML';
 
 export interface YesNoProps {
   info: YesNoInfo;

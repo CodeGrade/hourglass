@@ -29,7 +29,7 @@ import {
 } from '@student/exams/show/types';
 import lock from '@student/exams/show/lockdown/lock';
 import { DateTime } from 'luxon';
-import { getCSRFToken } from '../helpers';
+import { getCSRFToken } from '@student/exams/show/helpers';
 
 export function togglePagination(): TogglePaginationAction {
   return {

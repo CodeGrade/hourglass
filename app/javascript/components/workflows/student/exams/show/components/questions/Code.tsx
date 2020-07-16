@@ -2,8 +2,8 @@ import React, { useContext } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { CodeInfo, CodeState } from '@student/exams/show/types';
 import { ExamContext } from '@student/exams/show/context';
-import { Editor } from '../ExamCodeBox';
-import HTML from '../HTML';
+import { Editor } from '@student/exams/show/components/ExamCodeBox';
+import HTML from '@student/exams/show/components/HTML';
 
 interface CodeProps {
   refreshProps?: React.DependencyList;

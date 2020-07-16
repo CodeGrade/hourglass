@@ -4,11 +4,11 @@ import RegularNavbar from '@hourglass/common/navbar';
 import { Row, Col, Container } from 'react-bootstrap';
 import ExamShowContents from '@student/exams/show/containers/ExamShowContents';
 import PreStart from '@student/exams/show/containers/PreStart';
+import { Policy } from '@student/exams/show/types';
 import './ExamTaker.scss';
 import { useFragment, graphql } from 'relay-hooks';
 
 import { ExamTaker$key } from './__generated__/ExamTaker.graphql';
-import { Policy } from '../types';
 
 interface ExamTakerProps {
   examKey: ExamTaker$key;

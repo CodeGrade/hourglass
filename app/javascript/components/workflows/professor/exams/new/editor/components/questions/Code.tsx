@@ -18,7 +18,7 @@ import {
 } from 'redux-form';
 import { ExamContext } from '@student/exams/show/context';
 import { firstFile } from '@student/exams/show/files';
-import { FilePickerSelectWithPreview } from '../FilePicker';
+import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
 
 
 export const languages = {

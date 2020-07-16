@@ -918,6 +918,7 @@ const SavedComment: React.FC<{
         alert({
           variant: 'success',
           message: 'Comment successfully deleted.',
+          autohide: true,
         });
       },
       onError: (err) => {

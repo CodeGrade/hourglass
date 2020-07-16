@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo } from 'react';
+import React, { ReactElement, useMemo, useState } from 'react';
 import {
   Form,
   Row,
@@ -68,31 +68,45 @@ import { gradingItemRubric$key } from './__generated__/gradingItemRubric.graphql
 import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
 import { gradingNestedConditionalRubric$key } from './__generated__/gradingNestedConditionalRubric.graphql';
 
-const Feedback: React.FC<{
-  variant: AlertProps['variant'];
-}> = ({ variant }) => (
-  <Alert
-    variant={variant}
-    dismissible
-  >
-    <Row>
-      <Form.Group as={Col} lg="auto">
-        <Form.Label>Points</Form.Label>
-        <Form.Control step={0.5} type="number" min={0} />
-      </Form.Group>
-      <Form.Group as={Col}>
-        <Form.Label>Category</Form.Label>
-        <Select options={[]} />
-      </Form.Group>
-    </Row>
-    <Row>
-      <Form.Group as={Col}>
-        <Form.Label>Comment</Form.Label>
-        <Form.Control as="textarea" />
-      </Form.Group>
-    </Row>
-  </Alert>
-);
+const Feedback: React.FC = () => {
+  const [points, setPoints] = useState(null);
+
+  let variant;
+  if (points < 0) variant = 'danger';
+  else if (points > 0) variant = 'success';
+  else variant = 'warning';
+
+  return (
+    <Alert
+      variant={variant}
+      dismissible
+    >
+      <Row>
+        <Form.Group as={Col} lg="auto">
+          <Form.Label>Points</Form.Label>
+          <Form.Control
+            step={0.5}
+            type="number"
+            value={points}
+            onChange={(e) => {
+              setPoints(e.target.value);
+            }}
+          />
+        </Form.Group>
+        <Form.Group as={Col}>
+          <Form.Label>Category</Form.Label>
+          <Select options={[]} />
+        </Form.Group>
+      </Row>
+      <Row>
+        <Form.Group as={Col}>
+          <Form.Label>Comment</Form.Label>
+          <Form.Control as="textarea" />
+        </Form.Group>
+      </Row>
+    </Alert>
+  );
+};
 
 const ItemizedGrades: React.FC = () => (
   <ButtonGroup>
@@ -512,8 +526,8 @@ const AnswersRow = <T, V>(props: AnswersRowProps<T, V>): ReactElement => {
         <Row>
           <Col>
             <ItemizedGrades />
-            <Feedback variant="success" />
-            <Feedback variant="danger" />
+            <Feedback />
+            <Feedback />
           </Col>
           <Col md={6}>
             <ShowRubric

@@ -154,6 +154,10 @@ const ShowStatusIcon: React.FC<{
   );
 };
 
+function isNode(et: EventTarget): et is Node {
+  return et instanceof Node;
+}
+
 const Feedback: React.FC<{
   disabled?: boolean;
   message: string;
@@ -176,11 +180,16 @@ const Feedback: React.FC<{
     status,
     error,
   } = props;
+  const alertRef = useRef<HTMLDivElement>();
   const variant = variantForPoints(points);
   return (
     <Alert
+      ref={alertRef}
       variant={variant}
-      onBlur={onBlur}
+      onBlur={(e) => {
+        if (isNode(e.relatedTarget) && alertRef.current.contains(e.relatedTarget)) return;
+        if (onBlur) onBlur(e);
+      }}
     >
       <Row>
         <Form.Group as={Col} lg="auto">

@@ -35,4 +35,10 @@ class GradingCheckTest < ActiveSupport::TestCase
     assert_not bad.valid?
     assert_match(/item numbers must be valid/, bad.errors.full_messages.to_sentence)
   end
+
+  test 'two checks on same bnum is invalid' do
+    bad = build(:grading_check, registration: @reg, bnum: 0)
+    assert_not bad.valid?
+    assert_match(/already exists/, bad.errors.full_messages.to_sentence)
+  end
 end

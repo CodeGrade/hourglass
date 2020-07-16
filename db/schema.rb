@@ -82,6 +82,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["creator_id"], name: "index_grading_checks_on_creator_id"
+    t.index ["registration_id", "qnum", "pnum", "bnum"], name: "unique_check_per_item", unique: true
     t.index ["registration_id"], name: "index_grading_checks_on_registration_id"
   end
 

@@ -219,6 +219,8 @@ class CreateSchema < ActiveRecord::Migration[6.0]
 
       t.float :points, null: true
 
+      t.index [:registration_id, :qnum, :pnum, :bnum], unique: true, name: 'unique_check_per_item'
+
       t.timestamps
     end
   end

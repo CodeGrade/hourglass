@@ -18,7 +18,10 @@ class GradingCheck < ApplicationRecord
 
   validates :qnum, presence: true
   validates :pnum, presence: true
-  validates :bnum, presence: true
+  validates :bnum, presence: true, uniqueness: {
+    scope: [:registration, :qnum, :pnum],
+    message: 'Grading check already exists on this body item.',
+  }
 
   delegate :user, to: :registration
   delegate :course, to: :exam_version

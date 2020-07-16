@@ -1,4 +1,4 @@
-import React, { ReactElement, useMemo } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import {
   Form,
   Row,
@@ -70,17 +70,19 @@ import { gradingNestedConditionalRubric$key } from './__generated__/gradingNeste
 
 const Feedback: React.FC<{
   disabled: boolean;
-  comment: string;
-  onChangeComment?: (comment: string) => void;
+  message: string;
+  onChangeMessage?: (comment: string) => void;
   points: number;
   onChangePoints?: (pts: number) => void;
+  onRemove?: () => void;
 }> = (props) => {
   const {
     disabled,
     points,
     onChangePoints,
-    comment,
-    onChangeComment,
+    message,
+    onChangeMessage,
+    onRemove,
   } = props;
 
   let variant;
@@ -92,6 +94,7 @@ const Feedback: React.FC<{
     <Alert
       variant={variant}
       dismissible
+      onClose={onRemove}
     >
       <Row>
         <Form.Group as={Col} lg="auto">
@@ -120,9 +123,9 @@ const Feedback: React.FC<{
           <Form.Control
             as="textarea"
             disabled={disabled}
-            value={comment}
+            value={message}
             onChange={(e) => {
-              if (onChangeComment) onChangeComment(e.target.value);
+              if (onChangeMessage) onChangeMessage(e.target.value);
             }}
           />
         </Form.Group>
@@ -481,6 +484,89 @@ const ShowRubric: React.FC<{
   );
 };
 
+const NewComment: React.FC<{
+  message: string;
+  points: number;
+  onChange: (points: number, message: string) => void;
+  onRemove: () => void;
+}> = (props) => {
+  const {
+    message,
+    points,
+    onChange,
+    onRemove,
+  } = props;
+  return (
+    <Feedback
+      points={points}
+      onChangePoints={(pts) => onChange(pts, message)}
+      message={message}
+      onChangeMessage={(msg) => onChange(points, msg)}
+      onRemove={onRemove}
+    />
+  );
+};
+
+interface NewComment {
+  points: number;
+  message: string;
+}
+
+interface NewCommentMap {
+  [id: number]: NewComment;
+}
+
+const NewComments: React.FC<{
+}> = (props) => {
+  const lastId = useRef<number>(0);
+  const [commentMap, setCommentMap] = useState<NewCommentMap>({});
+  const addNew = () => {
+    setCommentMap({
+      ...commentMap,
+      [lastId.current]: {
+        points: 0,
+        message: '',
+      },
+    });
+    lastId.current += 1;
+  };
+  return (
+    <>
+      {Object.entries(commentMap).map(([id, { message, points }]) => {
+        const onChange = (pts: number, msg: string) => {
+          setCommentMap({
+            ...commentMap,
+            [id]: {
+              message: msg,
+              points: pts,
+            },
+          });
+        };
+        const onRemove = () => {
+          const newMap = { ...commentMap };
+          delete newMap[id];
+          setCommentMap(newMap);
+        };
+        return (
+          <NewComment
+            key={id}
+            message={message}
+            points={points}
+            onChange={onChange}
+            onRemove={onRemove}
+          />
+        );
+      })}
+      <Button
+        variant="success"
+        onClick={addNew}
+      >
+        Add new comment
+      </Button>
+    </>
+  );
+};
+
 const BodyItemGrades: React.FC<{
   qnum: number;
   pnum: number;
@@ -500,9 +586,10 @@ const BodyItemGrades: React.FC<{
           key={comment.id}
           disabled
           points={comment.points}
-          comment={comment.message}
+          message={comment.message}
         />
       ))}
+      <NewComments />
     </>
   );
 };
@@ -817,10 +904,10 @@ const Grade: React.FC<{
 
               const ans = answers[qnum][pnum][bnum];
               const expectedAnswer = isNoAns(ans) ? undefined : ans;
-              const check = res.gradingChecks.find((check) => (
-                check.qnum === qnum
-                && check.pnum === pnum
-                && check.bnum === bnum
+              const check = res.gradingChecks.find((c) => (
+                c.qnum === qnum
+                && c.pnum === pnum
+                && c.bnum === bnum
               ));
               const comments = res.gradingComments.filter((comment) => (
                 comment.qnum === qnum

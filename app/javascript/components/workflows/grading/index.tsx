@@ -56,13 +56,13 @@ import {
   Route,
 } from 'react-router-dom';
 import { useQuery, useFragment, graphql } from 'relay-hooks';
+import { QuestionName } from '@student/exams/show/components/ShowQuestion';
+import { PartName } from '@student/exams/show/components/Part';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
+import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
+import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 
 import { grading_one$key } from './__generated__/grading_one.graphql';
-import { QuestionName } from '../student/exams/show/components/ShowQuestion';
-import { PartName } from '../student/exams/show/components/Part';
-import CustomEditor from '../professor/exams/new/editor/components/CustomEditor';
-import DisplayMatching from '../proctor/registrations/show/questions/DisplayMatching';
-import DisplayYesNo from '../proctor/registrations/show/questions/DisplayYesNo';
 import { gradingRubric$key, gradingRubric } from './__generated__/gradingRubric.graphql';
 import { gradingItemRubric$key } from './__generated__/gradingItemRubric.graphql';
 import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';

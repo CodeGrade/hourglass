@@ -100,6 +100,7 @@ class Upload
       points: r['points'],
       description: make_html_val(r['description']),
       label: r['label'],
+      direction: r['direction'],
       presets: r['presets']&.map do |preset|
         {
           points: preset['points'],

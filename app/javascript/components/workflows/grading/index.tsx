@@ -70,6 +70,7 @@ import { gradingConditionalRubric$key } from './__generated__/gradingConditional
 import { gradingNestedConditionalRubric$key } from './__generated__/gradingNestedConditionalRubric.graphql';
 import { AlertContext } from '@hourglass/common/alerts';
 import { IconType } from 'react-icons';
+import { BsArrowUpRight, BsArrowDownRight } from 'react-icons/bs';
 
 function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
@@ -276,6 +277,7 @@ const ItemRubric: React.FC<{
         value
       }
       points
+      direction
       presets {
         description {
           type
@@ -293,7 +295,22 @@ const ItemRubric: React.FC<{
         <Col>
           <ButtonGroup className="float-right">
             <Button variant="outline-secondary" size="sm" disabled>{res.label}</Button>
-            <Button variant="outline-secondary" size="sm" disabled><i>{`${res.points} points`}</i></Button>
+            <Button variant="outline-secondary" size="sm" disabled>
+              <i>
+                {res.direction === 'credit' ? (
+                  <>
+                    <Icon I={BsArrowUpRight} />
+                    {`${res.points} points`}
+                  </>
+                ) : (
+                  <>
+                    {res.points}
+                    <Icon I={BsArrowDownRight} />
+                    points
+                  </>
+                )}
+              </i>
+            </Button>
           </ButtonGroup>
           <HTML value={res.description} />
         </Col>

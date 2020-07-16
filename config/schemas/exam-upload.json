@@ -88,11 +88,14 @@
     "ItemRubric": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["points", "label", "description"],
+      "required": ["points", "label", "description", "direction"],
       "properties": {
         "points": { "type": "number" },
         "description": { "$ref": "#/definitions/HTML" },
         "label": { "type": "string" },
+        "direction": {
+          "enum": ["credit", "deduction"]
+        },
         "mercy": {
           "type": "object",
           "additionalProperties": false,

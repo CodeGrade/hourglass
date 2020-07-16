@@ -15,10 +15,16 @@ module Types
     field :limit, Float, null: false
   end
 
+  class ItemRubricDirectionType < Types::BaseEnum
+    value 'credit'
+    value 'deduction'
+  end
+
   class ItemRubricType < Types::BaseObject
     field :points, Float, null: false
     field :label, String, null: false
     field :description, Types::HtmlType, null: false
+    field :direction, Types::ItemRubricDirectionType, null: false
     field :mercy, Types::MercyType, null: true
     field :presets, [Types::RubricPresetType], null: true
   end

@@ -64,7 +64,7 @@ import { RenderError } from '@hourglass/common/boundary';
 import ObjectiveGrade from '@grading/questions/ObjectiveGrade';
 
 import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
-import { gradingRubric$key, gradingRubric } from './__generated__/gradingRubric.graphql';
+import { gradingRubric$key, gradingRubric, gradingRubric$data } from './__generated__/gradingRubric.graphql';
 import { gradingItemRubric$key, gradingItemRubric$data } from './__generated__/gradingItemRubric.graphql';
 import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
 import { gradingNestedConditionalRubric$key } from './__generated__/gradingNestedConditionalRubric.graphql';
@@ -118,13 +118,6 @@ const Feedback: React.FC<{
             onChange={(e) => {
               if (onChangePoints) onChangePoints(Number(e.target.value));
             }}
-          />
-        </Form.Group>
-        <Form.Group as={Col}>
-          <Form.Label>Category</Form.Label>
-          <Select
-            isDisabled={disabled}
-            options={[]}
           />
         </Form.Group>
       </Row>
@@ -478,50 +471,21 @@ export const EditRubric: React.FC = () => (
   </>
 );
 
+
 const ShowNestedConditionalRubric: React.FC<{
-  conditionalRubricKey: gradingNestedConditionalRubric$key;
+  rubric: ConditionalRubric;
   registrationId: string;
   qnum: number;
   pnum: number;
   bnum: number;
 }> = (props) => {
   const {
-    conditionalRubricKey,
+    rubric,
     registrationId,
     qnum,
     pnum,
     bnum,
   } = props;
-  const rubric = useFragment(
-    graphql`
-    fragment gradingNestedConditionalRubric on ConditionalRubric {
-      condition {
-        value
-      }
-      ...gradingConditionalRubric
-      rubrics {
-        __typename
-        ... on ConditionalRubric {
-          condition {
-            value
-          }
-          ...gradingConditionalRubric
-          rubrics {
-            ... on ItemRubric {
-              label
-              ...gradingItemRubric
-            }
-          }
-        }
-        ... on ItemRubric {
-          label
-          ...gradingItemRubric
-        }
-      }
-    }
-    `,
-    conditionalRubricKey,
-  );
   return (
     <ConditionalRubric key={rubric.condition.value} conditionalRubricKey={rubric} depth={2}>
       {rubric.rubrics.map((innerRubric) => {
@@ -565,65 +529,40 @@ const ShowNestedConditionalRubric: React.FC<{
   );
 };
 
+type Rubrics = gradingRubric$data['rubrics'][number]['parts'][number]['part'];
+type Rubric = Rubrics[number];
+type ConditionalRubric = Extract<Rubric, { __typename: 'ConditionalRubric' }>;
+type ItemRubric = Extract<Rubric, { __typename: 'ItemRubric' }>;
+
+function isConditionalRubric(rubric: Rubric): rubric is ConditionalRubric {
+  // eslint-disable-next-line no-underscore-dangle
+  return rubric.__typename === 'ConditionalRubric';
+}
+
+function isItemRubric(rubric: Rubric): rubric is ItemRubric {
+  // eslint-disable-next-line no-underscore-dangle
+  return rubric.__typename === 'ItemRubric';
+}
+
 const ShowRubric: React.FC<{
-  examVersionKey: gradingRubric$key;
+  rubric: gradingRubric$data;
   qnum: number;
   pnum: number;
   bnum: number;
   registrationId: string;
+  partRubric: Rubrics;
+  bodyRubric: Rubrics;
 }> = (props) => {
   const {
-    examVersionKey,
     qnum,
     pnum,
     bnum,
     registrationId,
+    partRubric,
+    bodyRubric,
   } = props;
-  const res = useFragment(
-    graphql`
-    fragment gradingRubric on ExamVersion {
-      id
-      rubrics {
-        parts {
-          part {
-            __typename
-            ... on ConditionalRubric {
-              condition {
-                value
-              }
-              ...gradingNestedConditionalRubric
-            }
-            ... on ItemRubric {
-              label
-              ...gradingItemRubric
-            }
-          }
-          body {
-            rubrics {
-              __typename
-              ... on ConditionalRubric {
-                condition {
-                  value
-                }
-                ...gradingNestedConditionalRubric
-              }
-              ... on ItemRubric {
-                label
-                ...gradingItemRubric
-              }
-            }
-          }
-        }
-      }
-    }
-    `,
-    examVersionKey,
-  );
-  const partRubric = res.rubrics[qnum].parts[pnum].part;
-  const bodyRubric = res.rubrics[qnum].parts[pnum].body[bnum].rubrics;
-  const showRubric = (rubric: gradingRubric['rubrics'][number]['parts'][number]['part'][number]) => {
-    // eslint-disable-next-line no-underscore-dangle
-    if (rubric.__typename === 'ItemRubric') {
+  const showRubric = (rubric: Rubric) => {
+    if (isItemRubric(rubric)) {
       return (
         <ItemRubric
           key={rubric.label}
@@ -635,12 +574,11 @@ const ShowRubric: React.FC<{
         />
       );
     }
-    // eslint-disable-next-line no-underscore-dangle
-    if (rubric.__typename === 'ConditionalRubric') {
+    if (isConditionalRubric(rubric)) {
       return (
         <ShowNestedConditionalRubric
           key={rubric.condition.value}
-          conditionalRubricKey={rubric}
+          rubric={rubric}
           registrationId={registrationId}
           qnum={qnum}
           pnum={pnum}
@@ -808,6 +746,86 @@ function AnswersRow<T, V>(
     registrationId,
     children,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment gradingRubric on ExamVersion {
+      id
+      rubrics {
+        parts {
+          part {
+            __typename
+            ... on ConditionalRubric {
+              condition {
+                value
+              }
+              ...gradingConditionalRubric
+              rubrics {
+                __typename
+                ... on ConditionalRubric {
+                  condition {
+                    value
+                  }
+                  ...gradingConditionalRubric
+                  rubrics {
+                    ... on ItemRubric {
+                      label
+                      ...gradingItemRubric
+                    }
+                  }
+                }
+                ... on ItemRubric {
+                  label
+                  ...gradingItemRubric
+                }
+              }
+            }
+            ... on ItemRubric {
+              label
+              ...gradingItemRubric
+            }
+          }
+          body {
+            rubrics {
+              __typename
+              ... on ConditionalRubric {
+                condition {
+                  value
+                }
+                ...gradingConditionalRubric
+                rubrics {
+                  __typename
+                  ... on ConditionalRubric {
+                    condition {
+                      value
+                    }
+                    ...gradingConditionalRubric
+                    rubrics {
+                      ... on ItemRubric {
+                        label
+                        ...gradingItemRubric
+                      }
+                    }
+                  }
+                  ... on ItemRubric {
+                    label
+                    ...gradingItemRubric
+                  }
+                }
+              }
+              ... on ItemRubric {
+                label
+                ...gradingItemRubric
+              }
+            }
+          }
+        }
+      }
+    }
+    `,
+    examVersionKey,
+  );
+  const partRubric = res.rubrics[qnum].parts[pnum].part;
+  const bodyRubric = res.rubrics[qnum].parts[pnum].body[bnum].rubrics;
   return (
     <Card>
       <Card.Body>
@@ -844,8 +862,10 @@ function AnswersRow<T, V>(
           </Col>
           <Col md={6}>
             <ShowRubric
-              examVersionKey={examVersionKey}
+              rubric={res}
               registrationId={registrationId}
+              partRubric={partRubric}
+              bodyRubric={bodyRubric}
               qnum={qnum}
               pnum={pnum}
               bnum={bnum}

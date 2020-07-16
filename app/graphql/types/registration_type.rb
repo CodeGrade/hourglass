@@ -25,7 +25,7 @@ module Types
       guard Guards::PROCTORS_AND_PROFESSORS
     end
 
-    field :grading_comments, [Types::GradingCommentType], null: false do
+    field :grading_comments, Types::GradingCommentType.connection_type, null: false do
       # TODO: should be staff and profs
       guard Guards::PROCTORS_AND_PROFESSORS
     end

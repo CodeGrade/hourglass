@@ -157,7 +157,9 @@ const Entry: React.FC = () => {
                 <DocumentTitle title="Grading">
                   <RegularNavbar />
                   <Container fluid>
-                    <Grading />
+                    <AllAlerts>
+                      <Grading />
+                    </AllAlerts>
                   </Container>
                 </DocumentTitle>
               </Route>

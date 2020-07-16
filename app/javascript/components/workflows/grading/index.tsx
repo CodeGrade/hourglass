@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, useContext } from 'react';
 import {
   Form,
   Row,
@@ -53,7 +53,7 @@ import {
   Switch,
   Route,
 } from 'react-router-dom';
-import { useQuery, useFragment, graphql } from 'relay-hooks';
+import { useQuery, useFragment, graphql, useMutation } from 'relay-hooks';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
@@ -64,9 +64,10 @@ import ObjectiveGrade from '@grading/questions/ObjectiveGrade';
 
 import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
 import { gradingRubric$key, gradingRubric } from './__generated__/gradingRubric.graphql';
-import { gradingItemRubric$key } from './__generated__/gradingItemRubric.graphql';
+import { gradingItemRubric$key, gradingItemRubric$data } from './__generated__/gradingItemRubric.graphql';
 import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
 import { gradingNestedConditionalRubric$key } from './__generated__/gradingNestedConditionalRubric.graphql';
+import { AlertContext } from '@hourglass/common/alerts';
 
 const Feedback: React.FC<{
   disabled?: boolean;
@@ -144,11 +145,116 @@ const PromptRow: React.FC<{
   </Row>
 );
 
+type GradingPreset = gradingItemRubric$data['presets'][number];
+
+const ShowPreset: React.FC<{
+  preset: GradingPreset;
+  registrationId: string;
+  qnum: number;
+  pnum: number;
+  bnum: number;
+}> = (props) => {
+  const {
+    preset,
+    registrationId,
+    qnum,
+    pnum,
+    bnum,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation(
+    graphql`
+    mutation gradingCreateCommentMutation($input: CreateGradingCommentInput!) {
+      createGradingComment(input: $input) {
+        gradingComment {
+          id
+          qnum
+          pnum
+          bnum
+          points
+          message
+        }
+        gradingCommentEdge {
+          node {
+            id
+          }
+        }
+      }
+    }
+    `,
+    {
+      configs: [{
+        type: 'RANGE_ADD',
+        parentID: registrationId,
+        connectionInfo: [{
+          key: 'Registration_gradingComments',
+          rangeBehavior: 'append',
+        }],
+        edgeName: 'gradingCommentEdge',
+      }],
+      onCompleted: () => {
+        alert({
+          variant: 'success',
+          message: 'Comment successfully created.',
+        });
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating comment.',
+          message: err.message,
+        });
+      },
+    },
+  );
+  return (
+    <Alert variant="warning" className="p-0">
+      <Tooltip
+        showTooltip
+        message="Click to apply this message"
+      >
+        <Button
+          disabled={loading}
+          variant="warning"
+          size="sm"
+          className="mr-2 align-self-center"
+          onClick={(): void => {
+            mutate({
+              variables: {
+                input: {
+                  registrationId,
+                  qnum,
+                  pnum,
+                  bnum,
+                  message: preset.description.value,
+                  points: preset.points,
+                },
+              },
+            });
+          }}
+        >
+          <Icon I={MdFeedback} />
+        </Button>
+      </Tooltip>
+      {`(-${preset.points} points) `}
+      <HTML className="d-inline-block" value={preset.description} />
+    </Alert>
+  );
+};
+
 const ItemRubric: React.FC<{
   itemRubricKey: gradingItemRubric$key;
+  registrationId: string;
+  qnum: number;
+  pnum: number;
+  bnum: number;
 }> = (props) => {
   const {
     itemRubricKey,
+    registrationId,
+    qnum,
+    pnum,
+    bnum,
   } = props;
   const res = useFragment(
     graphql`
@@ -186,18 +292,14 @@ const ItemRubric: React.FC<{
           <p>Suggested comments:</p>
           <div>
             {res.presets?.map((preset) => (
-              <Alert key={preset.description.value} variant="warning" className="p-0">
-                <Tooltip
-                  showTooltip
-                  message="Click to apply this message"
-                >
-                  <Button variant="warning" size="sm" className="mr-2 align-self-center">
-                    <Icon I={MdFeedback} />
-                  </Button>
-                </Tooltip>
-                {`(-${preset.points} points) `}
-                <HTML className="d-inline-block" value={preset.description} />
-              </Alert>
+              <ShowPreset
+                key={preset.description.value}
+                preset={preset}
+                registrationId={registrationId}
+                qnum={qnum}
+                pnum={pnum}
+                bnum={bnum}
+              />
             ))}
           </div>
         </Col>
@@ -350,9 +452,17 @@ export const EditRubric: React.FC = () => (
 
 const ShowNestedConditionalRubric: React.FC<{
   conditionalRubricKey: gradingNestedConditionalRubric$key;
+  registrationId: string;
+  qnum: number;
+  pnum: number;
+  bnum: number;
 }> = (props) => {
   const {
     conditionalRubricKey,
+    registrationId,
+    qnum,
+    pnum,
+    bnum,
   } = props;
   const rubric = useFragment(
     graphql`
@@ -389,7 +499,16 @@ const ShowNestedConditionalRubric: React.FC<{
       {rubric.rubrics.map((innerRubric) => {
         // eslint-disable-next-line no-underscore-dangle
         if (innerRubric.__typename === 'ItemRubric') {
-          return <ItemRubric key={innerRubric.label} itemRubricKey={innerRubric} />;
+          return (
+            <ItemRubric
+              key={innerRubric.label}
+              itemRubricKey={innerRubric}
+              registrationId={registrationId}
+              qnum={qnum}
+              pnum={pnum}
+              bnum={bnum}
+            />
+          );
         }
         // eslint-disable-next-line no-underscore-dangle
         if (innerRubric.__typename === 'ConditionalRubric') {
@@ -400,7 +519,14 @@ const ShowNestedConditionalRubric: React.FC<{
               depth={1}
             >
               {innerRubric.rubrics.map((innerInnerRubric) => (
-                <ItemRubric key={innerInnerRubric.label} itemRubricKey={innerInnerRubric} />
+                <ItemRubric
+                  key={innerInnerRubric.label}
+                  itemRubricKey={innerInnerRubric}
+                  registrationId={registrationId}
+                  qnum={qnum}
+                  pnum={pnum}
+                  bnum={bnum}
+                />
               ))}
             </ConditionalRubric>
           );
@@ -416,12 +542,14 @@ const ShowRubric: React.FC<{
   qnum: number;
   pnum: number;
   bnum: number;
+  registrationId: string;
 }> = (props) => {
   const {
     examVersionKey,
     qnum,
     pnum,
     bnum,
+    registrationId,
   } = props;
   const res = useFragment(
     graphql`
@@ -468,12 +596,28 @@ const ShowRubric: React.FC<{
   const showRubric = (rubric: gradingRubric['rubrics'][number]['parts'][number]['part'][number]) => {
     // eslint-disable-next-line no-underscore-dangle
     if (rubric.__typename === 'ItemRubric') {
-      return <ItemRubric key={rubric.label} itemRubricKey={rubric} />;
+      return (
+        <ItemRubric
+          key={rubric.label}
+          itemRubricKey={rubric}
+          registrationId={registrationId}
+          qnum={qnum}
+          pnum={pnum}
+          bnum={bnum}
+        />
+      );
     }
     // eslint-disable-next-line no-underscore-dangle
     if (rubric.__typename === 'ConditionalRubric') {
       return (
-        <ShowNestedConditionalRubric key={rubric.condition.value} conditionalRubricKey={rubric} />
+        <ShowNestedConditionalRubric
+          key={rubric.condition.value}
+          conditionalRubricKey={rubric}
+          registrationId={registrationId}
+          qnum={qnum}
+          pnum={pnum}
+          bnum={bnum}
+        />
       );
     }
     return null;
@@ -569,11 +713,13 @@ const NewComments: React.FC<{
   );
 };
 
+type GradingComment = grading_one$data['gradingComments']['edges'][number]['node'];
+
 const BodyItemGrades: React.FC<{
   qnum: number;
   pnum: number;
   bnum: number;
-  comments: grading_one$data['gradingComments'];
+  comments: GradingComment[];
 }> = (props) => {
   const {
     qnum,
@@ -612,7 +758,8 @@ interface AnswersRowProps<T, V> {
   qnum: number;
   pnum: number;
   bnum: number;
-  comments: grading_one$data['gradingComments'];
+  comments: GradingComment[];
+  registrationId: string;
 }
 
 function AnswersRow<T, V>(
@@ -629,6 +776,7 @@ function AnswersRow<T, V>(
     pnum,
     bnum,
     comments,
+    registrationId,
     children,
   } = props;
   return (
@@ -668,6 +816,7 @@ function AnswersRow<T, V>(
           <Col md={6}>
             <ShowRubric
               examVersionKey={examVersionKey}
+              registrationId={registrationId}
               qnum={qnum}
               pnum={pnum}
               bnum={bnum}
@@ -688,7 +837,8 @@ const GradeBodyItem: React.FC<{
   bnum: number;
   examVersionKey: gradingRubric$key;
   check?: grading_one$data['gradingChecks'][number];
-  comments: grading_one$data['gradingComments'];
+  comments: GradingComment[];
+  registrationId: string;
 }> = (props) => {
   const {
     expectedAnswer,
@@ -700,6 +850,7 @@ const GradeBodyItem: React.FC<{
     bnum,
     check,
     comments,
+    registrationId,
   } = props;
   switch (info.type) {
     case 'HTML':
@@ -720,6 +871,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as CodeState}
             expectedAnswer={expectedAnswer as CodeState}
             comments={comments}
+            registrationId={registrationId}
           />
         </>
       );
@@ -737,6 +889,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as CodeTagState}
             expectedAnswer={expectedAnswer as CodeTagState}
             comments={comments}
+            registrationId={registrationId}
           />
         </>
       );
@@ -755,6 +908,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as YesNoState}
             expectedAnswer={expectedAnswer as YesNoState}
             comments={comments}
+            registrationId={registrationId}
           />
         </>
       );
@@ -772,6 +926,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as TextState}
             expectedAnswer={expectedAnswer as TextState}
             comments={comments}
+            registrationId={registrationId}
           />
         </>
       );
@@ -790,6 +945,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as MatchingState}
             expectedAnswer={expectedAnswer as MatchingState}
             comments={comments}
+            registrationId={registrationId}
           />
         </>
       );
@@ -807,6 +963,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as AllThatApplyState}
             expectedAnswer={expectedAnswer as AllThatApplyState}
             comments={comments}
+            registrationId={registrationId}
           />
         </>
       );
@@ -825,6 +982,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as MultipleChoiceState}
             expectedAnswer={expectedAnswer as MultipleChoiceState}
             comments={comments}
+            registrationId={registrationId}
           />
         </>
       );
@@ -846,14 +1004,21 @@ const Grade: React.FC<{
   const res = useFragment(
     graphql`
     fragment grading_one on Registration {
+      id
       currentAnswers
-      gradingComments {
-        id
-        qnum
-        pnum
-        bnum
-        points
-        message
+      gradingComments(
+        first: 100000
+      ) @connection(key: "Registration_gradingComments", filters: []) {
+        edges {
+          node {
+            id
+            qnum
+            pnum
+            bnum
+            points
+            message
+          }
+        }
       }
       gradingChecks {
         id
@@ -911,7 +1076,7 @@ const Grade: React.FC<{
                 && c.pnum === pnum
                 && c.bnum === bnum
               ));
-              const comments = res.gradingComments.filter((comment) => (
+              const comments = res.gradingComments.edges.map(({ node }) => node).filter((comment) => (
                 comment.qnum === qnum
                 && comment.pnum === pnum
                 && comment.bnum === bnum
@@ -929,6 +1094,7 @@ const Grade: React.FC<{
                   examVersionKey={res.examVersion}
                   check={check}
                   comments={comments}
+                  registrationId={res.id}
                 />
               );
             })}

@@ -61,6 +61,7 @@ import { PartName } from '@student/exams/show/components/Part';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
+import { RenderError } from '@hourglass/common/boundary';
 
 import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
 import { gradingRubric$key, gradingRubric } from './__generated__/gradingRubric.graphql';
@@ -508,13 +509,14 @@ const BodyItemGrades: React.FC<{
   } = props;
   return (
     <>
-      <p>grades for {qnum},{pnum},{bnum}</p>
-      <p>
-        checks:
-        {JSON.stringify(checks)}
-      </p>
+      {checks.map((check) => (
+        <p key={check.id} className="bg-warning rounded">
+          TODO: gradingcheck with {check.points} points
+        </p>
+      ))}
       {comments.map((comment) => (
         <Feedback
+          key={comment.id}
           disabled
           points={comment.points}
           comment={comment.message}
@@ -781,6 +783,7 @@ const Grade: React.FC<{
     fragment grading_one on Registration {
       currentAnswers
       gradingComments {
+        id
         qnum
         pnum
         bnum
@@ -788,6 +791,7 @@ const Grade: React.FC<{
         message
       }
       gradingChecks {
+        id
         qnum
         pnum
         bnum
@@ -876,7 +880,6 @@ const Grade: React.FC<{
 };
 
 const GradeOnePart: React.FC = () => {
-  // TODO: only show the one part
   const { registrationId, qnum, pnum } = useParams();
   const res = useQuery(
     graphql`
@@ -895,11 +898,9 @@ const GradeOnePart: React.FC = () => {
     { registrationId },
   );
   if (res.error) {
-    // TODO make these all use the same component
-    return <p>ERROR</p>;
+    return <RenderError error={res.error} />;
   }
   if (!res.props) {
-    // TODO make these all use the same component
     return <p>Loading...</p>;
   }
 

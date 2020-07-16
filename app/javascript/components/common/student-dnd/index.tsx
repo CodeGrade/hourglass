@@ -24,7 +24,6 @@ import {
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import { TabEditButton } from '@hourglass/workflows/professor/exams/admin';
-import '@professor/exams/list-columns.scss';
 import { useFragment, graphql, useMutation } from 'relay-hooks';
 import { studentDnd$key } from './__generated__/studentDnd.graphql';
 import { studentDndUpdateMutation } from './__generated__/studentDndUpdateMutation.graphql';

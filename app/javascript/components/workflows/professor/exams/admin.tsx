@@ -68,6 +68,7 @@ import {
   useQuery,
 } from 'relay-hooks';
 import { uploadFile } from '@hourglass/common/types/api';
+import './dnd.scss';
 
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
 import { admin_examInfo$key } from './__generated__/admin_examInfo.graphql';

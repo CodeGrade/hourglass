@@ -25,7 +25,6 @@ import {
 import { AlertContext } from '@hourglass/common/alerts';
 import { useFragment, graphql, useMutation } from 'relay-hooks';
 import { TabEditButton } from '@professor/exams/admin';
-import '@professor/exams/list-columns.scss';
 
 import { assignStaff, assignStaff$key } from './__generated__/assignStaff.graphql';
 import { assignStaffUpdateMutation } from './__generated__/assignStaffUpdateMutation.graphql';

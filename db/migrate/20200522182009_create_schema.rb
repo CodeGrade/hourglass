@@ -190,6 +190,8 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.integer :qnum, null: false
       t.integer :pnum, null: false
 
+      t.boolean :completed, null: false, default: false
+
       t.index [:registration_id, :qnum, :pnum], unique: true
 
       t.timestamps

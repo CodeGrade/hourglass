@@ -856,15 +856,45 @@ const PreviewVersion: React.FC<{
   );
 };
 
+const COMMENCE_GRADING_MUTATION = graphql`
+mutation adminCommenceGradingMutation($input: CommenceGradingInput!) {
+  commenceGrading(input: $input) {
+    success
+  }
+}
+`;
+
 const StartGradingButton: React.FC = () => {
   const { examId } = useParams();
   const history = useHistory();
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation(
+    COMMENCE_GRADING_MUTATION,
+    {
+      onCompleted: () => {
+        history.push(`/exams/${examId}/grading`);
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error setting up grading',
+          message: err.message,
+        });
+      },
+    },
+  );
   return (
     <Button
+      disabled={loading}
       variant="success"
       onClick={async () => {
-        // TODO CommenceGrading, then
-        history.push(`/exams/${examId}/grading`);
+        mutate({
+          variables: {
+            input: {
+              examId,
+            },
+          },
+        });
       }}
     >
       Grade!

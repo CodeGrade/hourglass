@@ -59,6 +59,7 @@ import {
   useParams,
   Switch,
   Route,
+  useHistory,
 } from 'react-router-dom';
 import {
   useQuery,
@@ -90,6 +91,7 @@ import { gradingConditionalRubric$key } from './__generated__/gradingConditional
 import { gradingCreateCommentMutation } from './__generated__/gradingCreateCommentMutation.graphql';
 import { gradingDestroyCommentMutation } from './__generated__/gradingDestroyCommentMutation.graphql';
 import { gradingUpdateCommentMutation } from './__generated__/gradingUpdateCommentMutation.graphql';
+import { gradingNextMutation } from './__generated__/gradingNextMutation.graphql';
 
 function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
@@ -1517,18 +1519,62 @@ const GradeOnePart: React.FC = () => {
   );
 };
 
+const GRADE_NEXT_MUTATION = graphql`
+mutation gradingNextMutation($input: GradeNextInput!) {
+  gradeNext(input: $input) {
+    registrationId
+    qnum
+    pnum
+  }
+}
+`;
+
+const GradingHomepage: React.FC = () => {
+  const { examId } = useParams();
+  const history = useHistory();
+  const [mutate, { loading }] = useMutation<gradingNextMutation>(
+    GRADE_NEXT_MUTATION,
+    {
+      onCompleted: ({ gradeNext }) => {
+        const {
+          registrationId,
+          qnum,
+          pnum,
+        } = gradeNext;
+        history.push(`/exams/${examId}/grading/${registrationId}/${qnum}/${pnum}`);
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error getting started',
+          message: err.message,
+        });
+      },
+    },
+  );
+  return (
+    <Button
+      disabled={loading}
+      variant="primary"
+      onClick={() => {
+        mutate({
+          variables: {
+            input: {
+              examId,
+            },
+          },
+        });
+      }}
+    >
+      Get started
+    </Button>
+  );
+};
+
 const Grading: React.FC = () => (
   <Switch>
     <Route exact path="/exams/:examId/grading">
-      <p>
-        TODO: grading homepage that acquires a lock and redirects to grading the single part
-      </p>
-      <p>
-        {'for now, here is '}
-        <Link to="/exams/RXhhbS0x/grading/UmVnaXN0cmF0aW9uLTE=/0/0">
-          Registration 1 q0 p0
-        </Link>
-      </p>
+      <GradingHomepage />
     </Route>
     <Route path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
       <GradeOnePart />

@@ -11,4 +11,8 @@ class GradingLock < ApplicationRecord
     scope: [:registration_id, :qnum],
     message: 'is already being graded',
   }
+
+  scope :incomplete, -> { where(completed: false) }
+  scope :complete, -> { where(completed: true) }
+  scope :no_grader, -> { where(grader: nil) }
 end

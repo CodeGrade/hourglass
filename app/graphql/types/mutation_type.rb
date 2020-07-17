@@ -2,6 +2,7 @@
 
 module Types
   class MutationType < Types::BaseObject
+    field :grade_next, mutation: Mutations::GradeNext
     field :stop_impersonating, mutation: Mutations::StopImpersonating
     field :impersonate_user, mutation: Mutations::ImpersonateUser
 

@@ -105,6 +105,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.bigint "grader_id"
     t.integer "qnum", null: false
     t.integer "pnum", null: false
+    t.boolean "completed", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["grader_id"], name: "index_grading_locks_on_grader_id"

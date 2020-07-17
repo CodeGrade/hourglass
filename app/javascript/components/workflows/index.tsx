@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import RegularNavbar from '@hourglass/common/navbar';
 import {
-  Container,
   Modal,
   Button,
 } from 'react-bootstrap';
@@ -152,52 +151,30 @@ const Entry: React.FC = () => {
                 </AllAlerts>
               </Route>
               <Route path="/">
+                <RegularNavbar />
                 <ErrorBoundary>
-                  <Switch>
-                    <Route exact path="/">
-                      <AllAlerts>
-                        <RegularNavbar />
-                        <Container>
-                          <Home />
-                        </Container>
-                      </AllAlerts>
-                    </Route>
-                    <Route path="/exams/:examId/admin">
-                      <AllAlerts>
-                        <RegularNavbar />
-                        <Container>
-                          <ExamAdmin />
-                        </Container>
-                      </AllAlerts>
-                    </Route>
-                    <Route path="/exams/:examId/submissions">
-                      <RegularNavbar />
-                      <AllAlerts>
-                        <Container>
-                          <ExamSubmissions />
-                        </Container>
-                      </AllAlerts>
-                    </Route>
-                    <Route path="/exams/:examId/versions/:versionId/edit" exact>
-                      <RegularNavbar />
-                      <AllAlerts>
-                        <Container>
-                          <EditExamVersion />
-                        </Container>
-                      </AllAlerts>
-                    </Route>
-                    <Route path="/courses/:courseId">
-                      <RegularNavbar />
-                      <AllAlerts>
-                        <Container>
-                          <ShowCourse />
-                        </Container>
-                      </AllAlerts>
-                    </Route>
-                    <Route path="*">
-                      <FourOhFour />
-                    </Route>
-                  </Switch>
+                  <AllAlerts>
+                    <Switch>
+                      <Route exact path="/">
+                        <Home />
+                      </Route>
+                      <Route path="/exams/:examId/admin">
+                        <ExamAdmin />
+                      </Route>
+                      <Route path="/exams/:examId/submissions">
+                        <ExamSubmissions />
+                      </Route>
+                      <Route path="/exams/:examId/versions/:versionId/edit" exact>
+                        <EditExamVersion />
+                      </Route>
+                      <Route path="/courses/:courseId">
+                        <ShowCourse />
+                      </Route>
+                      <Route path="*">
+                        <FourOhFour />
+                      </Route>
+                    </Switch>
+                  </AllAlerts>
                 </ErrorBoundary>
               </Route>
             </Switch>

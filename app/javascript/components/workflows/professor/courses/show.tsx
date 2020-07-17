@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link, Route } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Container, Button } from 'react-bootstrap';
 import NewExam from '@professor/exams/new';
 import SyncCourse from '@professor/courses/sync';
 import DocumentTitle from '@hourglass/common/documentTitle';
@@ -61,13 +61,13 @@ const ShowCourse: React.FC = () => {
     { courseId },
   );
   if (res.error) {
-    return <RenderError error={res.error} />;
+    return <Container><RenderError error={res.error} /></Container>;
   }
   if (!res.props) {
-    return <p>Loading...</p>;
+    return <Container><p>Loading...</p></Container>;
   }
   return (
-    <>
+    <Container>
       <div className="d-flex align-items-center justify-content-between">
         <h1>
           {res.props.course.title}
@@ -104,7 +104,7 @@ const ShowCourse: React.FC = () => {
           <NewExam courseId={res.props.course.id} />
         </DocumentTitle>
       </Route>
-    </>
+    </Container>
   );
 };
 

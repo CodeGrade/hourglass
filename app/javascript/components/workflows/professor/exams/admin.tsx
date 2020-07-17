@@ -26,6 +26,7 @@ import {
   Dropdown,
   Tab,
   Nav,
+  Container,
 } from 'react-bootstrap';
 import {
   FaChevronUp,
@@ -51,7 +52,7 @@ import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { DateTime } from 'luxon';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
-import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
+import Tooltip from '@student/exams/show/components/Tooltip';
 import EditExamRooms from '@professor/exams/rooms';
 import ManageAccommodations from '@professor/exams/accommodations';
 import AssignSeating from '@hourglass/common/student-dnd';
@@ -875,28 +876,30 @@ const ExamAdmin: React.FC = () => {
     { examId },
   );
   if (res.error) {
-    return <RenderError error={res.error} />;
+    return <Container><RenderError error={res.error} /></Container>;
   }
   if (!res.props) {
-    return <p>Loading...</p>;
+    return <Container><p>Loading...</p></Container>;
   }
   return (
     <DocumentTitle title={res.props.exam.name}>
-      <ExamInformation exam={res.props.exam} />
-      <Form.Group>
-        <TabbedChecklist
-          exam={res.props.exam}
-          examId={examId}
-        />
-      </Form.Group>
-      <Form.Group>
-        <Link to={`/exams/${res.props.exam.id}/proctoring`}>
-          <Button variant="success">Proctor!</Button>
-        </Link>
-        <Link to={`/exams/${res.props.exam.id}/submissions`}>
-          <Button className="ml-2" variant="primary">View submissions</Button>
-        </Link>
-      </Form.Group>
+      <Container>
+        <ExamInformation exam={res.props.exam} />
+        <Form.Group>
+          <TabbedChecklist
+            exam={res.props.exam}
+            examId={examId}
+          />
+        </Form.Group>
+        <Form.Group>
+          <Link to={`/exams/${res.props.exam.id}/proctoring`}>
+            <Button variant="success">Proctor!</Button>
+          </Link>
+          <Link to={`/exams/${res.props.exam.id}/submissions`}>
+            <Button className="ml-2" variant="primary">View submissions</Button>
+          </Link>
+        </Form.Group>
+      </Container>
     </DocumentTitle>
   );
 };

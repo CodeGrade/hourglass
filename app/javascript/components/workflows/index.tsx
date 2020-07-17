@@ -9,7 +9,6 @@ import React, {
 } from 'react';
 import RegularNavbar from '@hourglass/common/navbar';
 import {
-  Container,
   Modal,
   Button,
 } from 'react-bootstrap';

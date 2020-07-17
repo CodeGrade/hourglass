@@ -21,7 +21,8 @@ module Mutations
 
         check_permissions_for_lock(context[:current_user], lock, registration.course)
 
-        lock.destroy!
+        updated = lock.update(grader: nil, completed: true)
+        raise GraphQL::ExecutionError, lock.errors.full_messages.to_sentence unless updated
       end
       { released: true }
     end

@@ -92,6 +92,7 @@ import { gradingCreateCommentMutation } from './__generated__/gradingCreateComme
 import { gradingDestroyCommentMutation } from './__generated__/gradingDestroyCommentMutation.graphql';
 import { gradingUpdateCommentMutation } from './__generated__/gradingUpdateCommentMutation.graphql';
 import { gradingNextMutation } from './__generated__/gradingNextMutation.graphql';
+import { gradingReleaseLockMutation } from './__generated__/gradingReleaseLockMutation.graphql';
 
 function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
@@ -1349,6 +1350,14 @@ const GradeBodyItem: React.FC<{
   }
 };
 
+const RELEASE_LOCK_MUTATION = graphql`
+mutation gradingReleaseLockMutation($input: ReleaseGradingLockInput!) {
+  releaseGradingLock(input: $input) {
+    released
+  }
+}
+`;
+
 const Grade: React.FC<{
   registrationKey: grading_one$key;
   qnum: number;
@@ -1395,6 +1404,9 @@ const Grade: React.FC<{
     `,
     registrationKey,
   );
+  const { alert } = useContext(AlertContext);
+  const history = useHistory();
+  const { examId, registrationId } = useParams();
   const { examVersion } = res;
   const currentAnswers = res.currentAnswers as AnswersState;
   const { answers } = examVersion;
@@ -1407,7 +1419,44 @@ const Grade: React.FC<{
   const viewerContextVal = useMemo(() => ({
     answers: currentAnswers,
   }), [currentAnswers]);
-
+  const [mutateNext, { loading: nextLoading }] = useMutation<gradingNextMutation>(
+    GRADE_NEXT_MUTATION,
+    {
+      onCompleted: ({ gradeNext }) => {
+        const {
+          registrationId: nextRegId,
+          qnum: nextQ,
+          pnum: nextP,
+        } = gradeNext;
+        history.push(`/exams/${examId}/grading/${nextRegId}/${nextQ}/${nextP}`);
+      },
+      onError: () => {
+        history.push(`/exams/${examId}/grading`);
+      },
+    },
+  );
+  const [mutateRelease, { loading: releaseLoading }] = useMutation<gradingReleaseLockMutation>(
+    RELEASE_LOCK_MUTATION,
+    {
+      onCompleted: () => {
+        mutateNext({
+          variables: {
+            input: {
+              examId,
+            },
+          },
+        });
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error completing grading',
+          message: err.message,
+        });
+      },
+    },
+  );
+  const nextExamLoading = releaseLoading || nextLoading;
   return (
     <ExamContext.Provider value={contextVal}>
       <ExamViewerContext.Provider value={viewerContextVal}>
@@ -1461,7 +1510,20 @@ const Grade: React.FC<{
           </div>
         </div>
         <Row>
-          <Button>
+          <Button
+            disabled={nextExamLoading}
+            onClick={() => {
+              mutateRelease({
+                variables: {
+                  input: {
+                    registrationId,
+                    qnum,
+                    pnum,
+                  },
+                },
+              });
+            }}
+          >
             Next exam
           </Button>
         </Row>
@@ -1532,6 +1594,7 @@ mutation gradingNextMutation($input: GradeNextInput!) {
 const GradingHomepage: React.FC = () => {
   const { examId } = useParams();
   const history = useHistory();
+  const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<gradingNextMutation>(
     GRADE_NEXT_MUTATION,
     {

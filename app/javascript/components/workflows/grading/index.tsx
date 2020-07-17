@@ -1358,6 +1358,12 @@ const RELEASE_LOCK_MUTATION = graphql`
 mutation gradingReleaseLockMutation($input: ReleaseGradingLockInput!) {
   releaseGradingLock(input: $input) {
     released
+    gradingLock {
+      id
+      grader {
+        displayName
+      }
+    }
   }
 }
 `;
@@ -1643,6 +1649,87 @@ const GradingGrader: React.FC = () => (
   <BeginGradingButton />
 );
 
+const GradingLock: React.FC<{
+  registrationId: string;
+  qnum: number;
+  pnum: number;
+  lockKey: any;
+}> = (props) => {
+  const {
+    lockKey,
+    registrationId,
+    qnum,
+    pnum,
+  } = props;
+  const lock = useFragment(
+    graphql`
+    fragment gradingLock on GradingLock {
+      qnum
+      pnum
+      registration {
+        id
+        user {
+          displayName
+        }
+      }
+      grader {
+        displayName
+      }
+    }
+    `,
+    lockKey,
+  );
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<gradingReleaseLockMutation>(
+    RELEASE_LOCK_MUTATION,
+    {
+      onCompleted: () => {
+        alert({
+          variant: 'success',
+          message: 'Lock released',
+          autohide: true,
+        });
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error releasing lock',
+          message: err.message,
+        });
+      },
+    },
+  );
+  if (!lock.grader) return null;
+  return (
+    <tr>
+      <td>{lock.qnum}</td>
+      <td>{lock.pnum}</td>
+      <td>{lock.registration.user.displayName}</td>
+      <td>{lock.grader.displayName}</td>
+      <td>
+        <Button
+          disabled={loading}
+          variant="danger"
+          onClick={() => {
+            mutate({
+              variables: {
+                input: {
+                  markComplete: false,
+                  registrationId: lock.registration.id,
+                  qnum: lock.qnum,
+                  pnum: lock.pnum,
+                },
+              },
+            });
+          }}
+        >
+          <Icon I={FaTrash} />
+        </Button>
+      </td>
+    </tr>
+  );
+};
+
 const VersionLocks: React.FC<{
   versionKey: any;
 }> = (props) => {
@@ -1657,16 +1744,7 @@ const VersionLocks: React.FC<{
         edges {
           node {
             id
-            qnum
-            pnum
-            registration {
-              user {
-                displayName
-              }
-            }
-            grader {
-              displayName
-            }
+            ...gradingLock
           }
         }
       }
@@ -1701,24 +1779,9 @@ const VersionLocks: React.FC<{
               </tr>
             </thead>
             <tbody>
-              {version.gradingLocks.edges.map(({ node }) => {
-                if (!node.grader) return;
-                return (
-                  <tr key={node.id}>
-                    <td>{node.qnum}</td>
-                    <td>{node.pnum}</td>
-                    <td>{node.registration.user.displayName}</td>
-                    <td>{node.grader.displayName}</td>
-                    <td>
-                      <Button
-                        variant="danger"
-                      >
-                        <Icon I={FaTrash} />
-                      </Button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {version.gradingLocks.edges.map(({ node }) => (
+                <GradingLock key={node.id} lockKey={node} />
+              ))}
             </tbody>
           </Table>
         </div>

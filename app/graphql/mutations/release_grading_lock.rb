@@ -8,6 +8,7 @@ module Mutations
     argument :mark_complete, Boolean, required: false
 
     field :released, Boolean, null: false
+    field :grading_lock, Types::GradingLockType, null: false
 
     def authorized?(registration:, **_args)
       return true if registration.course.all_staff.exists? context[:current_user].id
@@ -30,8 +31,9 @@ module Mutations
                     lock.update(grader: nil, completed_by: nil)
                   end
         raise GraphQL::ExecutionError, lock.errors.full_messages.to_sentence unless updated
+
+        { released: true, grading_lock: lock }
       end
-      { released: true }
     end
 
     private

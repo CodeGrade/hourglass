@@ -18,7 +18,6 @@ import {
   ButtonProps,
   Collapse,
   Table,
-  Fade,
   Container,
 } from 'react-bootstrap';
 import {
@@ -56,7 +55,7 @@ import GradeYesNo from '@grading/questions/GradeYesNo';
 import GradeMatching from '@grading/questions/GradeMatching';
 import GradeMultipleChoice from '@grading/questions/GradeMultipleChoice';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
-import { ExhaustiveSwitchError, alphabetIdx } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import Tooltip from '@student/exams/show/components/Tooltip';
@@ -99,6 +98,9 @@ import { gradingDestroyCommentMutation } from './__generated__/gradingDestroyCom
 import { gradingUpdateCommentMutation } from './__generated__/gradingUpdateCommentMutation.graphql';
 import { gradingNextMutation } from './__generated__/gradingNextMutation.graphql';
 import { gradingReleaseLockMutation } from './__generated__/gradingReleaseLockMutation.graphql';
+import { gradingLock$key } from './__generated__/gradingLock.graphql';
+import { gradingLockVersion$key } from './__generated__/gradingLockVersion.graphql';
+import { gradingLockAdmin$key } from './__generated__/gradingLockAdmin.graphql';
 
 function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
@@ -1656,16 +1658,10 @@ const GradingGrader: React.FC = () => (
 );
 
 const GradingLock: React.FC<{
-  registrationId: string;
-  qnum: number;
-  pnum: number;
-  lockKey: any;
+  lockKey: gradingLock$key;
 }> = (props) => {
   const {
     lockKey,
-    registrationId,
-    qnum,
-    pnum,
   } = props;
   const lock = useFragment(
     graphql`
@@ -1759,7 +1755,7 @@ const Spoiler: React.FC<{
 };
 
 const VersionLocks: React.FC<{
-  versionKey: any;
+  versionKey: gradingLockVersion$key;
 }> = (props) => {
   const {
     versionKey,
@@ -1819,7 +1815,7 @@ const VersionLocks: React.FC<{
 };
 
 const LockAdministration: React.FC<{
-  examKey: any;
+  examKey: gradingLockAdmin$key;
 }> = (props) => {
   const {
     examKey,

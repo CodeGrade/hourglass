@@ -190,7 +190,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.integer :qnum, null: false
       t.integer :pnum, null: false
 
-      t.boolean :completed, null: false, default: false
+      t.references :completed_by, foreign_key: { to_table: 'users' }
 
       t.index [:registration_id, :qnum, :pnum], unique: true
 

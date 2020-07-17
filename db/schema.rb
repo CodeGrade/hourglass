@@ -105,9 +105,10 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.bigint "grader_id"
     t.integer "qnum", null: false
     t.integer "pnum", null: false
-    t.boolean "completed", default: false, null: false
+    t.bigint "completed_by_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["completed_by_id"], name: "index_grading_locks_on_completed_by_id"
     t.index ["grader_id"], name: "index_grading_locks_on_grader_id"
     t.index ["registration_id", "qnum", "pnum"], name: "index_grading_locks_on_registration_id_and_qnum_and_pnum", unique: true
     t.index ["registration_id"], name: "index_grading_locks_on_registration_id"
@@ -263,6 +264,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   add_foreign_key "grading_comments", "registrations"
   add_foreign_key "grading_comments", "users", column: "creator_id"
   add_foreign_key "grading_locks", "registrations"
+  add_foreign_key "grading_locks", "users", column: "completed_by_id"
   add_foreign_key "grading_locks", "users", column: "grader_id"
   add_foreign_key "messages", "registrations"
   add_foreign_key "messages", "users", column: "sender_id"

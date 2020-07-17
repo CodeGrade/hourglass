@@ -33,6 +33,12 @@ class User < ApplicationRecord
            dependent: :destroy,
            inverse_of: 'grader'
 
+  has_many :completed_grading_locks,
+           foreign_key: 'completed_by',
+           class_name: 'GradingLock',
+           dependent: :destroy,
+           inverse_of: 'completed_by'
+
   has_many :grading_checks,
            foreign_key: 'creator',
            class_name: 'GradingCheck',

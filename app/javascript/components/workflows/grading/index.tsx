@@ -55,7 +55,6 @@ import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAl
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import Tooltip from '@student/exams/show/components/Tooltip';
 import {
-  Link,
   useParams,
   Switch,
   Route,
@@ -903,7 +902,7 @@ const SavedComment: React.FC<{
         setStatus(CommentSaveStatus.ERROR);
         setError(err.message);
       },
-    }
+    },
   );
   const [mutateDestroy, { loading: destroyLoading }] = useMutation<gradingDestroyCommentMutation>(
     DESTROY_COMMENT_MUTATION,
@@ -952,7 +951,7 @@ const SavedComment: React.FC<{
         },
       },
     });
-  }
+  };
   return (
     <Feedback
       disabled={destroyLoading || updateLoading}
@@ -1358,6 +1357,16 @@ mutation gradingReleaseLockMutation($input: ReleaseGradingLockInput!) {
 }
 `;
 
+const GRADE_NEXT_MUTATION = graphql`
+mutation gradingNextMutation($input: GradeNextInput!) {
+  gradeNext(input: $input) {
+    registrationId
+    qnum
+    pnum
+  }
+}
+`;
+
 const Grade: React.FC<{
   registrationKey: grading_one$key;
   qnum: number;
@@ -1516,6 +1525,7 @@ const Grade: React.FC<{
               mutateRelease({
                 variables: {
                   input: {
+                    markComplete: true,
                     registrationId,
                     qnum,
                     pnum,
@@ -1524,7 +1534,7 @@ const Grade: React.FC<{
               });
             }}
           >
-            Next exam
+            Finish this submission and start next one
           </Button>
         </Row>
       </ExamViewerContext.Provider>
@@ -1580,16 +1590,6 @@ const GradeOnePart: React.FC = () => {
     </Row>
   );
 };
-
-const GRADE_NEXT_MUTATION = graphql`
-mutation gradingNextMutation($input: GradeNextInput!) {
-  gradeNext(input: $input) {
-    registrationId
-    qnum
-    pnum
-  }
-}
-`;
 
 const GradingHomepage: React.FC = () => {
   const { examId } = useParams();

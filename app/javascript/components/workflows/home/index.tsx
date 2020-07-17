@@ -9,6 +9,7 @@ import {
 } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
 import Select from 'react-select';
+import { Container } from 'react-bootstrap';
 
 import { homeQuery } from './__generated__/homeQuery.graphql';
 import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
@@ -220,25 +221,27 @@ const Home: React.FC = () => {
     && res.props.me.proctorRegistrations.nodes.length === 0
   );
   return (
-    <DocumentTitle title="My Exams">
-      {allEmpty && (
-        <DocumentTitle title="Hourglass">
-          <p>You have no registrations.</p>
-        </DocumentTitle>
-      )}
-      <ShowRegistrations
-        registrations={res.props.me.registrations.nodes}
-      />
-      <ShowProctorRegs
-        proctorRegistrations={res.props.me.proctorRegistrations.nodes}
-      />
-      <ShowProfRegs
-        professorCourseRegistrations={res.props.me.professorCourseRegistrations.nodes}
-      />
-      {res.props.me.admin && (
-        <Admin />
-      )}
-    </DocumentTitle>
+    <Container>
+      <DocumentTitle title="My Exams">
+        {allEmpty && (
+          <DocumentTitle title="Hourglass">
+            <p>You have no registrations.</p>
+          </DocumentTitle>
+        )}
+        <ShowRegistrations
+          registrations={res.props.me.registrations.nodes}
+        />
+        <ShowProctorRegs
+          proctorRegistrations={res.props.me.proctorRegistrations.nodes}
+        />
+        <ShowProfRegs
+          professorCourseRegistrations={res.props.me.professorCourseRegistrations.nodes}
+        />
+        {res.props.me.admin && (
+          <Admin />
+        )}
+      </DocumentTitle>
+    </Container>
   );
 };
 

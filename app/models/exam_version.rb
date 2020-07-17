@@ -156,4 +156,27 @@ class ExamVersion < ApplicationRecord
       end
     end.flatten(1)
   end
+
+  def itemrubrics_in_rubric(rubric)
+    rubric.map do |r|
+      if r.key? 'rubrics'
+        itemrubrics_in_rubric(r['rubrics'])
+      else
+        r
+      end
+    end
+  end
+
+  def all_itemrubrics
+    rubrics.map do |qrubric|
+      qrubric['parts'].map do |prubric|
+        [
+          itemrubrics_in_rubric(prubric['part']),
+          prubric['body'].map do |brubric|
+            itemrubrics_in_rubric(brubric['rubrics'])
+          end,
+        ]
+      end
+    end.flatten
+  end
 end

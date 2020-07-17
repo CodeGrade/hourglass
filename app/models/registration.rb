@@ -130,7 +130,15 @@ class Registration < ApplicationRecord
   end
 
   def current_score
-    exam_version.total_points + grading_checks.map(&:points).compact.sum + grading_checks.map(&:points).sum
+    credit_rubrics = exam_version.all_itemrubrics.select { |r| r['direction'] == 'credit' }
+    credit_points = credit_rubrics.map { |r| r['points'] }.sum
+
+    [
+      exam_version.total_points,
+      grading_checks.map(&:points).compact.sum,
+      grading_comments.map(&:points).sum,
+      -credit_points,
+    ].sum
   end
 
   def my_questions

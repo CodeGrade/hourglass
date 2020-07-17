@@ -157,10 +157,10 @@ class ExamVersion < ApplicationRecord
     end.flatten(1)
   end
 
-  def itemrubrics_in_rubric(rubric)
+  def self.itemrubrics_in_rubric(rubric)
     rubric.map do |r|
       if r.key? 'rubrics'
-        itemrubrics_in_rubric(r['rubrics'])
+        ExamVersion.itemrubrics_in_rubric(r['rubrics'])
       else
         r
       end
@@ -171,12 +171,53 @@ class ExamVersion < ApplicationRecord
     rubrics.map do |qrubric|
       qrubric['parts'].map do |prubric|
         [
-          itemrubrics_in_rubric(prubric['part']),
+          ExamVersion.itemrubrics_in_rubric(prubric['part']),
           prubric['body'].map do |brubric|
-            itemrubrics_in_rubric(brubric['rubrics'])
+            ExamVersion.itemrubrics_in_rubric(brubric['rubrics'])
           end,
         ]
       end
     end.flatten
+  end
+
+  # -> PartRubric
+  def rubric_for_part(qnum, pnum)
+    rubrics.dig(qnum, 'parts', pnum)
+  end
+
+  def part_tree
+    questions.each_with_index.map do |q, qnum|
+      q['parts'].each_with_index.map do |p, pnum|
+        yield({
+          question: q,
+          part: p,
+          qnum: qnum,
+          pnum: pnum,
+          rubric: rubric_for_part(qnum, pnum),
+        })
+      end
+    end
+  end
+
+  def bottlenose_summary
+    questions.map do |q|
+      parts = q['parts']
+      if parts.count == 1
+        {
+          'name' => q.dig('name', 'value'),
+          'weight' => parts.first['points'],
+        }
+      else
+        {
+          'name' => q.dig('name', 'value'),
+          'parts' => parts.map do |p|
+            {
+              'name' => p.dig('name', 'value'),
+              'weight' => p['points'],
+            }.compact
+          end,
+        }
+      end.compact
+    end
   end
 end

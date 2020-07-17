@@ -54,6 +54,16 @@ module Bottlenose
       end
     end
 
+    def create_exam(exam)
+      bottlenose_post(
+        "/api/courses/#{exam.course.bottlenose_id}/assignments",
+        headers: {
+          'Content-Type' => 'application/json',
+        },
+        body: exam.bottlenose_export.to_json,
+      )
+    end
+
     private
 
     def sync_user(u)
@@ -66,8 +76,8 @@ module Bottlenose
       user
     end
 
-    def bottlenose_get(*args)
-      bottlenose_token.get(*args).parsed
+    def bottlenose_send(method, *args)
+      bottlenose_token.send(method, *args).parsed
     rescue OAuth2::Error => e
       case e.response.status
       when 401
@@ -77,6 +87,14 @@ module Bottlenose
       end
     rescue Faraday::ConnectionFailed
       raise Bottlenose::ConnectionFailed
+    end
+
+    def bottlenose_post(*args)
+      bottlenose_send(:post, *args)
+    end
+
+    def bottlenose_get(*args)
+      bottlenose_send(:get, *args)
     end
 
     def bottlenose_oauth_client

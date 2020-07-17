@@ -78,7 +78,7 @@ contents:
                   file: "q1/all/src/packagetwo/Example2.java"
                 lang: "text/x-java"
                 rubric:
-                  - points: 11
+                  - points: 8
                     label: Style
                     description: <b>This</b> should be <i>stylish</i>.
                     direction: credit
@@ -98,7 +98,7 @@ contents:
                 rubric:
                   - condition: On Tuesdays
                     rubrics:
-                      - points: 11
+                      - points: 3
                         label: Style
                         description: <b>This</b> should be <i>stylish</i>.
                         direction: deduction
@@ -109,7 +109,7 @@ contents:
                             description: wow!
                   - condition: On Wednesdays
                     rubrics:
-                      - points: 11
+                      - points: 3
                         label: Function
                         description: <b>This</b> should be <i>functional</i>.
                         direction: credit

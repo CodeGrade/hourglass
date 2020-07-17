@@ -48,6 +48,7 @@ gem 'activerecord_json_validator'
 group :development, :test do
   gem 'factory_bot_rails', require: false
   gem 'minitest-reporters'
+  gem 'byebug'
   gem 'pry'
   gem 'pry-rails'
   gem 'pry-rescue'

@@ -1574,33 +1574,35 @@ const GradeOnePart: React.FC = () => {
     { registrationId },
   );
   if (res.error) {
-    return <RenderError error={res.error} />;
+    return <Container><RenderError error={res.error} /></Container>;
   }
   if (!res.props) {
-    return <p>Loading...</p>;
+    return <Container><p>Loading...</p></Container>;
   }
 
   return (
-    <Row>
-      <Col sm="auto">
-        <Icon I={FaChevronCircleLeft} size="3em" />
-      </Col>
-      <Col className="overflow-auto-y">
-        <Row>
-          <Col sm={{ span: 6, offset: 3 }}>
-            <h1>{res.props.registration.exam.name}</h1>
-          </Col>
-        </Row>
-        <Grade
-          registrationKey={res.props.registration}
-          qnum={Number(qnum)}
-          pnum={Number(pnum)}
-        />
-      </Col>
-      <Col sm="auto">
-        <Icon I={FaChevronCircleRight} size="3em" />
-      </Col>
-    </Row>
+    <Container fluid>
+      <Row>
+        <Col sm="auto">
+          <Icon I={FaChevronCircleLeft} size="3em" />
+        </Col>
+        <Col className="overflow-auto-y">
+          <Row>
+            <Col sm={{ span: 6, offset: 3 }}>
+              <h1>{res.props.registration.exam.name}</h1>
+            </Col>
+          </Row>
+          <Grade
+            registrationKey={res.props.registration}
+            qnum={Number(qnum)}
+            pnum={Number(pnum)}
+          />
+        </Col>
+        <Col sm="auto">
+          <Icon I={FaChevronCircleRight} size="3em" />
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
@@ -1648,7 +1650,9 @@ const BeginGradingButton: React.FC = () => {
 };
 
 const GradingGrader: React.FC = () => (
-  <BeginGradingButton />
+  <Container>
+    <BeginGradingButton />
+  </Container>
 );
 
 const GradingLock: React.FC<{
@@ -1857,38 +1861,36 @@ const GradingAdmin: React.FC = () => {
     { examId },
   );
   if (res.error) {
-    return <RenderError error={res.error} />;
+    return <Container><RenderError error={res.error} /></Container>;
   }
   if (!res.props) {
-    return <p>Loading...</p>;
+    return <Container><p>Loading...</p></Container>;
   }
   return (
-    <>
+    <Container>
       <p>prof grading</p>
       <p>TODO: progress</p>
       <LockAdministration examKey={res.props.exam} />
       <BeginGradingButton />
-    </>
+    </Container>
   );
 };
 
 const Grading: React.FC = () => (
-  <Container>
-    <Switch>
-      <Route exact path="/exams/:examId/grading">
-        <GradingGrader />
-      </Route>
-      <Route exact path="/exams/:examId/grading/admin">
-        <GradingAdmin />
-      </Route>
-      <Route path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
-        <GradeOnePart />
-      </Route>
-      <Route>
-        <FourOhFour />
-      </Route>
-    </Switch>
-  </Container>
+  <Switch>
+    <Route exact path="/exams/:examId/grading">
+      <GradingGrader />
+    </Route>
+    <Route exact path="/exams/:examId/grading/admin">
+      <GradingAdmin />
+    </Route>
+    <Route path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
+      <GradeOnePart />
+    </Route>
+    <Route>
+      <FourOhFour />
+    </Route>
+  </Switch>
 );
 
 export default Grading;

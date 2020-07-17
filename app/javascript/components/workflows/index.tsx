@@ -156,11 +156,9 @@ const Entry: React.FC = () => {
               <Route path="/exams/:examId/grading">
                 <DocumentTitle title="Grading">
                   <RegularNavbar />
-                  <Container fluid>
-                    <AllAlerts>
-                      <Grading />
-                    </AllAlerts>
-                  </Container>
+                  <AllAlerts>
+                    <Grading />
+                  </AllAlerts>
                 </DocumentTitle>
               </Route>
               <Route path="/">

@@ -18,6 +18,7 @@ import {
   ButtonProps,
   Collapse,
   Table,
+  Fade,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
@@ -1704,7 +1705,9 @@ const GradingLock: React.FC<{
     <tr>
       <td>{lock.qnum}</td>
       <td>{lock.pnum}</td>
-      <td>{lock.registration.user.displayName}</td>
+      <td>
+        <Spoiler text={lock.registration.user.displayName} />
+      </td>
       <td>{lock.grader.displayName}</td>
       <td>
         <Button
@@ -1727,6 +1730,25 @@ const GradingLock: React.FC<{
         </Button>
       </td>
     </tr>
+  );
+};
+
+const Spoiler: React.FC<{
+  text: string;
+}> = (props) => {
+  const {
+    text,
+  } = props;
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button
+        onClick={() => setOpen((o) => !o)}
+        variant={open ? 'dark-outline' : 'dark'}
+      >
+        {open ? text : 'REVEAL'}
+      </Button>
+    </>
   );
 };
 

@@ -160,7 +160,6 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.bigint "user_id", null: false
     t.bigint "room_id"
     t.bigint "exam_version_id", null: false
-    t.jsonb "grades"
     t.datetime "start_time"
     t.datetime "end_time"
     t.datetime "created_at", precision: 6, null: false

@@ -105,8 +105,6 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.index [:room_id, :user_id], unique: true
       t.index [:user_id, :room_id], unique: true
 
-      t.jsonb :grades
-
       t.datetime :start_time
       t.datetime :end_time
 

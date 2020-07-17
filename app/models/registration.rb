@@ -20,15 +20,6 @@ class Registration < ApplicationRecord
   validate :room_version_same_exam
   validate :user_in_course
 
-  GRADES_SCHEMA = Rails.root.join('config/schemas/grades.json').to_s
-  validates :grades, {
-    if: ->(obj) { !obj.grades.nil? },
-    json: {
-      schema: -> { GRADES_SCHEMA },
-      message: ->(errors) { errors },
-    },
-  }
-
   delegate :exam, to: :exam_version
   delegate :proctors_and_professors, to: :exam
   delegate :course, to: :exam

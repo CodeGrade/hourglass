@@ -49,6 +49,8 @@ class HourglassSchema < GraphQL::Schema
       Types::GradingCheckType
     when GradingComment
       Types::GradingCommentType
+    when GradingLock
+      Types::GradingLockType
     when Message
       Types::MessageType
     when ProctorRegistration

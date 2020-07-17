@@ -11,6 +11,7 @@ class ExamVersion < ApplicationRecord
 
   has_many :users, through: :registrations
   has_many :anomalies, through: :registrations
+  has_many :grading_locks, through: :registrations
 
   validates :exam, presence: true
 

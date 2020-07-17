@@ -16,11 +16,15 @@ import {
   DropdownButton,
   Dropdown,
   ButtonProps,
+  Collapse,
+  Table,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
   FaChevronCircleRight,
   FaTrash,
+  FaChevronUp,
+  FaChevronDown,
 } from 'react-icons/fa';
 import { RiMessage2Line, RiChatDeleteLine, RiChatCheckLine } from 'react-icons/ri';
 import { FiCheckSquare } from 'react-icons/fi';
@@ -1438,10 +1442,10 @@ const Grade: React.FC<{
           qnum: nextQ,
           pnum: nextP,
         } = gradeNext;
-        history.push(`/exams/${examId}/grading/${nextRegId}/${nextQ}/${nextP}`);
+        history.replace(`/exams/${examId}/grading/${nextRegId}/${nextQ}/${nextP}`);
       },
       onError: () => {
-        history.push(`/exams/${examId}/grading`);
+        history.replace(`/exams/${examId}/grading`);
       },
     },
   );
@@ -1592,7 +1596,7 @@ const GradeOnePart: React.FC = () => {
   );
 };
 
-const GradingHomepage: React.FC = () => {
+const BeginGradingButton: React.FC = () => {
   const { examId } = useParams();
   const history = useHistory();
   const { alert } = useContext(AlertContext);
@@ -1630,15 +1634,164 @@ const GradingHomepage: React.FC = () => {
         });
       }}
     >
-      Get started
+      Begin grading
     </Button>
+  );
+};
+
+const GradingGrader: React.FC = () => (
+  <BeginGradingButton />
+);
+
+const VersionLocks: React.FC<{
+  versionKey: any;
+}> = (props) => {
+  const {
+    versionKey,
+  } = props;
+  const version = useFragment(
+    graphql`
+    fragment gradingLockVersion on ExamVersion {
+      name
+      gradingLocks {
+        edges {
+          node {
+            id
+            qnum
+            pnum
+            registration {
+              user {
+                displayName
+              }
+            }
+            grader {
+              displayName
+            }
+          }
+        }
+      }
+    }
+    `,
+    versionKey,
+  );
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <h3>
+        <span
+          role="button"
+          onClick={(): void => setOpen((o) => !o)}
+          onKeyPress={(): void => setOpen((o) => !o)}
+          tabIndex={0}
+        >
+          {version.name}
+          {open ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+        </span>
+      </h3>
+      <Collapse in={open}>
+        <div className="border p-2">
+          <Table>
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Part</th>
+                <th>Student</th>
+                <th>Grader</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {version.gradingLocks.edges.map(({ node }) => {
+                if (!node.grader) return;
+                return (
+                  <tr key={node.id}>
+                    <td>{node.qnum}</td>
+                    <td>{node.pnum}</td>
+                    <td>{node.registration.user.displayName}</td>
+                    <td>{node.grader.displayName}</td>
+                    <td>
+                      <Button
+                        variant="danger"
+                      >
+                        <Icon I={FaTrash} />
+                      </Button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </div>
+      </Collapse>
+    </>
+  );
+};
+
+const LockAdministration: React.FC<{
+  examKey: any;
+}> = (props) => {
+  const {
+    examKey,
+  } = props;
+  const res = useFragment(
+    graphql`
+    fragment gradingLockAdmin on Exam {
+      examVersions {
+        edges {
+          node {
+            id
+            ...gradingLockVersion
+          }
+        }
+      }
+    }
+    `,
+    examKey,
+  );
+  return (
+    <>
+      {res.examVersions.edges.map(({ node }) => (
+        <VersionLocks key={node.id} versionKey={node} />
+      ))}
+    </>
+  );
+};
+
+const GradingAdmin: React.FC = () => {
+  const { examId } = useParams();
+  const res = useQuery(
+    graphql`
+    query gradingAdminQuery($examId: ID!) {
+      exam(id: $examId) {
+        ...gradingLockAdmin
+      }
+    }
+    `,
+    { examId },
+  );
+  if (res.error) {
+    return <RenderError error={res.error} />;
+  }
+  if (!res.props) {
+    return <p>Loading...</p>;
+  }
+  return (
+    <>
+      <p>prof grading</p>
+      <p>TODO: progress</p>
+      <LockAdministration examKey={res.props.exam} />
+      <BeginGradingButton />
+    </>
   );
 };
 
 const Grading: React.FC = () => (
   <Switch>
     <Route exact path="/exams/:examId/grading">
-      <GradingHomepage />
+      <GradingGrader />
+    </Route>
+    <Route exact path="/exams/:examId/grading/admin">
+      <GradingAdmin />
     </Route>
     <Route path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
       <GradeOnePart />

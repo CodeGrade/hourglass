@@ -872,7 +872,7 @@ const StartGradingButton: React.FC = () => {
     COMMENCE_GRADING_MUTATION,
     {
       onCompleted: () => {
-        history.push(`/exams/${examId}/grading`);
+        history.push(`/exams/${examId}/grading/admin`);
       },
       onError: (err) => {
         alert({

@@ -13,7 +13,13 @@ class GradingLock < ApplicationRecord
     message: 'is already being graded',
   }
 
+  delegate :exam, to: :registration
+
   scope :incomplete, -> { where(completed_by: nil) }
   scope :complete, -> { where.not(completed_by: nil) }
   scope :no_grader, -> { where(grader: nil) }
+
+  def visible_to?(check_user)
+    exam.professors.exists? check_user.id
+  end
 end

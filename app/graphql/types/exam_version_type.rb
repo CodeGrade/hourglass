@@ -63,5 +63,9 @@ module Types
     end
 
     field :version_announcements, Types::VersionAnnouncementType.connection_type, null: false
+
+    field :grading_locks, Types::GradingLockType.connection_type, null: false do
+      guard Guards::PROFESSORS
+    end
   end
 end

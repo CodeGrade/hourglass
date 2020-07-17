@@ -92,6 +92,7 @@ import { gradingDestroyCommentMutation } from './__generated__/gradingDestroyCom
 import { gradingUpdateCommentMutation } from './__generated__/gradingUpdateCommentMutation.graphql';
 import { gradingNextMutation } from './__generated__/gradingNextMutation.graphql';
 import { gradingReleaseLockMutation } from './__generated__/gradingReleaseLockMutation.graphql';
+import FourOhFour from '../FourOhFour';
 
 function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
@@ -1641,6 +1642,9 @@ const Grading: React.FC = () => (
     </Route>
     <Route path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
       <GradeOnePart />
+    </Route>
+    <Route>
+      <FourOhFour />
     </Route>
   </Switch>
 );

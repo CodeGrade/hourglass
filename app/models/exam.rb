@@ -217,35 +217,44 @@ class Exam < ApplicationRecord
     everyone.exists? check_user.id
   end
 
-  def bottlenose_export
+  def bottlenose_exam_summary
     if exam_versions.count == 1
-      {
-        'finish_time' => end_time.iso8601,
-        'exam_summary' => exam_versions.first.bottlenose_summary,
-        'exam_grades' => registrations.map do |r|
-          [
-            r.user.username,
-            r.current_part_scores,
-          ]
-        end.to_h,
-      }
+      exam_versions.first.bottlenose_summary
     else
-      {
-        'finish_time' => end_time.iso8601,
-        'exam_summary' => [{
-          'name' => 'Final grade',
-          'weight' => 100,
-        }],
-        'exam_grades' => registrations.map do |r|
-          [
-            r.user.username,
-            [r.current_score],
-          ]
-        end.to_h,
-      }
+      [{
+        'name' => 'Final grade',
+        'weight' => 100,
+      }]
     end
   end
-  
+
+  def bottlenose_exam_grades
+    if exam_versions.count == 1
+      registrations.map do |r|
+        [
+          r.user.username,
+          r.current_part_scores,
+        ]
+      end.to_h
+    else
+      registrations.map do |r|
+        [
+          r.user.username,
+          [r.current_score],
+        ]
+      end.to_h
+    end
+  end
+
+  def bottlenose_export
+    {
+      'name' => name,
+      'finish_time' => end_time.iso8601,
+      'exam_summary' => bottlenose_exam_summary,
+      'exam_grades' => bottlenose_exam_grades,
+    }
+  end
+
   private
 
   def duration_valid

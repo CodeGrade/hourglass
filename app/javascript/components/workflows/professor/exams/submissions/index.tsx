@@ -5,7 +5,8 @@ import {
   Route,
   Link,
 } from 'react-router-dom';
-import ExamViewer from '@proctor/registrations/show';
+import { Container } from 'react-bootstrap';
+import ExamViewer from '@hourglass/workflows/proctor/registrations/show';
 import { graphql } from 'react-relay';
 import {
   AnswersState,
@@ -14,7 +15,7 @@ import {
   FileRef,
   QuestionInfo,
   ContentsState,
-} from '@student/exams/show/types';
+} from '@hourglass/workflows/student/exams/show/types';
 import { useQuery } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
 
@@ -105,14 +106,16 @@ const ExamSubmission: React.FC = () => {
 };
 
 const Submissions: React.FC = () => (
-  <Switch>
-    <Route path="/exams/:examId/submissions/:registrationId">
-      <ExamSubmission />
-    </Route>
-    <Route path="/exams/:examId/submissions">
-      <ExamSubmissions />
-    </Route>
-  </Switch>
+  <Container>
+    <Switch>
+      <Route path="/exams/:examId/submissions/:registrationId">
+        <ExamSubmission />
+      </Route>
+      <Route path="/exams/:examId/submissions">
+        <ExamSubmissions />
+      </Route>
+    </Switch>
+  </Container>
 );
 
 export default Submissions;

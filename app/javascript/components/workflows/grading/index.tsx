@@ -19,6 +19,7 @@ import {
   Collapse,
   Table,
   Fade,
+  Container,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
@@ -87,6 +88,7 @@ import {
 } from 'react-icons/bs';
 import { RangeAddConfig } from 'relay-runtime/lib/mutations/RelayDeclarativeMutationConfig';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
+import FourOhFour from '@hourglass/workflows/FourOhFour';
 
 import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
 import { gradingRubric$key, gradingRubric$data } from './__generated__/gradingRubric.graphql';
@@ -97,7 +99,6 @@ import { gradingDestroyCommentMutation } from './__generated__/gradingDestroyCom
 import { gradingUpdateCommentMutation } from './__generated__/gradingUpdateCommentMutation.graphql';
 import { gradingNextMutation } from './__generated__/gradingNextMutation.graphql';
 import { gradingReleaseLockMutation } from './__generated__/gradingReleaseLockMutation.graphql';
-import FourOhFour from '../FourOhFour';
 
 function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
@@ -1872,20 +1873,22 @@ const GradingAdmin: React.FC = () => {
 };
 
 const Grading: React.FC = () => (
-  <Switch>
-    <Route exact path="/exams/:examId/grading">
-      <GradingGrader />
-    </Route>
-    <Route exact path="/exams/:examId/grading/admin">
-      <GradingAdmin />
-    </Route>
-    <Route path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
-      <GradeOnePart />
-    </Route>
-    <Route>
-      <FourOhFour />
-    </Route>
-  </Switch>
+  <Container>
+    <Switch>
+      <Route exact path="/exams/:examId/grading">
+        <GradingGrader />
+      </Route>
+      <Route exact path="/exams/:examId/grading/admin">
+        <GradingAdmin />
+      </Route>
+      <Route path="/exams/:examId/grading/:registrationId/:qnum/:pnum">
+        <GradeOnePart />
+      </Route>
+      <Route>
+        <FourOhFour />
+      </Route>
+    </Switch>
+  </Container>
 );
 
 export default Grading;

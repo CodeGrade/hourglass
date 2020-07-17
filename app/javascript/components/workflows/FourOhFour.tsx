@@ -1,7 +1,5 @@
 import React from 'react';
-import RegularNavbar from '@hourglass/common/navbar';
 import {
-  Container,
   Alert,
   Table,
 } from 'react-bootstrap';
@@ -24,44 +22,41 @@ const FourOhFour: React.FC = () => {
   );
   return (
     <DocumentTitle title="Not found">
-      <Container fluid className="p-0">
-        <div className="wrapper vh-100 d-flex flex-column">
-          <RegularNavbar />
-          <div className="justify-content-center flex-grow-1 align-items-center d-flex flex-column">
-            <div className="d-flex flex-column align-items-center">
-              <img src="/find_x.jpg" alt="Find 'x'" />
-              <h2>
-                Unfortunately, finding
-                <code className="mx-2">{pathname}</code>
-                isn&rsquo;t as easy as finding
-                <code className="ml-2">x</code>
-                ...
-              </h2>
-              <p>Please contact a professor, and provide them with the following information:</p>
-              <Alert variant="warning">
-                <Table size="sm" className="mb-0" borderless>
-                  <tbody>
+      <div className="wrapper">
+        <div className="justify-content-center flex-grow-1 align-items-center d-flex flex-column">
+          <div className="d-flex flex-column align-items-center">
+            <img src="/find_x.jpg" alt="Find 'x'" />
+            <h2>
+              Unfortunately, finding
+              <code className="mx-2">{pathname}</code>
+              isn&rsquo;t as easy as finding
+              <code className="ml-2">x</code>
+              ...
+            </h2>
+            <p>Please contact a professor, and provide them with the following information:</p>
+            <Alert variant="warning">
+              <Table size="sm" className="mb-0" borderless>
+                <tbody>
+                  <tr>
+                    <td>Location:</td>
+                    <td><code>{window.location.toString()}</code></td>
+                  </tr>
+                  <tr>
+                    <td>Time:</td>
+                    <td><code>{DateTime.local().toISO()}</code></td>
+                  </tr>
+                  {res.props && (
                     <tr>
-                      <td>Location:</td>
-                      <td><code>{window.location.toString()}</code></td>
+                      <td>Username:</td>
+                      <td><code>{res.props.me.displayName}</code></td>
                     </tr>
-                    <tr>
-                      <td>Time:</td>
-                      <td><code>{DateTime.local().toISO()}</code></td>
-                    </tr>
-                    {res.props && (
-                      <tr>
-                        <td>Username:</td>
-                        <td><code>{res.props.me.displayName}</code></td>
-                      </tr>
-                    )}
-                  </tbody>
-                </Table>
-              </Alert>
-            </div>
+                  )}
+                </tbody>
+              </Table>
+            </Alert>
           </div>
         </div>
-      </Container>
+      </div>
     </DocumentTitle>
   );
 };

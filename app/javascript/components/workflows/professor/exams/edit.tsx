@@ -1,4 +1,5 @@
 import React from 'react';
+import { Container } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import Editor from '@professor/exams/new/editor';
 import { useAlert } from '@hourglass/common/alerts';
@@ -48,10 +49,10 @@ const EditExamVersion: React.FC = () => {
     [res.props?.examVersion?.anyStarted],
   );
   if (res.error) {
-    return <RenderError error={res.error} />;
+    return <Container><RenderError error={res.error} /></Container>;
   }
   if (!res.props) {
-    return <p>Loading...</p>;
+    return <Container><p>Loading...</p></Container>;
   }
   const { examVersion } = res.props;
   const parsedContents: ContentsState = {
@@ -67,13 +68,15 @@ const EditExamVersion: React.FC = () => {
     },
   };
   return (
-    <Editor
-      examVersionId={examVersion.id}
-      exam={parsedContents.exam}
-      versionName={examVersion.name}
-      versionPolicies={examVersion.policies as readonly Policy[]}
-      answers={parsedContents.answers}
-    />
+    <Container>
+      <Editor
+        examVersionId={examVersion.id}
+        exam={parsedContents.exam}
+        versionName={examVersion.name}
+        versionPolicies={examVersion.policies as readonly Policy[]}
+        answers={parsedContents.answers}
+      />
+    </Container>
   );
 };
 

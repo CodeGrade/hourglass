@@ -55,13 +55,14 @@ module Bottlenose
     end
 
     def create_exam(exam)
-      bottlenose_post(
-        "/api/courses/#{exam.course.bottlenose_id}/assignments",
+      res = bottlenose_post(
+        "/api/courses/#{exam.course.bottlenose_id}/assignments/create_or_update",
         headers: {
           'Content-Type' => 'application/json',
         },
         body: exam.bottlenose_export.to_json,
       )
+      exam.update(bottlenose_assignment_id: res['id'])
     end
 
     private

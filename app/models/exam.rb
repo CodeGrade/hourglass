@@ -249,6 +249,7 @@ class Exam < ApplicationRecord
   def bottlenose_export
     {
       'name' => name,
+      'exam_id' => bottlenose_assignment_id,
       'finish_time' => end_time.iso8601,
       'exam_summary' => bottlenose_exam_summary,
       'exam_grades' => bottlenose_exam_grades,

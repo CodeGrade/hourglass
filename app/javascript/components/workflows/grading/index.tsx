@@ -55,7 +55,7 @@ import GradeYesNo from '@grading/questions/GradeYesNo';
 import GradeMatching from '@grading/questions/GradeMatching';
 import GradeMultipleChoice from '@grading/questions/GradeMultipleChoice';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, alphabetIdx } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import Tooltip from '@student/exams/show/components/Tooltip';
@@ -1703,8 +1703,8 @@ const GradingLock: React.FC<{
   if (!lock.grader) return null;
   return (
     <tr>
-      <td>{lock.qnum}</td>
-      <td>{lock.pnum}</td>
+      <td><QuestionName qnum={lock.qnum} /></td>
+      <td><PartName pnum={lock.pnum} /></td>
       <td>
         <Spoiler text={lock.registration.user.displayName} />
       </td>
@@ -1726,7 +1726,8 @@ const GradingLock: React.FC<{
             });
           }}
         >
-          <Icon I={FaTrash} />
+          <Icon I={FaTrash} className="mr-2" />
+          Release lock
         </Button>
       </td>
     </tr>

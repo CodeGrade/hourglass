@@ -88,6 +88,7 @@ import {
 import { RangeAddConfig } from 'relay-runtime/lib/mutations/RelayDeclarativeMutationConfig';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import FourOhFour from '@hourglass/workflows/FourOhFour';
+import Spoiler from '@hourglass/common/Spoiler';
 
 import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
 import { gradingRubric$key, gradingRubric$data } from './__generated__/gradingRubric.graphql';
@@ -1732,25 +1733,6 @@ const GradingLock: React.FC<{
         </Button>
       </td>
     </tr>
-  );
-};
-
-const Spoiler: React.FC<{
-  text: string;
-}> = (props) => {
-  const {
-    text,
-  } = props;
-  const [open, setOpen] = useState(false);
-  return (
-    <>
-      <Button
-        onClick={() => setOpen((o) => !o)}
-        variant={open ? 'dark-outline' : 'dark'}
-      >
-        {open ? text : 'REVEAL'}
-      </Button>
-    </>
   );
 };
 

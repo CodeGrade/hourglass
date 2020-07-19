@@ -1,3 +1,6 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
 .z-1000 {
   position: relative;
   z-index: 1000;
@@ -44,6 +47,27 @@
   width: 0;
 }
 
+.spoiler {
+  cursor: pointer;
+  transition: 0.35s background-color ease-in-out;
+  > span {
+    transition: 0.35s opacity-color ease-in-out;
+  }
+  &.show {
+    background-color: rgba(theme-color("dark"), .2);
+    > span {
+      opacity: 1;
+    }
+  }
+  &.hide {
+    background-color: theme-color("dark");
+    > span {
+      opacity: 0;
+    }
+  }
+}
+
+
 .cursor-help {
   cursor: help;
 }
@@ -64,9 +88,6 @@
 .column-count-4 {
   column-count: 4;
 }
-
-@import "node_modules/bootstrap/scss/functions";
-@import "node_modules/bootstrap/scss/variables";
 
 .bg-pulse {
   background-color: unset;

@@ -21,6 +21,7 @@ module Mutations
       info = JSON.parse(update[:info])
       rubrics = info['rubrics'] || exam_version.info['rubrics']
       info['rubrics'] = rubrics
+      info.compact!
       update[:info] = info.to_json
       updated = exam_version.update(update)
       raise GraphQL::ExecutionError, exam_version.errors.full_messages.to_sentence unless updated

@@ -707,6 +707,7 @@ const ShowVersion: React.FC<{
       name
       policies
       anyStarted
+      anyFinalized
       fileExportUrl
       archiveExportUrl
       questions
@@ -768,6 +769,14 @@ const ShowVersion: React.FC<{
       scratch: '',
     },
   };
+  let disabledDeleteMessage = '';
+  if (res.anyFinalized) {
+    disabledDeleteMessage = 'Students have already finished taking this exam version';
+  } else if (res.anyStarted) {
+    disabledDeleteMessage = 'Students have already started taking this exam version';
+  } else if (loading) {
+    disabledDeleteMessage = 'Please wait...';
+  }
   return (
     <>
       <h3 className="flex-grow-1">
@@ -810,8 +819,8 @@ const ShowVersion: React.FC<{
           </LinkButton>
           <TooltipButton
             variant="danger"
-            disabled={res.anyStarted || loading}
-            disabledMessage="Students have already started taking this exam version"
+            disabled={res.anyStarted || res.anyFinalized || loading}
+            disabledMessage={disabledDeleteMessage}
             cursorClass="cursor-not-allowed"
             onClick={(): void => {
               mutate({

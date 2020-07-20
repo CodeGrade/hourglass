@@ -32,6 +32,7 @@ const EditExamVersion: React.FC = () => {
         files
         answers
         anyStarted
+        anyFinalized
       }
     }
     `,
@@ -45,8 +46,8 @@ const EditExamVersion: React.FC = () => {
       title: 'Students have already started taking this version',
       message: 'Changing the questions will likely result in nonsensical answers, and changing the structure of this version will result in undefined behavior. Be careful!',
     },
-    res.props?.examVersion?.anyStarted,
-    [res.props?.examVersion?.anyStarted],
+    res.props?.examVersion?.anyStarted || res.props?.examVersion?.anyFinalized,
+    [res.props?.examVersion?.anyStarted || res.props?.examVersion?.anyFinalized],
   );
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;

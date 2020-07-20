@@ -24,6 +24,12 @@ module Types
       object.any_started?
     end
 
+    field :any_finalized, Boolean, null: false do
+      guard Guards::PROFESSORS
+    end
+    def any_finalized
+      object.any_finalized?
+    end
     field :questions, GraphQL::Types::JSON, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end

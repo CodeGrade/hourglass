@@ -115,10 +115,10 @@ class ExamVersion < ApplicationRecord
   end
 
   def export_json
-    {
+    JSON.pretty_generate({
       info: info,
       files: files,
-    }.to_json
+    })
   end
 
   def export_all(dir)

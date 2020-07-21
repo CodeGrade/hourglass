@@ -4,6 +4,14 @@ policies:
   - TOLERATE_WINDOWED
 contents:
   instructions: Instructions go here.
+  examRubric:
+    type: all
+    description: This is an <i>exam-wide</i> rubric.
+    choices:
+      direction: credit
+      presets:
+        - points: 111
+          graderHint: "Grader hint for the exam-wide preset"
   reference:
     - file: "test.txt"
     - dir: "q1/all/src/packageone"
@@ -13,32 +21,44 @@ contents:
       separateSubparts: true
       reference:
         - dir: "q1/all"
+      questionRubric:
+        type: all
+        description: This is the Q1 <i>question</i> rubric.
+        choices:
+          direction: credit
+          presets:
+            - points: 222
+              graderHint: "Grader hint for the Q1 preset"
       parts:
         - description: "This part will test basic Java syntax knowledge. This text is shown only on the page for part A."
           points: 16
           reference:
             - dir: "q1/p1"
-          rubric:
-            - points: 8
-              label: Style
-              description: <b>This</b> should be <i>stylish</i>.
-              direction: credit
-              presets:
-                - points: 2
-                  description: blah
-                - points: 8
-                  description: wow!
-                - points: -2
-                  description: oops
-            - points: 8
-              label: Function
-              description: <b>This</b> should <i>work</i>.
-              direction: deduction
-              presets:
-                - points: -3
-                  description: three
-                - points: -5
-                  description: five pts
+          partRubric:
+            type: all
+            choices:
+            - type: one
+              points: 8
+              description: <b>Q1-PA</b> should be <i>stylish</i>.
+              choices:
+                label: Style
+                direction: credit
+                presets:
+                  - points: 2
+                    graderHint: blah
+                  - points: 8
+                    graderHint: wow!
+            - type: one
+              points: 8
+              description: <b>Q1-PA</b> should <i>work</i>.
+              choices:
+                direction: deduction
+                label: Function
+                presets:
+                  - points: -3
+                    graderHint: three
+                  - points: -5
+                    graderHint: five pts
           body:
             - "Answer all of the following true/false questions."
             - TrueFalse:
@@ -78,15 +98,19 @@ contents:
                   file: "q1/all/src/packagetwo/Example2.java"
                 lang: "text/x-java"
                 rubric:
-                  - points: 8
-                    label: Style
-                    description: <b>This</b> should be <i>stylish</i>.
-                    direction: credit
-                    presets:
-                      - points: 3
-                        description: blah
-                      - points: 8
-                        description: wow!
+                  type: all
+                  choices:
+                  - type: one
+                    points: 8
+                    description: <b>Q1-PB-B1</b> should be <i>stylish</i>.
+                    choices:
+                      label: Style
+                      direction: credit
+                      presets:
+                        - points: 2
+                          graderHint: blah
+                        - points: 8
+                          graderHint: wow!
             - Code:
                 prompt: "Code with direct starter."
                 initial:
@@ -96,28 +120,30 @@ contents:
                     Empty line above.
                 lang: "text/x-java"
                 rubric:
-                  - condition: On Tuesdays
-                    rubrics:
-                      - points: 3
+                  type: all
+                  choices:
+                    - type: one
+                      points: 8
+                      description: <b>Q1-PB-B2</b> should be <i>stylish</i>.
+                      choices:
                         label: Style
-                        description: <b>This</b> should be <i>stylish</i>.
-                        direction: deduction
-                        presets:
-                          - points: -3
-                            description: blah
-                          - points: -8
-                            description: wow!
-                  - condition: On Wednesdays
-                    rubrics:
-                      - points: 3
-                        label: Function
-                        description: <b>This</b> should be <i>functional</i>.
                         direction: credit
                         presets:
-                          - points: 2
-                            description: blah
-                          - points: 9
-                            description: wow!
+                          - points: 3
+                            graderHint: blah
+                          - points: 8
+                            graderHint: wow!
+                    - type: one
+                      points: 8
+                      description: <b>Q1-PB-B2</b> should <i>work</i>.
+                      choices:
+                        direction: deduction
+                        label: Function
+                        presets:
+                          - points: -3
+                            graderHint: three
+                          - points: -5
+                            graderHint: five pts
             - "<p>This is an interlude of <b>HTML</b> content</p>"
             - MultipleChoice:
                 prompt: "What does the code in PartB.java do?"
@@ -130,19 +156,23 @@ contents:
     - name: "Second Question Name"
       description: "Welcome to question 2. This is where the fun begins."
       parts:
-        - rubric:
-            - points: 1
-              label: "Q2P1 label"
-              description: "Part rubric"
-              direction: credit
+        - partRubric:
+            type: all
+            choices:
+              - type: one
+                points: 8
+                description: <b>Q2-PA</b> rubric
+                choices: []
           body:
             - "This matching section concerns important information."
             - Matching:
                 rubric:
-                  - points: 2
-                    label: "Q2P1B2 label"
-                    description: "BodyItem rubric for matching"
-                    direction: deduction
+                  type: all
+                  choices:
+                    - type: one
+                      points: 8
+                      description: <b>Q2-PA-B2</b> rubric
+                      choices: []
                 promptsLabel: "Match <i>from here</i>.."
                 valuesLabel: "across <i>to here</i>."
                 prompts:

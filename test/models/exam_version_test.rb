@@ -4,7 +4,7 @@ require 'test_helper'
 
 class ExamVersionTest < ActiveSupport::TestCase
   def condense_yaml(name)
-    parse_yaml(name).to_json
+    JSON.pretty_generate(parse_yaml(name))
   end
 
   def parse_yaml(name)

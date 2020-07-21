@@ -95,37 +95,37 @@ class Upload
     arr.map { |i| make_html_val(i) }
   end
 
-  def item_rubric(r)
+  def convert_presets(r)
+    return nil if r.nil?
+
     {
-      points: r['points'],
-      description: make_html_val(r['description']),
       label: r['label'],
       direction: r['direction'],
-      presets: r['presets']&.map do |preset|
+      mercy: r['mercy'],
+      presets: r['presets']&.map do |p|
         {
-          points: preset['points'],
-          description: make_html_val(preset['description']),
-        }
-      end,
-      mercy: r['mercy']&.symbolize_keys,
+          label: p['label'],
+          graderHint: make_html_val(p['graderHint']),
+          studentFeedback: make_html_val(p['studentFeedback']),
+          points: p['points']
+        }.compact
+      end.compact
     }.compact
   end
-
-  def conditional_rubric(r, depth)
+  
+  def convert_rubric(r)
+    return {type: "none"} if r.nil?
     {
-      condition: make_html_val(r['condition']),
-      rubrics: r['rubrics'].map { |r| convert_rubric(r, depth) },
-    }
-  end
-
-  def convert_rubric(r, depth = 2)
-    raise 'Cannot nest rubric conditions that deeply.' if depth <= 0
-
-    if r.key? 'condition'
-      conditional_rubric(r, depth - 1)
-    else
-      item_rubric(r)
-    end
+      type: r['type'],
+      description: make_html_val(r['description']),
+      points: r['points'],
+      choices: 
+        if r['choices'].is_a? Array
+          r['choices'].map{|c| convert_rubric(c)}
+        else
+          convert_presets(r['choices'])
+        end
+    }.compact
   end
 
   def parse_info(properties)
@@ -177,31 +177,23 @@ class Upload
       end
     end
 
-    rubrics = contents['questions'].map do |q|
-      {
-        parts: q['parts']&.map do |p|
-          {
-            part: p['rubric']&.map do |r|
-              convert_rubric(r)
-            end || [],
-            body: p['body']&.map do |b|
-              {
-                rubrics: (
-                  if b.is_a? Hash
-                    b.values.first['rubric']&.map do |r|
-                      convert_rubric(r)
-                    end || []
-                  else
-                    []
-                  end
-                ),
-              }
-            end || [],
-          }
-        end || [],
-      }
-    end
-
+    rubrics = {
+      examRubric: convert_rubric(contents['examRubric']),
+      questions: contents['questions'].map do |q|
+        {
+          questionRubric: convert_rubric(q['questionRubric']),
+          parts: q['parts']&.map do |p|
+            {
+              partRubric: convert_rubric(p['partRubric']),
+              body: p['body']&.map do |b|
+                convert_rubric(b['rubric'])
+              end || [],
+            }
+          end || [],
+        }
+      end || []
+    }
+    
     e_reference = contents['reference']&.map{|r| map_reference r} || []
     questions = contents['questions'].map do |q|
       q_reference = q['reference']&.map{|r| map_reference r} || []

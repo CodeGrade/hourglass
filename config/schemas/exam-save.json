@@ -255,8 +255,17 @@
       "anyOf": [
         { "$ref": "#/definitions/RubricAll" },
         { "$ref": "#/definitions/RubricAny" },
-        { "$ref": "#/definitions/RubricOne" }
+        { "$ref": "#/definitions/RubricOne" },
+        { "$ref": "#/definitions/NoRubric" }
       ]
+    },
+    "NoRubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["none"] }
+      }
     },
     "RubricAll": {
       "type": "object",

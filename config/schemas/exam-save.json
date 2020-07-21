@@ -215,14 +215,23 @@
       "items": { "$ref": "#/definitions/BodyItemAnswer" }
     },
     "VersionRubric": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/QuestionRubric" }
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["questions"],
+      "properties": {
+        "examRubric": { "$ref": "#/definitions/Rubric" },
+        "questions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/QuestionRubric" }
+        }
+      }
     },
     "QuestionRubric": {
       "type": "object",
       "additionalProperties": false,
       "required": ["parts"],
       "properties": {
+        "questionRubric": { "$ref": "#/definitions/Rubric" },
         "parts": {
           "type": "array",
           "items": { "$ref": "#/definitions/PartRubric" }
@@ -232,22 +241,10 @@
     "PartRubric": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["part", "body"],
+      "required": ["body"],
       "properties": {
-        "part": { "$ref": "#/definitions/Rubrics" },
-        "body": { "$ref": "#/definitions/BodyRubrics" }
-      }
-    },
-    "BodyRubrics": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/BodyRubric" }
-    },
-    "BodyRubric": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["rubrics"],
-      "properties": {
-        "rubrics": { "$ref": "#/definitions/Rubrics" }
+        "partRubric": { "$ref": "#/definitions/Rubric" },
+        "body": { "$ref": "#/definitions/Rubrics" }
       }
     },
     "Rubrics": {
@@ -256,51 +253,81 @@
     },
     "Rubric": {
       "anyOf": [
-        { "$ref": "#/definitions/ItemRubric" },
-        { "$ref": "#/definitions/ConditionalRubric" }
+        { "$ref": "#/definitions/RubricAll" },
+        { "$ref": "#/definitions/RubricAny" },
+        { "$ref": "#/definitions/RubricOne" }
       ]
     },
-    "ConditionalRubric": {
+    "RubricAll": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["condition", "rubrics"],
+      "required": ["type", "choices"],
       "properties": {
-        "condition": { "$ref": "#/definitions/HTML" },
-        "rubrics": { "$ref": "#/definitions/Rubrics" }
+        "type": { "enum": ["all"] },
+        "description": { "$ref": "#/definitions/HTML" },
+        "choices": {
+          "oneOf": [
+            { "$ref": "#/definitions/Rubrics" }, 
+            { "$ref": "#/definitions/RubricPresets" }
+          ]
+        }
       }
     },
-    "ItemRubric": {
+    "RubricAny": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["points", "label", "description", "direction"],
+      "required": ["type", "points", "choices"],
       "properties": {
+        "type": { "enum": ["any"] },
         "points": { "type": "number" },
         "description": { "$ref": "#/definitions/HTML" },
+        "choices": {
+          "oneOf": [
+            { "$ref": "#/definitions/Rubrics" }, 
+            { "$ref": "#/definitions/RubricPresets" }
+          ]
+        }
+      }
+    },
+    "RubricOne": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "points", "choices"],
+      "properties": {
+        "type": { "enum": ["one"] },
+        "points": { "type": "number" },
+        "description": { "$ref": "#/definitions/HTML" },
+        "choices": {
+          "oneOf": [
+            { "$ref": "#/definitions/Rubrics" }, 
+            { "$ref": "#/definitions/RubricPresets" }
+          ]
+        }
+      }
+    },
+    "RubricPresets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["direction", "presets"],
+      "properties": {
         "label": { "type": "string" },
-        "direction": {
-          "enum": ["credit", "deduction"]
-        },
-        "mercy": {
-          "type": "object",
-          "additionalProperties": false,
-          "required": ["scope", "limit"],
-          "properties": {
-            "scope": { "enum": ["exam", "question", "part"] },
-            "limit": { "type": "number" }
-          }
-        },
+        "direction": { "enum": ["credit", "deduction"] },
+        "mercy": { "type": "number"},
         "presets": {
           "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["description", "points"],
-            "properties": {
-              "points": { "type": "number" },
-              "description": { "$ref": "#/definitions/HTML" }
-            }
-          }
+          "items": { "$ref": "#/definitions/Preset" }
         }
+      }
+    },
+    "Preset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["graderHint", "points"],
+      "properties": {
+        "label": { "type": "string" },
+        "graderHint": { "$ref": "#/definitions/HTML" },
+        "studentFeedback": { "$ref": "#/definitions/HTML" },
+        "points": { "type": "number" }
       }
     },
     "BodyItemAnswer": {

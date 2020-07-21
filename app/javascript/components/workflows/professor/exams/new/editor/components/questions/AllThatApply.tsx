@@ -16,7 +16,7 @@ import {
   FormSection,
 } from 'redux-form';
 import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
-import { AllThatApplyOptionWithAnswer } from '@student/exams/show/types';
+import { AllThatApplyOptionWithAnswer } from '@professor/exams/types';
 import Icon from '@student/exams/show/components/Icon';
 import { FaCheck } from 'react-icons/fa';
 

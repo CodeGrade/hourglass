@@ -14,6 +14,7 @@ import {
   AnswerState,
 } from '@student/exams/show/types';
 import { RenderError } from '@hourglass/common/boundary';
+import { isExamRubric, assertType } from '@professor/exams/types';
 
 import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
 
@@ -33,6 +34,7 @@ const EditExamVersion: React.FC = () => {
         answers
         anyStarted
         anyFinalized
+        rawRubrics
       }
     }
     `,
@@ -76,6 +78,7 @@ const EditExamVersion: React.FC = () => {
         versionName={examVersion.name}
         versionPolicies={examVersion.policies as readonly Policy[]}
         answers={parsedContents.answers}
+        rubrics={assertType(isExamRubric, res.props.examVersion.rawRubrics)}
       />
     </Container>
   );

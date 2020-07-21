@@ -5,7 +5,7 @@ import {
   Dropdown,
   DropdownButton,
 } from 'react-bootstrap';
-import { BodyItemWithAnswer } from '@student/exams/show/types';
+import { BodyItemWithAnswer } from '@professor/exams/types';
 import { WrappedFieldArrayProps } from 'redux-form';
 import BodyItem from '@professor/exams/new/editor/components/BodyItem';
 import { languages } from '@professor/exams/new/editor/components/questions/Code';

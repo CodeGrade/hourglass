@@ -16,6 +16,7 @@ import {
 import { PartFilesContext } from '@student/exams/show/context';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
+import { RubricEditor } from '@professor/exams/new/editor';
 import { EditHTMLField } from './editHTMLs';
 import EditReference from './Reference';
 
@@ -147,6 +148,9 @@ const Part: React.FC<{
           </Card.Subtitle>
         </Alert>
         <Card.Body>
+          <FormSection name="partRubric">
+            <Field name="type" format={null} component={RubricEditor} />
+          </FormSection>
           <Field
             name="reference"
             component={PartReferenceProvider}

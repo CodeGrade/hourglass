@@ -19,7 +19,7 @@ import {
   WrappedFieldArrayProps,
 } from 'redux-form';
 import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
-import { MatchingPromptWithAnswer } from '@student/exams/show/types';
+import { MatchingPromptWithAnswer } from '@professor/exams/types';
 import './Matching.css';
 
 interface MatchingProps {

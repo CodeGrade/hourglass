@@ -1,0 +1,15 @@
+.rubric {
+  > .alert { 
+    background-color: gray; 
+  }
+  .rubric {
+    > .alert { 
+      background-color: rgba(255, 255, 255, 0.65); 
+      margin-bottom: 0;
+    }
+  }
+  
+  .alert > .form-group.row:last-of-type {
+    margin-bottom: 0;
+  }
+}

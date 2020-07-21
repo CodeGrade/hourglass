@@ -6,6 +6,7 @@ import {
   Alert,
   Form,
   Row,
+  Col,
 } from 'react-bootstrap';
 import {
   ExamVersion,
@@ -13,21 +14,27 @@ import {
   Policy,
   ExamFile,
   FileRef,
-  ExamVersionWithAnswers,
   QuestionInfo,
   PartInfo,
   BodyItem,
-  QuestionInfoWithAnswers,
-  PartInfoWithAnswers,
-  BodyItemWithAnswer,
   AllThatApplyState,
   AllThatApplyInfo,
-  AllThatApplyInfoWithAnswer,
   AnswerState,
-  MatchingInfoWithAnswer,
   MatchingInfo,
   MatchingState,
 } from '@student/exams/show/types';
+import {
+  BodyItemWithAnswer,
+  ExamVersionWithAnswers,
+  QuestionInfoWithAnswers,
+  PartInfoWithAnswers,
+  AllThatApplyInfoWithAnswer,
+  MatchingInfoWithAnswer,
+  Rubric,
+  ExamRubric,
+  isRubricPresets,
+  RubricPresets,
+} from '@professor/exams/types';
 import {
   reduxForm,
   InjectedFormProps,
@@ -36,6 +43,7 @@ import {
   WrappedFieldProps,
   formValueSelector,
   FieldArray,
+  WrappedFieldArrayProps,
 } from 'redux-form';
 import { Provider, connect } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
@@ -49,6 +57,9 @@ import FileUploader from '@professor/exams/new/editor/components/FileUploader';
 import ShowQuestions from '@professor/exams/new/editor/components/ShowQuestions';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import { useMutation, graphql } from 'relay-hooks';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { EditHTMLField } from './components/editHTMLs';
+import '@professor/exams/rubrics.scss';
 
 export interface Version {
   name: string;
@@ -67,6 +78,7 @@ export interface Version {
 function transformATAReverse(
   ata: AllThatApplyInfo,
   answer: AllThatApplyState,
+  rubric: Rubric,
 ): AllThatApplyInfoWithAnswer {
   const {
     options,
@@ -78,6 +90,7 @@ function transformATAReverse(
   }));
   return {
     ...rest,
+    rubric,
     options: newOptions,
   };
 }
@@ -85,6 +98,7 @@ function transformATAReverse(
 function transformMatchingReverse(
   matching: MatchingInfo,
   answer: MatchingState,
+  rubric: Rubric,
 ): MatchingInfoWithAnswer {
   const {
     prompts,
@@ -96,12 +110,17 @@ function transformMatchingReverse(
   }));
   return {
     ...rest,
+    rubric,
     prompts: newPrompts,
   };
 }
 
 
-function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): ExamVersionWithAnswers {
+function examWithAnswersAndRubrics(
+  exam: ExamVersion,
+  answers: AnswersState['answers'],
+  rubric: ExamRubric,
+): ExamVersionWithAnswers {
   const {
     questions,
     ...restOfE
@@ -112,23 +131,26 @@ function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): E
       parts,
       ...restOfQ
     } = q;
+    const qRubric = rubric?.questions[qnum];
     const newParts: PartInfoWithAnswers[] = [];
     parts.forEach((p, pnum) => {
       const {
         body,
         ...restOfP
       } = p;
+      const pRubric = qRubric?.parts[pnum];
       const newBody: BodyItemWithAnswer[] = [];
       body.forEach((b, bnum) => {
+        const bRubric = pRubric?.body[bnum];
         const ans = answers[qnum][pnum][bnum];
         let newItem: BodyItemWithAnswer;
         switch (b.type) {
           case 'AllThatApply': {
-            newItem = transformATAReverse(b, ans as AllThatApplyState);
+            newItem = transformATAReverse(b, ans as AllThatApplyState, bRubric);
             break;
           }
           case 'Matching': {
-            newItem = transformMatchingReverse(b, ans as MatchingState);
+            newItem = transformMatchingReverse(b, ans as MatchingState, bRubric);
             break;
           }
           default:
@@ -141,16 +163,19 @@ function examWithAnswers(exam: ExamVersion, answers: AnswersState['answers']): E
       });
       newParts.push({
         ...restOfP,
+        partRubric: pRubric?.partRubric,
         body: newBody,
       });
     });
     newQuestions.push({
       ...restOfQ,
       parts: newParts,
+      questionRubric: qRubric?.questionRubric,
     });
   });
   return {
     ...restOfE,
+    examRubric: rubric.examRubric,
     questions: newQuestions,
   };
 }
@@ -161,6 +186,7 @@ export interface ExamEditorProps {
   versionName: string;
   versionPolicies: readonly Policy[];
   answers: AnswersState;
+  rubrics: ExamRubric;
 }
 
 const Editor: React.FC<ExamEditorProps> = (props) => {
@@ -170,14 +196,15 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
     versionName,
     versionPolicies,
     answers,
+    rubrics,
   } = props;
   const initialValues = useMemo(() => ({
     all: {
       name: versionName,
       policies: versionPolicies,
-      exam: examWithAnswers(exam, answers.answers),
+      exam: examWithAnswersAndRubrics(exam, answers.answers, rubrics),
     },
-  }), [versionName, versionPolicies, answers.answers, exam]);
+  }), [versionName, versionPolicies, answers.answers, exam, rubrics]);
   return (
     <Provider store={store}>
       <ExamEditorForm
@@ -207,6 +234,165 @@ function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
     );
   };
 }
+
+const RubricPresetEditor: React.FC = () => (
+  <Alert variant="warning">
+    <Form.Group as={Row}>
+      <Form.Label column sm="2">Label</Form.Label>
+      <Col sm="4">
+        <Field name="label" component="input" type="text" className="w-100" />
+      </Col>
+      <Form.Label column sm="2">Points</Form.Label>
+      <Col sm="4">
+        <Field name="points" component="input" type="number" className="w-100" />
+      </Col>
+    </Form.Group>
+    <Form.Group as={Row}>
+      <Form.Label column sm="2">Grader hint</Form.Label>
+      <Col sm="10">
+        <Field
+          className="bg-white border rounded"
+          name="graderHint"
+          component={EditHTMLField}
+          theme="bubble"
+          placeholder="Give a description to graders to use"
+        />
+      </Col>
+    </Form.Group>
+    <Form.Group as={Row}>
+      <Form.Label column sm="2">Student feedback</Form.Label>
+      <Col sm="10">
+        <Field
+          className="bg-white border rounded"
+          name="studentFeedback"
+          component={EditHTMLField}
+          theme="bubble"
+          placeholder="Give a default message to students -- if blank, will use the grader hint"
+        />
+      </Col>
+    </Form.Group>
+  </Alert>
+);
+
+const RubricPresetsArrayEditor: React.FC<
+  WrappedFieldArrayProps<RubricPresets['presets'][number]>
+> = (props) => {
+  const { fields } = props;
+  return (
+    <>
+      {fields.map((member, index) => (
+        <FormSection
+          // eslint-disable-next-line react/no-array-index-key
+          key={index}
+          name={member}
+        >
+          <RubricPresetEditor />
+        </FormSection>
+      ))}
+    </>
+  );
+};
+
+
+const RubricPresetsEditor: React.FC = () => (
+  <FormSection name="choices">
+    <Form.Group as={Row}>
+      <Form.Label column sm="1">Label</Form.Label>
+      <Col sm="3">
+        <Field name="label" component="input" type="text" className="w-100" />
+      </Col>
+      <Form.Label column sm="2">Direction</Form.Label>
+      <Col sm="3">
+        <Field name="direction" component="input" type="text" className="w-100" />
+      </Col>
+      <Form.Label column sm="1">Points</Form.Label>
+      <Col sm="2">
+        <Field name="points" component="input" type="number" className="w-100" />
+      </Col>
+    </Form.Group>
+    {/* Mercy:
+    <i>{mercy}</i> */}
+    <Form.Label>Presets</Form.Label>
+    <FieldArray name="presets" component={RubricPresetsArrayEditor} />
+  </FormSection>
+);
+
+const WrappedRubricPresetsEditor = wrapInput(RubricPresetsEditor);
+
+const RubricEntriesEditor: React.FC<{
+  value: Rubric[] | RubricPresets,
+}> = (props) => {
+  const { value } = props;
+  if (isRubricPresets(value)) {
+    return <Field name="choices" component={WrappedRubricPresetsEditor} />;
+  }
+  // eslint-disable-next-line no-use-before-define
+  return <FieldArray name="choices" component={RubricsArrayEditor} />
+};
+
+const WrappedRubricEntriesEditor = wrapInput(RubricEntriesEditor);
+
+const RubricAllAnyOneEditor: React.FC<WrappedFieldProps & {
+  prompt: string
+}> = (props) => {
+  const { prompt } = props;
+  return (
+    <Alert variant="dark">
+      <Alert.Heading>
+        Rubric: Choose something from
+        <i className="mx-1">{prompt}</i>
+        entries
+      </Alert.Heading>
+      <Field
+        className="bg-white border rounded"
+        name="description"
+        component={EditHTMLField}
+        theme="bubble"
+        placeholder="Give rubric instructions here"
+      />
+      <Field name="choices" component={WrappedRubricEntriesEditor} />
+    </Alert>
+  );
+};
+
+export const RubricEditor: React.FC<WrappedFieldProps> = (props) => {
+  const { input, meta } = props;
+  const { value } = input;
+  if (value === undefined) {
+    return <p>TODO: no rubric here yet</p>;
+  }
+  const type = value as Rubric['type'];
+  let prompt = '';
+  switch (type) {
+    case 'all': prompt = 'all'; break;
+    case 'any': prompt = 'any'; break;
+    case 'one': prompt = 'exactly one of the'; break;
+    default:
+      throw new ExhaustiveSwitchError(type);
+  }
+  return (
+    <div className="rubric">
+      <RubricAllAnyOneEditor prompt={prompt} input={input} meta={meta} />
+    </div>
+  );
+};
+
+const RubricsArrayEditor: React.FC<WrappedFieldArrayProps<Rubric>> = (props) => {
+  const { fields } = props;
+  return (
+    <>
+      {fields.map((member, index) => (
+        <FormSection
+          // eslint-disable-next-line react/no-array-index-key
+          key={index}
+          name={member}
+        >
+          <Field name="type" component={RubricEditor} />
+        </FormSection>
+      ))}
+    </>
+  );
+};
 
 const WrappedName = wrapInput(Name);
 const WrappedPolicies = wrapInput(Policies);
@@ -298,21 +484,29 @@ function transformForSubmit(values: FormValues): Version {
   const { all } = values;
   const questions: QuestionInfo[] = [];
   const answers: AnswersState['answers'] = [];
+  const rubrics: ExamRubric = { examRubric: all.exam.examRubric, questions: [] };
   all.exam.questions.forEach((q, qnum) => {
     answers[qnum] = [];
     const {
       parts,
+      questionRubric,
       ...restOfQ
     } = q;
+    rubrics.questions[qnum] = { questionRubric, parts: [] };
     const newParts: PartInfo[] = [];
     parts.forEach((p, pnum) => {
       answers[qnum][pnum] = [];
       const {
         body,
+        partRubric,
         ...restOfP
       } = p;
+      rubrics.questions[qnum].parts[pnum] = { partRubric, body: [] };
       const newBody: BodyItem[] = [];
       body.forEach((b, bnum) => {
+        if ('rubric' in b) {
+          rubrics.questions[qnum].parts[pnum].body[bnum] = b.rubric;
+        }
         let itemAnswer: AnswerState;
         let bodyItem: BodyItem;
         switch (b.type) {
@@ -434,7 +628,7 @@ const ExamEditor: React.FC<
     },
   );
   const loading = saveLoading || autosaveLoading;
-  useEffect(() => {
+  /* useEffect(() => {
     const timer = setInterval(() => {
       handleSubmit((values) => {
         const {
@@ -457,7 +651,7 @@ const ExamEditor: React.FC<
     return () => {
       clearInterval(timer);
     };
-  }, [handleSubmit]);
+  }, [handleSubmit]); */
   return (
     <form
       onSubmit={(e): void => {
@@ -498,6 +692,9 @@ const ExamEditor: React.FC<
                 label="the entire exam"
               />
             </Form.Group>
+            <FormSection name="examRubric">
+              <Field name="type" component={RubricEditor} />
+            </FormSection>
             <FieldArray name="questions" component={ShowQuestions} />
           </FormContextProviderConnected>
         </FormSection>

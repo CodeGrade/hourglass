@@ -14,10 +14,12 @@ import CustomEditor, { CustomEditorProps } from './CustomEditor';
 
 export const EditHTMLField: React.FC<WrappedFieldProps & {
   theme?: CustomEditorProps['theme'];
+  className?: string;
   placeholder?: CustomEditorProps['placeholder'];
 }> = (props) => {
   const {
     input,
+    className = 'bg-white',
     theme,
     placeholder,
   } = props;
@@ -27,7 +29,7 @@ export const EditHTMLField: React.FC<WrappedFieldProps & {
   } = input;
   return (
     <CustomEditor
-      className="bg-white"
+      className={className}
       theme={theme}
       value={value.value}
       placeholder={placeholder}

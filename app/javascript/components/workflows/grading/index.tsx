@@ -19,6 +19,7 @@ import {
   Collapse,
   Table,
   Container,
+  Accordion,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
@@ -513,18 +514,20 @@ const ConditionalRubric: React.FC<{
   const variants: AlertProps['variant'][] = ['light', 'secondary', 'dark'];
   const variant: AlertProps['variant'] = variants[depth] ?? 'primary';
   return (
-    <Alert variant={variant} className="pb-0">
-      <Row>
-        <Col>
-          <HTML value={res.condition} />
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          {children}
-        </Col>
-      </Row>
-    </Alert>
+    <Card className="border-0">
+      <Alert variant={variant} className="p-0 m-0 rounded-0 bg-transparent">
+        <Accordion.Toggle as={Card.Header} eventKey={res.condition.value} className="rounded-0">
+          <Col className="rounded-0">
+            <HTML value={res.condition} />
+          </Col>
+        </Accordion.Toggle>
+        <Accordion.Collapse as={Card.Body} eventKey={res.condition.value}>
+          <>
+            {children}
+          </>
+        </Accordion.Collapse>
+      </Alert>
+    </Card>
   );
 };
 
@@ -600,7 +603,7 @@ const ShowNestedConditionalRubric: React.FC<{
     bnum,
   } = props;
   return (
-    <ConditionalRubric key={rubric.condition.value} conditionalRubricKey={rubric} depth={2}>
+    <ConditionalRubric conditionalRubricKey={rubric} depth={2}>
       {rubric.rubrics.map((innerRubric) => {
         // eslint-disable-next-line no-underscore-dangle
         if (innerRubric.__typename === 'ItemRubric') {
@@ -618,22 +621,24 @@ const ShowNestedConditionalRubric: React.FC<{
         // eslint-disable-next-line no-underscore-dangle
         if (innerRubric.__typename === 'ConditionalRubric') {
           return (
-            <ConditionalRubric
-              key={innerRubric.condition.value}
-              conditionalRubricKey={innerRubric}
-              depth={1}
-            >
-              {innerRubric.rubrics.map((innerInnerRubric) => (
-                <ItemRubric
-                  key={innerInnerRubric.label}
-                  itemRubricKey={innerInnerRubric}
-                  registrationId={registrationId}
-                  qnum={qnum}
-                  pnum={pnum}
-                  bnum={bnum}
-                />
-              ))}
-            </ConditionalRubric>
+            <Accordion>
+              <ConditionalRubric
+                key={innerRubric.condition.value}
+                conditionalRubricKey={innerRubric}
+                depth={1}
+              >
+                {innerRubric.rubrics.map((innerInnerRubric) => (
+                  <ItemRubric
+                    key={innerInnerRubric.label}
+                    itemRubricKey={innerInnerRubric}
+                    registrationId={registrationId}
+                    qnum={qnum}
+                    pnum={pnum}
+                    bnum={bnum}
+                  />
+                ))}
+              </ConditionalRubric>
+            </Accordion>
           );
         }
         return null;
@@ -642,7 +647,7 @@ const ShowNestedConditionalRubric: React.FC<{
   );
 };
 
-type Rubrics = gradingRubric$data['rubrics'][number]['parts'][number]['part'];
+export type Rubrics = gradingRubric$data['rubrics'][number]['parts'][number]['part'];
 type Rubric = Rubrics[number];
 type ConditionalRubric = Extract<Rubric, { __typename: 'ConditionalRubric' }>;
 type ItemRubric = Extract<Rubric, { __typename: 'ItemRubric' }>;
@@ -657,7 +662,7 @@ function isItemRubric(rubric: Rubric): rubric is ItemRubric {
   return rubric.__typename === 'ItemRubric';
 }
 
-const ShowRubric: React.FC<{
+export const ShowRubric: React.FC<{
   rubric: gradingRubric$data;
   qnum: number;
   pnum: number;
@@ -702,10 +707,10 @@ const ShowRubric: React.FC<{
     return null;
   };
   return (
-    <>
+    <Accordion>
       {partRubric.map(showRubric)}
       {bodyRubric.map(showRubric)}
-    </>
+    </Accordion>
   );
 };
 
@@ -1144,7 +1149,7 @@ function AnswersRow<T, V>(
     examVersionKey,
   );
   const partRubric = res.rubrics[qnum].parts[pnum].part;
-  const bodyRubric = res.rubrics[qnum].parts[pnum].body[bnum].rubrics;
+  const bodyRubric = res.rubrics[qnum].parts[pnum]?.body[bnum]?.rubrics ?? [];
   return (
     <Card>
       <Card.Body>

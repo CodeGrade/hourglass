@@ -54,6 +54,13 @@ module Types
       guard Guards::PROFESSORS
     end
 
+    field :raw_rubrics, GraphQL::Types::JSON, null: true do
+      guard Guards::PROFESSORS
+    end
+    def raw_rubrics
+      object.rubrics
+    end
+
     field :file_export_url, String, null: false do
       guard Guards::PROFESSORS
     end

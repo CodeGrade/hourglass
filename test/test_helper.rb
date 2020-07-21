@@ -5,7 +5,10 @@ require_relative '../config/environment'
 require 'rails/test_help'
 
 require 'minitest/reporters'
-Minitest::Reporters.use! [Minitest::Reporters::SpecReporter.new]
+Minitest::Reporters.use! [
+  Minitest::Reporters::DefaultReporter.new(color: true, detailed_skip: false)
+  #Minitest::Reporters::SpecReporter.new
+]
 
 Selenium::WebDriver::Chrome::Service.driver_path = `which chromedriver`.chomp
 

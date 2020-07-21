@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useContext } from 'react';
 import { QuestionInfo } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import Part from '@proctor/registrations/show/Part';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
-import { QuestionFilesContext } from '@student/exams/show/context';
+import { QuestionFilesContext, ExamViewerContext } from '@hourglass/common/context';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
+import ShowRubric from '@proctor/registrations/show/ShowRubric';
 
 interface ShowQuestionProps {
   refreshCodeMirrorsDeps: React.DependencyList;
@@ -24,6 +25,8 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     description,
     parts,
   } = question;
+  const { rubric } = useContext(ExamViewerContext);
+  const qRubric = rubric?.questions[qnum]?.questionRubric;
   const singlePart = parts.length === 1 && !parts[0].name.value;
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
@@ -47,6 +50,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             refreshProps={refreshCodeMirrorsDeps}
           />
         )}
+        {qRubric && <ShowRubric rubric={qRubric} />}
         {parts.map((p, i) => (
           <Part
             // Part numbers are STATIC.

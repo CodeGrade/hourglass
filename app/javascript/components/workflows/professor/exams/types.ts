@@ -96,7 +96,8 @@ export interface ExamVersionWithAnswers extends Omit<ExamVersion, 'questions'> {
   examRubric?: Rubric;
 }
 
-type Preset = {
+export type Preset = {
+  label?: string;
   graderHint: HTMLVal;
   studentFeedback?: HTMLVal;
   points: number;
@@ -132,14 +133,21 @@ export function isRubricPresets(obj : unknown): obj is RubricPresets {
     && array(isPreset)(objAsRubricPresets.presets);
 }
 
-export type Rubric = RubricAll | RubricAny | RubricOne;
+export type Rubric = RubricAll | RubricAny | RubricOne | RubricNone;
 
 export function isRubric(obj : unknown): obj is Rubric {
   // mutual recursion trips up this rule
   // eslint-disable-next-line no-use-before-define
-  return isRubricAll(obj) || isRubricAny(obj) || isRubricOne(obj);
+  return isRubricAll(obj) || isRubricAny(obj) || isRubricOne(obj) || isRubricNone(obj);
 }
 
+export type RubricNone = {
+  type: 'none'
+}
+export function isRubricNone(obj : unknown): obj is RubricNone {
+  return (obj !== undefined && obj !== null)
+    && (obj as RubricNone).type === 'none';
+}
 
 export type RubricAll = {
   type: 'all';

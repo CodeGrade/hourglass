@@ -9,7 +9,7 @@ import {
   BottomScrollspy,
 } from '@student/exams/show/containers/scrollspy/Question';
 import SubmitButton from '@student/exams/show/containers/SubmitButton';
-import { QuestionFilesContext } from '@student/exams/show/context';
+import { QuestionFilesContext } from '@hourglass/common/context';
 
 interface ShowQuestionProps {
   examTakeUrl: string;

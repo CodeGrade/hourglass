@@ -69,6 +69,7 @@ import {
   useQuery,
 } from 'relay-hooks';
 import { uploadFile } from '@hourglass/common/types/api';
+import { ExamRubric, assertType, isExamRubric } from '@professor/exams/types';
 import './dnd.scss';
 
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
@@ -715,6 +716,7 @@ const ShowVersion: React.FC<{
       instructions
       files
       answers
+      rawRubrics
     }
     `,
     version,
@@ -840,6 +842,7 @@ const ShowVersion: React.FC<{
         <PreviewVersion
           open={preview}
           contents={parsedContents}
+          rubric={assertType(isExamRubric, res.rawRubrics)}
         />
       </ErrorBoundary>
     </>
@@ -849,10 +852,12 @@ const ShowVersion: React.FC<{
 const PreviewVersion: React.FC<{
   open: boolean;
   contents: ContentsState;
+  rubric?: ExamRubric;
 }> = (props) => {
   const {
     open,
     contents,
+    rubric,
   } = props;
   return (
     <Collapse in={open}>
@@ -860,6 +865,7 @@ const PreviewVersion: React.FC<{
         <ExamViewer
           contents={contents}
           refreshCodeMirrorsDeps={[open]}
+          rubric={rubric}
         />
       </div>
     </Collapse>

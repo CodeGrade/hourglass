@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { ExamViewerContext } from '@student/exams/show/context';
+import { ExamViewerContext } from '@hourglass/common/context';
 import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import DisplayCodeTag from '@proctor/registrations/show/questions/DisplayCodeTag';
@@ -15,6 +15,7 @@ import {
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import Prompted from '@proctor/registrations/show/questions/Prompted';
+import ShowRubric from '@proctor/registrations/show/ShowRubric';
 
 export interface BodyProps {
   refreshCodeMirrorsDeps: React.DependencyList;
@@ -34,9 +35,11 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
   } = props;
   const {
     answers,
+    rubric,
   } = useContext(ExamViewerContext);
   const answer = answers.answers[qnum]?.[pnum]?.[bnum];
   const value = isNoAns(answer) ? undefined : answer;
+  const bRubric = rubric?.questions[qnum]?.parts[pnum]?.body[bnum];
 
   switch (body.type) {
     case 'HTML':
@@ -49,40 +52,51 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
             value={value as CodeState}
             refreshProps={refreshCodeMirrorsDeps}
           />
+          {bRubric && <ShowRubric rubric={bRubric} />}
         </Prompted>
       );
     case 'AllThatApply':
       return (
         <Prompted prompt={body.prompt}>
           <DisplayAllThatApply info={body} value={value as AllThatApplyState} />
+          {bRubric && <ShowRubric rubric={bRubric} />}
         </Prompted>
       );
     case 'CodeTag':
       return (
         <Prompted prompt={body.prompt}>
           <DisplayCodeTag info={body} value={value as CodeTagState} />
+          {bRubric && <ShowRubric rubric={bRubric} />}
         </Prompted>
       );
     case 'YesNo':
       return (
         <Prompted prompt={body.prompt}>
           <DisplayYesNo info={body} value={value as YesNoState} />
+          {bRubric && <ShowRubric rubric={bRubric} />}
         </Prompted>
       );
     case 'MultipleChoice':
       return (
         <Prompted prompt={body.prompt}>
           <DisplayMultipleChoice info={body} value={value as MultipleChoiceState} />
+          {bRubric && <ShowRubric rubric={bRubric} />}
         </Prompted>
       );
     case 'Text':
       return (
         <Prompted prompt={body.prompt}>
           <DisplayText info={body} value={value as TextState} />
+          {bRubric && <ShowRubric rubric={bRubric} />}
         </Prompted>
       );
     case 'Matching':
-      return <DisplayMatching info={body} value={value as MatchingState} />;
+      return (
+        <>
+          <DisplayMatching info={body} value={value as MatchingState} />
+          {bRubric && <ShowRubric rubric={bRubric} />}
+        </>
+      );
     default:
       throw new ExhaustiveSwitchError(body);
   }

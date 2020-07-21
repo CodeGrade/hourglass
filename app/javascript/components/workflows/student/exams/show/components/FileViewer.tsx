@@ -12,7 +12,7 @@ import { Row, Col } from 'react-bootstrap';
 import {
   CodeTagState, FileRef, ExamFile, FileMap,
 } from '@student/exams/show/types';
-import { ExamContext } from '@student/exams/show/context';
+import { ExamContext } from '@hourglass/common/context';
 import {
   firstFile,
   getFilesForRefs,

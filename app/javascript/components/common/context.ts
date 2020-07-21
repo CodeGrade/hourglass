@@ -5,6 +5,7 @@ import {
   AnswersState,
   FileRef,
 } from '@student/exams/show/types';
+import { ExamRubric } from '@professor/exams/types';
 
 interface ExamContext {
   files: ExamFile[];
@@ -14,6 +15,7 @@ export const ExamContext = createContext<ExamContext>({} as ExamContext);
 
 interface ExamViewerContext {
   answers: AnswersState;
+  rubric?: ExamRubric;
 }
 export const ExamViewerContext = createContext<ExamViewerContext>({} as ExamViewerContext);
 

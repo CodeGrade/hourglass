@@ -16,7 +16,7 @@ import {
   Fields,
   WrappedFieldsProps,
 } from 'redux-form';
-import { ExamContext } from '@student/exams/show/context';
+import { ExamContext } from '@hourglass/common/context';
 import { firstFile } from '@student/exams/show/files';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
 

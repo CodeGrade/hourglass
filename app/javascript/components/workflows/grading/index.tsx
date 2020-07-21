@@ -48,7 +48,7 @@ import {
 } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
-import { ExamViewerContext, ExamContext } from '@student/exams/show/context';
+import { ExamViewerContext, ExamContext } from '@hourglass/common/context';
 import { createMap } from '@student/exams/show/files';
 import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
 import DisplayCodeTag from '@proctor/registrations/show/questions/DisplayCodeTag';
@@ -104,13 +104,13 @@ import { gradingLock$key } from './__generated__/gradingLock.graphql';
 import { gradingLockVersion$key } from './__generated__/gradingLockVersion.graphql';
 import { gradingLockAdmin$key } from './__generated__/gradingLockAdmin.graphql';
 
-function variantForPoints(points: number): AlertProps['variant'] {
+export function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
   if (points > 0) return 'success';
   return 'warning';
 }
 
-function iconForPoints(points: number): IconType {
+export function iconForPoints(points: number): IconType {
   if (points < 0) return RiChatDeleteLine;
   if (points > 0) return RiChatCheckLine;
   return RiMessage2Line;

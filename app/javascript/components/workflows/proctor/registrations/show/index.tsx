@@ -5,21 +5,25 @@ import {
   ExamContext,
   ExamViewerContext,
   ExamFilesContext,
-} from '@student/exams/show/context';
+} from '@hourglass/common/context';
 import { createMap } from '@student/exams/show/files';
 import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
+import { ExamRubric } from '@hourglass/workflows/professor/exams/types';
+import ShowRubric from '@proctor/registrations/show/ShowRubric';
 
 interface ExamViewerProps {
   contents: ContentsState;
   refreshCodeMirrorsDeps?: React.DependencyList;
+  rubric?: ExamRubric;
 }
 
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {
   const {
     contents,
     refreshCodeMirrorsDeps,
+    rubric,
   } = props;
   const {
     exam,
@@ -37,6 +41,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
   }), [files]);
   const examViewerContextVal = useMemo(() => ({
     answers,
+    rubric,
   }), [answers]);
   const examFilesContextVal = useMemo(() => ({
     references: reference,
@@ -62,6 +67,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
                 references={reference}
               />
             )}
+            {rubric?.examRubric && <ShowRubric rubric={rubric.examRubric} />}
             <div>
               <DisplayQuestions
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}

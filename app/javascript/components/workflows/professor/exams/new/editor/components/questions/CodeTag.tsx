@@ -16,7 +16,7 @@ import {
   ExamFilesContext,
   QuestionFilesContext,
   PartFilesContext,
-} from '@student/exams/show/context';
+} from '@hourglass/common/context';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { getFilesForRefs, countFiles } from '@student/exams/show/files';
 import { Fields, WrappedFieldsProps } from 'redux-form';

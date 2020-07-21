@@ -4,7 +4,7 @@ import {
   Col,
 } from 'react-bootstrap';
 import { WrappedFieldProps } from 'redux-form';
-import { ExamContext } from '@student/exams/show/context';
+import { ExamContext } from '@hourglass/common/context';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
 import { FileRef } from '@student/exams/show/types';
 

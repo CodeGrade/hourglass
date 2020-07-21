@@ -3,7 +3,7 @@ import {
   ExamVersion, Policy,
 } from '@student/exams/show/types';
 import { createMap } from '@student/exams/show/files';
-import { ExamContext, ExamFilesContext } from '@student/exams/show/context';
+import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
 import useAnomalyListeners from '@student/exams/show/lockdown/anomaly';
 import HTML from '@student/exams/show/components/HTML';
 import { Row, Col } from 'react-bootstrap';

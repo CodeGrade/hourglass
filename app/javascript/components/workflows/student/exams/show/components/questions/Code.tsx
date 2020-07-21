@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { CodeInfo, CodeState } from '@student/exams/show/types';
-import { ExamContext } from '@student/exams/show/context';
+import { ExamContext } from '@hourglass/common/context';
 import { Editor } from '@student/exams/show/components/ExamCodeBox';
 import HTML from '@student/exams/show/components/HTML';
 

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo } from 'react';
 import { createMap } from '@student/exams/show/files';
-import { ExamContext, ExamFilesContext } from '@student/exams/show/context';
+import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
 import {
   Button,
   Alert,
@@ -327,7 +327,7 @@ const RubricEntriesEditor: React.FC<{
     return <Field name="choices" component={WrappedRubricPresetsEditor} />;
   }
   // eslint-disable-next-line no-use-before-define
-  return <FieldArray name="choices" component={RubricsArrayEditor} />
+  return <FieldArray name="choices" component={RubricsArrayEditor} />;
 };
 
 const WrappedRubricEntriesEditor = wrapInput(RubricEntriesEditor);
@@ -338,11 +338,11 @@ const RubricAllAnyOneEditor: React.FC<WrappedFieldProps & {
   const { prompt } = props;
   return (
     <Alert variant="dark">
-      <Alert.Heading>
+      <h5>
         Rubric: Choose something from
         <i className="mx-1">{prompt}</i>
         entries
-      </Alert.Heading>
+      </h5>
       <Field
         className="bg-white border rounded"
         name="description"
@@ -358,12 +358,13 @@ const RubricAllAnyOneEditor: React.FC<WrappedFieldProps & {
 export const RubricEditor: React.FC<WrappedFieldProps> = (props) => {
   const { input, meta } = props;
   const { value } = input;
-  if (value === undefined) {
+  if (value === undefined || value === '') {
     return <p>TODO: no rubric here yet</p>;
   }
   const type = value as Rubric['type'];
   let prompt = '';
   switch (type) {
+    case 'none': return <p>No rubric</p>;
     case 'all': prompt = 'all'; break;
     case 'any': prompt = 'any'; break;
     case 'one': prompt = 'exactly one of the'; break;
@@ -628,7 +629,7 @@ const ExamEditor: React.FC<
     },
   );
   const loading = saveLoading || autosaveLoading;
-  /* useEffect(() => {
+  useEffect(() => {
     const timer = setInterval(() => {
       handleSubmit((values) => {
         const {
@@ -651,7 +652,7 @@ const ExamEditor: React.FC<
     return () => {
       clearInterval(timer);
     };
-  }, [handleSubmit]); */
+  }, [handleSubmit]);
   return (
     <form
       onSubmit={(e): void => {

@@ -15,7 +15,7 @@ import {
   FieldArray,
   FormSection,
 } from 'redux-form';
-import { QuestionFilesContext } from '@student/exams/show/context';
+import { QuestionFilesContext } from '@hourglass/common/context';
 import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
 import EditReference from '@professor/exams/new/editor/components/Reference';
 import { YesNoInfo } from '@student/exams/show/types';

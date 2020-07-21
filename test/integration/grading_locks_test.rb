@@ -49,11 +49,12 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     })
   end
 
-  def attempt_unlock(user, reg, qnum, pnum)
+  def attempt_unlock(user, reg, qnum, pnum, complete)
     HourglassSchema.do_mutation!(RELEASE_LOCK_MUTATION, user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
       qnum: qnum,
       pnum: pnum,
+      markComplete: complete,
     })
   end
 
@@ -106,11 +107,12 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     @student_reg1.reload
     assert_equal 1, @student_reg1.grading_locks.length
     assert_equal @ta, @student_reg1.grading_locks.first.grader
-    res = attempt_unlock(@ta, @student_reg1, 0, 0)
+    res = attempt_unlock(@ta, @student_reg1, 0, 0, true)
     assert_not res['errors']
     assert res['data']['releaseGradingLock']['released']
     @student_reg1.reload
-    assert_equal 0, @student_reg1.grading_locks.length
+    assert_equal 1, @student_reg1.grading_locks.length
+    assert_equal @ta, @student_reg1.grading_locks.first.completed_by
   end
 
   test "grader cannot release another grader's lock" do
@@ -121,11 +123,12 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     assert_equal 1, @student_reg1.grading_locks.length
     assert_equal @ta, @student_reg1.grading_locks.first.grader
 
-    res = attempt_unlock(@grader, @student_reg1, 0, 0)
+    res = attempt_unlock(@grader, @student_reg1, 0, 0, true)
     assert_not res['errors'].empty?
     assert_match(/do not have permission/, res['errors'][0]['message'])
     @student_reg1.reload
     assert_equal 1, @student_reg1.grading_locks.length
+    assert_nil @student_reg1.grading_locks.first.completed_by
   end
 
   test 'professor can release a lock belonging to a grader' do
@@ -136,11 +139,13 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     assert_equal 1, @student_reg1.grading_locks.length
     assert_equal @ta, @student_reg1.grading_locks.first.grader
 
-    res = attempt_unlock(@prof, @student_reg1, 0, 0)
+    res = attempt_unlock(@prof, @student_reg1, 0, 0, false)
     assert_not res['errors']
     assert res['data']['releaseGradingLock']['released']
     @student_reg1.reload
-    assert_equal 0, @student_reg1.grading_locks.length
+    assert_equal 1, @student_reg1.grading_locks.length
+    assert_nil @student_reg1.grading_locks.first.completed_by
+    assert_nil @student_reg1.grading_locks.first.grader
   end
 
   test 'release multiple locks' do

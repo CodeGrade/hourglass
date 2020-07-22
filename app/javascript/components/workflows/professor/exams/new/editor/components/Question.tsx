@@ -19,7 +19,7 @@ import { QuestionFilesContext } from '@hourglass/common/context';
 import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
 import EditReference from '@professor/exams/new/editor/components/Reference';
 import { YesNoInfo } from '@student/exams/show/types';
-import { RubricEditor } from '@professor/exams/new/editor';
+import RubricEditor from '@professor/exams/new/editor/RubricEditor';
 
 const SEP_SUB_YESNO: YesNoInfo = {
   type: 'YesNo',
@@ -139,9 +139,7 @@ const Question: React.FC<{
           </Card.Subtitle>
         </Alert>
         <Card.Body>
-          <FormSection name="questionRubric">
-            <Field name="type" format={null} component={RubricEditor} />
-          </FormSection>
+          <Field name="questionRubric" rubricField="questionRubric" component={RubricEditor} />
           <Field
             name="reference"
             component={QuestionReferenceProvider}

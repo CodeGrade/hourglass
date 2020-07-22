@@ -17,7 +17,7 @@ import { createMap, getFilesForRefs } from '@student/exams/show/files';
 import { ExamContext } from '@hourglass/common/context';
 import { InputGroup, Button, Collapse } from 'react-bootstrap';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-import { pluralize } from '@hourglass/common/helpers';
+import { pluralize, SelectOption, SelectOptions } from '@hourglass/common/helpers';
 
 export interface FilePickerProps {
   options: ExamFile[];
@@ -61,10 +61,8 @@ const FilePicker: React.FC<FilePickerProps> = (props) => {
   );
 };
 
-interface FileRefOption {
-  value: FileRef;
-  label: string;
-}
+type FileRefOption = SelectOption<FileRef>;
+type FileRefOptions = SelectOptions<FileRef>;
 
 const Group: React.FC<GroupProps<FileRefOption>> = (props) => {
   const {
@@ -95,7 +93,7 @@ const FilePickerSelect: React.FC<FilePickerProps> = (props) => {
   } = props;
   const selectOptions = useMemo(() => {
     const allIds = createMap(options);
-    const allOptions = Object.keys(allIds).map((relPath) => ({
+    const allOptions: SelectOptions<FileRef> = Object.keys(allIds).map((relPath) => ({
       label: relPath,
       value: {
         type: allIds[relPath].filedir,
@@ -109,7 +107,7 @@ const FilePickerSelect: React.FC<FilePickerProps> = (props) => {
     // or else the bubbles won't show up in the select control.
     return [{ options: allOptions }];
   }, [options]);
-  const value = useMemo(() => (
+  const value: FileRefOptions = useMemo(() => (
     selected.map((s) => ({
       label: s.path,
       // This toString is needed because otherwise some CSS

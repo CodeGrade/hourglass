@@ -2,7 +2,7 @@ import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { Policy } from '@student/exams/show/types';
 import Select from 'react-select';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, SelectOption, SelectOptions } from '@hourglass/common/helpers';
 
 export interface PoliciesProps {
   value: Policy[];
@@ -16,11 +16,10 @@ const policyToString = (p: Policy): string => {
     default: throw new ExhaustiveSwitchError(p);
   }
 };
-interface PolicyOption {
-  value: Policy;
-  label: string;
-}
-const policyValues: PolicyOption[] = Object.keys(Policy).map((policy) => ({
+type PolicyOption = SelectOption<Policy>;
+type PolicyOptions = SelectOptions<Policy>;
+
+const policyValues: PolicyOptions = Object.keys(Policy).map((policy) => ({
   value: Policy[policy],
   label: policyToString(Policy[policy]),
 }));

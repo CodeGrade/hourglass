@@ -6,8 +6,8 @@ import { useState } from 'react';
  * @param v the item being switched over
  */
 export class ExhaustiveSwitchError extends Error {
-  constructor(v: never) {
-    super(`Switch is not exhaustive on ${v}`);
+  constructor(v: never, message?: string) {
+    super(`Switch is not exhaustive on \`${JSON.stringify(v)}\`: ${message}`);
   }
 }
 
@@ -41,3 +41,10 @@ export function pluralize(number: number, singular: string, plural: string): str
   }
   return `${number} ${plural}`;
 }
+
+export type SelectOption<T> = {
+  label: string;
+  value: T;
+};
+
+export type SelectOptions<T> = SelectOption<T>[];

@@ -33,7 +33,7 @@ import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import Loading from '@hourglass/common/loading';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, SelectOption } from '@hourglass/common/helpers';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
@@ -818,7 +818,7 @@ const SingleMessage: React.FC<{
   }
 };
 
-type FilterVals = { value: string; label: string; };
+type FilterVals = SelectOption<string>;
 
 const ShowMessages: React.FC<{
   replyTo: (regId: string) => void;
@@ -1419,10 +1419,7 @@ const ExamMessages: React.FC<{
   );
 };
 
-interface MessageFilterOption {
-  value: Recipient;
-  label: string;
-}
+type MessageFilterOption = SelectOption<Recipient>;
 
 const SendMessageButton: React.FC<{
   recipient: Recipient;

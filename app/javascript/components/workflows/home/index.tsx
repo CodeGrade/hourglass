@@ -11,6 +11,7 @@ import { RenderError } from '@hourglass/common/boundary';
 import Select from 'react-select';
 import { Button, Container } from 'react-bootstrap';
 import LinkButton from '@hourglass/common/linkbutton';
+import { SelectOption } from '@hourglass/common/helpers';
 
 import { homeQuery } from './__generated__/homeQuery.graphql';
 import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
@@ -173,10 +174,7 @@ const ShowProfRegs: React.FC<{
   );
 };
 
-interface ImpersonateVal {
-  label: string;
-  value: string;
-}
+type ImpersonateVal = SelectOption<string>
 
 const Admin: React.FC = () => {
   const res = useQuery(

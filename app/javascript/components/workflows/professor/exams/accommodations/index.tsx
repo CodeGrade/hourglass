@@ -12,6 +12,7 @@ import Icon from '@student/exams/show/components/Icon';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { BsPencilSquare } from 'react-icons/bs';
 import { AlertContext } from '@hourglass/common/alerts';
+import { SelectOption, SelectOptions } from '@hourglass/common/helpers';
 import { FaTrash } from 'react-icons/fa';
 import Select from 'react-select';
 import { DateTime } from 'luxon';
@@ -273,10 +274,7 @@ const SingleAccommodation: React.FC<{
   );
 };
 
-interface Selection {
-  label: string;
-  value: string;
-}
+type Selection = SelectOption<string>;
 
 const NewAccommodation: React.FC<{
   exam: accommodations_regsWithout$key;
@@ -304,7 +302,9 @@ const NewAccommodation: React.FC<{
     `,
     exam,
   );
-  const sorted = [...regsNoAccommodation.registrationsWithoutAccommodation.edges].sort(
+  const sorted: SelectOptions<string> = [
+    ...regsNoAccommodation.registrationsWithoutAccommodation.edges,
+  ].sort(
     (a, b) => a.node.user.displayName.localeCompare(b.node.user.displayName),
   ).map(({ node }) => ({
     label: node.user.displayName,

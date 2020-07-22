@@ -11,7 +11,7 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Card } from 'react-bootstrap';
 import { Field, WrappedFieldProps, FormSection } from 'redux-form';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
-import { RubricEditor } from '@professor/exams/new/editor';
+import RubricEditor from '@professor/exams/new/editor/RubricEditor';
 import { EditHTMLField } from './editHTMLs';
 
 const OneItem: React.FC<WrappedFieldProps & {
@@ -123,8 +123,12 @@ const Body: React.FC<BodyProps> = (props) => {
           bnum={bnum}
           memberName={memberName}
         />
-        <FormSection name={`${memberName}.rubric`}>
-          <Field name="type" component={RubricEditor} />
+        <FormSection name={memberName}>
+          <Field
+            name="rubric"
+            rubricField="rubric"
+            component={RubricEditor}
+          />
         </FormSection>
       </Card.Body>
     </Card>

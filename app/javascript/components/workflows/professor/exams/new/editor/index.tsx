@@ -6,7 +6,6 @@ import {
   Alert,
   Form,
   Row,
-  Col,
 } from 'react-bootstrap';
 import {
   ExamVersion,
@@ -32,8 +31,6 @@ import {
   MatchingInfoWithAnswer,
   Rubric,
   ExamRubric,
-  isRubricPresets,
-  RubricPresets,
 } from '@professor/exams/types';
 import {
   reduxForm,
@@ -43,7 +40,6 @@ import {
   WrappedFieldProps,
   formValueSelector,
   FieldArray,
-  WrappedFieldArrayProps,
 } from 'redux-form';
 import { Provider, connect } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
@@ -55,11 +51,9 @@ import Instructions from '@professor/exams/new/editor/components/Instructions';
 import EditReference from '@professor/exams/new/editor/components/Reference';
 import FileUploader from '@professor/exams/new/editor/components/FileUploader';
 import ShowQuestions from '@professor/exams/new/editor/components/ShowQuestions';
+import RubricEditor from '@professor/exams/new/editor/RubricEditor';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import { useMutation, graphql } from 'relay-hooks';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { EditHTMLField } from './components/editHTMLs';
-import '@professor/exams/rubrics.scss';
 
 export interface Version {
   name: string;
@@ -156,6 +150,7 @@ function examWithAnswersAndRubrics(
           default:
             newItem = {
               ...b,
+              rubric: bRubric,
               answer: isNoAns(ans) ? undefined : ans,
             } as BodyItemWithAnswer;
         }
@@ -230,170 +225,12 @@ function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
   return (props) => {
     const { input } = props;
     return (
-      <Wrappee value={input.value} onChange={input.onChange} />
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      <Wrappee {...props} value={input.value} onChange={input.onChange} />
     );
   };
 }
 
-const RubricPresetEditor: React.FC = () => (
-  <Alert variant="warning">
-    <Form.Group as={Row}>
-      <Form.Label column sm="2">Label</Form.Label>
-      <Col sm="4">
-        <Field name="label" component="input" type="text" className="w-100" />
-      </Col>
-      <Form.Label column sm="2">Points</Form.Label>
-      <Col sm="4">
-        <Field name="points" component="input" type="number" className="w-100" />
-      </Col>
-    </Form.Group>
-    <Form.Group as={Row}>
-      <Form.Label column sm="2">Grader hint</Form.Label>
-      <Col sm="10">
-        <Field
-          className="bg-white border rounded"
-          name="graderHint"
-          component={EditHTMLField}
-          theme="bubble"
-          placeholder="Give a description to graders to use"
-        />
-      </Col>
-    </Form.Group>
-    <Form.Group as={Row}>
-      <Form.Label column sm="2">Student feedback</Form.Label>
-      <Col sm="10">
-        <Field
-          className="bg-white border rounded"
-          name="studentFeedback"
-          component={EditHTMLField}
-          theme="bubble"
-          placeholder="Give a default message to students -- if blank, will use the grader hint"
-        />
-      </Col>
-    </Form.Group>
-  </Alert>
-);
-
-const RubricPresetsArrayEditor: React.FC<
-  WrappedFieldArrayProps<RubricPresets['presets'][number]>
-> = (props) => {
-  const { fields } = props;
-  return (
-    <>
-      {fields.map((member, index) => (
-        <FormSection
-          // eslint-disable-next-line react/no-array-index-key
-          key={index}
-          name={member}
-        >
-          <RubricPresetEditor />
-        </FormSection>
-      ))}
-    </>
-  );
-};
-
-
-const RubricPresetsEditor: React.FC = () => (
-  <FormSection name="choices">
-    <Form.Group as={Row}>
-      <Form.Label column sm="1">Label</Form.Label>
-      <Col sm="3">
-        <Field name="label" component="input" type="text" className="w-100" />
-      </Col>
-      <Form.Label column sm="2">Direction</Form.Label>
-      <Col sm="3">
-        <Field name="direction" component="input" type="text" className="w-100" />
-      </Col>
-      <Form.Label column sm="1">Points</Form.Label>
-      <Col sm="2">
-        <Field name="points" component="input" type="number" className="w-100" />
-      </Col>
-    </Form.Group>
-    {/* Mercy:
-    <i>{mercy}</i> */}
-    <Form.Label>Presets</Form.Label>
-    <FieldArray name="presets" component={RubricPresetsArrayEditor} />
-  </FormSection>
-);
-
-const WrappedRubricPresetsEditor = wrapInput(RubricPresetsEditor);
-
-const RubricEntriesEditor: React.FC<{
-  value: Rubric[] | RubricPresets,
-}> = (props) => {
-  const { value } = props;
-  if (isRubricPresets(value)) {
-    return <Field name="choices" component={WrappedRubricPresetsEditor} />;
-  }
-  // eslint-disable-next-line no-use-before-define
-  return <FieldArray name="choices" component={RubricsArrayEditor} />;
-};
-
-const WrappedRubricEntriesEditor = wrapInput(RubricEntriesEditor);
-
-const RubricAllAnyOneEditor: React.FC<WrappedFieldProps & {
-  prompt: string
-}> = (props) => {
-  const { prompt } = props;
-  return (
-    <Alert variant="dark">
-      <h5>
-        Rubric: Choose something from
-        <i className="mx-1">{prompt}</i>
-        entries
-      </h5>
-      <Field
-        className="bg-white border rounded"
-        name="description"
-        component={EditHTMLField}
-        theme="bubble"
-        placeholder="Give rubric instructions here"
-      />
-      <Field name="choices" component={WrappedRubricEntriesEditor} />
-    </Alert>
-  );
-};
-
-export const RubricEditor: React.FC<WrappedFieldProps> = (props) => {
-  const { input, meta } = props;
-  const { value } = input;
-  if (value === undefined || value === '') {
-    return <p>TODO: no rubric here yet</p>;
-  }
-  const type = value as Rubric['type'];
-  let prompt = '';
-  switch (type) {
-    case 'none': return <p>No rubric</p>;
-    case 'all': prompt = 'all'; break;
-    case 'any': prompt = 'any'; break;
-    case 'one': prompt = 'exactly one of the'; break;
-    default:
-      throw new ExhaustiveSwitchError(type);
-  }
-  return (
-    <div className="rubric">
-      <RubricAllAnyOneEditor prompt={prompt} input={input} meta={meta} />
-    </div>
-  );
-};
-
-const RubricsArrayEditor: React.FC<WrappedFieldArrayProps<Rubric>> = (props) => {
-  const { fields } = props;
-  return (
-    <>
-      {fields.map((member, index) => (
-        <FormSection
-          // eslint-disable-next-line react/no-array-index-key
-          key={index}
-          name={member}
-        >
-          <Field name="type" component={RubricEditor} />
-        </FormSection>
-      ))}
-    </>
-  );
-};
 
 const WrappedName = wrapInput(Name);
 const WrappedPolicies = wrapInput(Policies);
@@ -693,9 +530,7 @@ const ExamEditor: React.FC<
                 label="the entire exam"
               />
             </Form.Group>
-            <FormSection name="examRubric">
-              <Field name="type" component={RubricEditor} />
-            </FormSection>
+            <Field name="examRubric" rubricField="examRubric" component={RubricEditor} />
             <FieldArray name="questions" component={ShowQuestions} />
           </FormContextProviderConnected>
         </FormSection>

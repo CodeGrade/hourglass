@@ -16,7 +16,7 @@ import {
 import { PartFilesContext } from '@hourglass/common/context';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
-import { RubricEditor } from '@professor/exams/new/editor';
+import RubricEditor from '@professor/exams/new/editor/RubricEditor';
 import { EditHTMLField } from './editHTMLs';
 import EditReference from './Reference';
 
@@ -148,9 +148,7 @@ const Part: React.FC<{
           </Card.Subtitle>
         </Alert>
         <Card.Body>
-          <FormSection name="partRubric">
-            <Field name="type" format={null} component={RubricEditor} />
-          </FormSection>
+          <Field name="partRubric" rubricField="partRubric" component={RubricEditor} />
           <Field
             name="reference"
             component={PartReferenceProvider}

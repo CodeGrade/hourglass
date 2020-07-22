@@ -4,6 +4,8 @@ import {
   Form,
   Row,
   Col,
+  ButtonGroup,
+  ToggleButton,
 } from 'react-bootstrap';
 import ErrorBoundary from '@hourglass/common/boundary';
 import {
@@ -51,7 +53,13 @@ const RubricPresetEditor: React.FC = () => (
       </Col>
       <Form.Label column sm="2">Points</Form.Label>
       <Col sm="4">
-        <Field name="points" component="input" type="number" className="w-100" />
+        <Field
+          name="points"
+          component="input"
+          type="number"
+          className="w-100"
+          normalize={(newval) => Number.parseInt(newval, 10)}
+        />
       </Col>
     </Form.Group>
     <Form.Group as={Row}>
@@ -100,39 +108,68 @@ const RubricPresetsArrayEditor: React.FC<
   );
 };
 
-
-const RubricPresetsEditor: React.FC<{
-  value: unknown;
-  showPoints?: boolean
+const RubricPresetDirectionEditor: React.FC<{
+  value: RubricPresets['direction'];
+  onChange: (newval: RubricPresets['direction']) => void;
 }> = (props) => {
-  const { showPoints = true } = props;
+  const { value, onChange } = props;
+  const values = [
+    { name: 'Credit', value: 'credit' },
+    { name: 'Deduction', value: 'deduction' },
+  ];
   return (
-    <FormSection name="choices">
-      <Form.Group as={Row}>
-        <Form.Label column sm="1">Label</Form.Label>
-        <Col sm="3">
-          <Field name="label" component="input" type="text" className="w-100" />
-        </Col>
-        <Form.Label column sm="2">Direction</Form.Label>
-        <Col sm="3">
-          <Field name="direction" component="input" type="text" className="w-100" />
-        </Col>
-        {showPoints && (
-          <>
-            <Form.Label column sm="1">Points</Form.Label>
-            <Col sm="2">
-              <Field name="points" component="input" type="number" className="w-100" />
-            </Col>
-          </>
-        )}
-      </Form.Group>
-      {/* Mercy:
-      <i>{mercy}</i> */}
-      <Form.Label>Presets</Form.Label>
-      <FieldArray name="presets" component={RubricPresetsArrayEditor} />
-    </FormSection>
+    <ButtonGroup toggle>
+      {values.map((val) => {
+        const checked = (value === val.value);
+        return (
+          <ToggleButton
+            key={val.value}
+            type="radio"
+            variant={checked ? 'secondary' : 'outline-secondary'}
+            className={checked ? '' : 'bg-white'}
+            name="radio"
+            value={val.value}
+            checked={checked}
+            onChange={(e) => onChange(e.currentTarget.value)}
+          >
+            {val.name}
+          </ToggleButton>
+        );
+      })}
+    </ButtonGroup>
   );
 };
+
+const WrappedPresetDirectionEditor = wrapInput(RubricPresetDirectionEditor);
+
+const RubricPresetsEditor: React.FC = () => (
+  <FormSection name="choices">
+    <Form.Group as={Row}>
+      <Form.Label column sm="1">Label</Form.Label>
+      <Col sm="3">
+        <Field name="label" component="input" type="text" className="w-100" />
+      </Col>
+      <Form.Label column sm="2">Direction</Form.Label>
+      <Col sm="3">
+        <Field name="direction" component={WrappedPresetDirectionEditor} />
+      </Col>
+      <Form.Label column sm="1">Points</Form.Label>
+      <Col sm="2">
+        <Field
+          name="points"
+          component="input"
+          type="number"
+          className="w-100"
+          normalize={(newval) => Number.parseInt(newval, 10)}
+        />
+      </Col>
+    </Form.Group>
+    {/* Mercy:
+    <i>{mercy}</i> */}
+    <Form.Label>Presets</Form.Label>
+    <FieldArray name="presets" component={RubricPresetsArrayEditor} />
+  </FormSection>
+);
 
 const WrappedRubricPresetsEditor = wrapInput(RubricPresetsEditor);
 

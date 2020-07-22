@@ -65,6 +65,7 @@ export interface Version {
       questions: ExamVersion['questions'];
       reference: ExamVersion['reference'];
     };
+    rubrics: ExamRubric;
   };
   files: ExamVersion['files'];
 }
@@ -271,11 +272,12 @@ const FormContextProviderConnected = connect((state) => ({
 function transformATA(
   ata: AllThatApplyInfoWithAnswer,
 ): {
-  info: AllThatApplyInfo,
-  answer: AllThatApplyState,
+  info: AllThatApplyInfo;
+  answer: AllThatApplyState;
 } {
   const {
     options,
+    rubric,
     ...rest
   } = ata;
   const answer = [];
@@ -296,11 +298,12 @@ function transformATA(
 function transformMatching(
   matching: MatchingInfoWithAnswer,
 ): {
-  info: MatchingInfo,
-  answer: MatchingState,
+  info: MatchingInfo;
+  answer: MatchingState;
 } {
   const {
     prompts,
+    rubric,
     ...rest
   } = matching;
   const answer = [];
@@ -342,11 +345,9 @@ function transformForSubmit(values: FormValues): Version {
       rubrics.questions[qnum].parts[pnum] = { partRubric, body: [] };
       const newBody: BodyItem[] = [];
       body.forEach((b, bnum) => {
-        if ('rubric' in b) {
-          rubrics.questions[qnum].parts[pnum].body[bnum] = b.rubric;
-        }
         let itemAnswer: AnswerState;
         let bodyItem: BodyItem;
+        rubrics.questions[qnum].parts[pnum].body[bnum] = b.rubric;
         switch (b.type) {
           case 'AllThatApply': {
             const res = transformATA(b);
@@ -363,6 +364,7 @@ function transformForSubmit(values: FormValues): Version {
           default: {
             const {
               answer,
+              rubric,
               ...restOfB
             } = b;
             itemAnswer = answer;
@@ -393,6 +395,7 @@ function transformForSubmit(values: FormValues): Version {
         questions,
         reference: all.exam.reference ?? [],
       },
+      rubrics,
     },
     files: all.exam.files,
   };
@@ -470,6 +473,7 @@ const ExamEditor: React.FC<
   const loading = saveLoading || autosaveLoading;
   useEffect(() => {
     const timer = setInterval(() => {
+      if (undefined !== 1) return;
       handleSubmit((values) => {
         const {
           name,

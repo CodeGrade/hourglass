@@ -32,10 +32,12 @@ function array<T>(isT: (val: unknown) => val is T): (val: unknown) => val is T[]
 
 export interface CodeInfoWithAnswer extends CodeInfo {
   answer: CodeState;
+  rubric?: Rubric;
 }
 
 export interface HTMLValWithAnswer extends HTMLVal {
   answer: NoAnswerState;
+  rubric?: Rubric;
 }
 
 export interface AllThatApplyOptionWithAnswer {

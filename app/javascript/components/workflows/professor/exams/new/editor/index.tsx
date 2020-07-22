@@ -440,6 +440,7 @@ const ExamEditor: React.FC<
           variant: 'danger',
           title: 'Exam version not updated.',
           message: <pre>{err.message}</pre>,
+          copyButton: true,
         });
       },
     },
@@ -461,6 +462,7 @@ const ExamEditor: React.FC<
           title: 'Error doing autosave',
           message: <pre>{err.message}</pre>,
           autohide: true,
+          copyButton: true,
         });
       },
     },

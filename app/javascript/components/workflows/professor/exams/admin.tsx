@@ -136,6 +136,7 @@ const ExamInformation: React.FC<{
           variant: 'danger',
           title: 'Error saving exam info.',
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -619,6 +620,7 @@ const VersionInfo: React.FC<{
           variant: 'danger',
           title: 'Exam version not created.',
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -648,6 +650,7 @@ const VersionInfo: React.FC<{
                   variant: 'danger',
                   title: 'Exam version not imported.',
                   message: err.message,
+                  copyButton: true,
                 });
               });
             }}
@@ -744,6 +747,7 @@ const ShowVersion: React.FC<{
           variant: 'danger',
           title: 'Error deleting version.',
           message: err.message,
+          copyButton: true,
         });
       },
       configs: [
@@ -895,6 +899,7 @@ const StartGradingButton: React.FC = () => {
           variant: 'danger',
           title: 'Error setting up grading',
           message: err.message,
+          copyButton: true,
         });
       },
     },

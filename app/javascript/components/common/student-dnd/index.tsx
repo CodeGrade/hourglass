@@ -273,6 +273,7 @@ const StudentDNDForm: React.FC<
           variant: 'danger',
           title: 'Room assignments not created.',
           message: err.message,
+          copyButton: true,
         });
       },
     },

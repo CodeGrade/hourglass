@@ -320,6 +320,7 @@ const ShowPreset: React.FC<{
           variant: 'danger',
           title: 'Error creating comment.',
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -943,6 +944,7 @@ const SavedComment: React.FC<{
           variant: 'danger',
           title: 'Error deleting comment',
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -1482,6 +1484,7 @@ const Grade: React.FC<{
           variant: 'danger',
           title: 'Error completing grading',
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -1634,6 +1637,7 @@ const BeginGradingButton: React.FC = () => {
           variant: 'danger',
           title: 'Error getting started',
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -1703,6 +1707,7 @@ const GradingLock: React.FC<{
           variant: 'danger',
           title: 'Error releasing lock',
           message: err.message,
+          copyButton: true,
         });
       },
     },

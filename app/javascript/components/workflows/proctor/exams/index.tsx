@@ -219,6 +219,7 @@ const FinalizeButton: React.FC<{
           variant: 'danger',
           title: 'Error finalizing registration',
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -287,6 +288,7 @@ const ClearButton: React.FC<{
           variant: 'danger',
           title: 'Error clearing anomaly',
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -502,6 +504,7 @@ const ShowAnomalies: React.FC<{
                       variant: 'danger',
                       title: 'Error fetching additional anomalies.',
                       message: error.message,
+                      copyButton: true,
                     });
                   },
                   {},
@@ -559,6 +562,7 @@ const FinalizeRegs: React.FC<{
           variant: 'danger',
           title: `Error finalizing '${selectedRecipient.label}'`,
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -1454,6 +1458,7 @@ const SendMessageButton: React.FC<{
           variant: 'danger',
           title: 'Error sending message',
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -1604,6 +1609,7 @@ const SplitViewLoaded: React.FC<{
         variant: 'danger',
         title: 'Error replying to message',
         message: `Invalid registration ID: ${registrationId}`,
+        copyButton: true,
       });
     }
     setSelectedRecipient(recip);

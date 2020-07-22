@@ -47,6 +47,7 @@ const DoSync: React.FC<{
           variant: 'danger',
           title: 'Error syncing course',
           message: err.message,
+          copyButton: true,
         });
       },
     },

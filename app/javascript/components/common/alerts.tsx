@@ -3,17 +3,21 @@ import React, {
   useEffect,
   useContext,
   useMemo,
+  useRef,
 } from 'react';
-import { AlertProps, Toast } from 'react-bootstrap';
+import { AlertProps, Toast, Button } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import './alerts.scss';
 import { DateTime } from 'luxon';
+import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
+import { FaCopy } from 'react-icons/fa';
 
 interface HGAlert {
   title?: string;
   message?: string | JSX.Element;
   variant: AlertProps['variant'];
   autohide?: boolean;
+  copyButton?: boolean;
 }
 
 interface HGAlertWithID extends HGAlert {
@@ -31,8 +35,10 @@ const ShowAlert: React.FC<{
     title,
     message,
     variant,
+    copyButton = false,
   } = alert;
   const [show, setShow] = useState(true);
+  const bodyRef = useRef<HTMLDivElement>();
   return (
     <Toast
       className={`border-${variant}`}
@@ -43,9 +49,22 @@ const ShowAlert: React.FC<{
     >
       <Toast.Header>
         <strong className="mr-auto">{title}</strong>
+        {copyButton && (
+          <Button
+            size="sm"
+            className="p-0"
+            variant={variant}
+            onClick={async () => {
+              const text = bodyRef.current.innerText;
+              await navigator.clipboard.writeText(text);
+            }}
+          >
+            <Icon I={FaCopy} />
+          </Button>
+        )}
       </Toast.Header>
       {message && (
-        <Toast.Body>{message}</Toast.Body>
+        <Toast.Body><div ref={bodyRef}>{message}</div></Toast.Body>
       )}
     </Toast>
   );

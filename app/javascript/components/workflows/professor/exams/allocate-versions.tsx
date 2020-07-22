@@ -261,6 +261,7 @@ const StudentDNDForm: React.FC<
           variant: 'danger',
           title: 'Allocations not created.',
           message: err.message,
+          copyButton: true,
         });
       },
     },

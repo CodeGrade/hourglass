@@ -302,6 +302,7 @@ const ExamRoomsForm: React.FC<
           variant: 'danger',
           title: 'Failed saving rooms.',
           message: err.message,
+          copyButton: true,
         });
       },
     },

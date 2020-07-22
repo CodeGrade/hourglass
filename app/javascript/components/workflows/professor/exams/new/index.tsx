@@ -39,6 +39,7 @@ const NewExamForm: React.FC<{
           variant: 'danger',
           title: 'Error creating exam.',
           message: err.message,
+          copyButton: true,
         });
       },
     },

@@ -144,6 +144,7 @@ const SingleAccommodation: React.FC<{
           variant: 'danger',
           title: 'Error deleting accommodation',
           message: err.message,
+          copyButton: true,
         });
       },
       configs: [
@@ -196,6 +197,7 @@ const SingleAccommodation: React.FC<{
           variant: 'danger',
           title: 'Error updating accommodation',
           message: err.message,
+          copyButton: true,
         });
       },
     },
@@ -341,6 +343,7 @@ const NewAccommodation: React.FC<{
           variant: 'danger',
           title: 'Error creating accommodation',
           message: err.message,
+          copyButton: true,
         });
       },
       configs: [

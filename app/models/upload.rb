@@ -186,7 +186,11 @@ class Upload
             {
               partRubric: convert_rubric(p['partRubric']),
               body: p['body']&.map do |b|
-                convert_rubric(b['rubric'])
+                if (b.is_a? Hash)
+                  convert_rubric(b.values.first['rubric'])
+                else
+                  convert_rubric(nil)
+                end
               end || [],
             }
           end || [],

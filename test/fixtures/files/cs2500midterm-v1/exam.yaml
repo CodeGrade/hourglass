@@ -168,10 +168,11 @@ contents:
             - Matching:
                 rubric:
                   type: all
+                  description: <b>Q2-PA-B2</b> matching rubric
                   choices:
                     - type: one
                       points: 8
-                      description: <b>Q2-PA-B2</b> rubric
+                      description: <b>Q2-PA-B2</b> choice rubric
                       choices: []
                 promptsLabel: "Match <i>from here</i>.."
                 valuesLabel: "across <i>to here</i>."

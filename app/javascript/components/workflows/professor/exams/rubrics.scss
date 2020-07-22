@@ -1,4 +1,8 @@
 .rubric {
+  margin-top: 15px;
+  &:first-child { margin-top: 0px; }
+  margin-bottom: 15px;
+  &:last-child { margin-bottom: 0px; }
   > .alert { 
     background-color: gray; 
   }

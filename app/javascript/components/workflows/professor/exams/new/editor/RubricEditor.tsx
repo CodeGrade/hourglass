@@ -7,6 +7,14 @@ import {
   ButtonGroup,
   ToggleButton,
 } from 'react-bootstrap';
+import {
+  FormSection,
+  Field,
+  FieldArray,
+  WrappedFieldArrayProps,
+  WrappedFieldProps,
+} from 'redux-form';
+import Select from 'react-select';
 import ErrorBoundary from '@hourglass/common/boundary';
 import {
   Rubric,
@@ -17,17 +25,10 @@ import {
   RubricPresets,
   RubricNone,
 } from '@professor/exams/types';
-import {
-  FormSection,
-  Field,
-  FieldArray,
-  WrappedFieldArrayProps,
-  WrappedFieldProps,
-} from 'redux-form';
+import Tooltip from '@student/exams/show/components/Tooltip';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
-import Select from 'react-select';
+import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
 import { ExhaustiveSwitchError, SelectOption, SelectOptions } from '@hourglass/common/helpers';
-import { EditHTMLField } from './components/editHTMLs';
 import '@professor/exams/rubrics.scss';
 
 type WrappedInput<T> = React.ComponentType<{ value: T; onChange: (a: T) => void; }>;
@@ -152,26 +153,28 @@ const RubricPresetDirectionEditor: React.FC<{
 }> = (props) => {
   const { value, onChange } = props;
   const values = [
-    { name: 'Credit', value: 'credit' },
-    { name: 'Deduction', value: 'deduction' },
+    { name: 'Credit', value: 'credit', message: 'Grade counts up from zero' },
+    { name: 'Deduction', value: 'deduction', message: 'Grade counts down from this section of points' },
   ];
   return (
     <ButtonGroup toggle>
       {values.map((val) => {
         const checked = (value === val.value);
         return (
-          <ToggleButton
-            key={val.value}
-            type="radio"
-            variant={checked ? 'secondary' : 'outline-secondary'}
-            className={checked ? '' : 'bg-white'}
-            name="radio"
-            value={val.value}
-            checked={checked}
-            onChange={(e) => onChange(e.currentTarget.value)}
-          >
-            {val.name}
-          </ToggleButton>
+          <Tooltip message={val.message}>
+            <ToggleButton
+              key={val.value}
+              type="radio"
+              variant={checked ? 'secondary' : 'outline-secondary'}
+              className={checked ? '' : 'bg-white'}
+              name="radio"
+              value={val.value}
+              checked={checked}
+              onChange={(e) => onChange(e.currentTarget.value)}
+            >
+              {val.name}
+            </ToggleButton>
+          </Tooltip>
         );
       })}
     </ButtonGroup>
@@ -180,43 +183,65 @@ const RubricPresetDirectionEditor: React.FC<{
 
 const WrappedPresetDirectionEditor = wrapInput(RubricPresetDirectionEditor);
 
-const RubricPresetsEditor: React.FC = () => (
-  <FormSection name="choices">
-    <Form.Group as={Row}>
-      <Form.Label column sm="1">Label</Form.Label>
-      <Col sm="3">
-        <Field name="label" component="input" type="text" className="w-100" />
-      </Col>
-      <Form.Label column sm="2">Direction</Form.Label>
-      <Col sm="3">
-        <Field name="direction" component={WrappedPresetDirectionEditor} />
-      </Col>
-      <Form.Label column sm="1">Points</Form.Label>
-      <Col sm="2">
-        <Field
-          name="points"
-          component="input"
-          type="number"
-          className="w-100"
-          normalize={(newval) => Number.parseInt(newval, 10)}
-        />
-      </Col>
-    </Form.Group>
-    {/* Mercy:
-    <i>{mercy}</i> */}
-    <Form.Label>Presets</Form.Label>
-    <FieldArray name="presets" component={RubricPresetsArrayEditor} />
-  </FormSection>
-);
+const RubricPresetsEditor: React.FC<{
+  showPoints: boolean;
+  value: RubricPresets;
+  onChange: (newval: RubricPresets) => void;
+}> = (props) => {
+  const { showPoints, value } = props;
+  return (
+    <FormSection name="choices">
+      <Form.Group as={Row}>
+        <Form.Label column sm="1">Label</Form.Label>
+        <Col sm="3">
+          <Field name="label" component="input" type="text" className="w-100" />
+        </Col>
+        <Form.Label column sm="2">Direction</Form.Label>
+        <Col sm="3">
+          <Field name="direction" component={WrappedPresetDirectionEditor} />
+        </Col>
+        {showPoints && (
+          <>
+            <Form.Label column sm="1">Points</Form.Label>
+            <Col sm="2">
+              <Field
+                name="points"
+                component="input"
+                type="number"
+                className="w-100"
+                normalize={(newval) => Number.parseInt(newval, 10)}
+              />
+            </Col>
+          </>
+        )}
+      </Form.Group>
+      {/* Mercy:
+      <i>{mercy}</i> */}
+      <Form.Label>
+        Presets
+        <span className="mx-2">
+          (most point values should be
+          <b className="mx-2">
+            {value.direction === 'credit' ? 'positive' : 'negative'}
+          </b>
+          in this set of presets)
+        </span>
+      </Form.Label>
+      <FieldArray name="presets" component={RubricPresetsArrayEditor} />
+    </FormSection>
+  );
+};
 
 const WrappedRubricPresetsEditor = wrapInput(RubricPresetsEditor);
 
 const RubricEntriesEditor: React.FC<{
-  value: Rubric[] | RubricPresets,
+  showPoints: boolean;
+  value: Rubric[] | RubricPresets;
+  onChange: (newval: Rubric[] | RubricPresets) => void;
 }> = (props) => {
-  const { value } = props;
+  const { showPoints, value } = props;
   if (isRubricPresets(value)) {
-    return <Field name="choices" component={WrappedRubricPresetsEditor} />;
+    return <Field name="choices" showPoints={showPoints} component={WrappedRubricPresetsEditor} />;
   }
   // eslint-disable-next-line no-use-before-define
   return <FieldArray name="choices" component={RubricsArrayEditor} />;
@@ -299,6 +324,7 @@ const ChangeRubricType: React.FC<{
       <Form.Label column sm="2"><h5 className="my-0">Rubric type</h5></Form.Label>
       <Col sm="10">
         <Select
+          className="z-1000"
           options={options}
           value={defaultOptions[value.type]}
           onChange={changeRubricType}
@@ -333,7 +359,7 @@ const EditRubricAll: React.FC<{
         theme="bubble"
         placeholder="Give use-all rubric instructions here"
       />
-      <Field name="choices" component={WrappedRubricEntriesEditor} />
+      <Field name="choices" showPoints={false} component={WrappedRubricEntriesEditor} />
     </>
   );
 };
@@ -353,7 +379,7 @@ const EditRubricAny: React.FC<{
         theme="bubble"
         placeholder="Give use-any rubric instructions here"
       />
-      <Field name="choices" component={WrappedRubricEntriesEditor} />
+      <Field name="choices" showPoints component={WrappedRubricEntriesEditor} />
     </>
   );
 };
@@ -373,7 +399,7 @@ const EditRubricOne: React.FC<{
         theme="bubble"
         placeholder="Give use-one rubric instructions here"
       />
-      <Field name="choices" component={WrappedRubricEntriesEditor} />
+      <Field name="choices" showPoints component={WrappedRubricEntriesEditor} />
     </>
   );
 };
@@ -431,7 +457,7 @@ const RubricEditor: React.FC<{
       {enableMovers && (
         <MoveItem
           visible={moversVisible}
-          variant="warning"
+          variant="secondary"
           enableUp={enableUp}
           enableDown={enableDown}
           onUp={moveUp}

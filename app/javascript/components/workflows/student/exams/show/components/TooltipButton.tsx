@@ -11,7 +11,7 @@ interface TooltipButtonProps {
   onClick?: () => void;
   variant?: ButtonProps['variant'];
   className?: React.HTMLAttributes<HTMLButtonElement>['className'];
-  cursorClass?: 'cursor-help' | 'cursor-not-allowed';
+  cursorClass?: string;
   size?: ButtonProps['size'];
 }
 

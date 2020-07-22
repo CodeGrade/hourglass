@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Alert,
   Form,
@@ -24,6 +24,7 @@ import {
   WrappedFieldArrayProps,
   WrappedFieldProps,
 } from 'redux-form';
+import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import Select from 'react-select';
 import { ExhaustiveSwitchError, SelectOption, SelectOptions } from '@hourglass/common/helpers';
 import { EditHTMLField } from './components/editHTMLs';
@@ -44,50 +45,81 @@ function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
 }
 
 
-const RubricPresetEditor: React.FC = () => (
-  <Alert variant="warning">
-    <Form.Group as={Row}>
-      <Form.Label column sm="2">Label</Form.Label>
-      <Col sm="4">
-        <Field name="label" component="input" type="text" className="w-100" />
-      </Col>
-      <Form.Label column sm="2">Points</Form.Label>
-      <Col sm="4">
-        <Field
-          name="points"
-          component="input"
-          type="number"
-          className="w-100"
-          normalize={(newval) => Number.parseInt(newval, 10)}
-        />
-      </Col>
-    </Form.Group>
-    <Form.Group as={Row}>
-      <Form.Label column sm="2">Grader hint</Form.Label>
-      <Col sm="10">
-        <Field
-          className="bg-white border rounded"
-          name="graderHint"
-          component={EditHTMLField}
-          theme="bubble"
-          placeholder="Give a description to graders to use"
-        />
-      </Col>
-    </Form.Group>
-    <Form.Group as={Row}>
-      <Form.Label column sm="2">Student feedback</Form.Label>
-      <Col sm="10">
-        <Field
-          className="bg-white border rounded"
-          name="studentFeedback"
-          component={EditHTMLField}
-          theme="bubble"
-          placeholder="Give a default message to students -- if blank, will use the grader hint"
-        />
-      </Col>
-    </Form.Group>
-  </Alert>
-);
+const RubricPresetEditor: React.FC<{
+  enableUp: boolean;
+  enableDown: boolean;
+  moveDown: () => void;
+  moveUp: () => void;
+  remove: () => void;
+}> = (props) => {
+  const {
+    enableUp,
+    enableDown,
+    moveDown,
+    moveUp,
+    remove,
+  } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
+  return (
+    <Alert
+      variant="warning"
+      onMouseOver={() => setMoversVisible(true)}
+      onFocus={() => setMoversVisible(true)}
+      onMouseOut={() => setMoversVisible(false)}
+      onBlur={() => setMoversVisible(false)}
+    >
+      <MoveItem
+        visible={moversVisible}
+        variant="warning"
+        enableUp={enableUp}
+        enableDown={enableDown}
+        onUp={moveUp}
+        onDown={moveDown}
+        onDelete={remove}
+      />
+      <Form.Group as={Row}>
+        <Form.Label column sm="2">Label</Form.Label>
+        <Col sm="4">
+          <Field name="label" component="input" type="text" className="w-100" />
+        </Col>
+        <Form.Label column sm="2">Points</Form.Label>
+        <Col sm="4">
+          <Field
+            name="points"
+            component="input"
+            type="number"
+            className="w-100"
+            normalize={(newval) => Number.parseInt(newval, 10)}
+          />
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Form.Label column sm="2">Grader hint</Form.Label>
+        <Col sm="10">
+          <Field
+            className="bg-white border rounded"
+            name="graderHint"
+            component={EditHTMLField}
+            theme="bubble"
+            placeholder="Give a description to graders to use"
+          />
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Form.Label column sm="2">Student feedback</Form.Label>
+        <Col sm="10">
+          <Field
+            className="bg-white border rounded"
+            name="studentFeedback"
+            component={EditHTMLField}
+            theme="bubble"
+            placeholder="Give a default message to students -- if blank, will use the grader hint"
+          />
+        </Col>
+      </Form.Group>
+    </Alert>
+  );
+};
 
 const RubricPresetsArrayEditor: React.FC<
   WrappedFieldArrayProps<RubricPresets['presets'][number]>
@@ -101,7 +133,13 @@ const RubricPresetsArrayEditor: React.FC<
           key={index}
           name={member}
         >
-          <RubricPresetEditor />
+          <RubricPresetEditor
+            enableUp={index > 0}
+            enableDown={index + 1 < fields.length}
+            moveDown={() => fields.move(index, index + 1)}
+            moveUp={() => fields.move(index, index - 1)}
+            remove={() => fields.remove(index)}
+          />
         </FormSection>
       ))}
     </>
@@ -186,11 +224,30 @@ const RubricEntriesEditor: React.FC<{
 
 const WrappedRubricEntriesEditor = wrapInput(RubricEntriesEditor);
 
-const RubricWrapper: React.FC<{ name: string }> = (props) => {
-  const { name, children } = props;
+const RubricWrapper: React.FC<{
+  name: string;
+  onMouseOver: () => void;
+  onMouseOut: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
+}> = (props) => {
+  const {
+    name,
+    onMouseOver,
+    onMouseOut,
+    onFocus,
+    onBlur,
+    children,
+  } = props;
   return (
     <FormSection name={name}>
-      <div className="rubric">
+      <div
+        className="rubric"
+        onMouseOver={onMouseOver}
+        onMouseOut={onMouseOut}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      >
         <Alert variant="dark">
           {children}
         </Alert>
@@ -252,26 +309,22 @@ const ChangeRubricType: React.FC<{
 };
 
 const EditRubricNone: React.FC<{
-  rubricField: string;
   value: RubricNone;
   onChange: (newVal: Rubric) => void
 }> = (props) => {
-  const { rubricField, value, onChange } = props;
+  const { value, onChange } = props;
   return (
-    <RubricWrapper name={rubricField}>
-      <ChangeRubricType value={value} onChange={onChange} />
-    </RubricWrapper>
+    <ChangeRubricType value={value} onChange={onChange} />
   );
 };
 
 const EditRubricAll: React.FC<{
-  rubricField: string;
   value: RubricAll;
   onChange: (newVal: Rubric) => void
 }> = (props) => {
-  const { rubricField, value, onChange } = props;
+  const { value, onChange } = props;
   return (
-    <RubricWrapper name={rubricField}>
+    <>
       <ChangeRubricType value={value} onChange={onChange} />
       <Field
         className="bg-white border rounded"
@@ -281,18 +334,17 @@ const EditRubricAll: React.FC<{
         placeholder="Give use-all rubric instructions here"
       />
       <Field name="choices" component={WrappedRubricEntriesEditor} />
-    </RubricWrapper>
+    </>
   );
 };
 
 const EditRubricAny: React.FC<{
-  rubricField: string;
   value: RubricAny;
   onChange: (newVal: Rubric) => void
 }> = (props) => {
-  const { rubricField, value, onChange } = props;
+  const { value, onChange } = props;
   return (
-    <RubricWrapper name={rubricField}>
+    <>
       <ChangeRubricType value={value} onChange={onChange} />
       <Field
         className="bg-white border rounded"
@@ -302,18 +354,17 @@ const EditRubricAny: React.FC<{
         placeholder="Give use-any rubric instructions here"
       />
       <Field name="choices" component={WrappedRubricEntriesEditor} />
-    </RubricWrapper>
+    </>
   );
 };
 
 const EditRubricOne: React.FC<{
-  rubricField: string;
   value: RubricOne;
   onChange: (newVal: Rubric) => void
 }> = (props) => {
-  const { rubricField, value, onChange } = props;
+  const { value, onChange } = props;
   return (
-    <RubricWrapper name={rubricField}>
+    <>
       <ChangeRubricType value={value} onChange={onChange} />
       <Field
         className="bg-white border rounded"
@@ -323,7 +374,7 @@ const EditRubricOne: React.FC<{
         placeholder="Give use-one rubric instructions here"
       />
       <Field name="choices" component={WrappedRubricEntriesEditor} />
-    </RubricWrapper>
+    </>
   );
 };
 
@@ -332,25 +383,65 @@ const RubricEditor: React.FC<{
   rubricField: string;
   value: Rubric;
   onChange: (newval: Rubric) => void;
+  enableMovers: boolean;
+  enableUp: boolean;
+  enableDown: boolean;
+  moveDown: () => void;
+  moveUp: () => void;
+  remove: () => void;
 }> = (props) => {
-  const { rubricField, value, onChange } = props;
+  const {
+    rubricField,
+    value,
+    onChange,
+    enableMovers,
+    enableUp,
+    enableDown,
+    moveDown,
+    moveUp,
+    remove,
+  } = props;
+  const [moversVisible, setMoversVisible] = useState(false);
+  let body;
   if (value === undefined) {
-    return (
+    body = (
       <EditRubricNone
-        rubricField={rubricField}
         onChange={onChange}
         value={{ type: 'none' }}
       />
     );
+  } else {
+    switch (value.type) {
+      case 'none': body = <EditRubricNone onChange={onChange} value={value} />; break;
+      case 'any': body = <EditRubricAny onChange={onChange} value={value} />; break;
+      case 'one': body = <EditRubricOne onChange={onChange} value={value} />; break;
+      case 'all': body = <EditRubricAll onChange={onChange} value={value} />; break;
+      default:
+        throw new ExhaustiveSwitchError(value, `rubricField is ${rubricField}`);
+    }
   }
-  switch (value.type) {
-    case 'none': return <EditRubricNone rubricField={rubricField} onChange={onChange} value={value} />;
-    case 'all': return <EditRubricAll rubricField={rubricField} onChange={onChange} value={value} />;
-    case 'any': return <EditRubricAny rubricField={rubricField} onChange={onChange} value={value} />;
-    case 'one': return <EditRubricOne rubricField={rubricField} onChange={onChange} value={value} />;
-    default:
-      throw new ExhaustiveSwitchError(value, `rubricField is ${rubricField}`);
-  }
+  return (
+    <RubricWrapper
+      name={rubricField}
+      onMouseOver={() => setMoversVisible(true)}
+      onFocus={() => setMoversVisible(true)}
+      onMouseOut={() => setMoversVisible(false)}
+      onBlur={() => setMoversVisible(false)}
+    >
+      {enableMovers && (
+        <MoveItem
+          visible={moversVisible}
+          variant="warning"
+          enableUp={enableUp}
+          enableDown={enableDown}
+          onUp={moveUp}
+          onDown={moveDown}
+          onDelete={remove}
+        />
+      )}
+      {body}
+    </RubricWrapper>
+  );
 };
 
 const WrappedRubricEditor = wrapInput(RubricEditor);
@@ -365,6 +456,12 @@ const RubricsArrayEditor: React.FC<WrappedFieldArrayProps<Rubric>> = (props) => 
           key={index}
           name={member}
           rubricField={member}
+          enableMovers
+          enableUp={index > 1}
+          enableDown={index + 1 < fields.length}
+          moveDown={() => fields.move(index, index + 1)}
+          moveUp={() => fields.move(index, index - 1)}
+          remove={() => fields.remove(index)}
           component={WrappedRubricEditor}
         />
       ))}

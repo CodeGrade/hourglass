@@ -1,6 +1,7 @@
-import React from 'react';
-import Code from '@student/exams/show/components/questions/Code';
+import React, { useContext } from 'react';
 import { CodeState, CodeInfo } from '@student/exams/show/types';
+import { Editor } from '@student/exams/show/components/ExamCodeBox';
+import { ExamContext } from '@hourglass/common/context';
 
 interface CodeProps {
   info: CodeInfo;
@@ -14,8 +15,33 @@ const DisplayCode: React.FC<CodeProps> = (props) => {
     value,
     refreshProps,
   } = props;
+  const { lang, initial } = info;
+  const { fmap } = useContext(ExamContext);
+  let text = value?.text ?? undefined;
+  let marks = value?.marks ?? undefined;
+  if (initial) {
+    if ('file' in initial) {
+      const f = fmap[initial.file];
+      if (f?.filedir === 'dir') {
+        throw new Error('Code initial cannot be a directory.');
+      }
+      text = text ?? f?.contents;
+      marks = marks ?? f?.marks;
+    } else if ('text' in initial) {
+      text = text ?? initial.text;
+      marks = marks ?? initial.marks;
+    }
+  }
+  text = text ?? '';
+  marks = marks ?? [];
   return (
-    <Code info={info} value={value} disabled autosize refreshProps={refreshProps} />
+    <Editor
+      refreshProps={refreshProps}
+      disabled
+      value={text}
+      markDescriptions={marks}
+      language={lang}
+    />
   );
 };
 

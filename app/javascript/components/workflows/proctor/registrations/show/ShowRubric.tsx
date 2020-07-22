@@ -22,6 +22,7 @@ import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
 import { BsArrowUpRight, BsArrowDownRight } from 'react-icons/bs';
 import { variantForPoints, iconForPoints } from '@grading/index';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
+import Tooltip from '@student/exams/show/components/Tooltip';
 
 const ShowPreset: React.FC<{
   preset: Preset;
@@ -72,15 +73,26 @@ const ShowRubricPresets: React.FC<{ choices: RubricPresets }> = (props) => {
     presets,
     mercy,
   } = choices;
+  const disabledMessage = (direction === 'credit'
+    ? 'Credits counting up'
+    : 'Deductions counting down'
+  );
   return (
     <div>
       <Row>
         <Col>
           <ButtonGroup className="float-right">
-            <Button variant="outline-secondary" className="bg-white" size="sm" disabled>{label}</Button>
-            <Button variant="outline-secondary" className="bg-white" size="sm" disabled>
-              <Icon I={direction === 'credit' ? BsArrowUpRight : BsArrowDownRight} />
-            </Button>
+            {label && <Button variant="outline-secondary" className="bg-white" size="sm" disabled>{label}</Button>}
+            <Tooltip message={disabledMessage}>
+              <Button
+                variant="outline-secondary"
+                className="bg-white"
+                size="sm"
+                disabled
+              >
+                <Icon I={direction === 'credit' ? BsArrowUpRight : BsArrowDownRight} />
+              </Button>
+            </Tooltip>
             {mercy && (
               <Button variant="outline-secondary" className="bg-white" size="sm" disabled>
                 {`Up to ${pluralize(mercy, 'point', 'points')}`}
@@ -229,7 +241,7 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne }> = (props) => {
 const ShowRubric: React.FC<{ rubric: Rubric }> = (props) => {
   const { rubric } = props;
   switch (rubric.type) {
-    case 'none': return null;
+    case 'none': return <div><i>No rubric</i></div>;
     case 'all': return <ShowRubricAll rubric={rubric} />;
     case 'any': return <ShowRubricAny rubric={rubric} />;
     case 'one': return <ShowRubricOne rubric={rubric} />;

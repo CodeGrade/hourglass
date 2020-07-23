@@ -536,7 +536,7 @@ const ExamEditor: React.FC<
                 label="the entire exam"
               />
             </Form.Group>
-            <Field name="examRubric" rubricField="examRubric" component={RubricEditor} />
+            <Field name="examRubric" fieldName="examRubric" component={RubricEditor} />
             <FieldArray name="questions" component={ShowQuestions} />
           </FormContextProviderConnected>
         </FormSection>

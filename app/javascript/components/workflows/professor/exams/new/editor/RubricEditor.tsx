@@ -6,6 +6,9 @@ import {
   Col,
   ButtonGroup,
   ToggleButton,
+  Dropdown,
+  DropdownButton,
+  Button,
 } from 'react-bootstrap';
 import {
   FormSection,
@@ -31,15 +34,28 @@ import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs'
 import { ExhaustiveSwitchError, SelectOption, SelectOptions } from '@hourglass/common/helpers';
 import '@professor/exams/rubrics.scss';
 
-type WrappedInput<T> = React.ComponentType<{ value: T; onChange: (a: T) => void; }>;
+type WrappedInputProps<T> = {
+  value: T;
+  onChange: (a: T) => void;
+  fieldName: string;
+}
 
-function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
+type WrappedInput<T> = React.ComponentType<WrappedInputProps<T>>;
+
+function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<
+  WrappedFieldProps & WrappedInputProps<T>
+> {
   return (props) => {
-    const { input } = props;
+    const { fieldName, input } = props;
     return (
       <ErrorBoundary>
-        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-        <Wrappee {...props} value={input.value} onChange={input.onChange} />
+        <Wrappee
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          {...props}
+          fieldName={fieldName ?? input.name}
+          value={input.value}
+          onChange={input.onChange}
+        />
       </ErrorBoundary>
     );
   };
@@ -143,6 +159,21 @@ const RubricPresetsArrayEditor: React.FC<
           />
         </FormSection>
       ))}
+      <Row className="text-center">
+        <Col>
+          <Button
+            variant="warning"
+            onClick={(): void => {
+              fields.push({
+                points: 0,
+                graderHint: { type: 'HTML', value: '' },
+              });
+            }}
+          >
+            Add new preset
+          </Button>
+        </Col>
+      </Row>
     </>
   );
 };
@@ -184,11 +215,13 @@ const RubricPresetDirectionEditor: React.FC<{
 const WrappedPresetDirectionEditor = wrapInput(RubricPresetDirectionEditor);
 
 const RubricPresetsEditor: React.FC<{
-  showPoints: boolean;
+  fieldName: string;
+  type: Rubric['type'];
   value: RubricPresets;
   onChange: (newval: RubricPresets) => void;
 }> = (props) => {
-  const { showPoints, value } = props;
+  const { type, value } = props;
+  const showPoints = (type === 'any' || type === 'one');
   return (
     <FormSection name="choices">
       <Form.Group as={Row}>
@@ -196,12 +229,12 @@ const RubricPresetsEditor: React.FC<{
         <Col sm="3">
           <Field name="label" component="input" type="text" className="w-100" />
         </Col>
-        <Form.Label column sm="2">Direction</Form.Label>
-        <Col sm="3">
-          <Field name="direction" component={WrappedPresetDirectionEditor} />
-        </Col>
         {showPoints && (
           <>
+            <Form.Label column sm="2">Direction</Form.Label>
+            <Col sm="3">
+              <Field name="direction" component={WrappedPresetDirectionEditor} />
+            </Col>
             <Form.Label column sm="1">Points</Form.Label>
             <Col sm="2">
               <Field
@@ -221,7 +254,7 @@ const RubricPresetsEditor: React.FC<{
         Presets
         <span className="mx-2">
           (most point values should be
-          <b className="mx-2">
+          <b className="mx-1">
             {value.direction === 'credit' ? 'positive' : 'negative'}
           </b>
           in this set of presets)
@@ -235,16 +268,66 @@ const RubricPresetsEditor: React.FC<{
 const WrappedRubricPresetsEditor = wrapInput(RubricPresetsEditor);
 
 const RubricEntriesEditor: React.FC<{
-  showPoints: boolean;
+  fieldName: string;
+  type: Rubric['type'];
   value: Rubric[] | RubricPresets;
   onChange: (newval: Rubric[] | RubricPresets) => void;
 }> = (props) => {
-  const { showPoints, value } = props;
-  if (isRubricPresets(value)) {
-    return <Field name="choices" showPoints={showPoints} component={WrappedRubricPresetsEditor} />;
+  const {
+    fieldName,
+    type,
+    value,
+    onChange,
+  } = props;
+  const anyPresets = (isRubricPresets(value) && value.presets.length > 0);
+  const anySections = (value instanceof Array && value.length > 0);
+  const freeChoice = !(anyPresets || anySections);
+  if (freeChoice) {
+    return (
+      <Row className="text-center">
+        <Col>
+          <DropdownButton
+            id={`${fieldName}-newPreset`}
+            variant="secondary"
+            title="Add new rubric item..."
+          >
+            <Dropdown.Item
+              onClick={(): void => {
+                onChange([{
+                  type: 'none',
+                }]);
+              }}
+            >
+              Rubric section
+            </Dropdown.Item>
+            <Dropdown.Item
+              onClick={(): void => {
+                onChange({
+                  label: '',
+                  direction: 'deduction',
+                  presets: [{
+                    points: 0,
+                    graderHint: { type: 'HTML', value: '' },
+                  }],
+                });
+              }}
+            >
+              Preset comment
+            </Dropdown.Item>
+          </DropdownButton>
+        </Col>
+      </Row>
+    );
   }
-  // eslint-disable-next-line no-use-before-define
-  return <FieldArray name="choices" component={RubricsArrayEditor} />;
+  if (anyPresets) {
+    return <Field name="choices" type={type} component={WrappedRubricPresetsEditor} />;
+  }
+  return (
+    <>
+      {/* eslint-disable-next-line no-use-before-define */}
+      <FieldArray name="choices" component={RubricsArrayEditor} />
+    </>
+  );
 };
 
 const WrappedRubricEntriesEditor = wrapInput(RubricEntriesEditor);
@@ -281,29 +364,30 @@ const RubricWrapper: React.FC<{
   );
 };
 
+const defaultOptions: Record<Rubric['type'], SelectOption<Rubric['type']>> = {
+  none: {
+    label: 'No rubric',
+    value: 'none',
+  },
+  all: {
+    label: 'Use something from all entries',
+    value: 'all',
+  },
+  any: {
+    label: 'Use any applicable entries',
+    value: 'any',
+  },
+  one: {
+    label: 'Use exactly one entry',
+    value: 'one',
+  },
+};
+
 const ChangeRubricType: React.FC<{
   value: Rubric;
   onChange: (newVal: Rubric) => void;
 }> = (props) => {
   const { value, onChange } = props;
-  const defaultOptions: Record<Rubric['type'], SelectOption<Rubric['type']>> = useMemo(() => ({
-    none: {
-      label: 'No rubric',
-      value: 'none',
-    },
-    all: {
-      label: 'Use something from all entries',
-      value: 'all',
-    },
-    any: {
-      label: 'Use any applicable entries',
-      value: 'any',
-    },
-    one: {
-      label: 'Use exactly one entry',
-      value: 'one',
-    },
-  }), []);
   const options: SelectOptions<Rubric['type']> = useMemo(
     () => Object.values(defaultOptions),
     [defaultOptions],
@@ -324,7 +408,8 @@ const ChangeRubricType: React.FC<{
       <Form.Label column sm="2"><h5 className="my-0">Rubric type</h5></Form.Label>
       <Col sm="10">
         <Select
-          className="z-1000"
+          classNamePrefix="select"
+          className="z-1000-select"
           options={options}
           value={defaultOptions[value.type]}
           onChange={changeRubricType}
@@ -359,7 +444,12 @@ const EditRubricAll: React.FC<{
         theme="bubble"
         placeholder="Give use-all rubric instructions here"
       />
-      <Field name="choices" showPoints={false} component={WrappedRubricEntriesEditor} />
+      <Field
+        name="choices"
+        type={value.type}
+        format={null}
+        component={WrappedRubricEntriesEditor}
+      />
     </>
   );
 };
@@ -379,7 +469,12 @@ const EditRubricAny: React.FC<{
         theme="bubble"
         placeholder="Give use-any rubric instructions here"
       />
-      <Field name="choices" showPoints component={WrappedRubricEntriesEditor} />
+      <Field
+        name="choices"
+        type={value.type}
+        format={null}
+        component={WrappedRubricEntriesEditor}
+      />
     </>
   );
 };
@@ -399,14 +494,19 @@ const EditRubricOne: React.FC<{
         theme="bubble"
         placeholder="Give use-one rubric instructions here"
       />
-      <Field name="choices" showPoints component={WrappedRubricEntriesEditor} />
+      <Field
+        name="choices"
+        type={value.type}
+        format={null}
+        component={WrappedRubricEntriesEditor}
+      />
     </>
   );
 };
 
 
 const RubricEditor: React.FC<{
-  rubricField: string;
+  fieldName: string;
   value: Rubric;
   onChange: (newval: Rubric) => void;
   enableMovers: boolean;
@@ -417,7 +517,7 @@ const RubricEditor: React.FC<{
   remove: () => void;
 }> = (props) => {
   const {
-    rubricField,
+    fieldName,
     value,
     onChange,
     enableMovers,
@@ -443,12 +543,12 @@ const RubricEditor: React.FC<{
       case 'one': body = <EditRubricOne onChange={onChange} value={value} />; break;
       case 'all': body = <EditRubricAll onChange={onChange} value={value} />; break;
       default:
-        throw new ExhaustiveSwitchError(value, `rubricField is ${rubricField}`);
+        throw new ExhaustiveSwitchError(value, `name is ${fieldName}`);
     }
   }
   return (
     <RubricWrapper
-      name={rubricField}
+      name={fieldName}
       onMouseOver={() => setMoversVisible(true)}
       onFocus={() => setMoversVisible(true)}
       onMouseOut={() => setMoversVisible(false)}
@@ -481,7 +581,6 @@ const RubricsArrayEditor: React.FC<WrappedFieldArrayProps<Rubric>> = (props) => 
           // eslint-disable-next-line react/no-array-index-key
           key={index}
           name={member}
-          rubricField={member}
           enableMovers
           enableUp={index > 1}
           enableDown={index + 1 < fields.length}
@@ -491,6 +590,20 @@ const RubricsArrayEditor: React.FC<WrappedFieldArrayProps<Rubric>> = (props) => 
           component={WrappedRubricEditor}
         />
       ))}
+      <Row className="text-center">
+        <Col>
+          <Button
+            variant="secondary"
+            onClick={(): void => {
+              fields.push({
+                type: 'none',
+              });
+            }}
+          >
+            Add new rubric section
+          </Button>
+        </Col>
+      </Row>
     </>
   );
 };

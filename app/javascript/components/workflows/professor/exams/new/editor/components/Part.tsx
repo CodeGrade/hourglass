@@ -148,7 +148,7 @@ const Part: React.FC<{
           </Card.Subtitle>
         </Alert>
         <Card.Body>
-          <Field name="partRubric" rubricField="partRubric" component={RubricEditor} />
+          <Field name="partRubric" fieldName="partRubric" component={RubricEditor} />
           <Field
             name="reference"
             component={PartReferenceProvider}

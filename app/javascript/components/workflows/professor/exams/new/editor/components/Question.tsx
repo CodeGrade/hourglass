@@ -139,7 +139,7 @@ const Question: React.FC<{
           </Card.Subtitle>
         </Alert>
         <Card.Body>
-          <Field name="questionRubric" rubricField="questionRubric" component={RubricEditor} />
+          <Field name="questionRubric" fieldName="questionRubric" component={RubricEditor} />
           <Field
             name="reference"
             component={QuestionReferenceProvider}

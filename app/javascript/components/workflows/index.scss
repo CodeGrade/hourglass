@@ -6,6 +6,20 @@
   z-index: 1000;
 }
 
+.z-1000-select {
+  &:focus {
+    position: relative;
+    z-index: 1000;
+  }
+  .select__menu {
+    z-index: 1001;
+  }
+  .select__menu-list {
+    position: relative;
+    z-index: 1001; 
+  }
+}
+
 .size-0 {
   width: 0;
   height: 0;

@@ -126,7 +126,7 @@ const Body: React.FC<BodyProps> = (props) => {
         <FormSection name={memberName}>
           <Field
             name="rubric"
-            rubricField="rubric"
+            fieldName="rubric"
             component={RubricEditor}
           />
         </FormSection>

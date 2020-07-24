@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Alert,
   Form,
@@ -106,7 +106,7 @@ const RubricPresetEditor: React.FC<{
             component="input"
             type="number"
             className="w-100"
-            normalize={(newval) => Number.parseInt(newval, 10)}
+            normalize={(newval) => (newval === '' ? 0 : Number.parseInt(newval, 10))}
           />
         </Col>
       </Form.Group>
@@ -192,9 +192,11 @@ const RubricPresetDirectionEditor: React.FC<{
       {values.map((val) => {
         const checked = (value === val.value);
         return (
-          <Tooltip message={val.message}>
+          <Tooltip
+            key={val.value}
+            message={val.message}
+          >
             <ToggleButton
-              key={val.value}
               type="radio"
               variant={checked ? 'secondary' : 'outline-secondary'}
               className={checked ? '' : 'bg-white'}
@@ -242,7 +244,7 @@ const RubricPresetsEditor: React.FC<{
                 component="input"
                 type="number"
                 className="w-100"
-                normalize={(newval) => Number.parseInt(newval, 10)}
+                normalize={(newval) => (newval === '' ? 0 : Number.parseInt(newval, 10))}
               />
             </Col>
           </>
@@ -283,6 +285,24 @@ const RubricEntriesEditor: React.FC<{
   const anySections = (value instanceof Array && value.length > 0);
   const freeChoice = !(anyPresets || anySections);
   if (freeChoice) {
+    if (type === 'all') {
+      return (
+        <Row className="text-center">
+          <Col>
+            <Button
+              variant="secondary"
+              onClick={(): void => {
+                onChange([{
+                  type: 'none',
+                }]);
+              }}
+            >
+              Add new rubric section
+            </Button>
+          </Col>
+        </Row>
+      );
+    }
     return (
       <Row className="text-center">
         <Col>
@@ -382,17 +402,14 @@ const defaultOptions: Record<Rubric['type'], SelectOption<Rubric['type']>> = {
     value: 'one',
   },
 };
+const options: SelectOptions<Rubric['type']> = Object.values(defaultOptions);
 
 const ChangeRubricType: React.FC<{
   value: Rubric;
   onChange: (newVal: Rubric) => void;
 }> = (props) => {
   const { value, onChange } = props;
-  const options: SelectOptions<Rubric['type']> = useMemo(
-    () => Object.values(defaultOptions),
-    [defaultOptions],
-  );
-  const changeRubricType = (newtype: SelectOption<Rubric['type']>) => {
+  const changeRubricType = useCallback((newtype: SelectOption<Rubric['type']>) => {
     onChange({
       // set defaults to blank
       choices: [],
@@ -402,6 +419,19 @@ const ChangeRubricType: React.FC<{
       // and change the type
       type: newtype.value,
     });
+  }, [value, onChange]);
+  const disableAllWhenPreset = (option) => {
+    if (option.value !== 'all') { return false; } // only disable 'all'...
+    if ('choices' in value) { //           if we have any saved choices...
+      if (isRubricPresets(value.choices)) { //        that are presets,...
+        if (value.choices.presets.length > 0) { // and presets are present
+          return true;
+        }
+      }
+    }
+    // Note: we use `choices in value` because the onChange handler
+    // saves the old choices, even if it's a RubricNone
+    return false;
   };
   return (
     <Form.Group as={Row}>
@@ -412,6 +442,7 @@ const ChangeRubricType: React.FC<{
           className="z-1000-select"
           options={options}
           value={defaultOptions[value.type]}
+          isOptionDisabled={disableAllWhenPreset}
           onChange={changeRubricType}
         />
       </Col>
@@ -582,7 +613,7 @@ const RubricsArrayEditor: React.FC<WrappedFieldArrayProps<Rubric>> = (props) => 
           key={index}
           name={member}
           enableMovers
-          enableUp={index > 1}
+          enableUp={index > 0}
           enableDown={index + 1 < fields.length}
           moveDown={() => fields.move(index, index + 1)}
           moveUp={() => fields.move(index, index - 1)}

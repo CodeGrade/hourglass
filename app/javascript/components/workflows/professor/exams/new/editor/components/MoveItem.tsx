@@ -33,7 +33,7 @@ const MoveItem: React.FC<MoveProps> = (props) => {
       <div className="float-left">
         <ButtonGroup
           vertical
-          className="m-0 p-0 bg-white rounded position-relative overhang-left-100"
+          className="m-0 p-0 z-1000 bg-white rounded position-relative overhang-left-100"
         >
           <Button
             variant={variant}

@@ -1,3 +1,6 @@
+/* eslint-disable import/first */
+// require('./wdyr.ts');
+
 import { hot } from 'react-hot-loader';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';

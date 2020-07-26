@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import { WrappedFieldProps, Field } from 'redux-form';
@@ -21,6 +21,11 @@ const EditPrompt: React.FC<WrappedFieldProps & {
     value: string;
     onChange: (newVal: string) => void;
   } = input;
+  const handleChange = useCallback((newVal, _delta, source, _editor): void => {
+    if (source === 'user') {
+      onChange(newVal);
+    }
+  }, [onChange]);
   return (
     <>
       <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-prompt`}>
@@ -30,11 +35,7 @@ const EditPrompt: React.FC<WrappedFieldProps & {
             className="bg-white"
             value={value}
             placeholder="Provide any instructions for this specific item..."
-            onChange={(newVal, _delta, source, _editor): void => {
-              if (source === 'user') {
-                onChange(newVal);
-              }
-            }}
+            onChange={handleChange}
           />
         </Col>
       </Form.Group>

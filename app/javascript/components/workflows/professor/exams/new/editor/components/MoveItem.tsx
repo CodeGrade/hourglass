@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ButtonGroup,
   Button,
   ButtonProps,
 } from 'react-bootstrap';
-import { FaChevronUp, FaChevronDown, FaTrashAlt } from 'react-icons/fa';
+import {
+  FaChevronUp,
+  FaChevronDown,
+  FaTrashAlt,
+  FaCopy,
+} from 'react-icons/fa';
 
 export interface MoveProps {
   enableUp?: boolean;
@@ -14,6 +19,7 @@ export interface MoveProps {
   onUp?: () => void;
   onDown?: () => void;
   onDelete?: () => void;
+  onCopy?: () => void;
 }
 
 const MoveItem: React.FC<MoveProps> = (props) => {
@@ -25,12 +31,20 @@ const MoveItem: React.FC<MoveProps> = (props) => {
     onUp,
     onDown,
     onDelete,
+    onCopy,
   } = props;
+  const [forceVisible, setForceVisible] = useState(false);
   return (
     <div
-      className={`float-left size-0 ${visible ? '' : 'd-none'}`}
+      className={`float-left size-0 ${visible || forceVisible ? '' : 'd-none'}`}
     >
-      <div className="float-left">
+      <div
+        className="float-left"
+        onMouseOver={() => setForceVisible(true)}
+        onMouseOut={() => setForceVisible(false)}
+        onFocus={() => setForceVisible(true)}
+        onBlur={() => setForceVisible(false)}
+      >
         <ButtonGroup
           vertical
           className="m-0 p-0 z-1000 bg-white rounded position-relative overhang-left-100"
@@ -38,6 +52,7 @@ const MoveItem: React.FC<MoveProps> = (props) => {
           <Button
             variant={variant}
             disabled={!enableUp}
+            className={enableUp ? '' : 'pointer-events-none'}
             onClick={onUp}
             title="Move up"
           >
@@ -46,11 +61,21 @@ const MoveItem: React.FC<MoveProps> = (props) => {
           <Button
             variant={variant}
             disabled={!enableDown}
+            className={enableDown ? '' : 'pointer-events-none'}
             onClick={onDown}
             title="Move down"
           >
             <FaChevronDown />
           </Button>
+          {onCopy && (
+          <Button
+            variant={variant}
+            onClick={onCopy}
+            title="Copy"
+          >
+            <FaCopy />
+          </Button>
+          )}
           <Button
             variant="danger"
             onClick={onDelete}

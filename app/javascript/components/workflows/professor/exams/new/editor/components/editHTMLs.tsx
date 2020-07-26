@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   Button,
   Row,
@@ -27,20 +27,21 @@ export const EditHTMLField: React.FC<WrappedFieldProps & {
     value,
     onChange,
   } = input;
+  const handleChange = useCallback((newName, _delta, source, _editor): void => {
+    if (source === 'user') {
+      onChange({
+        type: 'HTML',
+        value: newName,
+      });
+    }
+  }, [onChange]);
   return (
     <CustomEditor
       className={className}
       theme={theme}
       value={value.value}
       placeholder={placeholder}
-      onChange={(newName, _delta, source, _editor): void => {
-        if (source === 'user') {
-          onChange({
-            type: 'HTML',
-            value: newName,
-          });
-        }
-      }}
+      onChange={handleChange}
     />
   );
 };

@@ -83,13 +83,15 @@ const OneValue: React.FC<{
     remove,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
+  const showMovers = (): void => setMoversVisible(true);
+  const hideMovers = (): void => setMoversVisible(false);
   return (
     <Row
       className="p-2"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onBlur={(): void => setMoversVisible(false)}
-      onMouseOut={(): void => setMoversVisible(false)}
+      onMouseOver={showMovers}
+      onFocus={showMovers}
+      onBlur={hideMovers}
+      onMouseOut={hideMovers}
     >
       <Col className="flex-grow-01 pl-0">
         <MoveItem
@@ -166,14 +168,16 @@ const OnePrompt: React.FC<{
     remove,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
+  const showMovers = (): void => setMoversVisible(true);
+  const hideMovers = (): void => setMoversVisible(false);
   return (
     <FormSection name={memberName}>
       <Row
         className="p-2"
-        onMouseOver={(): void => setMoversVisible(true)}
-        onFocus={(): void => setMoversVisible(true)}
-        onBlur={(): void => setMoversVisible(false)}
-        onMouseOut={(): void => setMoversVisible(false)}
+        onMouseOver={showMovers}
+        onFocus={showMovers}
+        onBlur={hideMovers}
+        onMouseOut={hideMovers}
       >
         <div className="float-left pl-0">
           <MoveItem
@@ -244,15 +248,16 @@ const EditColName: React.FC<WrappedFieldProps & {
     value,
     onChange,
   } = input;
+  const handleChange = useCallback((newVal) => onChange({
+    type: 'HTML',
+    value: newVal,
+  }), [onChange]);
   return (
     <CustomEditor
       className="bg-white"
       theme="bubble"
       value={value.value ?? defaultLabel}
-      onChange={(newVal) => onChange({
-        type: 'HTML',
-        value: newVal,
-      })}
+      onChange={handleChange}
     />
   );
 };

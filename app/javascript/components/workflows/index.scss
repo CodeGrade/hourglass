@@ -1,6 +1,10 @@
 @import "node_modules/bootstrap/scss/functions";
 @import "node_modules/bootstrap/scss/variables";
 
+.pointer-events-none {
+  pointer-events: none;
+}
+
 .z-1000 {
   position: relative;
   z-index: 1000;

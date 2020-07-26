@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import {
   Form,
   Card,
-  Alert,
   Row,
   Col,
 } from 'react-bootstrap';
@@ -82,26 +81,28 @@ const Question: React.FC<{
     remove,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
+  const showMovers = () => setMoversVisible(true);
+  const hideMovers = () => setMoversVisible(false);
   return (
     <Card
       className="mb-3"
       border="primary"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onBlur={(): void => setMoversVisible(false)}
-      onMouseOut={(): void => setMoversVisible(false)}
+      onMouseOver={showMovers}
+      onFocus={showMovers}
+      onBlur={hideMovers}
+      onMouseOut={hideMovers}
     >
+      <MoveItem
+        visible={moversVisible}
+        variant="primary"
+        enableUp={qnum > 0}
+        enableDown={enableDown}
+        onUp={moveUp}
+        onDown={moveDown}
+        onDelete={remove}
+      />
       <FormSection name={memberName}>
-        <MoveItem
-          visible={moversVisible}
-          variant="primary"
-          enableUp={qnum > 0}
-          enableDown={enableDown}
-          onUp={moveUp}
-          onDown={moveDown}
-          onDelete={remove}
-        />
-        <Alert variant="primary">
+        <div className="alert alert-primary">
           <Card.Title>
             {`Question ${qnum + 1}`}
           </Card.Title>
@@ -137,9 +138,14 @@ const Question: React.FC<{
               />
             </Form.Group>
           </Card.Subtitle>
-        </Alert>
+        </div>
         <Card.Body>
-          <Field name="questionRubric" fieldName="questionRubric" component={RubricEditor} />
+          <Field
+            name="questionRubric"
+            fieldName="questionRubric"
+            component={RubricEditor}
+            format={null}
+          />
           <Field
             name="reference"
             component={QuestionReferenceProvider}

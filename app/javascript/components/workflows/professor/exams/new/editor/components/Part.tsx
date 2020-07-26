@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import {
   Form,
   Card,
-  Alert,
   Row,
   Col,
 } from 'react-bootstrap';
@@ -91,26 +90,28 @@ const Part: React.FC<{
     remove,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
+  const showMovers = (): void => setMoversVisible(true);
+  const hideMovers = (): void => setMoversVisible(false);
   return (
     <Card
       className="mb-3"
       border="success"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onBlur={(): void => setMoversVisible(false)}
-      onMouseOut={(): void => setMoversVisible(false)}
+      onMouseOver={showMovers}
+      onFocus={showMovers}
+      onBlur={hideMovers}
+      onMouseOut={hideMovers}
     >
+      <MoveItem
+        visible={moversVisible}
+        variant="success"
+        enableUp={pnum > 0}
+        enableDown={enableDown}
+        onUp={moveUp}
+        onDown={moveDown}
+        onDelete={remove}
+      />
       <FormSection name={memberName}>
-        <MoveItem
-          visible={moversVisible}
-          variant="success"
-          enableUp={pnum > 0}
-          enableDown={enableDown}
-          onUp={moveUp}
-          onDown={moveDown}
-          onDelete={remove}
-        />
-        <Alert variant="success">
+        <div className="alert alert-success">
           <Card.Title>
             {`Part ${alphabetIdx(pnum)}`}
           </Card.Title>
@@ -146,9 +147,14 @@ const Part: React.FC<{
               />
             </Form.Group>
           </Card.Subtitle>
-        </Alert>
+        </div>
         <Card.Body>
-          <Field name="partRubric" fieldName="partRubric" component={RubricEditor} />
+          <Field
+            name="partRubric"
+            fieldName="partRubric"
+            component={RubricEditor}
+            format={null}
+          />
           <Field
             name="reference"
             component={PartReferenceProvider}

@@ -51,7 +51,7 @@ const formatOptions = [
   // NO 'video'
 ];
 
-const CustomEditor: React.FC<CustomEditorProps> = (props) => {
+const CustomEditor: React.FC<CustomEditorProps> = React.memo((props) => {
   const {
     value,
     placeholder,
@@ -81,6 +81,6 @@ const CustomEditor: React.FC<CustomEditorProps> = (props) => {
       onChange={filteredOnChange}
     />
   );
-};
+});
 
 export default CustomEditor;

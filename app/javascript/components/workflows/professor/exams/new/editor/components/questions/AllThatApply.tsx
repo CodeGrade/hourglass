@@ -59,14 +59,16 @@ const OneOption: React.FC<{
     remove,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
+  const showMovers = (): void => setMoversVisible(true);
+  const hideMovers = (): void => setMoversVisible(false);
   return (
     <FormSection name={memberName}>
       <Row
         className="p-2"
-        onMouseOver={(): void => setMoversVisible(true)}
-        onFocus={(): void => setMoversVisible(true)}
-        onBlur={(): void => setMoversVisible(false)}
-        onMouseOut={(): void => setMoversVisible(false)}
+        onMouseOver={showMovers}
+        onFocus={showMovers}
+        onBlur={hideMovers}
+        onMouseOut={hideMovers}
       >
         <Col className="flex-grow-01">
           <MoveItem

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   Form,
   Row,
@@ -39,13 +39,15 @@ const OneOption: React.FC<{
     remove,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
+  const showMovers = (): void => setMoversVisible(true);
+  const hideMovers = (): void => setMoversVisible(false);
   return (
     <Row
       className="p-2"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onBlur={(): void => setMoversVisible(false)}
-      onMouseOut={(): void => setMoversVisible(false)}
+      onMouseOver={showMovers}
+      onFocus={showMovers}
+      onBlur={hideMovers}
+      onMouseOut={hideMovers}
     >
       <Col className="flex-grow-01">
         <MoveItem
@@ -124,17 +126,18 @@ const EditAns: React.FC<WrappedFieldProps> = (props) => {
   const moveDown = () => onChange(value + 1);
   const moveUp = () => onChange(value - 1);
   const remove = () => onChange(0);
+  const renderOptions = useCallback(renderOptionsMultipleChoice({
+    selected: value,
+    onChange,
+    moveDown,
+    moveUp,
+    remove,
+  }), [onChange, value]);
   return (
     <FieldArray
       name="options"
       component={EditHTMLs}
-      renderOptions={renderOptionsMultipleChoice({
-        selected: value,
-        onChange,
-        moveDown,
-        moveUp,
-        remove,
-      })}
+      renderOptions={renderOptions}
     />
   );
 };

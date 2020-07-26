@@ -16,24 +16,23 @@ const ShowQuestions: React.FC<WrappedFieldArrayProps<QuestionInfo>> = (props) =>
     <>
       <Row className="py-3">
         <Col>
-          {fields.map((member, index) => (
-            <Question
-              // eslint-disable-next-line react/no-array-index-key
-              key={index}
-              qnum={index}
-              memberName={member}
-              enableDown={index + 1 < fields.length}
-              moveDown={(): void => {
-                fields.move(index, index + 1);
-              }}
-              moveUp={(): void => {
-                fields.move(index, index - 1);
-              }}
-              remove={(): void => {
-                fields.remove(index);
-              }}
-            />
-          ))}
+          {fields.map((member, index) => {
+            const moveUp = () => fields.move(index, index - 1);
+            const moveDown = () => fields.move(index, index + 1);
+            const remove = () => fields.remove(index);
+            return (
+              <Question
+                // eslint-disable-next-line react/no-array-index-key
+                key={index}
+                qnum={index}
+                memberName={member}
+                enableDown={index + 1 < fields.length}
+                moveDown={moveDown}
+                moveUp={moveUp}
+                remove={remove}
+              />
+            );
+          })}
         </Col>
       </Row>
       <Row className="text-center">

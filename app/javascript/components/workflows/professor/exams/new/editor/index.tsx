@@ -1,9 +1,13 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, {
+  useContext,
+  useEffect,
+  useMemo,
+  useCallback,
+} from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
 import {
   Button,
-  Alert,
   Form,
   Row,
 } from 'react-bootstrap';
@@ -345,7 +349,7 @@ function transformForSubmit(values: FormValues): Version {
       body.forEach((b, bnum) => {
         let itemAnswer: AnswerState;
         let bodyItem: BodyItem;
-        rubrics.questions[qnum].parts[pnum].body[bnum] = b.rubric;
+        rubrics.questions[qnum].parts[pnum].body[bnum] = b.rubric || { type: 'none' };
         switch (b.type) {
           case 'AllThatApply': {
             const res = transformATA(b);
@@ -493,40 +497,39 @@ const ExamEditor: React.FC<
     return () => {
       clearInterval(timer);
     };
-  }, [handleSubmit]);
-  return (
-    <form
-      onSubmit={(e): void => {
-        e.preventDefault();
-        handleSubmit((values) => {
-          const {
+  }, [handleSubmit, autosave]);
+  const doSubmit = useCallback((e): void => {
+    e.preventDefault();
+    handleSubmit((values) => {
+      const {
+        name,
+        info,
+        files,
+      } = transformForSubmit(values);
+      update({
+        variables: {
+          input: {
+            examVersionId,
             name,
-            info,
-            files,
-          } = transformForSubmit(values);
-          update({
-            variables: {
-              input: {
-                examVersionId,
-                name,
-                info: JSON.stringify(info),
-                files: JSON.stringify(files),
-              },
-            },
-          });
-        })();
-      }}
-    >
+            info: JSON.stringify(info),
+            files: JSON.stringify(files),
+          },
+        },
+      });
+    })();
+  }, [handleSubmit, update]);
+  return (
+    <Form onSubmit={doSubmit}>
       <FormSection name="all">
         <Field name="name" component={WrappedName} />
         <Field name="policies" component={WrappedPolicies} />
         <FormSection name="exam">
           <FormContextProviderConnected>
-            <Alert variant="info">
-              <h3>Exam-wide information</h3>
+            <div className="alert alert-info">
+              <h4>Exam-wide information</h4>
               <Field name="files" component={FileUploader} />
               <Field name="instructions" component={WrappedInstructions} />
-            </Alert>
+            </div>
             <Form.Group as={Row}>
               <Field
                 name="reference"
@@ -538,7 +541,7 @@ const ExamEditor: React.FC<
             <FieldArray name="questions" component={ShowQuestions} />
           </FormContextProviderConnected>
         </FormSection>
-        <div className="my-2 float-right">
+        <Row className="my-2 float-right">
           <Button
             disabled={loading}
             variant="danger"
@@ -554,9 +557,9 @@ const ExamEditor: React.FC<
           >
             Submit
           </Button>
-        </div>
+        </Row>
       </FormSection>
-    </form>
+    </Form>
   );
 };
 

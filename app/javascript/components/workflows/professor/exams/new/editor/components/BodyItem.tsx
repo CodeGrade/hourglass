@@ -97,13 +97,15 @@ const Body: React.FC<BodyProps> = (props) => {
     remove,
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
+  const showMovers = (): void => setMoversVisible(true);
+  const hideMovers = (): void => setMoversVisible(false);
   return (
     <Card
       className="border border-secondary alert-secondary mb-3"
-      onMouseOver={(): void => setMoversVisible(true)}
-      onFocus={(): void => setMoversVisible(true)}
-      onMouseOut={(): void => setMoversVisible(false)}
-      onBlur={(): void => setMoversVisible(false)}
+      onMouseOver={showMovers}
+      onFocus={showMovers}
+      onBlur={hideMovers}
+      onMouseOut={hideMovers}
     >
       <MoveItem
         visible={moversVisible}
@@ -127,6 +129,7 @@ const Body: React.FC<BodyProps> = (props) => {
           <Field
             name="rubric"
             fieldName="rubric"
+            format={null}
             component={RubricEditor}
           />
         </FormSection>

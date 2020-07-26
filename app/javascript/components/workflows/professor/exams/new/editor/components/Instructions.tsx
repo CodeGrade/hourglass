@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   Row, Col,
 } from 'react-bootstrap';
@@ -15,6 +15,14 @@ const Instructions: React.FC<TextProps> = (props) => {
     value,
     onChange,
   } = props;
+  const handleChange = useCallback((newVal, _delta, source, _editor): void => {
+    if (source === 'user') {
+      onChange({
+        type: 'HTML',
+        value: newVal,
+      });
+    }
+  }, [onChange]);
   return (
     <Row className="py-3">
       <Col>
@@ -23,14 +31,7 @@ const Instructions: React.FC<TextProps> = (props) => {
           className="bg-white"
           value={value.value}
           placeholder="Give exam-wide instructions here"
-          onChange={(newVal, _delta, source, _editor): void => {
-            if (source === 'user') {
-              onChange({
-                type: 'HTML',
-                value: newVal,
-              });
-            }
-          }}
+          onChange={handleChange}
         />
       </Col>
     </Row>

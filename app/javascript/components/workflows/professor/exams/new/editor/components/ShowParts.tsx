@@ -19,25 +19,24 @@ const ShowParts: React.FC<{
     <>
       <Row>
         <Col>
-          {fields.map((member, index) => (
-            <Part
-              // eslint-disable-next-line react/no-array-index-key
-              key={index}
-              qnum={qnum}
-              pnum={index}
-              memberName={member}
-              enableDown={index + 1 < fields.length}
-              moveDown={(): void => {
-                fields.move(index, index + 1);
-              }}
-              moveUp={(): void => {
-                fields.move(index, index - 1);
-              }}
-              remove={(): void => {
-                fields.remove(index);
-              }}
-            />
-          ))}
+          {fields.map((member, index) => {
+            const moveUp = () => fields.move(index, index - 1);
+            const moveDown = () => fields.move(index, index + 1);
+            const remove = () => fields.remove(index);
+            return (
+              <Part
+                // eslint-disable-next-line react/no-array-index-key
+                key={index}
+                qnum={qnum}
+                pnum={index}
+                memberName={member}
+                enableDown={index + 1 < fields.length}
+                moveDown={moveDown}
+                moveUp={moveUp}
+                remove={remove}
+              />
+            );
+          })}
         </Col>
       </Row>
       <Row className="text-center">

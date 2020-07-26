@@ -13,8 +13,6 @@ import {
   ButtonGroup,
   Alert,
   AlertProps,
-  DropdownButton,
-  Dropdown,
   ButtonProps,
   Collapse,
   Table,
@@ -74,7 +72,6 @@ import {
 } from 'relay-hooks';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
-import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import { RenderError } from '@hourglass/common/boundary';
@@ -446,54 +443,6 @@ const ItemRubric: React.FC<{
   );
 };
 
-const ItemRubricEditor: React.FC = () => (
-  <Alert variant="info" className="pb-0 px-3" dismissible>
-    <Alert.Heading>Item rubric</Alert.Heading>
-    <Row>
-      <Form.Group as={Col}>
-        <Form.Label>Label</Form.Label>
-        <Form.Control as="input" />
-      </Form.Group>
-      <Form.Group as={Col}>
-        <Form.Label>Maximum points</Form.Label>
-        <Form.Control step={0.5} type="number" min={0} />
-      </Form.Group>
-    </Row>
-    <Row>
-      <Form.Group as={Col}>
-        <Form.Label>Instructions</Form.Label>
-        <CustomEditor
-          className="bg-white"
-          theme="bubble"
-          value=""
-          placeholder="Describe what the grading rules are"
-        />
-      </Form.Group>
-    </Row>
-    <Row>
-      <Form.Group as={Col} className="mb-0">
-        <Form.Label>Presets</Form.Label>
-        <div>
-          {[1, 2, 3].map((i) => (
-            <Alert key={`preset-${i}`} variant="warning" className="pb-0" dismissible>
-              <Row>
-                <Form.Group as={Col} sm={2}>
-                  <Form.Label>Points</Form.Label>
-                  <Form.Control step={0.5} type="number" min={0} />
-                </Form.Group>
-                <Form.Group as={Col} sm={10}>
-                  <Form.Label>Description</Form.Label>
-                  <Form.Control as="textarea" placeholder="Comment for students to see" rows={1} />
-                </Form.Group>
-              </Row>
-            </Alert>
-          ))}
-        </div>
-      </Form.Group>
-    </Row>
-  </Alert>
-);
-
 const ConditionalRubric: React.FC<{
   depth: number;
   conditionalRubricKey: gradingConditionalRubric$key;
@@ -533,62 +482,6 @@ const ConditionalRubric: React.FC<{
     </Card>
   );
 };
-
-const ConditionalRubricEditor: React.FC<{ depth: number }> = ({ depth }) => {
-  const variants: AlertProps['variant'][] = ['light', 'secondary', 'dark'];
-  const variant: AlertProps['variant'] = variants[depth] ?? 'primary';
-  return (
-    <Alert variant={variant} className="pb-0 px-3" dismissible>
-      <Alert.Heading>Conditional rubric</Alert.Heading>
-      <Row>
-        <Form.Group as={Col}>
-          <Form.Label>Condition</Form.Label>
-          <CustomEditor
-            className="bg-white border-silver border"
-            theme="bubble"
-            value=""
-            placeholder="Describe when to use this sub-rubric"
-          />
-        </Form.Group>
-      </Row>
-      <Row>
-        <Form.Group as={Col} className="mb-0">
-          <Form.Label>Use the following rubric:</Form.Label>
-          {depth <= 0 ? (
-            <>
-              <ItemRubricEditor />
-              <ItemRubricEditor />
-            </>
-          ) : (
-            <>
-              <ConditionalRubricEditor depth={depth - 1} />
-              <ConditionalRubricEditor depth={depth - 2} />
-            </>
-          )}
-        </Form.Group>
-      </Row>
-    </Alert>
-  );
-};
-
-export const EditRubric: React.FC = () => (
-  <>
-    <ItemRubricEditor />
-    <ConditionalRubricEditor depth={2} />
-    <DropdownButton
-      id="add-rubric"
-      variant="secondary"
-      title="Add new rubric item..."
-    >
-      <Dropdown.Item>
-        Item rubric
-      </Dropdown.Item>
-      <Dropdown.Item>
-        Conditional rubric
-      </Dropdown.Item>
-    </DropdownButton>
-  </>
-);
 
 const ShowNestedConditionalRubric: React.FC<{
   rubric: ConditionalRubric;

@@ -612,6 +612,7 @@ const RubricsArrayEditor: React.FC<WrappedFieldArrayProps<Rubric>> = (props) => 
           // eslint-disable-next-line react/no-array-index-key
           key={index}
           name={member}
+          fieldName={member}
           enableMovers
           enableUp={index > 0}
           enableDown={index + 1 < fields.length}

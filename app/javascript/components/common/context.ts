@@ -19,7 +19,6 @@ interface ExamViewerContext {
 }
 export const ExamViewerContext = createContext<ExamViewerContext>({} as ExamViewerContext);
 
-
 interface FilesContext {
   references: FileRef[];
 }

@@ -18,6 +18,7 @@ import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
 import { home_profregs$key } from './__generated__/home_profregs.graphql';
 import { home_proctorregs$key } from './__generated__/home_proctorregs.graphql';
 import { home_staffregs$key } from './__generated__/home_staffregs.graphql';
+import { homeAdminQuery } from './__generated__/homeAdminQuery.graphql';
 
 const ShowRegistrations: React.FC<{
   registrations: home_studentregs$key;
@@ -177,7 +178,7 @@ const ShowProfRegs: React.FC<{
 type ImpersonateVal = SelectOption<string>
 
 const Admin: React.FC = () => {
-  const res = useQuery(
+  const res = useQuery<homeAdminQuery>(
     graphql`
     query homeAdminQuery {
       users {

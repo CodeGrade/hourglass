@@ -110,7 +110,6 @@ function transformMatchingReverse(
   };
 }
 
-
 function examWithAnswersAndRubrics(
   exam: ExamVersion,
   answers: AnswersState['answers'],
@@ -231,7 +230,6 @@ function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
     );
   };
 }
-
 
 const WrappedName = wrapInput(Name);
 const WrappedPolicies = wrapInput(Policies);
@@ -473,7 +471,7 @@ const ExamEditor: React.FC<
   const loading = saveLoading || autosaveLoading;
   useEffect(() => {
     const timer = setInterval(() => {
-      if (undefined !== 1) return;
+      if (undefined !== 1) return; // TODO: remove this
       handleSubmit((values) => {
         const {
           name,

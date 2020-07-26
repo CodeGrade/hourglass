@@ -20,7 +20,6 @@ import { ExamContext } from '@hourglass/common/context';
 import { firstFile } from '@student/exams/show/files';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
 
-
 export const languages = {
   scheme: 'Racket',
   'text/x-java': 'Java',
@@ -35,7 +34,6 @@ export const languages = {
   'text/css': 'CSS',
   'application/xml': 'XML',
 };
-
 
 const EditLang: React.FC<{
   value: CodeInfo['lang'];
@@ -247,6 +245,7 @@ const EditSuppliedCode: React.FC<WrappedFieldsProps> = (props) => {
   );
 };
 
+const langInitial = ['lang', 'initial'];
 const SetInitial: React.FC<WrappedFieldProps> = (props) => {
   const {
     input,
@@ -296,7 +295,7 @@ const SetInitial: React.FC<WrappedFieldProps> = (props) => {
       </ButtonGroup>
       {isText && (
         <Fields
-          names={['lang', 'initial']}
+          names={langInitial}
           component={EditSuppliedCode}
         />
       )}
@@ -321,6 +320,7 @@ const SetInitial: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+const langAnswer = ['lang', 'answer'];
 const Code: React.FC<CodeProps> = (props) => {
   const {
     qnum,
@@ -347,7 +347,7 @@ const Code: React.FC<CodeProps> = (props) => {
         <Form.Label column sm={2}>Answer</Form.Label>
         <Col sm={10}>
           <Fields
-            names={['lang', 'answer']}
+            names={langAnswer}
             component={EditCodeAnswer}
           />
         </Col>

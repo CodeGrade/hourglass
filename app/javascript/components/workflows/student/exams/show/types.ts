@@ -266,7 +266,6 @@ export interface CodeInitialContents {
   marks: MarkDescription[];
 }
 
-
 export interface MarkDescription {
   from: CodeMirror.Position;
   to: CodeMirror.Position;
@@ -286,13 +285,11 @@ export interface HTMLVal {
   value: string;
 }
 
-
 export interface AllThatApplyInfo {
   type: 'AllThatApply';
   options: HTMLVal[];
   prompt: HTMLVal;
 }
-
 
 export type AllThatApplyState = boolean[];
 
@@ -303,7 +300,6 @@ export interface YesNoInfo {
   prompt: HTMLVal;
 }
 
-
 export type YesNoState = boolean;
 
 export interface CodeTagInfo {
@@ -311,7 +307,6 @@ export interface CodeTagInfo {
   prompt: HTMLVal;
   choices: 'exam' | 'question' | 'part';
 }
-
 
 export interface CodeTagState {
   selectedFile?: string;

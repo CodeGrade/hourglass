@@ -189,7 +189,6 @@ export const FileViewer: React.FC<FileViewerProps> = (props) => {
   );
 };
 
-
 interface ControlledFileViewerProps {
   references: FileRef[];
   alwaysShowTreeView?: boolean;

@@ -103,6 +103,8 @@ import { gradingReleaseLockMutation } from './__generated__/gradingReleaseLockMu
 import { gradingLock$key } from './__generated__/gradingLock.graphql';
 import { gradingLockVersion$key } from './__generated__/gradingLockVersion.graphql';
 import { gradingLockAdmin$key } from './__generated__/gradingLockAdmin.graphql';
+import { gradingQuery } from './__generated__/gradingQuery.graphql';
+import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 
 export function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
@@ -587,7 +589,6 @@ export const EditRubric: React.FC = () => (
     </DropdownButton>
   </>
 );
-
 
 const ShowNestedConditionalRubric: React.FC<{
   rubric: ConditionalRubric;
@@ -1568,7 +1569,7 @@ const Grade: React.FC<{
 
 const GradeOnePart: React.FC = () => {
   const { registrationId, qnum, pnum } = useParams();
-  const res = useQuery(
+  const res = useQuery<gradingQuery>(
     graphql`
     query gradingQuery($registrationId: ID!) {
       registration(id: $registrationId) {
@@ -1838,7 +1839,7 @@ const LockAdministration: React.FC<{
 
 const GradingAdmin: React.FC = () => {
   const { examId } = useParams();
-  const res = useQuery(
+  const res = useQuery<gradingAdminQuery>(
     graphql`
     query gradingAdminQuery($examId: ID!) {
       exam(id: $examId) {

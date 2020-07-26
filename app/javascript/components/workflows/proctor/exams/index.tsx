@@ -699,7 +699,6 @@ const ShowExamAnnouncement: React.FC<{
   );
 };
 
-
 const ShowVersionAnnouncement: React.FC<{
   announcement: VersionAnnouncement;
 }> = (props) => {
@@ -1012,7 +1011,6 @@ const newExamAnnouncementSubscriptionSpec = graphql`
     }
   }
 `;
-
 
 const newMessageSubscriptionSpec = graphql`
   subscription examsNewMessageSubscription($examId: ID!) {

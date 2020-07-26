@@ -12,5 +12,4 @@ const reduxEnhancers = composeEnhancers(
   applyMiddleware(ReduxThunk),
 );
 
-
 export default createStore(rootReducer, reduxEnhancers);

@@ -195,7 +195,6 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny }> = (props) => {
   );
 };
 
-
 const ShowRubricOne: React.FC<{ rubric: RubricOne }> = (props) => {
   const { rubric } = props;
   const { points, description, choices } = rubric;

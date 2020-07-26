@@ -26,7 +26,6 @@ export interface FilePickerProps {
   children?: React.ReactNode;
 }
 
-
 const FilePicker: React.FC<FilePickerProps> = (props) => {
   const {
     options,

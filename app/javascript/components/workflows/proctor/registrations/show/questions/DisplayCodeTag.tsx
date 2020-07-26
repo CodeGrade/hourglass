@@ -14,7 +14,6 @@ import {
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { getFilesForRefs, countFiles } from '@student/exams/show/files';
 
-
 interface FileModalProps {
   references: FileRef[];
   value: CodeTagState;

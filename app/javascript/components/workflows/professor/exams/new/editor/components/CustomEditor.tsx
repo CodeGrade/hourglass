@@ -5,7 +5,6 @@ import 'react-quill/dist/quill.snow';
 import 'react-quill/dist/quill.bubble';
 import './CustomEditor.css';
 
-
 ReactQuill.Quill.register('modules/clipboard', QuillPasteSmart, true);
 
 export interface CustomEditorProps {
@@ -36,7 +35,6 @@ const toolbarOptions = [
 
   //  [{ size: ['small', false, 'large', 'huge'] }], // custom dropdown
   //  [{ header: [4, 5, 6, false] }],
-
 
   ['clean'], // remove formatting button
 ];

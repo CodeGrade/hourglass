@@ -189,7 +189,6 @@ function snapshotFailure(message: string): SnapshotFailure {
   };
 }
 
-
 function snapshotSuccess(): SnapshotSuccess {
   return {
     type: 'SNAPSHOT_SUCCESS',

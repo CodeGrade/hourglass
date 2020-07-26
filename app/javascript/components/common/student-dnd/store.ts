@@ -13,5 +13,4 @@ const rootReducer = combineReducers({
   form: formReducer,
 });
 
-
 export default createStore(rootReducer, reduxEnhancers);

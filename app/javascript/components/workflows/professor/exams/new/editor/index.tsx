@@ -475,7 +475,6 @@ const ExamEditor: React.FC<
   const loading = saveLoading || autosaveLoading;
   useEffect(() => {
     const timer = setInterval(() => {
-      if (undefined !== 1) return; // TODO: remove this
       handleSubmit((values) => {
         const {
           name,

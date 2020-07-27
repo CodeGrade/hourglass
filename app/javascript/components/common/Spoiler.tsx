@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
+import Tooltip from '@student/exams/show/components/Tooltip';
 
 const Spoiler: React.FC<{
   text: string;

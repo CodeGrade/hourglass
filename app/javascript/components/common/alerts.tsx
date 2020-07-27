@@ -9,7 +9,7 @@ import { AlertProps, Toast, Button } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import './alerts.scss';
 import { DateTime } from 'luxon';
-import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
+import Icon from '@student/exams/show/components/Icon';
 import { FaCopy } from 'react-icons/fa';
 
 interface HGAlert {

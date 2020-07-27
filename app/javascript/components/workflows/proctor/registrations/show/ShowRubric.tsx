@@ -17,8 +17,8 @@ import {
   Button,
   Collapse,
 } from 'react-bootstrap';
-import HTML from '@hourglass/workflows/student/exams/show/components/HTML';
-import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
+import HTML from '@student/exams/show/components/HTML';
+import Icon from '@student/exams/show/components/Icon';
 import { BsArrowUpRight, BsArrowDownRight } from 'react-icons/bs';
 import { variantForPoints, iconForPoints } from '@grading/index';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';

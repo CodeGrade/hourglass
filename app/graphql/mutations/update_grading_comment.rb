@@ -29,7 +29,7 @@ module Mutations
 
     def require_my_lock!(grading_comment)
       reg = grading_comment.registration
-      lock = reg.grading_locks.find_by(grading_comment.attributes.slice(:registration_id, :qnum, :pnum))
+      lock = reg.grading_locks.find_by(registration: reg, qnum: grading_comment.qnum, pnum: grading_comment.pnum)
       my_lock = lock&.grader == context[:current_user]
       raise GraphQL::ExecutionError, 'You do not have a lock for that part number.' unless my_lock
     end

@@ -10,7 +10,7 @@ import { createMap } from '@student/exams/show/files';
 import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
-import { ExamRubric } from '@hourglass/workflows/professor/exams/types';
+import { ExamRubric } from '@professor/exams/types';
 import ShowRubric from '@proctor/registrations/show/ShowRubric';
 
 interface ExamViewerProps {

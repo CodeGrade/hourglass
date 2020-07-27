@@ -10,14 +10,12 @@ import {
   Col,
   Button,
   Card,
-  ButtonGroup,
   Alert,
   AlertProps,
   ButtonProps,
   Collapse,
   Table,
   Container,
-  Accordion,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
@@ -57,7 +55,6 @@ import DisplayText from '@proctor/registrations/show/questions/DisplayText';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
-import Tooltip from '@student/exams/show/components/Tooltip';
 import {
   useParams,
   Switch,
@@ -78,21 +75,19 @@ import { RenderError } from '@hourglass/common/boundary';
 import { AlertContext } from '@hourglass/common/alerts';
 import { IconType } from 'react-icons';
 import {
-  BsArrowUpRight,
-  BsArrowDownRight,
   BsPencilSquare,
   BsXSquare,
 } from 'react-icons/bs';
-import { RangeAddConfig } from 'relay-runtime/lib/mutations/RelayDeclarativeMutationConfig';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import FourOhFour from '@hourglass/workflows/FourOhFour';
 import Spoiler from '@hourglass/common/Spoiler';
+import { assertType, isExamRubric } from '@professor/exams/types';
+import { ShowRubrics } from '@grading/UseRubrics';
+import { CREATE_COMMENT_MUTATION, addCommentConfig } from './createComment';
 
 import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
-import { gradingRubric$key, gradingRubric$data } from './__generated__/gradingRubric.graphql';
-import { gradingItemRubric$key, gradingItemRubric$data } from './__generated__/gradingItemRubric.graphql';
-import { gradingConditionalRubric$key } from './__generated__/gradingConditionalRubric.graphql';
-import { gradingCreateCommentMutation } from './__generated__/gradingCreateCommentMutation.graphql';
+import { gradingRubric$key } from './__generated__/gradingRubric.graphql';
+import { createCommentMutation } from './__generated__/createCommentMutation.graphql';
 import { gradingDestroyCommentMutation } from './__generated__/gradingDestroyCommentMutation.graphql';
 import { gradingUpdateCommentMutation } from './__generated__/gradingUpdateCommentMutation.graphql';
 import { gradingNextMutation } from './__generated__/gradingNextMutation.graphql';
@@ -263,352 +258,6 @@ const PromptRow: React.FC<{
   </Row>
 );
 
-type GradingPreset = gradingItemRubric$data['presets'][number];
-
-const CREATE_COMMENT_MUTATION = graphql`
-  mutation gradingCreateCommentMutation($input: CreateGradingCommentInput!) {
-    createGradingComment(input: $input) {
-      gradingComment {
-        id
-        qnum
-        pnum
-        bnum
-        points
-        message
-      }
-      gradingCommentEdge {
-        node {
-          id
-        }
-      }
-    }
-  }
-`;
-
-const addCommentConfig = (registrationId: string): RangeAddConfig => ({
-  type: 'RANGE_ADD',
-  parentID: registrationId,
-  connectionInfo: [{
-    key: 'Registration_gradingComments',
-    rangeBehavior: 'append',
-  }],
-  edgeName: 'gradingCommentEdge',
-});
-
-const ShowPreset: React.FC<{
-  preset: GradingPreset;
-  registrationId: string;
-  qnum: number;
-  pnum: number;
-  bnum: number;
-}> = (props) => {
-  const {
-    preset,
-    registrationId,
-    qnum,
-    pnum,
-    bnum,
-  } = props;
-  const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<gradingCreateCommentMutation>(
-    CREATE_COMMENT_MUTATION,
-    {
-      configs: [addCommentConfig(registrationId)],
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error creating comment.',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
-  );
-  const variant = variantForPoints(preset.points);
-  const VariantIcon = iconForPoints(preset.points);
-  return (
-    <Alert variant={variant} className="p-0">
-      <Tooltip
-        showTooltip
-        message="Click to apply this message"
-      >
-        <Button
-          disabled={loading}
-          variant={variant}
-          size="sm"
-          className="mr-2 align-self-center"
-          onClick={(): void => {
-            mutate({
-              variables: {
-                input: {
-                  registrationId,
-                  qnum,
-                  pnum,
-                  bnum,
-                  message: preset.description.value,
-                  points: preset.points,
-                },
-              },
-            });
-          }}
-        >
-          <Icon I={VariantIcon} />
-        </Button>
-      </Tooltip>
-      {`(${preset.points} points) `}
-      <HTML className="d-inline-block" value={preset.description} />
-    </Alert>
-  );
-};
-
-const ItemRubric: React.FC<{
-  itemRubricKey: gradingItemRubric$key;
-  registrationId: string;
-  qnum: number;
-  pnum: number;
-  bnum: number;
-}> = (props) => {
-  const {
-    itemRubricKey,
-    registrationId,
-    qnum,
-    pnum,
-    bnum,
-  } = props;
-  const res = useFragment(
-    graphql`
-    fragment gradingItemRubric on ItemRubric {
-      label
-      description {
-        type
-        value
-      }
-      points
-      direction
-      presets {
-        description {
-          type
-          value
-        }
-        points
-      }
-    }
-    `,
-    itemRubricKey,
-  );
-  return (
-    <Alert variant="info" className="pb-0">
-      <Row>
-        <Col>
-          <ButtonGroup className="float-right">
-            <Button variant="outline-secondary" size="sm" disabled>{res.label}</Button>
-            <Button variant="outline-secondary" size="sm" disabled>
-              <i>
-                {res.direction === 'credit' ? (
-                  <>
-                    <Icon I={BsArrowUpRight} />
-                    {`${res.points} points`}
-                  </>
-                ) : (
-                  <>
-                    {res.points}
-                    <Icon I={BsArrowDownRight} />
-                    points
-                  </>
-                )}
-              </i>
-            </Button>
-          </ButtonGroup>
-          <HTML value={res.description} />
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <p>Suggested comments:</p>
-          <div>
-            {res.presets?.map((preset) => (
-              <ShowPreset
-                key={preset.description.value}
-                preset={preset}
-                registrationId={registrationId}
-                qnum={qnum}
-                pnum={pnum}
-                bnum={bnum}
-              />
-            ))}
-          </div>
-        </Col>
-      </Row>
-    </Alert>
-  );
-};
-
-const ConditionalRubric: React.FC<{
-  depth: number;
-  conditionalRubricKey: gradingConditionalRubric$key;
-}> = (props) => {
-  const {
-    depth,
-    conditionalRubricKey,
-    children,
-  } = props;
-  const res = useFragment(
-    graphql`
-      fragment gradingConditionalRubric on ConditionalRubric {
-        condition {
-          type
-          value
-        }
-      }
-    `,
-    conditionalRubricKey,
-  );
-  const variants: AlertProps['variant'][] = ['light', 'secondary', 'dark'];
-  const variant: AlertProps['variant'] = variants[depth] ?? 'primary';
-  return (
-    <Card className="border-0">
-      <Alert variant={variant} className="p-0 m-0 rounded-0 bg-transparent">
-        <Accordion.Toggle as={Card.Header} eventKey={res.condition.value} className="rounded-0">
-          <Col className="rounded-0">
-            <HTML value={res.condition} />
-          </Col>
-        </Accordion.Toggle>
-        <Accordion.Collapse as={Card.Body} eventKey={res.condition.value}>
-          <>
-            {children}
-          </>
-        </Accordion.Collapse>
-      </Alert>
-    </Card>
-  );
-};
-
-const ShowNestedConditionalRubric: React.FC<{
-  rubric: ConditionalRubric;
-  registrationId: string;
-  qnum: number;
-  pnum: number;
-  bnum: number;
-}> = (props) => {
-  const {
-    rubric,
-    registrationId,
-    qnum,
-    pnum,
-    bnum,
-  } = props;
-  return (
-    <ConditionalRubric conditionalRubricKey={rubric} depth={2}>
-      {rubric.rubrics.map((innerRubric) => {
-        // eslint-disable-next-line no-underscore-dangle
-        if (innerRubric.__typename === 'ItemRubric') {
-          return (
-            <ItemRubric
-              key={innerRubric.label}
-              itemRubricKey={innerRubric}
-              registrationId={registrationId}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={bnum}
-            />
-          );
-        }
-        // eslint-disable-next-line no-underscore-dangle
-        if (innerRubric.__typename === 'ConditionalRubric') {
-          return (
-            <Accordion>
-              <ConditionalRubric
-                key={innerRubric.condition.value}
-                conditionalRubricKey={innerRubric}
-                depth={1}
-              >
-                {innerRubric.rubrics.map((innerInnerRubric) => (
-                  <ItemRubric
-                    key={innerInnerRubric.label}
-                    itemRubricKey={innerInnerRubric}
-                    registrationId={registrationId}
-                    qnum={qnum}
-                    pnum={pnum}
-                    bnum={bnum}
-                  />
-                ))}
-              </ConditionalRubric>
-            </Accordion>
-          );
-        }
-        return null;
-      })}
-    </ConditionalRubric>
-  );
-};
-
-export type Rubrics = gradingRubric$data['rubrics'][number]['parts'][number]['part'];
-type Rubric = Rubrics[number];
-type ConditionalRubric = Extract<Rubric, { __typename: 'ConditionalRubric' }>;
-type ItemRubric = Extract<Rubric, { __typename: 'ItemRubric' }>;
-
-function isConditionalRubric(rubric: Rubric): rubric is ConditionalRubric {
-  // eslint-disable-next-line no-underscore-dangle
-  return rubric.__typename === 'ConditionalRubric';
-}
-
-function isItemRubric(rubric: Rubric): rubric is ItemRubric {
-  // eslint-disable-next-line no-underscore-dangle
-  return rubric.__typename === 'ItemRubric';
-}
-
-export const ShowRubric: React.FC<{
-  rubric: gradingRubric$data;
-  qnum: number;
-  pnum: number;
-  bnum: number;
-  registrationId: string;
-  partRubric: Rubrics;
-  bodyRubric: Rubrics;
-}> = (props) => {
-  const {
-    qnum,
-    pnum,
-    bnum,
-    registrationId,
-    partRubric,
-    bodyRubric,
-  } = props;
-  const showRubric = (rubric: Rubric) => {
-    if (isItemRubric(rubric)) {
-      return (
-        <ItemRubric
-          key={rubric.label}
-          itemRubricKey={rubric}
-          registrationId={registrationId}
-          qnum={qnum}
-          pnum={pnum}
-          bnum={bnum}
-        />
-      );
-    }
-    if (isConditionalRubric(rubric)) {
-      return (
-        <ShowNestedConditionalRubric
-          key={rubric.condition.value}
-          rubric={rubric}
-          registrationId={registrationId}
-          qnum={qnum}
-          pnum={pnum}
-          bnum={bnum}
-        />
-      );
-    }
-    return null;
-  };
-  return (
-    <Accordion>
-      {partRubric.map(showRubric)}
-      {bodyRubric.map(showRubric)}
-    </Accordion>
-  );
-};
-
 const NewComment: React.FC<{
   disabled?: boolean;
   message: string;
@@ -677,7 +326,7 @@ const NewComments: React.FC<{
     });
     lastId.current += 1;
   };
-  const [mutate, { loading }] = useMutation<gradingCreateCommentMutation>(
+  const [mutate, { loading }] = useMutation<createCommentMutation>(
     CREATE_COMMENT_MUTATION,
     {
       configs: [addCommentConfig(registrationId)],
@@ -966,86 +615,20 @@ function AnswersRow<T, V>(
     registrationId,
     children,
   } = props;
-  const res = useFragment(
+  const res = useFragment<gradingRubric$key>(
     graphql`
     fragment gradingRubric on ExamVersion {
       id
-      rubrics {
-        parts {
-          part {
-            __typename
-            ... on ConditionalRubric {
-              condition {
-                value
-              }
-              ...gradingConditionalRubric
-              rubrics {
-                __typename
-                ... on ConditionalRubric {
-                  condition {
-                    value
-                  }
-                  ...gradingConditionalRubric
-                  rubrics {
-                    ... on ItemRubric {
-                      label
-                      ...gradingItemRubric
-                    }
-                  }
-                }
-                ... on ItemRubric {
-                  label
-                  ...gradingItemRubric
-                }
-              }
-            }
-            ... on ItemRubric {
-              label
-              ...gradingItemRubric
-            }
-          }
-          body {
-            rubrics {
-              __typename
-              ... on ConditionalRubric {
-                condition {
-                  value
-                }
-                ...gradingConditionalRubric
-                rubrics {
-                  __typename
-                  ... on ConditionalRubric {
-                    condition {
-                      value
-                    }
-                    ...gradingConditionalRubric
-                    rubrics {
-                      ... on ItemRubric {
-                        label
-                        ...gradingItemRubric
-                      }
-                    }
-                  }
-                  ... on ItemRubric {
-                    label
-                    ...gradingItemRubric
-                  }
-                }
-              }
-              ... on ItemRubric {
-                label
-                ...gradingItemRubric
-              }
-            }
-          }
-        }
-      }
+      rawRubrics
     }
     `,
     examVersionKey,
   );
-  const partRubric = res.rubrics[qnum].parts[pnum].part;
-  const bodyRubric = res.rubrics[qnum].parts[pnum]?.body[bnum]?.rubrics ?? [];
+  const rubrics = assertType(isExamRubric, res.rawRubrics);
+  const { examRubric } = rubrics;
+  const qnumRubric = rubrics.questions[qnum]?.questionRubric;
+  const pnumRubric = rubrics.questions[qnum]?.parts[pnum]?.partRubric;
+  const bnumRubric = rubrics.questions[qnum]?.parts[pnum]?.body[bnum];
   return (
     <Card>
       <Card.Body>
@@ -1082,11 +665,12 @@ function AnswersRow<T, V>(
             />
           </Col>
           <Col md={6}>
-            <ShowRubric
-              rubric={res}
+            <ShowRubrics
+              examRubric={examRubric}
+              qnumRubric={qnumRubric}
+              pnumRubric={pnumRubric}
+              bnumRubric={bnumRubric}
               registrationId={registrationId}
-              partRubric={partRubric}
-              bodyRubric={bodyRubric}
               qnum={qnum}
               pnum={pnum}
               bnum={bnum}

@@ -564,4 +564,6 @@ const ExamEditor: React.FC<
 
 const ExamEditorForm = reduxForm<FormValues, ExamEditorExtraProps>({
   form: 'version-editor',
+  asyncBlurFields: [],
+  asyncChangeFields: [],
 })(ExamEditor);

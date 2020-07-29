@@ -108,7 +108,7 @@ const ShowPreset: React.FC<{
   );
 };
 
-const ShowPresetSummary: React.FC<{
+export const ShowPresetSummary: React.FC<{
   direction: RubricPresets['direction'];
   label: string;
   mercy: number;

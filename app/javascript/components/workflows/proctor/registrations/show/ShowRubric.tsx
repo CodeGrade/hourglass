@@ -13,16 +13,14 @@ import {
   Alert,
   Row,
   Col,
-  ButtonGroup,
   Button,
   Collapse,
 } from 'react-bootstrap';
 import HTML from '@student/exams/show/components/HTML';
 import Icon from '@student/exams/show/components/Icon';
-import { BsArrowUpRight, BsArrowDownRight } from 'react-icons/bs';
 import { variantForPoints, iconForPoints } from '@grading/index';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
-import Tooltip from '@student/exams/show/components/Tooltip';
+import { ShowPresetSummary } from '@grading/UseRubrics';
 
 const ShowPreset: React.FC<{
   preset: Preset;
@@ -69,47 +67,17 @@ const ShowRubricPresets: React.FC<{ choices: RubricPresets }> = (props) => {
   const { choices } = props;
   const {
     direction,
-    label,
     presets,
-    mercy,
   } = choices;
-  const disabledMessage = (direction === 'credit'
-    ? 'Credits counting up'
-    : 'Deductions counting down'
-  );
   return (
-    <div>
-      <Row>
-        <Col>
-          <ButtonGroup className="float-right">
-            {label && <Button variant="outline-secondary" className="bg-white" size="sm" disabled>{label}</Button>}
-            <Tooltip message={disabledMessage}>
-              <Button
-                variant="outline-secondary"
-                className="bg-white"
-                size="sm"
-                disabled
-              >
-                <Icon I={direction === 'credit' ? BsArrowUpRight : BsArrowDownRight} />
-              </Button>
-            </Tooltip>
-            {mercy && (
-              <Button variant="outline-secondary" className="bg-white" size="sm" disabled>
-                {`Up to ${pluralize(mercy, 'point', 'points')}`}
-              </Button>
-            )}
-          </ButtonGroup>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          {presets.map((p, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <ShowPreset direction={direction} preset={p} key={index} />
-          ))}
-        </Col>
-      </Row>
-    </div>
+    <Row>
+      <Col>
+        {presets.map((p, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <ShowPreset direction={direction} preset={p} key={index} />
+        ))}
+      </Col>
+    </Row>
   );
 };
 
@@ -117,35 +85,54 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll }> = (props) => {
   const { rubric } = props;
   const { description, choices } = rubric;
   const [open, setOpen] = useState(false);
+  let summary;
+  let body;
+  if (isRubricPresets(choices)) {
+    const { direction, label, mercy } = choices;
+    summary = (
+      <span className="ml-auto">
+        <ShowPresetSummary
+          direction={direction}
+          label={label}
+          mercy={mercy}
+        />
+      </span>
+    );
+    body = <ShowRubricPresets choices={choices} />;
+  } else {
+    body = (
+      <>
+        {choices.map((c, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <ShowRubric key={index} rubric={c} />
+        ))}
+      </>
+    );
+  }
+  const heading = (
+    <h5 className="d-flex align-items-center">
+      <span
+        role="button"
+        onClick={() => setOpen((o) => !o)}
+        onKeyPress={() => setOpen((o) => !o)}
+        tabIndex={0}
+      >
+        Choose something from
+        <i className="mx-1">all</i>
+        entries
+        <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />
+      </span>
+      <span className="ml-auto">{summary}</span>
+    </h5>
+  );
   return (
     <div className="rubric">
       <Alert variant="dark">
-        <h5>
-          <span
-            role="button"
-            onClick={() => setOpen((o) => !o)}
-            onKeyPress={() => setOpen((o) => !o)}
-            tabIndex={0}
-          >
-            Rubric: Choose something from
-            <i className="mx-1">all</i>
-            entries
-            <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />
-          </span>
-        </h5>
+        {heading}
         <Collapse in={open}>
           <div>
             <HTML value={description} />
-            {isRubricPresets(choices) ? (
-              <ShowRubricPresets choices={choices} />
-            ) : (
-              <>
-                {choices.map((c, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <ShowRubric key={index} rubric={c} />
-                ))}
-              </>
-            )}
+            {body}
           </div>
         </Collapse>
       </Alert>
@@ -158,36 +145,56 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny }> = (props) => {
   const { points, description, choices } = rubric;
   const [open, setOpen] = useState(false);
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
+  let summary;
+  let body;
+  if (isRubricPresets(choices)) {
+    const { direction, label, mercy } = choices;
+    summary = (
+      <span className="ml-auto">
+        <ShowPresetSummary
+          direction={direction}
+          label={label}
+          mercy={mercy}
+          pointsMsg={pointsMsg}
+        />
+      </span>
+    );
+    body = <ShowRubricPresets choices={choices} />;
+  } else {
+    summary = <span className="ml-auto">{pointsMsg}</span>;
+    body = (
+      <>
+        {choices.map((c, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <ShowRubric key={index} rubric={c} />
+        ))}
+      </>
+    );
+  }
+  const heading = (
+    <h5 className="d-flex align-items-center">
+      <span
+        role="button"
+        onClick={() => setOpen((o) => !o)}
+        onKeyPress={() => setOpen((o) => !o)}
+        tabIndex={0}
+      >
+        Rubric: Choose something from
+        <i className="mx-1">any</i>
+        entries
+        <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />
+      </span>
+      <span className="ml-auto">{summary}</span>
+    </h5>
+  );
   return (
     <div className="rubric">
       <Alert variant="dark">
-        <h5>
-          <span
-            role="button"
-            onClick={() => setOpen((o) => !o)}
-            onKeyPress={() => setOpen((o) => !o)}
-            tabIndex={0}
-          >
-            Rubric: Choose something from
-            <i className="mx-1">any</i>
-            entries
-            <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />
-          </span>
-          <span className="float-right">{pointsMsg}</span>
-        </h5>
+        {heading}
         <Collapse in={open}>
           <div>
             <HTML value={description} />
-            {isRubricPresets(choices) ? (
-              <ShowRubricPresets choices={choices} />
-            ) : (
-              <>
-                {choices.map((c, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <ShowRubric key={index} rubric={c} />
-                ))}
-              </>
-            )}
+            {body}
           </div>
         </Collapse>
       </Alert>
@@ -200,36 +207,56 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne }> = (props) => {
   const { points, description, choices } = rubric;
   const [open, setOpen] = useState(false);
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
+  let summary;
+  let body;
+  if (isRubricPresets(choices)) {
+    const { direction, label, mercy } = choices;
+    summary = (
+      <span className="ml-auto">
+        <ShowPresetSummary
+          direction={direction}
+          label={label}
+          mercy={mercy}
+          pointsMsg={pointsMsg}
+        />
+      </span>
+    );
+    body = <ShowRubricPresets choices={choices} />;
+  } else {
+    summary = <span className="ml-auto">{pointsMsg}</span>;
+    body = (
+      <>
+        {choices.map((c, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <ShowRubric key={index} rubric={c} />
+        ))}
+      </>
+    );
+  }
+  const heading = (
+    <h5 className="d-flex align-items-center">
+      <span
+        role="button"
+        onClick={() => setOpen((o) => !o)}
+        onKeyPress={() => setOpen((o) => !o)}
+        tabIndex={0}
+      >
+        Rubric: Choose something from
+        <i className="mx-1">exactly one</i>
+        entry
+        <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />
+      </span>
+      <span className="ml-auto">{summary}</span>
+    </h5>
+  );
   return (
     <div className="rubric">
       <Alert variant="dark">
-        <h5>
-          <span
-            role="button"
-            onClick={() => setOpen((o) => !o)}
-            onKeyPress={() => setOpen((o) => !o)}
-            tabIndex={0}
-          >
-            Rubric: Choose something from
-            <i className="mx-1">exactly one</i>
-            entry
-            <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />
-          </span>
-          <span className="float-right">{pointsMsg}</span>
-        </h5>
+        {heading}
         <Collapse in={open}>
           <div>
             <HTML value={description} />
-            {isRubricPresets(choices) ? (
-              <ShowRubricPresets choices={choices} />
-            ) : (
-              <>
-                {choices.map((c, index) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <ShowRubric key={index} rubric={c} />
-                ))}
-              </>
-            )}
+            {body}
           </div>
         </Collapse>
       </Alert>

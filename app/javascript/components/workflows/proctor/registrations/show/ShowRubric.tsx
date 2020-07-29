@@ -179,7 +179,7 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny }> = (props) => {
         onKeyPress={() => setOpen((o) => !o)}
         tabIndex={0}
       >
-        Rubric: Choose something from
+        Choose something from
         <i className="mx-1">any</i>
         entries
         <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />
@@ -241,7 +241,7 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne }> = (props) => {
         onKeyPress={() => setOpen((o) => !o)}
         tabIndex={0}
       >
-        Rubric: Choose something from
+        Choose something from
         <i className="mx-1">exactly one</i>
         entry
         <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />

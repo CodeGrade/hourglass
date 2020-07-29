@@ -5,7 +5,22 @@
   &:last-child { margin-bottom: 0px; }
   background-color: gray; 
   border-radius: 0.25rem;
-  > .alert { background-color: transparent; }
+  > .alert { 
+    background-color: transparent; 
+    padding: 1em;
+    &.alert-dark {
+      border-color: gray;
+    }
+    &:not(:last-of-type) {
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
+      border-bottom: 0px;
+    }
+    &:not(:first-of-type) {
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
+  }
   .rubric {
     background-color: rgba(255, 255, 255, 0.65); 
     > .alert { 
@@ -14,7 +29,7 @@
     }
   }
   
-  .alert > .form-group.row:last-of-type {
+  .alert > .form-group.row:last-of-type, .preset:last-of-type {
     margin-bottom: 0;
   }
   .ql-tooltip {

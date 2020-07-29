@@ -74,7 +74,7 @@ const ShowPreset: React.FC<{
   const variant = variantForPoints(points);
   const VariantIcon = iconForPoints(points);
   return (
-    <Alert variant={variant} className="p-0">
+    <Alert variant={variant} className="p-0 preset">
       <Tooltip
         showTooltip
         message="Click to apply this message"
@@ -99,12 +99,55 @@ const ShowPreset: React.FC<{
             });
           }}
         >
-          <Icon I={VariantIcon} />
+          <Icon I={VariantIcon} className="mr-2" />
+          {`${preset.points} points`}
         </Button>
       </Tooltip>
-      {`(${preset.points} points) `}
       <span>{graderHint}</span>
     </Alert>
+  );
+};
+
+const ShowPresetSummary: React.FC<{
+  direction: RubricPresets['direction'];
+  label: string;
+  mercy: number;
+  pointsMsg?: string;
+}> = (props) => {
+  const {
+    direction,
+    label,
+    mercy,
+    pointsMsg,
+  } = props;
+  const disabledMessage = (direction === 'credit'
+    ? 'Credits counting up'
+    : 'Deductions counting down'
+  );
+  return (
+    <ButtonGroup>
+      {label && <Button variant="outline-secondary" className="bg-white" size="sm" disabled>{label}</Button>}
+      <Tooltip message={disabledMessage}>
+        <Button
+          variant="outline-secondary"
+          className="bg-white"
+          size="sm"
+          disabled
+        >
+          <Icon I={direction === 'credit' ? BsArrowUpRight : BsArrowDownRight} />
+        </Button>
+      </Tooltip>
+      {mercy && (
+        <Button variant="outline-secondary" className="bg-white" size="sm" disabled>
+          {`Up to ${pluralize(mercy, 'point', 'points')}`}
+        </Button>
+      )}
+      {pointsMsg !== undefined && (
+        <Button variant="outline-secondary" className="bg-white" size="sm" disabled>
+          {pointsMsg}
+        </Button>
+      )}
+    </ButtonGroup>
   );
 };
 
@@ -117,55 +160,24 @@ const ShowRubricPresets: React.FC<ShowRubricProps<RubricPresets>> = (props) => {
     registrationId,
   } = props;
   const {
-    direction,
-    label,
     presets,
-    mercy,
   } = rubric;
-  const disabledMessage = (direction === 'credit'
-    ? 'Credits counting up'
-    : 'Deductions counting down'
-  );
   return (
-    <div>
-      <Row>
-        <Col>
-          <ButtonGroup className="float-right">
-            {label && <Button variant="outline-secondary" className="bg-white" size="sm" disabled>{label}</Button>}
-            <Tooltip message={disabledMessage}>
-              <Button
-                variant="outline-secondary"
-                className="bg-white"
-                size="sm"
-                disabled
-              >
-                <Icon I={direction === 'credit' ? BsArrowUpRight : BsArrowDownRight} />
-              </Button>
-            </Tooltip>
-            {mercy && (
-              <Button variant="outline-secondary" className="bg-white" size="sm" disabled>
-                {`Up to ${pluralize(mercy, 'point', 'points')}`}
-              </Button>
-            )}
-          </ButtonGroup>
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          {presets.map((p, index) => (
-            <ShowPreset
-              // eslint-disable-next-line react/no-array-index-key
-              key={index}
-              preset={p}
-              registrationId={registrationId}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={bnum}
-            />
-          ))}
-        </Col>
-      </Row>
-    </div>
+    <Row>
+      <Col>
+        {presets.map((p, index) => (
+          <ShowPreset
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+            preset={p}
+            registrationId={registrationId}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
+          />
+        ))}
+      </Col>
+    </Row>
   );
 };
 
@@ -178,39 +190,58 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
     registrationId,
   } = props;
   const { description, choices } = rubric;
-  return (
-    <>
-      <h5>
-        Choose something from
-        <i className="mx-1">all</i>
-        entries
-      </h5>
-      <div>
-        <HTML value={description} />
-        {isRubricPresets(choices) ? (
-          <ShowRubricPresets
-            rubric={choices}
+  let summary;
+  let body;
+  if (isRubricPresets(choices)) {
+    const { direction, label, mercy } = choices;
+    summary = (
+      <span className="ml-auto">
+        <ShowPresetSummary
+          direction={direction}
+          label={label}
+          mercy={mercy}
+        />
+      </span>
+    );
+    body = (
+      <ShowRubricPresets
+        rubric={choices}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
+    );
+  } else {
+    body = (
+      <div className="rubric">
+        {choices.map((c, index) => (
+          <ShowRubric
+            /* eslint-disable-next-line react/no-array-index-key */
+            key={index}
+            rubric={c}
             qnum={qnum}
             pnum={pnum}
             bnum={bnum}
             registrationId={registrationId}
           />
-        ) : (
-          <>
-            {choices.map((c, index) => (
-              <ShowRubric
-                /* eslint-disable-next-line react/no-array-index-key */
-                key={index}
-                rubric={c}
-                qnum={qnum}
-                pnum={pnum}
-                bnum={bnum}
-                registrationId={registrationId}
-              />
-            ))}
-          </>
-        )}
+        ))}
       </div>
+    );
+  }
+  const heading = (
+    <h5 className="d-flex align-items-center">
+      Choose something from
+      <i className="mx-1">all</i>
+      entries
+      <span className="ml-auto">{summary}</span>
+    </h5>
+  );
+  return (
+    <>
+      {heading}
+      <HTML value={description} />
+      {body}
     </>
   );
 };
@@ -225,35 +256,30 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
   } = props;
   const { description, choices, points } = rubric;
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
+  let summary;
+  let body;
   if (isRubricPresets(choices)) {
-    return (
-      <>
-        <h5>
-          Choose something from
-          <i className="mx-1">any</i>
-          entries
-          <span className="float-right">{pointsMsg}</span>
-        </h5>
-        <HTML value={description} />
-        <ShowRubricPresets
-          rubric={choices}
-          qnum={qnum}
-          pnum={pnum}
-          bnum={bnum}
-          registrationId={registrationId}
-        />
-      </>
+    const { direction, label, mercy } = choices;
+    summary = (
+      <ShowPresetSummary
+        direction={direction}
+        label={label}
+        mercy={mercy}
+        pointsMsg={pointsMsg}
+      />
     );
-  }
-  return (
-    <>
-      <h5>
-        Choose something from
-        <i className="mx-1">any</i>
-        entries
-        <span className="float-right">{pointsMsg}</span>
-      </h5>
-      <HTML value={description} />
+    body = (
+      <ShowRubricPresets
+        rubric={choices}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
+    );
+  } else {
+    summary = <>{pointsMsg}</>;
+    body = (
       <Accordion>
         {choices.map((r, i) => (
           <ShowRubric
@@ -267,13 +293,90 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
           />
         ))}
       </Accordion>
-    </>
+    );
+  }
+  const heading = (
+    <h5 className="d-flex align-items-center">
+      Choose exactly
+      <i className="mx-1">one</i>
+      entry
+      <span className="ml-auto">{summary}</span>
+    </h5>
+  );
+  return (
+    <div>
+      {heading}
+      <HTML value={description} />
+      {body}
+    </div>
   );
 };
 
 const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
-  const { rubric } = props;
-  return <>{JSON.stringify(rubric)}</>;
+  const {
+    rubric,
+    qnum,
+    pnum,
+    bnum,
+    registrationId,
+  } = props;
+  const { description, choices, points } = rubric;
+  let summary;
+  let body;
+  if (isRubricPresets(choices)) {
+    const { direction, label, mercy } = choices;
+    const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
+    summary = (
+      <span className="ml-auto">
+        <ShowPresetSummary
+          direction={direction}
+          label={label}
+          mercy={mercy}
+          pointsMsg={pointsMsg}
+        />
+      </span>
+    );
+    body = (
+      <ShowRubricPresets
+        rubric={choices}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
+    );
+  } else {
+    body = (
+      <div className="rubric">
+        {choices.map((c, index) => (
+          <ShowRubric
+            /* eslint-disable-next-line react/no-array-index-key */
+            key={index}
+            rubric={c}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
+            registrationId={registrationId}
+          />
+        ))}
+      </div>
+    );
+  }
+  const heading = (
+    <h5 className="d-flex align-items-center">
+      Choose something from
+      <i className="mx-1">any</i>
+      appropriate entries
+      <span className="ml-auto">{summary}</span>
+    </h5>
+  );
+  return (
+    <div>
+      {heading}
+      <HTML value={description} />
+      {body}
+    </div>
+  );
 };
 
 const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
@@ -330,6 +433,10 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
   );
 };
 
+function nonEmptyRubric(r ?: Rubric): boolean {
+  return r !== null && r !== undefined && r.type !== 'none';
+}
+
 export const ShowRubrics: React.FC<{
   examRubric: Rubric;
   qnumRubric: Rubric;
@@ -352,7 +459,7 @@ export const ShowRubrics: React.FC<{
   } = props;
   return (
     <>
-      {examRubric && (
+      {nonEmptyRubric(examRubric) && (
         <>
           <h5>Exam-wide rubric</h5>
           <div className="rubric">
@@ -366,7 +473,7 @@ export const ShowRubrics: React.FC<{
           </div>
         </>
       )}
-      {qnumRubric && (
+      {nonEmptyRubric(qnumRubric) && (
         <>
           <h5>Question rubric</h5>
           <div className="rubric">
@@ -380,7 +487,7 @@ export const ShowRubrics: React.FC<{
           </div>
         </>
       )}
-      {pnumRubric && (
+      {nonEmptyRubric(pnumRubric) && (
         <>
           <h5>Part rubric</h5>
           <div className="rubric">
@@ -394,7 +501,7 @@ export const ShowRubrics: React.FC<{
           </div>
         </>
       )}
-      {bnumRubric && (
+      {nonEmptyRubric(bnumRubric) && (
         <>
           <h5>Item rubric</h5>
           <div className="rubric">

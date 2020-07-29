@@ -98,10 +98,12 @@ export interface ExamVersionWithAnswers extends Omit<ExamVersion, 'questions'> {
   examRubric?: Rubric;
 }
 
+type GradingComment = string;
+
 export type Preset = {
   label?: string;
-  graderHint: HTMLVal;
-  studentFeedback?: HTMLVal;
+  graderHint: GradingComment;
+  studentFeedback?: GradingComment;
   points: number;
 }
 
@@ -121,8 +123,8 @@ function isHTMLVal(obj : unknown): obj is HTMLVal {
 function isPreset(obj : unknown): obj is Preset {
   if (obj === undefined || obj === null) return false;
   const objAsPreset = (obj as Preset);
-  return isHTMLVal(objAsPreset.graderHint)
-    && maybe(isHTMLVal)(objAsPreset.studentFeedback)
+  return (typeof objAsPreset.graderHint === 'string')
+    && (objAsPreset.studentFeedback === undefined || typeof objAsPreset.studentFeedback === 'string')
     && (typeof objAsPreset.points === 'number');
 }
 

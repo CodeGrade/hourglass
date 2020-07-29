@@ -86,10 +86,9 @@ const RubricPresetEditor: React.FC<{
           <Form.Label column sm="2">Grader hint</Form.Label>
           <Col sm="10">
             <Field
-              className="bg-white border rounded"
+              className="bg-white border rounded w-100"
               name="graderHint"
-              component={EditHTMLField}
-              theme="bubble"
+              component="input"
               placeholder="Give a description to graders to use"
             />
           </Col>
@@ -98,10 +97,9 @@ const RubricPresetEditor: React.FC<{
           <Form.Label column sm="2">Student feedback</Form.Label>
           <Col sm="10">
             <Field
-              className="bg-white border rounded"
+              className="bg-white border rounded w-100"
               name="studentFeedback"
-              component={EditHTMLField}
-              theme="bubble"
+              component="input"
               placeholder="Give a default message to students -- if blank, will use the grader hint"
             />
           </Col>
@@ -144,7 +142,7 @@ const RubricPresetsArrayEditor: React.FC<
             onClick={(): void => {
               fields.push({
                 points: 0,
-                graderHint: { type: 'HTML', value: '' },
+                graderHint: '',
               });
             }}
           >
@@ -310,7 +308,7 @@ const RubricEntriesEditor: React.FC<WrappedFieldProps & RubricEntriesProps> = (p
                   direction: 'deduction',
                   presets: [{
                     points: 0,
-                    graderHint: { type: 'HTML', value: '' },
+                    graderHint: '',
                   }],
                 });
               }}

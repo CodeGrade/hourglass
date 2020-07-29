@@ -105,8 +105,8 @@ class Upload
       presets: r['presets']&.map do |p|
         {
           label: p['label'],
-          graderHint: make_html_val(p['graderHint']),
-          studentFeedback: make_html_val(p['studentFeedback']),
+          graderHint: p['graderHint'],
+          studentFeedback: p['studentFeedback'],
           points: p['points']
         }.compact
       end.compact

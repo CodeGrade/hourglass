@@ -334,8 +334,8 @@
       "required": ["graderHint", "points"],
       "properties": {
         "label": { "type": "string" },
-        "graderHint": { "$ref": "#/definitions/HTML" },
-        "studentFeedback": { "$ref": "#/definitions/HTML" },
+        "graderHint": { "type": "string" },
+        "studentFeedback": { "type": "string" },
         "points": { "type": "number" }
       }
     },

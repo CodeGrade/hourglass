@@ -50,14 +50,14 @@ const ShowPreset: React.FC<{
         {pluralize(points, 'point', 'points')}
       </Button>
       {label && <span>{`[${label}]`}</span>}
-      <HTML value={graderHint} className="d-inline-block" />
+      <span>{graderHint}</span>
       {studentFeedback && (
         <Row className="p-2">
           <Col sm="2">
             <i className="mr-2">Sample student message:</i>
           </Col>
           <Col className="border border-info bg-white rounded mr-3">
-            <HTML value={studentFeedback} />
+            {studentFeedback}
           </Col>
         </Row>
       )}

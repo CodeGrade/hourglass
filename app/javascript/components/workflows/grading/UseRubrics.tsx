@@ -92,7 +92,7 @@ const ShowPreset: React.FC<{
                   qnum,
                   pnum,
                   bnum,
-                  message: (studentFeedback ?? graderHint).value,
+                  message: (studentFeedback ?? graderHint),
                   points,
                 },
               },
@@ -103,7 +103,7 @@ const ShowPreset: React.FC<{
         </Button>
       </Tooltip>
       {`(${preset.points} points) `}
-      <HTML className="d-inline-block" value={graderHint} />
+      <span>{graderHint}</span>
     </Alert>
   );
 };

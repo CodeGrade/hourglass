@@ -94,7 +94,18 @@ class ExamVersion < ApplicationRecord
       exam: exam,
       name: "#{exam.name} Version #{n}",
       files: [],
-      info: { policies: [], answers: [], contents: { reference: [], questions: [] } },
+      info: { 
+        policies: [],
+        answers: [],
+        contents: {
+          reference: [],
+          questions: []
+        },
+        rubrics: {
+          questions: [],
+          examRubric: { type: 'none' }
+        }
+      },
     )
   end
 

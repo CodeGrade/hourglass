@@ -180,6 +180,42 @@ class CreateSchema < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+    
+    create_table :rubrics do |t|
+      t.references :exam_version, null: false, foreign_key: true
+      t.references :parent_section, null: true, foreign_key: { to_table: 'rubrics' }
+      t.string :type, null: false
+      t.string :description, null: true
+      t.float :points, null: true
+
+      t.integer :qnum, null: true
+      t.integer :pnum, null: true
+      t.integer :bnum, null: true
+      t.integer :order, null: true
+
+      t.timestamps
+    end
+
+    create_table :rubric_presets do |t|
+      t.references :rubric, null: false, foreign_key: true
+      t.string :label, null: true
+      t.string :direction, null: false
+      t.float :mercy, null: true
+      t.integer :order, null: true
+
+      t.timestamps
+    end
+
+    create_table :preset_comments do |t|
+      t.references :rubric_preset, null: false, foreign_key: true
+      t.string :label, null: true
+      t.string :grader_hint, null: false
+      t.string :student_feedback, null: true
+      t.float :points, null: false
+      t.integer :order, null: true
+      
+      t.timestamps
+    end
 
     create_table :grading_locks do |t|
       t.references :registration, null: false, foreign_key: true

@@ -124,6 +124,18 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.index ["sender_id"], name: "index_messages_on_sender_id"
   end
 
+  create_table "preset_comments", force: :cascade do |t|
+    t.bigint "rubric_preset_id", null: false
+    t.string "label"
+    t.string "grader_hint", null: false
+    t.string "student_feedback"
+    t.float "points", null: false
+    t.integer "order"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["rubric_preset_id"], name: "index_preset_comments_on_rubric_preset_id"
+  end
+
   create_table "proctor_registrations", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "exam_id", null: false
@@ -187,6 +199,33 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["exam_id"], name: "index_rooms_on_exam_id"
+  end
+
+  create_table "rubric_presets", force: :cascade do |t|
+    t.bigint "rubric_id", null: false
+    t.string "label"
+    t.string "direction", null: false
+    t.float "mercy"
+    t.integer "order"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["rubric_id"], name: "index_rubric_presets_on_rubric_id"
+  end
+
+  create_table "rubrics", force: :cascade do |t|
+    t.bigint "exam_version_id", null: false
+    t.bigint "parent_section_id"
+    t.string "type", null: false
+    t.string "description"
+    t.float "points"
+    t.integer "qnum"
+    t.integer "pnum"
+    t.integer "bnum"
+    t.integer "order"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["exam_version_id"], name: "index_rubrics_on_exam_version_id"
+    t.index ["parent_section_id"], name: "index_rubrics_on_parent_section_id"
   end
 
   create_table "sections", force: :cascade do |t|
@@ -267,6 +306,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   add_foreign_key "grading_locks", "users", column: "grader_id"
   add_foreign_key "messages", "registrations"
   add_foreign_key "messages", "users", column: "sender_id"
+  add_foreign_key "preset_comments", "rubric_presets"
   add_foreign_key "proctor_registrations", "exams"
   add_foreign_key "proctor_registrations", "rooms"
   add_foreign_key "proctor_registrations", "users"
@@ -278,6 +318,9 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   add_foreign_key "registrations", "users"
   add_foreign_key "room_announcements", "rooms"
   add_foreign_key "rooms", "exams"
+  add_foreign_key "rubric_presets", "rubrics"
+  add_foreign_key "rubrics", "exam_versions"
+  add_foreign_key "rubrics", "rubrics", column: "parent_section_id"
   add_foreign_key "sections", "courses"
   add_foreign_key "snapshots", "registrations"
   add_foreign_key "staff_registrations", "sections"

@@ -13,6 +13,8 @@ class ExamVersion < ApplicationRecord
   has_many :anomalies, through: :registrations
   has_many :grading_locks, through: :registrations
 
+  has_many :rubrics, dependent: :destroy
+
   validates :exam, presence: true
 
   delegate :course, to: :exam
@@ -55,10 +57,6 @@ class ExamVersion < ApplicationRecord
     info['answers']
   end
 
-  def rubrics
-    info['rubrics']
-  end
-
   def questions
     contents['questions']
   end
@@ -85,6 +83,119 @@ class ExamVersion < ApplicationRecord
     {
       answers: def_answers,
       scratch: '',
+    }
+  end
+
+  def set_rubrics!(rubrics)
+    Rubric.transaction do
+      convert_rubric(rubrics['examRubric'], nil, nil, nil)
+      rubrics['questions']&.each_with_index do |qrubric, qnum|
+        puts "#{qnum} => #{qrubric.keys} ==> $#{qrubric}"
+        convert_rubric(qrubric['questionRubric'], qnum, nil, nil)
+        qrubric['parts']&.each_with_index do |prubric, pnum|
+          puts "#{qnum}, #{pnum} => #{prubric.keys} ==> #{prubric}"
+          convert_rubric(prubric['partRubric'], qnum, pnum, nil)
+          prubric['body']&.each_with_index do |brubric, bnum|
+            puts "#{qnum}, #{pnum}, #{bnum} => #{brubric.keys} ==> #{brubric}"
+            convert_rubric(brubric, qnum, pnum, bnum)
+          end
+        end
+      end
+    end
+    puts self.rubrics
+  end
+
+  def convert_rubric(r, qnum, pnum, bnum, order = nil, parent = nil)
+    return if r.nil?
+    puts "#{qnum}, #{pnum}, #{bnum}, #{order} => #{r}"
+    rubric = Rubric.create(type: r['type'].capitalize,
+      qnum: qnum,
+      pnum: pnum,
+      bnum: bnum,
+      order: order,
+      parent_section: parent,
+      exam_version: self)
+    self.rubrics << rubric
+    if (r['choices'].is_a? Hash)
+      convert_presets(r['choices'], qnum, pnum, bnum, rubric)
+    else
+      r['choices']&.each_with_index do |c, cindex|
+        convert_rubric(c, qnum, pnum, bnum, cindex, rubric)
+      end
+    end
+  end
+
+  def convert_presets(presets, qnum, pnum, bnum, rubric)
+    p = RubricPreset.create(
+      label: presets['label'],
+      direction: presets['direction'],
+      mercy: presets['mercy']&.to_f,
+      rubric: rubric
+    )
+    rubric.rubric_presets << p
+    presets['presets']&.each_with_index do |preset, pindex|
+      p.preset_comments << PresetComment.create(
+        label: preset['label'],
+        points: preset['points'],
+        grader_hint: preset['graderHint'],
+        student_feedback: preset['studentFeedback'],
+        order: pindex,
+        rubric_preset: p
+      )
+    end
+  end
+
+  # def create_rubric(exam_version)
+  #   rubrics = {
+  #     examRubric: convert_rubric(contents['examRubric'], nil, nil, nil, nil),
+  #     questions: contents['questions'].each_with_index.map do |qnum, q|
+  #       {
+  #         questionRubric: convert_rubric(q['questionRubric'], qnum, nil, nil, nil),
+  #         parts: q['parts']&.each_with_index.map do |pnum, p|
+  #           {
+  #             partRubric: convert_rubric(p['partRubric'], qnum, pnum, nil, nil),
+  #             body: p['body']&.each_with_index.map do |bnum, b|
+  #               if (b.is_a? Hash)
+  #                 convert_rubric(b.values.first['rubric'], qnum, pnum, bnum, nil)
+  #               else
+  #                 convert_rubric(nil, qnum, pnum, bnum, nil)
+  #               end
+  #             end || [],
+  #           }
+  #         end || [],
+  #       }
+  #     end || []
+  #   }
+  # end
+
+  def version_rubric
+    all_rubrics = rubrics.includes(subsections: {rubric_presets: [:preset_comments]})
+    roots = all_rubrics.where(parent_section: nil)
+    by_qnum = roots.group_by(&:qnum)
+    exam_rubric = by_qnum.delete(nil)
+    q_rubrics = by_qnum.map do |qnum, q_rubrics|
+      by_pnum = q_rubrics.group_by(&:pnum)
+      question_rubric = by_pnum.delete(nil)
+      p_rubrics = by_pnum.map do |pnum, p_rubrics|
+        by_bnum = p_rubrics.group_by(&:bnum)
+        part_rubric = by_bnum.delete(nil)
+        b_rubrics = by_bnum.map do |bnum, b_rubrics|
+          # TODO: fix this
+          [bnum, b_rubrics.sort_by(&:order)]
+        end.to_h
+        {
+          part_rubric: part_rubric,
+          body: b_rubrics
+        }
+      end
+      {
+        question_rubric: question_rubric,
+        parts: p_rubrics
+      }
+    end
+    {
+      exam_rubric: exam_rubric,
+      questions: q_rubrics
     }
   end
 

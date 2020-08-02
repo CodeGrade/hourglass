@@ -29,12 +29,14 @@ class Upload
 
   attr_reader :files
   attr_reader :info
+  attr_reader :rubrics
 
   def initialize(upload)
     @upload = upload
     @upload_data = @upload.read
     @files = []
     @info = {}
+    @rubrics = nil
     @dir = Pathname.new(Dir.mktmpdir)
     extract_contents!
     parse_info!
@@ -69,13 +71,16 @@ class Upload
       JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, properties['files'])
       @info = properties['info']
       @files = properties['files']
+      @rubrics = properties['info']['rubrics']
     else
       begin
         JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
         @info = parse_info(properties)
+        @rubrics = @info['rubrics']
       rescue JSON::Schema::ValidationError
         JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties)
         @info = properties
+        @rubrics = @info['rubrics']
       end
     end
   end

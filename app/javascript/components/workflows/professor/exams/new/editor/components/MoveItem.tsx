@@ -12,8 +12,10 @@ import {
 } from 'react-icons/fa';
 
 export interface MoveProps {
-  enableUp?: boolean;
-  enableDown?: boolean;
+  enableUp: boolean;
+  enableDown: boolean;
+  enableDelete?: boolean;
+  disabledDeleteMessage?: string;
   variant?: ButtonProps['variant'];
   visible: boolean;
   onUp?: () => void;
@@ -26,6 +28,8 @@ const MoveItem: React.FC<MoveProps> = (props) => {
   const {
     enableUp,
     enableDown,
+    enableDelete = true,
+    disabledDeleteMessage,
     variant,
     visible,
     onUp,
@@ -78,8 +82,10 @@ const MoveItem: React.FC<MoveProps> = (props) => {
           )}
           <Button
             variant="danger"
+            disabled={!enableDelete}
             onClick={onDelete}
-            title="Delete"
+            className={enableDelete ? '' : 'cursor-not-allowed'}
+            title={enableDelete ? 'Delete' : disabledDeleteMessage}
           >
             <FaTrashAlt />
           </Button>

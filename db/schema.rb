@@ -90,6 +90,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.bigint "creator_id", null: false
     t.text "message", null: false
     t.bigint "registration_id", null: false
+    t.bigint "preset_comment_id"
     t.integer "qnum", null: false
     t.integer "pnum", null: false
     t.integer "bnum", null: false
@@ -97,6 +98,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["creator_id"], name: "index_grading_comments_on_creator_id"
+    t.index ["preset_comment_id"], name: "index_grading_comments_on_preset_comment_id"
     t.index ["registration_id"], name: "index_grading_comments_on_registration_id"
   end
 
@@ -206,7 +208,6 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.string "label"
     t.string "direction", null: false
     t.float "mercy"
-    t.integer "order"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["rubric_id"], name: "index_rubric_presets_on_rubric_id"
@@ -224,6 +225,8 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
     t.integer "order"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["exam_version_id", "qnum", "pnum", "bnum", "order"], name: "unique_rubric_order_per_coords", unique: true, where: "(parent_section_id IS NOT NULL)"
+    t.index ["exam_version_id", "qnum", "pnum", "bnum"], name: "unique_rubric_root_coords", unique: true, where: "(parent_section_id IS NULL)"
     t.index ["exam_version_id"], name: "index_rubrics_on_exam_version_id"
     t.index ["parent_section_id"], name: "index_rubrics_on_parent_section_id"
   end
@@ -299,6 +302,7 @@ ActiveRecord::Schema.define(version: 2020_05_22_182009) do
   add_foreign_key "exams", "courses"
   add_foreign_key "grading_checks", "registrations"
   add_foreign_key "grading_checks", "users", column: "creator_id"
+  add_foreign_key "grading_comments", "preset_comments"
   add_foreign_key "grading_comments", "registrations"
   add_foreign_key "grading_comments", "users", column: "creator_id"
   add_foreign_key "grading_locks", "registrations"

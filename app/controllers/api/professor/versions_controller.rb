@@ -17,8 +17,8 @@ module Api
           name: "#{@exam.name} Version #{n}",
           files: upload.files,
           info: upload.info,
+          json_rubrics: upload.rubrics
         )
-        @version.set_rubrics! upload.rubrics
         @version.save!
         render json: {
           id: HourglassSchema.id_from_object(@version, Types::ExamVersionType, {}),

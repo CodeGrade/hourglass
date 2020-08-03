@@ -180,7 +180,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
-    
+
     create_table :rubrics do |t|
       t.references :exam_version, null: false, foreign_key: true
       t.references :parent_section, null: true, foreign_key: { to_table: 'rubrics' }
@@ -193,6 +193,9 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.integer :bnum, null: true
       t.integer :order, null: true
 
+      t.index [:exam_version_id, :qnum, :pnum, :bnum], name: 'unique_rubric_root_coords', unique: true, where: "parent_section_id IS NULL"
+      t.index [:exam_version_id, :qnum, :pnum, :bnum, :order], name: 'unique_rubric_order_per_coords', unique: true, where: "parent_section_id IS NOT NULL"
+
       t.timestamps
     end
 
@@ -201,7 +204,6 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.string :label, null: true
       t.string :direction, null: false
       t.float :mercy, null: true
-      t.integer :order, null: true
 
       t.timestamps
     end
@@ -235,6 +237,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.references :creator, null: false, foreign_key: { to_table: 'users' }
       t.text :message, null: false
       t.references :registration, null: false, foreign_key: true
+      t.references :preset_comment, null: true, foreign_key: true
 
       t.integer :qnum, null: false
       t.integer :pnum, null: false

@@ -4,6 +4,10 @@
       "IGNORE_LOCKDOWN",
       "TOLERATE_WINDOWED"
     ],
+    "rubrics": {
+      "examRubric": { "type": "none" },
+      "questions": [],
+    },
     "answers": [
       [
         [

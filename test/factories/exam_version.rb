@@ -57,5 +57,6 @@ FactoryBot.define do
     exam
     files { upload.files }
     info { upload.info }
+    json_rubrics { upload.rubrics }
   end
 end

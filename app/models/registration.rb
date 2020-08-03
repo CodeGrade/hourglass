@@ -130,27 +130,15 @@ class Registration < ApplicationRecord
   end
 
   def current_score
-    current_part_scores.flatten.sum
+    exam_version.score_for(self)
+  end
+
+  def current_part_scores
+    exam_version.part_scores_for(self)
   end
 
   def current_score_percentage
     (current_score / exam_version.total_points.to_f) * 100.0
-  end
-
-  # Tree of questions to parts to score for that part
-  def current_part_scores
-    exam_version.part_tree do |qnum:, pnum:, rubric:, part:, **|
-      checks_sum = grading_checks.where(qnum: qnum, pnum: pnum).map(&:points).compact.sum
-      comments_sum = grading_comments.where(qnum: qnum, pnum: pnum).map(&:points).sum
-      combined_rubric = [rubric['part']] + rubric['body'].map { |b| b['rubrics'] }
-      credit_rubrics =
-        combined_rubric
-        .map { |r| ExamVersion.itemrubrics_in_rubric(r) }
-        .flatten
-        .select { |r| r['direction'] == 'credit' }
-      credit_points = credit_rubrics.map { |r| r['points'] }.sum
-      (part['points'] + checks_sum + comments_sum - credit_points).to_f
-    end
   end
 
   def my_questions

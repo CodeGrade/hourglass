@@ -65,7 +65,7 @@ class Upload
       else
         @dir.join('exam.yaml')
       end
-    properties = YAML.safe_load(File.read(file))
+    properties = YAML.safe_load(File.read(file)).deep_stringify_keys
     if properties.key? 'files'
       JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties['info'])
       JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, properties['files'])
@@ -75,7 +75,7 @@ class Upload
     else
       begin
         JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
-        @info = parse_info(properties)
+        @info = parse_info(properties).deep_stringify_keys
         @rubrics = @info['rubrics']
       rescue JSON::Schema::ValidationError
         JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties)

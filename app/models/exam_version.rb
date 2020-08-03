@@ -15,6 +15,8 @@ class ExamVersion < ApplicationRecord
 
   has_many :rubrics, dependent: :destroy
 
+  attr_writer :json_rubrics
+
   validates :exam, presence: true
 
   delegate :course, to: :exam
@@ -86,34 +88,30 @@ class ExamVersion < ApplicationRecord
     }
   end
 
-  def set_rubrics!(rubrics)
-    Rubric.transaction do
-      convert_rubric(rubrics['examRubric'], nil, nil, nil)
-      rubrics['questions']&.each_with_index do |qrubric, qnum|
-        puts "#{qnum} => #{qrubric.keys} ==> $#{qrubric}"
-        convert_rubric(qrubric['questionRubric'], qnum, nil, nil)
-        qrubric['parts']&.each_with_index do |prubric, pnum|
-          puts "#{qnum}, #{pnum} => #{prubric.keys} ==> #{prubric}"
-          convert_rubric(prubric['partRubric'], qnum, pnum, nil)
-          prubric['body']&.each_with_index do |brubric, bnum|
-            puts "#{qnum}, #{pnum}, #{bnum} => #{brubric.keys} ==> #{brubric}"
-            convert_rubric(brubric, qnum, pnum, bnum)
-          end
+  def json_rubrics=(rubrics)
+    return unless self.new_record?
+    convert_rubric(rubrics['examRubric'], nil, nil, nil)
+    rubrics['questions']&.each_with_index do |qrubric, qnum|
+      convert_rubric(qrubric['questionRubric'], qnum, nil, nil)
+      qrubric['parts']&.each_with_index do |prubric, pnum|
+        convert_rubric(prubric['partRubric'], qnum, pnum, nil)
+        prubric['body']&.each_with_index do |brubric, bnum|
+          convert_rubric(brubric, qnum, pnum, bnum)
         end
       end
     end
-    puts self.rubrics
   end
 
   def convert_rubric(r, qnum, pnum, bnum, order = nil, parent = nil)
     return if r.nil?
-    puts "#{qnum}, #{pnum}, #{bnum}, #{order} => #{r}"
-    rubric = Rubric.create(type: r['type'].capitalize,
+    rubric = Rubric.new(type: r['type'].capitalize,
       qnum: qnum,
       pnum: pnum,
       bnum: bnum,
       order: order,
       parent_section: parent,
+      description: r.dig('description', 'value'),
+      points: r['points'],
       exam_version: self)
     self.rubrics << rubric
     if (r['choices'].is_a? Hash)
@@ -126,15 +124,14 @@ class ExamVersion < ApplicationRecord
   end
 
   def convert_presets(presets, qnum, pnum, bnum, rubric)
-    p = RubricPreset.create(
+    p = RubricPreset.new(
       label: presets['label'],
       direction: presets['direction'],
       mercy: presets['mercy']&.to_f,
       rubric: rubric
     )
-    rubric.rubric_presets << p
     presets['presets']&.each_with_index do |preset, pindex|
-      p.preset_comments << PresetComment.create(
+      p.preset_comments << PresetComment.new(
         label: preset['label'],
         points: preset['points'],
         grader_hint: preset['graderHint'],
@@ -145,59 +142,102 @@ class ExamVersion < ApplicationRecord
     end
   end
 
-  # def create_rubric(exam_version)
-  #   rubrics = {
-  #     examRubric: convert_rubric(contents['examRubric'], nil, nil, nil, nil),
-  #     questions: contents['questions'].each_with_index.map do |qnum, q|
-  #       {
-  #         questionRubric: convert_rubric(q['questionRubric'], qnum, nil, nil, nil),
-  #         parts: q['parts']&.each_with_index.map do |pnum, p|
-  #           {
-  #             partRubric: convert_rubric(p['partRubric'], qnum, pnum, nil, nil),
-  #             body: p['body']&.each_with_index.map do |bnum, b|
-  #               if (b.is_a? Hash)
-  #                 convert_rubric(b.values.first['rubric'], qnum, pnum, bnum, nil)
-  #               else
-  #                 convert_rubric(nil, qnum, pnum, bnum, nil)
-  #               end
-  #             end || [],
-  #           }
-  #         end || [],
-  #       }
-  #     end || []
-  #   }
-  # end
-
-  def version_rubric
-    all_rubrics = rubrics.includes(subsections: {rubric_presets: [:preset_comments]})
-    roots = all_rubrics.where(parent_section: nil)
-    by_qnum = roots.group_by(&:qnum)
-    exam_rubric = by_qnum.delete(nil)
-    q_rubrics = by_qnum.map do |qnum, q_rubrics|
-      by_pnum = q_rubrics.group_by(&:pnum)
-      question_rubric = by_pnum.delete(nil)
-      p_rubrics = by_pnum.map do |pnum, p_rubrics|
-        by_bnum = p_rubrics.group_by(&:bnum)
-        part_rubric = by_bnum.delete(nil)
-        b_rubrics = by_bnum.map do |bnum, b_rubrics|
-          # TODO: fix this
-          [bnum, b_rubrics.sort_by(&:order)]
-        end.to_h
+  def rubric_as_json
+    rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)
+    exam_rubric = rubric_tree.delete(nil)&.dig(nil, nil)&.as_json
+    q_rubrics = rubric_tree.sort.map do |qnum, q_rubrics|
+      question_rubric = q_rubrics.delete(nil)&.dig(nil)&.as_json
+      p_rubrics = q_rubrics.sort.map do |pnum, p_rubrics|
+        part_rubric = p_rubrics.delete(nil)&.as_json
+        b_rubrics = p_rubrics.sort.map{|_, b| b.as_json}
         {
-          part_rubric: part_rubric,
+          partRubric: part_rubric,
           body: b_rubrics
-        }
+        }.compact
       end
       {
-        question_rubric: question_rubric,
+        questionRubric: question_rubric,
         parts: p_rubrics
-      }
+      }.compact
     end
     {
-      exam_rubric: exam_rubric,
+      examRubric: exam_rubric,
       questions: q_rubrics
-    }
+    }.compact.deep_stringify_keys
   end
+
+  def compare_rubrics(r1, r2)
+    begin
+      compare_help("ROOT", r1, r2)
+      true
+    rescue Exception => e
+      e.message
+    end
+  end
+  def compare_help(path, r1, r2)
+    if r1.is_a?(Hash) && r2.is_a?(Hash)
+      mismatch = r1.keys.to_set ^ r2.keys.to_set
+      unless mismatch.empty?
+        raise "Mismatched keys at #{path}: #{r1.keys} ^ #{r2.keys} = #{mismatch}"
+      end
+      r1.keys.each do |k|
+        compare_help "#{path}.#{k}", r1[k], r2[k]
+      end
+    elsif r1.is_a?(Array) && r2.is_a?(Array)
+      unless r1.length == r2.length
+        raise "Mismatched lengths at #{path}: #{r1.length} vs #{r2.length}"
+      end
+      (0...r1.length).each do |i|
+        compare_help "#{path}[#{i}]", r1[i], r2[i]
+      end
+    elsif r1 != r2
+      raise "Not equal at #{path}: #{r1} != #{r2}"
+    end
+  end
+
+  def score_for(reg)
+    begin
+      comments = multi_group_by(reg.grading_comments, [:qnum, :pnum, :bnum, :preset_comment])
+      checks = multi_group_by(reg.grading_checks, [:qnum, :pnum, :bnum])
+      rubrics_for_grading.sum do |r|
+        r.compute_grade_for(reg, comments, checks, r.qnum, r.pnum, r.bnum)
+      end
+    rescue Exception => e
+      puts e.message
+      puts e.backtrace
+    end
+  end
+
+
+  # Tree of questions to parts to score for that part
+  def part_scores_for(reg)
+    begin
+    comments = multi_group_by(reg.grading_comments, [:qnum, :pnum, :bnum, :preset_comment])
+    checks = multi_group_by(reg.grading_checks, [:qnum, :pnum, :bnum])
+    rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)
+    exam_rubric = rubric_tree.dig(nil, nil, nil)
+    part_tree do |qnum:, pnum:, **|
+      question_rubric = rubric_tree.dig(qnum, nil, nil)
+      part_rubric = rubric_tree.dig(qnum, pnum, nil)
+      [
+        exam_rubric&.compute_grade_for(reg, comments, checks, qnum, pnum, nil),
+        question_rubric&.compute_grade_for(reg, comments, checks, qnum, pnum, nil),
+        part_rubric&.compute_grade_for(reg, comments, checks, qnum, pnum, nil)
+      ].compact.sum + rubric_tree.dig(qnum, pnum)&.sum do |key, r|
+        if key.nil?
+          0
+        else
+          r.compute_grade_for(reg, comments, checks, qnum, pnum, r.bnum)
+        end
+      end
+    end
+    rescue Exception => e
+      puts e.message
+      puts e.backtrace
+    end
+  end
+
+
 
   def self.new_empty(exam)
     n = exam.exam_versions.length + 1
@@ -279,43 +319,25 @@ class ExamVersion < ApplicationRecord
     end.flatten(1)
   end
 
-  def self.itemrubrics_in_rubric(rubric)
-    rubric.map do |r|
-      if r.key? 'rubrics'
-        ExamVersion.itemrubrics_in_rubric(r['rubrics'])
-      else
-        r
-      end
-    end
+  def root_rubrics
+    rubrics.where(parent_section: nil)
   end
 
-  def all_itemrubrics
-    rubrics.map do |qrubric|
-      qrubric['parts'].map do |prubric|
-        [
-          ExamVersion.itemrubrics_in_rubric(prubric['part']),
-          prubric['body'].map do |brubric|
-            ExamVersion.itemrubrics_in_rubric(brubric['rubrics'])
-          end,
-        ]
-      end
-    end.flatten
-  end
-
-  # -> PartRubric
-  def rubric_for_part(qnum, pnum)
-    rubrics.dig(qnum, 'parts', pnum)
+  def rubrics_for_grading
+    root_rubrics.includes(rubric_preset: :preset_comments,
+                          subsections: [rubric_preset: :preset_comments,
+                                        subsections: [rubric_preset: :preset_comments,
+                                                      subsections: [rubric_preset: :preset_comments]]])
   end
 
   def part_tree
     questions.each_with_index.map do |q, qnum|
       q['parts'].each_with_index.map do |p, pnum|
-        yield({
+        yield(**{
           question: q,
           part: p,
           qnum: qnum,
           pnum: pnum,
-          rubric: rubric_for_part(qnum, pnum),
         })
       end
     end

@@ -56,7 +56,7 @@ const NewExamForm: React.FC<{
       <h2>New Exam</h2>
       <Card className="mb-4">
         <Card.Body>
-          <Form.Group as={Row} controlId="examTitle">
+          <Form.Group as={Row} controlId="examTitle" className="align-items-center">
             <Form.Label column sm={2}>
               Exam name:
             </Form.Label>
@@ -101,7 +101,7 @@ const NewExamForm: React.FC<{
             </span>
             <div className="col flex-grow-0 pl-0" />
           </Form.Group>
-          <Form.Group as={Row} controlId="examStartTime">
+          <Form.Group as={Row} controlId="examStartTime" className="align-items-center">
             <Form.Label column sm={2}>Start time:</Form.Label>
             <Col>
               <DateTimePicker
@@ -112,7 +112,7 @@ const NewExamForm: React.FC<{
               />
             </Col>
           </Form.Group>
-          <Form.Group as={Row} controlId="examEndTime">
+          <Form.Group as={Row} controlId="examEndTime" className="align-items-center">
             <Form.Label column sm={2}>End time:</Form.Label>
             <Col>
               <DateTimePicker
@@ -123,7 +123,7 @@ const NewExamForm: React.FC<{
               />
             </Col>
           </Form.Group>
-          <Form.Group as={Row} controlId="examDuration">
+          <Form.Group as={Row} controlId="examDuration" className="align-items-center">
             <Form.Label column sm={2}>Duration (minutes):</Form.Label>
             <Col>
               <Form.Control

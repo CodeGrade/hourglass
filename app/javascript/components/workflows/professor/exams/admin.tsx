@@ -455,15 +455,15 @@ const ExamInfoViewer: React.FC<{
             </Button>
           </span>
         </h1>
-        <Row>
+        <Row className="align-items-center">
           <Form.Label column sm={2}>Starts:</Form.Label>
           <ReadableDate value={startTime} showTime />
         </Row>
-        <Row>
+        <Row className="align-items-center">
           <Form.Label column sm={2}>Ends:</Form.Label>
           <ReadableDate value={endTime} showTime />
         </Row>
-        <Row>
+        <Row className="align-items-center">
           <Form.Label column sm={2}>Duration:</Form.Label>
           {`${duration / 60.0} minutes`}
         </Row>
@@ -498,7 +498,7 @@ export const ExamInfoEditor: React.FC<{
   return (
     <Card className="mb-4">
       <Card.Body>
-        <Form.Group as={Row} controlId="examTitle">
+        <Form.Group as={Row} controlId="examTitle" className="align-items-center">
           <Form.Label column sm={2}>
             Exam name:
           </Form.Label>
@@ -536,7 +536,7 @@ export const ExamInfoEditor: React.FC<{
           </span>
           <div className="col flex-grow-0 pl-0" />
         </Form.Group>
-        <Form.Group as={Row} controlId="examStartTime">
+        <Form.Group as={Row} controlId="examStartTime" className="align-items-center">
           <Form.Label column sm={2}>Start time:</Form.Label>
           <Col>
             <DateTimePicker
@@ -547,7 +547,7 @@ export const ExamInfoEditor: React.FC<{
             />
           </Col>
         </Form.Group>
-        <Form.Group as={Row} controlId="examEndTime">
+        <Form.Group as={Row} controlId="examEndTime" className="align-items-center">
           <Form.Label column sm={2}>End time:</Form.Label>
           <Col>
             <DateTimePicker
@@ -558,7 +558,7 @@ export const ExamInfoEditor: React.FC<{
             />
           </Col>
         </Form.Group>
-        <Form.Group as={Row} controlId="examDuration">
+        <Form.Group as={Row} controlId="examDuration" className="align-items-center">
           <Form.Label column sm={2}>Duration (minutes):</Form.Label>
           <Col>
             <Form.Control

@@ -12,8 +12,14 @@ module Types
     field :registrations, [Types::RegistrationType], null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
+    def registations
+      AssociationLoader.for(Room, :registrations).load(object)
+    end
     field :proctor_registrations, [Types::ProctorRegistrationType], null: false do
       guard Guards::PROFESSORS
+    end
+    def proctor_registrations
+      AssociationLoader.for(Room, :proctor_registrations).load(object)
     end
 
     field :room_announcements, Types::RoomAnnouncementType.connection_type, null: false

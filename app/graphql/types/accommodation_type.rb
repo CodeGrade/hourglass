@@ -10,6 +10,9 @@ module Types
     description 'Accommodates a student with additional time.'
 
     field :registration, Types::RegistrationType, null: false
+    def registration
+      RecordLoader.for(Registration).load(object.registration_id)
+    end
     field :new_start_time, GraphQL::Types::ISO8601DateTime, null: true
     field :percent_time_expansion, Integer, null: false
   end

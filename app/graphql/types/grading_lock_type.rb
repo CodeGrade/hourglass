@@ -8,8 +8,17 @@ module Types
     guard Guards::VISIBILITY
 
     field :registration, Types::RegistrationType, null: false
+    def registration
+      RecordLoader.for(Registration).load(object.registration_id)
+    end
     field :grader, Types::UserType, null: true
+    def registration
+      RecordLoader.for(User).load(object.grader_id)
+    end
     field :completed_by, Types::UserType, null: true
+    def registration
+      RecordLoader.for(User).load(object.completed_by_id)
+    end
 
     field :qnum, Integer, null: false
     field :pnum, Integer, null: false

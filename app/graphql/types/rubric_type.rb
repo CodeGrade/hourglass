@@ -63,7 +63,7 @@ module Types
     field :points, Float, null: true
     field :description, Types::HtmlType, null: true
     def description
-      {
+      object.description && {
         type: 'HTML',
         value: object.description
       }

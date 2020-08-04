@@ -10,6 +10,9 @@ module Types
     field :reason, String, null: false
 
     field :registration, Types::RegistrationType, null: false
+    def registration
+      RecordLoader.for(Registration).load(object.registration_id)
+    end
 
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
   end

@@ -9,6 +9,12 @@ module Types
 
     field :title, String, null: false
     field :students, [Types::UserType], null: false
+    def students
+      AssociationLoader.for(Section, :students).load(object)
+    end
     field :staff, [Types::UserType], null: false
+    def staff
+      AssociationLoader.for(Section, :staff).load(object)
+    end
   end
 end

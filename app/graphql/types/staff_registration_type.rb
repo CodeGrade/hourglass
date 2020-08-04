@@ -8,5 +8,8 @@ module Types
     guard Guards::VISIBILITY
 
     field :course, CourseType, null: false
+    def course
+      RecordLoader.for(Course).load(object.course_id)
+    end
   end
 end

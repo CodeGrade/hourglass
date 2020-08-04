@@ -22,9 +22,12 @@ module Mutations
 
       trigger_subscription(registration.exam, q)
 
-      range_add = GraphQL::Relay::RangeAdd.new({
-        parent: registration, collection: registration.questions, item: q, context: context
-      })
+      range_add = GraphQL::Relay::RangeAdd.new(
+        parent: registration,
+        collection: registration.questions,
+        item: q,
+        context: context
+      )
 
       { question: q, questions_connection: range_add.connection, question_edge: range_add.edge }
     end

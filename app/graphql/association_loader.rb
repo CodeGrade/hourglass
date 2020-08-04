@@ -5,9 +5,10 @@ class AssociationLoader < GraphQL::Batch::Loader
     nil
   end
 
-  def initialize(model, association_name)
+  def initialize(model, association_name, merge: nil)
     @model = model
     @association_name = association_name
+    @merge = merge
     validate
   end
 
@@ -40,7 +41,9 @@ class AssociationLoader < GraphQL::Batch::Loader
   end
 
   def read_association(record)
-    record.public_send(@association_name)
+    scope = record.public_send(@association_name)
+    scope = scope.merge(@merge) if @merge.present?
+    scope
   end
 
   def association_loaded?(record)

@@ -32,7 +32,7 @@ module Types
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def anomalies
-      object.anomalies.unforgiven
+      AssociationLoader.for(Exam, :anomalies, merge: -> { Anomaly.unforgiven }).load(object)
     end
 
     field :messages, Types::MessageType.connection_type, null: false do
@@ -42,28 +42,27 @@ module Types
     field :version_announcements, Types::VersionAnnouncementType.connection_type, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
-
     def version_announcements
-      object.version_announcements.order(created_at: :desc)
+      AssociationLoader.for(Exam, :version_announcements, merge: -> { order(created_at: :desc) }).load(object)
     end
 
     field :room_announcements, Types::RoomAnnouncementType.connection_type, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def room_announcements
-      object.room_announcements.order(created_at: :desc)
+      AssociationLoader.for(Exam, :room_announcements, merge: -> { order(created_at: :desc) }).load(object)
     end
 
     field :exam_announcements, Types::ExamAnnouncementType.connection_type, null: false
     def exam_announcements
-      object.exam_announcements.order(created_at: :desc)
+      AssociationLoader.for(Exam, :exam_announcements, merge: -> { order(created_at: :desc) }).load(object)
     end
 
     field :questions, Types::QuestionType.connection_type, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def questions
-      object.questions.order(created_at: :desc)
+      AssociationLoader.for(Exam, :questions, merge: -> { order(created_at: :desc) }).load(object)
     end
 
     field :accommodations, Types::AccommodationType.connection_type, null: false do
@@ -78,14 +77,14 @@ module Types
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def final_registrations
-      object.registrations.final
+      AssociationLoader.for(Exam, :registrations, merge: -> { final }).load(object)
     end
 
     field :registrations_without_accommodation, Types::RegistrationType.connection_type, null: false do
       guard Guards::PROFESSORS
     end
     def registrations_without_accommodation
-      object.registrations.without_accommodation
+      AssociationLoader.for(Exam, :version_announcements, merge: -> { Registration.without_accommodation }).load(object)
     end
 
     field :registrations_without_rooms, [Types::RegistrationType], null: false do
@@ -106,6 +105,7 @@ module Types
 
     field :my_registration, Types::RegistrationType, null: true
     def my_registration
+      # TODO?
       object.registrations.find_by(user: context[:current_user])
     end
 

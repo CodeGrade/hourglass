@@ -8,6 +8,7 @@ class GraphqlChannel < ApplicationCable::Channel
     variables = ensure_hash(data["variables"])
     operation_name = data["operationName"]
     context = {
+      access_cache: {},
       # Re-implement whatever context methods you need
       # in this channel or ApplicationCable::Channel
       current_user: current_user,

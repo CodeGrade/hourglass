@@ -14,9 +14,12 @@ module Subscriptions
     end
 
     def update(exam_version:)
-      range_add = GraphQL::Relay::RangeAdd.new({
-        parent: exam_version, collection: exam_version.version_announcements, item: object, context: context
-      })
+      range_add = GraphQL::Relay::RangeAdd.new(
+        parent: exam_version,
+        collection: exam_version.version_announcements,
+        item: object,
+        context: context
+      )
       {
         version_announcement: object,
         version_announcements_edge: range_add.edge,

@@ -8,6 +8,9 @@ module Mutations
     argument :points, Float, required: true
 
     field :grading_comment, Types::GradingCommentType, null: false
+    def preset_comment
+      RecordLoader.for(PresetComment).load(object.preset_comment_id)
+    end
 
     def authorized?(grading_comment:, **_args)
       return true if grading_comment.course.all_staff.exists? context[:current_user].id

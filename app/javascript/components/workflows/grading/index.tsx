@@ -23,6 +23,7 @@ import {
   FaTrash,
   FaChevronUp,
   FaChevronDown,
+  FaUndo,
 } from 'react-icons/fa';
 import { RiMessage2Line, RiChatDeleteLine, RiChatCheckLine } from 'react-icons/ri';
 import { FiCheckSquare } from 'react-icons/fi';
@@ -174,6 +175,8 @@ const Feedback: React.FC<{
   onChangeMessage?: (comment: string) => void;
   points: number;
   onChangePoints?: (pts: number) => void;
+  couldReset?: boolean;
+  onReset?: () => void;
   onRemove?: () => void;
   onBlur?: AlertProps['onBlur'];
   status: CommentSaveStatus;
@@ -185,6 +188,8 @@ const Feedback: React.FC<{
     onChangePoints,
     message,
     onChangeMessage,
+    couldReset,
+    onReset,
     onRemove,
     onBlur,
     status,
@@ -217,6 +222,17 @@ const Feedback: React.FC<{
         <Form.Group className="ml-auto mr-3">
           <Form.Label>Status</Form.Label>
           <div>
+            {couldReset && (
+              <Button
+                className="mr-2"
+                variant="outline-warning"
+                size="sm"
+                onClick={onReset}
+                title="Reset to suggested preset values"
+              >
+                <Icon I={FaUndo} />
+              </Button>
+            )}
             <span>
               <ShowStatusIcon error={error} status={status} />
             </span>
@@ -226,6 +242,7 @@ const Feedback: React.FC<{
               variant="outline-danger"
               size="sm"
               onClick={onRemove}
+              title="Delete this comment"
             >
               <Icon I={FaTrash} />
             </Button>
@@ -418,6 +435,12 @@ const UPDATE_COMMENT_MUTATION = graphql`
         id
         points
         message
+        presetComment {
+          id
+          graderHint
+          studentFeedback
+          points
+        }
       }
     }
   }
@@ -431,11 +454,16 @@ const SavedComment: React.FC<{
     registrationId,
     comment,
   } = props;
+  const {
+    message,
+    points,
+    presetComment,
+  } = comment;
   const { alert } = useContext(AlertContext);
   const [error, setError] = useState<string>(null);
   const [value, setValue] = useState<CommentVal>({
-    message: comment.message,
-    points: comment.points,
+    message,
+    points,
   });
   const [status, setStatus] = useState<CommentSaveStatus>(CommentSaveStatus.SAVED);
   const onChangeMessage = (newMsg: string) => {
@@ -452,6 +480,18 @@ const SavedComment: React.FC<{
       points: newPoints,
     }));
   };
+  const onReset = () => {
+    setStatus(CommentSaveStatus.DIRTY);
+    setValue((old) => ({
+      ...old,
+      message: presetComment.studentFeedback ?? presetComment.graderHint,
+      points: presetComment.points,
+    }));
+  };
+  const couldReset = (presetComment instanceof Object)
+    && ((value.message !== presetComment.studentFeedback
+           && value.message !== presetComment.graderHint)
+        || value.points !== presetComment.points);
   const [mutateUpdate, { loading: updateLoading }] = useMutation<gradingUpdateCommentMutation>(
     UPDATE_COMMENT_MUTATION,
     {
@@ -520,6 +560,8 @@ const SavedComment: React.FC<{
       onChangePoints={onChangePoints}
       message={value.message}
       onChangeMessage={onChangeMessage}
+      couldReset={couldReset}
+      onReset={onReset}
       status={status}
       onRemove={removeComment}
       onBlur={doUpdate}
@@ -925,6 +967,12 @@ const Grade: React.FC<{
             bnum
             points
             message
+            presetComment {
+              id
+              points
+              graderHint
+              studentFeedback
+            }
           }
         }
       }

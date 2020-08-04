@@ -11,6 +11,9 @@ export const CREATE_COMMENT_MUTATION = graphql`
         bnum
         points
         message
+        presetComment {
+          id
+        }
       }
       gradingCommentEdge {
         node {

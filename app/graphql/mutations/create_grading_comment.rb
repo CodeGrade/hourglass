@@ -18,6 +18,9 @@ module Mutations
     field :grading_comment_edge, Types::GradingCommentType.edge_type, null: false
     field :registration_id, ID, null: false
     field :preset_comment, Types::PresetCommentType, null: true
+    def preset_comment
+      RecordLoader.for(PresetComment).load(object.preset_comment_id)
+    end
 
     def authorized?(registration:, **_args)
       return true if registration.course.all_staff.exists? context[:current_user].id

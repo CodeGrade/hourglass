@@ -7,7 +7,10 @@ module Types
 
     guard Guards::VISIBILITY
 
-    field :preset_comment_id, ID, null: true
+    field :preset_comment, Types::PresetCommentType, null: true
+    def preset_comment
+      RecordLoader.for(PresetComment).load(object.preset_comment_id)
+    end
     field :qnum, Integer, null: false
     field :pnum, Integer, null: false
     field :bnum, Integer, null: false

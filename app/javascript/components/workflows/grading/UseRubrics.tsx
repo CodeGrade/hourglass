@@ -27,10 +27,14 @@ import { AlertContext } from '@hourglass/common/alerts';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
 import { useMutation } from 'relay-hooks';
 import { createCommentMutation } from './__generated__/createCommentMutation.graphql';
+import { grading_one$data } from './__generated__/grading_one.graphql';
 
-export const foo = 1;
+type GradingComment = grading_one$data['gradingComments']['edges'][number]['node'];
+type PresetCommentId = GradingComment['presetComment']['id']
+
 interface ShowRubricProps<R> {
   rubric: R;
+  showCompletenessAgainst?: PresetCommentId[];
   qnum: number;
   pnum: number;
   bnum: number;
@@ -110,6 +114,16 @@ const ShowPreset: React.FC<{
   );
 };
 
+const completenessStatus = (status ?: boolean): string => {
+  if (status === true) {
+    return 'status-valid';
+  }
+  if (status === false) {
+    return 'status-invalid';
+  }
+  return '';
+};
+
 export const ShowPresetSummary: React.FC<{
   direction: RubricPresets['direction'];
   label: string;
@@ -183,9 +197,45 @@ const ShowRubricPresets: React.FC<ShowRubricProps<RubricPresets>> = (props) => {
   );
 };
 
+function isRubricComplete(rubric: Rubric, presetIDs: PresetCommentId[]): boolean {
+  if (rubric === undefined || rubric === null) return undefined;
+  if (presetIDs === undefined || presetIDs === null) return undefined;
+  switch (rubric.type) {
+    case 'none': return true;
+    case 'all': {
+      const { choices } = rubric;
+      if (choices instanceof Array) {
+        return choices.every((r) => isRubricComplete(r, presetIDs));
+      }
+      return choices.presets.every((p) => presetIDs.some((id) => (p.id === id)));
+    }
+    case 'any': {
+      const { choices } = rubric;
+      if (choices instanceof Array) {
+        return choices.some((r) => isRubricComplete(r, presetIDs));
+      }
+      return choices.presets.some((p) => presetIDs.some((id) => (p.id === id)));
+    }
+    case 'one': {
+      const { choices } = rubric;
+      if (choices instanceof Array) {
+        return choices.reduce((sum, r) => (
+          sum + (isRubricComplete(r, presetIDs) ? 1 : 0)
+        ), 0) === 1;
+      }
+      return choices.presets.reduce((sum, p) => (
+        sum + (presetIDs.some((id) => (p.id === id)) ? 1 : 0)
+      ), 0) === 1;
+    }
+    default:
+      throw new ExhaustiveSwitchError(rubric);
+  }
+}
+
 const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   const {
     rubric,
+    showCompletenessAgainst,
     qnum,
     pnum,
     bnum,
@@ -221,6 +271,7 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
           <ShowRubric
             /* eslint-disable-next-line react/no-array-index-key */
             key={index}
+            showCompletenessAgainst={showCompletenessAgainst}
             rubric={c}
             qnum={qnum}
             pnum={pnum}
@@ -388,7 +439,10 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
     pnum,
     bnum,
     registrationId,
+    showCompletenessAgainst,
   } = props;
+  const showCompleteness = isRubricComplete(rubric, showCompletenessAgainst);
+  const completenessClass = rubric.type !== 'any' ? completenessStatus(showCompleteness) : '';
   let body;
   switch (rubric.type) {
     case 'none': return null;
@@ -396,6 +450,7 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
       body = (
         <ShowAll
           rubric={rubric}
+          showCompletenessAgainst={showCompletenessAgainst}
           qnum={qnum}
           pnum={pnum}
           bnum={bnum}
@@ -407,6 +462,7 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
       body = (
         <ShowAny
           rubric={rubric}
+          showCompletenessAgainst={showCompletenessAgainst}
           qnum={qnum}
           pnum={pnum}
           bnum={bnum}
@@ -418,6 +474,7 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
       body = (
         <ShowOne
           rubric={rubric}
+          showCompletenessAgainst={showCompletenessAgainst}
           qnum={qnum}
           pnum={pnum}
           bnum={bnum}
@@ -429,7 +486,7 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
       throw new ExhaustiveSwitchError(rubric, `showing rubric for q${qnum}-p${pnum}-b${bnum}`);
   }
   return (
-    <Alert variant="dark">
+    <Alert variant="dark" className={completenessClass}>
       {body}
     </Alert>
   );
@@ -444,6 +501,7 @@ export const ShowRubrics: React.FC<{
   qnumRubric: Rubric;
   pnumRubric: Rubric;
   bnumRubric: Rubric;
+  showCompletenessAgainst?: PresetCommentId[];
   qnum: number;
   pnum: number;
   bnum: number;
@@ -454,6 +512,7 @@ export const ShowRubrics: React.FC<{
     qnumRubric,
     pnumRubric,
     bnumRubric,
+    showCompletenessAgainst,
     qnum,
     pnum,
     bnum,
@@ -467,6 +526,7 @@ export const ShowRubrics: React.FC<{
           <div className="rubric">
             <ShowRubric
               rubric={examRubric}
+              showCompletenessAgainst={showCompletenessAgainst}
               qnum={qnum}
               pnum={pnum}
               bnum={bnum}
@@ -481,6 +541,7 @@ export const ShowRubrics: React.FC<{
           <div className="rubric">
             <ShowRubric
               rubric={qnumRubric}
+              showCompletenessAgainst={showCompletenessAgainst}
               qnum={qnum}
               pnum={pnum}
               bnum={bnum}
@@ -495,6 +556,7 @@ export const ShowRubrics: React.FC<{
           <div className="rubric">
             <ShowRubric
               rubric={pnumRubric}
+              showCompletenessAgainst={showCompletenessAgainst}
               qnum={qnum}
               pnum={pnum}
               bnum={bnum}
@@ -509,6 +571,7 @@ export const ShowRubrics: React.FC<{
           <div className="rubric">
             <ShowRubric
               rubric={bnumRubric}
+              showCompletenessAgainst={showCompletenessAgainst}
               qnum={qnum}
               pnum={pnum}
               bnum={bnum}

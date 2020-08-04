@@ -743,6 +743,7 @@ function AnswersRow<T, V>(
               qnumRubric={qnumRubric}
               pnumRubric={pnumRubric}
               bnumRubric={bnumRubric}
+              showCompletenessAgainst={comments.map((c) => c.presetComment?.id)}
               registrationId={registrationId}
               qnum={qnum}
               pnum={pnum}

@@ -50,7 +50,15 @@ module Types
       guard Guards::PROCTORS_AND_PROFESSORS
     end
 
-    field :rubrics, [Types::QuestionRubricType], null: true do
+    field :rubrics, [Types::RubricType], null: true do
+      guard Guards::PROFESSORS
+    end
+
+    field :rubric_presets, [Types::RubricPresetType], null: true do
+      guard Guards::PROFESSORS
+    end
+
+    field :preset_comments, [Types::PresetCommentType], null: true do
       guard Guards::PROFESSORS
     end
 

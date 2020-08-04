@@ -14,6 +14,8 @@ class ExamVersion < ApplicationRecord
   has_many :grading_locks, through: :registrations
 
   has_many :rubrics, dependent: :destroy
+  has_many :rubric_presets, through: :rubrics
+  has_many :preset_comments, through: :rubric_presets
 
   attr_writer :json_rubrics
 

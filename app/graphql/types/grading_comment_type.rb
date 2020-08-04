@@ -7,6 +7,7 @@ module Types
 
     guard Guards::VISIBILITY
 
+    field :preset_comment_id, ID, null: true
     field :qnum, Integer, null: false
     field :pnum, Integer, null: false
     field :bnum, Integer, null: false

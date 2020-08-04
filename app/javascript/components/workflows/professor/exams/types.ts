@@ -101,6 +101,7 @@ export interface ExamVersionWithAnswers extends Omit<ExamVersion, 'questions'> {
 type GradingComment = string;
 
 export type Preset = {
+  id?: string;
   label?: string;
   graderHint: GradingComment;
   studentFeedback?: GradingComment;

@@ -39,6 +39,7 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
     direction,
     presets: presetComments.map((c) => {
       const {
+        id,
         // eslint-disable-next-line no-shadow
         label,
         graderHint,
@@ -47,6 +48,7 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
       } = c;
       // eslint-disable-next-line no-shadow
       const ans: Preset = {
+        id,
         graderHint,
         points,
       };

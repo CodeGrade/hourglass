@@ -52,6 +52,7 @@ const ShowPreset: React.FC<{
     bnum,
   } = props;
   const {
+    id,
     points,
     graderHint,
     studentFeedback,
@@ -89,6 +90,7 @@ const ShowPreset: React.FC<{
               variables: {
                 input: {
                   registrationId,
+                  presetCommentId: id,
                   qnum,
                   pnum,
                   bnum,

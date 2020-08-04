@@ -13,8 +13,11 @@ module Types
 
     field :policies, [Types::LockdownPolicyType], null: false
 
-    field :students, [Types::UserType], null: false, method: :users do
+    field :students, [Types::UserType], null: false do
       guard Guards::PROFESSORS
+    end
+    def students
+      AssociationLoader.for(ExamVersion, :users).load(object)
     end
 
     field :any_started, Boolean, null: false do
@@ -53,13 +56,8 @@ module Types
     field :rubrics, [Types::RubricType], null: true do
       guard Guards::PROFESSORS
     end
-
-    field :rubric_presets, [Types::RubricPresetType], null: true do
-      guard Guards::PROFESSORS
-    end
-
-    field :preset_comments, [Types::PresetCommentType], null: true do
-      guard Guards::PROFESSORS
+    def rubrics
+      AssociationLoader.for(ExamVersion, :rubrics).load(object)
     end
 
     field :raw_rubrics, GraphQL::Types::JSON, null: true do

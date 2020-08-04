@@ -14,6 +14,7 @@ gem 'puma', '~> 4.1'
 
 gem 'graphql'
 gem 'graphql-guard'
+gem 'graphql-batch'
 
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
 gem 'webpacker', '~> 5.1'

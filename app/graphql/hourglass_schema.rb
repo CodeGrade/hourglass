@@ -1,4 +1,5 @@
 require 'graphql/subscriptions/action_cable_subscriptions'
+require 'graphql/batch'
 
 class HourglassSchema < GraphQL::Schema
   mutation(Types::MutationType)
@@ -7,6 +8,7 @@ class HourglassSchema < GraphQL::Schema
 
   use GraphQL::Execution::Interpreter
   use GraphQL::Analysis::AST
+  use GraphQL::Batch
 
   use GraphQL::Guard.new(
     not_authorized: lambda do |type, field|

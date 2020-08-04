@@ -20,6 +20,11 @@ module Types
     field :student_feedback, String, null: true
     field :points, Float, null: false
     field :order, Integer, null: true
+
+    field :rubric_preset, GraphQL::Schema::LateBoundType.new('RubricPreset'), null: false
+    def rubric_preset
+      RecordLoader.for(RubricPreset).load(object.rubric_preset_id)
+    end
   end
 
   class RubricPresetType < Types::BaseObject
@@ -31,6 +36,14 @@ module Types
     field :mercy, Float, null: true
 
     field :preset_comments, [Types::PresetCommentType], null: false
+    def preset_comments
+      AssociationLoader.for(RubricPreset, :preset_comments).load(object)
+    end
+
+    field :rubric, GraphQL::Schema::LateBoundType.new('Rubric'), null: false
+    def rubric
+      RecordLoader.for(Rubric).load(object.rubric_id)
+    end
   end
 
   class RubricType < Types::BaseObject
@@ -57,6 +70,12 @@ module Types
     end
     
     field :subsections, [Types::RubricType], null: true
+    def subsections
+      AssociationLoader.for(Rubric, :subsections).load(object)
+    end
     field :rubric_preset, Types::RubricPresetType, null: true
+    def rubric_preset
+      AssociationLoader.for(Rubric, :rubric_preset).load(object)
+    end
   end
 end

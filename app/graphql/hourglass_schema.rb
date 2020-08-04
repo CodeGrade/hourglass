@@ -22,8 +22,11 @@ class HourglassSchema < GraphQL::Schema
   use GraphQL::Subscriptions::ActionCableSubscriptions
 
   # Create UUIDs by joining the type name & ID, then base64-encoding it
+  def self.id_from_object_id(object_id, type_definition, _query_ctx)
+    GraphQL::Schema::UniqueWithinType.encode(type_definition.graphql_name, object_id)
+  end
   def self.id_from_object(object, type_definition, _query_ctx)
-    GraphQL::Schema::UniqueWithinType.encode(type_definition.graphql_name, object.id)
+    self.id_from_object_id(object.id, type_definition, _query_ctx)
   end
 
   def self.object_from_id(id, _query_ctx)

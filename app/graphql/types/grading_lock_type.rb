@@ -12,11 +12,11 @@ module Types
       RecordLoader.for(Registration).load(object.registration_id)
     end
     field :grader, Types::UserType, null: true
-    def registration
+    def grader
       RecordLoader.for(User).load(object.grader_id)
     end
     field :completed_by, Types::UserType, null: true
-    def registration
+    def completed_by
       RecordLoader.for(User).load(object.completed_by_id)
     end
 

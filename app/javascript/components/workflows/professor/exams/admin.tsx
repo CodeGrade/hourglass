@@ -70,6 +70,7 @@ import {
 } from 'relay-hooks';
 import { uploadFile } from '@hourglass/common/types/api';
 import { ExamRubric, assertType, isExamRubric } from '@professor/exams/types';
+import convertRubric from '@professor/exams/rubrics';
 import './dnd.scss';
 
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
@@ -719,7 +720,37 @@ const ShowVersion: React.FC<{
       instructions
       files
       answers
-      rawRubrics
+      rubrics {
+        id
+        type
+        parentSectionId
+        qnum
+        pnum
+        bnum
+        order
+        points
+        description { 
+          type
+          value
+        }
+        rubricPreset {
+          id
+          direction
+          label
+          mercy
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+        subsections {
+          id
+        }
+      }
     }
     `,
     version,
@@ -775,6 +806,7 @@ const ShowVersion: React.FC<{
       scratch: '',
     },
   };
+  const rubrics = assertType(isExamRubric, convertRubric(res.rubrics));
   let disabledDeleteMessage = '';
   if (res.anyFinalized) {
     disabledDeleteMessage = 'Students have already finished taking this exam version';
@@ -846,7 +878,7 @@ const ShowVersion: React.FC<{
         <PreviewVersion
           open={preview}
           contents={parsedContents}
-          rubric={assertType(isExamRubric, res.rawRubrics)}
+          rubric={rubrics}
         />
       </ErrorBoundary>
     </>

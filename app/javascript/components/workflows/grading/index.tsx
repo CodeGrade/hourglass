@@ -55,6 +55,7 @@ import DisplayText from '@proctor/registrations/show/questions/DisplayText';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
+import convertRubric from '@professor/exams/rubrics';
 import {
   useParams,
   Switch,
@@ -619,12 +620,42 @@ function AnswersRow<T, V>(
     graphql`
     fragment gradingRubric on ExamVersion {
       id
-      rawRubrics
+      rubrics {
+        id
+        type
+        parentSectionId
+        qnum
+        pnum
+        bnum
+        order
+        points
+        description { 
+          type
+          value
+        }
+        rubricPreset {
+          id
+          direction
+          label
+          mercy
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+        subsections {
+          id
+        }
+      }
     }
     `,
     examVersionKey,
   );
-  const rubrics = assertType(isExamRubric, res.rawRubrics);
+  const rubrics = assertType(isExamRubric, convertRubric(res.rubrics));
   const { examRubric } = rubrics;
   const qnumRubric = rubrics.questions[qnum]?.questionRubric;
   const pnumRubric = rubrics.questions[qnum]?.parts[pnum]?.partRubric;

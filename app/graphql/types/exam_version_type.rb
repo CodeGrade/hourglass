@@ -26,6 +26,12 @@ module Types
     def any_started
       object.any_started?
     end
+    field :started_count, Integer, null: false do
+      guard Guards::PROFESSORS
+    end
+    def started_count
+      object.registrations.started.count
+    end
 
     field :any_finalized, Boolean, null: false do
       guard Guards::PROFESSORS
@@ -33,6 +39,14 @@ module Types
     def any_finalized
       object.any_finalized?
     end
+    field :finalized_count, Integer, null: false do
+      guard Guards::PROFESSORS
+    end
+    def finalized_count
+      object.registrations.final.count
+    end
+
+
     field :questions, GraphQL::Types::JSON, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end

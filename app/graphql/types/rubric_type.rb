@@ -25,6 +25,11 @@ module Types
     def rubric_preset
       RecordLoader.for(RubricPreset).load(object.rubric_preset_id)
     end
+
+    field :in_use, Boolean, null: false
+    def in_use
+      object.in_use?
+    end
   end
 
   class RubricPresetType < Types::BaseObject
@@ -43,6 +48,11 @@ module Types
     field :rubric, GraphQL::Schema::LateBoundType.new('Rubric'), null: false
     def rubric
       RecordLoader.for(Rubric).load(object.rubric_id)
+    end
+
+    field :in_use, Boolean, null: false
+    def in_use
+      object.in_use?
     end
   end
 
@@ -86,6 +96,11 @@ module Types
     field :rubric_preset, Types::RubricPresetType, null: true
     def rubric_preset
       AssociationLoader.for(Rubric, :rubric_preset).load(object)
+    end
+
+    field :in_use, Boolean, null: false
+    def in_use
+      object.in_use?
     end
   end
 end

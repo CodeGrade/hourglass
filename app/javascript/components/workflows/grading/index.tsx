@@ -53,7 +53,7 @@ import GradeYesNo from '@grading/questions/GradeYesNo';
 import GradeMatching from '@grading/questions/GradeMatching';
 import GradeMultipleChoice from '@grading/questions/GradeMultipleChoice';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, alphabetIdx } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import convertRubric from '@professor/exams/rubrics';
@@ -80,12 +80,13 @@ import {
   BsPencilSquare,
   BsXSquare,
 } from 'react-icons/bs';
+import Tooltip from '@student/exams/show/components/Tooltip';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import FourOhFour from '@hourglass/workflows/FourOhFour';
 import Spoiler from '@hourglass/common/Spoiler';
 import { assertType, isExamRubric } from '@professor/exams/types';
 import { ShowRubrics } from '@grading/UseRubrics';
-import { CREATE_COMMENT_MUTATION, addCommentConfig } from './createComment';
+import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
 
 import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
 import { gradingRubric$key } from './__generated__/gradingRubric.graphql';
@@ -95,8 +96,10 @@ import { gradingUpdateCommentMutation } from './__generated__/gradingUpdateComme
 import { gradingNextMutation } from './__generated__/gradingNextMutation.graphql';
 import { gradingReleaseLockMutation } from './__generated__/gradingReleaseLockMutation.graphql';
 import { gradingLock$key } from './__generated__/gradingLock.graphql';
-import { gradingLockVersion$key } from './__generated__/gradingLockVersion.graphql';
-import { gradingLockAdmin$key } from './__generated__/gradingLockAdmin.graphql';
+import { gradingLocks$key } from './__generated__/gradingLocks.graphql';
+import { gradingCompletion$key } from './__generated__/gradingCompletion.graphql';
+import { gradingVersionAdmin$key } from './__generated__/gradingVersionAdmin.graphql';
+import { gradingExamAdmin$key } from './__generated__/gradingExamAdmin.graphql';
 import { gradingQuery } from './__generated__/gradingQuery.graphql';
 import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 
@@ -1305,15 +1308,12 @@ const GradingLock: React.FC<{
 };
 
 const VersionLocks: React.FC<{
-  versionKey: gradingLockVersion$key;
+  versionKey: gradingLocks$key;
 }> = (props) => {
-  const {
-    versionKey,
-  } = props;
+  const { versionKey } = props;
   const version = useFragment(
     graphql`
-    fragment gradingLockVersion on ExamVersion {
-      name
+    fragment gradingLocks on ExamVersion {
       gradingLocks {
         edges {
           node {
@@ -1326,9 +1326,145 @@ const VersionLocks: React.FC<{
     `,
     versionKey,
   );
+  return (
+    <Table>
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Part</th>
+          <th>Student</th>
+          <th>Grader</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {version.gradingLocks.edges.map(({ node }) => (
+          <GradingLock key={node.id} lockKey={node} />
+        ))}
+      </tbody>
+    </Table>
+  );
+};
+
+const GradingCompletion: React.FC<{
+  versionKey: gradingCompletion$key;
+}> = (props) => {
+  const { versionKey } = props;
+  const version = useFragment(
+    graphql`
+    fragment gradingCompletion on ExamVersion {
+      gradingLocks {
+        edges {
+          node {
+            qnum
+            pnum
+            grader { id }
+            completedBy { id }
+          }
+        }
+      }
+    }
+    `,
+    versionKey,
+  );
+  const completionStats: {
+    notStarted: number;
+    inProgress: number;
+    finished: number;
+  }[][] = [];
+  const { gradingLocks } = version;
+  gradingLocks.edges.forEach(({ node }) => {
+    const {
+      qnum,
+      pnum,
+      grader,
+      completedBy,
+    } = node;
+    if (completionStats[qnum] === undefined) completionStats[qnum] = [];
+    if (completionStats[qnum][pnum] === undefined) {
+      completionStats[qnum][pnum] = {
+        notStarted: 0,
+        inProgress: 0,
+        finished: 0,
+      };
+    }
+    const qpStat = completionStats[qnum][pnum];
+    if (completedBy !== null) qpStat.finished += 1;
+    else if (grader !== null && completedBy === null) qpStat.inProgress += 1;
+    else qpStat.notStarted += 1;
+  });
+  return (
+    <Table>
+      <thead>
+        <tr>
+          {completionStats.map((qStat, qnum) => (
+            <th
+              // eslint-disable-next-line react/no-array-index-key
+              key={`q${qnum}`}
+              className="border-bottom-0 pb-0"
+              colSpan={qStat.length}
+            >
+              {`Question ${qnum + 1}`}
+            </th>
+          ))}
+        </tr>
+        <tr>
+          {completionStats.map((qStats, qnum) => (
+            qStats.map((_pStats, pnum) => (
+              <th
+                // eslint-disable-next-line react/no-array-index-key
+                key={`q${qnum}-p${pnum}`}
+                className="border-top-0 pt-0"
+              >
+                {`Part ${alphabetIdx(pnum)}`}
+              </th>
+            ))
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          {completionStats.map((qStats, qnum) => (
+            qStats.map((pStat, pnum) => {
+              const { notStarted, inProgress, finished } = pStat;
+              return (
+                // eslint-disable-next-line react/no-array-index-key
+                <td key={`q${qnum}-p${pnum}`}>
+                  <Tooltip message="Not started / In progress / Finished">
+                    <span>{`${notStarted} / ${inProgress} / ${finished}`}</span>
+                  </Tooltip>
+                </td>
+              );
+            })
+          ))}
+        </tr>
+      </tbody>
+    </Table>
+  );
+};
+
+const VersionAdministration: React.FC<{
+  versionKey: gradingVersionAdmin$key;
+}> = (props) => {
+  const {
+    versionKey,
+  } = props;
+  const version = useFragment(
+    graphql`
+    fragment gradingVersionAdmin on ExamVersion {
+      id
+      name
+      startedCount
+      finalizedCount
+      ...gradingLocks
+      ...gradingCompletion
+    }
+    `,
+    versionKey,
+  );
   const [open, setOpen] = useState(false);
   return (
-    <>
+    <div className="border p-2 my-4">
       <h3>
         <span
           role="button"
@@ -1341,43 +1477,36 @@ const VersionLocks: React.FC<{
         </span>
       </h3>
       <Collapse in={open}>
-        <div className="border p-2">
-          <Table>
-            <thead>
-              <tr>
-                <th>Question</th>
-                <th>Part</th>
-                <th>Student</th>
-                <th>Grader</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {version.gradingLocks.edges.map(({ node }) => (
-                <GradingLock key={node.id} lockKey={node} />
-              ))}
-            </tbody>
-          </Table>
+        <div>
+          <h4>
+            Completion stats
+            <small className="ml-4">
+              {`${version.startedCount} started; ${version.finalizedCount} finalized`}
+            </small>
+          </h4>
+          <GradingCompletion versionKey={version} />
+          <h4>Active grading</h4>
+          <VersionLocks versionKey={version} />
         </div>
       </Collapse>
-    </>
+    </div>
   );
 };
 
-const LockAdministration: React.FC<{
-  examKey: gradingLockAdmin$key;
+const ExamGradingAdministration: React.FC<{
+  examKey: gradingExamAdmin$key;
 }> = (props) => {
   const {
     examKey,
   } = props;
   const res = useFragment(
     graphql`
-    fragment gradingLockAdmin on Exam {
+    fragment gradingExamAdmin on Exam {
       examVersions {
         edges {
           node {
             id
-            ...gradingLockVersion
+            ...gradingVersionAdmin
           }
         }
       }
@@ -1388,7 +1517,7 @@ const LockAdministration: React.FC<{
   return (
     <>
       {res.examVersions.edges.map(({ node }) => (
-        <VersionLocks key={node.id} versionKey={node} />
+        <VersionAdministration key={node.id} versionKey={node} />
       ))}
     </>
   );
@@ -1400,7 +1529,7 @@ const GradingAdmin: React.FC = () => {
     graphql`
     query gradingAdminQuery($examId: ID!) {
       exam(id: $examId) {
-        ...gradingLockAdmin
+        ...gradingExamAdmin
       }
     }
     `,
@@ -1414,9 +1543,7 @@ const GradingAdmin: React.FC = () => {
   }
   return (
     <Container>
-      <p>prof grading</p>
-      <p>TODO: progress</p>
-      <LockAdministration examKey={res.props.exam} />
+      <ExamGradingAdministration examKey={res.props.exam} />
       <BeginGradingButton />
     </Container>
   );

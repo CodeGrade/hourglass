@@ -4,7 +4,7 @@ module Mutations
   class CreateGradingComment < BaseMutation
     argument :registration_id, ID, required: true, loads: Types::RegistrationType
 
-    argument :preset_comment_id, ID, required: false
+    argument :preset_comment_id, ID, required: false, loads: Types::PresetCommentType
 
     argument :qnum, Integer, required: true
     argument :pnum, Integer, required: true
@@ -43,12 +43,9 @@ module Mutations
     private
 
     def mutate!(**args)
-      if (args[:preset_comment_id])
-        args[:preset_comment] = HourglassSchema.object_from_id(args.delete(:preset_comment_id), context)
-      end
       comment = build_comment(**args)
       GradingComment.transaction do
-        require_my_lock!(args)
+        require_my_lock!(**args)
         save_comment!(comment)
       end
       comment

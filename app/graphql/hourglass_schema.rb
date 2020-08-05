@@ -102,7 +102,10 @@ class HourglassSchema < GraphQL::Schema
   end
 
   def self.do_mutation!(mutation_query, user, input)
-    execute(mutation_query, context: { current_user: user }, variables: {
+    execute(mutation_query, context: {
+        current_user: user,
+        access_cache: {},
+      }, variables: {
       input: input,
     })
   end

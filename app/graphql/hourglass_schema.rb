@@ -16,6 +16,24 @@ class HourglassSchema < GraphQL::Schema
     end,
   )
 
+  if Rails.env.development?
+    # In dev mode, permit non-persisted queries, but warn
+    def self.execute(query_str = nil, **kwargs)
+      if STATIC_GRAPHQL_QUERIES[query_str].nil?
+        Rails.logger.debug "** GraphQL: Received non-persisted query"
+      else
+        query_str = STATIC_GRAPHQL_QUERIES[query_str]
+      end
+      super(query_str, **kwargs)
+    end
+  else
+    # In production or test mode, only permit persisted queries
+    def self.execute(query_str = nil, **kwargs)
+      query_str = STATIC_GRAPHQL_QUERIES[query_str]
+      super(query_str, **kwargs)
+    end
+  end
+
   # Add built-in connections for pagination
   use GraphQL::Pagination::Connections
 

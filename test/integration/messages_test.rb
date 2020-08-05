@@ -14,7 +14,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
     @student = @registration.user
   end
 
-  SEND_MESSAGE_QUERY = <<-GRAPHQL
+  STATIC_GRAPHQL_QUERIES['SEND_MESSAGE_QUERY'] = <<-GRAPHQL
     mutation sendMessage($input: SendMessageInput!) {
       sendMessage(input: $input) {
         clientMutationId
@@ -24,7 +24,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
 
   test 'send exam message as student does not work' do
     assert_equal 0, @exam.exam_announcements.length
-    result = HourglassSchema.do_mutation!(SEND_MESSAGE_QUERY, @student, {
+    result = HourglassSchema.do_mutation!('SEND_MESSAGE_QUERY', @student, {
       recipientId: HourglassSchema.id_from_object(@exam, Types::ExamType, {}),
       message: 'Test announcement',
     })
@@ -36,7 +36,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
 
   test 'send exam message' do
     assert_equal 0, @exam.exam_announcements.length
-    result = HourglassSchema.do_mutation!(SEND_MESSAGE_QUERY, @prof, {
+    result = HourglassSchema.do_mutation!('SEND_MESSAGE_QUERY', @prof, {
       recipientId: HourglassSchema.id_from_object(@exam, Types::ExamType, {}),
       message: 'Test announcement',
     })
@@ -48,7 +48,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
 
   test 'send version message' do
     assert_equal 0, @version.version_announcements.length
-    result = HourglassSchema.do_mutation!(SEND_MESSAGE_QUERY, @prof, {
+    result = HourglassSchema.do_mutation!('SEND_MESSAGE_QUERY', @prof, {
       recipientId: HourglassSchema.id_from_object(@version, Types::ExamVersionType, {}),
       message: 'Test message',
     })
@@ -60,7 +60,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
 
   test 'send room message' do
     assert_equal 0, @room.room_announcements.length
-    result = HourglassSchema.do_mutation!(SEND_MESSAGE_QUERY, @prof, {
+    result = HourglassSchema.do_mutation!('SEND_MESSAGE_QUERY', @prof, {
       recipientId: HourglassSchema.id_from_object(@room, Types::RoomType, {}),
       message: 'Test room message',
     })
@@ -72,7 +72,7 @@ class MessagesTest < ActionDispatch::IntegrationTest
 
   test 'send direct message' do
     assert_equal 0, @registration.messages.length
-    result = HourglassSchema.do_mutation!(SEND_MESSAGE_QUERY, @prof, {
+    result = HourglassSchema.do_mutation!('SEND_MESSAGE_QUERY', @prof, {
       recipientId: HourglassSchema.id_from_object(@registration, Types::RegistrationType, {}),
       message: 'Test student message',
     })

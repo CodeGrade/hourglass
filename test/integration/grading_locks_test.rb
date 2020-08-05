@@ -17,7 +17,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     @grader = @grader_reg.user
   end
 
-  ACQUIRE_LOCK_MUTATION = <<-GRAPHQL
+  STATIC_GRAPHQL_QUERIES['ACQUIRE_LOCK_MUTATION'] = <<-GRAPHQL
     mutation acquireLock($input: AcquireGradingLockInput!) {
       acquireGradingLock(input: $input) {
         acquired
@@ -25,7 +25,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
-  RELEASE_LOCK_MUTATION = <<-GRAPHQL
+  STATIC_GRAPHQL_QUERIES['RELEASE_LOCK_MUTATION'] = <<-GRAPHQL
     mutation releaseLock($input: ReleaseGradingLockInput!) {
       releaseGradingLock(input: $input) {
         released
@@ -33,7 +33,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
-  RELEASE_ALL_LOCKS_MUTATION = <<-GRAPHQL
+  STATIC_GRAPHQL_QUERIES['RELEASE_ALL_LOCKS_MUTATION'] = <<-GRAPHQL
     mutation releaseAllLocks($input: ReleaseAllGradingLocksInput!) {
       releaseAllGradingLocks(input: $input) {
         released
@@ -42,7 +42,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   GRAPHQL
 
   def attempt_lock(user, reg, qnum, pnum)
-    HourglassSchema.do_mutation!(ACQUIRE_LOCK_MUTATION, user, {
+    HourglassSchema.do_mutation!('ACQUIRE_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
       qnum: qnum,
       pnum: pnum,
@@ -50,7 +50,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   end
 
   def attempt_unlock(user, reg, qnum, pnum, complete)
-    HourglassSchema.do_mutation!(RELEASE_LOCK_MUTATION, user, {
+    HourglassSchema.do_mutation!('RELEASE_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
       qnum: qnum,
       pnum: pnum,
@@ -59,7 +59,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   end
 
   def attempt_unlock_all(user, exam)
-    HourglassSchema.do_mutation!(RELEASE_ALL_LOCKS_MUTATION, user, {
+    HourglassSchema.do_mutation!('RELEASE_ALL_LOCKS_MUTATION', user, {
       examId: HourglassSchema.id_from_object(exam, Types::ExamType, {}),
     })
   end

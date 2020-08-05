@@ -14,7 +14,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
     @student = @registration.user
   end
 
-  FINALIZE_ITEM_QUERY = <<-GRAPHQL
+  STATIC_GRAPHQL_QUERIES['FINALIZE_ITEM_QUERY'] = <<-GRAPHQL
     mutation finalizeItem($input: FinalizeItemInput!) {
       finalizeItem(input: $input) {
         clientMutationId
@@ -27,7 +27,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
     assert_not @version.finalized?
     assert_not @registration.final?
     assert_not @room.finalized?
-    result = HourglassSchema.do_mutation!(FINALIZE_ITEM_QUERY, @prof, {
+    result = HourglassSchema.do_mutation!('FINALIZE_ITEM_QUERY', @prof, {
       id: HourglassSchema.id_from_object(@exam, Types::ExamType, {}),
     })
 
@@ -46,7 +46,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
     assert_not @version.finalized?
     assert_not @registration.final?
     assert_not @room.finalized?
-    result = HourglassSchema.do_mutation!(FINALIZE_ITEM_QUERY, @prof, {
+    result = HourglassSchema.do_mutation!('FINALIZE_ITEM_QUERY', @prof, {
       id: HourglassSchema.id_from_object(@version, Types::ExamVersionType, {}),
     })
 
@@ -62,7 +62,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
   test 'finalize room' do
     assert_not @registration.final?
     assert_not @room.finalized?
-    result = HourglassSchema.do_mutation!(FINALIZE_ITEM_QUERY, @prof, {
+    result = HourglassSchema.do_mutation!('FINALIZE_ITEM_QUERY', @prof, {
       id: HourglassSchema.id_from_object(@room, Types::RoomType, {}),
     })
 
@@ -75,7 +75,7 @@ class FinalizationTest < ActionDispatch::IntegrationTest
 
   test 'finalize user' do
     assert_not @registration.final?
-    result = HourglassSchema.do_mutation!(FINALIZE_ITEM_QUERY, @prof, {
+    result = HourglassSchema.do_mutation!('FINALIZE_ITEM_QUERY', @prof, {
       id: HourglassSchema.id_from_object(@registration, Types::RegistrationType, {}),
     })
 

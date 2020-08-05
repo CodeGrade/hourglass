@@ -22,7 +22,7 @@ const fetchQuery: FetchFunction = async (
       'X-CSRF-Token': getCSRFToken(),
     },
     body: JSON.stringify({
-      query: operation.text,
+      query: operation.id ?? operation.text,
       variables,
     }),
   }).then(async (response) => {

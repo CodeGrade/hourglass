@@ -3,7 +3,7 @@
 require 'test_helper'
 
 class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
-  UPDATE_EXAM_VERSION = <<-GRAPHQL
+  STATIC_GRAPHQL_QUERIES['UPDATE_EXAM_VERSION'] = <<-GRAPHQL
     mutation updateExamVersion($input: UpdateExamVersionInput!) {
       updateExamVersion(input: $input) {
         examVersion {
@@ -13,7 +13,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
-  CREATE_EXAM_VERSION = <<-GRAPHQL
+  STATIC_GRAPHQL_QUERIES['CREATE_EXAM_VERSION'] = <<-GRAPHQL
     mutation createExamVersion($input: CreateExamVersionInput!) {
       createExamVersion(input: $input) {
         examVersion {
@@ -24,7 +24,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
-  DESTROY_EXAM_VERSION = <<-GRAPHQL
+  STATIC_GRAPHQL_QUERIES['DESTROY_EXAM_VERSION'] = <<-GRAPHQL
     mutation destroyExamVersion($input: DestroyExamVersionInput!) {
       destroyExamVersion(input: $input) {
         deletedId
@@ -33,7 +33,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   GRAPHQL
 
   def try_update(ver, new_name:, user:)
-    HourglassSchema.do_mutation!(UPDATE_EXAM_VERSION, user, {
+    HourglassSchema.do_mutation!('UPDATE_EXAM_VERSION', user, {
       examVersionId: HourglassSchema.id_from_object(ver, Types::ExamVersionType, {}),
       name: new_name,
       info: ver.info.to_json,
@@ -60,7 +60,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   end
 
   def try_destroy(ver, user:)
-    HourglassSchema.do_mutation!(DESTROY_EXAM_VERSION, user, {
+    HourglassSchema.do_mutation!('DESTROY_EXAM_VERSION', user, {
       examVersionId: HourglassSchema.id_from_object(ver, Types::ExamVersionType, {}),
     })
   end
@@ -87,7 +87,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
 
   test 'cannot create exam version without being logged in' do
     exam = create(:exam)
-    result = HourglassSchema.do_mutation!(CREATE_EXAM_VERSION, nil, {
+    result = HourglassSchema.do_mutation!('CREATE_EXAM_VERSION', nil, {
       examId: HourglassSchema.id_from_object(exam, Types::ExamType, {}),
     })
     assert_equal 1, result['errors'].length
@@ -96,7 +96,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   test 'student cannot create exam version' do
     reg = create(:registration)
     exam = create(:exam, course: reg.course)
-    result = HourglassSchema.do_mutation!(CREATE_EXAM_VERSION, reg.user, {
+    result = HourglassSchema.do_mutation!('CREATE_EXAM_VERSION', reg.user, {
       examId: HourglassSchema.id_from_object(exam, Types::ExamType, {}),
     })
     assert_equal 1, result['errors'].length
@@ -120,7 +120,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   test 'should create new exam version' do
     reg = create(:professor_course_registration)
     exam = create(:exam, course: reg.course)
-    result = HourglassSchema.do_mutation!(CREATE_EXAM_VERSION, reg.user, {
+    result = HourglassSchema.do_mutation!('CREATE_EXAM_VERSION', reg.user, {
       examId: HourglassSchema.id_from_object(exam, Types::ExamType, {}),
     })
     assert_not result['errors']

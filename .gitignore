@@ -46,4 +46,6 @@ yarn-debug.log*
 __generated__/
 /app/javascript/relay/
 
+config/schemas/graphql-queries.json
+
 Exams/

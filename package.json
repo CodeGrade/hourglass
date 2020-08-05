@@ -12,6 +12,7 @@
     "uml": "tplant -C --input app/javascript/components/workflows/student/exams/show/types.ts --output types.svg",
     "relay-dev": "relay-compiler --watch",
     "relay": "relay-compiler --watchman false",
+    "relay-persist": "relay-compiler --watchman false --persist-output ./config/schemas/graphql-queries.json",
     "dev": "concurrently \"yarn run webpack-dev\" \"yarn run relay-dev\"",
     "unused": "ts-prune"
   },

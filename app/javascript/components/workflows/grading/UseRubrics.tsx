@@ -13,6 +13,7 @@ import HTML from '@student/exams/show/components/HTML';
 import Icon from '@student/exams/show/components/Icon';
 import {
   Alert,
+  Card,
   Button,
   Row,
   Col,
@@ -35,6 +36,8 @@ type PresetCommentId = GradingComment['presetComment']['id']
 interface ShowRubricProps<R> {
   rubric: R;
   showCompletenessAgainst?: PresetCommentId[];
+  parentRubricType?: Rubric['type'];
+  collapseKey?: string;
   qnum: number;
   pnum: number;
   bnum: number;
@@ -114,11 +117,72 @@ const ShowPreset: React.FC<{
   );
 };
 
-const completenessStatus = (status ?: boolean): string => {
-  if (status === true) {
+type CompletionStatus = 'complete' | 'incomplete' | 'invalid'
+function combineCompletion(c1 : CompletionStatus, c2: CompletionStatus): CompletionStatus {
+  switch (c1) {
+    case 'complete': return c2;
+    case 'incomplete': return (c2 === 'invalid') ? c2 : c1;
+    case 'invalid': return c1;
+    default:
+      throw new ExhaustiveSwitchError(c1);
+  }
+}
+function completionStatus(rubric: Rubric, parentRubricType: Rubric['type'], presetIDs: PresetCommentId[]): CompletionStatus {
+  if (rubric === undefined || rubric === null) return undefined;
+  if (presetIDs === undefined || presetIDs === null) return undefined;
+  switch (rubric.type) {
+    case 'none': return 'complete';
+    case 'all': {
+      const { choices } = rubric;
+      if (choices instanceof Array) {
+        const completion = choices.reduce((cur: CompletionStatus, r) => (
+          combineCompletion(cur, completionStatus(r, 'all', presetIDs))
+        ), 'incomplete');
+        return (completion === 'incomplete') ? 'invalid' : completion;
+      }
+      const allUsed = choices.presets.every((p) => presetIDs.some((id) => (p.id === id)));
+      return allUsed ? 'complete' : 'invalid';
+    }
+    case 'any': {
+      const { choices } = rubric;
+      if (choices instanceof Array) {
+        const completion = choices.reduce((cur: CompletionStatus, r) => (
+          combineCompletion(cur, completionStatus(r, 'any', presetIDs))
+        ), 'incomplete');
+        // An Any rubric is not in error if it's unused
+        return completion;
+      }
+      const anyUsed = choices.presets.some((p) => presetIDs.some((id) => (p.id === id)));
+      return anyUsed ? 'complete' : 'incomplete';
+    }
+    case 'one': {
+      // There should be exactly one used message
+      const { choices } = rubric;
+      if (choices instanceof Array) {
+        const completion = choices.map((r) => completionStatus(r, 'one', presetIDs));
+        const completeCount = completion.filter((c) => c === 'complete').length;
+        if (completeCount > 1 || completion.includes('invalid')) return 'invalid';
+        if (completeCount === 1) return 'complete';
+        if (parentRubricType === 'one') return 'incomplete';
+        return 'invalid';
+      }
+      const matches = choices.presets.reduce((sum, p) => (
+        sum + presetIDs.filter((id) => (p.id === id)).length
+      ), 0);
+      if (matches > 1) return 'invalid';
+      if (matches === 1) return 'complete';
+      if (parentRubricType === 'one') return 'incomplete';
+      return 'invalid';
+    }
+    default:
+      throw new ExhaustiveSwitchError(rubric);
+  }
+}
+const statusToClass = (status: CompletionStatus): string => {
+  if (status === 'complete') {
     return 'status-valid';
   }
-  if (status === false) {
+  if (status === 'invalid') {
     return 'status-invalid';
   }
   return '';
@@ -197,41 +261,6 @@ const ShowRubricPresets: React.FC<ShowRubricProps<RubricPresets>> = (props) => {
   );
 };
 
-function isRubricComplete(rubric: Rubric, presetIDs: PresetCommentId[]): boolean {
-  if (rubric === undefined || rubric === null) return undefined;
-  if (presetIDs === undefined || presetIDs === null) return undefined;
-  switch (rubric.type) {
-    case 'none': return true;
-    case 'all': {
-      const { choices } = rubric;
-      if (choices instanceof Array) {
-        return choices.every((r) => isRubricComplete(r, presetIDs));
-      }
-      return choices.presets.every((p) => presetIDs.some((id) => (p.id === id)));
-    }
-    case 'any': {
-      const { choices } = rubric;
-      if (choices instanceof Array) {
-        return choices.some((r) => isRubricComplete(r, presetIDs));
-      }
-      return choices.presets.some((p) => presetIDs.some((id) => (p.id === id)));
-    }
-    case 'one': {
-      const { choices } = rubric;
-      if (choices instanceof Array) {
-        return choices.reduce((sum, r) => (
-          sum + (isRubricComplete(r, presetIDs) ? 1 : 0)
-        ), 0) === 1;
-      }
-      return choices.presets.reduce((sum, p) => (
-        sum + (presetIDs.some((id) => (p.id === id)) ? 1 : 0)
-      ), 0) === 1;
-    }
-    default:
-      throw new ExhaustiveSwitchError(rubric);
-  }
-}
-
 const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   const {
     rubric,
@@ -240,6 +269,7 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
     pnum,
     bnum,
     registrationId,
+    collapseKey,
   } = props;
   const { description, choices } = rubric;
   let summary;
@@ -266,12 +296,13 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
     );
   } else {
     body = (
-      <div className="rubric">
+      <>
         {choices.map((c, index) => (
           <ShowRubric
             /* eslint-disable-next-line react/no-array-index-key */
             key={index}
             showCompletenessAgainst={showCompletenessAgainst}
+            parentRubricType="all"
             rubric={c}
             qnum={qnum}
             pnum={pnum}
@@ -279,9 +310,11 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
             registrationId={registrationId}
           />
         ))}
-      </div>
+      </>
     );
   }
+  const showAnyway = (collapseKey === undefined ? 'show' : '');
+  const padDescription = (description ? 'mb-2' : '');
   const heading = (
     <h5 className="d-flex align-items-center">
       Choose something from
@@ -292,9 +325,15 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   );
   return (
     <>
-      {heading}
-      <HTML value={description} />
-      {body}
+      <Accordion.Toggle as={Card.Header} eventKey={collapseKey}>
+        {heading}
+        <HTML value={description} className={padDescription} />
+      </Accordion.Toggle>
+      <Accordion.Collapse className={showAnyway} eventKey={collapseKey}>
+        <Card.Body>
+          {body}
+        </Card.Body>
+      </Accordion.Collapse>
     </>
   );
 };
@@ -306,6 +345,8 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
     pnum,
     bnum,
     registrationId,
+    showCompletenessAgainst,
+    collapseKey,
   } = props;
   const { description, choices, points } = rubric;
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
@@ -333,7 +374,7 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
   } else {
     summary = <>{pointsMsg}</>;
     body = (
-      <Accordion>
+      <Accordion defaultActiveKey="0">
         {choices.map((r, i) => (
           <ShowRubric
             // eslint-disable-next-line react/no-array-index-key
@@ -343,6 +384,9 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
             pnum={pnum}
             bnum={bnum}
             registrationId={registrationId}
+            showCompletenessAgainst={showCompletenessAgainst}
+            parentRubricType="one"
+            collapseKey={`${i}`}
           />
         ))}
       </Accordion>
@@ -356,12 +400,20 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
       <span className="ml-auto">{summary}</span>
     </h5>
   );
+  const showAnyway = (collapseKey === undefined ? 'show' : '');
+  const padDescription = (description ? 'mb-2' : '');
   return (
-    <div>
-      {heading}
-      <HTML value={description} />
-      {body}
-    </div>
+    <>
+      <Accordion.Toggle as={Card.Header} eventKey={collapseKey}>
+        {heading}
+        <HTML value={description} className={padDescription} />
+      </Accordion.Toggle>
+      <Accordion.Collapse className={showAnyway} eventKey={collapseKey}>
+        <Card.Body>
+          {body}
+        </Card.Body>
+      </Accordion.Collapse>
+    </>
   );
 };
 
@@ -372,6 +424,8 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
     pnum,
     bnum,
     registrationId,
+    showCompletenessAgainst,
+    collapseKey,
   } = props;
   const { description, choices, points } = rubric;
   let summary;
@@ -400,7 +454,7 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
     );
   } else {
     body = (
-      <div className="rubric">
+      <>
         {choices.map((c, index) => (
           <ShowRubric
             /* eslint-disable-next-line react/no-array-index-key */
@@ -410,9 +464,11 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
             pnum={pnum}
             bnum={bnum}
             registrationId={registrationId}
+            parentRubricType="any"
+            showCompletenessAgainst={showCompletenessAgainst}
           />
         ))}
-      </div>
+      </>
     );
   }
   const heading = (
@@ -423,12 +479,20 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
       <span className="ml-auto">{summary}</span>
     </h5>
   );
+  const showAnyway = (collapseKey === undefined ? 'show' : '');
+  const padDescription = (description ? 'mb-2' : '');
   return (
-    <div>
-      {heading}
-      <HTML value={description} />
-      {body}
-    </div>
+    <>
+      <Accordion.Toggle as={Card.Header} eventKey={collapseKey}>
+        {heading}
+        <HTML value={description} className={padDescription} />
+      </Accordion.Toggle>
+      <Accordion.Collapse className={showAnyway} eventKey={collapseKey}>
+        <Card.Body>
+          {body}
+        </Card.Body>
+      </Accordion.Collapse>
+    </>
   );
 };
 
@@ -439,10 +503,12 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
     pnum,
     bnum,
     registrationId,
+    parentRubricType,
     showCompletenessAgainst,
+    collapseKey,
   } = props;
-  const showCompleteness = isRubricComplete(rubric, showCompletenessAgainst);
-  const completenessClass = rubric.type !== 'any' ? completenessStatus(showCompleteness) : '';
+  const showCompleteness = completionStatus(rubric, parentRubricType, showCompletenessAgainst);
+  const completenessClass = statusToClass(showCompleteness);
   let body;
   switch (rubric.type) {
     case 'none': return null;
@@ -451,6 +517,8 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
         <ShowAll
           rubric={rubric}
           showCompletenessAgainst={showCompletenessAgainst}
+          parentRubricType={parentRubricType}
+          collapseKey={collapseKey}
           qnum={qnum}
           pnum={pnum}
           bnum={bnum}
@@ -463,6 +531,8 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
         <ShowAny
           rubric={rubric}
           showCompletenessAgainst={showCompletenessAgainst}
+          parentRubricType={parentRubricType}
+          collapseKey={collapseKey}
           qnum={qnum}
           pnum={pnum}
           bnum={bnum}
@@ -475,6 +545,8 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
         <ShowOne
           rubric={rubric}
           showCompletenessAgainst={showCompletenessAgainst}
+          parentRubricType={parentRubricType}
+          collapseKey={collapseKey}
           qnum={qnum}
           pnum={pnum}
           bnum={bnum}
@@ -486,9 +558,9 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
       throw new ExhaustiveSwitchError(rubric, `showing rubric for q${qnum}-p${pnum}-b${bnum}`);
   }
   return (
-    <Alert variant="dark" className={completenessClass}>
+    <Card className={`${completenessClass} alert-dark`}>
       {body}
-    </Alert>
+    </Card>
   );
 };
 

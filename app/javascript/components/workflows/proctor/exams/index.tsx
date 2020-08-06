@@ -605,7 +605,7 @@ const FinalizeRegs: React.FC<{
           </Button>
         </Form.Group>
       </Alert>
-      <Modal show={showModal} onHide={closeModal}>
+      <Modal centered keyboard show={showModal} onHide={closeModal}>
         <Modal.Header closeButton>
           Finalize
         </Modal.Header>

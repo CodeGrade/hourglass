@@ -110,6 +110,8 @@ const Entry: React.FC = () => {
             }}
           >
             <Modal
+              centered
+              keyboard
               show={transitioning}
               onHide={() => {
                 setTransitioning(false);

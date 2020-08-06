@@ -15,6 +15,11 @@ module Types
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 
+    field :rails_id, Integer, null: false
+    def rails_id
+      object.id
+    end
+
     field :label, String, null: true
     field :grader_hint, String, null: false
     field :student_feedback, String, null: true
@@ -35,6 +40,11 @@ module Types
   class RubricPresetType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id
+
+    field :rails_id, Integer, null: false
+    def rails_id
+      object.id
+    end
 
     field :label, String, null: true
     field :direction, Types::RubricDirectionType, null: false
@@ -63,6 +73,11 @@ module Types
     field :type, Types::RubricVariantType, null: false
     def type
       object.type.downcase
+    end
+
+    field :rails_id, Integer, null: false
+    def rails_id
+      object.id
     end
 
     field :qnum, Integer, null: true

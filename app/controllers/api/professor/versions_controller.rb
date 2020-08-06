@@ -17,7 +17,6 @@ module Api
           name: "#{@exam.name} Version #{n}",
           files: upload.files,
           info: upload.info,
-          json_rubrics: upload.rubrics
         )
         @version.save!
         render json: {

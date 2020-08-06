@@ -127,7 +127,7 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll }> = (props) => {
   );
   return (
     <div className="rubric">
-      <Alert variant="dark">
+      <Alert className="card" variant="dark">
         {heading}
         <Collapse in={open}>
           <div>
@@ -189,7 +189,7 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny }> = (props) => {
   );
   return (
     <div className="rubric">
-      <Alert variant="dark">
+      <Alert className="card" variant="dark">
         {heading}
         <Collapse in={open}>
           <div>
@@ -251,7 +251,7 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne }> = (props) => {
   );
   return (
     <div className="rubric">
-      <Alert variant="dark">
+      <Alert className="card" variant="dark">
         {heading}
         <Collapse in={open}>
           <div>

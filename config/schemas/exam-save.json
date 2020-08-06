@@ -264,6 +264,7 @@
       "additionalProperties": false,
       "required": ["type"],
       "properties": {
+        "railsId": { "type": "integer"},
         "type": { "enum": ["none"] }
       }
     },
@@ -272,6 +273,7 @@
       "additionalProperties": false,
       "required": ["type", "choices"],
       "properties": {
+        "railsId": { "type": "integer"},
         "type": { "enum": ["all"] },
         "description": { "$ref": "#/definitions/HTML" },
         "choices": {
@@ -287,6 +289,7 @@
       "additionalProperties": false,
       "required": ["type", "points", "choices"],
       "properties": {
+        "railsId": { "type": "integer"},
         "type": { "enum": ["any"] },
         "points": { "type": "number" },
         "description": { "$ref": "#/definitions/HTML" },
@@ -303,6 +306,7 @@
       "additionalProperties": false,
       "required": ["type", "points", "choices"],
       "properties": {
+        "railsId": { "type": "integer"},
         "type": { "enum": ["one"] },
         "points": { "type": "number" },
         "description": { "$ref": "#/definitions/HTML" },
@@ -319,6 +323,7 @@
       "additionalProperties": false,
       "required": ["direction", "presets"],
       "properties": {
+        "railsId": { "type": "integer"},
         "label": { "type": "string" },
         "direction": { "enum": ["credit", "deduction"] },
         "mercy": { "type": "number"},
@@ -333,6 +338,7 @@
       "additionalProperties": false,
       "required": ["graderHint", "points"],
       "properties": {
+        "railsId": { "type": "integer"},
         "label": { "type": "string" },
         "graderHint": { "type": "string" },
         "studentFeedback": { "type": "string" },

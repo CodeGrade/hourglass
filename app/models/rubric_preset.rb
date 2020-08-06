@@ -8,6 +8,10 @@ class RubricPreset < ApplicationRecord
     preset_comments.sum{|c| c.points}
   end
 
+  def in_use?
+    preset_comments.any?(&:in_use?)
+  end
+
   def compute_grade_for(reg, max_points, comments, checks, qnum, pnum, bnum)
     preset_ids = preset_comments.map(&:id)
     my_comments = comments.dig(qnum, pnum, bnum)&.slice(*preset_ids) || []
@@ -25,6 +29,7 @@ class RubricPreset < ApplicationRecord
 
   def as_json
     {
+      railsId: id,
       label: label,
       direction: direction,
       mercy: mercy,

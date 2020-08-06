@@ -53,6 +53,10 @@ class Rubric < ApplicationRecord
     qnum && pnum && bnum && true
   end
 
+  def in_use?
+    rubric_preset&.in_use || subsections.any?(&:in_use?)
+  end
+
   def compute_grade_for(reg, comments, checks, qnum, pnum, bnum)
     if rubric_preset
       rubric_preset.compute_grade_for(reg, out_of, comments, checks, qnum, pnum, bnum)
@@ -74,6 +78,7 @@ class Rubric < ApplicationRecord
 
   def as_json
     {
+      railsId: id,
       type: type.downcase,
       description: description && { type: "HTML", value: description },
       points: points,

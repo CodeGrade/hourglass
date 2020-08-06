@@ -17,8 +17,6 @@ class ExamVersion < ApplicationRecord
   has_many :rubric_presets, through: :rubrics
   has_many :preset_comments, through: :rubric_presets
 
-  attr_writer :json_rubrics
-
   validates :exam, presence: true
 
   delegate :course, to: :exam
@@ -90,8 +88,14 @@ class ExamVersion < ApplicationRecord
     }
   end
 
-  def json_rubrics=(rubrics)
-    return unless self.new_record?
+
+  # Because activerecord_json_validator defines its own
+  # attr_writer for :info=, we need to wrap it here
+  # instead of just calling super
+  orig_info_eq = instance_method(:info=)
+  define_method(:info=) do |*args, &block|
+    res = orig_info_eq.bind(self).call *args, &block
+    rubrics = res['rubrics']
     convert_rubric(rubrics['examRubric'], nil, nil, nil)
     rubrics['questions']&.each_with_index do |qrubric, qnum|
       convert_rubric(qrubric['questionRubric'], qnum, nil, nil)
@@ -102,11 +106,14 @@ class ExamVersion < ApplicationRecord
         end
       end
     end
+    res
   end
 
   def convert_rubric(r, qnum, pnum, bnum, order = nil, parent = nil)
     return if r.nil?
-    rubric = Rubric.new(type: r['type'].capitalize,
+    rubric = Rubric.find_or_initialize_by(id: r['railsId'])
+    # puts "********* In convert_rubric: (#{qnum}/#{pnum}/#{bnum}) r = #{r}, rubric = #{rubric.inspect}, new record = #{rubric.new_record?}"
+    rubric.assign_attributes(type: r['type'].capitalize,
       qnum: qnum,
       pnum: pnum,
       bnum: bnum,
@@ -115,10 +122,15 @@ class ExamVersion < ApplicationRecord
       description: r.dig('description', 'value'),
       points: r['points'],
       exam_version: self)
-    self.rubrics << rubric
+    self.rubrics << rubric if rubric.new_record?
     if (r['choices'].is_a? Hash)
       convert_presets(r['choices'], qnum, pnum, bnum, rubric)
     else
+      subsectionIds = r['choices']&.map{|r| r['railsId']}&.compact
+      toBeDeleted = rubric.subsections.where.not(id: subsectionIds)
+      if toBeDeleted.count > 0
+        binding.pry
+      end
       r['choices']&.each_with_index do |c, cindex|
         convert_rubric(c, qnum, pnum, bnum, cindex, rubric)
       end
@@ -126,14 +138,21 @@ class ExamVersion < ApplicationRecord
   end
 
   def convert_presets(presets, qnum, pnum, bnum, rubric)
-    p = RubricPreset.new(
+    p = RubricPreset.find_or_initialize_by(id: presets['railsId'])
+    p.assign_attributes(
       label: presets['label'],
       direction: presets['direction'],
       mercy: presets['mercy']&.to_f,
       rubric: rubric
     )
+    commentIds = presets['presets']&.map{|p| p['railsId']}.compact
+    toBeDeleted = p.preset_comments.where.not(id: commentIds)
+    if toBeDeleted.count > 0
+      binding.pry
+    end
     presets['presets']&.each_with_index do |preset, pindex|
-      p.preset_comments << PresetComment.new(
+      c = PresetComment.find_or_initialize_by(id: preset['railsId'])
+      c.assign_attributes(
         label: preset['label'],
         points: preset['points'],
         grader_hint: preset['graderHint'],
@@ -141,6 +160,7 @@ class ExamVersion < ApplicationRecord
         order: pindex,
         rubric_preset: p
       )
+      p.preset_comments << c if c.new_record?
     end
   end
 
@@ -179,10 +199,12 @@ class ExamVersion < ApplicationRecord
   def compare_help(path, r1, r2)
     if r1.is_a?(Hash) && r2.is_a?(Hash)
       mismatch = r1.keys.to_set ^ r2.keys.to_set
+      mismatch.delete "railsId" # Ignore tedious bookeeping
       unless mismatch.empty?
         raise "Mismatched keys at #{path}: #{r1.keys} ^ #{r2.keys} = #{mismatch}"
       end
       r1.keys.each do |k|
+        next if k == "railsId"
         compare_help "#{path}.#{k}", r1[k], r2[k]
       end
     elsif r1.is_a?(Array) && r2.is_a?(Array)
@@ -248,15 +270,15 @@ class ExamVersion < ApplicationRecord
       name: "#{exam.name} Version #{n}",
       files: [],
       info: { 
-        policies: [],
-        answers: [],
-        contents: {
-          reference: [],
-          questions: []
+        'policies' => [],
+        'answers' => [],
+        'contents' => {
+          'reference' => [],
+          'questions' => []
         },
-        rubrics: {
-          questions: [],
-          examRubric: { type: 'none' }
+        'rubrics' => {
+          'questions' => [],
+          'examRubric' => { 'type' => 'none' }
         }
       },
     )

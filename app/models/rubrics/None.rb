@@ -11,6 +11,7 @@ class None < Rubric
 
   def as_json
     {
+      railsId: id,
       type: "none"
     }
   end

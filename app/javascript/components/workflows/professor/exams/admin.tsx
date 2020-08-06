@@ -722,6 +722,7 @@ const ShowVersion: React.FC<{
       answers
       rubrics {
         id
+        railsId
         type
         parentSectionId
         qnum
@@ -735,11 +736,13 @@ const ShowVersion: React.FC<{
         }
         rubricPreset {
           id
+          railsId
           direction
           label
           mercy
           presetComments {
             id
+            railsId
             label
             order
             points

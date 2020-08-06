@@ -6,7 +6,7 @@
 }
 
 .ql-bubble .ql-tooltip {
-  z-index: 1;
+  z-index: 1001; // make sure this hovers above the movers
 }
 
 .ql-snow .ql-picker:not(.ql-font) .ql-picker-label svg {

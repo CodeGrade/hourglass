@@ -78,7 +78,7 @@ module Types
       guard Guards::PROFESSORS
     end
     def raw_rubrics
-      object.info['rubrics']
+      object.rubric_as_json
     end
 
     field :file_export_url, String, null: false do

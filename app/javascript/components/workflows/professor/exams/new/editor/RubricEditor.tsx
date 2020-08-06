@@ -49,7 +49,7 @@ const RubricPresetEditor: React.FC<{
   const hideMovers = (): void => setMoversVisible(false);
   return (
     <Card
-      className="mb-3"
+      className="mb-3 alert-warning p-0"
       border="warning"
       onMouseOver={showMovers}
       onFocus={showMovers}
@@ -65,7 +65,8 @@ const RubricPresetEditor: React.FC<{
         onDown={moveDown}
         onDelete={remove}
       />
-      <div className="alert alert-warning mb-0">
+      <Card.Body>
+        <Field name="railsId" component="input" type="hidden" />
         <Form.Group as={Row}>
           <Form.Label column sm="2">Label</Form.Label>
           <Col sm="4">
@@ -104,7 +105,7 @@ const RubricPresetEditor: React.FC<{
             />
           </Col>
         </Form.Group>
-      </div>
+      </Card.Body>
     </Card>
   );
 };
@@ -210,6 +211,7 @@ const RubricPresetsEditor: React.FC<WrappedFieldProps & RubricPresetsProps> = (p
   return (
     <FormSection name="choices">
       <Form.Group as={Row}>
+        <Field name="railsId" component="input" type="hidden" />
         <Form.Label column sm="1">Label</Form.Label>
         <Col sm="3">
           <Field name="label" component="input" type="text" className="w-100" />
@@ -430,7 +432,7 @@ const RubricEditor: React.FC<WrappedFieldProps & RubricEditorProps> = (props) =>
   const hideMovers = (): void => setMoversVisible(false);
   let body;
   if (value === undefined) {
-    body = <ChangeRubricType value={{ type: 'none' }} onChange={onChange} />;
+    body = <ChangeRubricType value={value} onChange={onChange} />;
   } else {
     switch (value.type) {
       case 'none':
@@ -464,7 +466,7 @@ const RubricEditor: React.FC<WrappedFieldProps & RubricEditorProps> = (props) =>
   }
   return (
     <Card
-      className="mb-3 rubric"
+      className="mb-3 alert-dark rubric p-0"
       border="secondary"
       onMouseOver={showMovers}
       onMouseOut={hideMovers}
@@ -481,11 +483,12 @@ const RubricEditor: React.FC<WrappedFieldProps & RubricEditorProps> = (props) =>
         onDelete={remove}
       />
       <FormSection name={fieldName}>
-        <div className="alert alert-dark m-0 border-0">
+        <Card.Body>
           <ErrorBoundary>
+            <Field name="railsId" component="input" type="hidden" />
             {body}
           </ErrorBoundary>
-        </div>
+        </Card.Body>
       </FormSection>
     </Card>
   );

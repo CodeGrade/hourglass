@@ -667,6 +667,7 @@ function AnswersRow<T, V>(
       id
       rubrics {
         id
+        railsId
         type
         parentSectionId
         qnum
@@ -680,11 +681,13 @@ function AnswersRow<T, V>(
         }
         rubricPreset {
           id
+          railsId
           direction
           label
           mercy
           presetComments {
             id
+            railsId
             label
             order
             points

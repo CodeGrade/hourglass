@@ -33,6 +33,9 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   GRAPHQL
 
   def try_update(ver, new_name:, user:)
+    # Make sure we preserve any railsIds in the rubrics so far
+    info = ver.info
+    info['rubrics'] = ver.rubric_as_json
     HourglassSchema.do_mutation!('UPDATE_EXAM_VERSION', user, {
       examVersionId: HourglassSchema.id_from_object(ver, Types::ExamVersionType, {}),
       name: new_name,

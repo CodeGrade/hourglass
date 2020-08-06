@@ -5,8 +5,15 @@ class PresetComment < ApplicationRecord
   # DON'T delete comments, but make them Unknown
   has_many :grading_comments, dependent: :nullify 
 
+  def in_use
+    !grading_comments.empty?
+  end
+
+
+
   def as_json
     {
+      railsId: id,
       label: label,
       graderHint: grader_hint,
       studentFeedback: student_feedback,

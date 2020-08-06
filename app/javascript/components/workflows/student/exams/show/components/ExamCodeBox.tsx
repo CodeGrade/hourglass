@@ -1,6 +1,5 @@
 import CM from 'codemirror';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/mdn-like';
+import './ExamCodeBox.scss';
 
 import 'codemirror/addon/runmode/runmode';
 import 'codemirror/addon/selection/active-line';
@@ -20,7 +19,6 @@ import 'codemirror/mode/htmlmixed/htmlmixed';
 import React, { useEffect, useState } from 'react';
 import { UnControlled as UnControlledCodeMirror, IUnControlledCodeMirror } from 'react-codemirror2';
 import { MarkDescription } from '@student/exams/show/types';
-import './ExamCodeBox.css';
 
 function applyMarks(cm: CM.Editor, marks: MarkDescription[]): CM.TextMarker[] {
   return marks.map((mark) => cm.markText(mark.from, mark.to, {

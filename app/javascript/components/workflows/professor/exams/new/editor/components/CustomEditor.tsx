@@ -1,9 +1,7 @@
 import React, { useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import QuillPasteSmart from 'quill-paste-smart';
-import 'react-quill/dist/quill.snow';
-import 'react-quill/dist/quill.bubble';
-import './CustomEditor.css';
+import './CustomEditor.scss';
 
 ReactQuill.Quill.register('modules/clipboard', QuillPasteSmart, true);
 

@@ -28,6 +28,18 @@ const ExamSubmissions: React.FC = () => {
     graphql`
     query submissionsAllQuery($examId: ID!) {
       exam(id: $examId) {
+        notStartedRegistrations {
+          id
+          user {
+            displayName
+          }
+        }
+        startedRegistrations {
+          id
+          user {
+            displayName
+          }
+        }
         finalRegistrations {
           id
           user {
@@ -45,16 +57,56 @@ const ExamSubmissions: React.FC = () => {
   if (!res.props) {
     return <p>Loading...</p>;
   }
+  const {
+    notStartedRegistrations,
+    startedRegistrations,
+    finalRegistrations,
+  } = res.props.exam;
   return (
-    <ul>
-      {res.props.exam.finalRegistrations.map((reg) => (
-        <li key={reg.id}>
-          <Link to={`/exams/${examId}/submissions/${reg.id}`}>
-            {reg.user.displayName}
-          </Link>
-        </li>
-      ))}
-    </ul>
+    <>
+      <h4>Completed submissions</h4>
+      {finalRegistrations.length === 0 ? (
+        <i>No completed submissions yet</i>
+      ) : (
+        <ul>
+          {finalRegistrations.map((reg) => (
+            <li key={reg.id}>
+              <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+                {reg.user.displayName}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+      <h4>Started submissions</h4>
+      {startedRegistrations.length === 0 ? (
+        <i>No one has started yet</i>
+      ) : (
+        <ul>
+          {startedRegistrations.map((reg) => (
+            <li key={reg.id}>
+              <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+                {reg.user.displayName}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+      <h4>Not-yet-started submissions</h4>
+      {notStartedRegistrations.length === 0 ? (
+        <i>Everyone has started</i>
+      ) : (
+        <ul>
+          {notStartedRegistrations.map((reg) => (
+            <li key={reg.id}>
+              <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+                {reg.user.displayName}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 };
 

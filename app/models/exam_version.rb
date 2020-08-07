@@ -95,7 +95,7 @@ class ExamVersion < ApplicationRecord
   orig_info_eq = instance_method(:info=)
   define_method(:info=) do |*args, &block|
     res = orig_info_eq.bind(self).call *args, &block
-    rubrics = res['rubrics']
+    rubrics = res['rubrics'] || {}
     convert_rubric(rubrics['examRubric'], nil, nil, nil)
     rubrics['questions']&.each_with_index do |qrubric, qnum|
       convert_rubric(qrubric['questionRubric'], qnum, nil, nil)
@@ -110,7 +110,19 @@ class ExamVersion < ApplicationRecord
   end
 
   def convert_rubric(r, qnum, pnum, bnum, order = nil, parent = nil)
-    return if r.nil?
+    if r.nil?
+      rubric = Rubric.new(
+        type: 'None', 
+        qnum: qnum,
+        pnum: pnum,
+        bnum: bnum,
+        order: order,
+        parent_section: parent,
+        exam_version: self,
+      )
+      self.rubrics << rubric;
+      return rubric
+    end
     rubric = Rubric.find_or_initialize_by(id: r['railsId'])
     # puts "********* In convert_rubric: (#{qnum}/#{pnum}/#{bnum}) r = #{r}, rubric = #{rubric.inspect}, new record = #{rubric.new_record?}"
     rubric.assign_attributes(type: r['type'].capitalize,
@@ -276,10 +288,6 @@ class ExamVersion < ApplicationRecord
           'reference' => [],
           'questions' => []
         },
-        'rubrics' => {
-          'questions' => [],
-          'examRubric' => { 'type' => 'none' }
-        }
       },
     )
   end

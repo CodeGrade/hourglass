@@ -359,19 +359,23 @@ const ChangeRubricType: React.FC<{
 }> = (props) => {
   const { value, onChange } = props;
   const changeRubricType = useCallback((newtype: SelectOption<Rubric['type']>) => {
-    onChange({
-      // set defaults to blank
-      choices: [],
-      points: 0,
-      // preserve as much as possible
-      ...value,
-      // and change the type
-      type: newtype.value,
-    });
+    if (newtype.value === 'none') {
+      onChange({ type: 'none', railsId: value?.railsId });
+    } else {
+      onChange({
+        // set defaults to blank
+        choices: [],
+        points: 0,
+        // preserve as much as possible
+        ...value,
+        // and change the type
+        type: newtype.value,
+      });
+    }
   }, [value, onChange]);
   const disableAllWhenPreset = (option) => {
     if (option.value !== 'all') { return false; } // only disable 'all'...
-    if ('choices' in value) { //           if we have any saved choices...
+    if (value && 'choices' in value) { //  if we have any saved choices...
       if (isRubricPresets(value.choices)) { //        that are presets,...
         if (value.choices.presets.length > 0) { // and presets are present
           return true;
@@ -390,7 +394,7 @@ const ChangeRubricType: React.FC<{
           classNamePrefix="select"
           className="z-1000-select"
           options={options}
-          value={defaultOptions[value.type]}
+          value={defaultOptions[value?.type || 'none']}
           isOptionDisabled={disableAllWhenPreset}
           onChange={changeRubricType}
         />
@@ -435,9 +439,11 @@ const RubricEditor: React.FC<WrappedFieldProps & RubricEditorProps> = (props) =>
     body = <ChangeRubricType value={value} onChange={onChange} />;
   } else {
     switch (value.type) {
-      case 'none':
-        body = <ChangeRubricType value={value} onChange={onChange} />;
+      case 'none': {
+        const valueNone = { type: value.type, railsId: value.railsId };
+        body = <ChangeRubricType value={valueNone} onChange={onChange} />;
         break;
+      }
       case 'any':
       case 'one':
       case 'all':

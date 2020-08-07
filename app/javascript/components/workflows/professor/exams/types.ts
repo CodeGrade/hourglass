@@ -147,7 +147,8 @@ export function isRubric(obj : unknown): obj is Rubric {
 }
 
 export type RubricNone = {
-  type: 'none'
+  type: 'none';
+  railsId?: number;
 }
 export function isRubricNone(obj : unknown): obj is RubricNone {
   return (obj !== undefined && obj !== null)
@@ -156,6 +157,7 @@ export function isRubricNone(obj : unknown): obj is RubricNone {
 
 export type RubricAll = {
   type: 'all';
+  railsId?: number;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
 }
@@ -169,6 +171,7 @@ export function isRubricAll(obj : unknown): obj is RubricAll {
 
 export type RubricAny = {
   type: 'any';
+  railsId?: number;
   points: number;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
@@ -185,6 +188,7 @@ export function isRubricAny(obj : unknown): obj is RubricAny {
 
 export type RubricOne = {
   type: 'one';
+  railsId?: number;
   points: number;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;

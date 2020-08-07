@@ -15,6 +15,15 @@ end
 
 if File.exists?(Rails.root.join('config/schemas/graphql-queries.json'))
   STATIC_GRAPHQL_QUERIES = JSON.parse(File.read(Rails.root.join('config/schemas/graphql-queries.json')))
+  KNOWN_GRAPHQL_QUERIES = STATIC_GRAPHQL_QUERIES.invert
 else
   STATIC_GRAPHQL_QUERIES = {}
+  KNOWN_GRAPHQL_QUERIES = STATIC_GRAPHQL_QUERIES.invert
+end
+
+if Rails.env.production?
+  STATIC_GRAPHQL_QUERIES.each do |k, v| v.freeze end
+  STATIC_GRAPHQL_QUERIES.freeze
+  KNOWN_GRAPHQL_QUERIES.each do |k, v| v.freeze end
+  KNOWN_GRAPHQL_QUERIES.freeze
 end

@@ -16,12 +16,12 @@ class GraphqlChannel < ApplicationCable::Channel
       channel: self,
     }
 
-    result = HourglassSchema.execute({
-      query: query,
+    result = HourglassSchema.execute(
+      query,
       context: context,
       variables: variables,
       operation_name: operation_name,
-    })
+    )
 
     payload = {
       result: result.to_h,

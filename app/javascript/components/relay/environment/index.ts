@@ -6,6 +6,7 @@ import {
   Observable,
   SubscribeFunction,
   FetchFunction,
+  RequestParameters,
 } from 'relay-runtime';
 import { getCSRFToken } from '@student/exams/show/helpers';
 import ActionCable from 'actioncable';
@@ -45,11 +46,19 @@ const subscriptionHandler = createHandler({
 
 const handleSubscribe: SubscribeFunction = (operation, variables, cacheConfig) => (
   Observable.create((sink) => {
-    subscriptionHandler(operation, variables, cacheConfig, {
-      onNext: sink.next,
-      onError: sink.error,
-      onCompleted: sink.complete,
-    });
+    subscriptionHandler(
+      {
+        ...operation,
+        text: operation.id ?? operation.text,
+      },
+      variables,
+      cacheConfig,
+      {
+        onNext: sink.next,
+        onError: sink.error,
+        onCompleted: sink.complete,
+      },
+    );
   })
 );
 

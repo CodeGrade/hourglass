@@ -49,8 +49,8 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
     expanded,
     setExpanded,
   } = props;
-  const [remainingTime, setRemainingTime] = useState(time.ends.diffNow());
-  const durationInMillisec = time.ends.diff(time.began).as('milliseconds');
+  const [remainingTime, setRemainingTime] = useState(time.stop.diffNow());
+  const durationInMillisec = time.stop.diff(time.start).as('milliseconds');
   const cutoffs = [
     { t: Duration.fromMillis(durationInMillisec * 0.50), c: 'bg-info text-light' },
     { t: Duration.fromMillis(durationInMillisec * 0.25), c: 'bg-info text-light' },
@@ -65,13 +65,15 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
     return tMinusRemaining >= 0 && tMinusRemaining < 30;
   });
   const classes = warningIndex >= 0 ? cutoffs[warningIndex].c : undefined;
-  const [relativeStart, showRelativeStart] = useState(true);
+  const [relativeBegan, showRelativeBegan] = useState(true);
   const [relativeEnd, showRelativeEnd] = useState(true);
+  const [relativeStart, showRelativeStart] = useState(true);
+  const [relativeStop, showRelativeStop] = useState(true);
 
   useEffect(() => {
-    setRemainingTime(time.ends.diffNow());
+    setRemainingTime(time.stop.diffNow());
     const timer = setInterval(() => {
-      setRemainingTime(time.ends.diffNow());
+      setRemainingTime(time.stop.diffNow());
     }, 1000);
     return (): void => {
       clearInterval(timer);
@@ -105,13 +107,33 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
       >
         <Table size="sm" borderless className="mb-0">
           <tbody>
-            <tr>
+            <tr className="text-muted">
               <td className="align-middle">Exam began:</td>
+              <td className="w-100 align-middle">
+                <ReadableDate
+                  relative={relativeBegan}
+                  showTime
+                  value={time.began}
+                />
+              </td>
+              <td>
+                <Button
+                  variant="outline-info"
+                  size="sm"
+                  className="ml-4"
+                  onClick={(): void => showRelativeBegan((b) => !b)}
+                >
+                  <RenderIcon I={FaClock} />
+                </Button>
+              </td>
+            </tr>
+            <tr className="font-weight-bold">
+              <td className="align-middle">You started:</td>
               <td className="w-100 align-middle">
                 <ReadableDate
                   relative={relativeStart}
                   showTime
-                  value={time.began}
+                  value={time.start}
                 />
               </td>
               <td>
@@ -125,7 +147,27 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
                 </Button>
               </td>
             </tr>
-            <tr>
+            <tr className="font-weight-bold">
+              <td className="align-middle">{`Your exam ${endsLabel}:`}</td>
+              <td className="w-100 align-middle">
+                <ReadableDate
+                  relative={relativeStop}
+                  showTime
+                  value={time.stop}
+                />
+              </td>
+              <td>
+                <Button
+                  variant="outline-info"
+                  size="sm"
+                  className="ml-4"
+                  onClick={(): void => showRelativeStop((b) => !b)}
+                >
+                  <RenderIcon I={FaClock} />
+                </Button>
+              </td>
+            </tr>
+            <tr className="text-muted">
               <td className="align-middle">{`Exam ${endsLabel}:`}</td>
               <td className="w-100 align-middle">
                 <ReadableDate

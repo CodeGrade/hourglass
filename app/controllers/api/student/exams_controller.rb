@@ -69,8 +69,11 @@ module Api
             files: version.files,
           },
           time: {
+            serverNow: DateTime.now,
             began: @registration.accommodated_start_time,
             ends: @registration.accommodated_end_time,
+            start: @registration.start_time,
+            stop: @registration.effective_end_time
           },
           answers: answers,
         }

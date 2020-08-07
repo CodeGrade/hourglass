@@ -147,9 +147,14 @@ export function doLoad(examTakeUrl: string): Thunk {
             exam,
             answers,
           } = result;
+          // local time - server time
+          const clockSkew = DateTime.local().diff(DateTime.fromISO(time.serverNow));
           const newTime: TimeInfo = {
-            began: DateTime.fromISO(time.began),
-            ends: DateTime.fromISO(time.ends),
+            // server time + (local time - server time) ==> local time
+            began: DateTime.fromISO(time.began).plus(clockSkew),
+            ends: DateTime.fromISO(time.ends).plus(clockSkew),
+            start: DateTime.fromISO(time.start).plus(clockSkew),
+            stop: DateTime.fromISO(time.stop).plus(clockSkew),
           };
           dispatch(loadExam(exam, newTime, answers));
         }

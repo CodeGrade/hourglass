@@ -1,6 +1,6 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 
 export type ExamTakerAction =
   LoadExamAction |
@@ -371,13 +371,22 @@ export interface QuestionInfo {
 }
 
 export interface RailsTimeInfo {
+  serverNow: string
   began: string;
   ends: string;
+  start: string;
+  stop: string;
 }
 
 export interface TimeInfo {
+  // when the exam period began (including accommodation)
   began: DateTime;
+  // when the exam period ends (including accommodation)
   ends: DateTime;
+  // when student started their exam
+  start: DateTime;
+  // when student must stop
+  stop: DateTime;
 }
 
 export interface ExamVersion {

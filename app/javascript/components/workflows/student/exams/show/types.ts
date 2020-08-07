@@ -1,6 +1,6 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
-import { DateTime, Duration } from 'luxon';
+import { DateTime } from 'luxon';
 
 export type ExamTakerAction =
   LoadExamAction |

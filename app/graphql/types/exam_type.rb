@@ -105,8 +105,8 @@ module Types
 
     field :my_registration, Types::RegistrationType, null: true
     def my_registration
-      # TODO?
-      object.registrations.find_by(user: context[:current_user])
+      current_user = context[:current_user]
+      AssociationLoader.for(Exam, :registrations, merge: -> { find_by(user: current_user) }).load(object)
     end
 
     field :exam_version_upload_url, String, null: false do

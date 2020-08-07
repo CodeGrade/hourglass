@@ -6,7 +6,6 @@ import {
   Observable,
   SubscribeFunction,
   FetchFunction,
-  RequestParameters,
 } from 'relay-runtime';
 import { getCSRFToken } from '@student/exams/show/helpers';
 import ActionCable from 'actioncable';

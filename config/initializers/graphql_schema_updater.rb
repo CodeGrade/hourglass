@@ -22,8 +22,8 @@ else
 end
 
 if Rails.env.production?
-  STATIC_GRAPHQL_QUERIES.each do |k, v| v.freeze end
+  STATIC_GRAPHQL_QUERIES.values.each(&:freeze) end
   STATIC_GRAPHQL_QUERIES.freeze
-  KNOWN_GRAPHQL_QUERIES.each do |k, v| v.freeze end
+  KNOWN_GRAPHQL_QUERIES.values.each(&:freeze) end
   KNOWN_GRAPHQL_QUERIES.freeze
 end

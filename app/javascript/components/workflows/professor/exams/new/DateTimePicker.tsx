@@ -10,10 +10,9 @@ import { BsCalendar } from 'react-icons/bs';
 import DatePicker from 'react-datepicker';
 import TimePicker from 'react-timekeeper';
 import { DateTime } from 'luxon';
-import 'react-datepicker/dist/react-datepicker.css';
-import './DateTimePicker.scss';
 import Icon from '@student/exams/show/components/Icon';
 import { FaTimes } from 'react-icons/fa';
+import './DateTimePicker.scss';
 
 interface DateTimeProps {
   disabled?: boolean;

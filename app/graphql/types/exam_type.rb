@@ -32,7 +32,7 @@ module Types
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def anomalies
-      AssociationLoader.for(Exam, :anomalies, merge: -> { Anomaly.unforgiven }).load(object)
+      AssociationLoader.for(Exam, :anomalies, merge: -> { unforgiven }).load(object)
     end
 
     field :messages, Types::MessageType.connection_type, null: false do
@@ -84,7 +84,7 @@ module Types
       guard Guards::PROFESSORS
     end
     def registrations_without_accommodation
-      AssociationLoader.for(Exam, :version_announcements, merge: -> { Registration.without_accommodation }).load(object)
+      AssociationLoader.for(Exam, :registrations, merge: -> { without_accommodation }).load(object)
     end
 
     field :registrations_without_rooms, [Types::RegistrationType], null: false do

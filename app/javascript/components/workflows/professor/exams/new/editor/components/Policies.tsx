@@ -9,7 +9,7 @@ export interface PoliciesProps {
   onChange: (newPolicies: Policy[]) => void;
 }
 
-const policyToString = (p: Policy): string => {
+export const policyToString = (p: Policy): string => {
   switch (p) {
     case Policy.ignoreLockdown: return 'Ignore lockdown';
     case Policy.tolerateWindowed: return 'Tolerate windowed mode';

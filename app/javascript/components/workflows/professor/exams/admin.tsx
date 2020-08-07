@@ -62,6 +62,7 @@ import ErrorBoundary, { RenderError } from '@hourglass/common/boundary';
 import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
+import { policyToString } from '@professor/exams/new/editor/components/Policies';
 import {
   graphql,
   useFragment,
@@ -78,7 +79,7 @@ import { admin_examInfo$key } from './__generated__/admin_examInfo.graphql';
 import { adminUpdateExamMutation } from './__generated__/adminUpdateExamMutation.graphql';
 import { ChecklistItemStatus, admin_checklist$key } from './__generated__/admin_checklist.graphql';
 import { admin_versionInfo$key } from './__generated__/admin_versionInfo.graphql';
-import { admin_version$key } from './__generated__/admin_version.graphql';
+import { admin_version$key, LockdownPolicy } from './__generated__/admin_version.graphql';
 import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMutation.graphql';
 import { adminDestroyVersionMutation } from './__generated__/adminDestroyVersionMutation.graphql';
 
@@ -882,6 +883,7 @@ const ShowVersion: React.FC<{
           open={preview}
           contents={parsedContents}
           rubric={rubrics}
+          policies={res.policies}
         />
       </ErrorBoundary>
     </>
@@ -892,20 +894,30 @@ const PreviewVersion: React.FC<{
   open: boolean;
   contents: ContentsState;
   rubric?: ExamRubric;
+  policies: readonly LockdownPolicy[];
 }> = (props) => {
   const {
     open,
     contents,
     rubric,
+    policies,
   } = props;
   return (
     <Collapse in={open}>
-      <div className="border p-2">
-        <ExamViewer
-          contents={contents}
-          refreshCodeMirrorsDeps={[open]}
-          rubric={rubric}
-        />
+      <div>
+        <h6>
+          Policies:
+          <span className="ml-4">
+            {policies.map(policyToString).join(', ')}
+          </span>
+        </h6>
+        <div className="border p-2">
+          <ExamViewer
+            contents={contents}
+            refreshCodeMirrorsDeps={[open]}
+            rubric={rubric}
+          />
+        </div>
       </div>
     </Collapse>
   );

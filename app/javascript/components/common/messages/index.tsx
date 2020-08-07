@@ -11,7 +11,7 @@ export const NewMessages: React.FC<{
   onClick: () => void;
 }> = ({ onClick }) => (
   <Tooltip
-    message="Click to dismiss"
+    message="Click to mark messages read"
   >
     <Button
       block

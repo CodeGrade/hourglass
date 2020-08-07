@@ -73,18 +73,11 @@ module Types
       guard Guards::PROCTORS_AND_PROFESSORS
     end
 
-    field :started_registrations, [Types::RegistrationType], null: false do
+    field :in_progress_registrations, [Types::RegistrationType], null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
-    def started_registrations
-      AssociationLoader.for(Exam, :registrations, merge: -> { started }).load(object)
-    end
-
-    field :not_started_registrations, [Types::RegistrationType], null: false do
-      guard Guards::PROCTORS_AND_PROFESSORS
-    end
-    def not_started_registrations
-      AssociationLoader.for(Exam, :registrations, merge: -> { not_started }).load(object)
+    def in_progress_registrations
+      AssociationLoader.for(Exam, :registrations, merge: -> { in_progress }).load(object)
     end
 
     field :final_registrations, [Types::RegistrationType], null: false do

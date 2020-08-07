@@ -35,6 +35,11 @@ module Types
       object.anomalous?
     end
 
+    field :started, Boolean, null: false
+    def started
+      object.started?
+    end
+
     field :over, Boolean, null: false
     def over
       object.over?

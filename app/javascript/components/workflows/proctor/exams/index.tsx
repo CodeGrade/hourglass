@@ -182,7 +182,7 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
   );
 };
 
-const finalizeItemMutation = graphql`
+export const finalizeItemMutation = graphql`
 mutation examsFinalizeItemMutation($input: FinalizeItemInput!) {
   finalizeItem(input: $input) {
     exam {
@@ -532,7 +532,61 @@ const formatGroupLabel = (data) => {
   return <span />;
 };
 
+export const FinalizeDialog: React.FC<{
+  loading: boolean;
+  showModal: boolean;
+  closeModal: () => void;
+  subjectName: string;
+  subjectValue: string;
+  finalize: (string) => void;
+  buttonText: string;
+}> = (props) => {
+  const {
+    loading,
+    showModal,
+    closeModal,
+    subjectName,
+    subjectValue,
+    finalize,
+    buttonText,
+  } = props;
+  return (
+    <Modal centered keyboard show={showModal} onHide={closeModal}>
+      <Modal.Header closeButton>
+        Finalize
+      </Modal.Header>
+      <Modal.Body>
+        <p>
+          {'Are you sure you want to finalize '}
+          <i>{subjectName}</i>
+          ?
+        </p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          disabled={loading}
+          variant="secondary"
+          onClick={closeModal}
+        >
+          Cancel
+        </Button>
+        <Loading loading={loading}>
+          <TooltipButton
+            disabled={loading}
+            disabledMessage="Loading..."
+            variant="danger"
+            onClick={() => finalize(subjectValue)}
+          >
+            {buttonText}
+          </TooltipButton>
+        </Loading>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
 const FinalizeRegs: React.FC<{
+  buttonText?: string;
   recipientOptions: RecipientOptions;
 }> = (props) => {
   const {
@@ -567,11 +621,11 @@ const FinalizeRegs: React.FC<{
       },
     },
   );
-  const finalize = () => {
+  const finalize = (subjectValue) => {
     mutate({
       variables: {
         input: {
-          id: selectedRecipient.value.id,
+          id: subjectValue,
         },
       },
     });
@@ -605,37 +659,15 @@ const FinalizeRegs: React.FC<{
           </Button>
         </Form.Group>
       </Alert>
-      <Modal centered keyboard show={showModal} onHide={closeModal}>
-        <Modal.Header closeButton>
-          Finalize
-        </Modal.Header>
-        <Modal.Body>
-          <p>
-            {'Are you sure you want to finalize '}
-            <i>{selectedRecipient.label}</i>
-            ?
-          </p>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            disabled={loading}
-            variant="secondary"
-            onClick={closeModal}
-          >
-            Cancel
-          </Button>
-          <Loading loading={loading}>
-            <TooltipButton
-              disabled={loading}
-              disabledMessage="Loading..."
-              variant="danger"
-              onClick={finalize}
-            >
-              Finalize
-            </TooltipButton>
-          </Loading>
-        </Modal.Footer>
-      </Modal>
+      <FinalizeDialog
+        showModal={showModal}
+        loading={loading}
+        closeModal={closeModal}
+        subjectName={selectedRecipient.label}
+        subjectValue={selectedRecipient.value.id}
+        finalize={finalize}
+        buttonText="Finalize"
+      />
     </>
   );
 };

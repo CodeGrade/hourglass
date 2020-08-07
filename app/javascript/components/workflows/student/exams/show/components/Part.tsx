@@ -81,7 +81,7 @@ const Part: React.FC<PartProps> = (props) => {
         {body.map((b, i) => (
           // Body numbers are STATIC.
           // eslint-disable-next-line react/no-array-index-key
-          <div className="p-2 bodyitem" key={i}>
+          <div className={`p-2 bodyitem ${b.type}`} key={i}>
             <ErrorBoundary>
               <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
             </ErrorBoundary>

@@ -64,7 +64,7 @@ class Exam < ApplicationRecord
 
   def unassigned_students
     student_regs_by_id = registrations.group_by(&:user_id)
-    course.students.reject do |s|
+    course.students.order(display_name: :asc).reject do |s|
       student_regs_by_id.key? s.id
     end
   end
@@ -83,7 +83,7 @@ class Exam < ApplicationRecord
 
   def unassigned_staff
     proctor_regs_by_id = proctor_registrations.group_by(&:user_id)
-    course.staff.reject do |s|
+    course.staff.order(display_name: :asc).reject do |s|
       proctor_regs_by_id.has_key? s.id
     end
   end

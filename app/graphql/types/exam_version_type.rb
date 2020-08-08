@@ -17,7 +17,7 @@ module Types
       guard Guards::PROFESSORS
     end
     def students
-      AssociationLoader.for(ExamVersion, :users).load(object)
+      AssociationLoader.for(ExamVersion, :users, merge: -> { order(display_name: :asc) }).load(object)
     end
 
     field :any_started, Boolean, null: false do

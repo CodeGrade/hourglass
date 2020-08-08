@@ -35,13 +35,13 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   return (
     <QuestionFilesContext.Provider value={contextVal}>
       <div>
-        <h1>
-          {singlePart && (
-            <small className="float-right text-muted">
-              {subtitle}
-            </small>
-          )}
+        <h1 id={`question-${qnum}`} className="d-flex align-items-baseline">
           <QuestionName name={name} qnum={qnum} />
+          {singlePart && (
+            <span className="ml-auto point-count">
+              {subtitle}
+            </span>
+          )}
         </h1>
         <HTML value={description} />
         {reference.length !== 0 && (

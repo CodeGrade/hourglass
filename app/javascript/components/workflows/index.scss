@@ -1,6 +1,11 @@
 @import "node_modules/bootstrap/scss/functions";
 @import "node_modules/bootstrap/scss/variables";
 
+.point-count {
+  font-size: 1.5rem;
+  color: $text-muted;
+}
+
 .z-1000 {
   position: relative;
   z-index: 1000;

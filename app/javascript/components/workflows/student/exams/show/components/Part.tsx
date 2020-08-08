@@ -68,13 +68,13 @@ const Part: React.FC<PartProps> = (props) => {
             separateSubparts={separateSubparts}
           />
         )}
-        <h3 id={`question-${qnum}-part-${pnum}`}>
-          {anonymous || (
-            <small className="float-right text-muted">
-              {subtitle}
-            </small>
-          )}
+        <h3 id={`question-${qnum}-part-${pnum}`} className="d-flex align-items-baseline">
           <PartName name={name} pnum={pnum} />
+          {anonymous || (
+            <span className="ml-auto point-count">
+              {subtitle}
+            </span>
+          )}
         </h3>
         <div><HTML value={description} /></div>
         {reference.length !== 0 && <FileViewer references={reference} />}

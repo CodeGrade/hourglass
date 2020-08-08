@@ -48,17 +48,24 @@ const PreStart: React.FC<PreStartProps> = (props) => {
       <div>
         <h1>{res.name}</h1>
         <Alert variant="danger">
-          <i>
+          <p>
+            <i>Your exam period is over.</i>
+          </p>
+          {parsed ? (
             <p>
-              Your exam period is over.
+              <i>{'Your submission was saved: '}</i>
+              <ReadableDate showTime value={parsed} />
             </p>
-            {parsed && (
-              <>
-                {'Your submission was saved: '}
-                <ReadableDate showTime value={parsed} />
-              </>
-            )}
-          </i>
+          ) : (
+            <p>
+              <b>
+                <i>
+                  You have no submissions for this exam.
+                  If this is in error, contact a professor.
+                </i>
+              </b>
+            </p>
+          )}
         </Alert>
       </div>
     );

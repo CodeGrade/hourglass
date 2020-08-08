@@ -30,19 +30,21 @@ const ExamSubmitted: React.FC<{
     <>
       <RegularNavbar />
       <Container>
-        <div>
-          <p>
-            <i>You have submitted this exam.</i>
-          </p>
-          <p>
-            {lastSnapshot && (
-              <>
-                {'Exam submitted '}
-                <ReadableDate showTime value={parsed} />
-              </>
-            )}
-          </p>
-        </div>
+        <Alert variant="success">
+          <div>
+            <p>
+              <i>You have submitted this exam.</i>
+            </p>
+            <p>
+              {lastSnapshot && (
+                <>
+                  {'Exam submitted '}
+                  <ReadableDate showTime value={parsed} />
+                </>
+              )}
+            </p>
+          </div>
+        </Alert>
       </Container>
     </>
   );

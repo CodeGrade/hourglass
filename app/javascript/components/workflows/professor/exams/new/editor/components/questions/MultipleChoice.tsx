@@ -17,6 +17,7 @@ import {
 import { FaCircle } from 'react-icons/fa';
 import { HTMLVal } from '@student/exams/show/types';
 import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
+import { useRefresher } from '@hourglass/common/helpers';
 
 const OneOption: React.FC<{
   selected: boolean;
@@ -27,6 +28,7 @@ const OneOption: React.FC<{
   moveDown: () => void;
   moveUp: () => void;
   remove: () => void;
+  refreshProps?: React.DependencyList;
 }> = (props) => {
   const {
     selected,
@@ -37,6 +39,7 @@ const OneOption: React.FC<{
     moveDown,
     moveUp,
     remove,
+    refreshProps = [],
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
   const showMovers = (): void => setMoversVisible(true);
@@ -67,7 +70,12 @@ const OneOption: React.FC<{
         </Button>
       </Col>
       <Col className="pr-0">
-        <Field name={memberName} component={EditHTMLField} theme="bubble" />
+        <Field
+          name={memberName}
+          component={EditHTMLField}
+          theme="bubble"
+          refreshProps={refreshProps}
+        />
       </Col>
     </Row>
   );
@@ -79,12 +87,16 @@ export const renderOptionsMultipleChoice = ({
   moveDown,
   moveUp,
   remove,
+  refresh,
+  refreshProps,
 }: {
   selected: number;
   onChange: (idx: number) => void;
   moveDown: () => void;
   moveUp: () => void;
   remove: () => void;
+  refresh?: () => void;
+  refreshProps?: React.DependencyList;
 }) => (
   member: string,
   index: number,
@@ -102,16 +114,20 @@ export const renderOptionsMultipleChoice = ({
       fields.move(index, index + 1);
       if (index === selected) moveDown();
       if (index + 1 === selected) moveUp();
+      if (refresh) refresh();
     }}
     moveUp={(): void => {
       fields.move(index, index - 1);
       if (index === selected) moveUp();
       if (index - 1 === selected) moveDown();
+      if (refresh) refresh();
     }}
     remove={(): void => {
       fields.remove(index);
       if (index === selected) remove();
+      if (refresh) refresh();
     }}
+    refreshProps={refreshProps}
   />
 );
 
@@ -126,12 +142,16 @@ const EditAns: React.FC<WrappedFieldProps> = (props) => {
   const moveDown = () => onChange(value + 1);
   const moveUp = () => onChange(value - 1);
   const remove = () => onChange(0);
+  const [refresher, refresh] = useRefresher();
+  const refreshProps: React.DependencyList = [refresher];
   const renderOptions = useCallback(renderOptionsMultipleChoice({
     selected: value,
     onChange,
     moveDown,
     moveUp,
     remove,
+    refresh,
+    refreshProps,
   }), [onChange, value]);
   return (
     <FieldArray

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useContext } from 'react';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { Link } from 'react-router-dom';
 import {
@@ -8,10 +8,16 @@ import {
   useMutation,
 } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
-import Select from 'react-select';
-import { Button, Container } from 'react-bootstrap';
+import Select, { GroupedOptionsType } from 'react-select';
+import {
+  Button,
+  Container,
+  Row,
+  Col,
+} from 'react-bootstrap';
 import LinkButton from '@hourglass/common/linkbutton';
 import { SelectOption } from '@hourglass/common/helpers';
+import { AlertContext } from '@hourglass/common/alerts';
 
 import { homeQuery } from './__generated__/homeQuery.graphql';
 import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
@@ -19,6 +25,7 @@ import { home_profregs$key } from './__generated__/home_profregs.graphql';
 import { home_proctorregs$key } from './__generated__/home_proctorregs.graphql';
 import { home_staffregs$key } from './__generated__/home_staffregs.graphql';
 import { homeAdminQuery } from './__generated__/homeAdminQuery.graphql';
+import { ImpersonateUserInput } from './__generated__/homeImpersonateMutation.graphql';
 
 const ShowRegistrations: React.FC<{
   registrations: home_studentregs$key;
@@ -175,19 +182,14 @@ const ShowProfRegs: React.FC<{
   );
 };
 
-type ImpersonateVal = SelectOption<string>
+export type ImpersonateVal = SelectOption<string>
 
-const Admin: React.FC = () => {
-  const res = useQuery<homeAdminQuery>(
-    graphql`
-    query homeAdminQuery {
-      users {
-        id
-        displayName
-      }
-    }
-    `,
-  );
+export const ImpersonateUser: React.FC<{
+  userOptions: ImpersonateVal[] | GroupedOptionsType<ImpersonateVal>;
+  courseId?: ImpersonateUserInput['courseId'];
+}> = (props) => {
+  const { userOptions, courseId } = props;
+  const { alert } = useContext(AlertContext);
   const [impersonate, { loading }] = useMutation(
     graphql`
     mutation homeImpersonateMutation($input: ImpersonateUserInput!) {
@@ -200,7 +202,66 @@ const Admin: React.FC = () => {
       onCompleted: () => {
         window.location.href = '/';
       },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error impersonating user',
+          message: err.message,
+        });
+      },
     },
+  );
+  const [selectedUser, setSelectedUser] = useState<string>(undefined);
+  return (
+    <>
+      <Row>
+        <Col className="w-100">
+          <h1>Impersonation</h1>
+          <Select
+            placeholder="Select a user to impersonate..."
+            isDisabled={loading}
+            options={userOptions}
+            onChange={(val: ImpersonateVal) => {
+              setSelectedUser(val.value);
+            }}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col className="d-flex">
+          <Button
+            className="mx-auto"
+            variant="danger"
+            disabled={selectedUser === undefined}
+            onClick={() => {
+              impersonate({
+                variables: {
+                  input: {
+                    userId: selectedUser,
+                    courseId,
+                  },
+                },
+              });
+            }}
+          >
+            Impersonate user
+          </Button>
+        </Col>
+      </Row>
+    </>
+  );
+};
+
+const Admin: React.FC = () => {
+  const res = useQuery<homeAdminQuery>(
+    graphql`
+    query homeAdminQuery {
+      users {
+        id
+        displayName
+      }
+    }
+    `,
   );
   if (res.error) {
     return <RenderError error={res.error} />;
@@ -212,24 +273,7 @@ const Admin: React.FC = () => {
     label: user.displayName,
     value: user.id,
   }));
-  return (
-    <>
-      <h1>Impersonation</h1>
-      <Select
-        isDisabled={loading}
-        options={userOptions}
-        onChange={(val: ImpersonateVal) => {
-          impersonate({
-            variables: {
-              input: {
-                userId: val.value,
-              },
-            },
-          });
-        }}
-      />
-    </>
-  );
+  return <ImpersonateUser userOptions={userOptions} />;
 };
 
 const Home: React.FC = () => {

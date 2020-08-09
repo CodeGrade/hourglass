@@ -9,27 +9,35 @@ class Course < ApplicationRecord
   has_many :staff_registrations, through: :sections
   has_many :student_registrations, through: :sections
 
+  has_many :student_ids, -> { distinct }, through: :student_registrations
+  has_many :staff_ids, -> { distinct }, through: :staff_registrations
+  has_many :professor_ids, -> { distinct }, through: :professor_course_registrations
+
+  has_many :students, -> { distinct }, through: :student_registrations, source: :user
+  has_many :staff, -> { distinct }, through: :staff_registrations, source: :user
+  has_many :professors, -> { distinct }, through: :professor_course_registrations, source: :user
+
   validates :title, presence: true
   validates :bottlenose_id, presence: true
 
-  def students
-    User.where(id: student_registrations.select(:user_id))
+  def user_is_student(user)
+    students.where(id: user&.id).exists?
   end
 
-  def staff
-    User.where(id: staff_registrations.select(:user_id))
+  def user_is_staff(user)
+    staff.where(id: user&.id).exists?
   end
 
-  def professors
-    User.where(id: professor_course_registrations.select(:user_id))
+  def user_is_professor(user)
+    professors.where(id: user&.id).exists?
   end
 
   def all_staff
-    staff.or(professors)
+    User.where(id: staff_ids + professor_ids)
   end
 
   def all_users
-    students.or(staff).or(professors)
+    User.where(id: staff_ids + professor_ids + student_ids)
   end
 
   def has_staff?

@@ -18,6 +18,17 @@ class Exam < ApplicationRecord
   has_many :room_announcements, through: :rooms
   has_many :anomalies, through: :registrations
 
+  has_many :student_ids, -> { distinct }, through: :registrations
+  has_many :proctor_ids, -> { distinct }, through: :proctor_registrations
+  delegate :professor_ids, to: :course
+
+  has_many :students, -> { distinct }, through: :registrations, source: :user
+  has_many :proctors, -> { distinct }, through: :proctor_registrations, source: :user
+  delegate :professors, to: :course
+  delegate :all_staff, to: :course
+  
+
+
   validates :course, presence: true
   validates :name, presence: true
   validates :duration, presence: true, numericality: {
@@ -27,7 +38,6 @@ class Exam < ApplicationRecord
   validate :end_after_start
   validate :duration_valid
 
-  delegate :professors, to: :course
 
   def duration
     self[:duration].seconds
@@ -41,25 +51,17 @@ class Exam < ApplicationRecord
     exam_versions.map(&:finalize!)
   end
 
-  def students
-    User.where(id: registrations.select(:user_id))
-  end
-
-  def proctors
-    User.where(id: proctor_registrations.select(:user_id))
-  end
-
   def proctors_and_professors
-    proctors.or(professors)
+    User.where(id: proctor_ids + professor_ids)
   end
 
   # All students and proctors registered for the exam.
   def all_registered_users
-    students.or(proctors)
+    User.where(id: student_ids + proctor_ids)
   end
 
   def everyone
-    students.or(proctors).or(professors)
+    User.where(id: student_ids + proctor_ids + professor_ids)
   end
 
   def unassigned_students

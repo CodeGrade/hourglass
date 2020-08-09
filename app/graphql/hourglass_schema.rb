@@ -50,10 +50,14 @@ class HourglassSchema < GraphQL::Schema
   end
 
   def self.object_from_id(id, _query_ctx)
-    type_name, item_id = GraphQL::Schema::UniqueWithinType.decode(id)
-    # Now, based on `type_name` and `item_id`
-    # find an object in your application
-    Object.const_get(type_name).find(item_id)
+    begin
+      type_name, item_id = GraphQL::Schema::UniqueWithinType.decode(id)
+      # Now, based on `type_name` and `item_id`
+      # find an object in your application
+      Object.const_get(type_name).find(item_id)      
+    rescue => exception
+#      puts "Object_from_id: #{id} ==> #{exception.message}\n#{exception.backtrace.join("\n")}"
+    end
   end
 
   def self.resolve_type(type, obj, ctx)

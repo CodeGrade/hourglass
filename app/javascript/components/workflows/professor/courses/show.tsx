@@ -7,6 +7,8 @@ import DocumentTitle from '@hourglass/common/documentTitle';
 import { graphql } from 'react-relay';
 import { useFragment, useQuery } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
+import { GroupedOptionsType } from 'react-select';
+import { ImpersonateVal, ImpersonateUser } from '@hourglass/workflows/home';
 
 import { showCourseQuery } from './__generated__/showCourseQuery.graphql';
 import { show_courseExams$key } from './__generated__/show_courseExams.graphql';
@@ -52,6 +54,18 @@ const ShowCourse: React.FC = () => {
       course(id: $courseId) {
         title
         id
+        students {
+          id
+          displayName
+        }
+        staff {
+          id
+          displayName
+        }
+        professors {
+          id
+          displayName
+        }
         exams {
           ...show_courseExams
         }
@@ -66,6 +80,29 @@ const ShowCourse: React.FC = () => {
   if (!res.props) {
     return <Container><p>Loading...</p></Container>;
   }
+  const userOptions: GroupedOptionsType<ImpersonateVal> = [
+    {
+      label: 'Students',
+      options: res.props.course.students.map((user) => ({
+        label: user.displayName,
+        value: user.id,
+      })),
+    },
+    {
+      label: 'Staff',
+      options: res.props.course.staff.map((user) => ({
+        label: user.displayName,
+        value: user.id,
+      })),
+    },
+    {
+      label: 'Professors',
+      options: res.props.course.professors.map((user) => ({
+        label: user.displayName,
+        value: user.id,
+      })),
+    },
+  ];
   return (
     <Container>
       <div className="d-flex align-items-center justify-content-between">
@@ -92,6 +129,10 @@ const ShowCourse: React.FC = () => {
       <Route path="/courses/:courseId" exact>
         <DocumentTitle title={res.props.course.title}>
           <CourseExams courseExams={res.props.course.exams} />
+          <ImpersonateUser
+            userOptions={userOptions}
+            courseId={res.props.course.id}
+          />
         </DocumentTitle>
       </Route>
       <Route path="/courses/:courseId/sync" exact>

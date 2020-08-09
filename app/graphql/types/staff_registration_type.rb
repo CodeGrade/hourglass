@@ -9,7 +9,7 @@ module Types
 
     field :course, CourseType, null: false
     def course
-      RecordLoader.for(Course).load(object.course_id)
+      object.course
     end
   end
 end

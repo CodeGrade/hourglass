@@ -22,5 +22,24 @@ module Types
     def sections
       AssociationLoader.for(Course, :sections).load(object)
     end
+
+    field :students, [Types::UserType], null: false do
+      guard Guards::PROFESSORS
+    end
+    def students
+      object.students.order(display_name: :asc)
+    end
+    field :staff, [Types::UserType], null: false do
+      guard Guards::PROFESSORS
+    end
+    def staff
+      object.staff.order(display_name: :asc)
+    end
+    field :professors, [Types::UserType], null: false do
+      guard Guards::PROFESSORS
+    end
+    def professors
+      object.professors.order(display_name: :asc)
+    end
   end
 end

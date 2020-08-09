@@ -658,7 +658,6 @@ class ArchiveUtils
     cur
   end
 
-  # rubocop:disable Metrics/PerceivedComplexity
   private_class_method def self.helper_to_json(file, type, archive)
     seen_symlinks = false
     dest = '/tmp/<json>'
@@ -719,7 +718,6 @@ class ArchiveUtils
     Rails.logger.debug e.backtrace
     raise FileReadError.new(file, type, e)
   end
-  # rubocop:enable Metrics/PerceivedComplexity
 
   private_class_method def self.zip_to_json(file)
     Zip::File.open(file) { |zf| helper_to_json(file, 'zip', zf) }

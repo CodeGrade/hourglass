@@ -18,7 +18,6 @@ class Rubric < ApplicationRecord
 
   validate :sensible_coordinates
 
-  # rubocop:disable Metrics/PerceivedComplexity
   def sensible_coordinates
     if qnum.nil?
       if pnum.nil?
@@ -42,7 +41,6 @@ class Rubric < ApplicationRecord
       errors.add(:order, "cannot be nil if this is a subrubric within (#{qnum}, #{pnum}, #{bnum})")
     end
   end
-  # rubocop:enable Metrics/PerceivedComplexity
 
   def exam_rubric?
     qnum.nil? && pnum.nil? && bnum.nil?

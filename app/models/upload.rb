@@ -395,7 +395,6 @@ class Upload
     @files = @files.compact
   end
 
-  # rubocop:disable Metrics/PerceivedComplexity
   def with_extracted(item)
     return nil if item.nil?
 
@@ -439,7 +438,6 @@ class Upload
     end
     item
   end
-  # rubocop:enable Metrics/PerceivedComplexity
 
   def ensure_utf8(str, mimetype)
     return str if ApplicationHelper.binary?(mimetype)

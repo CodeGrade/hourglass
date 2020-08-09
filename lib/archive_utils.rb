@@ -252,7 +252,7 @@ class ArchiveUtils
     end
   end
 
-  # rubocop:disable Metrics/PerceivedComplexity, Style/NegatedIf
+  # rubocop:disable Style/NegatedIf
   def self.invalid_paths?(file, mime)
     if is_zip?(file, mime)
       zip_invalid_paths?(file)
@@ -313,7 +313,7 @@ class ArchiveUtils
       FileUtils.chmod 'u+r', dest, verbose: false if force_readable
     end
   end
-  # rubocop:enable Metrics/PerceivedComplexity, Style/NegatedIf
+  # rubocop:enable Style/NegatedIf
 
   def self.to_json(file, mime)
     # Extracts the file to a JSON dictionary
@@ -446,7 +446,6 @@ class ArchiveUtils
     Gem::Package::TarReader.new(stream) { |tar| return helper_entries(file, 'tgz', tar) }
   end
 
-  # rubocop:disable Metrics/PerceivedComplexity
   private_class_method def self.helper_entries(file, type, stream)
     output = {}
     stream.safe_each do |entry|
@@ -475,7 +474,6 @@ class ArchiveUtils
   rescue RuntimeError => e
     raise FileReadError.new(file, type, e)
   end
-  # rubocop:enable Metrics/PerceivedComplexity
 
   ##############################
   # File sizes

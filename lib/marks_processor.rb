@@ -2,7 +2,7 @@
 
 # Utility class to take source code with spans marked up, and extract the marks as structured data
 class MarksProcessor
-  # rubocop:disable Metrics/PerceivedComplexity, Metrics/BlockLength, Style/MultilineBlockChain
+  # rubocop:disable Metrics/BlockLength, Style/MultilineBlockChain
   def self.process_marks(contents)
     lines = contents.lines.map(&:chomp)
     lines.shift if lines[0].blank?
@@ -90,5 +90,5 @@ class MarksProcessor
     end
     lines.join
   end
-  # rubocop:enable Metrics/PerceivedComplexity, Metrics/BlockLength, Style/MultilineBlockChain
+  # rubocop:enable Metrics/BlockLength, Style/MultilineBlockChain
 end

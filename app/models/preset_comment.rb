@@ -6,7 +6,7 @@ class PresetComment < ApplicationRecord
   # DON'T delete comments, but make them Unknown
   has_many :grading_comments, dependent: :nullify
 
-  def in_use
+  def in_use?
     !grading_comments.empty?
   end
 

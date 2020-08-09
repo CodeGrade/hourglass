@@ -59,7 +59,7 @@ class Rubric < ApplicationRecord
   end
 
   def in_use?
-    rubric_preset&.in_use || subsections.any?(&:in_use?)
+    rubric_preset&.in_use? || subsections.any?(&:in_use?)
   end
 
   def compute_grade_for(reg, comments, checks, qpb)

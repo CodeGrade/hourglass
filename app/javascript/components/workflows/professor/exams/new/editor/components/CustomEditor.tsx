@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import ReactQuill from 'react-quill';
 import QuillPasteSmart from 'quill-paste-smart';
 import './CustomEditor.scss';
@@ -12,6 +12,7 @@ export interface CustomEditorProps {
   id?: string;
   theme?: string;
   onChange?: ReactQuill.ReactQuillProps['onChange'];
+  refreshProps?: React.DependencyList;
 }
 
 const toolbarOptions = [
@@ -49,7 +50,7 @@ const formatOptions = [
   // NO 'video'
 ];
 
-const CustomEditor: React.FC<CustomEditorProps> = React.memo((props) => {
+const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
   const {
     value,
     placeholder,
@@ -57,6 +58,7 @@ const CustomEditor: React.FC<CustomEditorProps> = React.memo((props) => {
     id,
     theme,
     onChange,
+    refreshProps = [],
   } = props;
 
   const filteredOnChange = useCallback((val, delta, source, editor) => {
@@ -67,9 +69,12 @@ const CustomEditor: React.FC<CustomEditorProps> = React.memo((props) => {
     }
   }, [onChange]);
 
+  const key = useMemo(() => Math.random(), refreshProps);
+
   return (
     <ReactQuill
       id={id}
+      key={key}
       className={className}
       theme={theme || 'snow'}
       placeholder={placeholder}

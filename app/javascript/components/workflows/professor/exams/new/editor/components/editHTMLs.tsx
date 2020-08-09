@@ -16,12 +16,14 @@ export const EditHTMLField: React.FC<WrappedFieldProps & {
   theme?: CustomEditorProps['theme'];
   className?: string;
   placeholder?: CustomEditorProps['placeholder'];
+  refreshProps?: React.DependencyList;
 }> = (props) => {
   const {
     input,
     className = 'bg-white',
     theme,
     placeholder,
+    refreshProps,
   } = props;
   const {
     value,
@@ -42,6 +44,7 @@ export const EditHTMLField: React.FC<WrappedFieldProps & {
       value={value.value}
       placeholder={placeholder}
       onChange={handleChange}
+      refreshProps={refreshProps}
     />
   );
 };

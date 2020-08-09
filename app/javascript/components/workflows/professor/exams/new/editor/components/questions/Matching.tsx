@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
-import { alphabetIdx } from '@hourglass/common/helpers';
+import { alphabetIdx, useRefresher } from '@hourglass/common/helpers';
 import {
   Field,
   WrappedFieldProps,
@@ -73,6 +73,7 @@ const OneValue: React.FC<{
   moveDown: () => void;
   moveUp: () => void;
   remove: () => void;
+  refreshProps?: React.DependencyList;
 }> = (props) => {
   const {
     memberName,
@@ -81,6 +82,7 @@ const OneValue: React.FC<{
     moveDown,
     moveUp,
     remove,
+    refreshProps = [],
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
   const showMovers = (): void => setMoversVisible(true);
@@ -111,43 +113,56 @@ const OneValue: React.FC<{
           component={EditHTMLField}
           theme="bubble"
           placeholder="Enter a new choice"
+          refreshProps={refreshProps}
         />
       </Col>
     </Row>
   );
 };
 
-const renderValue = ({
-  removeAnswer,
-  swapAnswers,
-}: {
+interface RenderValueSetup {
   removeAnswer: (oldVal: number) => void;
   swapAnswers: (valA: number, valB: number) => void;
-}) => (
-  member,
-  index,
-  fields,
-) => (
-  <OneValue
-    // eslint-disable-next-line react/no-array-index-key
-    key={index}
-    valueNum={index}
-    memberName={member}
-    enableDown={index + 1 < fields.length}
-    moveDown={(): void => {
-      fields.move(index, index + 1);
-      swapAnswers(index, index + 1);
-    }}
-    moveUp={(): void => {
-      fields.move(index, index - 1);
-      swapAnswers(index, index - 1);
-    }}
-    remove={(): void => {
-      fields.remove(index);
-      removeAnswer(index);
-    }}
-  />
-);
+  refreshProps: React.DependencyList;
+  refresh: () => void;
+}
+function renderValue(setup: RenderValueSetup) {
+  const {
+    removeAnswer,
+    swapAnswers,
+    refreshProps,
+    refresh,
+  } = setup;
+  return (
+    member,
+    index,
+    fields,
+  ) => (
+    <OneValue
+      // eslint-disable-next-line react/no-array-index-key
+      key={index}
+      valueNum={index}
+      memberName={member}
+      enableDown={index + 1 < fields.length}
+      moveDown={(): void => {
+        fields.move(index, index + 1);
+        swapAnswers(index, index + 1);
+        refresh();
+      }}
+      moveUp={(): void => {
+        fields.move(index, index - 1);
+        swapAnswers(index, index - 1);
+        refresh();
+      }}
+      remove={(): void => {
+        fields.remove(index);
+        removeAnswer(index);
+        refresh();
+      }}
+      refreshProps={refreshProps}
+    />
+  );
+}
 
 const OnePrompt: React.FC<{
   memberName: string;
@@ -157,6 +172,7 @@ const OnePrompt: React.FC<{
   moveDown: () => void;
   moveUp: () => void;
   remove: () => void;
+  refreshProps?: React.DependencyList;
 }> = (props) => {
   const {
     memberName,
@@ -166,6 +182,7 @@ const OnePrompt: React.FC<{
     moveDown,
     moveUp,
     remove,
+    refreshProps = [],
   } = props;
   const [moversVisible, setMoversVisible] = useState(false);
   const showMovers = (): void => setMoversVisible(true);
@@ -197,6 +214,7 @@ const OnePrompt: React.FC<{
             component={EditHTMLField}
             theme="bubble"
             placeholder="Enter a new prompt"
+            refreshProps={refreshProps}
           />
         </Col>
         <div className="float-right match-box">
@@ -211,31 +229,41 @@ const OnePrompt: React.FC<{
   );
 };
 
-const renderPrompt = ({
-  numAnswers,
-}) => (
-  member: string,
-  index: number,
-  fields: FieldArrayFieldsProps<MatchingPromptWithAnswer>,
-) => (
-  <OnePrompt
-    // eslint-disable-next-line react/no-array-index-key
-    key={index}
-    valueNum={index}
-    numAnswers={numAnswers}
-    memberName={member}
-    enableDown={index + 1 < fields.length}
-    moveDown={(): void => {
-      fields.move(index, index + 1);
-    }}
-    moveUp={(): void => {
-      fields.move(index, index - 1);
-    }}
-    remove={(): void => {
-      fields.remove(index);
-    }}
-  />
-);
+interface RenderPromptSetup {
+  numAnswers: number;
+  refreshProps?: React.DependencyList;
+  refresh?: () => void;
+}
+function renderPrompt(setup: RenderPromptSetup) {
+  const { numAnswers, refreshProps, refresh } = setup;
+  return (
+    member: string,
+    index: number,
+    fields: FieldArrayFieldsProps<MatchingPromptWithAnswer>,
+  ) => (
+    <OnePrompt
+      // eslint-disable-next-line react/no-array-index-key
+      key={index}
+      valueNum={index}
+      numAnswers={numAnswers}
+      memberName={member}
+      enableDown={index + 1 < fields.length}
+      moveDown={(): void => {
+        fields.move(index, index + 1);
+        refresh();
+      }}
+      moveUp={(): void => {
+        fields.move(index, index - 1);
+        refresh();
+      }}
+      remove={(): void => {
+        fields.remove(index);
+        refresh();
+      }}
+      refreshProps={refreshProps}
+    />
+  );
+}
 
 const EditColName: React.FC<WrappedFieldProps & {
   defaultLabel: string;
@@ -262,16 +290,20 @@ const EditColName: React.FC<WrappedFieldProps & {
   );
 };
 
-const EditPrompts: React.FC<{
-  numAnswers: number;
-} & WrappedFieldArrayProps<MatchingPromptWithAnswer>> = (props) => {
+const EditPrompts: React.FC<
+  RenderPromptSetup & WrappedFieldArrayProps<MatchingPromptWithAnswer>
+> = (props) => {
   const {
     fields,
     numAnswers,
+    refreshProps,
+    refresh,
   } = props;
-  const renderPrompts = React.useCallback(renderPrompt({
+  const renderPrompts = renderPrompt({
     numAnswers,
-  }), [numAnswers]);
+    refreshProps,
+    refresh,
+  });
   return (
     <>
       {fields.map(renderPrompts)}
@@ -300,11 +332,15 @@ const EditPrompts: React.FC<{
 const RenderPrompts: React.FC<WrappedFieldProps> = (props) => {
   const { input } = props;
   const { length } = input.value;
+  const [refresher, refresh] = useRefresher();
+  const refreshProps: React.DependencyList = [refresher];
   return (
     <FieldArray
       name="prompts"
       component={EditPrompts}
       numAnswers={length}
+      refresh={refresh}
+      refreshProps={refreshProps}
     />
   );
 };
@@ -318,11 +354,13 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
     value: MatchingPromptWithAnswer[],
     onChange: (newVal: MatchingPromptWithAnswer[]) => void;
   } = input;
+  const [refresher, refresh] = useRefresher();
+  const refreshProps: React.DependencyList = [refresher];
 
   /**
    * Set all answers that used to have oldVal to -1, and shift answers below it up.
    */
-  const removeAnswer = useCallback((oldVal: number): void => {
+  const removeAnswer = (oldVal: number): void => {
     onChange(value.map((v) => {
       const ret = {
         ...v,
@@ -334,12 +372,12 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
       if (v.answer > oldVal) ret.answer -= 1;
       return ret;
     }));
-  }, [value, onChange]);
+  };
 
   /**
    * Swap all answers with valA to be valB and vice-versa.
    */
-  const swapAnswers = useCallback((valA: number, valB: number): void => {
+  const swapAnswers = (valA: number, valB: number): void => {
     // Trigger onChange with a new value
     onChange(value.map((v) => {
       const ret = {
@@ -349,11 +387,13 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
       if (v.answer === valB) ret.answer = valA;
       return ret;
     }));
-  }, [value, onChange]);
-  const renderValues = useCallback(
-    renderValue({ removeAnswer, swapAnswers }),
-    [removeAnswer, swapAnswers],
-  );
+  };
+  const renderValues = renderValue({
+    removeAnswer,
+    swapAnswers,
+    refresh,
+    refreshProps,
+  });
   return (
     <FieldArray
       name="values"

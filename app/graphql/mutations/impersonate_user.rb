@@ -8,7 +8,7 @@ module Mutations
 
     field :success, Boolean, null: false
 
-    def authorized?(user:, course:)
+    def authorized?(user:, course: nil)
       return true if context[:true_user].admin?
       return true if course&.user_is_professor(context[:true_user]) && course&.user_member?(user)
 

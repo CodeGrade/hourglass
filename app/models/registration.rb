@@ -107,7 +107,7 @@ class Registration < ApplicationRecord
 
   scope :in_progress, -> { where(end_time: nil) }
   scope :final, -> { where.not(end_time: nil) }
-  
+
   def final?
     !end_time.nil?
   end

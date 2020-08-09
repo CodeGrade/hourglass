@@ -46,7 +46,7 @@ class AccommodationTest < ActiveSupport::TestCase
     exam = build(:exam, duration: 8.minutes, start_time: start_time, end_time: end_time)
     exam_version = build(:exam_version, exam: exam)
     reg = build(:registration, :early_start, exam_version: exam_version)
-    acc = build(:accommodation, registration: reg, percent_time_expansion: 25)
+    build(:accommodation, registration: reg, percent_time_expansion: 25)
     extra_duration = 2.minutes
     assert_equal extra_duration, reg.accommodated_extra_duration
     assert_equal 10.minutes, reg.accommodated_duration
@@ -73,7 +73,7 @@ class AccommodationTest < ActiveSupport::TestCase
     reg = build(:registration)
     exam = reg.exam
     new_start_time = exam.start_time - 1.hour
-    acc = build(:accommodation, registration: reg, new_start_time: new_start_time)
+    build(:accommodation, registration: reg, new_start_time: new_start_time)
     assert_equal new_start_time, reg.accommodated_start_time
   end
 
@@ -89,7 +89,7 @@ class AccommodationTest < ActiveSupport::TestCase
   test 'full time remaining for an early start' do
     reg = build(:registration, :early_start)
     exam = reg.exam
-    acc = build(:accommodation, registration: reg, percent_time_expansion: 25)
+    build(:accommodation, registration: reg, percent_time_expansion: 25)
     extra_duration = exam.duration / 4.0
     assert_equal exam.duration + extra_duration, reg.accommodated_duration
     assert_equal reg.accommodated_duration, reg.effective_duration

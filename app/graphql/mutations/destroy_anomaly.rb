@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to eliminate a student's exam anomaly
   class DestroyAnomaly < BaseMutation
     argument :anomaly_id, ID, required: true, loads: Types::AnomalyType
 

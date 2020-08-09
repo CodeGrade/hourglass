@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # from https://pganalyze.com/blog/efficient-graphql-queries-in-ruby-on-rails-and-postgres
 class ForeignKeyLoader < GraphQL::Batch::Loader
   attr_reader :model, :foreign_key, :merge
@@ -6,7 +8,7 @@ class ForeignKeyLoader < GraphQL::Batch::Loader
     # avoiding including the `merge` lambda in loader key
     # each lambda is unique which defeats the purpose of
     # grouping queries together
-    [self].concat(group_args.slice(0,2))
+    [self].concat(group_args.slice(0, 2))
   end
 
   def initialize(model, foreign_key, merge: nil)

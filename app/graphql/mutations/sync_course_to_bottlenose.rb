@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to synchronize course enrollments with Bottlenose course
   class SyncCourseToBottlenose < BaseMutation
     argument :course_id, ID, required: true, loads: Types::CourseType
 

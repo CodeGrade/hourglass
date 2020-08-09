@@ -19,7 +19,7 @@ module Subscriptions
         parent: exam,
         collection: exam.messages,
         item: object,
-        context: context
+        context: context,
       )
       {
         message: object,

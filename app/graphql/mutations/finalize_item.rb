@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to finalize a student's exam submission
   class FinalizeItem < BaseMutation
     argument :id, ID, required: true
 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Mutations
+  # Mutation to delete an existing grading comment
   class DestroyGradingComment < BaseMutation
     argument :grading_comment_id, ID, required: true, loads: Types::GradingCommentType
 

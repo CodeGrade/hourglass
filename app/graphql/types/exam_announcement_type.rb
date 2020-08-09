@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Types
+  # Type describing exam announcements
   class ExamAnnouncementType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id

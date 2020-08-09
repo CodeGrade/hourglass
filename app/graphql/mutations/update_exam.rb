@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to up date an exam's administrative details
   class UpdateExam < BaseMutation
     argument :exam_id, ID, required: true, loads: Types::ExamType
     argument :name, String, required: true

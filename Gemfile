@@ -13,8 +13,8 @@ gem 'pg', '>= 0.18', '< 2.0'
 gem 'puma', '~> 4.1'
 
 gem 'graphql'
-gem 'graphql-guard'
 gem 'graphql-batch'
+gem 'graphql-guard'
 
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
 gem 'webpacker', '~> 5.1'
@@ -47,9 +47,9 @@ gem 'bootsnap', '>= 1.4.2', require: false
 gem 'activerecord_json_validator'
 
 group :development, :test do
+  gem 'byebug'
   gem 'factory_bot_rails', require: false
   gem 'minitest-reporters'
-  gem 'byebug'
   gem 'pry'
   gem 'pry-rails'
   gem 'pry-rescue'

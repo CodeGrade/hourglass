@@ -18,7 +18,7 @@ module Subscriptions
         parent: exam_version,
         collection: exam_version.version_announcements,
         item: object,
-        context: context
+        context: context,
       )
       {
         version_announcement: object,

@@ -2,6 +2,7 @@
 
 module Api
   module Professor
+    # API Controller for creating and exporting exam versions
     class VersionsController < ProfessorController
       before_action :find_version, only: [:export_file, :export_archive]
       before_action :find_exam_and_course
@@ -44,4 +45,3 @@ module Api
     end
   end
 end
-

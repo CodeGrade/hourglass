@@ -43,7 +43,6 @@ class RegistrationTest < ActiveSupport::TestCase
 
   test 'effective_end_time with no accommodation and early start' do
     reg = build(:registration, :early_start)
-    exam = reg.exam
     assert_equal reg.effective_end_time, reg.start_time + reg.effective_duration
   end
 

@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to update a student's exam accommodations
   class UpdateAccommodation < BaseMutation
     argument :accommodation_id, ID, required: true, loads: Types::AccommodationType
     argument :new_start_time, GraphQL::Types::ISO8601DateTime, required: false

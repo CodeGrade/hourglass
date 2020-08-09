@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Types
   class RubricVariantType < Types::BaseEnum
     value 'all'
@@ -90,20 +92,22 @@ module Types
     def description
       object.description && {
         type: 'HTML',
-        value: object.description
+        value: object.description,
       }
     end
     field :parent_section_id, ID, null: true
     def parent_section_id
       return nil if object.parent_section_id.nil?
+
       HourglassSchema.id_from_object_id(object.parent_section_id, Types::RubricType, context)
     end
     field :parent_section, Types::RubricType, null: true
     def parent_section
       return nil if object.parent_section_id.nil?
+
       RecordLoader.for(Rubric).load(object.parent_section_id)
     end
-    
+
     field :subsections, [Types::RubricType], null: true
     def subsections
       AssociationLoader.for(Rubric, :subsections).load(object)

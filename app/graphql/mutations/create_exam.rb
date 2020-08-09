@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to create a new exam
   class CreateExam < BaseMutation
     argument :course_id, ID, required: true, loads: Types::CourseType
     argument :name, String, required: true

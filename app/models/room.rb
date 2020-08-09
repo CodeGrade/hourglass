@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# A room where students can take an exam
 class Room < ApplicationRecord
   belongs_to :exam
   has_many :registrations, dependent: :restrict_with_error

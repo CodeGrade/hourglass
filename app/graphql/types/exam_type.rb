@@ -4,9 +4,10 @@ module Types
   class ExamType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id
-        
-    guard ->(obj, _, ctx) {
-      obj.object.visible_to?(ctx[:current_user]) || obj.object.all_staff.exists?(ctx[:current_user].id)
+
+    guard lambda { |obj, _, ctx|
+      (obj.object.visible_to?(ctx[:current_user]) ||
+       obj.object.all_staff.exists?(ctx[:current_user].id))
     }
 
     field :name, String, null: false
@@ -45,7 +46,8 @@ module Types
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def version_announcements
-      AssociationLoader.for(Exam, :version_announcements, merge: -> { order(created_at: :desc) }).load(object)
+      AssociationLoader.for(Exam, :version_announcements, merge: -> { order(created_at: :desc) })
+                       .load(object)
     end
 
     field :room_announcements, Types::RoomAnnouncementType.connection_type, null: false do

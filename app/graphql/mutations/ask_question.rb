@@ -26,7 +26,7 @@ module Mutations
         parent: registration,
         collection: registration.questions,
         item: q,
-        context: context
+        context: context,
       )
 
       { question: q, questions_connection: range_add.connection, question_edge: range_add.edge }

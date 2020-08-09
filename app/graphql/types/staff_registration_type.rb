@@ -8,8 +8,6 @@ module Types
     guard Guards::VISIBILITY
 
     field :course, CourseType, null: false
-    def course
-      object.course
-    end
+    delegate :course, to: :object
   end
 end

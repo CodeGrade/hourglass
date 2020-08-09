@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Utility module
 module ApplicationHelper
   def flash_class
     { notice: 'info',

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Types
   class HtmlTag < Types::BaseEnum
     value 'HTML'

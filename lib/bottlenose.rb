@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Bottlenose
+  # Connects with the Bottlenose server to synchronize course information
   class API
-
-    def initialize(u)
-      @user = u
+    def initialize(user)
+      @user = user
     end
 
     def sync_courses
@@ -67,12 +67,12 @@ module Bottlenose
 
     private
 
-    def sync_user(u)
-      user = User.where(username: u['username']).first_or_initialize
-      user.display_name = u['display_name']
-      user.nuid = u['nuid']
-      user.email = u['email']
-      user.image_url = u['image_url']
+    def sync_user(raw_user)
+      user = User.where(username: raw_user['username']).first_or_initialize
+      user.display_name = raw_user['display_name']
+      user.nuid = raw_user['nuid']
+      user.email = raw_user['email']
+      user.image_url = raw_user['image_url']
       user.save!
       user
     end
@@ -102,7 +102,7 @@ module Bottlenose
       @bottlenose_oauth_client ||= OAuth2::Client.new(
         ENV.fetch('BOTTLENOSE_APP_ID'),
         ENV.fetch('BOTTLENOSE_APP_SECRET'),
-        site: ENV.fetch('BOTTLENOSE_URL')
+        site: ENV.fetch('BOTTLENOSE_URL'),
       )
     end
 

@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+# Utility class to take source code with spans marked up, and extract the marks as structured data
 class MarksProcessor
+  # rubocop:disable Metrics/PerceivedComplexity, Metrics/BlockLength, Style/MultilineBlockChain
   def self.process_marks(contents)
-    lines = contents.lines.map &:chomp
+    lines = contents.lines.map(&:chomp)
     lines.shift if lines[0].blank?
     lines.pop if lines[-1].blank?
     marks = {
@@ -10,51 +12,51 @@ class MarksProcessor
       byNum: {},
     }
     count = 0
-    (0...lines.length).each do |lineNum|
-      marks[:byLine][lineNum] = []
-      reTag = /~ro:(\d+):([se])~/
-      match = reTag.match(lines[lineNum])
-      while match do
+    (0...lines.length).each do |line_num|
+      marks[:byLine][line_num] = []
+      re_tag = /~ro:(\d+):([se])~/
+      match = re_tag.match(lines[line_num])
+      while match
         idx = match.begin(0)
-        lines[lineNum].sub!(match[0], '')
+        lines[line_num].sub!(match[0], '')
         if match[2] == 's'
           count += 1
           marks[:byNum][match[1]] = {
             from: {
-              line: lineNum,
+              line: line_num,
               ch: idx,
             },
             options: {
-              inclusiveLeft: (lineNum == 0 && idx == 0),
+              inclusiveLeft: (line_num.zero? && idx.zero?),
             },
           }
-          if marks[:byLine][lineNum][idx].nil?
-            marks[:byLine][lineNum][idx] = {
+          if marks[:byLine][line_num][idx].nil?
+            marks[:byLine][line_num][idx] = {
               open: [],
               close: [],
             }
           end
-          marks[:byLine][lineNum][idx][:open].push(marks[:byNum][match[1]])
+          marks[:byLine][line_num][idx][:open].push(marks[:byNum][match[1]])
         elsif !marks[:byNum][match[1]].nil?
           marks[:byNum][match[1]][:to] = {
-            line: lineNum,
+            line: line_num,
             ch: idx,
           }
-          lastLine = lineNum == lines.length - 1
-          endOfLine = idx == lines[lineNum].length
-          marks[:byNum][match[1]][:options][:inclusiveRight] = lastLine && endOfLine
-          if marks[:byLine][lineNum][idx].nil?
-            marks[:byLine][lineNum][idx] = {
+          last_line = line_num == lines.length - 1
+          end_of_line = idx == lines[line_num].length
+          marks[:byNum][match[1]][:options][:inclusiveRight] = last_line && end_of_line
+          if marks[:byLine][line_num][idx].nil?
+            marks[:byLine][line_num][idx] = {
               open: [],
               close: [],
             }
           end
-          marks[:byLine][lineNum][idx][:close].unshift(marks[:byNum][match[1]])
+          marks[:byLine][line_num][idx][:close].unshift(marks[:byNum][match[1]])
         else
           m = match.to_a.join(', ')
           raise "No information found for mark [#{m}]"
         end
-        match = reTag.match(lines[lineNum], idx)
+        match = re_tag.match(lines[line_num], idx)
       end
     end
     {
@@ -88,4 +90,5 @@ class MarksProcessor
     end
     lines.join
   end
+  # rubocop:enable Metrics/PerceivedComplexity, Metrics/BlockLength, Style/MultilineBlockChain
 end

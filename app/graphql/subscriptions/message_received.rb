@@ -18,7 +18,7 @@ module Subscriptions
         parent: registration,
         collection: registration.messages,
         item: object,
-        context: context
+        context: context,
       )
 
       {

@@ -64,7 +64,7 @@ class User < ApplicationRecord
   def update_bottlenose_credentials(auth)
     update(
       bottlenose_access_token: auth.credentials.token,
-      bottlenose_refresh_token: auth.credentials.refresh_token
+      bottlenose_refresh_token: auth.credentials.refresh_token,
     )
   end
 

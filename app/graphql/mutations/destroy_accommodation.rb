@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to remove a student's exam accommodation
   class DestroyAccommodation < BaseMutation
     argument :accommodation_id, ID, required: true, loads: Types::AccommodationType
 

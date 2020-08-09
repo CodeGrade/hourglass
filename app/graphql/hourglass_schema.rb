@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 require 'graphql/subscriptions/action_cable_subscriptions'
 require 'graphql/batch'
 
+# Class that actually executes all Hourglass GraphQL queries
 class HourglassSchema < GraphQL::Schema
   mutation(Types::MutationType)
   query(Types::QueryType)
@@ -22,8 +25,8 @@ class HourglassSchema < GraphQL::Schema
       query_str = kwargs[:query] if query_str.nil?
       if STATIC_GRAPHQL_QUERIES[query_str].nil? && KNOWN_GRAPHQL_QUERIES[query_str].nil?
         Rails.logger.debug "** GraphQL: Received non-persisted query: >#{query_str}<"
-      else
-        query_str = STATIC_GRAPHQL_QUERIES[query_str] if KNOWN_GRAPHQL_QUERIES[query_str].nil?
+      elsif KNOWN_GRAPHQL_QUERIES[query_str].nil?
+        query_str = STATIC_GRAPHQL_QUERIES[query_str]
       end
       super(query_str, **kwargs)
     end
@@ -45,22 +48,21 @@ class HourglassSchema < GraphQL::Schema
   def self.id_from_object_id(object_id, type_definition, _query_ctx)
     GraphQL::Schema::UniqueWithinType.encode(type_definition.graphql_name, object_id)
   end
-  def self.id_from_object(object, type_definition, _query_ctx)
-    self.id_from_object_id(object.id, type_definition, _query_ctx)
+
+  def self.id_from_object(object, type_definition, query_ctx)
+    id_from_object_id(object.id, type_definition, query_ctx)
   end
 
   def self.object_from_id(id, _query_ctx)
-    begin
-      type_name, item_id = GraphQL::Schema::UniqueWithinType.decode(id)
-      # Now, based on `type_name` and `item_id`
-      # find an object in your application
-      Object.const_get(type_name).find(item_id)      
-    rescue => exception
-#      puts "Object_from_id: #{id} ==> #{exception.message}\n#{exception.backtrace.join("\n")}"
-    end
+    type_name, item_id = GraphQL::Schema::UniqueWithinType.decode(id)
+    # Now, based on `type_name` and `item_id`
+    # find an object in your application
+    Object.const_get(type_name).find(item_id)
+  rescue RuntimeError => e
+    Rails.logger.debug "Object_from_id: #{id} ==> #{e.message}\n#{e.backtrace.join("\n")}"
   end
 
-  def self.resolve_type(type, obj, ctx)
+  def self.resolve_type(type, obj, _ctx)
     case obj
     when Accommodation
       Types::AccommodationType
@@ -126,11 +128,15 @@ class HourglassSchema < GraphQL::Schema
   end
 
   def self.do_mutation!(mutation_query, user, input)
-    execute(mutation_query, context: {
+    execute(
+      mutation_query,
+      context: {
         current_user: user,
         access_cache: {},
-      }, variables: {
-      input: input,
-    })
+      },
+      variables: {
+        input: input,
+      },
+    )
   end
 end

@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to delete an exam version (if possible)
   class DestroyExamVersion < BaseMutation
     argument :exam_version_id, ID, required: true, loads: Types::ExamVersionType
 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Types
+  # Type describing a room update query
   class RoomUpdate < Types::BaseInputObject
     description 'Update a room name.'
     argument :room_id, ID, required: true, loads: Types::RoomType
@@ -9,6 +10,7 @@ module Types
 end
 
 module Mutations
+  # Mutation to update the rooms of an exam
   class UpdateExamRooms < BaseMutation
     argument :exam_id, ID, required: true, loads: Types::ExamType
     argument :deleted_room_ids, [ID], required: true, loads: Types::RoomType

@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to send a message (private, room-wide, version-wide or exam-wide)
   class SendMessage < BaseMutation
     argument :recipient_id, ID, required: true
     argument :message, String, required: true

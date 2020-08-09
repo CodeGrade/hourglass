@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to create a student's exam accommodation
   class CreateAccommodation < BaseMutation
     argument :registration_id, ID, required: true, loads: Types::RegistrationType
 

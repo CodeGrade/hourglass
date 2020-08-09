@@ -18,7 +18,7 @@ module Subscriptions
         parent: room,
         collection: room.room_announcements,
         item: object,
-        context: context
+        context: context,
       )
       {
         room_announcement: object,

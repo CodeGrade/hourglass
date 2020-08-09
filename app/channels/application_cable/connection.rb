@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module ApplicationCable
+  # Main connection class for communicating with front end
   class Connection < ActionCable::Connection::Base
     identified_by :current_user, :true_user
     impersonates :user

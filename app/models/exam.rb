@@ -26,8 +26,6 @@ class Exam < ApplicationRecord
   has_many :proctors, -> { distinct }, through: :proctor_registrations, source: :user
   delegate :professors, to: :course
   delegate :all_staff, to: :course
-  
-
 
   validates :course, presence: true
   validates :name, presence: true
@@ -37,7 +35,6 @@ class Exam < ApplicationRecord
 
   validate :end_after_start
   validate :duration_valid
-
 
   def duration
     self[:duration].seconds
@@ -86,7 +83,7 @@ class Exam < ApplicationRecord
   def unassigned_staff
     proctor_regs_by_id = proctor_registrations.group_by(&:user_id)
     course.staff.order(display_name: :asc).reject do |s|
-      proctor_regs_by_id.has_key? s.id
+      proctor_regs_by_id.key? s.id
     end
   end
 

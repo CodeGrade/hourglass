@@ -72,7 +72,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def total_points
-    questions.map{|q| q['parts'].map{|p| p['points']}.sum}.sum
+    questions.map { |q| q['parts'].map { |p| p['points'] }.sum }.sum
   end
 
   def default_answers
@@ -88,31 +88,31 @@ class ExamVersion < ApplicationRecord
     }
   end
 
-
   # Because activerecord_json_validator defines its own
   # attr_writer for :info=, we need to wrap it here
   # instead of just calling super
   orig_info_eq = instance_method(:info=)
   define_method(:info=) do |*args, &block|
-    res = orig_info_eq.bind(self).call *args, &block
+    res = orig_info_eq.bind(self).call(*args, &block)
     rubrics = res['rubrics'] || {}
-    convert_rubric(rubrics['examRubric'], nil, nil, nil)
+    convert_rubric(rubrics['examRubric'], [nil, nil, nil])
     rubrics['questions']&.each_with_index do |qrubric, qnum|
-      convert_rubric(qrubric['questionRubric'], qnum, nil, nil)
+      convert_rubric(qrubric['questionRubric'], [qnum, nil, nil])
       qrubric['parts']&.each_with_index do |prubric, pnum|
-        convert_rubric(prubric['partRubric'], qnum, pnum, nil)
+        convert_rubric(prubric['partRubric'], [qnum, pnum, nil])
         prubric['body']&.each_with_index do |brubric, bnum|
-          convert_rubric(brubric, qnum, pnum, bnum)
+          convert_rubric(brubric, [qnum, pnum, bnum])
         end
       end
     end
     res
   end
 
-  def convert_rubric(r, qnum, pnum, bnum, order = nil, parent = nil)
-    if r.nil?
+  def convert_rubric(raw, qpb, order = nil, parent = nil)
+    qnum, pnum, bnum = qpb
+    if raw.nil?
       rubric = Rubric.new(
-        type: 'None', 
+        type: 'None',
         qnum: qnum,
         pnum: pnum,
         bnum: bnum,
@@ -120,48 +120,47 @@ class ExamVersion < ApplicationRecord
         parent_section: parent,
         exam_version: self,
       )
-      self.rubrics << rubric;
+      rubrics << rubric
       return rubric
     end
-    rubric = Rubric.find_or_initialize_by(id: r['railsId'])
-    # puts "********* In convert_rubric: (#{qnum}/#{pnum}/#{bnum}) r = #{r}, rubric = #{rubric.inspect}, new record = #{rubric.new_record?}"
-    rubric.assign_attributes(type: r['type'].capitalize,
+    rubric = Rubric.find_or_initialize_by(id: raw['railsId'])
+    # puts "********* In convert_rubric: (#{qnum}/#{pnum}/#{bnum}) r = #{r}, " +
+    #      "rubric = #{rubric.inspect}, new record = #{rubric.new_record?}"
+    rubric.assign_attributes(
+      type: raw['type'].capitalize,
       qnum: qnum,
       pnum: pnum,
       bnum: bnum,
       order: order,
       parent_section: parent,
-      description: r.dig('description', 'value'),
-      points: r['points'],
-      exam_version: self)
-    self.rubrics << rubric if rubric.new_record?
-    if (r['choices'].is_a? Hash)
-      convert_presets(r['choices'], qnum, pnum, bnum, rubric)
+      description: raw.dig('description', 'value'),
+      points: raw['points'],
+      exam_version: self,
+    )
+    rubrics << rubric if rubric.new_record?
+    if raw['choices'].is_a? Hash
+      convert_presets(raw['choices'], rubric)
     else
-      subsectionIds = r['choices']&.map{|r| r['railsId']}&.compact
-      toBeDeleted = rubric.subsections.where.not(id: subsectionIds)
-      if toBeDeleted.count > 0
-        binding.pry
-      end
-      r['choices']&.each_with_index do |c, cindex|
-        convert_rubric(c, qnum, pnum, bnum, cindex, rubric)
+      subsection_ids = raw['choices']&.map { |sub| sub['railsId'] }&.compact
+      to_be_deleted = rubric.subsections.where.not(id: subsection_ids)
+      to_be_deleted.destroy_all
+      raw['choices']&.each_with_index do |c, cindex|
+        convert_rubric(c, qpb, cindex, rubric)
       end
     end
   end
 
-  def convert_presets(presets, qnum, pnum, bnum, rubric)
+  def convert_presets(presets, rubric)
     p = RubricPreset.find_or_initialize_by(id: presets['railsId'])
     p.assign_attributes(
       label: presets['label'],
       direction: presets['direction'],
       mercy: presets['mercy']&.to_f,
-      rubric: rubric
+      rubric: rubric,
     )
-    commentIds = presets['presets']&.map{|p| p['railsId']}.compact
-    toBeDeleted = p.preset_comments.where.not(id: commentIds)
-    if toBeDeleted.count > 0
-      binding.pry
-    end
+    comment_ids = presets['presets']&.map { |pre| pre['railsId'] }&.compact
+    to_be_deleted = p.preset_comments.where.not(id: comment_ids)
+    to_be_deleted.destroy_all
     presets['presets']&.each_with_index do |preset, pindex|
       c = PresetComment.find_or_initialize_by(id: preset['railsId'])
       c.assign_attributes(
@@ -170,7 +169,7 @@ class ExamVersion < ApplicationRecord
         grader_hint: preset['graderHint'],
         student_feedback: preset['studentFeedback'],
         order: pindex,
-        rubric_preset: p
+        rubric_preset: p,
       )
       p.preset_comments << c if c.new_record?
     end
@@ -179,75 +178,81 @@ class ExamVersion < ApplicationRecord
   def rubric_as_json
     rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)
     exam_rubric = rubric_tree.delete(nil)&.dig(nil, nil)&.as_json
-    q_rubrics = rubric_tree.sort.map do |qnum, q_rubrics|
-      question_rubric = q_rubrics.delete(nil)&.dig(nil)&.as_json
-      p_rubrics = q_rubrics.sort.map do |pnum, p_rubrics|
-        part_rubric = p_rubrics.delete(nil)&.as_json
-        b_rubrics = p_rubrics.sort.map{|_, b| b.as_json}
+    q_rubrics = rubric_tree.sort.map do |_qnum, rubrics_q|
+      question_rubric = rubrics_q.delete(nil)&.dig(nil)&.as_json
+      p_rubrics = rubrics_q.sort.map do |_pnum, rubrics_p|
+        part_rubric = rubrics_p.delete(nil)&.as_json
+        b_rubrics = rubrics_p.sort.map { |_, b| b.as_json }
         {
           partRubric: part_rubric,
-          body: b_rubrics
+          body: b_rubrics,
         }.compact
       end
       {
         questionRubric: question_rubric,
-        parts: p_rubrics
+        parts: p_rubrics,
       }.compact
     end
     {
       examRubric: exam_rubric,
-      questions: q_rubrics
+      questions: q_rubrics,
     }.compact.deep_stringify_keys
   end
 
-  def compare_rubrics(r1, r2)
-    begin
-      compare_help("ROOT", r1, r2)
-      true
-    rescue Exception => e
-      e.message
+  def compare_rubrics(rub1, rub2)
+    compare_help('ROOT', rub1, rub2)
+    true
+  rescue RuntimeError => e
+    e.message
+  end
+
+  def compare_help(path, rub1, rub2)
+    if rub1.is_a?(Hash) && rub2.is_a?(Hash)
+      compare_hashes(path, rub1, rub2)
+    elsif rub1.is_a?(Array) && rub2.is_a?(Array)
+      compare_arrays(path, rub1, rub2)
+    elsif rub1 != rub2
+      raise "Not equal at #{path}: #{rub1} != #{rub2}"
     end
   end
-  def compare_help(path, r1, r2)
-    if r1.is_a?(Hash) && r2.is_a?(Hash)
-      mismatch = r1.keys.to_set ^ r2.keys.to_set
-      mismatch.delete "railsId" # Ignore tedious bookeeping
-      unless mismatch.empty?
-        raise "Mismatched keys at #{path}: #{r1.keys} ^ #{r2.keys} = #{mismatch}"
-      end
-      r1.keys.each do |k|
-        next if k == "railsId"
-        compare_help "#{path}.#{k}", r1[k], r2[k]
-      end
-    elsif r1.is_a?(Array) && r2.is_a?(Array)
-      unless r1.length == r2.length
-        raise "Mismatched lengths at #{path}: #{r1.length} vs #{r2.length}"
-      end
-      (0...r1.length).each do |i|
-        compare_help "#{path}[#{i}]", r1[i], r2[i]
-      end
-    elsif r1 != r2
-      raise "Not equal at #{path}: #{r1} != #{r2}"
+
+  def compare_hashes(path, rub1, rub2)
+    mismatch = rub1.keys.to_set ^ rub2.keys.to_set
+    mismatch.delete 'railsId' # Ignore tedious bookeeping
+    unless mismatch.empty?
+      err = "Mismatched keys at #{path}: #{rub1.keys} ^ #{rub2.keys} = #{mismatch}"
+      raise err
+    end
+    rub1.keys.each do |k|
+      next if k == 'railsId'
+
+      compare_help "#{path}.#{k}", rub1[k], rub2[k]
+    end
+  end
+
+  def compare_arrays(path, rub1, rub2)
+    unless rub1.length == rub2.length
+      err = "Mismatched lengths at #{path}: #{rub1.length} vs #{rub2.length}"
+      raise err
+    end
+    (0...rub1.length).each do |i|
+      compare_help "#{path}[#{i}]", rub1[i], rub2[i]
     end
   end
 
   def score_for(reg)
-    begin
-      comments = multi_group_by(reg.grading_comments, [:qnum, :pnum, :bnum, :preset_comment])
-      checks = multi_group_by(reg.grading_checks, [:qnum, :pnum, :bnum])
-      rubrics_for_grading.sum do |r|
-        r.compute_grade_for(reg, comments, checks, r.qnum, r.pnum, r.bnum)
-      end
-    rescue Exception => e
-      puts e.message
-      puts e.backtrace
+    comments = multi_group_by(reg.grading_comments, [:qnum, :pnum, :bnum, :preset_comment])
+    checks = multi_group_by(reg.grading_checks, [:qnum, :pnum, :bnum])
+    rubrics_for_grading.sum do |r|
+      r.compute_grade_for(reg, comments, checks, [r.qnum, r.pnum, r.bnum])
     end
+  rescue RuntimeError => e
+    Rails.logger.debug e.message
+    Rails.logger.debug e.backtrace
   end
-
 
   # Tree of questions to parts to score for that part
   def part_scores_for(reg)
-    begin
     comments = multi_group_by(reg.grading_comments, [:qnum, :pnum, :bnum, :preset_comment])
     checks = multi_group_by(reg.grading_checks, [:qnum, :pnum, :bnum])
     rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)
@@ -255,25 +260,23 @@ class ExamVersion < ApplicationRecord
     part_tree do |qnum:, pnum:, **|
       question_rubric = rubric_tree.dig(qnum, nil, nil)
       part_rubric = rubric_tree.dig(qnum, pnum, nil)
+      qp = [qnum, pnum, nil]
       [
-        exam_rubric&.compute_grade_for(reg, comments, checks, qnum, pnum, nil),
-        question_rubric&.compute_grade_for(reg, comments, checks, qnum, pnum, nil),
-        part_rubric&.compute_grade_for(reg, comments, checks, qnum, pnum, nil)
+        exam_rubric&.compute_grade_for(reg, comments, checks, qp),
+        question_rubric&.compute_grade_for(reg, comments, checks, qp),
+        part_rubric&.compute_grade_for(reg, comments, checks, qp),
       ].compact.sum + rubric_tree.dig(qnum, pnum)&.sum do |key, r|
         if key.nil?
           0
         else
-          r.compute_grade_for(reg, comments, checks, qnum, pnum, r.bnum)
+          r.compute_grade_for(reg, comments, checks, [qnum, pnum, r.bnum])
         end
       end
     end
-    rescue Exception => e
-      puts e.message
-      puts e.backtrace
-    end
+  rescue RuntimeError => e
+    Rails.logger.debug e.message
+    Rails.logger.debug e.backtrace
   end
-
-
 
   def self.new_empty(exam)
     n = exam.exam_versions.length + 1
@@ -281,12 +284,12 @@ class ExamVersion < ApplicationRecord
       exam: exam,
       name: "#{exam.name} Version #{n}",
       files: [],
-      info: { 
+      info: {
         'policies' => [],
         'answers' => [],
         'contents' => {
           'reference' => [],
-          'questions' => []
+          'questions' => [],
         },
       },
     )

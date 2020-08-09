@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # The base class of Hourglass-specific mutations
   class BaseMutation < GraphQL::Schema::RelayClassicMutation
     argument_class Types::BaseArgument
     field_class Types::BaseField

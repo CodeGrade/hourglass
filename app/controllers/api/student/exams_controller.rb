@@ -55,9 +55,8 @@ module Api
       end
 
       def start_exam!
-        if @registration.start_time.nil?
-          @registration.update(start_time: DateTime.now)
-        end
+        @registration.update(start_time: DateTime.now) if @registration.start_time.nil?
+
         answers = @registration.current_answers
         version = @registration.exam_version
         {
@@ -73,7 +72,7 @@ module Api
             began: @registration.accommodated_start_time,
             ends: @registration.accommodated_end_time,
             start: @registration.start_time,
-            stop: @registration.effective_end_time
+            stop: @registration.effective_end_time,
           },
           answers: answers,
         }
@@ -83,7 +82,7 @@ module Api
         answers = answer_params
         saved = @registration.save_answers(answers)
         {
-          lockout: !saved
+          lockout: !saved,
         }
       end
 

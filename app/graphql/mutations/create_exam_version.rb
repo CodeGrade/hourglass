@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to create a new version for an exam
   class CreateExamVersion < BaseMutation
     argument :exam_id, ID, required: true, loads: Types::ExamType
 

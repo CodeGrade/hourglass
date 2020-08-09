@@ -95,39 +95,41 @@ class Upload
     arr.map { |i| make_html_val(i) }
   end
 
-  def convert_presets(r)
-    return nil if r.nil?
+  def convert_presets(preset)
+    return nil if preset.nil?
 
     {
-      label: r['label'],
-      direction: r['direction'],
-      mercy: r['mercy'],
-      presets: r['presets']&.map do |p|
+      label: preset['label'],
+      direction: preset['direction'],
+      mercy: preset['mercy'],
+      presets: preset['presets']&.map do |p|
         {
           label: p['label'],
           graderHint: p['graderHint'],
           studentFeedback: p['studentFeedback'],
-          points: p['points']
+          points: p['points'],
         }.compact
-      end.compact
-    }.compact
-  end
-  
-  def convert_rubric(r)
-    return {type: "none"} if r.nil?
-    {
-      type: r['type'],
-      description: make_html_val(r['description']),
-      points: r['points'],
-      choices: 
-        if r['choices'].is_a? Array
-          r['choices'].map{|c| convert_rubric(c)}
-        else
-          convert_presets(r['choices'])
-        end
+      end&.compact,
     }.compact
   end
 
+  def convert_rubric(rubric)
+    return { type: 'none' } if rubric.nil?
+
+    {
+      type: rubric['type'],
+      description: make_html_val(rubric['description']),
+      points: rubric['points'],
+      choices:
+        if rubric['choices'].is_a? Array
+          rubric['choices'].map { |c| convert_rubric(c) }
+        else
+          convert_presets(rubric['choices'])
+        end,
+    }.compact
+  end
+
+  # rubocop:disable Metrics/PerceivedComplexity, Metrics/BlockLength, Metrics/BlockNesting
   def parse_info(properties)
     contents = properties['contents']
     contents['questions'].each do |q|
@@ -158,13 +160,13 @@ class Upload
             elsif b.key? 'Text'
               { NO_ANS: true }
             elsif b.key? 'TrueFalse'
-              if b['TrueFalse'] == !! b['YesNo']
+              if (b['TrueFalse'] == true) || (b['TrueFalse'] == false)
                 b['TrueFalse']
               else
                 b['TrueFalse']['correctAnswer']
               end
             elsif b.key? 'YesNo'
-              if b['YesNo'] == !! b['YesNo']
+              if (b['YesNo'] == true) || (b['YesNo'] == false)
                 b['YesNo']
               else
                 b['YesNo']['correctAnswer']
@@ -195,19 +197,19 @@ class Upload
             }
           end || [],
         }
-      end || []
+      end || [],
     }
-    
-    e_reference = contents['reference']&.map{|r| map_reference r} || []
+
+    e_reference = contents['reference']&.map { |r| map_reference r } || []
     questions = contents['questions'].map do |q|
-      q_reference = q['reference']&.map{|r| map_reference r} || []
+      q_reference = q['reference']&.map { |r| map_reference r } || []
       {
         name: make_html_val(q['name']),
         separateSubparts: q['separateSubparts'],
         description: make_html_val(q['description']),
         reference: q_reference,
         parts: q['parts'].map do |p|
-          p_reference = p['reference']&.map{|r| map_reference r} || []
+          p_reference = p['reference']&.map { |r| map_reference r } || []
           {
             name: make_html_val(p['name']),
             description: make_html_val(p['description']),
@@ -251,12 +253,15 @@ class Upload
                   referent =
                     if b['CodeTag']['choices'] == 'part'
                       raise 'No reference for part.' if p_reference.nil?
+
                       'part'
                     elsif b['CodeTag']['choices'] == 'question'
                       raise 'No reference for question.' if q_reference.nil?
+
                       'question'
                     elsif b['CodeTag']['choices'] == 'exam'
                       raise 'No reference for exam.' if e_reference.nil?
+
                       'exam'
                     else
                       raise 'CodeTag reference is invalid.'
@@ -298,7 +303,7 @@ class Upload
                     yesLabel: 'True',
                     noLabel: 'False',
                     prompt:
-                      if b['TrueFalse'] == !!b['TrueFalse']
+                      if (b['TrueFalse'] == true) || (b['TrueFalse'] == false)
                         ''
                       else
                         make_html_val(b['TrueFalse']['prompt'])
@@ -310,7 +315,7 @@ class Upload
                     yesLabel: 'Yes',
                     noLabel: 'No',
                     prompt:
-                      if b['YesNo'] == !!b['YesNo']
+                      if (b['YesNo'] == true) || (b['YesNo'] == false)
                         ''
                       else
                         make_html_val(b['YesNo']['prompt'])
@@ -338,6 +343,7 @@ class Upload
       rubrics: rubrics,
     }
   end
+  # rubocop:enable Metrics/PerceivedComplexity, Metrics/BlockLength, Metrics/BlockNesting
 
   def rec_path(base_path, path)
     if path.symlink?
@@ -389,6 +395,7 @@ class Upload
     @files = @files.compact
   end
 
+  # rubocop:disable Metrics/PerceivedComplexity
   def with_extracted(item)
     return nil if item.nil?
 
@@ -400,11 +407,11 @@ class Upload
         begin
           File.read(item[:full_path].to_s)
         rescue Errno::EACCES => e
-          "Could not access file:\n#{e.to_s}"
-        rescue Errno::ENOENT => e
+          "Could not access file:\n#{e}"
+        rescue Errno::ENOENT
           "Somehow, #{item[:full_path]} does not exist"
-        rescue Exception => e
-          "Error reading file:\n#{e.to_s}"
+        rescue RuntimeError => e
+          "Error reading file:\n#{e}"
         end
 
       if mimetype.starts_with? 'image/'
@@ -424,6 +431,7 @@ class Upload
       item[:type] = 'symlink'
     else
       return nil if item[:path] == '__MACOSX'
+
       item[:filedir] = 'dir'
       item[:text] = item[:path] + '/'
       item[:nodes] = item[:children].map { |n| with_extracted(n) }.compact
@@ -431,24 +439,20 @@ class Upload
     end
     item
   end
+  # rubocop:enable Metrics/PerceivedComplexity
 
   def ensure_utf8(str, mimetype)
-    if ApplicationHelper.binary?(mimetype)
-      str
-    else
-      if str.is_utf8?
-        str
+    return str if ApplicationHelper.binary?(mimetype)
+    return str if str.is_utf8?
+
+    begin
+      if str.dup.force_encoding(Encoding::CP1252).valid_encoding?
+        str.encode(Encoding::UTF_8, Encoding::CP1252)
       else
-        begin
-          if str.dup.force_encoding(Encoding::CP1252).valid_encoding?
-            str.encode(Encoding::UTF_8, Encoding::CP1252)
-          else
-            str.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '?')
-          end
-        rescue Exception => e
-          str
-        end
+        str.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '?')
       end
+    rescue RuntimeError
+      str
     end
   end
 end

@@ -1,4 +1,18 @@
 require: rubocop-rails
+AllCops:
+  Exclude:
+    - 'node_modules/**/*'
+    - 'tmp/**/*'
+    - 'vendor/**/*'
+    - '.git/**/*'  
+    - config/**/*
+    - db/**/*
+    - app/helpers/**/*
+    - app/graphql/**/*
+    - app/models/application_record.rb
+    - bin/**/*
+    - lib/audit.rb
+    - lib/tasks/**.rake
 Style/SymbolArray:
   EnforcedStyle: brackets
 Style/TrailingCommaInHashLiteral:
@@ -7,11 +21,30 @@ Style/TrailingCommaInArguments:
   EnforcedStyleForMultiline: comma
 Style/TrailingCommaInArrayLiteral:
   EnforcedStyleForMultiline: comma
+Style/ParenthesesAroundCondition:
+  Enabled: false
 Layout/FirstHashElementIndentation:
   EnforcedStyle: consistent
 Style/Documentation:
   Exclude:
     - app/graphql/**/*
+    - test/**/*
 Metrics/BlockLength:
   Exclude:
     - config/routes.rb
+    - test/factories/**/*
+Metrics/ClassLength:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Naming/PredicateName:
+  Enabled: false
+Metrics/ModuleLength:
+  Exclude:
+    - app/helpers/**/*
+Style/RescueModifier:
+  Enabled: false

@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module Mutations
+  # Mutation to update the contents of an exam version
   class UpdateExamVersion < BaseMutation
     argument :exam_version_id, ID, required: true, loads: Types::ExamVersionType
     argument :name, String, required: true

@@ -28,7 +28,7 @@ class MessageTest < ActiveSupport::TestCase
         sender: reg.user,
         registration: reg2,
         body: 'hi',
-      }
+      },
     )
     assert_not msg.valid?
     assert_match(/must be a proctor or professor/, msg.errors[:sender].first)

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Types
+  # Type describing a student room-update query
   class StudentRoomUpdate < Types::BaseInputObject
     description 'Assign all given students to proctor the given room.'
     argument :room_id, ID, required: true, loads: Types::RoomType
@@ -9,6 +10,7 @@ module Types
 end
 
 module Mutations
+  # MNutation to update a student seating assignment
   class UpdateStudentSeating < BaseMutation
     argument :exam_id, ID, required: true, loads: Types::ExamType
     argument :unassigned_student_ids, [ID], required: true, loads: Types::UserType

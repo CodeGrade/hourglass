@@ -5,7 +5,7 @@ import {
 } from 'react-bootstrap';
 import { MatchingProps } from '@proctor/registrations/show/questions/DisplayMatching';
 import HTML from '@student/exams/show/components/HTML';
-import { alphabetIdx } from '@hourglass/common/helpers';
+import { alphabetIdx, htmlValOrDefault } from '@hourglass/common/helpers';
 
 const GradeMatching: React.FC<MatchingProps> = (props) => {
   const {
@@ -23,18 +23,12 @@ const GradeMatching: React.FC<MatchingProps> = (props) => {
       <Row>
         <Col sm={6}>
           <HTML
-            value={promptsLabel ?? {
-              type: 'HTML',
-              value: 'Column A',
-            }}
+            value={htmlValOrDefault(promptsLabel, 'Prompt')}
           />
         </Col>
         <Col>
           <HTML
-            value={valuesLabel ?? {
-              type: 'HTML',
-              value: 'Answer',
-            }}
+            value={htmlValOrDefault(valuesLabel, 'Answer')}
           />
         </Col>
       </Row>

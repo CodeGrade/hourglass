@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
 
 /**
  * Error to throw in the default case of an exhaustive `switch` statement.
@@ -30,6 +31,13 @@ export function useRefresher(): [number, () => void] {
 export function alphabetIdx(idx: number, lowercase = false): string {
   if (lowercase) return String.fromCharCode(97 + idx);
   return String.fromCharCode(65 + idx);
+}
+
+export function htmlValOrDefault(val: HTMLVal | undefined | null, defVal: string): HTMLVal {
+  return {
+    type: 'HTML',
+    value: (val?.value !== undefined && val?.value !== '') ? val.value : defVal,
+  };
 }
 
 export function pluralize(number: number, singular: string, plural: string): string {

@@ -4,7 +4,7 @@ import {
 } from 'react-bootstrap';
 import { MatchingInfo, MatchingState } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
-import { alphabetIdx } from '@hourglass/common/helpers';
+import { alphabetIdx, htmlValOrDefault } from '@hourglass/common/helpers';
 
 export interface MatchingProps {
   info: MatchingInfo;
@@ -29,20 +29,10 @@ const DisplayMatching: React.FC<MatchingProps> = (props) => {
           <thead>
             <tr>
               <th colSpan={2}>
-                <HTML
-                  value={promptsLabel ?? {
-                    type: 'HTML',
-                    value: 'Column A',
-                  }}
-                />
+                <HTML value={htmlValOrDefault(promptsLabel, 'Prompt')} />
               </th>
               <th colSpan={2}>
-                <HTML
-                  value={valuesLabel ?? {
-                    type: 'HTML',
-                    value: 'Answer',
-                  }}
-                />
+                <HTML value={htmlValOrDefault(valuesLabel, 'Answer')} />
               </th>
             </tr>
           </thead>

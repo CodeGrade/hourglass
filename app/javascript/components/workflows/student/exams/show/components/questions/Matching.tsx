@@ -6,7 +6,7 @@ import {
   Select, FormControl, InputLabel, MenuItem,
 } from '@material-ui/core';
 import { MatchingInfo, MatchingState } from '@student/exams/show/types';
-import { alphabetIdx } from '@hourglass/common/helpers';
+import { alphabetIdx, htmlValOrDefault } from '@hourglass/common/helpers';
 import HTML from '@student/exams/show/components/HTML';
 
 interface MatchingProps {
@@ -36,12 +36,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
           <thead>
             <tr>
               <th colSpan={3} className="text-center">
-                <HTML
-                  value={promptsLabel ?? {
-                    type: 'HTML',
-                    value: 'Column A',
-                  }}
-                />
+                <HTML value={htmlValOrDefault(promptsLabel, 'Column A')} />
               </th>
             </tr>
           </thead>
@@ -97,12 +92,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
           <thead>
             <tr>
               <th colSpan={2} className="text-center">
-                <HTML
-                  value={valuesLabel ?? {
-                    type: 'HTML',
-                    value: 'Column B',
-                  }}
-                />
+                <HTML value={htmlValOrDefault(valuesLabel, 'Column B')} />
               </th>
             </tr>
           </thead>

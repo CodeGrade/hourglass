@@ -12,6 +12,7 @@ contents:
         - body:
             - "This matching section concerns <i>important</i> information!"
             - Matching:
+                prompt: "Match the <i>correct</i> answers"
                 prompts:
                   - "favorite programming language"
                   - "choose 5"

@@ -166,6 +166,7 @@ contents:
           body:
             - "This matching section concerns important information."
             - Matching:
+                prompt: "This is a matching question"
                 rubric:
                   type: all
                   description: <b>Q2-PA-B2</b> matching rubric

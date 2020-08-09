@@ -330,6 +330,7 @@ export type TextState = string;
 
 export interface MatchingInfo {
   type: 'Matching';
+  prompt: HTMLVal;
   promptsLabel?: HTMLVal;
   prompts: HTMLVal[];
   valuesLabel?: HTMLVal;

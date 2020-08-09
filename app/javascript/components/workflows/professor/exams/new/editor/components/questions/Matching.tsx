@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core';
 import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
+import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
 import { alphabetIdx, useRefresher } from '@hourglass/common/helpers';
 import {
   Field,
@@ -404,25 +405,35 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
-const Matching: React.FC<MatchingProps> = (_props) => (
-  <Row>
-    <Col sm={6}>
-      <Row className="p-2">
-        <Col className="text-center p-0">
-          <Field name="promptsLabel" component={EditColName} defaultLabel="Column A" />
+const Matching: React.FC<MatchingProps> = (props) => {
+  const { qnum, pnum, bnum } = props;
+  return (
+    <>
+      <Prompted
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+      />
+      <Row>
+        <Col sm={6}>
+          <Row className="p-2">
+            <Col className="text-center p-0">
+              <Field name="promptsLabel" component={EditColName} defaultLabel="Column A" />
+            </Col>
+          </Row>
+          <Field name="values" component={RenderPrompts} />
+        </Col>
+        <Col sm={6}>
+          <Row className="p-2">
+            <Col className="text-center p-0">
+              <Field name="valuesLabel" component={EditColName} defaultLabel="Column B" />
+            </Col>
+          </Row>
+          <Field name="prompts" component={RenderValues} />
         </Col>
       </Row>
-      <Field name="values" component={RenderPrompts} />
-    </Col>
-    <Col sm={6}>
-      <Row className="p-2">
-        <Col className="text-center p-0">
-          <Field name="valuesLabel" component={EditColName} defaultLabel="Column B" />
-        </Col>
-      </Row>
-      <Field name="prompts" component={RenderValues} />
-    </Col>
-  </Row>
-);
+    </>
+  );
+};
 
 export default Matching;

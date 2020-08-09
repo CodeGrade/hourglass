@@ -92,10 +92,10 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       );
     case 'Matching':
       return (
-        <>
+        <Prompted prompt={body.prompt}>
           <DisplayMatching info={body} value={value as MatchingState} />
           {bRubric && <ShowRubric rubric={bRubric} />}
-        </>
+        </Prompted>
       );
     default:
       throw new ExhaustiveSwitchError(body);

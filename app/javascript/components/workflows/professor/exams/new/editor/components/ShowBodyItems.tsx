@@ -113,6 +113,10 @@ const ShowBodyItems: React.FC<{
               onClick={(): void => {
                 fields.push({
                   type: 'Matching',
+                  prompt: {
+                    type: 'HTML',
+                    value: '',
+                  },
                   prompts: [],
                   values: [],
                 });

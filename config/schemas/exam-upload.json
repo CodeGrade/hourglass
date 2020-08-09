@@ -322,6 +322,7 @@
           "additionalProperties": false,
           "required": ["prompts", "values", "correctAnswers"],
           "properties": {
+            "prompt": { "$ref": "#/definitions/HTML" },
             "promptsLabel": { "$ref": "#/definitions/HTML" },
             "valuesLabel": { "$ref": "#/definitions/HTML" },
             "prompts": { "$ref": "#/definitions/Options" },

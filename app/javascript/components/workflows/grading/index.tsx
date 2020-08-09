@@ -866,7 +866,7 @@ const GradeBodyItem: React.FC<{
     case 'Matching':
       return (
         <>
-          {/* <PromptRow prompt={info.prompt} /> */}
+          <PromptRow prompt={info.prompt} />
           <AnswersRow
             examVersionKey={examVersionKey}
             qnum={qnum}

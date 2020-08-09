@@ -274,6 +274,7 @@ class Upload
                 elsif b.key? 'Matching'
                   {
                     type: 'Matching',
+                    prompt: make_html_val(b['Matching']['prompt']),
                     promptsLabel: make_html_val(b['Matching']['promptsLabel']),
                     valuesLabel: make_html_val(b['Matching']['valuesLabel']),
                     prompts: make_html_vals(b['Matching']['prompts']),

@@ -24,6 +24,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
     disabled,
   } = props;
   const {
+    prompt,
     promptsLabel,
     prompts,
     valuesLabel,
@@ -32,6 +33,7 @@ const Matching: React.FC<MatchingProps> = (props) => {
   return (
     <Row>
       <Col sm={6}>
+        <HTML value={prompt} />
         <Table>
           <thead>
             <tr>

@@ -12,6 +12,6 @@ class StaffRegistration < ApplicationRecord
   delegate :professors, to: :course
 
   def visible_to?(check_user)
-    (user.id == check_user.id) || professors.exists?(check_user.id)
+    (user == check_user) || professors.exists?(check_user.id)
   end
 end

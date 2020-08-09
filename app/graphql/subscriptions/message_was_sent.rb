@@ -8,7 +8,8 @@ module Subscriptions
     field :messages_edge, Types::MessageType.edge_type, null: false
 
     def authorized?(exam:)
-      return true if exam.proctors.or(exam.professors).exists? context[:current_user].id
+      return true if exam.proctors.exists? context[:current_user].id
+      return true if exam.professors.exists? context[:current_user].id
 
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end

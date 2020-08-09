@@ -23,6 +23,6 @@ class ProctorRegistration < ApplicationRecord
   end
 
   def visible_to?(check_user)
-    professors.or(User.where(id: user.id)).exists? check_user.id
+    (user == check_user) || professors.exists?(check_user.id)
   end
 end

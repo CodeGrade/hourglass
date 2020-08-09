@@ -3,6 +3,7 @@
 module Types
   class ExamType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
+    global_id_field :id
         
     guard ->(obj, _, ctx) {
       obj.object.visible_to?(ctx[:current_user]) || obj.object.all_staff.exists?(ctx[:current_user].id)

@@ -8,7 +8,8 @@ module Subscriptions
     field :version_announcements_edge, Types::VersionAnnouncementType.edge_type, null: false
 
     def authorized?(exam:)
-      return true if exam.proctors.or(exam.professors).exists? context[:current_user].id
+      return true if exam.proctors.exists? context[:current_user].id
+      return true if exam.professors.exists? context[:current_user].id
 
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end

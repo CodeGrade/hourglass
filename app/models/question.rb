@@ -12,6 +12,6 @@ class Question < ApplicationRecord
   validates :body, presence: true, length: { maximum: 2000 }
 
   def visible_to?(check_user)
-    proctors_and_professors.or(User.where(id: user.id)).exists? check_user.id
+    (user == check_user) || proctors_and_professors.exists?(check_user.id)
   end
 end

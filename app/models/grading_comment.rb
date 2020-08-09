@@ -32,6 +32,6 @@ class GradingComment < ApplicationRecord
   end
 
   def visible_to?(check_user)
-    course.all_staff.or(User.where(id: user.id)).exists? check_user.id
+    (user == check_user) || course.all_staff.exists?(check_user.id)
   end
 end

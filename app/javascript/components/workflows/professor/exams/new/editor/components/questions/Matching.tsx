@@ -123,8 +123,8 @@ const OneValue: React.FC<{
 interface RenderValueSetup {
   removeAnswer: (oldVal: number) => void;
   swapAnswers: (valA: number, valB: number) => void;
-  refreshProps: React.DependencyList;
-  refresh: () => void;
+  refreshProps?: React.DependencyList;
+  refresh?: () => void;
 }
 function renderValue(setup: RenderValueSetup) {
   const {
@@ -147,17 +147,17 @@ function renderValue(setup: RenderValueSetup) {
       moveDown={(): void => {
         fields.move(index, index + 1);
         swapAnswers(index, index + 1);
-        refresh();
+        if (refresh) refresh();
       }}
       moveUp={(): void => {
         fields.move(index, index - 1);
         swapAnswers(index, index - 1);
-        refresh();
+        if (refresh) refresh();
       }}
       remove={(): void => {
         fields.remove(index);
         removeAnswer(index);
-        refresh();
+        if (refresh) refresh();
       }}
       refreshProps={refreshProps}
     />
@@ -250,15 +250,15 @@ function renderPrompt(setup: RenderPromptSetup) {
       enableDown={index + 1 < fields.length}
       moveDown={(): void => {
         fields.move(index, index + 1);
-        refresh();
+        if (refresh) refresh();
       }}
       moveUp={(): void => {
         fields.move(index, index - 1);
-        refresh();
+        if (refresh) refresh();
       }}
       remove={(): void => {
         fields.remove(index);
-        refresh();
+        if (refresh) refresh();
       }}
       refreshProps={refreshProps}
     />
@@ -284,7 +284,8 @@ const EditColName: React.FC<WrappedFieldProps & {
     <CustomEditor
       className="bg-white"
       theme="bubble"
-      value={value.value ?? defaultLabel}
+      placeholder={defaultLabel}
+      value={value.value}
       onChange={handleChange}
     />
   );
@@ -299,11 +300,11 @@ const EditPrompts: React.FC<
     refreshProps,
     refresh,
   } = props;
-  const renderPrompts = renderPrompt({
+  const renderPrompts = useCallback(renderPrompt({
     numAnswers,
     refreshProps,
     refresh,
-  });
+  }), [numAnswers, ...refreshProps]);
   return (
     <>
       {fields.map(renderPrompts)}
@@ -360,7 +361,7 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
   /**
    * Set all answers that used to have oldVal to -1, and shift answers below it up.
    */
-  const removeAnswer = (oldVal: number): void => {
+  const removeAnswer = useCallback((oldVal: number): void => {
     onChange(value.map((v) => {
       const ret = {
         ...v,
@@ -372,12 +373,12 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
       if (v.answer > oldVal) ret.answer -= 1;
       return ret;
     }));
-  };
+  }, [value, onChange, refresher]);
 
   /**
    * Swap all answers with valA to be valB and vice-versa.
    */
-  const swapAnswers = (valA: number, valB: number): void => {
+  const swapAnswers = useCallback((valA: number, valB: number): void => {
     // Trigger onChange with a new value
     onChange(value.map((v) => {
       const ret = {
@@ -387,13 +388,13 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
       if (v.answer === valB) ret.answer = valA;
       return ret;
     }));
-  };
-  const renderValues = renderValue({
+  }, [value, onChange, refresher]);
+  const renderValues = useCallback(renderValue({
     removeAnswer,
     swapAnswers,
     refresh,
     refreshProps,
-  });
+  }), [removeAnswer, swapAnswers]);
   return (
     <FieldArray
       name="values"

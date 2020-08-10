@@ -1,10 +1,17 @@
-import React, { useState, useContext } from 'react';
+import React, {
+  useState,
+  useContext,
+  useEffect,
+} from 'react';
 import {
   Form,
   Button,
 } from 'react-bootstrap';
 import { MdCloudDone } from 'react-icons/md';
-import { ShowMessage } from '@student/exams/show/components/navbar/ExamMessages';
+import {
+  ShowMessage,
+} from '@student/exams/show/components/navbar/ExamMessages';
+import TooltipButton from '@student/exams/show/components/TooltipButton';
 import {
   useFragment,
   graphql,
@@ -13,6 +20,7 @@ import {
 } from 'relay-hooks';
 import { DateTime } from 'luxon';
 import { AlertContext } from '@hourglass/common/alerts';
+import { pluralize } from '@hourglass/common/helpers';
 
 import { AskQuestion$key } from './__generated__/AskQuestion.graphql';
 import { AskQuestion_single$key } from './__generated__/AskQuestion_single.graphql';
@@ -51,6 +59,26 @@ const SendQuestion: React.FC<{
     registrationId,
   } = props;
   const [val, setVal] = useState('');
+  const [inTimeout, setInTimeout] = useState(false);
+  const [remainingTime, setRemainingTime] = useState(60);
+  useEffect(() => {
+    if (inTimeout) {
+      setRemainingTime(60);
+      const timer = setInterval(() => {
+        setRemainingTime((t) => {
+          if (t === 1) {
+            setInTimeout(false);
+            return 0;
+          }
+          return t - 1;
+        });
+      }, 1000);
+      return (): void => {
+        clearInterval(timer);
+      };
+    }
+    return undefined;
+  }, [inTimeout]);
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<AskQuestionMutation>(
     graphql`
@@ -81,6 +109,7 @@ const SendQuestion: React.FC<{
       ],
       onCompleted: () => {
         setVal('');
+        setInTimeout(true);
       },
       onError: (err) => {
         alert({
@@ -93,6 +122,14 @@ const SendQuestion: React.FC<{
   );
   const buttonText = loading ? 'Saving...' : 'Submit';
   const valEmpty = val === '';
+  let disabledMessage;
+  if (valEmpty) {
+    disabledMessage = 'You cannot send an empty question.';
+  } else if (inTimeout) {
+    disabledMessage = `Wait another ${pluralize(remainingTime, 'second', 'seconds')} between asking questions`;
+  } else if (loading) {
+    disabledMessage = 'Please wait...';
+  }
   return (
     <>
       <Form.Control
@@ -104,10 +141,11 @@ const SendQuestion: React.FC<{
         as="textarea"
         disabled={loading}
       />
-      <Button
+      <TooltipButton
         className="ml-auto mt-3 float-right"
         variant="success"
-        disabled={valEmpty || loading}
+        disabled={valEmpty || loading || inTimeout}
+        disabledMessage={disabledMessage}
         onClick={(): void => {
           mutate({
             variables: {
@@ -120,7 +158,7 @@ const SendQuestion: React.FC<{
         }}
       >
         {buttonText}
-      </Button>
+      </TooltipButton>
     </>
   );
 };
@@ -171,6 +209,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
           edges {
             node {
               id
+              createdAt
               ...AskQuestion_single
             }
           }

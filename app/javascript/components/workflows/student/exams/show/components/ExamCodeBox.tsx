@@ -67,6 +67,14 @@ export interface EditorProps {
   autosize?: boolean;
 }
 
+const languageSpecificKeys = {
+  scheme: {
+    'Ctrl-\\': (cm : CM.Editor): void => {
+      cm.replaceSelection('λ');
+    },
+  },
+};
+
 export const Editor: React.FC<EditorProps> = (props) => {
   const {
     value,
@@ -141,6 +149,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
     extraKeys: CM.normalizeKeyMap({
       Enter: 'newlineAndIndent',
       Tab: 'indentAuto',
+      ...languageSpecificKeys[language],
     }),
     readOnly: readOnly || disableCursor,
     cursorBlinkRate: readOnly ? -1 : 500,

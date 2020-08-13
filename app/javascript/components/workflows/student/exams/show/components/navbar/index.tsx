@@ -22,6 +22,7 @@ import { TimeInfo } from '@student/exams/show/types';
 import TimeRemaining from '@student/exams/show/components/navbar/TimeRemaining';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { useFragment, graphql } from 'relay-hooks';
+import Tooltip from '@student/exams/show/components/Tooltip';
 
 import { navbar$key } from './__generated__/navbar.graphql';
 import { navbar_accordion$key } from './__generated__/navbar_accordion.graphql';
@@ -49,6 +50,7 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
     `,
     examKey,
   );
+  const showTooltip = (expanded ? 'never' : 'onHover');
   return (
     <Accordion
       activeKey={openSection}
@@ -59,6 +61,9 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
         label="Jump to"
         onSectionClick={onSectionClick}
         eventKey="jump"
+        tooltipMessage="Jump to"
+        tooltipPlacement="right"
+        showTooltip={showTooltip}
       >
         <JumpTo />
       </NavAccordionItem>
@@ -73,6 +78,9 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
         label="Scratch space"
         onSectionClick={onSectionClick}
         eventKey="scratch"
+        tooltipMessage="Scratch space"
+        tooltipPlacement="right"
+        showTooltip={showTooltip}
       >
         <Scratch />
       </NavAccordionItem>
@@ -82,6 +90,9 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
         label="Ask a question"
         onSectionClick={onSectionClick}
         eventKey="askq"
+        tooltipMessage="Ask a question"
+        tooltipPlacement="right"
+        showTooltip={showTooltip}
       >
         <AskQuestion examKey={res} />
       </NavAccordionItem>
@@ -141,22 +152,27 @@ const ExamNavbar: React.FC<{
           </h1>
         </Collapse>
         <h1 aria-hidden="true" className="width-0">&nbsp;</h1>
-        <Button
-          className="ml-2"
-          onClick={(): void => {
-            if (expanded) {
-              setOpenSection('');
-              setOpenTimer('');
-              setExpanded(false);
-            } else {
-              setExpanded(true);
-            }
-          }}
+        <Tooltip
+          message={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
+          placement="right"
         >
-          {expanded
-            ? <RenderIcon I={FaAngleDoubleLeft} />
-            : <RenderIcon I={FaAngleDoubleRight} />}
-        </Button>
+          <Button
+            className="ml-2"
+            onClick={(): void => {
+              if (expanded) {
+                setOpenSection('');
+                setOpenTimer('');
+                setExpanded(false);
+              } else {
+                setExpanded(true);
+              }
+            }}
+          >
+            {expanded
+              ? <RenderIcon I={FaAngleDoubleLeft} />
+              : <RenderIcon I={FaAngleDoubleRight} />}
+          </Button>
+        </Tooltip>
       </div>
       <div className="m-0 p-0">
         <div className="d-flex align-items-center">

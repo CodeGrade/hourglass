@@ -41,6 +41,8 @@ export interface TimeRemainingProps {
   setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+type TimeRemainingWarning = 'noWarning' | 'warningActivated' | 'warningDismissed';
+
 const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
   const {
     time,
@@ -51,25 +53,94 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
   } = props;
   const [remainingTime, setRemainingTime] = useState(time.stop.diffNow());
   const durationInMillisec = time.stop.diff(time.start).as('milliseconds');
-  const cutoffs = [
-    { t: Duration.fromMillis(durationInMillisec * 0.50), c: 'bg-info text-light' },
-    { t: Duration.fromMillis(durationInMillisec * 0.25), c: 'bg-info text-light' },
-    { t: Duration.fromMillis(durationInMillisec * 0.05), c: 'bg-warning text-dark' },
-    { t: Duration.fromObject({ minutes: 30 }).shiftTo('milliseconds'), c: 'bg-info text-light' },
-    { t: Duration.fromObject({ minutes: 5 }).shiftTo('milliseconds'), c: 'bg-warning text-dark' },
-    { t: Duration.fromObject({ minutes: 1 }).shiftTo('milliseconds'), c: 'bg-danger text-light' },
-  ].sort((d1, d2) => d1.t.milliseconds - d2.t.milliseconds);
+  let cutoffs : { t: Duration, c: string; d: number; w?: string }[];
+  if (durationInMillisec < 60 * 60 * 1000) { // shorter than one hour
+    cutoffs = [
+      {
+        t: Duration.fromMillis(durationInMillisec * 0.50),
+        c: 'bg-info text-light',
+        d: 30,
+        w: 'Halfway finished',
+      },
+      {
+        t: Duration.fromMillis(durationInMillisec * 0.25),
+        c: 'bg-warning text-dark',
+        d: 30,
+        w: 'Three-fourths finished',
+      },
+      {
+        t: Duration.fromMillis(durationInMillisec * 0.05),
+        c: 'bg-danger text-dark',
+        d: 30,
+        w: 'Nearly finished!',
+      },
+      {
+        t: Duration.fromMillis(0),
+        c: 'bg-danger text-dark',
+        d: 1000000,
+        w: 'Exam over',
+      },
+    ];
+  } else {
+    cutoffs = [
+      {
+        t: Duration.fromMillis(durationInMillisec * 0.50),
+        c: 'bg-info text-light',
+        d: 30,
+        w: 'Halfway finished',
+      },
+      {
+        t: Duration.fromObject({ minutes: 30 }).shiftTo('milliseconds'),
+        c: 'bg-info text-light',
+        d: 30,
+        w: 'Thirty minutes left',
+      },
+      {
+        t: Duration.fromObject({ minutes: 5 }).shiftTo('milliseconds'),
+        c: 'bg-warning text-dark',
+        d: 30,
+        w: 'Five minutes left',
+      },
+      {
+        t: Duration.fromObject({ minutes: 1 }).shiftTo('milliseconds'),
+        c: 'bg-danger text-light',
+        d: 60,
+        w: 'Nearly finished!',
+      },
+      {
+        t: Duration.fromMillis(0),
+        c: 'bg-danger text-dark',
+        d: 1000000,
+        w: 'Exam over',
+      },
+    ].sort((d1, d2) => d1.t.milliseconds - d2.t.milliseconds);
+  }
   const remaining = describeRemainingTime(remainingTime);
   const warningIndex = cutoffs.findIndex((cutoff) => {
     const tMinusRemaining = cutoff.t.minus(remainingTime).shiftTo('seconds').seconds;
-    return tMinusRemaining >= 0 && tMinusRemaining < 30;
+    return tMinusRemaining >= 0 && tMinusRemaining < cutoff.d;
   });
-  const classes = warningIndex >= 0 ? cutoffs[warningIndex].c : undefined;
+  const warning = cutoffs[warningIndex]?.w;
+  const classes = cutoffs[warningIndex]?.c;
   const [relativeBegan, showRelativeBegan] = useState(true);
   const [relativeEnd, showRelativeEnd] = useState(true);
   const [relativeStart, showRelativeStart] = useState(true);
   const [relativeStop, showRelativeStop] = useState(true);
+  const [curState, setCurState] = useState<TimeRemainingWarning>('noWarning');
 
+  useEffect(() => {
+    // each time the warning changes, we'll reset whether the
+    // tooltip appears based on whether we're currently expanded
+    if (warning) {
+      if (expanded) {
+        setCurState('warningDismissed');
+      } else if (curState === 'noWarning') {
+        setCurState('warningActivated');
+      }
+    } else {
+      setCurState('noWarning');
+    }
+  }, [warningIndex, expanded]);
   useEffect(() => {
     setRemainingTime(time.stop.diffNow());
     const timer = setInterval(() => {
@@ -80,12 +151,24 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
     };
   }, [time, openTimer, expanded]);
   const endsLabel = remainingTime.valueOf() > 0 ? 'ends' : 'ended';
+  let showTooltip;
+  if (curState === 'warningActivated') {
+    showTooltip = 'always';
+  } else if (!expanded) {
+    showTooltip = 'onHover';
+  } else {
+    showTooltip = 'never';
+  }
   return (
     <Accordion
       className="mt-4"
       activeKey={openTimer}
     >
       <NavAccordionItem
+        showTooltip={showTooltip}
+        tooltipMessage={warning || 'Time remaining'}
+        tooltipPlacement="right"
+        tooltipClassname={classes}
         className={classes}
         expanded={expanded}
         Icon={MdTimer}

@@ -1,6 +1,31 @@
 @import "node_modules/bootstrap/scss/functions";
 @import "node_modules/bootstrap/scss/variables";
 
+@each $color, $value in $theme-colors {
+  .tooltip.bg-#{$color} {
+    background-color: unset !important;
+    &.bs-tooltip-right > .arrow::before {
+      border-right-color: $value !important;
+    }
+    &.bs-tooltip-left > .arrow::before {
+      border-left-color: $value !important;
+    }
+    &.bs-tooltip-top > .arrow::before {
+      border-top-color: $value !important;
+    }
+    &.bs-tooltip-bottom > .arrow::before {
+      border-bottom-color: $value !important;
+    }
+    .tooltip-inner {
+      background-color: $value !important;
+    }
+  }
+}
+
+.tooltip.text-dark .tooltip-inner {
+  color: $yiq-text-dark !important;
+}
+
 .point-count {
   font-size: 1.5rem;
   color: $text-muted;

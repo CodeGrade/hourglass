@@ -347,6 +347,8 @@ interface ExamMessagesProps {
   onSectionClick: (eventKey: string) => void;
 }
 
+type NewMessageWarning = 'noWarning' | 'warningActivated' | 'warningDismissed';
+
 const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   const {
     examKey,
@@ -412,9 +414,35 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
 
   const anyUnread: boolean = dates.reduce((acc, date) => (acc || date > lastViewed), false);
   const classes = anyUnread ? 'bg-warning text-dark' : undefined;
+  const [curState, setCurState] = useState<NewMessageWarning>('noWarning');
+  useEffect(() => {
+    // each time unread messages appear, we'll reset whether the
+    // tooltip appears based on whether we're currently expanded
+    if (anyUnread) {
+      if (expanded) {
+        setCurState('warningDismissed');
+      } else if (curState === 'noWarning') {
+        setCurState('warningActivated');
+      }
+    } else {
+      setCurState('noWarning');
+    }
+  }, [anyUnread, expanded]);
+  let showTooltip;
+  if (curState === 'warningActivated') {
+    showTooltip = 'always';
+  } else if (!expanded) {
+    showTooltip = 'onHover';
+  } else {
+    showTooltip = 'never';
+  }
 
   return (
     <NavAccordionItem
+      showTooltip={showTooltip}
+      tooltipMessage="New messages"
+      tooltipPlacement="right"
+      tooltipClassname={classes}
       expanded={expanded}
       Icon={MdFeedback}
       label="Professor messages"

@@ -5,9 +5,11 @@ import {
   OverlayTriggerProps,
 } from 'react-bootstrap';
 
-interface TooltipProps {
+export interface TooltipProps {
   message: string;
+  className?: string;
   showTooltip?: boolean;
+  defaultShow?: boolean;
   placement?: OverlayTriggerProps['placement'];
   children: React.ReactElement;
 }
@@ -15,13 +17,16 @@ interface TooltipProps {
 const Tooltip: React.FC<TooltipProps> = (props) => {
   const {
     message,
+    className,
     showTooltip = true,
+    defaultShow,
     placement = 'bottom',
     children,
   } = props;
   const tooltip = showTooltip
     ? (
       <BSTooltip
+        className={className}
         id={null}
       >
         {message}
@@ -30,6 +35,7 @@ const Tooltip: React.FC<TooltipProps> = (props) => {
     : ((): JSX.Element => <span />);
   return (
     <OverlayTrigger
+      show={defaultShow}
       overlay={tooltip}
       placement={placement}
     >

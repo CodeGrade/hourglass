@@ -71,7 +71,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
       {
         t: Duration.fromMillis(durationInMillisec * 0.05),
         c: 'bg-danger text-dark',
-        d: 30,
+        d: Math.min(30000, durationInMillisec * 0.05) / 1000,
         w: 'Nearly finished!',
       },
       {

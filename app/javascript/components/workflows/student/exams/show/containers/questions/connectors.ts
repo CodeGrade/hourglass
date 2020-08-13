@@ -26,17 +26,20 @@ const mapStateToProps: MSTP<{
   value: AnswerState;
   disabled: boolean;
   locked: boolean;
+  examFinished: boolean;
   lockedMsg: string;
 }, OwnProps> = (state: ExamTakerState, ownProps) => {
   const { qnum, pnum, bnum } = ownProps;
   const { snapshot } = state;
   const { status, message } = snapshot;
-  const locked = status === SnapshotStatus.FAILURE;
+  const locked = (status === SnapshotStatus.FAILURE);
+  const examFinished = (status === SnapshotStatus.FINISHED);
   const answer = state.contents.answers.answers[qnum][pnum][bnum];
   return {
     value: isNoAns(answer) ? undefined : answer,
     disabled: locked,
     locked,
+    examFinished,
     lockedMsg: message,
   };
 };

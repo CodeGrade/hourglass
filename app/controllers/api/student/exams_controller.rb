@@ -89,7 +89,19 @@ module Api
       def check_over
         return unless @registration.over?
 
-        head :forbidden
+        lastSnapshot = @registration.snapshots.last
+        if lastSnapshot
+          render json: {
+            finished: true,
+            lastSaved: lastSnapshot.created_at,
+            message: "Your exam is over."
+          }
+        else
+          render json: {
+            finished: true,
+            message: "Your exam is over."
+          }
+        end
       end
 
       def check_anomaly

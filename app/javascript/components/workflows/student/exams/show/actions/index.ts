@@ -6,6 +6,7 @@ import {
   ExamTakerState,
   SnapshotStatus,
   SnapshotFailure,
+  SnapshotFinished,
   SnapshotSuccess,
   SnapshotSaveResult,
   SnapshotSaving,
@@ -30,6 +31,7 @@ import {
 import lock from '@student/exams/show/lockdown/lock';
 import { DateTime } from 'luxon';
 import { getCSRFToken } from '@student/exams/show/helpers';
+import { pluralize } from '@hourglass/common/helpers';
 
 export function togglePagination(): TogglePaginationAction {
   return {
@@ -187,6 +189,13 @@ interface SubmitResponse {
   lockout: boolean;
 }
 
+function snapshotFinished(message: string): SnapshotFinished {
+  return {
+    type: 'SNAPSHOT_FINISHED',
+    message,
+  };
+}
+
 function snapshotFailure(message: string): SnapshotFailure {
   return {
     type: 'SNAPSHOT_FAILURE',
@@ -204,6 +213,27 @@ function snapshotSaving(): SnapshotSaving {
   return {
     type: 'SNAPSHOT_SAVING',
   };
+}
+
+function describeTime(time: DateTime): string {
+  const remaining = DateTime.local().diff(time);
+  const left = remaining.shiftTo('weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds').normalize();
+  if (left.weeks > 0) {
+    return `${pluralize(left.weeks, 'week', 'weeks')}, ${pluralize(left.days, 'day', 'days')} ago`;
+  }
+  if (left.days > 0) {
+    return `${pluralize(left.days, 'day', 'days')}, ${pluralize(left.hours, 'hour', 'hours')} ago`;
+  }
+  if (left.hours > 0) {
+    return `${pluralize(left.hours, 'hour', 'hours')}, ${pluralize(left.minutes, 'minute', 'minutes')} ago`;
+  }
+  if (left.minutes > 0) {
+    return `${pluralize(left.minutes, 'minute', 'minutes')}, ${pluralize(left.seconds, 'second', 'seconds')} ago`;
+  }
+  if (left.valueOf() > 0) {
+    return `${pluralize(left.seconds, 'second', 'seconds')} ago`;
+  }
+  return time.toRelative();
 }
 
 export function saveSnapshot(examTakeUrl: string): Thunk {
@@ -233,15 +263,27 @@ export function saveSnapshot(examTakeUrl: string): Thunk {
         return result.json() as Promise<SnapshotSaveResult>;
       })
       .then((result) => {
-        const {
-          lockout,
-        } = result;
-        if (lockout) {
-          const error = 'Locked out of exam.';
-          dispatch(snapshotFailure(error));
-          window.location.href = '/';
+        if ('lockout' in result) {
+          if (result.lockout) {
+            const error = 'Locked out of exam.';
+            dispatch(snapshotFailure(error));
+            window.location.href = '/';
+          } else {
+            dispatch(snapshotSuccess());
+          }
         } else {
-          dispatch(snapshotSuccess());
+          const { finished, message, lastSaved } = result;
+          if (finished) {
+            if (lastSaved) {
+              const saved = DateTime.fromISO(lastSaved);
+              const friendly = describeTime(saved);
+              dispatch(snapshotFinished(`${message}  Your exam was saved ${friendly}.`));
+            } else {
+              dispatch(snapshotFinished(message));
+            }
+          } else {
+            dispatch(snapshotFailure('Unknown error'));
+          }
         }
       }).catch((err) => {
         const error = `Error saving snapshot to server: ${err.message}`;

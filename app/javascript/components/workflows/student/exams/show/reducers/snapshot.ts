@@ -30,6 +30,12 @@ export default function snapshot(state: SnapshotState = {
         status: SnapshotStatus.FAILURE,
         message: action.message,
       };
+    case 'SNAPSHOT_FINISHED':
+      return {
+        ...state,
+        status: SnapshotStatus.FINISHED,
+        message: action.message,
+      };
     default:
       return state;
   }

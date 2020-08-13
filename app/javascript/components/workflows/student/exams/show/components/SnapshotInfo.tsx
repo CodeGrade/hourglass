@@ -47,6 +47,16 @@ const SnapshotInfo: React.FC<SnapshotInfoProps> = (props) => {
           <Icon I={MdError} />
         </TooltipButton>
       );
+    case SnapshotStatus.FINISHED:
+      return (
+        <TooltipButton
+          variant="info"
+          disabled
+          disabledMessage={message}
+        >
+          <Icon I={MdCloudDone} />
+        </TooltipButton>
+      );
     default:
       throw new ExhaustiveSwitchError(status);
   }

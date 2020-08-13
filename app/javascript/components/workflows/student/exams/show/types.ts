@@ -154,11 +154,20 @@ export interface SnapshotFailure {
   message: string;
 }
 
-export interface SnapshotSaveResult {
-  lockout: boolean;
+export interface SnapshotFinished {
+  type: 'SNAPSHOT_FINISHED';
+  message: string;
 }
 
-export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure;
+export type SnapshotSaveResult = {
+  lockout: boolean;
+} | {
+  finished: boolean;
+  message: string;
+  lastSaved: string;
+};
+
+export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure | SnapshotFinished;
 
 export enum LockdownStatus {
   // Lockdown hasn't been requested yet.
@@ -228,6 +237,9 @@ export enum SnapshotStatus {
 
   // The last snapshot fetch was not successful.
   FAILURE = 'FAILURE',
+
+  // The last snapshot fetch said the exam was finished.
+  FINISHED = 'FINISHED',
 }
 
 export interface SnapshotState {

@@ -16,6 +16,10 @@ module Types
     field :update_grading_comment, mutation: Mutations::UpdateGradingComment
     field :destroy_grading_comment, mutation: Mutations::DestroyGradingComment
 
+    field :create_rubric, mutation: Mutations::CreateRubric
+    field :create_rubric_preset, mutation: Mutations::CreateRubricPreset
+    field :create_preset_comment, mutation: Mutations::CreatePresetComment
+
     field :ask_question, mutation: Mutations::AskQuestion
     field :destroy_exam_version, mutation: Mutations::DestroyExamVersion
     field :update_exam_version, mutation: Mutations::UpdateExamVersion

@@ -70,7 +70,7 @@ import {
   useQuery,
 } from 'relay-hooks';
 import { uploadFile } from '@hourglass/common/types/api';
-import { ExamRubric, assertType, isExamRubric } from '@professor/exams/types';
+import { ExamRubric } from '@professor/exams/types';
 import convertRubric from '@professor/exams/rubrics';
 import './dnd.scss';
 
@@ -810,7 +810,7 @@ const ShowVersion: React.FC<{
       scratch: '',
     },
   };
-  const rubrics = assertType(isExamRubric, convertRubric(res.rubrics));
+  const rubrics = convertRubric(res.rubrics);
   let disabledDeleteMessage = '';
   if (res.anyFinalized) {
     disabledDeleteMessage = 'Students have already finished taking this exam version';

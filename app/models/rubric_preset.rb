@@ -5,6 +5,9 @@ class RubricPreset < ApplicationRecord
   belongs_to :rubric
   has_many :preset_comments, dependent: :destroy
 
+  delegate :exam_version, to: :rubric
+  delegate :exam, to: :exam_version
+
   def total_points
     preset_comments.sum(&:points)
   end

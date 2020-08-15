@@ -65,16 +65,18 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
 function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric {
   const {
     type,
+    railsId,
     description,
     subsections,
     rubricPreset,
     points,
   } = rawRubric;
   switch (type) {
-    case 'none': return { type };
+    case 'none': return { type, railsId };
     case 'all': {
       const ans : RubricAll = {
         type,
+        railsId,
         choices: (
           expandPreset(rubricPreset)
            ?? subsections.map((s) => expandRubric(rubricsByID[s.id], rubricsByID))
@@ -88,6 +90,7 @@ function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric 
       const ans : RubricAny | RubricOne = {
         type,
         points,
+        railsId,
         choices: (
           expandPreset(rubricPreset)
            ?? subsections.map((s) => expandRubric(rubricsByID[s.id], rubricsByID))

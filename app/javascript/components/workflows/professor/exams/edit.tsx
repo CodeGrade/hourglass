@@ -14,7 +14,7 @@ import {
   AnswerState,
 } from '@student/exams/show/types';
 import { RenderError } from '@hourglass/common/boundary';
-import { isExamRubric, assertType } from '@professor/exams/types';
+import convertRubric from '@professor/exams/rubrics';
 
 import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
 
@@ -34,7 +34,40 @@ const EditExamVersion: React.FC = () => {
         answers
         anyStarted
         anyFinalized
-        rawRubrics
+        rubrics {
+          id
+          railsId
+          type
+          parentSectionId
+          qnum
+          pnum
+          bnum
+          order
+          points
+          description { 
+            type
+            value
+          }
+          rubricPreset {
+            id
+            railsId
+            direction
+            label
+            mercy
+            presetComments {
+              id
+              railsId
+              label
+              order
+              points
+              graderHint
+              studentFeedback
+            }
+          }
+          subsections {
+            id
+          }
+        }
       }
     }
     `,
@@ -70,6 +103,7 @@ const EditExamVersion: React.FC = () => {
       scratch: '',
     },
   };
+  const rubrics = convertRubric(res.props.examVersion.rubrics);
   return (
     <Container>
       <Editor
@@ -78,7 +112,7 @@ const EditExamVersion: React.FC = () => {
         versionName={examVersion.name}
         versionPolicies={examVersion.policies as readonly Policy[]}
         answers={parsedContents.answers}
-        rubrics={assertType(isExamRubric, res.props.examVersion.rawRubrics)}
+        rubrics={rubrics}
       />
     </Container>
   );

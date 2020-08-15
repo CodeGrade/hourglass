@@ -1,20 +1,40 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Row,
   Col,
   Button,
 } from 'react-bootstrap';
 import { WrappedFieldArrayProps } from 'redux-form';
-import { PartInfo } from '@student/exams/show/types';
+import { PartInfoWithAnswers } from '@professor/exams/types';
 import Part from '@professor/exams/new/editor/components/Part';
+import { AlertContext } from '@hourglass/common/alerts';
+import { useMutation } from 'relay-hooks';
+import CREATE_RUBRIC_MUTATION from '@professor/exams/new/editor/components/manageRubrics';
+import { manageRubricsCreateRubricMutation } from './__generated__/manageRubricsCreateRubricMutation.graphql';
 
 const ShowParts: React.FC<{
   qnum: number;
-} & WrappedFieldArrayProps<PartInfo>> = (props) => {
+  examVersionId: string;
+} & WrappedFieldArrayProps<PartInfoWithAnswers>> = (props) => {
   const {
     qnum,
+    examVersionId,
     fields,
   } = props;
+  const { alert } = useContext(AlertContext);
+  const [createRubric, { loading }] = useMutation<manageRubricsCreateRubricMutation>(
+    CREATE_RUBRIC_MUTATION,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating rubric for new question.',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
   return (
     <>
       <Row>
@@ -27,6 +47,7 @@ const ShowParts: React.FC<{
               <Part
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
+                examVersionId={examVersionId}
                 qnum={qnum}
                 pnum={index}
                 memberName={member}
@@ -43,21 +64,38 @@ const ShowParts: React.FC<{
         <Col>
           <Button
             variant="success"
+            disabled={loading}
             onClick={(): void => {
-              const p: PartInfo = {
-                reference: [],
-                name: {
-                  type: 'HTML',
-                  value: '',
+              createRubric({
+                variables: {
+                  input: {
+                    examVersionId,
+                    type: 'none',
+                    qnum,
+                    pnum: fields.length,
+                  },
                 },
-                description: {
-                  type: 'HTML',
-                  value: '',
-                },
-                points: 0,
-                body: [],
-              };
-              fields.push(p);
+              }).then((result) => {
+                const { rubric } = result.createRubric;
+                const p: PartInfoWithAnswers = {
+                  reference: [],
+                  name: {
+                    type: 'HTML',
+                    value: '',
+                  },
+                  description: {
+                    type: 'HTML',
+                    value: '',
+                  },
+                  points: 0,
+                  body: [],
+                  partRubric: {
+                    type: 'none',
+                    railsId: rubric.railsId,
+                  },
+                };
+                fields.push(p);
+              });
             }}
           >
             Add part

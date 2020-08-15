@@ -17,6 +17,7 @@ class Rubric < ApplicationRecord
   has_one :rubric_preset, dependent: :destroy
 
   validate :sensible_coordinates
+  delegate :exam, to: :exam_version
 
   def sensible_coordinates
     if qnum.nil?

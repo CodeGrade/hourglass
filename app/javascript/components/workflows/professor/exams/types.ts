@@ -101,6 +101,7 @@ export interface ExamVersionWithAnswers extends Omit<ExamVersion, 'questions'> {
 type GradingComment = string;
 
 export type Preset = {
+  railsId?: number;
   id?: string;
   label?: string;
   graderHint: GradingComment;
@@ -110,6 +111,7 @@ export type Preset = {
 }
 
 export type RubricPresets = {
+  railsId?: number;
   label?: string;
   direction: 'credit' | 'deduction';
   mercy?: number;

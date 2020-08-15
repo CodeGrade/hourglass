@@ -66,6 +66,7 @@ const QuestionReferenceProvider: React.FC<WrappedFieldProps> = (props) => {
 
 const Question: React.FC<{
   memberName: string;
+  examVersionId: string;
   qnum: number;
   enableDown: boolean;
   moveDown: () => void;
@@ -74,6 +75,7 @@ const Question: React.FC<{
 }> = (props) => {
   const {
     memberName,
+    examVersionId,
     qnum,
     enableDown,
     moveDown,
@@ -154,7 +156,12 @@ const Question: React.FC<{
             name="reference"
             component={QuestionReferenceProvider}
           >
-            <FieldArray name="parts" component={ShowParts} qnum={qnum} />
+            <FieldArray
+              name="parts"
+              component={ShowParts}
+              qnum={qnum}
+              examVersionId={examVersionId}
+            />
           </Field>
         </Card.Body>
       </FormSection>

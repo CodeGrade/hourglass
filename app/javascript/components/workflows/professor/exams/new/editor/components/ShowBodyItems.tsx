@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Row,
   Col,
@@ -9,16 +9,59 @@ import { BodyItemWithAnswer } from '@professor/exams/types';
 import { WrappedFieldArrayProps } from 'redux-form';
 import BodyItem from '@professor/exams/new/editor/components/BodyItem';
 import { languages } from '@professor/exams/new/editor/components/questions/Code';
+import { AlertContext } from '@hourglass/common/alerts';
+import { useMutation } from 'relay-hooks';
+import CREATE_RUBRIC_MUTATION from '@professor/exams/new/editor/components/manageRubrics';
+import { manageRubricsCreateRubricMutation } from './__generated__/manageRubricsCreateRubricMutation.graphql';
 
 const ShowBodyItems: React.FC<{
+  examVersionId: string;
   qnum: number;
   pnum: number;
 } & WrappedFieldArrayProps<BodyItemWithAnswer>> = (props) => {
   const {
+    examVersionId,
     qnum,
     pnum,
     fields,
   } = props;
+  const { alert } = useContext(AlertContext);
+  const [createRubric, { loading }] = useMutation<manageRubricsCreateRubricMutation>(
+    CREATE_RUBRIC_MUTATION,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating rubric for new question.',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const createNewItem = (item: BodyItemWithAnswer) => {
+    createRubric({
+      variables: {
+        input: {
+          examVersionId,
+          type: 'none',
+          qnum,
+          pnum,
+          bnum: fields.length,
+        },
+      },
+    }).then((result) => {
+      const { rubric } = result.createRubric;
+      const b: BodyItemWithAnswer = {
+        ...item,
+        rubric: {
+          type: 'none',
+          railsId: rubric.railsId,
+        },
+      };
+      fields.push(b);
+    });
+  };
   return (
     <>
       <Row>
@@ -48,12 +91,13 @@ const ShowBodyItems: React.FC<{
         <Col>
           <DropdownButton
             id={`${qnum}-${pnum}-newBodyItem`}
+            disabled={loading}
             variant="secondary"
             title="Add new item..."
           >
             <Dropdown.Item
               onClick={(): void => {
-                fields.push({
+                createNewItem({
                   type: 'HTML',
                   value: '',
                   answer: { NO_ANS: true },
@@ -65,7 +109,7 @@ const ShowBodyItems: React.FC<{
             <Dropdown.Divider />
             <Dropdown.Item
               onClick={(): void => {
-                fields.push({
+                createNewItem({
                   type: 'AllThatApply',
                   prompt: {
                     type: 'HTML',
@@ -79,7 +123,7 @@ const ShowBodyItems: React.FC<{
             </Dropdown.Item>
             <Dropdown.Item
               onClick={(): void => {
-                fields.push({
+                createNewItem({
                   type: 'Code',
                   lang: Object.keys(languages)[0],
                   prompt: {
@@ -97,7 +141,7 @@ const ShowBodyItems: React.FC<{
             </Dropdown.Item>
             <Dropdown.Item
               onClick={(): void => {
-                fields.push({
+                createNewItem({
                   type: 'CodeTag',
                   choices: 'exam',
                   prompt: {
@@ -111,7 +155,7 @@ const ShowBodyItems: React.FC<{
             </Dropdown.Item>
             <Dropdown.Item
               onClick={(): void => {
-                fields.push({
+                createNewItem({
                   type: 'Matching',
                   prompt: {
                     type: 'HTML',
@@ -126,7 +170,7 @@ const ShowBodyItems: React.FC<{
             </Dropdown.Item>
             <Dropdown.Item
               onClick={(): void => {
-                fields.push({
+                createNewItem({
                   type: 'MultipleChoice',
                   prompt: {
                     type: 'HTML',
@@ -140,7 +184,7 @@ const ShowBodyItems: React.FC<{
             </Dropdown.Item>
             <Dropdown.Item
               onClick={(): void => {
-                fields.push({
+                createNewItem({
                   type: 'Text',
                   prompt: {
                     type: 'HTML',
@@ -154,7 +198,7 @@ const ShowBodyItems: React.FC<{
             </Dropdown.Item>
             <Dropdown.Item
               onClick={(): void => {
-                fields.push({
+                createNewItem({
                   type: 'YesNo',
                   yesLabel: 'Yes',
                   noLabel: 'No',

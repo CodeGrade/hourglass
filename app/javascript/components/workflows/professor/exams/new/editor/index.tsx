@@ -6,6 +6,7 @@ import React, {
 } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
+import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   Button,
   Form,
@@ -35,6 +36,8 @@ import {
   MatchingInfoWithAnswer,
   Rubric,
   ExamRubric,
+  Preset,
+  RubricPresets,
 } from '@professor/exams/types';
 import {
   reduxForm,
@@ -58,6 +61,7 @@ import ShowQuestions from '@professor/exams/new/editor/components/ShowQuestions'
 import RubricEditor from '@professor/exams/new/editor/RubricEditor';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import { useMutation, graphql } from 'relay-hooks';
+import { editorUpdateExamVersionMutation } from './__generated__/editorUpdateExamVersionMutation.graphql';
 
 export interface Version {
   name: string;
@@ -329,17 +333,10 @@ function stripInUsePreset(preset: Preset): Preset {
 }
 
 function stripInUsePresets(rubric: RubricPresets): RubricPresets {
-  const {
-    direction,
-    presets,
-    label,
-    mercy,
-  } = rubric;
+  const { inUse: _, presets, ...rest } = rubric;
   return {
-    direction,
+    ...rest,
     presets: presets.map(stripInUsePreset),
-    label,
-    mercy,
   };
 }
 
@@ -350,32 +347,12 @@ function stripInUse(rubric: Rubric): Rubric {
       const { inUse: _, ...rest } = rubric;
       return rest;
     }
-    case 'all': {
-      const { choices, description, railsId } = rubric;
-      return {
-        type: 'all',
-        description,
-        railsId,
-        choices: (choices instanceof Array
-          ? choices.map(stripInUse)
-          : stripInUsePresets(choices)
-        ),
-      };
-    }
+    case 'all':
     case 'any':
     case 'one': {
-      const {
-        type,
-        points,
-        choices,
-        description,
-        railsId,
-      } = rubric;
+      const { inUse: _, choices, ...rest } = rubric;
       return {
-        type,
-        description,
-        railsId,
-        points,
+        ...rest,
         choices: (choices instanceof Array
           ? choices.map(stripInUse)
           : stripInUsePresets(choices)
@@ -482,6 +459,30 @@ mutation editorUpdateExamVersionMutation($input: UpdateExamVersionInput!) {
   updateExamVersion(input: $input) {
     examVersion {
       id
+      rubrics {
+        id
+        railsId
+        type
+        rubricPreset {
+          id
+          railsId
+          direction
+          label
+          mercy
+          presetComments {
+            id
+            railsId
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+        subsections {
+          id
+        }
+      }
     }
   }
 }
@@ -503,7 +504,7 @@ const ExamEditor: React.FC<
   const { alert } = useContext(AlertContext);
   const history = useHistory();
   const { examId } = useParams();
-  const [update, { loading: saveLoading }] = useMutation(
+  const [update, { loading: saveLoading }] = useMutation<editorUpdateExamVersionMutation>(
     UPDATE_EXAM_VERSION,
     {
       onCompleted: () => {
@@ -524,7 +525,7 @@ const ExamEditor: React.FC<
       },
     },
   );
-  const [autosave, { loading: autosaveLoading }] = useMutation(
+  const [autosave, { loading: autosaveLoading }] = useMutation<editorUpdateExamVersionMutation>(
     UPDATE_EXAM_VERSION,
     {
       onCompleted: () => {
@@ -617,7 +618,11 @@ const ExamEditor: React.FC<
               enableDelete={false}
               disabledDeleteMessage="Cannot delete root rubric"
             />
-            <FieldArray name="questions" component={ShowQuestions} />
+            <FieldArray
+              name="questions"
+              component={ShowQuestions}
+              examVersionId={examVersionId}
+            />
           </FormContextProviderConnected>
         </FormSection>
         <Row className="my-2 float-right">

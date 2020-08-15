@@ -123,9 +123,7 @@ class ExamVersion < ApplicationRecord
       rubrics << rubric
       return rubric
     end
-    rubric = Rubric.find_or_initialize_by(id: raw['railsId'])
-    # puts "********* In convert_rubric: (#{qnum}/#{pnum}/#{bnum}) r = #{rubric}, " +
-    #      "raw = #{raw.inspect} rubric = #{rubric.inspect}, new record = #{rubric.new_record?}"
+    rubric = rubrics.find_or_initialize_by(id: raw['railsId'])
     rubric.assign_attributes(
       type: raw['type'].capitalize,
       qnum: qnum,
@@ -137,7 +135,7 @@ class ExamVersion < ApplicationRecord
       points: raw['points'],
       exam_version: self,
     )
-    rubrics << rubric if rubric.new_record?
+    rubrics << rubric
     if raw['choices'].is_a? Hash
       convert_presets(raw['choices'], rubric)
     else
@@ -152,19 +150,18 @@ class ExamVersion < ApplicationRecord
 
   def convert_presets(presets, rubric)
     p = RubricPreset.find_or_initialize_by(id: presets['railsId'])
+    puts "#{presets.inspect} vs #{p.new_record?} in #{rubric.rubric_preset&.id}"
     p.assign_attributes(
       label: presets['label'],
       direction: presets['direction'],
       mercy: presets['mercy']&.to_f,
     )
-    rubric.rubric_preset = p if p.new_record?
-    # puts "********* In convert_presets: (#{rubric.qnum}/#{rubric.pnum}/#{rubric.bnum}) r = #{rubric}, " +
-    #      "presets = #{presets.inspect} p = #{p.inspect}, new record = #{p.new_record?}"
+    rubric.rubric_preset = p
     comment_ids = presets['presets']&.map { |pre| pre['railsId'] }&.compact
     to_be_deleted = p.preset_comments.where.not(id: comment_ids)
     to_be_deleted.destroy_all
     presets['presets']&.each_with_index do |preset, pindex|
-      c = PresetComment.find_or_initialize_by(id: preset['railsId'])
+      c = p.preset_comments.find_or_initialize_by(id: preset['railsId'])
       c.assign_attributes(
         label: preset['label'],
         points: preset['points'],
@@ -173,7 +170,7 @@ class ExamVersion < ApplicationRecord
         order: pindex,
         rubric_preset: p,
       )
-      p.preset_comments << c if c.new_record?
+      p.preset_comments << c
     end
   end
 

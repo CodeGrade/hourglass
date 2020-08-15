@@ -69,6 +69,31 @@ module Types
         )
         ans
       }
+      ALL_STAFF = lambda { |obj, _args, ctx|
+        cached = (
+          ctx[:access_cache].dig(
+            obj.class.name,
+            obj.object_id,
+            :all_staff,
+            ctx[:current_user].id,
+          ) ||
+          ctx[:access_cache].dig(
+            obj.class.name,
+            obj.object_id,
+            :professors,
+            ctx[:current_user].id,
+          )
+        )
+        return cached unless cached.nil?
+
+        ans = obj.object.course.all_staff.exists? ctx[:current_user].id
+        Guards.cache(
+          ctx[:access_cache],
+          [obj.class.name, obj.object_id, :all_staff, ctx[:current_user].id],
+          ans,
+        )
+        ans
+      }
       CURRENT_USER_ADMIN = lambda { |_obj, _args, ctx|
         ctx[:current_user].admin?
       }

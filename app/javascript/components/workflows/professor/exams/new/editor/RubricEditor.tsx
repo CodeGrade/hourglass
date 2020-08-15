@@ -192,7 +192,7 @@ const RubricPresetDirectionEditor: React.FC<
             <ToggleButton
               type="radio"
               variant={checked ? 'secondary' : 'outline-secondary'}
-              className={checked ? '' : 'bg-white'}
+              className={checked ? '' : 'bg-white text-dark'}
               name="radio"
               value={val.value}
               checked={checked}
@@ -286,6 +286,7 @@ const RubricEntriesEditor: React.FC<WrappedFieldProps & RubricEntriesProps> = (p
               onClick={(): void => {
                 onChange([{
                   type: 'none',
+                  railsId: value?.railsId,
                 }]);
               }}
             >
@@ -307,6 +308,7 @@ const RubricEntriesEditor: React.FC<WrappedFieldProps & RubricEntriesProps> = (p
               onClick={(): void => {
                 onChange([{
                   type: 'none',
+                  railsId: value?.railsId,
                 }]);
               }}
             >

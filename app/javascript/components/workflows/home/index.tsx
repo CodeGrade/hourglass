@@ -15,48 +15,133 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
+import { DateTime } from 'luxon';
 import LinkButton from '@hourglass/common/linkbutton';
 import { SelectOption } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 
 import { homeQuery } from './__generated__/homeQuery.graphql';
-import { home_studentregs$key } from './__generated__/home_studentregs.graphql';
+import { home_futureregs$key, home_futureregs as HFR } from './__generated__/home_futureregs.graphql';
+import { home_studentregs$key, home_studentregs as HSR } from './__generated__/home_studentregs.graphql';
 import { home_profregs$key } from './__generated__/home_profregs.graphql';
 import { home_proctorregs$key } from './__generated__/home_proctorregs.graphql';
 import { home_staffregs$key } from './__generated__/home_staffregs.graphql';
 import { homeAdminQuery } from './__generated__/homeAdminQuery.graphql';
 import { ImpersonateUserInput } from './__generated__/homeImpersonateMutation.graphql';
 
+const ShowUpcomingRegistrations: React.FC<{
+  registrations: home_futureregs$key;
+}> = (props) => {
+  const { registrations } = props;
+  const res = useFragment<home_futureregs$key>(
+    graphql`
+    fragment home_futureregs on Registration @relay(plural: true) {
+      id
+      examName
+      accommodatedStartTime
+      courseTitle
+    }
+    `,
+    registrations,
+  );
+  if (res.length === 0) return null;
+  const regsByCourse: Record<string, HFR[number][]> = {};
+  res.forEach((reg : HFR[number]) => {
+    if (regsByCourse[reg.courseTitle] === undefined) {
+      regsByCourse[reg.courseTitle] = [];
+    }
+    regsByCourse[reg.courseTitle].push(reg);
+  });
+  Object.values(regsByCourse).forEach((regs) => {
+    regs.sort((r1, r2) => r2.accommodatedStartTime.localeCompare(r1.accommodatedStartTime));
+  });
+  return (
+    <>
+      <h1>Upcoming exams</h1>
+      <ul>
+        {Object.keys(regsByCourse).map((courseTitle) => {
+          const regs = regsByCourse[courseTitle];
+          return (
+            <li key={regs[0].id}>
+              <h2>{courseTitle}</h2>
+              <ul>
+                {regs.map((reg) => {
+                  const {
+                    id,
+                    examName,
+                    accommodatedStartTime,
+                  } = reg;
+                  const startTime = DateTime.fromISO(accommodatedStartTime).toLocal();
+                  const start = startTime.toLocaleString(DateTime.DATETIME_FULL);
+                  return (
+                    <li key={id}>
+                      {`${examName} at ${start}`}
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+};
+
 const ShowRegistrations: React.FC<{
+  name: string;
   registrations: home_studentregs$key;
 }> = (props) => {
   const {
+    name,
     registrations,
   } = props;
   const res = useFragment(
     graphql`
     fragment home_studentregs on Registration @relay(plural: true) {
       id
+      accommodatedStartTime
       exam {
         id
         name
       }
+      courseTitle
     }
     `,
     registrations,
   );
   if (res.length === 0) return null;
+  const regsByCourse: Record<string, HSR[number][]> = {};
+  res.forEach((reg : HSR[number]) => {
+    if (regsByCourse[reg.courseTitle] === undefined) {
+      regsByCourse[reg.courseTitle] = [];
+    }
+    regsByCourse[reg.courseTitle].push(reg);
+  });
+  Object.values(regsByCourse).forEach((regs) => {
+    regs.sort((r1, r2) => r2.accommodatedStartTime.localeCompare(r1.accommodatedStartTime));
+  });
   return (
     <>
-      <h1>Take an Exam</h1>
+      <h1>{name}</h1>
       <ul>
-        {res.map((reg) => (
-          <li key={reg.id}>
-            <Link to={`/exams/${reg.exam.id}`}>
-              {reg.exam.name}
-            </Link>
-          </li>
-        ))}
+        {Object.keys(regsByCourse).map((courseTitle) => {
+          const regs = regsByCourse[courseTitle];
+          return (
+            <li key={regs[0].id}>
+              <h2>{courseTitle}</h2>
+              <ul>
+                {res.map((reg) => (
+                  <li key={reg.id}>
+                    <Link to={`/exams/${reg.exam.id}`}>
+                      {reg.exam.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          );
+        })}
       </ul>
     </>
   );
@@ -282,10 +367,14 @@ const Home: React.FC = () => {
     query homeQuery {
       me {
         admin
-        registrations {
-          nodes {
-            ...home_studentregs
-          }
+        futureRegistrations {
+          ...home_futureregs
+        }
+        currentRegistrations {
+          ...home_studentregs
+        }
+        priorRegistrations {
+          ...home_studentregs
         }
         staffRegistrations {
           nodes {
@@ -313,7 +402,9 @@ const Home: React.FC = () => {
     return <p>Loading...</p>;
   }
   const allEmpty = (
-    res.props.me.registrations.nodes.length === 0
+    res.props.me.futureRegistrations.length === 0
+    && res.props.me.currentRegistrations.length === 0
+    && res.props.me.priorRegistrations.length === 0
     && res.props.me.professorCourseRegistrations.nodes.length === 0
     && res.props.me.proctorRegistrations.nodes.length === 0
     && res.props.me.staffRegistrations.nodes.length === 0
@@ -326,8 +417,16 @@ const Home: React.FC = () => {
             <p>You have no registrations.</p>
           </DocumentTitle>
         )}
+        <ShowUpcomingRegistrations
+          registrations={res.props.me.futureRegistrations}
+        />
         <ShowRegistrations
-          registrations={res.props.me.registrations.nodes}
+          name="Active exams"
+          registrations={res.props.me.currentRegistrations}
+        />
+        <ShowRegistrations
+          name="Prior exams"
+          registrations={res.props.me.priorRegistrations}
         />
         <ShowProctorRegs
           proctorRegistrations={res.props.me.proctorRegistrations.nodes}

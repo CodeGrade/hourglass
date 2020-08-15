@@ -12,7 +12,18 @@ module Types
     field :image_url, String, null: true
     field :admin, Boolean, null: false
 
-    field :registrations, Types::RegistrationType.connection_type, null: false
+    field :future_registrations, [Types::RegistrationType], null: false
+    def future_registrations
+      object.registrations.future_exams
+    end
+    field :current_registrations, [Types::RegistrationType], null: false
+    def current_registrations
+      object.registrations.current_exams
+    end
+    field :prior_registrations, [Types::RegistrationType], null: false
+    def prior_registrations
+      object.registrations.past_exams
+    end
 
     field :is_me, Boolean, null: false
     def is_me

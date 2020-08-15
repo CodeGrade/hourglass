@@ -38,6 +38,18 @@ class Registration < ApplicationRecord
     errors.add(:user, 'needs to be registered for the course')
   end
 
+  scope :past_exams, -> { 
+    includes(exam_version: :exam).filter { |r| r.accommodated_end_time < DateTime.now } 
+  }
+  scope :current_exams, -> {
+    includes(exam_version: :exam).filter do |r|
+      r.accommodated_start_time < DateTime.now && r.accommodated_end_time > DateTime.now
+    end
+  }
+  scope :future_exams, -> {
+    includes(exam_version: :exam).filter { |r| r.accommodated_start_time > DateTime.now }
+  }
+
   scope :without_accommodation, -> { includes(:accommodation).where(accommodations: { id: nil }) }
 
   # TIMELINE EXPLANATION
@@ -95,6 +107,10 @@ class Registration < ApplicationRecord
 
   def started?
     !start_time.nil?
+  end
+
+  def available?
+    DateTime.now > accommodated_start_time && !over?
   end
 
   def over?

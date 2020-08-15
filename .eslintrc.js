@@ -62,6 +62,12 @@ module.exports = {
         ],
       },
     ],
+    'no-shadow': [
+      'error',
+      {
+        allow: ['_'],
+      },
+    ],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',

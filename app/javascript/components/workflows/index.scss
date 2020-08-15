@@ -124,6 +124,10 @@
   pointer-events: none;
 }
 
+.pointer-events-auto {
+  pointer-events: auto !important;
+}
+
 .wrap-anywhere {
   word-wrap: anywhere;
   white-space: break-spaces;

@@ -106,6 +106,7 @@ export type Preset = {
   graderHint: GradingComment;
   studentFeedback?: GradingComment;
   points: number;
+  inUse?: boolean;
 }
 
 export type RubricPresets = {
@@ -113,6 +114,7 @@ export type RubricPresets = {
   direction: 'credit' | 'deduction';
   mercy?: number;
   presets: Preset[];
+  inUse?: boolean;
 }
 
 function isHTMLVal(obj : unknown): obj is HTMLVal {
@@ -149,6 +151,7 @@ export function isRubric(obj : unknown): obj is Rubric {
 export type RubricNone = {
   type: 'none';
   railsId?: number;
+  inUse?: boolean;
 }
 export function isRubricNone(obj : unknown): obj is RubricNone {
   return (obj !== undefined && obj !== null)
@@ -160,6 +163,7 @@ export type RubricAll = {
   railsId?: number;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
+  inUse?: boolean;
 }
 export function isRubricAll(obj : unknown): obj is RubricAll {
   if (obj === undefined || obj === null) return false;
@@ -175,6 +179,7 @@ export type RubricAny = {
   points: number;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
+  inUse?: boolean;
 }
 export function isRubricAny(obj : unknown): obj is RubricAny {
   if (obj === undefined || obj === null) return false;
@@ -192,6 +197,7 @@ export type RubricOne = {
   points: number;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
+  inUse?: boolean;
 }
 export function isRubricOne(obj : unknown): obj is RubricOne {
   if (obj === undefined || obj === null) return false;

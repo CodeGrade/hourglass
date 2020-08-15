@@ -10,7 +10,7 @@ class RubricPreset < ApplicationRecord
   end
 
   def in_use?
-    preset_comments.any?(&:in_use?)
+    preset_comments.includes(:grading_comments).any?(&:in_use?)
   end
 
   def compute_grade_for(_reg, max_points, comments, checks, qpb)
@@ -28,13 +28,15 @@ class RubricPreset < ApplicationRecord
     end
   end
 
-  def as_json
+  def as_json(preset_comments_in_use = nil)
+    presets_as_json = preset_comments.sort_by(&:order).map{ |p| p.as_json(preset_comments_in_use) }
     {
       railsId: id,
       label: label,
       direction: direction,
       mercy: mercy,
-      presets: preset_comments.sort_by(&:order).map(&:as_json),
+      presets: presets_as_json,
+      inUse: presets_as_json.any?{ |p| p['inUse'] },
     }.compact
   end
 end

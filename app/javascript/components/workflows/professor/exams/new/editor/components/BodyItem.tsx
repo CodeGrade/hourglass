@@ -112,6 +112,8 @@ const Body: React.FC<BodyProps> = (props) => {
         variant="secondary"
         enableUp={bnum > 0}
         enableDown={enableDown}
+        enableDelete
+        disabledDeleteMessage=""
         onUp={moveUp}
         onDown={moveDown}
         onDelete={remove}
@@ -131,6 +133,8 @@ const Body: React.FC<BodyProps> = (props) => {
             fieldName="rubric"
             format={null}
             component={RubricEditor}
+            enableDelete={false}
+            disabledDeleteMessage="Cannot delete root rubric"
           />
         </FormSection>
       </Card.Body>

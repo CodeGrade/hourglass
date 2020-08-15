@@ -14,8 +14,8 @@ import {
 export interface MoveProps {
   enableUp: boolean;
   enableDown: boolean;
-  enableDelete?: boolean;
-  disabledDeleteMessage?: string;
+  enableDelete: boolean;
+  disabledDeleteMessage: string;
   variant?: ButtonProps['variant'];
   visible: boolean;
   onUp?: () => void;
@@ -56,18 +56,18 @@ const MoveItem: React.FC<MoveProps> = (props) => {
           <Button
             variant={variant}
             disabled={!enableUp}
-            className={enableUp ? '' : 'pointer-events-none'}
+            className={enableUp ? '' : 'cursor-not-allowed pointer-events-auto'}
             onClick={onUp}
-            title="Move up"
+            title={enableUp ? 'Move up' : 'Cannot move first item up'}
           >
             <FaChevronUp />
           </Button>
           <Button
             variant={variant}
             disabled={!enableDown}
-            className={enableDown ? '' : 'pointer-events-none'}
+            className={enableDown ? '' : 'cursor-not-allowed pointer-events-auto'}
             onClick={onDown}
-            title="Move down"
+            title={enableDown ? 'Move down' : 'Cannot move last item down'}
           >
             <FaChevronDown />
           </Button>
@@ -84,7 +84,7 @@ const MoveItem: React.FC<MoveProps> = (props) => {
             variant="danger"
             disabled={!enableDelete}
             onClick={onDelete}
-            className={enableDelete ? '' : 'cursor-not-allowed'}
+            className={enableDelete ? '' : 'cursor-not-allowed pointer-events-auto'}
             title={enableDelete ? 'Delete' : disabledDeleteMessage}
           >
             <FaTrashAlt />

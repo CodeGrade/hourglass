@@ -97,6 +97,8 @@ const Question: React.FC<{
         variant="primary"
         enableUp={qnum > 0}
         enableDown={enableDown}
+        enableDelete
+        disabledDeleteMessage=""
         onUp={moveUp}
         onDown={moveDown}
         onDelete={remove}
@@ -145,6 +147,8 @@ const Question: React.FC<{
             fieldName="questionRubric"
             component={RubricEditor}
             format={null}
+            enableDelete={false}
+            disabledDeleteMessage="Cannot delete root rubric"
           />
           <Field
             name="reference"

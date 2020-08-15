@@ -102,6 +102,8 @@ const OneValue: React.FC<{
           variant="dark"
           enableUp={valueNum > 0}
           enableDown={enableDown}
+          enableDelete
+          disabledDeleteMessage=""
           onUp={moveUp}
           onDown={moveDown}
           onDelete={remove}
@@ -203,6 +205,8 @@ const OnePrompt: React.FC<{
             variant="dark"
             enableUp={valueNum > 0}
             enableDown={enableDown}
+            enableDelete
+            disabledDeleteMessage=""
             onUp={moveUp}
             onDown={moveDown}
             onDelete={remove}

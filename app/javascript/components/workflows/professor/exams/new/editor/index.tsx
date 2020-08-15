@@ -323,11 +323,78 @@ function transformMatching(
   };
 }
 
+function stripInUsePreset(preset: Preset): Preset {
+  const { inUse: _, ...presetClean } = preset;
+  return presetClean;
+}
+
+function stripInUsePresets(rubric: RubricPresets): RubricPresets {
+  const {
+    direction,
+    presets,
+    label,
+    mercy,
+  } = rubric;
+  return {
+    direction,
+    presets: presets.map(stripInUsePreset),
+    label,
+    mercy,
+  };
+}
+
+function stripInUse(rubric: Rubric): Rubric {
+  if (rubric === undefined) return rubric;
+  switch (rubric.type) {
+    case 'none': {
+      const { inUse: _, ...rest } = rubric;
+      return rest;
+    }
+    case 'all': {
+      const { choices, description, railsId } = rubric;
+      return {
+        type: 'all',
+        description,
+        railsId,
+        choices: (choices instanceof Array
+          ? choices.map(stripInUse)
+          : stripInUsePresets(choices)
+        ),
+      };
+    }
+    case 'any':
+    case 'one': {
+      const {
+        type,
+        points,
+        choices,
+        description,
+        railsId,
+      } = rubric;
+      return {
+        type,
+        description,
+        railsId,
+        points,
+        choices: (choices instanceof Array
+          ? choices.map(stripInUse)
+          : stripInUsePresets(choices)
+        ),
+      };
+    }
+    default:
+      throw new ExhaustiveSwitchError(rubric);
+  }
+}
+
 function transformForSubmit(values: FormValues): Version {
   const { all } = values;
   const questions: QuestionInfo[] = [];
   const answers: AnswersState['answers'] = [];
-  const rubrics: ExamRubric = { examRubric: all.exam.examRubric, questions: [] };
+  const rubrics: ExamRubric = {
+    examRubric: stripInUse(all.exam.examRubric),
+    questions: [],
+  };
   all.exam.questions.forEach((q, qnum) => {
     answers[qnum] = [];
     const {
@@ -335,7 +402,10 @@ function transformForSubmit(values: FormValues): Version {
       questionRubric,
       ...restOfQ
     } = q;
-    rubrics.questions[qnum] = { questionRubric, parts: [] };
+    rubrics.questions[qnum] = {
+      questionRubric: stripInUse(questionRubric),
+      parts: [],
+    };
     const newParts: PartInfo[] = [];
     parts.forEach((p, pnum) => {
       answers[qnum][pnum] = [];
@@ -344,12 +414,16 @@ function transformForSubmit(values: FormValues): Version {
         partRubric,
         ...restOfP
       } = p;
-      rubrics.questions[qnum].parts[pnum] = { partRubric, body: [] };
+      rubrics.questions[qnum].parts[pnum] = {
+        partRubric: stripInUse(partRubric),
+        body: [],
+      };
       const newBody: BodyItem[] = [];
       body.forEach((b, bnum) => {
         let itemAnswer: AnswerState;
         let bodyItem: BodyItem;
-        rubrics.questions[qnum].parts[pnum].body[bnum] = b.rubric || { type: 'none' };
+        const bodyRubric = stripInUse(b.rubric || { type: 'none' });
+        rubrics.questions[qnum].parts[pnum].body[bnum] = bodyRubric;
         switch (b.type) {
           case 'AllThatApply': {
             const res = transformATA(b);
@@ -536,7 +610,13 @@ const ExamEditor: React.FC<
                 label="the entire exam"
               />
             </Form.Group>
-            <Field name="examRubric" fieldName="examRubric" component={RubricEditor} />
+            <Field
+              name="examRubric"
+              fieldName="examRubric"
+              component={RubricEditor}
+              enableDelete={false}
+              disabledDeleteMessage="Cannot delete root rubric"
+            />
             <FieldArray name="questions" component={ShowQuestions} />
           </FormContextProviderConnected>
         </FormSection>

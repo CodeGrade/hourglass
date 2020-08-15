@@ -106,6 +106,8 @@ const Part: React.FC<{
         variant="success"
         enableUp={pnum > 0}
         enableDown={enableDown}
+        enableDelete
+        disabledDeleteMessage=""
         onUp={moveUp}
         onDown={moveDown}
         onDelete={remove}
@@ -154,6 +156,8 @@ const Part: React.FC<{
             fieldName="partRubric"
             component={RubricEditor}
             format={null}
+            enableDelete={false}
+            disabledDeleteMessage="Cannot delete root rubric"
           />
           <Field
             name="reference"

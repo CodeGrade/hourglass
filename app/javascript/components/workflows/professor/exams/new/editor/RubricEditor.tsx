@@ -33,6 +33,8 @@ import '@professor/exams/rubrics.scss';
 const RubricPresetEditor: React.FC<{
   enableUp: boolean;
   enableDown: boolean;
+  enableDelete: boolean;
+  disabledDeleteMessage?: string;
   moveDown: () => void;
   moveUp: () => void;
   remove: () => void;
@@ -40,6 +42,8 @@ const RubricPresetEditor: React.FC<{
   const {
     enableUp,
     enableDown,
+    enableDelete,
+    disabledDeleteMessage,
     moveDown,
     moveUp,
     remove,
@@ -61,6 +65,8 @@ const RubricPresetEditor: React.FC<{
         variant="warning"
         enableUp={enableUp}
         enableDown={enableDown}
+        enableDelete={enableDelete}
+        disabledDeleteMessage={disabledDeleteMessage}
         onUp={moveUp}
         onDown={moveDown}
         onDelete={remove}
@@ -120,6 +126,7 @@ const RubricPresetsArrayEditor: React.FC<
         const moveUp = () => fields.move(index, index - 1);
         const moveDown = () => fields.move(index, index + 1);
         const remove = () => fields.remove(index);
+        const preset = fields.get(index);
         return (
           <FormSection
             // eslint-disable-next-line react/no-array-index-key
@@ -129,6 +136,8 @@ const RubricPresetsArrayEditor: React.FC<
             <RubricPresetEditor
               enableUp={index > 0}
               enableDown={index + 1 < fields.length}
+              enableDelete={!preset.inUse}
+              disabledDeleteMessage="Can't delete presets that are in use"
               moveDown={moveDown}
               moveUp={moveUp}
               remove={remove}
@@ -407,6 +416,8 @@ interface RubricEditorProps {
   fieldName: string;
   enableUp: boolean;
   enableDown: boolean;
+  enableDelete: boolean;
+  disabledDeleteMessage?: string;
   moveDown: () => void;
   moveUp: () => void;
   remove: () => void;
@@ -422,6 +433,8 @@ const RubricEditor: React.FC<WrappedFieldProps & RubricEditorProps> = (props) =>
     fieldName = input.name,
     enableUp,
     enableDown,
+    enableDelete,
+    disabledDeleteMessage,
     moveDown,
     moveUp,
     remove,
@@ -484,6 +497,8 @@ const RubricEditor: React.FC<WrappedFieldProps & RubricEditorProps> = (props) =>
         variant="secondary"
         enableUp={enableUp}
         enableDown={enableDown}
+        enableDelete={enableDelete}
+        disabledDeleteMessage={disabledDeleteMessage}
         onUp={moveUp}
         onDown={moveDown}
         onDelete={remove}
@@ -508,6 +523,7 @@ const RubricsArrayEditor: React.FC<WrappedFieldArrayProps<Rubric>> = (props) => 
         const moveUp = () => fields.move(index, index - 1);
         const moveDown = () => fields.move(index, index + 1);
         const remove = () => fields.remove(index);
+        const rubric = fields.get(index);
         return (
           <Field
             // eslint-disable-next-line react/no-array-index-key
@@ -516,6 +532,8 @@ const RubricsArrayEditor: React.FC<WrappedFieldArrayProps<Rubric>> = (props) => 
             fieldName={member}
             enableUp={index > 0}
             enableDown={index + 1 < fields.length}
+            enableDelete={!rubric.inUse}
+            disabledDeleteMessage="Cannot delete rubric that is in use"
             moveDown={moveDown}
             moveUp={moveUp}
             remove={remove}

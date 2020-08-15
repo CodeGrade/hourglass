@@ -58,6 +58,8 @@ const OneOption: React.FC<{
           variant="dark"
           enableUp={optionNum > 0}
           enableDown={enableDown}
+          enableDelete
+          disabledDeleteMessage=""
           onUp={moveUp}
           onDown={moveDown}
           onDelete={remove}

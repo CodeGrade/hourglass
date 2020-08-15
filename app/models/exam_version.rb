@@ -124,8 +124,8 @@ class ExamVersion < ApplicationRecord
       return rubric
     end
     rubric = Rubric.find_or_initialize_by(id: raw['railsId'])
-    # puts "********* In convert_rubric: (#{qnum}/#{pnum}/#{bnum}) r = #{r}, " +
-    #      "rubric = #{rubric.inspect}, new record = #{rubric.new_record?}"
+    # puts "********* In convert_rubric: (#{qnum}/#{pnum}/#{bnum}) r = #{rubric}, " +
+    #      "raw = #{raw.inspect} rubric = #{rubric.inspect}, new record = #{rubric.new_record?}"
     rubric.assign_attributes(
       type: raw['type'].capitalize,
       qnum: qnum,
@@ -156,8 +156,10 @@ class ExamVersion < ApplicationRecord
       label: presets['label'],
       direction: presets['direction'],
       mercy: presets['mercy']&.to_f,
-      rubric: rubric,
     )
+    rubric.rubric_preset = p if p.new_record?
+    # puts "********* In convert_presets: (#{rubric.qnum}/#{rubric.pnum}/#{rubric.bnum}) r = #{rubric}, " +
+    #      "presets = #{presets.inspect} p = #{p.inspect}, new record = #{p.new_record?}"
     comment_ids = presets['presets']&.map { |pre| pre['railsId'] }&.compact
     to_be_deleted = p.preset_comments.where.not(id: comment_ids)
     to_be_deleted.destroy_all
@@ -177,12 +179,13 @@ class ExamVersion < ApplicationRecord
 
   def rubric_as_json
     rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)
-    exam_rubric = rubric_tree.delete(nil)&.dig(nil, nil)&.as_json
+    preset_comments_in_use = preset_comments.joins(:grading_comments).pluck(:id)
+    exam_rubric = rubric_tree.delete(nil)&.dig(nil, nil)&.as_json(preset_comments_in_use)
     q_rubrics = rubric_tree.sort.map do |_qnum, rubrics_q|
-      question_rubric = rubrics_q.delete(nil)&.dig(nil)&.as_json
+      question_rubric = rubrics_q.delete(nil)&.dig(nil)&.as_json(preset_comments_in_use)
       p_rubrics = rubrics_q.sort.map do |_pnum, rubrics_p|
-        part_rubric = rubrics_p.delete(nil)&.as_json
-        b_rubrics = rubrics_p.sort.map { |_, b| b.as_json }
+        part_rubric = rubrics_p.delete(nil)&.as_json(preset_comments_in_use)
+        b_rubrics = rubrics_p.sort.map { |_, b| b.as_json(preset_comments_in_use) }
         {
           partRubric: part_rubric,
           body: b_rubrics,

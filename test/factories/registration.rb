@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :registration do
     transient do
-      student_registration { create(:student_registration, course: exam_version.exam.course) }
+      student_registration { create(:student_registration, course: exam_version.course) }
     end
 
     user { student_registration.user }

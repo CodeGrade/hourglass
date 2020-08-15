@@ -13,7 +13,7 @@ module Mutations
     def authorized?(exam_version:, **_args)
       return true if ProfessorCourseRegistration.find_by(
         user: context[:current_user],
-        course: exam_version.exam.course,
+        course: exam_version.course,
       )
 
       raise GraphQL::ExecutionError, 'You do not have permission.'

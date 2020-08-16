@@ -440,7 +440,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
   return (
     <NavAccordionItem
       showTooltip={showTooltip}
-      tooltipMessage="New messages"
+      tooltipMessage={anyUnread ? 'New messages' : 'Professor messages'}
       tooltipPlacement="right"
       tooltipClassname={classes}
       expanded={expanded}

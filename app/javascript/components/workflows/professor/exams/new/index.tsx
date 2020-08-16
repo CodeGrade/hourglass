@@ -44,11 +44,11 @@ const NewExamForm: React.FC<{
       },
     },
   );
-  const tomorrow = DateTime.local().plus({ days: 1 }).startOf('day');
-  const tomorrowEnd = tomorrow.endOf('day');
+  const today = DateTime.local().startOf('day');
+  const todayEnd = today.endOf('day');
   const [name, setName] = useState<string>('');
-  const [start, setStart] = useState<DateTime>(tomorrow);
-  const [end, setEnd] = useState<DateTime>(tomorrowEnd);
+  const [start, setStart] = useState<DateTime>(today);
+  const [end, setEnd] = useState<DateTime>(todayEnd);
   const [duration, setDuration] = useState<number>(300);
 
   return (

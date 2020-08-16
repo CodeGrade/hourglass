@@ -230,16 +230,17 @@ class Exam < ApplicationRecord
     end
   end
 
-  def bottlenose_exam_grades
+  def bottlenose_exam_grades(regs = nil)
+    regs = registrations if regs.nil?
     if exam_versions.count == 1
-      registrations.map do |r|
+      regs.map do |r|
         [
           r.user.username,
           r.current_part_scores,
         ]
       end.to_h
     else
-      registrations.map do |r|
+      regs.map do |r|
         [
           r.user.username,
           [r.current_score],

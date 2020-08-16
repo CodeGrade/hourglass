@@ -32,10 +32,20 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
+  def deep_delete_in_use(obj)
+    if obj.is_a? Hash
+      obj.delete 'inUse'
+      obj.each { |k, v| deep_delete_in_use v }
+    elsif obj.is_a? Array
+      obj.each { |v| deep_delete_in_use v }
+    end
+  end
+
   def try_update(ver, new_name:, user:)
     # Make sure we preserve any railsIds in the rubrics so far
     info = ver.info
     info['rubrics'] = ver.rubric_as_json
+    deep_delete_in_use info
     HourglassSchema.do_mutation!('UPDATE_EXAM_VERSION', user, {
       examVersionId: HourglassSchema.id_from_object(ver, Types::ExamVersionType, {}),
       name: new_name,

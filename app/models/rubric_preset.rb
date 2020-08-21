@@ -22,7 +22,7 @@ class RubricPreset < ApplicationRecord
     my_checks = checks.dig(*qpb) || []
     raw_score = my_comments.flatten.sum do |c|
       c.points || c.rubric_preset.points
-    end + my_checks.sum { |c| c.points }
+    end + my_checks.sum(&:points)
 
     if direction == 'credit'
       raw_score
@@ -32,14 +32,14 @@ class RubricPreset < ApplicationRecord
   end
 
   def as_json(preset_comments_in_use = nil)
-    presets_as_json = preset_comments.sort_by(&:order).map{ |p| p.as_json(preset_comments_in_use) }
+    presets_as_json = preset_comments.sort_by(&:order).map { |p| p.as_json(preset_comments_in_use) }
     {
       railsId: id,
       label: label,
       direction: direction,
       mercy: mercy,
       presets: presets_as_json,
-      inUse: presets_as_json.any?{ |p| p['inUse'] },
+      inUse: presets_as_json.any? { |p| p['inUse'] },
     }.compact
   end
 end

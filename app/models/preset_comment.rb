@@ -20,7 +20,7 @@ class PresetComment < ApplicationRecord
       graderHint: grader_hint,
       studentFeedback: student_feedback,
       points: points,
-      inUse: 
+      inUse:
         if preset_comments_in_use.nil?
           in_use?
         else

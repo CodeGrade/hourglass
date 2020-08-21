@@ -35,7 +35,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   def deep_delete_in_use(obj)
     if obj.is_a? Hash
       obj.delete 'inUse'
-      obj.each { |k, v| deep_delete_in_use v }
+      obj.each { |_, v| deep_delete_in_use v }
     elsif obj.is_a? Array
       obj.each { |v| deep_delete_in_use v }
     end

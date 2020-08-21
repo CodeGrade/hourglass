@@ -38,15 +38,15 @@ class Registration < ApplicationRecord
     errors.add(:user, 'needs to be registered for the course')
   end
 
-  scope :past_exams, -> { 
-    includes(exam_version: :exam).filter { |r| r.effective_end_time < DateTime.now } 
+  scope :past_exams, lambda {
+    includes(exam_version: :exam).filter { |r| r.effective_end_time < DateTime.now }
   }
-  scope :current_exams, -> {
+  scope :current_exams, lambda {
     includes(exam_version: :exam).filter do |r|
       r.accommodated_start_time < DateTime.now && r.effective_end_time > DateTime.now
     end
   }
-  scope :future_exams, -> {
+  scope :future_exams, lambda {
     includes(exam_version: :exam).filter { |r| r.accommodated_start_time > DateTime.now }
   }
 

@@ -89,17 +89,17 @@ module Api
       def check_over
         return unless @registration.over?
 
-        lastSnapshot = @registration.snapshots.last
-        if lastSnapshot
+        last_snapshot = @registration.snapshots.last
+        if last_snapshot
           render json: {
             finished: true,
-            lastSaved: lastSnapshot.created_at,
-            message: "Your exam is over."
+            lastSaved: last_snapshot.created_at,
+            message: 'Your exam is over.',
           }
         else
           render json: {
             finished: true,
-            message: "Your exam is over."
+            message: 'Your exam is over.',
           }
         end
       end

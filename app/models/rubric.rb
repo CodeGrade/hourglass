@@ -46,8 +46,9 @@ class Rubric < ApplicationRecord
 
   def points_if_preset
     # Note: for new_records, the class is still Rubric, not All
-    return if type == 'All' 
+    return if type == 'All'
     return if rubric_preset.nil?
+
     errors.add(:points, 'must not be nil if this contains presets') if points.nil?
   end
 
@@ -95,14 +96,14 @@ class Rubric < ApplicationRecord
 
   def as_json(preset_comments_in_use = nil)
     rubric_preset_as_json = rubric_preset&.as_json(preset_comments_in_use)
-    subsections_as_json = subsections.sort_by(&:order).map{ |s| s.as_json(preset_comments_in_use) }
+    subsections_as_json = subsections.sort_by(&:order).map { |s| s.as_json(preset_comments_in_use) }
     {
       railsId: id,
       type: type.downcase,
       description: description && { type: 'HTML', value: description },
       points: points,
       choices: (rubric_preset_as_json || subsections_as_json),
-      inUse: (rubric_preset_as_json&.dig('inUse') || subsections_as_json.any?{ |s| s['inUse'] }),
+      inUse: (rubric_preset_as_json&.dig('inUse') || subsections_as_json.any? { |s| s['inUse'] }),
     }.compact
   end
 

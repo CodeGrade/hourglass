@@ -215,8 +215,9 @@ class Exam < ApplicationRecord
   def visible_to?(check_user)
     return true if proctors_and_professors.exists? check_user.id
     return false unless student_ids.member? check_user.id
+
     reg = registrations.find_by(user: check_user)
-    return reg.available? || reg.over?
+    reg.available? || reg.over?
   end
 
   def bottlenose_exam_summary

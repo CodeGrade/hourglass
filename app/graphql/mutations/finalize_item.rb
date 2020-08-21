@@ -18,9 +18,9 @@ module Mutations
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
-    def resolve(id:, scope:)
+    def resolve(id:, scope: nil)
       obj = HourglassSchema.object_from_id(id, context)
-      if obj.is_a? Exam && scope == 'out_of_time'
+      if obj.is_a?(Exam) && scope == 'out_of_time'
         obj.finalize_registrations_that_have_run_out_of_time!
       else
         obj.finalize!

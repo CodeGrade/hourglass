@@ -118,10 +118,21 @@ const ShowPreset: React.FC<{
 };
 
 type CompletionStatus = 'complete' | 'incomplete' | 'invalid'
-function combineCompletion(c1 : CompletionStatus, c2: CompletionStatus): CompletionStatus {
+function combineCompletionAll(c1 : CompletionStatus, c2: CompletionStatus): CompletionStatus {
+  // complete < incomplete < invalid
   switch (c1) {
     case 'complete': return c2;
     case 'incomplete': return (c2 === 'invalid') ? c2 : c1;
+    case 'invalid': return c1;
+    default:
+      throw new ExhaustiveSwitchError(c1);
+  }
+}
+function combineCompletionAny(c1 : CompletionStatus, c2: CompletionStatus): CompletionStatus {
+  // incomplete < complete < invalid
+  switch (c1) {
+    case 'incomplete': return c2;
+    case 'complete': return (c2 !== 'incomplete') ? c2 : c1;
     case 'invalid': return c1;
     default:
       throw new ExhaustiveSwitchError(c1);
@@ -136,8 +147,8 @@ function completionStatus(rubric: Rubric, parentRubricType: Rubric['type'], pres
       const { choices } = rubric;
       if (choices instanceof Array) {
         const completion = choices.reduce((cur: CompletionStatus, r) => (
-          combineCompletion(cur, completionStatus(r, 'all', presetIDs))
-        ), 'incomplete');
+          combineCompletionAll(cur, completionStatus(r, 'all', presetIDs))
+        ), 'complete');
         return (completion === 'incomplete') ? 'invalid' : completion;
       }
       const allUsed = choices.presets.every((p) => presetIDs.some((id) => (p.id === id)));
@@ -147,7 +158,7 @@ function completionStatus(rubric: Rubric, parentRubricType: Rubric['type'], pres
       const { choices } = rubric;
       if (choices instanceof Array) {
         const completion = choices.reduce((cur: CompletionStatus, r) => (
-          combineCompletion(cur, completionStatus(r, 'any', presetIDs))
+          combineCompletionAny(cur, completionStatus(r, 'any', presetIDs))
         ), 'incomplete');
         // An Any rubric is not in error if it's unused
         return completion;

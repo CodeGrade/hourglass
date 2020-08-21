@@ -1433,7 +1433,7 @@ const GradingCompletion: React.FC<{
               return (
                 // eslint-disable-next-line react/no-array-index-key
                 <td key={`q${qnum}-p${pnum}`}>
-                  <Tooltip message="Not started / In progress / Finished">
+                  <Tooltip className="bg-info" message="Not started / In progress / Finished">
                     <span>{`${notStarted} / ${inProgress} / ${finished}`}</span>
                   </Tooltip>
                 </td>
@@ -1484,7 +1484,18 @@ const VersionAdministration: React.FC<{
           <h4>
             Completion stats
             <small className="ml-4">
-              {`${version.startedCount} started; ${version.finalizedCount} finalized`}
+              <Tooltip
+                className="bg-info"
+                message="Students who actively began their exam"
+              >
+                <span className="mr-2">{`${version.startedCount} started;`}</span>
+              </Tooltip>
+              <Tooltip
+                className="bg-info"
+                message="Students who have been finalized, whether or not they actually started it"
+              >
+                <span>{`${version.finalizedCount} finalized`}</span>
+              </Tooltip>
             </small>
           </h4>
           <GradingCompletion versionKey={version} />

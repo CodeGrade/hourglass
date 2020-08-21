@@ -11,5 +11,6 @@ module Types
     field :pnum, Integer, null: false
     field :bnum, Integer, null: false
     field :points, Float, null: true
+    field :creator, Types::UserType, null: false
   end
 end

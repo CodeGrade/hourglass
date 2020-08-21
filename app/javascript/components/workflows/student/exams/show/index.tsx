@@ -11,7 +11,6 @@ import { graphql, useFragment, useQuery } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
 
 import { showQuery } from './__generated__/showQuery.graphql';
-import { showConfirmActiveQuery } from './__generated__/showConfirmActiveQuery.graphql';
 import { showExam$key } from './__generated__/showExam.graphql';
 
 interface ShowExamProps {
@@ -44,69 +43,16 @@ const Exam: React.FC<ShowExamProps> = (props) => {
 
 const ShowExam: React.FC = () => {
   const { examId } = useParams();
-  const confirmActive = useQuery<showConfirmActiveQuery>(
-    graphql`
-    query showConfirmActiveQuery {
-      me {
-        currentRegistrations {
-          exam { id }
-        }
-        priorRegistrations {
-          exam {
-            id
-            myRegistration { id }
-          }
-        }
-      }
-    }
-    `,
-  );
-  if (confirmActive.error) {
-    return (
-      <>
-        <RegularNavbar />
-        <Container>
-          <RenderError error={confirmActive.error} />
-        </Container>
-      </>
-    );
-  }
 
-  if (!confirmActive.props) {
-    return (
-      <>
-        <RegularNavbar />
-        <Container>
-          <p>Loading...</p>
-        </Container>
-      </>
-    );
-  }
-
-  const myPriorReg = confirmActive.props.me.priorRegistrations.find((e) => e.exam.id === examId);
-  if (myPriorReg) {
-    return (
-      <Redirect to={`/exams/${examId}/submissions/${myPriorReg.exam.myRegistration.id}`} />
-    );
-  }
-  if (!confirmActive.props.me.currentRegistrations.some((e) => e.exam.id === examId)) {
-    return (
-      <>
-        <RegularNavbar />
-        <Container>
-          <span className="text-danger">
-            <p>There is no such exam available for you to take.</p>
-          </span>
-        </Container>
-      </>
-    );
-  }
   const res = useQuery<showQuery>(
     graphql`
     query showQuery($examId: ID!) {
       exam(id: $examId) {
         name
         myRegistration {
+          over
+          inFuture
+          available
           id
         }
         ...showExam
@@ -135,11 +81,30 @@ const ShowExam: React.FC = () => {
       </>
     );
   }
-  if (!res.props.exam.myRegistration) {
+  const { myRegistration } = res.props.exam;
+  if (!myRegistration) {
     return (
       <Redirect to="/" />
     );
   }
+  if (myRegistration.over) {
+    return (
+      <Redirect to={`/exams/${examId}/submissions/${myRegistration.id}`} />
+    );
+  }
+  if (!myRegistration.available) {
+    return (
+      <>
+        <RegularNavbar />
+        <Container>
+          <span className="text-danger">
+            <p>There is no such exam available for you to take.</p>
+          </span>
+        </Container>
+      </>
+    );
+  }
+
   return (
     <DocumentTitle title={res.props.exam.name}>
       <Exam examKey={res.props.exam} />

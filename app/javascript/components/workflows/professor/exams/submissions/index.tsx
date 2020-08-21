@@ -11,11 +11,8 @@ import { BsListCheck } from 'react-icons/bs';
 import { useQuery, useMutation } from 'relay-hooks';
 import {
   AnswersState,
-  ExamFile,
-  HTMLVal,
-  FileRef,
-  QuestionInfo,
   ContentsState,
+  ExamVersion,
 } from '@student/exams/show/types';
 import ExamViewer from '@proctor/registrations/show';
 import { FinalizeDialog, finalizeItemMutation } from '@proctor/exams';
@@ -23,6 +20,7 @@ import { AlertContext } from '@hourglass/common/alerts';
 import { examsFinalizeItemMutation } from '@proctor/exams/__generated__/examsFinalizeItemMutation.graphql';
 import Icon from '@student/exams/show/components/Icon';
 import { RenderError } from '@hourglass/common/boundary';
+import { CurrentGrading } from '@professor/exams/types';
 
 import { submissionsAllQuery, submissionsAllQueryResponse } from './__generated__/submissionsAllQuery.graphql';
 import { submissionsOneQuery } from './__generated__/submissionsOneQuery.graphql';
@@ -201,16 +199,13 @@ const ExamSubmission: React.FC = () => {
     query submissionsOneQuery($registrationId: ID!) {
       registration(id: $registrationId) {
         currentAnswers
+        currentGrading
+        published
         user {
           displayName
         }
-        examVersion {
-          questions
-          reference
-          instructions
-          files
-          answers
-        }
+        exam { name }
+        reviewExam
       }
     }
     `,
@@ -223,20 +218,33 @@ const ExamSubmission: React.FC = () => {
     return <p>Loading...</p>;
   }
   const { registration } = res.props;
-  const { examVersion, currentAnswers, user } = registration;
+  const {
+    reviewExam,
+    currentAnswers,
+    currentGrading,
+    published,
+    user,
+    exam,
+  } = registration;
+  if (currentAnswers === null && !published) {
+    return (
+      <>
+        <h1>{`Submission for ${exam.name}`}</h1>
+        <p>Your submission is not yet graded, and cannot be viewed at this time.</p>
+      </>
+    );
+  }
   const parsedContents: ContentsState = {
-    exam: {
-      questions: examVersion.questions as QuestionInfo[],
-      reference: examVersion.reference as FileRef[],
-      instructions: examVersion.instructions as HTMLVal,
-      files: examVersion.files as ExamFile[],
-    },
+    exam: reviewExam as ExamVersion,
     answers: currentAnswers as AnswersState,
   };
   return (
     <>
       <h1>{`Submission by ${user.displayName}`}</h1>
-      <ExamViewer contents={parsedContents} />
+      <ExamViewer
+        contents={parsedContents}
+        currentGrading={currentGrading as CurrentGrading}
+      />
     </>
   );
 };

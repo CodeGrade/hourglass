@@ -35,7 +35,7 @@ const ShowUpcomingRegistrations: React.FC<{
   const { registrations } = props;
   const res = useFragment<home_futureregs$key>(
     graphql`
-    fragment home_futureregs on Registration @relay(plural: true) {
+    fragment home_futureregs on FutureRegistration @relay(plural: true) {
       id
       examName
       accommodatedStartTime

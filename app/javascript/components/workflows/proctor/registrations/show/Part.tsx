@@ -7,12 +7,14 @@ import '@student/exams/show/components/Part.css';
 import { PartFilesContext, ExamViewerContext } from '@hourglass/common/context';
 import { PartName } from '@student/exams/show/components/Part';
 import ShowRubric from '@proctor/registrations/show/ShowRubric';
+import { CurrentGrading } from '@hourglass/workflows/professor/exams/types';
 
 interface PartProps {
   refreshCodeMirrorsDeps: React.DependencyList;
   part: PartInfo;
   qnum: number;
   pnum: number;
+  currentGrading?: CurrentGrading[number][number];
   anonymous?: boolean;
 }
 
@@ -22,6 +24,7 @@ const Part: React.FC<PartProps> = (props) => {
     part,
     qnum,
     pnum,
+    currentGrading,
     anonymous,
   } = props;
   const {
@@ -34,7 +37,12 @@ const Part: React.FC<PartProps> = (props) => {
   const { rubric } = useContext(ExamViewerContext);
   const pRubric = rubric?.questions[qnum]?.parts[pnum]?.partRubric;
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
-  const subtitle = `(${points} ${strPoints})`;
+  let subtitle;
+  if (currentGrading?.score !== undefined) {
+    subtitle = `${currentGrading?.score} / ${points} ${strPoints}`;
+  } else {
+    subtitle = `(${points} ${strPoints})`;
+  }
   const contextVal = useMemo(() => ({ references: reference }), [reference]);
   return (
     <PartFilesContext.Provider value={contextVal}>
@@ -64,6 +72,7 @@ const Part: React.FC<PartProps> = (props) => {
               qnum={qnum}
               pnum={pnum}
               bnum={i}
+              currentGrading={currentGrading?.body[i]}
               refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
             />
           </div>

@@ -150,7 +150,6 @@ class ExamVersion < ApplicationRecord
 
   def convert_presets(presets, rubric)
     p = RubricPreset.find_or_initialize_by(id: presets['railsId'])
-    puts "#{presets.inspect} vs #{p.new_record?} in #{rubric.rubric_preset&.id}"
     p.assign_attributes(
       label: presets['label'],
       direction: presets['direction'],
@@ -241,41 +240,135 @@ class ExamVersion < ApplicationRecord
   end
 
   def score_for(reg)
-    comments = multi_group_by(reg.grading_comments, [:qnum, :pnum, :bnum, :preset_comment])
-    checks = multi_group_by(reg.grading_checks, [:qnum, :pnum, :bnum])
-    rubrics_for_grading.sum do |r|
-      r.compute_grade_for(reg, comments, checks, [r.qnum, r.pnum, r.bnum])
+    part_scores_for(reg).flatten.sum
+  rescue RuntimeError => e
+    Rails.logger.debug e.message
+    Rails.logger.debug e.backtrace
+  end
+
+  def flatten_groups(obj)
+    # Each key in grouped has non-nil points, eventually bottoming out
+    # at a rubric_preset with a direction and label, that contains
+    # 1+ preset_comments.
+    if obj.is_a? Hash
+      obj.map do |k, v| 
+        flat_key = flatten_groups k
+        flat_v = flatten_groups v
+        [
+          flat_key&.dig('railsId'), 
+          {
+            'type' => k&.class&.name&.underscore,
+            'info' => flat_key,
+            'values' => flat_v 
+          },
+        ]
+      end.to_h
+    elsif obj.is_a? Array
+      obj.map { |v| flatten_groups v }
+    elsif obj.is_a? Rubric
+      {
+        railsId: obj.id,
+        points: if obj.new_record? then nil else obj.points end,
+        qnum: obj.qnum,
+        pnum: obj.pnum,
+        bnum: obj.bnum,
+        description: obj.description,
+      }.stringify_keys
+    elsif obj.is_a? RubricPreset
+      {
+        railsId: obj.id,
+        label: obj.label,
+        direction: obj.direction,
+        mercy: obj.mercy,
+      }.stringify_keys
+    elsif obj.is_a? PresetComment
+      {
+        railsId: obj.id,
+        label: obj.label,
+        points: obj.points,
+      }.stringify_keys
+    elsif obj.is_a? GradingComment
+      {
+        railsId: obj.id,
+        qnum: obj.qnum,
+        pnum: obj.pnum,
+        bnum: obj.bnum,
+        grader: obj.creator.display_name,
+        points: obj.points,
+        message: obj.message,
+      }.stringify_keys
+    else
+      obj
+    end
+  end
+
+  # Tree of questions to parts to score for that part
+  def detailed_grade_breakdown_for(reg)
+    comments_and_rubrics = reg.grading_comments.includes(
+      :creator,
+      preset_comment: [rubric_preset: [rubric: [parent_section: [parent_section: :parent_section]]]],
+    )
+    comments = multi_group_by(comments_and_rubrics, [:qnum, :pnum, :bnum, :preset_comment])
+    checks = multi_group_by(reg.grading_checks.includes(:creator), [:qnum, :pnum, :bnum])
+    rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)
+
+    exam_rubric = rubric_tree.dig(nil, nil, nil)
+    part_tree do |qnum:, pnum:, part:, **|
+      question_rubric = rubric_tree.dig(qnum, nil, nil)
+      part_rubric = rubric_tree.dig(qnum, pnum, nil)
+      part_rubric = rubric_tree.dig(qnum, pnum, nil)
+      score = part['body'].each_with_index.map do |b, bnum|
+        qpb = [qnum, pnum, bnum]
+        nil_comments = comments.dig(qnum, pnum, bnum, nil) || []
+        extra_comment_score = nil_comments.sum(&:points)
+        body_rubric = rubric_tree.dig(*qpb)
+        rubric_score = [exam_rubric, question_rubric, part_rubric, body_rubric].sum do |r|
+          r_score = r.compute_grade_for(reg, comments, checks, qpb)
+          r_score
+        end
+        extra_comment_score + rubric_score
+      end.sum
+      body_item_info = part['body'].each_with_index.map do |b, bnum|
+        body_checks = checks.dig(qnum, pnum, bnum) || []
+        body_comments = comments.dig(qnum, pnum, bnum) || {}
+
+        grouped = body_comments.group_by{|pc, cs| pc&.rubric_preset || RubricPreset.new(direction: 'deduction')}.map{|k, v| [k, v.to_h]}.to_h
+        grouped = grouped.group_by{|rp, pccs| rp&.rubric || Any.new(points: 0)}.map{|k, v| [k, v.to_h]}.to_h
+        while grouped.keys.any?{|r, _| (r.is_a?(One) || r.is_a?(Any)) && r.points.nil?}
+          pointless, pointed = grouped.partition{|r, _| (r.is_a?(One) || r.is_a?(Any)) && r.points.nil?}
+          pointless = pointless.group_by do |r, rppccs|
+            ((r.is_a?(One) || r.is_a?(Any)) && r.points.nil?) ? r.parent_section : r
+          end.map{|k, v| [k&.parent_section, v.to_h]}.to_h
+          grouped = pointed.to_h.merge! pointless
+        end
+        grouped = flatten_groups(grouped).deep_stringify_keys
+
+        {
+          'checks' => body_checks.map do |c|
+            {
+              points: c.points,
+              grader: c.creator.display_name,
+            }
+          end,
+          'grouped' => grouped,
+        }
+      end
+      {
+        'score' => score,
+        'body' => body_item_info,
+      }
     end
   rescue RuntimeError => e
     Rails.logger.debug e.message
     Rails.logger.debug e.backtrace
   end
 
-  # Tree of questions to parts to score for that part
   def part_scores_for(reg)
-    comments = multi_group_by(reg.grading_comments, [:qnum, :pnum, :bnum, :preset_comment])
-    checks = multi_group_by(reg.grading_checks, [:qnum, :pnum, :bnum])
-    rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)
-    exam_rubric = rubric_tree.dig(nil, nil, nil)
-    part_tree do |qnum:, pnum:, **|
-      question_rubric = rubric_tree.dig(qnum, nil, nil)
-      part_rubric = rubric_tree.dig(qnum, pnum, nil)
-      qp = [qnum, pnum, nil]
-      [
-        exam_rubric&.compute_grade_for(reg, comments, checks, qp),
-        question_rubric&.compute_grade_for(reg, comments, checks, qp),
-        part_rubric&.compute_grade_for(reg, comments, checks, qp),
-      ].compact.sum + rubric_tree.dig(qnum, pnum)&.sum do |key, r|
-        if key.nil?
-          0
-        else
-          r.compute_grade_for(reg, comments, checks, [qnum, pnum, r.bnum])
-        end
+    detailed_grade_breakdown_for(reg).map do |q|
+      q.map do |p|
+        p['score']
       end
     end
-  rescue RuntimeError => e
-    Rails.logger.debug e.message
-    Rails.logger.debug e.backtrace
   end
 
   def self.new_empty(exam)

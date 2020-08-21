@@ -6,7 +6,7 @@
   &:first-child { margin-top: 0px; }
   margin-bottom: 15px;
   &:last-child { margin-bottom: 0px; }
-  background-color: gray; 
+  &:not(.alert) { background-color: gray; }
   border-radius: 0.25rem;
   .card {
     padding: 1em;

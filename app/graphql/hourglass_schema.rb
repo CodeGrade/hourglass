@@ -13,13 +13,22 @@ class HourglassSchema < GraphQL::Schema
   use GraphQL::Analysis::AST
   use GraphQL::Batch
 
-  use GraphQL::Guard.new(
-    not_authorized: lambda do |type, field|
-      GraphQL::ExecutionError.new("Not authorized to access #{type}.#{field}")
-    end,
-  )
 
+  # Feedback and error messages in development mode will be 
+  # more informative than in production/test modes.
   if Rails.env.development?
+    use GraphQL::Guard.new(
+      not_authorized:  lambda do |type, field|
+        GraphQL::ExecutionError.new("Not authorized to access #{type}.#{field}")
+      end,
+    )
+
+    def self.unauthorized_object(error)
+      # Add a top-level error to the response instead of returning nil:
+      typ = error.type.graphql_name
+      raise GraphQL::ExecutionError, "You do not have permission to view that #{typ}."
+    end
+
     # In dev mode, permit non-persisted queries, but warn
     def self.execute(query_str = nil, **kwargs)
       query_str = kwargs[:query] if query_str.nil?
@@ -31,6 +40,17 @@ class HourglassSchema < GraphQL::Schema
       super(query_str, **kwargs)
     end
   else
+    use GraphQL::Guard.new(
+      not_authorized:  lambda do |type, field|
+        GraphQL::ExecutionError.new("You do not have permission to view that data.")
+      end,
+    )
+  
+    def self.unauthorized_object(error)
+      # Add a top-level error to the response instead of returning nil:
+      raise GraphQL::ExecutionError, "You do not have permission to view that data."
+    end
+
     # In production or test mode, only permit persisted queries
     def self.execute(query_str = nil, **kwargs)
       query_str = kwargs[:query] if query_str.nil?
@@ -58,8 +78,11 @@ class HourglassSchema < GraphQL::Schema
     # Now, based on `type_name` and `item_id`
     # find an object in your application
     Object.const_get(type_name).find(item_id)
+  rescue ActiveRecord::RecordNotFound => e
+    raise GraphQL::ExecutionError, "You do not have permission to view that data."
   rescue RuntimeError => e
     Rails.logger.debug "Object_from_id: #{id} ==> #{e.message}\n#{e.backtrace.join("\n")}"
+    raise GraphQL::ExecutionError, "Unknown error while trying to access #{type_name} #{item_id}: #{e.message}."
   end
 
   def self.resolve_type(type, obj, _ctx)
@@ -113,12 +136,6 @@ class HourglassSchema < GraphQL::Schema
     else
       raise("Unexpected object of type '#{type}': #{obj}")
     end
-  end
-
-  def self.unauthorized_object(error)
-    # Add a top-level error to the response instead of returning nil:
-    typ = error.type.graphql_name
-    raise GraphQL::ExecutionError, "You do not have permission to view that #{typ}."
   end
 
   def self.write_json!

@@ -6,11 +6,13 @@ import { FileViewer } from '@student/exams/show/components/FileViewer';
 import { QuestionFilesContext, ExamViewerContext } from '@hourglass/common/context';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import ShowRubric from '@proctor/registrations/show/ShowRubric';
+import { CurrentGrading } from '@professor/exams/types';
 
 interface ShowQuestionProps {
   refreshCodeMirrorsDeps: React.DependencyList;
   question: QuestionInfo;
   qnum: number;
+  currentGrading?: CurrentGrading[number];
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
@@ -18,6 +20,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     refreshCodeMirrorsDeps,
     question,
     qnum,
+    currentGrading = [],
   } = props;
   const {
     name,
@@ -60,6 +63,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             part={p}
             pnum={i}
             qnum={qnum}
+            currentGrading={currentGrading[i]}
             refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
           />
         ))}

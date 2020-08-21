@@ -30,6 +30,92 @@ function array<T>(isT: (val: unknown) => val is T): (val: unknown) => val is T[]
   return (val: unknown): val is T[] => (val instanceof Array) && val.every(isT);
 }
 
+interface GradingCheck {
+  points: number;
+  grader: string;
+}
+
+export interface CommentJson {
+  railsId: string;
+  qnum: number;
+  pnum: number;
+  bnum: number;
+  grader: string;
+  points: number;
+  message: string;
+}
+interface PresetCommentInfo {
+  railsId: string;
+  label: string;
+  points: number;
+}
+export interface PresetCommentsJson {
+  type: 'preset_comment';
+  info: PresetCommentInfo;
+  values: CommentJson[];
+}
+interface RubricPresetInfo {
+  railsId: number;
+  label: string;
+  direction: 'credit' | 'deduction';
+  mercy?: number;
+}
+export interface RubricPresetJson {
+  type: 'rubric_preset';
+  info: RubricPresetInfo;
+  values: {
+    [railsId: string]: PresetCommentsJson;
+  }
+}
+interface RubricInfo {
+  railsId: string;
+  points?: number;
+  qnum?: number;
+  pnum?: number;
+  bnum?: number;
+  description: string;
+}
+export interface RubricJson {
+  type?: 'any' | 'all' | 'one' | 'none';
+  info?: RubricInfo;
+  values: {
+    [railsId: string]: (RubricJson | RubricPresetJson);
+  }
+}
+export interface GroupedGradingComment {
+  [railsId: string]: RubricJson;
+}
+
+export interface CurrentGrading {
+  [qnum: number]: {
+    [pnum: number]: {
+      score: number;
+      body: {
+        checks: GradingCheck[];
+        grouped: GroupedGradingComment;
+      }[];
+    }
+  }
+}
+
+// export type GradingComments = {
+//   [qnum: number]: {
+//     [pnum: number]: {
+//       [bnum: number]: {
+//         comments: {
+//           grader: string;
+//           message: string;
+//           points: number;
+//         }[];
+//         checks: {
+//           grader: string;
+//           points: number;
+//         }[];
+//       };
+//     };
+//   };
+// };
+
 export interface CodeInfoWithAnswer extends CodeInfo {
   answer: CodeState;
   rubric?: Rubric;

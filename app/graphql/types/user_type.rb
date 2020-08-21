@@ -12,7 +12,7 @@ module Types
     field :image_url, String, null: true
     field :admin, Boolean, null: false
 
-    field :future_registrations, [Types::RegistrationType], null: false
+    field :future_registrations, [Types::FutureRegistrationType], null: false
     def future_registrations
       object.registrations.future_exams
     end

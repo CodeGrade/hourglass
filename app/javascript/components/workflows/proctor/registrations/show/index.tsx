@@ -10,11 +10,12 @@ import { createMap } from '@student/exams/show/files';
 import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
-import { ExamRubric } from '@professor/exams/types';
+import { ExamRubric, CurrentGrading } from '@professor/exams/types';
 import ShowRubric from '@proctor/registrations/show/ShowRubric';
 
 interface ExamViewerProps {
   contents: ContentsState;
+  currentGrading?: CurrentGrading;
   refreshCodeMirrorsDeps?: React.DependencyList;
   rubric?: ExamRubric;
 }
@@ -22,6 +23,7 @@ interface ExamViewerProps {
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {
   const {
     contents,
+    currentGrading,
     refreshCodeMirrorsDeps,
     rubric,
   } = props;
@@ -72,6 +74,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
               <DisplayQuestions
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
                 questions={questions}
+                currentGrading={currentGrading}
               />
             </div>
           </div>

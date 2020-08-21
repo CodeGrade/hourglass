@@ -17,6 +17,7 @@ class Rubric < ApplicationRecord
   has_one :rubric_preset, dependent: :destroy
 
   validate :sensible_coordinates
+  validate :points_if_preset
   delegate :exam, to: :exam_version
 
   def sensible_coordinates
@@ -41,6 +42,13 @@ class Rubric < ApplicationRecord
     elsif order.nil?
       errors.add(:order, "cannot be nil if this is a subrubric within (#{qnum}, #{pnum}, #{bnum})")
     end
+  end
+
+  def points_if_preset
+    # Note: for new_records, the class is still Rubric, not All
+    return if type == 'All' 
+    return if rubric_preset.nil?
+    errors.add(:points, 'must not be nil if this contains presets') if points.nil?
   end
 
   def exam_rubric?

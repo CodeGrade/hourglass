@@ -17,17 +17,17 @@ class RubricPreset < ApplicationRecord
   end
 
   def compute_grade_for(_reg, max_points, comments, checks, qpb)
-    preset_ids = preset_comments.map(&:id)
-    my_comments = comments.dig(*qpb)&.slice(*preset_ids) || []
+    # preset_ids = preset_comments.map(&:id)
+    my_comments = comments.dig(*qpb)&.values_at(*preset_comments)&.compact || []
     my_checks = checks.dig(*qpb) || []
-    raw_score = my_comments.sum do |c|
+    raw_score = my_comments.flatten.sum do |c|
       c.points || c.rubric_preset.points
-    end + my_checks.sum { |c| c.points.to_f }
+    end + my_checks.sum { |c| c.points }
 
     if direction == 'credit'
       raw_score
     else
-      (max_points.to_f - raw_score)
+      (max_points.to_f + raw_score)
     end
   end
 

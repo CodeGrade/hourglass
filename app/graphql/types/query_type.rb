@@ -35,6 +35,14 @@ module Types
 
     field :registration, Types::RegistrationType, null: true do
       argument :id, ID, required: true
+      guard lambda { |obj, args, ctx |
+        begin
+          reg = HourglassSchema.object_from_id(args[:id], ctx)
+          reg.visible_to?(ctx[:current_user])
+        rescue ActiveRecord::RecordNotFound, RuntimeError => e
+          false
+        end
+      }
     end
 
     def registration(id:)

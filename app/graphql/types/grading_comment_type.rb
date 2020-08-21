@@ -16,5 +16,7 @@ module Types
     field :bnum, Integer, null: false
     field :message, String, null: false
     field :points, Float, null: false
+    field :creator, Types::UserType, null: false
+    field :preset_comment, Types::PresetCommentType, null: true
   end
 end

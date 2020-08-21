@@ -39,11 +39,11 @@ class Registration < ApplicationRecord
   end
 
   scope :past_exams, -> { 
-    includes(exam_version: :exam).filter { |r| r.accommodated_end_time < DateTime.now } 
+    includes(exam_version: :exam).filter { |r| r.effective_end_time < DateTime.now } 
   }
   scope :current_exams, -> {
     includes(exam_version: :exam).filter do |r|
-      r.accommodated_start_time < DateTime.now && r.accommodated_end_time > DateTime.now
+      r.accommodated_start_time < DateTime.now && r.effective_end_time > DateTime.now
     end
   }
   scope :future_exams, -> {
@@ -113,6 +113,10 @@ class Registration < ApplicationRecord
     DateTime.now > accommodated_start_time && !over?
   end
 
+  def in_future?
+    DateTime.now < accommodated_start_time
+  end
+
   def over?
     DateTime.now > effective_end_time
   end
@@ -151,6 +155,10 @@ class Registration < ApplicationRecord
 
   def current_part_scores
     exam_version.part_scores_for(self)
+  end
+
+  def current_grading
+    exam_version.detailed_grade_breakdown_for(self)
   end
 
   def current_score_percentage

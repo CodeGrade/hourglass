@@ -5,10 +5,11 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
+import { useMutation } from 'relay-hooks';
+import { useRefresher } from '@hourglass/common/helpers';
 import { QuestionInfoWithAnswers } from '@professor/exams/types';
 import Question from '@professor/exams/new/editor/components/Question';
 import { AlertContext } from '@hourglass/common/alerts';
-import { useMutation } from 'relay-hooks';
 import CREATE_RUBRIC_MUTATION from '@professor/exams/new/editor/components/manageRubrics';
 import { manageRubricsCreateRubricMutation } from './__generated__/manageRubricsCreateRubricMutation.graphql';
 
@@ -20,6 +21,7 @@ const ShowQuestions: React.FC<{
     examVersionId,
   } = props;
   const { alert } = useContext(AlertContext);
+  const [refresher, refresh] = useRefresher();
   const [createRubric, { loading }] = useMutation<manageRubricsCreateRubricMutation>(
     CREATE_RUBRIC_MUTATION,
     {
@@ -38,13 +40,22 @@ const ShowQuestions: React.FC<{
       <Row className="py-3">
         <Col>
           {fields.map((member, index) => {
-            const moveUp = () => fields.move(index, index - 1);
-            const moveDown = () => fields.move(index, index + 1);
-            const remove = () => fields.remove(index);
+            const moveUp = () => {
+              refresh();
+              fields.move(index, index - 1);
+            };
+            const moveDown = () => {
+              refresh();
+              fields.move(index, index + 1);
+            };
+            const remove = () => {
+              refresh();
+              fields.remove(index);
+            };
             return (
               <Question
                 // eslint-disable-next-line react/no-array-index-key
-                key={index}
+                key={`${refresher}-${index}`}
                 examVersionId={examVersionId}
                 qnum={index}
                 memberName={member}

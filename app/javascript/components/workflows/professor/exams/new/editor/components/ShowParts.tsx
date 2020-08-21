@@ -5,10 +5,11 @@ import {
   Button,
 } from 'react-bootstrap';
 import { WrappedFieldArrayProps } from 'redux-form';
+import { useMutation } from 'relay-hooks';
+import { useRefresher } from '@hourglass/common/helpers';
 import { PartInfoWithAnswers } from '@professor/exams/types';
 import Part from '@professor/exams/new/editor/components/Part';
 import { AlertContext } from '@hourglass/common/alerts';
-import { useMutation } from 'relay-hooks';
 import CREATE_RUBRIC_MUTATION from '@professor/exams/new/editor/components/manageRubrics';
 import { manageRubricsCreateRubricMutation } from './__generated__/manageRubricsCreateRubricMutation.graphql';
 
@@ -22,6 +23,7 @@ const ShowParts: React.FC<{
     fields,
   } = props;
   const { alert } = useContext(AlertContext);
+  const [refresher, refresh] = useRefresher();
   const [createRubric, { loading }] = useMutation<manageRubricsCreateRubricMutation>(
     CREATE_RUBRIC_MUTATION,
     {
@@ -40,13 +42,22 @@ const ShowParts: React.FC<{
       <Row>
         <Col>
           {fields.map((member, index) => {
-            const moveUp = () => fields.move(index, index - 1);
-            const moveDown = () => fields.move(index, index + 1);
-            const remove = () => fields.remove(index);
+            const moveUp = () => {
+              refresh();
+              fields.move(index, index - 1);
+            };
+            const moveDown = () => {
+              refresh();
+              fields.move(index, index + 1);
+            };
+            const remove = () => {
+              refresh();
+              fields.remove(index);
+            };
             return (
               <Part
                 // eslint-disable-next-line react/no-array-index-key
-                key={index}
+                key={`${refresher}-${index}`}
                 examVersionId={examVersionId}
                 qnum={qnum}
                 pnum={index}

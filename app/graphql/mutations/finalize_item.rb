@@ -4,6 +4,7 @@ module Mutations
   # Mutation to finalize a student's exam submission
   class FinalizeItem < BaseMutation
     argument :id, ID, required: true
+    argument :scope, String, required: false
 
     field :exam, Types::ExamType, null: true
 
@@ -17,9 +18,13 @@ module Mutations
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
-    def resolve(id:)
+    def resolve(id:, scope:)
       obj = HourglassSchema.object_from_id(id, context)
-      obj.finalize!
+      if obj.is_a? Exam && scope == 'out_of_time'
+        obj.finalize_registrations_that_have_run_out_of_time!
+      else
+        obj.finalize!
+      end
       exam = exam_for_obj(obj)
       { exam: exam }
     end

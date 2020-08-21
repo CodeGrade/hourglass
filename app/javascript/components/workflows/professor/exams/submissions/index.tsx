@@ -77,6 +77,7 @@ const ExamSubmissions: React.FC = () => {
       variables: {
         input: {
           id: subjectValue,
+          scope: 'out_of_time',
         },
       },
     });
@@ -128,8 +129,8 @@ const ExamSubmissions: React.FC = () => {
         <div>
           <FinalizeDialog
             loading={loading}
-            buttonText="Finalize all started students' submissions"
-            subjectName="all started students' submissions"
+            buttonText="Finalize all students' submissions who have run out of time"
+            subjectName="all students who have run out of time"
             subjectValue={examId}
             showModal={showModal}
             closeModal={closeModal}

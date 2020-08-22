@@ -32,7 +32,7 @@ export const EditHTMLField: React.FC<WrappedFieldProps & {
   const handleChange = useCallback((newName, _delta, source, _editor): void => {
     if (source === 'user') {
       onChange({
-        type: 'HTML',
+        ...value,
         value: newName,
       });
     }

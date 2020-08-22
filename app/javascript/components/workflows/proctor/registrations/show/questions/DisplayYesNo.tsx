@@ -26,7 +26,7 @@ const DisplayYesNo: React.FC<YesNoProps> = (props) => {
   return (
     <>
       <b>Answer: </b>
-      <span className="btn btn-sm btn-outline-dark disabled">
+      <span className="btn btn-sm btn-outline-dark disabled answer">
         {value
           ? yesLabel
           : noLabel}

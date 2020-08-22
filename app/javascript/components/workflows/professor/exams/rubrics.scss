@@ -1,6 +1,8 @@
 @import "node_modules/bootstrap/scss/functions";
 @import "node_modules/bootstrap/scss/variables";
 
+.text-instructions + .rubric { display: none; }
+
 .rubric {
   margin-top: 15px;
   &:first-child { margin-top: 0px; }

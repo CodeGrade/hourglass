@@ -26,6 +26,8 @@
   color: $yiq-text-dark !important;
 }
 
+.answer p:last-child { margin-bottom: 0; }
+
 .point-count {
   font-size: 1.5rem;
   color: $text-muted;

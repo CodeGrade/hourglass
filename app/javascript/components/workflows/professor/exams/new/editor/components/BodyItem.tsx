@@ -37,6 +37,7 @@ const OneItem: React.FC<WrappedFieldProps & {
       <Field
         name={memberName}
         component={EditHTMLField}
+        className="text-instructions bg-white"
         placeholder="Provide instructions here..."
       />
     );

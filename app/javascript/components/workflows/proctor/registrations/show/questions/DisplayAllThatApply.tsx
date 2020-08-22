@@ -24,7 +24,7 @@ const DisplayAllThatApply: React.FC<AllThatApplyProps> = (props) => {
   return (
     <>
       <b>Answer: </b>
-      <ul>
+      <ul className="answer">
         {options.map((o, i) => {
           // options array is STATIC
           // eslint-disable-next-line react/no-array-index-key

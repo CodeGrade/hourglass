@@ -19,7 +19,7 @@ const GradeMultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
   return (
     <>
       <b>Answer: </b>
-      <span className="btn btn-sm btn-outline-dark disabled">
+      <span className="btn btn-sm btn-outline-dark disabled answer">
         <HTML value={options[value]} />
       </span>
     </>

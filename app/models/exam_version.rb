@@ -416,7 +416,7 @@ class ExamVersion < ApplicationRecord
 
   def export_json
     JSON.pretty_generate({
-      info: info,
+      info: info_no_ids,
       files: files,
     })
   end
@@ -430,7 +430,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def export_info_file(path)
-    File.write path.join('exam.yaml'), info.to_yaml
+    File.write path.join('exam.yaml'), info_no_ids.to_yaml
   end
 
   def export_files(path, files)
@@ -501,5 +501,22 @@ class ExamVersion < ApplicationRecord
         }
       end.compact
     end
+  end
+
+  def info_no_ids
+    deep_delete_keys! info.deep_stringify_keys, ['railsId']
+  end
+
+  def deep_delete_keys!(obj, keys)
+    if obj.is_a? Array
+      obj.each { |o| deep_delete_keys!(o, keys) }
+    elsif obj.is_a? Hash
+      keys.each {|k| obj.delete k }
+      obj.each do |k, v|
+        deep_delete_keys! k, keys
+        deep_delete_keys! v, keys
+      end
+    end
+    obj
   end
 end

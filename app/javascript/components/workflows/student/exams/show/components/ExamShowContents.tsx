@@ -1,4 +1,9 @@
-import React, { useEffect, useCallback, useMemo } from 'react';
+import React, {
+  useEffect,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import {
   ExamVersion, Policy,
 } from '@student/exams/show/types';
@@ -6,7 +11,13 @@ import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
 import useAnomalyListeners from '@student/exams/show/lockdown/anomaly';
 import HTML from '@student/exams/show/components/HTML';
-import { Row, Col } from 'react-bootstrap';
+import {
+  Row,
+  Col,
+  Modal,
+  Button,
+} from 'react-bootstrap';
+import { openFullscreen } from '@student/exams/show/lockdown/helpers';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import ShowQuestion from '@student/exams/show/containers/ShowQuestion';
 import { BlockNav } from '@hourglass/workflows';
@@ -44,9 +55,16 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     `,
     examKey,
   );
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [warningModalReason, setWarningModalReason] = useState<string>(undefined);
+  const warnOnAnomaly = (reason: string) => {
+    setWarningModalReason(reason);
+    setShowWarningModal(true);
+  };
   const cleanupBeforeSubmit = useAnomalyListeners(
     res.takeUrl,
     res.myRegistration.examVersion.policies as readonly Policy[],
+    warnOnAnomaly,
   );
   const leave = useCallback(() => {
     submit(cleanupBeforeSubmit);
@@ -79,6 +97,36 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
         leaveText="Leave and submit exam"
       />
       <ExamFilesContext.Provider value={examFilesContextVal}>
+        <Modal
+          centered
+          keyboard
+          show={showWarningModal}
+          onHide={() => {
+            setShowWarningModal(false);
+            openFullscreen();
+          }}
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Careful!</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <p>{`Your actions just now ${warningModalReason}, which is not permitted.`}</p>
+            <p><b>In a real setting, you would have just been removed from the exam.</b></p>
+            <p>Click the button below to resume this practice exam.</p>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setShowWarningModal(false);
+                openFullscreen();
+              }}
+            >
+              Oops!  I understand.
+            </Button>
+          </Modal.Footer>
+        </Modal>
+
         <h1>{res.name}</h1>
         <HTML value={instructions} />
         {reference.length !== 0 && <FileViewer references={reference} />}

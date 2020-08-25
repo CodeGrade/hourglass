@@ -14,7 +14,7 @@ const listeners: {
     event: 'mouseout',
     handler: (detected) => (e: MouseEvent): void => {
       if (e.target === null || e.relatedTarget === null) {
-        detected('mouseout', e);
+        detected('moved the mouse out of the window', e);
       }
     },
   },
@@ -29,7 +29,7 @@ const listeners: {
   {
     event: 'blur',
     handler: (detected) => (e: FocusEvent): void => {
-      detected('window blurred', e);
+      detected('unfocused the window', e);
     },
   },
   {
@@ -37,7 +37,7 @@ const listeners: {
     handler: (detected) => (e: Event): void => {
       e.preventDefault();
       e.stopPropagation();
-      detected('tried context menu', e);
+      detected('tried to use the context menu', e);
     },
   },
   {
@@ -53,11 +53,13 @@ export function installListeners(
   detected: AnomalyDetected,
 ): AnomalyListener[] {
   if (policyPermits(policies, Policy.ignoreLockdown)) return [];
-
+  const skipCleanup = policyPermits(policies, Policy.mockLockdown);
   const handlers = listeners.map(({ event, handler }) => {
     const f: EventListener = (...args) => {
       handler(detected)(...args);
-      window.removeEventListener(event, f);
+      if (!skipCleanup) {
+        window.removeEventListener(event, f);
+      }
     };
     window.addEventListener(event, f);
     return {

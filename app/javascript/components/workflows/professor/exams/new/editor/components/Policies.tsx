@@ -13,6 +13,7 @@ export const policyToString = (p: Policy): string => {
   switch (p) {
     case Policy.ignoreLockdown: return 'Ignore lockdown';
     case Policy.tolerateWindowed: return 'Tolerate windowed mode';
+    case Policy.mockLockdown: return 'Warn upon lockdown violation';
     default: throw new ExhaustiveSwitchError(p);
   }
 };

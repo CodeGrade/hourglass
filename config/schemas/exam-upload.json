@@ -19,7 +19,7 @@
     },
     "Policy": {
       "type": "string",
-      "enum": ["IGNORE_LOCKDOWN", "TOLERATE_WINDOWED"]
+      "enum": ["IGNORE_LOCKDOWN", "TOLERATE_WINDOWED", "MOCK_LOCKDOWN"]
     },
     "Version": {
       "type": "object",

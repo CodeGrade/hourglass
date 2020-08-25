@@ -482,6 +482,7 @@ export interface AnomalyListener {
 export enum Policy {
   ignoreLockdown = 'IGNORE_LOCKDOWN',
   tolerateWindowed = 'TOLERATE_WINDOWED',
+  mockLockdown = 'MOCK_LOCKDOWN'
 }
 
 export function policyPermits(policy: readonly Policy[], query: Policy): boolean {

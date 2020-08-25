@@ -1,0 +1,449 @@
+---
+answers:
+- - - 1
+  - - NO_ANS: true
+    - - true
+      - true
+      - false
+      - true
+- - - Click the chevrons at the top
+    - true
+    - 3
+    - NO_ANS: true
+    - ''
+    - ''
+    - - 1
+      - 2
+      - 0
+    - NO_ANS: true
+    - NO_ANS: true
+    - The next and previous buttons at the bottom.
+    - Click the submit button on the final question or part.
+    - It flashes blue, twice.
+- - - text: ''
+      marks: []
+    - text: ''
+      marks: []
+  - - lineNumber: 5
+      selectedFile: singleFile.java
+    - lineNumber: 5
+      selectedFile: several/and/seek.java
+    - NO_ANS: true
+- - - NO_ANS: true
+    - NO_ANS: true
+    - ''
+    - NO_ANS: true
+rubrics:
+  questions:
+  - parts:
+    - body:
+      - type: none
+      partRubric:
+        type: none
+    - body:
+      - type: none
+      - type: none
+      partRubric:
+        type: none
+    questionRubric:
+      type: none
+  - parts:
+    - body:
+      - type: none
+      - type: none
+      - type: none
+      - type: none
+      - type: none
+      - type: none
+      - type: none
+      - type: none
+      - type: none
+      - type: none
+      - type: none
+      - type: none
+      partRubric:
+        type: none
+    questionRubric:
+      type: none
+  - parts:
+    - body:
+      - type: none
+      - type: none
+      partRubric:
+        type: none
+    - body:
+      - type: none
+      - type: none
+      - type: none
+      partRubric:
+        type: none
+    questionRubric:
+      type: none
+  - parts:
+    - body:
+      - type: none
+      - type: none
+      - type: none
+      - type: none
+      partRubric:
+        type: none
+    questionRubric:
+      type: none
+  examRubric:
+    type: none
+contents:
+  questions:
+  - name:
+      type: HTML
+      value: "<p>Administrative details</p>"
+    parts:
+    - body:
+      - type: MultipleChoice
+        prompt:
+          type: HTML
+          value: "<p>To demonstrate a multiple-choice question, choose the most appropriate
+            answer below: How often does Hourglass automatically save your work?</p>"
+        options:
+        - type: HTML
+          value: "<p>Never</p>"
+        - type: HTML
+          value: "<p>Every few seconds</p>"
+        - type: HTML
+          value: "<p>Every few minutes</p>"
+        - type: HTML
+          value: "<p>Every hour</p>"
+      name:
+        type: HTML
+        value: "<p>Autosave</p>"
+      points: 0
+      reference: []
+      description:
+        type: HTML
+        value: "<p>Hourglass lets you take an exam, and will automatically save your
+          work to the server every few seconds or so: in case your internet connection
+          dies, you will not lose your work.</p>"
+    - body:
+      - type: HTML
+        value: "<p>To demonstrate an all-that-apply question, choose all the appropriate
+          answers below.</p>"
+      - type: AllThatApply
+        prompt:
+          type: HTML
+          value: "<p>Which actions could cause you to be removed from the exam?</p>"
+        options:
+        - type: HTML
+          value: "<p>Switching applications</p>"
+        - type: HTML
+          value: "<p>Switching tabs</p>"
+        - type: HTML
+          value: "<p>Switching on the TV</p>"
+        - type: HTML
+          value: "<p>Leaving fullscreen</p>"
+      name:
+        type: HTML
+        value: "<p>Security</p>"
+      points: 0
+      reference: []
+      description:
+        type: HTML
+        value: "<p>Hourglass locks down your browser in several ways, to ensure that
+          you have a distraction-free environment to take the exam. Primarily, this
+          is done by making your browser fullscreen, and detecting if you leave fullscreen:</p><ul><li>by
+          pressing <code>Escape</code></li><li>by right-clicking</li><li>by switching
+          to another program with <code>Alt+Tab</code></li><li>by switching to another
+          browser tab with <code>Ctrl+Tab</code></li><li>by resizing the window</li><li>...etc</li></ul><p>If
+          you do leave fullscreen, Hourglass will lock your exam and you will be unable
+          to proceed.</p>"
+    reference: []
+    description:
+      type: HTML
+      value: ''
+    separateSubparts: false
+  - name:
+      type: HTML
+      value: "<p>Navigating the UI</p>"
+    parts:
+    - body:
+      - type: Text
+        prompt:
+          type: HTML
+          value: "<p>How do you expand the sidebar to see more details?  And how do
+            you collapse it again?</p>"
+      - type: YesNo
+        prompt:
+          type: HTML
+          value: "<p>Is there a way for you to take scratch notes during your exam?</p>"
+        noLabel: 'No'
+        yesLabel: 'Yes'
+      - type: MultipleChoice
+        prompt:
+          type: HTML
+          value: "<p>Which of the sidebar icons lets you <em>ask</em> a question of
+            the professor?</p>"
+        options:
+        - type: HTML
+          value: "<p>The book</p>"
+        - type: HTML
+          value: "<p>The chat bubble with an exclamation mark</p>"
+        - type: HTML
+          value: "<p>The paper with a plus</p>"
+        - type: HTML
+          value: "<p>The chat bubble with a question mark</p>"
+      - type: HTML
+        value: "<p>Use the sidebar to ask the professor a question, then answer the
+          next two questions below</p>"
+      - type: Text
+        prompt:
+          type: HTML
+          value: "<p>Describe the process of asking a question.  Can you immediately
+            ask a question?  What happens once you've asked a question?   How long
+            do you have to wait before asking another one?</p>"
+      - type: Text
+        prompt:
+          type: HTML
+          value: "<p>Wait a minute for the professor to answer your question, and
+            then describe the changes you see.  What tries to get your attention to
+            show that a reply has arrived?  In the replies section, what can you click
+            on to mark the messages as read?</p>"
+      - type: Matching
+        prompt:
+          type: HTML
+          value: "<p>The clock icon at the bottom lets you see how much time you have
+            remaining.  Just as the professor replies section will highlight to get
+            your attention, the clock will highlight to let you know milestones during
+            the exam.  Each alert will last for 30 seconds, then fade away.  In order
+            of urgency, match the colors on the left to the amount of time remaining
+            on the right</p>"
+        values:
+        - type: HTML
+          value: "<p>1 minute remaining</p>"
+        - type: HTML
+          value: "<p>Halfway, and thirty minutes remaining</p>"
+        - type: HTML
+          value: "<p>5 minutes remaining</p>"
+        prompts:
+        - type: HTML
+          value: "<p>Blue</p>"
+        - type: HTML
+          value: "<p>Yellow</p>"
+        - type: HTML
+          value: "<p>Red</p>"
+        valuesLabel:
+          type: HTML
+          value: "<p>Time remaining</p>"
+        promptsLabel:
+          type: HTML
+          value: "<p>Alert color</p>"
+      - type: HTML
+        value: "<p>To see more detailed time information, click the clock to expand
+          the time section.  The popup will show you when the exam begins and ends,
+          and when your time window began and will end.  Click the icons on the side
+          to toggle between readable, relative times and exact timestamps.</p>"
+      - type: HTML
+        value: <p>The book icon at the top lets you jump between questions of the
+          exam.  You may choose whether to view the exam "paginated" or not.  When
+          paginated, you will see only one question (or only one part of one question)
+          at a time; otherwise, the entire exam will scroll in one page.  Answer the
+          following three questions:</p>
+      - type: Text
+        prompt:
+          type: HTML
+          value: "<p>In paginated mode, and with the sidebar collapsed, how can you
+            navigate to the next or previous questions?</p>"
+      - type: Text
+        prompt:
+          type: HTML
+          value: "<p>How can you submit your exam?  (<strong>Note:</strong> don't
+            actually do this yet, until you've finished this tutorial!)</p>"
+      - type: Text
+        prompt:
+          type: HTML
+          value: "<p>In non-paginated mode, if you click one of the question or part
+            links, how does the UI call your attention to the start of the question
+            you've requested?</p>"
+      name:
+        type: HTML
+        value: "<p>The sidebar</p>"
+      points: 0
+      reference: []
+      description:
+        type: HTML
+        value: "<p>On the left side of the screen, you should see a gray sidebar.
+          \ There are three sections to the sidebar: some status information at the
+          top, some navigation controls in the middle, and time information at the
+          bottom.</p>"
+    reference: []
+    description:
+      type: HTML
+      value: <p>This "question" will ask you about various parts of the screen you
+        see right now.  Each part will request that you explore a part of the user
+        interface, and then answer several questions that let you practice answering
+        the different forms of questions on an Hourglass exam.</p>
+    separateSubparts: false
+  - name:
+      type: HTML
+      value: "<p>Code and code-tag questions</p>"
+    parts:
+    - body:
+      - lang: scheme
+        type: Code
+        prompt:
+          type: HTML
+          value: "<p>This question expects you to write a bit of code in one of the
+            student languages of DrRacket.  Fill in the gaps in the code below.  Note:
+            to enter a <code>λ</code> character, press <code>Ctrl+\\</code> as you
+            would in DrRacket.  Some questions might provide starter code, as this
+            one does, and some questions might not.</p>"
+        initial:
+          text: ";; These first two lines of code are read-only, and\n;; you may not
+            modify it or insert code before them.\n\n;; This line of code is commented\n(define
+            (your-function-here    )\n  ...)\n\n;; Notice that we've also made the
+            outline of the function\n;; above read-only, so you cannot rename the
+            function or \n;; forget the outermost parenthesis.  But you can add arguments\n;;
+            or modify the ... in the body."
+          marks:
+          - to:
+              ch: 0
+              line: 2
+            from:
+              ch: 0
+              line: 0
+            options:
+              inclusiveLeft: true
+              inclusiveRight: false
+          - to:
+              ch: 27
+              line: 4
+            from:
+              ch: 0
+              line: 4
+            options:
+              inclusiveLeft: false
+              inclusiveRight: false
+          - to:
+              ch: 32
+              line: 4
+            from:
+              ch: 31
+              line: 4
+            options:
+              inclusiveLeft: false
+              inclusiveRight: false
+          - to:
+              ch: 6
+              line: 5
+            from:
+              ch: 5
+              line: 5
+            options:
+              inclusiveLeft: false
+              inclusiveRight: false
+      - lang: text/x-java
+        type: Code
+        prompt:
+          type: HTML
+          value: |-
+            <p>This question does not provide any starter code.  Write a bit of Java code here, just to play with the syntax highlighting.  (If you don't currently know Java, you may use the few lines below:</p><pre class="ql-syntax" spellcheck="false">int myFunction(int x) {
+              return x * 2;
+            }
+            </pre><p>Again, just familiarize yourself with the editor.)</p>
+      name:
+        type: HTML
+        value: "<p>Writing code</p>"
+      points: 0
+      reference: []
+      description:
+        type: HTML
+        value: ''
+    - body:
+      - type: CodeTag
+        prompt:
+          type: HTML
+          value: "<p>This question asks you to tag a particular line in just a single
+            file of code.  Click on the line where you find the answer.</p>"
+        choices: exam
+      - type: CodeTag
+        prompt:
+          type: HTML
+          value: "<p>This question asks you to find and tag a particular line of code
+            in multiple files.  Click on the line that finds the answer.</p>"
+        choices: part
+      - type: HTML
+        value: "<p>Once you've chosen a file and line, you can chance your answer
+          as often as you want, but you cannot clear your answer entirely (since you
+          might as well guess).</p>"
+      name:
+        type: HTML
+        value: "<p>Code-tags</p>"
+      points: 0
+      reference:
+      - path: several/hide.rkt
+        type: file
+      - path: several/and
+        type: dir
+      description:
+        type: HTML
+        value: "<p>Sometimes, we may ask you to identify a line of code that is relevant
+          to the question.  We may supply one or more files' worth of code.  Clicking
+          the code-tag button will pop up a dialog for you to read through the code
+          and select the relevant line.  <strong>WARNING:</strong> do not press <code>Escape</code>
+          to exit the dialog, because that will trigger the browser to exit fullscreen
+          and then remove you from the exam.  Be sure to only use the buttons in the
+          UI to navigate.  If something goes wrong, you can send the professor a message
+          asking for help.</p>"
+    reference: []
+    description:
+      type: HTML
+      value: "<p>The previous question gave you a tour of the UI, and also showed
+        you five different question types:</p><ol><li>Free-response</li><li>Multiple-choice</li><li>All-that-apply</li><li>Matching</li><li>Yes/No
+        (also might shown as True/False)</li></ol><p>This question will show you the
+        remaining two types of questions: writing code, and tagging code.</p>"
+    separateSubparts: false
+  - name:
+      type: HTML
+      value: "<p>The end</p>"
+    parts:
+    - body:
+      - type: HTML
+        value: "<p>Congratulations, you've finished your first exam!</p>"
+      - type: YesNo
+        prompt:
+          type: HTML
+          value: "<p>Was this tutorial useful?</p>"
+        noLabel: 'No'
+        yesLabel: 'Yes'
+      - type: Text
+        prompt:
+          type: HTML
+          value: "<p>What suggestions do you have for the UI, or for this tutorial?</p>"
+      - type: HTML
+        value: "<p>Click the Submit button below to finish your exam.</p>"
+      name:
+        type: HTML
+        value: ''
+      points: 0
+      reference: []
+      description:
+        type: HTML
+        value: ''
+    reference: []
+    description:
+      type: HTML
+      value: ''
+    separateSubparts: false
+  reference:
+  - path: singleFile.java
+    type: file
+  instructions:
+    type: HTML
+    value: "<p>This practice exam is meant to show you how Hourglass works. Every
+      exam you take on Hourglass will have exam-wide instructions here, at the top
+      of the page. </p><p>You may have less time to complete your exam than the exam
+      is being offered: for example, you may be given three hours to complete the
+      exam anywhere within a 24-hour window, say from noon Monday to noon Tuesday.
+      Once you begin your exam, you have the given amount of time available to complete
+      it...unless you wait until just before noon on Tuesday, in which case you will
+      only have until noon.</p><p>Additionally, an exam might show some starter or
+      reference code that's relevant to the whole exam, and it would be shown just
+      below these instructions.</p>"
+policies: []

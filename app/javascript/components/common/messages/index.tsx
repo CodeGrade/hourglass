@@ -5,6 +5,8 @@ import {
   Button,
 } from 'react-bootstrap';
 import Tooltip from '@student/exams/show/components/Tooltip';
+import Icon from '@student/exams/show/components/Icon';
+import { MdClearAll } from 'react-icons/md';
 import './index.scss';
 
 export const NewMessages: React.FC<{
@@ -25,7 +27,10 @@ export const NewMessages: React.FC<{
           <hr className="fancy-left-warning" />
         </Col>
         <Col sm="auto" className="p-0 d-flex justify-content-center flex-column">
-          New Messages
+          <span className="d-flex">
+            New Messages
+            <Icon I={MdClearAll} className="align-self-center text-warning ml-2" />
+          </span>
         </Col>
         <Col>
           <hr className="fancy-right-warning" />

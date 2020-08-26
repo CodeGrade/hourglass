@@ -10,9 +10,9 @@ import {
 import {
   MdNoteAdd,
   MdLiveHelp,
+  MdMenu,
 } from 'react-icons/md';
 import { GiOpenBook } from 'react-icons/gi';
-import { FaAngleDoubleLeft, FaAngleDoubleRight } from 'react-icons/fa';
 import JumpTo from '@student/exams/show/containers/navbar/JumpTo';
 import Scratch from '@student/exams/show/containers/navbar/Scratch';
 import ExamMessages from '@student/exams/show/components/navbar/ExamMessages';
@@ -168,9 +168,7 @@ const ExamNavbar: React.FC<{
               }
             }}
           >
-            {expanded
-              ? <RenderIcon I={FaAngleDoubleLeft} />
-              : <RenderIcon I={FaAngleDoubleRight} />}
+            <RenderIcon I={MdMenu} />
           </Button>
         </Tooltip>
       </div>

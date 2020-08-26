@@ -14,6 +14,7 @@ export interface NavAccordionItemProps {
   Icon: IconType;
   label: string;
   className?: string;
+  glowClassName?: string;
   eventKey: string;
   direction?: 'up' | 'down';
   showTooltip?: 'never' | 'always' | 'onHover';
@@ -31,6 +32,7 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
     eventKey,
     children,
     className = 'bg-secondary text-light',
+    glowClassName = '',
     direction = 'down',
     showTooltip,
     tooltipMessage,
@@ -91,7 +93,7 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
       </>
     );
   return (
-    <Card className="border-dark">
+    <Card className={`border-dark ${glowClassName}`}>
       {cardBody}
     </Card>
   );

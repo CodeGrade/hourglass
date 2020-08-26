@@ -4,6 +4,7 @@
 @each $color, $value in $theme-colors {
   .tooltip.bg-#{$color} {
     background-color: unset !important;
+    opacity: 1;
     &.bs-tooltip-right > .arrow::before {
       border-right-color: $value !important;
     }
@@ -155,5 +156,32 @@
   }
   100% {
     background-color: unset;
+  }
+}
+
+.overflow-visible {
+  overflow: visible !important;
+}
+
+@each $color, $value in $theme-colors {
+  .glow-pulse-#{$color} {
+    box-shadow: none;
+    position: relative;
+    z-index: 1001;
+    animation-name: glow-pulse-#{$color};
+    animation-duration: 1.5s;
+    animation-iteration-count: 3;
+  }
+
+  @keyframes glow-pulse-#{$color} {
+    0% {
+      box-shadow: none;
+    }
+    50% {
+      box-shadow: 0px 0px 40px 10px $value;
+    }
+    100% {
+      box-shadow: none;
+    }
   }
 }

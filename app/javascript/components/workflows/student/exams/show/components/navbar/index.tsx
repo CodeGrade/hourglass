@@ -53,6 +53,7 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
   const showTooltip = (expanded ? 'never' : 'onHover');
   return (
     <Accordion
+      className="overflow-visible"
       activeKey={openSection}
     >
       <NavAccordionItem
@@ -195,7 +196,7 @@ const ExamNavbar: React.FC<{
           </span>
         </div>
       </div>
-      <div className="mt-4 flex-fill overflow-auto">
+      <div className="mt-4 flex-fill overflow-visible">
         <NavAccordion
           examKey={res}
           onSectionClick={(eventKey): void => {

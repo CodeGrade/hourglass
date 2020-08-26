@@ -5,7 +5,7 @@ import React, {
   useState,
 } from 'react';
 import {
-  ExamVersion, Policy,
+  ExamVersion, Policy, policyPermits,
 } from '@student/exams/show/types';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
@@ -61,9 +61,10 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     setWarningModalReason(reason);
     setShowWarningModal(true);
   };
+  const policies = res.myRegistration.examVersion.policies as readonly Policy[];
   const cleanupBeforeSubmit = useAnomalyListeners(
     res.takeUrl,
-    res.myRegistration.examVersion.policies as readonly Policy[],
+    policies,
     warnOnAnomaly,
   );
   const leave = useCallback(() => {
@@ -103,7 +104,9 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
           show={showWarningModal}
           onHide={() => {
             setShowWarningModal(false);
-            openFullscreen();
+            if (!policyPermits(policies, Policy.tolerateWindowed)) {
+              openFullscreen();
+            }
           }}
         >
           <Modal.Header closeButton>

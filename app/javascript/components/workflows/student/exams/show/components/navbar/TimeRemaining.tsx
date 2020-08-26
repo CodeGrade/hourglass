@@ -53,24 +53,27 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
   } = props;
   const [remainingTime, setRemainingTime] = useState(time.stop.diffNow());
   const durationInMillisec = time.stop.diff(time.start).as('milliseconds');
-  let cutoffs : { t: Duration, c: string; d: number; w?: string }[];
+  let cutoffs : { t: Duration, c: string; d: number; g?: string; w?: string }[];
   if (durationInMillisec < 60 * 60 * 1000) { // shorter than one hour
     cutoffs = [
       {
         t: Duration.fromMillis(durationInMillisec * 0.50),
         c: 'bg-info text-light',
+        g: 'glow-pulse-info',
         d: 30,
         w: 'Halfway finished',
       },
       {
         t: Duration.fromMillis(durationInMillisec * 0.25),
         c: 'bg-warning text-dark',
+        g: 'glow-pulse-warning',
         d: 30,
         w: 'Three-fourths finished',
       },
       {
         t: Duration.fromMillis(durationInMillisec * 0.05),
         c: 'bg-danger text-dark',
+        g: 'glow-pulse-danger',
         d: Math.min(30000, durationInMillisec * 0.05) / 1000,
         w: 'Nearly finished!',
       },
@@ -86,24 +89,28 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
       {
         t: Duration.fromMillis(durationInMillisec * 0.50),
         c: 'bg-info text-light',
+        g: 'glow-pulse-info',
         d: 30,
         w: 'Halfway finished',
       },
       {
         t: Duration.fromObject({ minutes: 30 }).shiftTo('milliseconds'),
         c: 'bg-info text-light',
+        g: 'glow-pulse-info',
         d: 30,
         w: 'Thirty minutes left',
       },
       {
         t: Duration.fromObject({ minutes: 5 }).shiftTo('milliseconds'),
         c: 'bg-warning text-dark',
+        g: 'glow-pulse-warning',
         d: 30,
         w: 'Five minutes left',
       },
       {
         t: Duration.fromObject({ minutes: 1 }).shiftTo('milliseconds'),
         c: 'bg-danger text-light',
+        g: 'glow-pulse-danger',
         d: 60,
         w: 'Nearly finished!',
       },
@@ -122,6 +129,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
   });
   const warning = cutoffs[warningIndex]?.w;
   const classes = cutoffs[warningIndex]?.c;
+  const glow = cutoffs[warningIndex]?.g;
   const [relativeBegan, showRelativeBegan] = useState(true);
   const [relativeEnd, showRelativeEnd] = useState(true);
   const [relativeStart, showRelativeStart] = useState(true);
@@ -161,7 +169,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
   }
   return (
     <Accordion
-      className="mt-4"
+      className="mt-4 overflow-visible"
       activeKey={openTimer}
     >
       <NavAccordionItem
@@ -169,6 +177,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
         tooltipMessage={warning || 'Time remaining'}
         tooltipPlacement="right"
         tooltipClassname={classes}
+        glowClassName={glow}
         className={classes}
         expanded={expanded}
         Icon={MdTimer}

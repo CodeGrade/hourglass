@@ -414,6 +414,8 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
 
   const anyUnread: boolean = dates.reduce((acc, date) => (acc || date > lastViewed), false);
   const classes = anyUnread ? 'bg-warning text-dark' : undefined;
+  const glow = anyUnread ? 'glow-pulse-warning' : undefined;
+  const tooltipClasses = anyUnread ? 'bg-warning text-dark' : undefined;
   const [curState, setCurState] = useState<NewMessageWarning>('noWarning');
   useEffect(() => {
     // each time unread messages appear, we'll reset whether the
@@ -442,7 +444,8 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
       showTooltip={showTooltip}
       tooltipMessage={anyUnread ? 'New messages' : 'Professor messages'}
       tooltipPlacement="right"
-      tooltipClassname={classes}
+      tooltipClassname={tooltipClasses}
+      glowClassName={glow}
       expanded={expanded}
       Icon={MdFeedback}
       label="Professor messages"

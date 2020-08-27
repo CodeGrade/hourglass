@@ -29,7 +29,12 @@ const fetchQuery: FetchFunction = async (
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-    const json = await response.json();
+    let json;
+    try {
+      json = await response.json();
+    } catch (_e) {
+      throw new Error(await response.text());
+    }
     if ('errors' in json) {
       throw new Error(json.errors.map(({ message }) => message).join('\n'));
     }

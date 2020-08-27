@@ -139,7 +139,13 @@ export function doLoad(examTakeUrl: string): Thunk {
         task: 'start',
       }),
     })
-      .then((result) => result.json() as Promise<StartExamResponse>)
+      .then(async (result) => {
+        try {
+          return await result.json() as Promise<StartExamResponse>;
+        } catch (_e) {
+          throw new Error(await result.text());
+        }
+      })
       .then((result) => {
         if (result.type === 'ANOMALOUS') {
           dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
@@ -256,11 +262,15 @@ export function saveSnapshot(examTakeUrl: string): Thunk {
       }),
       credentials: 'same-origin',
     })
-      .then((result) => {
+      .then(async (result) => {
         if (result.status === 403) {
           throw new Error('forbidden');
         }
-        return result.json() as Promise<SnapshotSaveResult>;
+        try {
+          return await result.json() as Promise<SnapshotSaveResult>;
+        } catch (_e) {
+          throw new Error(await result.text());
+        }
       })
       .then((result) => {
         if ('lockout' in result) {

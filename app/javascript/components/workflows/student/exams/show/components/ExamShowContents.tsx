@@ -122,7 +122,9 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
               variant="primary"
               onClick={() => {
                 setShowWarningModal(false);
-                openFullscreen();
+                if (!policyPermits(policies, Policy.tolerateWindowed)) {
+                  openFullscreen();
+                }
               }}
             >
               Oops!  I understand.

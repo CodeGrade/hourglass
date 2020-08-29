@@ -46,6 +46,15 @@ const listeners: {
       detected('tried to navigate away', e);
     },
   },
+  {
+    event: 'keydown',
+    handler: (_detected) => (e: KeyboardEvent): void => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+  },
 ];
 
 export function installListeners(

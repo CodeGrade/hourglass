@@ -55,10 +55,16 @@ export async function hitApi<T>(url: string, options: RequestInit = {}, isJson =
     });
   }
   if (!res.ok) {
+    let json;
+    try {
+      json = await res.json();
+    } catch (_err) {
+      json = undefined;
+    }
     throw new HitApiError({
       type: 'ERROR',
-      status: res.status,
-      text: res.statusText,
+      status: json?.status ?? res.status,
+      text: json?.message ?? res.statusText,
     });
   }
   return res.json() as Promise<T>;

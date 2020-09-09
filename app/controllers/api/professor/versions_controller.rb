@@ -23,6 +23,10 @@ module Api
         render json: {
           id: HourglassSchema.id_from_object(@version, Types::ExamVersionType, {}),
         }, status: :created
+      rescue JSON::Schema::ValidationError, RuntimeError => e
+        render json: {
+          message: e.to_string,
+        }, status: :not_acceptable
       end
 
       def export_file

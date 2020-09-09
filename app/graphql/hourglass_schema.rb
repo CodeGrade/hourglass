@@ -79,7 +79,11 @@ class HourglassSchema < GraphQL::Schema
     # find an object in your application
     Object.const_get(type_name).find(item_id)
   rescue ActiveRecord::RecordNotFound => e
-    raise GraphQL::ExecutionError, "You do not have permission to view that data."
+    if Rails.env.development?
+      raise GraphQL::ExecutionError, "Cannot find #{type_name} with id #{item_id}."
+    else
+      raise GraphQL::ExecutionError, "You do not have permission to view that data."
+    end
   rescue RuntimeError => e
     Rails.logger.debug "Object_from_id: #{id} ==> #{e.message}\n#{e.backtrace.join("\n")}"
     raise GraphQL::ExecutionError, "Unknown error while trying to access #{type_name} #{item_id}: #{e.message}."

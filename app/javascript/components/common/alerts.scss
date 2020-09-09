@@ -20,6 +20,7 @@
 }
 
 .toast {
+  flex-basis: content;
   width: 350px;
   max-width: 100%;
   right: 0;

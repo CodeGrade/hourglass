@@ -952,6 +952,7 @@ const ShowMessages: React.FC<{
           <Select
             classNamePrefix="filterMessages"
             isClearable
+            isMulti
             placeholder="Choose selection criteria..."
             value={filter}
             onChange={(value: FilterVals, _action) => {

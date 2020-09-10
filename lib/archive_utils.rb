@@ -104,7 +104,6 @@ end
 
 # Utility class for uniformly dealing with archives
 class ArchiveUtils
-
   def self.mktmpdir
     path = File.realdirpath(Dir.mktmpdir)
     if block_given?

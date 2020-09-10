@@ -36,7 +36,7 @@ module Api
 
       def export_archive
         fname = @version.name.gsub(/ /, '-') + '.zip'
-        Dir.mktmpdir do |path|
+        ArchiveUtils.mktmpdir do |path|
           pathname = Pathname.new(path)
           zip_path = pathname.join(fname)
           contents_path = pathname.join('exam-contents')

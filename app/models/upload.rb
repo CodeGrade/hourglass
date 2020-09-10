@@ -35,7 +35,7 @@ class Upload
     @upload_data = @upload.read
     @files = []
     @info = {}
-    @dir = Pathname.new(Dir.mktmpdir)
+    @dir = Pathname.new(ArchiveUtils.mktmpdir)
     extract_contents!
     parse_info!
     purge!

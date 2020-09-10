@@ -575,7 +575,7 @@ class ArchiveUtils
       out = encode_or_escape(File.join(dest, entry.name.gsub('\\', '/').sub(%r{/$}, '')))
       next if out.to_s.match?('__MACOSX') || out.to_s.match?('.DS_Store')
 
-      if (safe_realdir(out).starts_with?(dest.to_s) rescue false)
+      if (safe_realdir(out).starts_with?(File.realdirpath(dest).to_s) rescue false)
         if entry.directory?
           FileUtils.rm_rf out unless File.directory? out
           FileUtils.mkdir_p out, mode: entry.unix_perms, verbose: false

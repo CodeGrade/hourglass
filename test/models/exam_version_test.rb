@@ -61,7 +61,7 @@ class ExamVersionTest < ActiveSupport::TestCase
 
   test 'cs2500 is the same when exported and reimported' do
     ev = build(:exam_version, :cs2500_v1)
-    Dir.mktmpdir do |path|
+    ArchiveUtils.mktmpdir do |path|
       ev.export_all(path)
       UploadTestHelper.with_temp_zip(Pathname.new(path).join('**')) do |zip|
         up = Upload.new(Rack::Test::UploadedFile.new(zip))

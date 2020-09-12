@@ -2,7 +2,7 @@
 
 module UploadTestHelper
   def self.with_temp_zip(glob_path)
-    Dir.mktmpdir do |path|
+    ArchiveUtils.mktmpdir do |path|
       dir = Pathname.new path
       zip = dir.join("#{name}.zip")
       ArchiveUtils.create_zip zip, Dir.glob(glob_path)

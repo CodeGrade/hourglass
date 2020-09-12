@@ -20,9 +20,9 @@
 }
 
 .toast {
-  flex-basis: content;
-  width: 350px;
-  max-width: 100%;
+  flex-basis: content !important;
+  width: 350px !important;
+  max-width: 100% !important;
   right: 0;
   resize: horizontal;
   direction: rtl;

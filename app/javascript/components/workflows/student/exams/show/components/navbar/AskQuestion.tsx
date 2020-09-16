@@ -36,6 +36,7 @@ const ShowQuestion: React.FC<{
     graphql`
     fragment AskQuestion_single on Question {
       createdAt
+      urgent
       body
     }
     `,
@@ -54,9 +55,11 @@ const ShowQuestion: React.FC<{
 
 const SendQuestion: React.FC<{
   registrationId: string;
+  urgent: boolean;
 }> = (props) => {
   const {
     registrationId,
+    urgent,
   } = props;
   const [val, setVal] = useState('');
   const [inTimeout, setInTimeout] = useState(false);
@@ -151,6 +154,7 @@ const SendQuestion: React.FC<{
             variables: {
               input: {
                 registrationId,
+                urgent,
                 body: val,
               },
             },
@@ -186,11 +190,13 @@ const questionPaginationConfig = {
 
 interface AskQuestionProps {
   examKey: AskQuestion$key;
+  urgent: boolean;
 }
 
 const AskQuestion: React.FC<AskQuestionProps> = (props) => {
   const {
     examKey,
+    urgent,
   } = props;
   const { alert } = useContext(AlertContext);
   const [res, { isLoading, hasMore, loadMore }] = usePagination(
@@ -222,7 +228,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
   const { edges } = res.myRegistration.questions;
   return (
     <div>
-      <SendQuestion registrationId={res.myRegistration.id} />
+      <SendQuestion registrationId={res.myRegistration.id} urgent={urgent} />
       <span className="clearfix" />
       <hr className="my-2" />
       {edges.length === 0 && (

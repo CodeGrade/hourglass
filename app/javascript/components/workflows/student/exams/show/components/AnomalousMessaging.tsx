@@ -31,7 +31,7 @@ const AnomalousMessaging: React.FC<{
             <Card.Title>
               <h2>Ask a question</h2>
             </Card.Title>
-            <AskQuestion examKey={res} />
+            <AskQuestion examKey={res} urgent />
           </Card.Body>
         </Card>
       </Col>

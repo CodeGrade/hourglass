@@ -25,7 +25,7 @@
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.45",
     "@rails/ujs": "^6.0.0",
-    "@rails/webpacker": "5.1.1",
+    "@rails/webpacker": "5.2.1",
     "@types/relay-runtime": "^10.0.3",
     "actioncable": "^5.2.4-3",
     "babel-loader": "^8.1.0",

@@ -14,7 +14,10 @@ module Types
     field :duration, Integer, null: false
     field :start_time, GraphQL::Types::ISO8601DateTime, null: false
     field :end_time, GraphQL::Types::ISO8601DateTime, null: false
-    field :graded, Boolean, null: false
+
+    field :graded, Boolean, null: false do
+      guard Guards::PROFESSORS
+    end
 
     field :course, Types::CourseType, null: false do
       guard Guards::PROFESSORS

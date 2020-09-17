@@ -218,9 +218,9 @@ const RubricPresetsEditor: React.FC<WrappedFieldProps & RubricPresetsProps> = (p
   const { value } = input;
   const showPoints = (type === 'any' || type === 'one');
   return (
-    <FormSection name="choices">
+    <>
       <Form.Group as={Row}>
-        <Field name="railsId" component="input" type="hidden" />
+        <Field name="choices.railsId" component="input" type="hidden" />
         <Form.Label column sm="1">Label</Form.Label>
         <Col sm="3">
           <Field name="label" component="input" type="text" className="w-100" />
@@ -229,12 +229,12 @@ const RubricPresetsEditor: React.FC<WrappedFieldProps & RubricPresetsProps> = (p
           <>
             <Form.Label column sm="2">Direction</Form.Label>
             <Col sm="3">
-              <Field name="direction" component={RubricPresetDirectionEditor} />
+              <Field name="choices.direction" component={RubricPresetDirectionEditor} />
             </Col>
             <Form.Label column sm="1">Points</Form.Label>
             <Col sm="2">
               <Field
-                name="points"
+                name="points" // NOTE: Not choices.points
                 component="input"
                 type="number"
                 className="w-100"
@@ -244,20 +244,22 @@ const RubricPresetsEditor: React.FC<WrappedFieldProps & RubricPresetsProps> = (p
           </>
         )}
       </Form.Group>
-      {/* Mercy:
-      <i>{mercy}</i> */}
-      <Form.Label>
-        Presets
-        <span className="mx-2">
-          (most point values should be
-          <b className="mx-1">
-            {value.direction === 'credit' ? 'positive' : 'negative'}
-          </b>
-          in this set of presets)
-        </span>
-      </Form.Label>
-      <FieldArray name="presets" component={RubricPresetsArrayEditor} />
-    </FormSection>
+      <FormSection name="choices">
+        {/* Mercy:
+        <i>{mercy}</i> */}
+        <Form.Label>
+          Presets
+          <span className="mx-2">
+            (most point values should be
+            <b className="mx-1">
+              {value.direction === 'credit' ? 'positive' : 'negative'}
+            </b>
+            in this set of presets)
+          </span>
+        </Form.Label>
+        <FieldArray name="presets" component={RubricPresetsArrayEditor} />
+      </FormSection>
+    </>
   );
 };
 

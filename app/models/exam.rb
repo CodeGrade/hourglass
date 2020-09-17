@@ -36,6 +36,10 @@ class Exam < ApplicationRecord
   validate :end_after_start
   validate :duration_valid
 
+  def graded
+    finalized? && grading_locks.incomplete.none?
+  end
+
   def duration
     self[:duration].seconds
   end

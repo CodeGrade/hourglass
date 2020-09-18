@@ -219,7 +219,7 @@ const ChecklistIcon: React.FC<{
 
 const TabbedChecklist: React.FC<{
   exam: admin_checklist$key;
-  examId: number;
+  examId: string;
 }> = (props) => {
   const {
     exam,
@@ -1001,7 +1001,7 @@ const ExamAdmin: React.FC = () => {
         <Form.Group>
           <TabbedChecklist
             exam={res.props.exam}
-            examId={Number(examId)}
+            examId={examId}
           />
         </Form.Group>
         <Form.Group>

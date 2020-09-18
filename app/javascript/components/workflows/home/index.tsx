@@ -193,6 +193,7 @@ const ShowStaffRegs: React.FC<{
     fragment home_staffregs on StaffRegistration @relay(plural: true) {
       id
       course {
+        id
         exams {
           id
           name
@@ -203,13 +204,17 @@ const ShowStaffRegs: React.FC<{
     staffRegistrations,
   );
   if (regs.length === 0) return null;
+  const courses = {};
+  regs.forEach((r) => {
+    courses[r.course.id] = r.course;
+  });
   return (
     <>
       <h1>Exams to Grade</h1>
       <ul>
-        {regs.map((r) => (
-          <React.Fragment key={r.id}>
-            {r.course.exams.map((exam) => (
+        {Object.keys(courses).map((cId) => (
+          <React.Fragment key={cId}>
+            {courses[cId].exams.map((exam) => (
               <li
                 key={exam.id}
               >

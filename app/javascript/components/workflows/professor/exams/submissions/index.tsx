@@ -27,7 +27,7 @@ import { submissionsOneQuery } from './__generated__/submissionsOneQuery.graphql
 
 type Registration = submissionsAllQueryResponse['exam']['registrations'][number];
 const ExamSubmissions: React.FC = () => {
-  const { examId } = useParams();
+  const { examId } = useParams<{ examId: string }>();
   const res = useQuery<submissionsAllQuery>(
     graphql`
     query submissionsAllQuery($examId: ID!) {
@@ -194,7 +194,7 @@ const ExamSubmissions: React.FC = () => {
 };
 
 const ExamSubmission: React.FC = () => {
-  const { registrationId } = useParams();
+  const { registrationId } = useParams<{ registrationId: string }>();
   const res = useQuery<submissionsOneQuery>(
     graphql`
     query submissionsOneQuery($registrationId: ID!) {

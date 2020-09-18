@@ -47,7 +47,7 @@ const CourseExams: React.FC<{
 };
 
 const ShowCourse: React.FC = () => {
-  const { courseId } = useParams();
+  const { courseId } = useParams<{ courseId: string }>();
   const res = useQuery<showCourseQuery>(
     graphql`
     query showCourseQuery($courseId: ID!) {

@@ -503,7 +503,7 @@ const ExamEditor: React.FC<
   } = props;
   const { alert } = useContext(AlertContext);
   const history = useHistory();
-  const { examId } = useParams();
+  const { examId } = useParams<{ examId: string }>();
   const [update, { loading: saveLoading }] = useMutation<editorUpdateExamVersionMutation>(
     UPDATE_EXAM_VERSION,
     {

@@ -279,7 +279,7 @@ const PreFlightChecklist: React.FC<{
   );
   const { checklist } = res;
   const history = useHistory();
-  const { examId, tabName } = useParams();
+  const { examId, tabName } = useParams<{ examId: string, tabName: string }>();
   return (
     <>
       <h1>Pre-flight Checklist</h1>
@@ -405,7 +405,7 @@ const PreFlightChecklist: React.FC<{
 };
 
 export const TabEditButton: React.FC = () => {
-  const { examId, tabName } = useParams();
+  const { examId, tabName } = useParams<{ examId: string, tabName: string }>();
   return (
     <LinkButton
       to={`/exams/${examId}/admin/${tabName}/edit`}
@@ -421,7 +421,7 @@ export const TabEditButton: React.FC = () => {
 export function useTabRefresher(currentTab: string): [number, () => void] {
   const [refresher, refresh] = useRefresher();
   const location = useLocation();
-  const { tabName } = useParams();
+  const { tabName } = useParams<{ tabName: string }>();
   useEffect(() => {
     if (tabName === currentTab) refresh();
   }, [tabName, location.pathname]);
@@ -932,7 +932,7 @@ mutation adminCommenceGradingMutation($input: CommenceGradingInput!) {
 `;
 
 const StartGradingButton: React.FC = () => {
-  const { examId } = useParams();
+  const { examId } = useParams<{ examId: string }>();
   const history = useHistory();
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation(
@@ -971,7 +971,7 @@ const StartGradingButton: React.FC = () => {
 };
 
 const ExamAdmin: React.FC = () => {
-  const { examId } = useParams();
+  const { examId } = useParams<{ examId: string }>();
   const res = useQuery<adminExamQuery>(
     graphql`
     query adminExamQuery($examId: ID!) {
@@ -1001,7 +1001,7 @@ const ExamAdmin: React.FC = () => {
         <Form.Group>
           <TabbedChecklist
             exam={res.props.exam}
-            examId={examId}
+            examId={Number(examId)}
           />
         </Form.Group>
         <Form.Group>

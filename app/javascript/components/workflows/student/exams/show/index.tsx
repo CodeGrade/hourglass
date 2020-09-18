@@ -42,7 +42,7 @@ const Exam: React.FC<ShowExamProps> = (props) => {
 };
 
 const ShowExam: React.FC = () => {
-  const { examId } = useParams();
+  const { examId } = useParams<{ examId: string }>();
 
   const res = useQuery<showQuery>(
     graphql`

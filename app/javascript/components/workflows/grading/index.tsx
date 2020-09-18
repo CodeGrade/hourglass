@@ -1002,7 +1002,7 @@ const Grade: React.FC<{
   );
   const { alert } = useContext(AlertContext);
   const history = useHistory();
-  const { examId, registrationId } = useParams();
+  const { examId, registrationId } = useParams<{ examId: string; registrationId: string }>();
   const { examVersion } = res;
   const currentAnswers = res.currentAnswers as AnswersState;
   const { answers } = examVersion;
@@ -1131,7 +1131,9 @@ const Grade: React.FC<{
 };
 
 const GradeOnePart: React.FC = () => {
-  const { registrationId, qnum, pnum } = useParams();
+  const { registrationId, qnum, pnum } = useParams<{
+    registrationId: string, qnum: string, pnum: string
+  }>();
   const res = useQuery<gradingQuery>(
     graphql`
     query gradingQuery($registrationId: ID!) {
@@ -1182,7 +1184,7 @@ const GradeOnePart: React.FC = () => {
 };
 
 const BeginGradingButton: React.FC = () => {
-  const { examId } = useParams();
+  const { examId } = useParams<{ examId: string }>();
   const history = useHistory();
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<gradingNextMutation>(
@@ -1538,7 +1540,7 @@ const ExamGradingAdministration: React.FC<{
 };
 
 const GradingAdmin: React.FC = () => {
-  const { examId } = useParams();
+  const { examId } = useParams<{ examId: string }>();
   const res = useQuery<gradingAdminQuery>(
     graphql`
     query gradingAdminQuery($examId: ID!) {

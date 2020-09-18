@@ -19,7 +19,7 @@ import convertRubric from '@professor/exams/rubrics';
 import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
 
 const EditExamVersion: React.FC = () => {
-  const { versionId } = useParams();
+  const { versionId } = useParams<{ versionId: string }>();
   const res = useQuery<editVersionQuery>(
     graphql`
     query editVersionQuery($examVersionId: ID!) {

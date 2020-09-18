@@ -33,7 +33,7 @@ import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import Loading from '@hourglass/common/loading';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import { ExhaustiveSwitchError, SelectOption } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, SelectOption, SelectOptions } from '@hourglass/common/helpers';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
@@ -853,7 +853,7 @@ const SingleMessage: React.FC<{
   }
 };
 
-type FilterVals = SelectOption<string>;
+type FilterVals = SelectOptions<string>;
 
 const ShowMessages: React.FC<{
   replyTo: (regId: string) => void;
@@ -924,13 +924,13 @@ const ShowMessages: React.FC<{
     all = all.filter((m) => {
       switch (m.type) {
         case MessageType.Direct:
-          return m.registration.user.displayName === filter.value;
+          return filter.some((f) => m.registration.user.displayName === f.value);
         case MessageType.Question:
-          return m.registration.user.displayName === filter.value;
+          return filter.some((f) => m.registration.user.displayName === f.value);
         case MessageType.Room:
-          return m.room.name === filter.value;
+          return filter.some((f) => m.room.name === f.value);
         case MessageType.Version:
-          return m.version.name === filter.value;
+          return filter.some((f) => m.version.name === f.value);
         case MessageType.Exam:
           return true;
         default:
@@ -956,7 +956,11 @@ const ShowMessages: React.FC<{
             placeholder="Choose selection criteria..."
             value={filter}
             onChange={(value: FilterVals, _action) => {
-              setFilter(value);
+              if (value?.length > 0) {
+                setFilter(value);
+              } else {
+                setFilter(undefined);
+              }
             }}
             options={filterOptions}
           />
@@ -1742,7 +1746,7 @@ const ProctoringSplitView: React.FC<{
 const ExamProctoring: React.FC = () => {
   const {
     examId,
-  } = useParams();
+  } = useParams<{ examId: string }>();
   const res = useQuery<examsProctorQuery>(
     graphql`
     query examsProctorQuery($examId: ID!) {

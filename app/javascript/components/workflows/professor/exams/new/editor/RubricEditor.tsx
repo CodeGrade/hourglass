@@ -85,7 +85,7 @@ const RubricPresetEditor: React.FC<{
               component="input"
               type="number"
               className="w-100"
-              normalize={(newval) => (newval === '' ? 0 : Number.parseInt(newval, 10))}
+              normalize={(newval) => (newval === '' ? 0 : Number.parseFloat(newval))}
             />
           </Col>
         </Form.Group>
@@ -211,7 +211,7 @@ interface RubricPresetsProps {
   value: RubricPresets;
 }
 
-const normalizeNumber = (newval: string) => (newval === '' ? 0 : Number.parseInt(newval, 10));
+const normalizeNumber = (newval: string) => (newval === '' ? 0 : Number.parseFloat(newval));
 
 const RubricPresetsEditor: React.FC<WrappedFieldProps & RubricPresetsProps> = (props) => {
   const { input, type } = props;
@@ -374,6 +374,17 @@ const ChangeRubricType: React.FC<{
   const changeRubricType = useCallback((newtype: SelectOption<Rubric['type']>) => {
     if (newtype.value === 'none') {
       onChange({ type: 'none', railsId: value?.railsId });
+    } else if (newtype.value === 'all') {
+      const copy = { ...value };
+      if ('points' in copy) { delete copy.points; }
+      onChange({
+        // set defaults to blank
+        choices: [],
+        // preserve as much as possible
+        ...copy,
+        // and change the type
+        type: newtype.value,
+      });
     } else {
       onChange({
         // set defaults to blank

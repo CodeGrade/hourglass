@@ -49,27 +49,27 @@ module Types
     end
 
     field :questions, GraphQL::Types::JSON, null: false do
-      guard Guards::PROCTORS_AND_PROFESSORS
+      guard Guards::ALL_STAFF
     end
 
     field :reference, GraphQL::Types::JSON, null: false do
-      guard Guards::PROCTORS_AND_PROFESSORS
+      guard Guards::ALL_STAFF
     end
 
     field :instructions, GraphQL::Types::JSON, null: false do
-      guard Guards::PROCTORS_AND_PROFESSORS
+      guard Guards::ALL_STAFF
     end
 
     field :answers, GraphQL::Types::JSON, null: false do
-      guard Guards::PROCTORS_AND_PROFESSORS
+      guard Guards::ALL_STAFF
     end
 
     field :files, GraphQL::Types::JSON, null: false do
-      guard Guards::PROCTORS_AND_PROFESSORS
+      guard Guards::ALL_STAFF
     end
 
     field :rubrics, [Types::RubricType], null: true do
-      guard Guards::PROFESSORS
+      guard Guards::ALL_STAFF
     end
     def rubrics
       AssociationLoader.for(ExamVersion, :rubrics).load(object)

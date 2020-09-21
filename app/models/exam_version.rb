@@ -22,6 +22,7 @@ class ExamVersion < ApplicationRecord
   delegate :course, to: :exam
   delegate :professors, to: :exam
   delegate :proctors_and_professors, to: :exam
+  delegate :all_staff, to: :exam
 
   EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save.json').to_s
   validates :info, presence: true, json: {
@@ -40,7 +41,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def everyone
-    proctors_and_professors.or(students)
+    all_staff.or(students)
   end
 
   def students

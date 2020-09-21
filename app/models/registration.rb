@@ -22,6 +22,7 @@ class Registration < ApplicationRecord
 
   delegate :exam, to: :exam_version
   delegate :proctors_and_professors, to: :exam
+  delegate :all_staff, to: :exam
   delegate :course, to: :exam
 
   def room_version_same_exam
@@ -174,6 +175,6 @@ class Registration < ApplicationRecord
   end
 
   def visible_to?(check_user)
-    (user == check_user) || proctors_and_professors.exists?(check_user.id)
+    (user == check_user) || all_staff.exists?(check_user.id)
   end
 end

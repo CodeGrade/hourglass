@@ -20,6 +20,6 @@ class GradingLock < ApplicationRecord
   scope :no_grader, -> { where(grader: nil) }
 
   def visible_to?(check_user)
-    exam.professors.exists? check_user.id
+    (grader == check_user) || (completed_by == check_user) || exam.professors.exists?(check_user.id)
   end
 end

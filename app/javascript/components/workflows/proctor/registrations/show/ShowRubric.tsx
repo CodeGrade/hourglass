@@ -47,7 +47,7 @@ const ShowPreset: React.FC<{
         <Icon I={iconForPoints(points)} className="mr-2" />
         {pluralize(points, 'point', 'points')}
       </Button>
-      {label && <span>{`[${label}]`}</span>}
+      {label && <span className="mr-2">{`[${label}]`}</span>}
       <span>{graderHint}</span>
       {studentFeedback && (
         <Row className="p-2">

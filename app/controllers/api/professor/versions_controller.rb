@@ -25,7 +25,7 @@ module Api
         }, status: :created
       rescue JSON::Schema::ValidationError, RuntimeError => e
         render json: {
-          message: e.to_string,
+          message: e.to_s,
         }, status: :not_acceptable
       end
 

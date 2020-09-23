@@ -1074,12 +1074,14 @@ const Grade: React.FC<{
               <h2><QuestionName qnum={qnum} name={questions[qnum].name} /></h2>
             </Col>
           </Row>
+          <PromptRow prompt={questions[qnum].description} />
           <div>
             <Row>
               <Col sm={{ span: 6, offset: 3 }}>
                 <h3><PartName pnum={pnum} name={questions[qnum].parts[pnum].name} /></h3>
               </Col>
             </Row>
+            <PromptRow prompt={questions[qnum].parts[pnum].description} />
             {questions[qnum].parts[pnum].body.map((b, bnum) => {
               const studentAns = currentAnswers.answers[qnum][pnum][bnum];
               const studentAnswer = isNoAns(studentAns) ? undefined : studentAns;

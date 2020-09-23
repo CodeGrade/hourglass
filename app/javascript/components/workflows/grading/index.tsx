@@ -76,6 +76,7 @@ import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import { RenderError } from '@hourglass/common/boundary';
 import { AlertContext } from '@hourglass/common/alerts';
 import { IconType } from 'react-icons';
+import { FileViewer } from '@student/exams/show/components/FileViewer';
 import {
   BsPencilSquare,
   BsXSquare,
@@ -1075,6 +1076,15 @@ const Grade: React.FC<{
             </Col>
           </Row>
           <PromptRow prompt={questions[qnum].description} />
+          {questions[qnum].reference.length !== 0 && (
+            <Row>
+              <Col sm={{ span: 9, offset: 3 }}>
+                <FileViewer
+                  references={questions[qnum].reference}
+                />
+              </Col>
+            </Row>
+          )}
           <div>
             <Row>
               <Col sm={{ span: 6, offset: 3 }}>
@@ -1082,6 +1092,15 @@ const Grade: React.FC<{
               </Col>
             </Row>
             <PromptRow prompt={questions[qnum].parts[pnum].description} />
+            {questions[qnum].parts[pnum].reference.length !== 0 && (
+              <Row>
+                <Col sm={{ span: 9, offset: 3 }}>
+                  <FileViewer
+                    references={questions[qnum].parts[pnum].reference}
+                  />
+                </Col>
+              </Row>
+            )}
             {questions[qnum].parts[pnum].body.map((b, bnum) => {
               const studentAns = currentAnswers.answers[qnum][pnum][bnum];
               const studentAnswer = isNoAns(studentAns) ? undefined : studentAns;
@@ -1197,7 +1216,7 @@ const GradeOnePart: React.FC = () => {
 };
 
 const SyncExamToBottlenoseButton: React.FC = () => {
-  const { examId } = useParams();
+  const { examId } = useParams<{ examId: string }>();
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<gradingSyncExamToBottlenoseMutation>(
     SYNC_EXAM_TO_BOTTLENOSE_MUTATION,

@@ -8,6 +8,7 @@ import { PartFilesContext, ExamViewerContext } from '@hourglass/common/context';
 import { PartName } from '@student/exams/show/components/Part';
 import ShowRubric from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@hourglass/workflows/professor/exams/types';
+import { pluralize } from '@hourglass/common/helpers';
 
 interface PartProps {
   refreshCodeMirrorsDeps: React.DependencyList;
@@ -36,19 +37,19 @@ const Part: React.FC<PartProps> = (props) => {
   } = part;
   const { rubric } = useContext(ExamViewerContext);
   const pRubric = rubric?.questions[qnum]?.parts[pnum]?.partRubric;
-  const strPoints = points > 1 || points === 0 ? 'points' : 'point';
+  const strPoints = pluralize(points, 'point', 'points');
   let subtitle;
   if (currentGrading?.score !== undefined) {
-    subtitle = `${currentGrading?.score} / ${points} ${strPoints}`;
+    subtitle = `${currentGrading?.score} / ${strPoints}`;
   } else {
-    subtitle = `(${points} ${strPoints})`;
+    subtitle = `(${strPoints})`;
   }
   const contextVal = useMemo(() => ({ references: reference }), [reference]);
   return (
     <PartFilesContext.Provider value={contextVal}>
       <div>
         <h3 id={`question-${qnum}-part-${pnum}`} className="d-flex align-items-baseline">
-          <PartName name={name} pnum={pnum} />
+          <PartName anonymous={anonymous} name={name} pnum={pnum} />
           {anonymous || (
             <span className="ml-auto point-count">
               {subtitle}

@@ -21,7 +21,12 @@ interface PartProps {
   spyQuestion?: (question: number, pnum?: number) => void;
 }
 
-export const PartName: React.FC<{ pnum: number; name?: HTMLVal }> = ({ pnum, name }) => {
+export const PartName: React.FC<{
+  anonymous: boolean;
+  pnum: number;
+  name?: HTMLVal;
+}> = ({ anonymous, pnum, name }) => {
+  if (anonymous) { return (<></>); }
   if (name === undefined || name.value === '') {
     return <div className="d-inline-block">{`Part ${alphabetIdx(pnum)}`}</div>;
   }
@@ -69,7 +74,7 @@ const Part: React.FC<PartProps> = (props) => {
           />
         )}
         <h3 id={`question-${qnum}-part-${pnum}`} className="d-flex align-items-baseline">
-          <PartName name={name} pnum={pnum} />
+          <PartName anonymous={anonymous} name={name} pnum={pnum} />
           {anonymous || (
             <span className="ml-auto point-count">
               {subtitle}

@@ -7,6 +7,7 @@ import { QuestionFilesContext, ExamViewerContext } from '@hourglass/common/conte
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import ShowRubric from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@professor/exams/types';
+import { pluralize } from '@hourglass/common/helpers';
 
 interface ShowQuestionProps {
   refreshCodeMirrorsDeps: React.DependencyList;
@@ -32,8 +33,21 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const qRubric = rubric?.questions[qnum]?.questionRubric;
   const singlePart = parts.length === 1 && !parts[0].name.value;
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
-  const strPoints = points > 1 || points === 0 ? 'points' : 'point';
-  const subtitle = `(${points} ${strPoints})`;
+  const strPoints = pluralize(points, 'point', 'points');
+  let curScore = 0;
+  for (let i = 0; i < parts.length; i += 1) {
+    if (currentGrading[i]?.score !== undefined) {
+      curScore += currentGrading[i].score;
+    } else {
+      curScore = undefined;
+    }
+  }
+  let subtitle;
+  if (curScore !== undefined) {
+    subtitle = `${curScore} / ${strPoints}`;
+  } else {
+    subtitle = `(${strPoints})`;
+  }
   const contextVal = useMemo(() => ({ references: reference }), [reference]);
   return (
     <QuestionFilesContext.Provider value={contextVal}>

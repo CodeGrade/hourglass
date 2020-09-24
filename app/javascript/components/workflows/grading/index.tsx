@@ -1066,6 +1066,7 @@ const Grade: React.FC<{
     },
   );
   const nextExamLoading = releaseLoading || nextLoading;
+  const anonymous = questions[qnum].parts.length > 1 || !!questions[qnum].parts[pnum].name?.value;
   return (
     <ExamContext.Provider value={contextVal}>
       <ExamViewerContext.Provider value={viewerContextVal}>
@@ -1088,7 +1089,13 @@ const Grade: React.FC<{
           <div>
             <Row>
               <Col sm={{ span: 6, offset: 3 }}>
-                <h3><PartName pnum={pnum} name={questions[qnum].parts[pnum].name} /></h3>
+                <h3>
+                  <PartName
+                    anonymous={anonymous}
+                    pnum={pnum}
+                    name={questions[qnum].parts[pnum].name}
+                  />
+                </h3>
               </Col>
             </Row>
             <PromptRow prompt={questions[qnum].parts[pnum].description} />
@@ -1357,7 +1364,7 @@ const GradingLock: React.FC<{
   return (
     <tr>
       <td><QuestionName qnum={lock.qnum} /></td>
-      <td><PartName pnum={lock.pnum} /></td>
+      <td><PartName anonymous={false} pnum={lock.pnum} /></td>
       <td>
         <Spoiler text={lock.registration.user.displayName} />
       </td>

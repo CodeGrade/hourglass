@@ -104,7 +104,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.index [:user_id, :exam_version_id], unique: true
       t.index [:room_id, :user_id], unique: true
       t.index [:user_id, :room_id], unique: true
-      
+
       t.boolean :published, null: false, default: false
 
       t.datetime :start_time
@@ -175,6 +175,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
     create_table :questions do |t|
       t.references :registration, null: false, foreign_key: true
 
+      t.boolean :urgent, null: false, default: false
       t.text :body, null: false
       t.timestamps
     end
@@ -220,7 +221,7 @@ class CreateSchema < ActiveRecord::Migration[6.0]
       t.string :student_feedback, null: true
       t.float :points, null: false
       t.integer :order, null: true
-      
+
       t.timestamps
     end
 

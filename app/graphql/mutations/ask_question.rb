@@ -3,6 +3,7 @@
 module Mutations
   class AskQuestion < BaseMutation
     argument :registration_id, ID, required: true, loads: Types::RegistrationType
+    argument :urgent, Boolean, required: false
     argument :body, String, required: true
 
     field :question, Types::QuestionType, null: false
@@ -15,8 +16,8 @@ module Mutations
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
-    def resolve(registration:, body:)
-      q = Question.new(registration: registration, body: body)
+    def resolve(registration:, urgent:, body:)
+      q = Question.new(registration: registration, urgent: urgent, body: body)
       saved = q.save
       raise GraphQL::ExecutionError, q.errors.full_messages.to_sentence unless saved
 

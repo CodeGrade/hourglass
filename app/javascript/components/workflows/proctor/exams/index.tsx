@@ -101,6 +101,7 @@ interface Question {
   type: MessageType.Question;
   time: DateTime;
   id: string;
+  urgent: boolean;
   body: string;
   registration: {
     id: string;
@@ -152,6 +153,7 @@ export interface MessageProps {
   iconClass?: string;
   tooltip: string;
   time: DateTime;
+  urgent: boolean;
   body: React.ReactElement | string;
 }
 
@@ -161,6 +163,7 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
     iconClass,
     tooltip,
     time,
+    urgent,
     body,
     children,
   } = props;
@@ -174,6 +177,7 @@ const ShowMessage: React.FC<MessageProps> = (props) => {
           <i className="text-muted">
             {`${tooltip} (${time.toLocaleString(DateTime.TIME_SIMPLE)})`}
           </i>
+          {urgent && <strong className="text-danger"> LOCKED OUT</strong>}
           {children}
         </p>
         <p className="wrap-anywhere">{body}</p>
@@ -784,6 +788,7 @@ const ShowQuestion: React.FC<{
   const {
     registration,
     body,
+    urgent,
     time,
   } = question;
   const reply = useCallback(() => replyTo(registration.id), [registration.id]);
@@ -791,6 +796,7 @@ const ShowQuestion: React.FC<{
     <ShowMessage
       icon={MdMessage}
       tooltip={`Received from ${registration.user.displayName}`}
+      urgent={urgent}
       body={body}
       time={time}
     >
@@ -1088,6 +1094,7 @@ const newQuestionSubscriptionSpec = graphql`
             displayName
           }
         }
+        urgent
         body
       }
       questionsEdge {
@@ -1375,6 +1382,7 @@ const ExamMessages: React.FC<{
                   displayName
                 }
               }
+              urgent
               body
             }
           }
@@ -1414,6 +1422,7 @@ const ExamMessages: React.FC<{
     questions: res.questions.edges.map(({ node: question }) => ({
       type: MessageType.Question,
       id: question.id,
+      urgent: question.urgent,
       body: question.body,
       registration: question.registration,
       time: DateTime.fromISO(question.createdAt),

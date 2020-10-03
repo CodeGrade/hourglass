@@ -1027,7 +1027,7 @@ const Grade: React.FC<{
   const viewerContextVal = useMemo(() => ({
     answers: currentAnswers,
   }), [currentAnswers]);
-  const [mutateNext, { loading: nextLoading }] = useMutation<gradingNextMutation>(
+  const [mutateGradeNext, { loading: nextLoading }] = useMutation<gradingNextMutation>(
     GRADE_NEXT_MUTATION,
     {
       onCompleted: ({ gradeNext }) => {
@@ -1043,11 +1043,14 @@ const Grade: React.FC<{
       },
     },
   );
-  const [mutateRelease, { loading: releaseLoading }] = useMutation<gradingReleaseLockMutation>(
+  const [
+    mutateReleaseAndContinue,
+    { loading: releaseNextLoading },
+  ] = useMutation<gradingReleaseLockMutation>(
     RELEASE_LOCK_MUTATION,
     {
       onCompleted: () => {
-        mutateNext({
+        mutateGradeNext({
           variables: {
             input: {
               examId,
@@ -1065,7 +1068,26 @@ const Grade: React.FC<{
       },
     },
   );
-  const nextExamLoading = releaseLoading || nextLoading;
+  const [
+    mutateReleaseAndFinish,
+    { loading: releaseFinishLoading },
+  ] = useMutation<gradingReleaseLockMutation>(
+    RELEASE_LOCK_MUTATION,
+    {
+      onCompleted: () => {
+        window.location.href = '/';
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error completing grading',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
   const anonymous = questions[qnum].parts.length > 1 || !!questions[qnum].parts[pnum].name?.value;
   return (
     <ExamContext.Provider value={contextVal}>
@@ -1145,24 +1167,47 @@ const Grade: React.FC<{
             })}
           </div>
         </div>
-        <Row>
-          <Button
-            disabled={nextExamLoading}
-            onClick={() => {
-              mutateRelease({
-                variables: {
-                  input: {
-                    markComplete: true,
-                    registrationId,
-                    qnum,
-                    pnum,
+        <Row className="text-center">
+          <Col className="text-center">
+            <Button
+              className="m-4"
+              variant="primary"
+              disabled={nextExamLoading}
+              onClick={() => {
+                mutateReleaseAndContinue({
+                  variables: {
+                    input: {
+                      markComplete: true,
+                      registrationId,
+                      qnum,
+                      pnum,
+                    },
                   },
-                },
-              });
-            }}
-          >
-            Finish this submission and start next one
-          </Button>
+                });
+              }}
+            >
+              Finish this submission and start next one
+            </Button>
+            <Button
+              className="m-4"
+              variant="outline-primary"
+              disabled={nextExamLoading}
+              onClick={() => {
+                mutateReleaseAndFinish({
+                  variables: {
+                    input: {
+                      markComplete: true,
+                      registrationId,
+                      qnum,
+                      pnum,
+                    },
+                  },
+                });
+              }}
+            >
+              Finish this submission and exit grading
+            </Button>
+          </Col>
         </Row>
       </ExamViewerContext.Provider>
     </ExamContext.Provider>

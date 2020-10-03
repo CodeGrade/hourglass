@@ -139,6 +139,7 @@ const SendQuestion: React.FC<{
           setVal(event.target.value);
         }}
         as="textarea"
+        spellCheck={false}
         disabled={loading}
       />
       <TooltipButton

@@ -28,6 +28,7 @@ const Text: React.FC<TextProps> = (props) => {
           <Form.Control
             disabled={disabled}
             as="textarea"
+            spellCheck={false}
             rows={3}
             placeholder="Enter your answer here."
             value={value}

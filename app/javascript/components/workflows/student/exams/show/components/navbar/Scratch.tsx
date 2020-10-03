@@ -21,6 +21,7 @@ const Scratch: React.FC<ScratchProps> = (props) => {
         onChange(event.target.value);
       }}
       as="textarea"
+      spellCheck={false}
       disabled={disabled}
     />
   );

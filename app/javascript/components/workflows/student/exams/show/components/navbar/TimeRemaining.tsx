@@ -33,6 +33,26 @@ function describeRemainingTime(remaining: Duration): string {
   return 'Exam over';
 }
 
+function briefTimeRemaining(remaining: Duration): string {
+  const left = remaining.shiftTo('weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds').normalize();
+  if (left.weeks > 0) {
+    return `Time remaining: ${pluralize(left.weeks, 'week', 'weeks')}`;
+  }
+  if (left.days > 0) {
+    return `Time remaining: ${pluralize(left.days, 'day', 'days')}`;
+  }
+  if (left.hours > 0) {
+    return `Time remaining: ${pluralize(left.hours, 'hour', 'hours')}`;
+  }
+  if (left.minutes > 0) {
+    return `Time remaining: ${pluralize(left.minutes, 'minute', 'minutes')}`;
+  }
+  if (left.valueOf() > 0) {
+    return `Time remaining: ${pluralize(left.seconds, 'second', 'seconds')}`;
+  }
+  return 'Exam over';
+}
+
 export interface TimeRemainingProps {
   time: TimeInfo;
   openTimer: string;
@@ -80,7 +100,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
       {
         t: Duration.fromMillis(0),
         c: 'bg-danger text-dark',
-        d: 1000000,
+        d: Number.MAX_VALUE,
         w: 'Exam over',
       },
     ];
@@ -117,11 +137,12 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
       {
         t: Duration.fromMillis(0),
         c: 'bg-danger text-dark',
-        d: 1000000,
+        d: Number.MAX_VALUE,
         w: 'Exam over',
       },
-    ].sort((d1, d2) => d1.t.milliseconds - d2.t.milliseconds);
+    ];
   }
+  cutoffs = cutoffs.sort((d1, d2) => d1.t.milliseconds - d2.t.milliseconds);
   const remaining = describeRemainingTime(remainingTime);
   const warningIndex = cutoffs.findIndex((cutoff) => {
     const tMinusRemaining = cutoff.t.minus(remainingTime).shiftTo('seconds').seconds;
@@ -174,7 +195,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
     >
       <NavAccordionItem
         showTooltip={showTooltip}
-        tooltipMessage={warning || 'Time remaining'}
+        tooltipMessage={warning || briefTimeRemaining(remainingTime)}
         tooltipPlacement="right"
         tooltipClassname={classes}
         glowClassName={glow}

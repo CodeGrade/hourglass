@@ -46,14 +46,14 @@ export default (state: PaginationState = {
     case 'SPY_QUESTION':
       return {
         ...state,
-        spy: state.spyCoords.findIndex(sameCoords(action.coords)),
+        spy: findBestPageCoordIdx(state.spyCoords, action.coords),
       };
     case 'PREV_QUESTION': {
       const page = state.page - 1;
       return {
         ...state,
         page,
-        spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[page])),
+        spy: findBestPageCoordIdx(state.spyCoords, state.pageCoords[page]),
       };
     }
     case 'NEXT_QUESTION': {
@@ -61,7 +61,7 @@ export default (state: PaginationState = {
       return {
         ...state,
         page,
-        spy: state.spyCoords.findIndex(sameCoords(state.pageCoords[page])),
+        spy: findBestPageCoordIdx(state.spyCoords, state.pageCoords[page]),
       };
     }
     case 'ACTIVATE_WAYPOINTS':

@@ -16,6 +16,8 @@ import {
   Collapse,
   Table,
   Container,
+  Dropdown,
+  DropdownButton,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
@@ -1054,6 +1056,8 @@ const Grade: React.FC<{
           variables: {
             input: {
               examId,
+              qnum,
+              pnum,
             },
           },
         });
@@ -1167,8 +1171,8 @@ const Grade: React.FC<{
             })}
           </div>
         </div>
-        <Row className="text-center">
-          <Col className="text-center">
+        <Row className="text-center pb-4">
+          <Col className="text-center pb-4">
             <Button
               className="m-4"
               variant="primary"
@@ -1188,25 +1192,46 @@ const Grade: React.FC<{
             >
               Finish this submission and start next one
             </Button>
-            <Button
-              className="m-4"
+            <DropdownButton
+              className="m-4 d-inline-block"
               variant="outline-primary"
               disabled={nextExamLoading}
-              onClick={() => {
-                mutateReleaseAndFinish({
-                  variables: {
-                    input: {
-                      markComplete: true,
-                      registrationId,
-                      qnum,
-                      pnum,
-                    },
-                  },
-                });
-              }}
+              title="Exit grading and..."
+              drop="right"
             >
-              Finish this submission and exit grading
-            </Button>
+              <Dropdown.Item
+                onClick={() => {
+                  mutateReleaseAndFinish({
+                    variables: {
+                      input: {
+                        markComplete: true,
+                        registrationId,
+                        qnum,
+                        pnum,
+                      },
+                    },
+                  });
+                }}
+              >
+                Finish grading this question
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={() => {
+                  mutateReleaseAndFinish({
+                    variables: {
+                      input: {
+                        markComplete: false,
+                        registrationId,
+                        qnum,
+                        pnum,
+                      },
+                    },
+                  });
+                }}
+              >
+                Abandon gradng this question
+              </Dropdown.Item>
+            </DropdownButton>
           </Col>
         </Row>
       </ExamViewerContext.Provider>

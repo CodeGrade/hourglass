@@ -3,6 +3,8 @@
 module Mutations
   class GradeNext < BaseMutation
     argument :exam_id, ID, required: true, loads: Types::ExamType
+    argument :qnum, Integer, required: false
+    argument :pnum, Integer, required: false
 
     field :registration_id, ID, null: false
     field :qnum, Integer, null: false
@@ -14,9 +16,9 @@ module Mutations
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
-    def resolve(exam:)
+    def resolve(exam:, qnum: nil, pnum: nil)
       GradingLock.transaction do
-        lock = my_currently_grading(exam) || next_incomplete(exam)
+        lock = my_currently_grading(exam) || next_incomplete(exam, qnum, pnum)
 
         raise GraphQL::ExecutionError, 'No submissions need grading.' unless lock
 
@@ -34,8 +36,11 @@ module Mutations
       exam.grading_locks.where(grader: context[:current_user]).incomplete.first
     end
 
-    def next_incomplete(exam)
-      sorted = exam.grading_locks.incomplete.no_grader.sort_by { |l| [l.qnum, l.pnum] }
+    def next_incomplete(exam, qnum, pnum)
+      sorted = exam.grading_locks.incomplete.no_grader
+      sorted = sorted.where(qnum: qnum) if qnum && sorted.where(qnum: qnum).exists?
+      sorted = sorted.where(pnum: pnum) if pnum && sorted.where(pnum: pnum).exists?
+      sorted = sorted.sort_by { |l| [l.qnum, l.pnum] }
       sorted.first
     end
   end

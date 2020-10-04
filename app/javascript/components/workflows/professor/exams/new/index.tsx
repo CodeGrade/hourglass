@@ -10,6 +10,7 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
+import { NumericInput } from '@hourglass/common/NumericInput';
 import DateTimePicker from './DateTimePicker';
 import { newExamMutation } from './__generated__/newExamMutation.graphql';
 
@@ -49,7 +50,7 @@ const NewExamForm: React.FC<{
   const [name, setName] = useState<string>('');
   const [start, setStart] = useState<DateTime>(today);
   const [end, setEnd] = useState<DateTime>(todayEnd);
-  const [duration, setDuration] = useState<number>(300);
+  const [duration, setDuration] = useState<string>('5');
 
   return (
     <>
@@ -88,7 +89,7 @@ const NewExamForm: React.FC<{
                       input: {
                         courseId,
                         name,
-                        duration,
+                        duration: Number(duration) * 60.0,
                         startTime: start.toISO(),
                         endTime: end.toISO(),
                       },
@@ -126,11 +127,11 @@ const NewExamForm: React.FC<{
           <Form.Group as={Row} controlId="examDuration" className="align-items-center">
             <Form.Label column sm={2}>Duration (minutes):</Form.Label>
             <Col>
-              <Form.Control
+              <NumericInput
                 disabled={loading}
-                type="number"
-                value={duration / 60.0}
-                onChange={(e): void => setDuration(Number(e.target.value) * 60)}
+                value={duration}
+                min={0}
+                onChange={setDuration}
               />
             </Col>
           </Form.Group>

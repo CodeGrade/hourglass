@@ -15,6 +15,7 @@ import {
   Link,
 } from 'react-router-dom';
 import { useRefresher } from '@hourglass/common/helpers';
+import { NumericInput } from '@hourglass/common/NumericInput';
 import {
   Card,
   Collapse,
@@ -495,7 +496,7 @@ export const ExamInfoEditor: React.FC<{
   const [name, setName] = useState<string>(defaultName);
   const [start, setStart] = useState<DateTime>(defaultStartTime);
   const [end, setEnd] = useState<DateTime>(defaultEndTime);
-  const [duration, setDuration] = useState<number>(defaultDuration);
+  const [duration, setDuration] = useState<string>(`${defaultDuration / 60.0}`);
 
   return (
     <Card className="mb-4">
@@ -527,7 +528,7 @@ export const ExamInfoEditor: React.FC<{
               onClick={(): void => {
                 onSubmit({
                   name,
-                  duration,
+                  duration: Number(duration) * 60.0,
                   start: start.toISO(),
                   end: end.toISO(),
                 });
@@ -563,11 +564,13 @@ export const ExamInfoEditor: React.FC<{
         <Form.Group as={Row} controlId="examDuration" className="align-items-center">
           <Form.Label column sm={2}>Duration (minutes):</Form.Label>
           <Col>
-            <Form.Control
+            <NumericInput
               disabled={disabled}
-              type="number"
-              value={duration / 60.0}
-              onChange={(e): void => setDuration(Number(e.target.value) * 60)}
+              value={duration}
+              className="overflow-visible"
+              variant="success"
+              min={0}
+              onChange={setDuration}
             />
           </Col>
         </Form.Group>

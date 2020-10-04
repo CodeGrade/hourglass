@@ -1,0 +1,10 @@
+div.numeric-input {
+  button.button-up { 
+    border-top-left-radius: 0;
+    line-height: 0.5em;
+  }
+  button.button-down {
+    border-bottom-left-radius: 0;
+    line-height: 0.5em;
+  }
+}

@@ -108,6 +108,7 @@ import { gradingQuery } from './__generated__/gradingQuery.graphql';
 import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 import { gradingGraderQuery } from './__generated__/gradingGraderQuery.graphql';
 import { gradingSyncExamToBottlenoseMutation } from './__generated__/gradingSyncExamToBottlenoseMutation.graphql';
+import { NumericInput } from '@hourglass/common/NumericInput';
 
 export function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';
@@ -218,13 +219,12 @@ const Feedback: React.FC<{
       <Row>
         <Form.Group as={Col} lg="auto">
           <Form.Label>Points</Form.Label>
-          <Form.Control
+          <NumericInput
             disabled={disabled}
             step={0.5}
-            type="number"
             value={points}
-            onChange={(e) => {
-              if (onChangePoints) onChangePoints(Number(e.target.value));
+            onChange={(val) => {
+              if (onChangePoints) onChangePoints(Number(val));
             }}
           />
         </Form.Group>

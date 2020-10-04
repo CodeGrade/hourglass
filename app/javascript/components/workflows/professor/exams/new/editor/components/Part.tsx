@@ -13,6 +13,7 @@ import {
   FieldArray,
 } from 'redux-form';
 import { PartFilesContext } from '@hourglass/common/context';
+import { NumericInput } from '@hourglass/common/NumericInput';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
 import RubricEditor from '@professor/exams/new/editor/RubricEditor';
@@ -29,22 +30,14 @@ const PartPoints: React.FC<WrappedFieldProps> = (props) => {
     <>
       <Form.Label column sm="2">Points</Form.Label>
       <Col sm="10">
-        <Form.Control
-          type="number"
+        <NumericInput
           value={value}
           placeholder="Points for this part"
+          variant="success"
           min={0}
           max={100}
           step={0.5}
-          onChange={(e): void => {
-            if (e.target.value === '') {
-              onChange(0);
-            } else {
-              const newVal = Number.parseFloat(e.target.value);
-              const actual = (Number.isFinite(newVal) ? newVal : value);
-              onChange(actual);
-            }
-          }}
+          onChange={onChange}
         />
         {/* <NumberPicker
             placeholder="Points for this part"

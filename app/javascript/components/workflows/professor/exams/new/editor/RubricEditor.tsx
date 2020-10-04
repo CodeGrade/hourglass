@@ -28,6 +28,7 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
 import { ExhaustiveSwitchError, SelectOption, SelectOptions } from '@hourglass/common/helpers';
+import { normalizeNumber, NumericInputField } from '@hourglass/common/NumericInput';
 import '@professor/exams/rubrics.scss';
 
 const RubricPresetEditor: React.FC<{
@@ -82,10 +83,11 @@ const RubricPresetEditor: React.FC<{
           <Col sm="4">
             <Field
               name="points"
-              component="input"
-              type="number"
+              component={NumericInputField}
               className="w-100"
-              normalize={(newval) => (newval === '' ? 0 : Number.parseFloat(newval))}
+              variant="warning"
+              step={0.5}
+              normalize={normalizeNumber}
             />
           </Col>
         </Form.Group>
@@ -211,8 +213,6 @@ interface RubricPresetsProps {
   value: RubricPresets;
 }
 
-const normalizeNumber = (newval: string) => (newval === '' ? 0 : Number.parseFloat(newval));
-
 const RubricPresetsEditor: React.FC<WrappedFieldProps & RubricPresetsProps> = (props) => {
   const { input, type } = props;
   const { value } = input;
@@ -235,9 +235,10 @@ const RubricPresetsEditor: React.FC<WrappedFieldProps & RubricPresetsProps> = (p
             <Col sm="2">
               <Field
                 name="points" // NOTE: Not choices.points
-                component="input"
-                type="number"
+                component={NumericInputField}
                 className="w-100"
+                min={0}
+                variant="secondary"
                 normalize={normalizeNumber}
               />
             </Col>

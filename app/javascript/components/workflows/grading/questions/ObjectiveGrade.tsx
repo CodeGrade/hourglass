@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { ToggleButtonGroup, ToggleButton, Form } from 'react-bootstrap';
+import { ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import './ObjectiveGrade.scss';
+import { NumericInput } from '@hourglass/common/NumericInput';
 
 interface ObjectiveGradeProps {
   className?: string;
@@ -31,11 +32,10 @@ const ObjectiveGrade: React.FC<ObjectiveGradeProps> = (props) => {
       >
         <Icon I={FaTimes} className="mr-2" />
         <span className="mr-2">Wrong:</span>
-        <Form.Control
+        <NumericInput
           className="w-100px"
           size="sm"
           step={0.5}
-          type="number"
           min={0}
           disabled={value !== false}
         />

@@ -10,6 +10,7 @@ import {
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import Icon from '@student/exams/show/components/Icon';
 import ReadableDate from '@hourglass/common/ReadableDate';
+import { NumericInput } from '@hourglass/common/NumericInput';
 import { BsPencilSquare } from 'react-icons/bs';
 import { AlertContext } from '@hourglass/common/alerts';
 import { SelectOption, SelectOptions } from '@hourglass/common/helpers';
@@ -42,7 +43,7 @@ const AccommodationEditor: React.FC<{
     percentTimeExpansion,
   } = props;
   const [startTime, setStartTime] = useState(newStartTime);
-  const [extraTime, setExtraTime] = useState(percentTimeExpansion);
+  const [extraTime, setExtraTime] = useState(`${percentTimeExpansion}`);
   return (
     <tr>
       <td className="align-middle">
@@ -57,12 +58,11 @@ const AccommodationEditor: React.FC<{
         />
       </td>
       <td>
-        <Form.Control
+        <NumericInput
           disabled={disabled}
-          type="number"
           min={0}
           value={extraTime}
-          onChange={(e) => setExtraTime(Number(e.target.value))}
+          onChange={setExtraTime}
         />
       </td>
       <td align="right" className="text-nowrap">
@@ -77,7 +77,7 @@ const AccommodationEditor: React.FC<{
           disabled={disabled}
           variant="primary"
           className="ml-2"
-          onClick={() => submit(startTime, extraTime)}
+          onClick={() => submit(startTime, Number(extraTime))}
         >
           Save
         </Button>

@@ -137,7 +137,7 @@ export const NumericInput: React.FC<{
         onChange={(e) => onChange(e.target.value)}
         onBlur={() => { if (onChange) onChange(clamp(numValue, min, max)); }}
       />
-      <InputGroup.Append className="h-100">
+      <InputGroup.Append className="align-self-stretch">
         <ButtonGroup vertical className="h-100">
           <Button
             size="sm"
@@ -147,7 +147,7 @@ export const NumericInput: React.FC<{
             tabIndex={-1}
             onClick={() => onChange(clamp(numValue + step, min, max))}
           >
-            <Icon className="m-0 p-0" size="0.5em" I={FaChevronUp} />
+            <Icon className="m-0 p-0" size={size === 'lg' ? '0.75em' : '0.5em'} I={FaChevronUp} />
           </Button>
           <Button
             size="sm"
@@ -157,7 +157,7 @@ export const NumericInput: React.FC<{
             tabIndex={-1}
             onClick={() => onChange(clamp(numValue - step, min, max))}
           >
-            <Icon size="0.5em" I={FaChevronDown} />
+            <Icon size={size === 'lg' ? '0.75em' : '0.5em'} I={FaChevronDown} />
           </Button>
         </ButtonGroup>
       </InputGroup.Append>

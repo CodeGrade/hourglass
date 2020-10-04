@@ -87,6 +87,7 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import FourOhFour from '@hourglass/workflows/FourOhFour';
 import Spoiler from '@hourglass/common/Spoiler';
+import { NumericInput } from '@hourglass/common/NumericInput';
 import { assertType, isExamRubric } from '@professor/exams/types';
 import { ShowRubrics } from '@grading/UseRubrics';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
@@ -108,7 +109,6 @@ import { gradingQuery } from './__generated__/gradingQuery.graphql';
 import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 import { gradingGraderQuery } from './__generated__/gradingGraderQuery.graphql';
 import { gradingSyncExamToBottlenoseMutation } from './__generated__/gradingSyncExamToBottlenoseMutation.graphql';
-import { NumericInput } from '@hourglass/common/NumericInput';
 
 export function variantForPoints(points: number): AlertProps['variant'] {
   if (points < 0) return 'danger';

@@ -103,8 +103,10 @@ import { gradingLocks$key } from './__generated__/gradingLocks.graphql';
 import { gradingCompletion$key } from './__generated__/gradingCompletion.graphql';
 import { gradingVersionAdmin$key } from './__generated__/gradingVersionAdmin.graphql';
 import { gradingExamAdmin$key } from './__generated__/gradingExamAdmin.graphql';
+import { gradingBeginGrading$key } from './__generated__/gradingBeginGrading.graphql';
 import { gradingQuery } from './__generated__/gradingQuery.graphql';
 import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
+import { gradingGraderQuery } from './__generated__/gradingGraderQuery.graphql';
 import { gradingSyncExamToBottlenoseMutation } from './__generated__/gradingSyncExamToBottlenoseMutation.graphql';
 
 export function variantForPoints(points: number): AlertProps['variant'] {
@@ -1335,7 +1337,72 @@ const SyncExamToBottlenoseButton: React.FC = () => {
   );
 };
 
-const BeginGradingButton: React.FC = () => {
+const getCompletionStats = (version) => {
+  const completionStats: {
+    notStarted: number;
+    inProgress: number;
+    finished: number;
+  }[][] = [];
+  const { gradingLocks } = version;
+  gradingLocks.edges.forEach(({ node }) => {
+    const {
+      qnum,
+      pnum,
+      grader,
+      completedBy,
+    } = node;
+    if (completionStats[qnum] === undefined) completionStats[qnum] = [];
+    if (completionStats[qnum][pnum] === undefined) {
+      completionStats[qnum][pnum] = {
+        notStarted: 0,
+        inProgress: 0,
+        finished: 0,
+      };
+    }
+    const qpStat = completionStats[qnum][pnum];
+    if (completedBy !== null) qpStat.finished += 1;
+    else if (grader !== null && completedBy === null) qpStat.inProgress += 1;
+    else qpStat.notStarted += 1;
+  });
+  return completionStats;
+};
+
+const BeginGradingButton: React.FC<{
+  examKey: gradingBeginGrading$key;
+}> = (props) => {
+  const {
+    examKey,
+  } = props;
+  const res = useFragment(
+    graphql`
+    fragment gradingBeginGrading on Exam {
+      examVersions {
+        edges {
+          node {
+            id
+            name
+            ...gradingCompletion
+            gradingLocks {
+              edges {
+                node {
+                  id
+                  qnum
+                  pnum
+                  grader { id }
+                  completedBy { id }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    `,
+    examKey,
+  );
+
+  const { examVersions } = res;
+  const completionStats = examVersions.edges.map(({ node }) => getCompletionStats(node));
   const { examId } = useParams<{ examId: string }>();
   const history = useHistory();
   const { alert } = useContext(AlertContext);
@@ -1361,29 +1428,107 @@ const BeginGradingButton: React.FC = () => {
     },
   );
   return (
-    <Button
-      disabled={loading}
-      variant="primary"
-      onClick={() => {
-        mutate({
-          variables: {
-            input: {
-              examId,
-            },
-          },
-        });
-      }}
-    >
-      Begin grading
-    </Button>
+    <>
+      <div>
+        <h3>Grading progress:</h3>
+        <ul>
+          {examVersions.edges.map(({ node }, index) => (
+            <li key={node.id}>
+              {node.name}
+              <ul>
+                {completionStats[index].map((qStats, qnum) => (
+                  qStats.length > 1 ? (
+                    qStats.map((pStat, pnum) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <li key={`q${qnum}-p${pnum}`}>
+                        {`Question ${qnum + 1}, part ${alphabetIdx(pnum)}: ${pStat.notStarted} remaining`}
+                      </li>
+                    ))
+                  ) : (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <li key={`q${qnum}-p0`}>{`Question ${qnum + 1}: ${qStats[0].notStarted} remaining`}</li>
+                  )
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <DropdownButton
+        id="start-grading-any"
+        disabled={loading}
+        variant="primary"
+        title="Begin grading..."
+      >
+        <Dropdown.Item
+          onClick={() => {
+            mutate({
+              variables: {
+                input: {
+                  examId,
+                },
+              },
+            });
+          }}
+        >
+          Whatever is needed
+        </Dropdown.Item>
+        {examVersions.edges.map(({ node }, index) => (
+          <>
+            <Dropdown.Divider />
+            <Dropdown.Header>{node.name}</Dropdown.Header>
+            {completionStats[index].map((qStats, qnum) => (
+              qStats.map((_pStat, pnum) => (
+                <Dropdown.Item
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={`q${qnum}-p${pnum}`}
+                  onClick={() => {
+                    mutate({
+                      variables: {
+                        input: {
+                          examId,
+                          qnum,
+                          pnum,
+                        },
+                      },
+                    });
+                  }}
+                >
+                  {qStats.length > 1 ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}` : `Question ${qnum + 1}`}
+                </Dropdown.Item>
+              ))
+            ))}
+          </>
+        ))}
+      </DropdownButton>
+    </>
   );
 };
 
-const GradingGrader: React.FC = () => (
-  <Container>
-    <BeginGradingButton />
-  </Container>
-);
+const GradingGrader: React.FC = () => {
+  const { examId } = useParams<{ examId: string }>();
+  const res = useQuery<gradingGraderQuery>(
+    graphql`
+    query gradingGraderQuery($examId: ID!) {
+      exam(id: $examId) {
+        ...gradingBeginGrading
+      }
+    }
+    `,
+    { examId },
+  );
+  if (res.error) {
+    return <Container><RenderError error={res.error} /></Container>;
+  }
+  if (!res.props) {
+    return <Container><p>Loading...</p></Container>;
+  }
+  return (
+    <Container>
+      <BeginGradingButton examKey={res.props.exam} />
+    </Container>
+  );
+};
 
 const GradingLock: React.FC<{
   lockKey: gradingLock$key;
@@ -1524,32 +1669,7 @@ const GradingCompletion: React.FC<{
     `,
     versionKey,
   );
-  const completionStats: {
-    notStarted: number;
-    inProgress: number;
-    finished: number;
-  }[][] = [];
-  const { gradingLocks } = version;
-  gradingLocks.edges.forEach(({ node }) => {
-    const {
-      qnum,
-      pnum,
-      grader,
-      completedBy,
-    } = node;
-    if (completionStats[qnum] === undefined) completionStats[qnum] = [];
-    if (completionStats[qnum][pnum] === undefined) {
-      completionStats[qnum][pnum] = {
-        notStarted: 0,
-        inProgress: 0,
-        finished: 0,
-      };
-    }
-    const qpStat = completionStats[qnum][pnum];
-    if (completedBy !== null) qpStat.finished += 1;
-    else if (grader !== null && completedBy === null) qpStat.inProgress += 1;
-    else qpStat.notStarted += 1;
-  });
+  const completionStats = getCompletionStats(version);
   return (
     <Table>
       <thead>
@@ -1702,6 +1822,7 @@ const GradingAdmin: React.FC = () => {
     query gradingAdminQuery($examId: ID!) {
       exam(id: $examId) {
         ...gradingExamAdmin
+        ...gradingBeginGrading
       }
     }
     `,
@@ -1716,7 +1837,7 @@ const GradingAdmin: React.FC = () => {
   return (
     <Container>
       <ExamGradingAdministration examKey={res.props.exam} />
-      <BeginGradingButton />
+      <BeginGradingButton examKey={res.props.exam} />
     </Container>
   );
 };

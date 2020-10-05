@@ -16,15 +16,15 @@ module Bottlenose
 
           hg_course = Course.find_or_initialize_by(bottlenose_id: active_course['id'])
           hg_course.title = active_course['name']
-          hg_course.last_sync = DateTime.now
           hg_course.active = true
           hg_course.save!
-          sync_course_regs(hg_course) if hg_course.all_users.empty?
+          sync_course_regs(hg_course) if hg_course.empty?
         end
       end
     end
 
     def sync_course_regs(course)
+      course.update(:last_sync, DateTime.now)
       got = bottlenose_get("/api/courses/#{course.bottlenose_id}/registrations")
       got.each do |sec_id, sec_obj|
         sec = course.sections.find_or_initialize_by(bottlenose_id: sec_id)

@@ -19,6 +19,7 @@ module Bottlenose
           hg_course.last_sync = DateTime.now
           hg_course.active = true
           hg_course.save!
+          sync_course_regs(hg_course) if hg_course.all_users.empty?
         end
       end
     end

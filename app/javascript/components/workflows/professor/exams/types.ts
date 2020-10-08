@@ -205,15 +205,13 @@ export type RubricPresets = {
   inUse?: boolean;
 }
 
-type Editable<T> = {
-  [P in keyof Omit<T, 'points'>]: Editable<T[P]>
-} & {
-  [P in Extract<keyof T, 'points'>]: T[P] | string;
+type Editable<T, editable extends string> = {
+  [P in keyof T]: P extends editable ? (T[P] | string) : Editable<T[P], editable>
 }
 
-export type EditablePreset = Editable<Preset>
+export type EditablePreset = Editable<Preset, 'points'>
 
-export type EditableRubricPresets = Editable<RubricPresets>
+export type EditableRubricPresets = Editable<RubricPresets, 'points'>
 
 function isHTMLVal(obj : unknown): obj is HTMLVal {
   return obj !== undefined && obj !== null

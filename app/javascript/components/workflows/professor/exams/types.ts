@@ -205,6 +205,16 @@ export type RubricPresets = {
   inUse?: boolean;
 }
 
+type Editable<T> = {
+  [P in keyof Omit<T, 'points'>]: Editable<T[P]>
+} & {
+  [P in Extract<keyof T, 'points'>]: T[P] | string;
+}
+
+export type EditablePreset = Editable<Preset>
+
+export type EditableRubricPresets = Editable<RubricPresets>
+
 function isHTMLVal(obj : unknown): obj is HTMLVal {
   return obj !== undefined && obj !== null
     && (obj as HTMLVal).type === 'HTML'
@@ -226,6 +236,23 @@ export function isRubricPresets(obj : unknown): obj is RubricPresets {
     && (objAsRubricPresets.direction === 'credit' || objAsRubricPresets.direction === 'deduction')
     && (objAsRubricPresets.mercy === undefined || typeof objAsRubricPresets.mercy === 'number')
     && array(isPreset)(objAsRubricPresets.presets);
+}
+
+function isEditablePreset(obj : unknown): obj is EditablePreset {
+  if (obj === undefined || obj === null) return false;
+  const objAsPreset = (obj as Preset);
+  return (typeof objAsPreset.graderHint === 'string')
+    && (objAsPreset.studentFeedback === undefined || typeof objAsPreset.studentFeedback === 'string')
+    && (typeof objAsPreset.points === 'number' || typeof objAsPreset.points === 'string');
+}
+
+export function isEditableRubricPresets(obj : unknown): obj is EditableRubricPresets {
+  if (obj === null || obj === undefined) return false;
+  const objAsRubricPresets = (obj as RubricPresets);
+  return (objAsRubricPresets.label === undefined || typeof objAsRubricPresets.label === 'string')
+    && (objAsRubricPresets.direction === 'credit' || objAsRubricPresets.direction === 'deduction')
+    && (objAsRubricPresets.mercy === undefined || typeof objAsRubricPresets.mercy === 'number')
+    && array(isEditablePreset)(objAsRubricPresets.presets);
 }
 
 export type Rubric = RubricAll | RubricAny | RubricOne | RubricNone;

@@ -22,7 +22,9 @@ import ErrorBoundary from '@hourglass/common/boundary';
 import {
   Rubric,
   isRubricPresets,
+  isEditableRubricPresets,
   RubricPresets,
+  EditableRubricPresets,
 } from '@professor/exams/types';
 import Tooltip from '@student/exams/show/components/Tooltip';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
@@ -210,7 +212,7 @@ const RubricPresetDirectionEditor: React.FC<
 };
 interface RubricPresetsProps {
   type: Rubric['type'];
-  value: RubricPresets;
+  value: EditableRubricPresets;
 }
 
 const RubricPresetsEditor: React.FC<WrappedFieldProps & RubricPresetsProps> = (props) => {
@@ -276,7 +278,7 @@ const RubricEntriesEditor: React.FC<WrappedFieldProps & RubricEntriesProps> = (p
     input,
   } = props;
   const { value, onChange } = input;
-  const anyPresets = (isRubricPresets(value) && value.presets.length > 0);
+  const anyPresets = (isEditableRubricPresets(value) && value.presets.length > 0);
   const anySections = (value instanceof Array && value.length > 0);
   const freeChoice = !(anyPresets || anySections);
   if (freeChoice) {

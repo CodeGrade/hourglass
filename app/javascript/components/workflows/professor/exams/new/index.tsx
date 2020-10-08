@@ -132,6 +132,7 @@ const NewExamForm: React.FC<{
                 value={duration}
                 min={0}
                 onChange={setDuration}
+                variant="primary"
               />
             </Col>
           </Form.Group>

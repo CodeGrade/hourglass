@@ -568,7 +568,7 @@ export const ExamInfoEditor: React.FC<{
               disabled={disabled}
               value={duration}
               className="overflow-visible"
-              variant="success"
+              variant="primary"
               min={0}
               onChange={setDuration}
             />

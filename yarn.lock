@@ -1489,7 +1489,7 @@
     "@types/prop-types" "*"
     csstype "^3.0.2"
 
-"@types/redux-form@^8.2.6":
+"@types/redux-form@^8.3.0":
   version "8.3.0"
   resolved "https://registry.yarnpkg.com/@types/redux-form/-/redux-form-8.3.0.tgz#d253e0078a4940187b946459e0bb4d6a355018b1"
   integrity sha512-LUOpffXkPpY7n9pQvaAy9TifMgQFVqQF0LmJLLiZGWpDmDmvgEbNbQ6h2tSJ7CVNIVo45wPPVdWw5Mi91ZPvfQ==

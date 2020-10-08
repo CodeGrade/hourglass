@@ -134,7 +134,7 @@ export const NumericInput: React.FC<{
           }
         }}
         disabled={disabled}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => { if (onChange) onChange(e.target.value); }}
         onBlur={() => { if (onChange) onChange(clamp(numValue, min, max)); }}
       />
       <InputGroup.Append className="align-self-stretch">

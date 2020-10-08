@@ -91,6 +91,7 @@ const PreStart: React.FC<PreStartProps> = (props) => {
   return (
     <div>
       <h1>{res.name}</h1>
+      <p><b><i>Make sure that your window is not maximized right now!</i></b></p>
       <p>Click the following button to enter secure mode and begin the exam.</p>
       <Button
         variant="success"

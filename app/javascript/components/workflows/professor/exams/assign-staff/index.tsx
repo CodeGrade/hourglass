@@ -292,8 +292,8 @@ const StaffSeatingForm: React.FC<
           variables: {
             input: {
               examId,
-              unassignedProctorIds: all.unassigned.map((s) => s.id),
-              proctorsWithoutRoomIds: all.proctors.map((s) => s.id),
+              unassignedProctorIds: (all.unassigned ?? []).map((s) => s.id),
+              proctorsWithoutRoomIds: (all.proctors ?? []).map((s) => s.id),
               proctorRegistrationUpdates: rooms,
             },
           },

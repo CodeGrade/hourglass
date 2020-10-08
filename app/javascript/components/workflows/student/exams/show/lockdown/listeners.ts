@@ -34,10 +34,10 @@ const listeners: {
   },
   {
     event: 'contextmenu',
-    handler: (detected) => (e: Event): void => {
+    handler: (_detected) => (e: Event): void => {
       e.preventDefault();
       e.stopPropagation();
-      detected('tried to use the context menu', e);
+      // detected('tried to use the context menu', e);
     },
   },
   {

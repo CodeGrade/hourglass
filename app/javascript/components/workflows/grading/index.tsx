@@ -1381,18 +1381,7 @@ const BeginGradingButton: React.FC<{
           node {
             id
             name
-            ...gradingCompletion
-            gradingLocks {
-              edges {
-                node {
-                  id
-                  qnum
-                  pnum
-                  grader { id }
-                  completedBy { id }
-                }
-              }
-            }
+            completionSummary
           }
         }
       }
@@ -1402,7 +1391,11 @@ const BeginGradingButton: React.FC<{
   );
 
   const { examVersions } = res;
-  const completionStats = examVersions.edges.map(({ node }) => getCompletionStats(node));
+  const completionStats = examVersions.edges.map(({ node }) => node.completionSummary as {
+    notStarted: number;
+    inProgress: number;
+    finished: number;
+  }[][]);
   const { examId } = useParams<{ examId: string }>();
   const history = useHistory();
   const { alert } = useContext(AlertContext);

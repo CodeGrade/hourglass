@@ -101,5 +101,22 @@ module Types
     field :grading_locks, Types::GradingLockType.connection_type, null: false do
       guard Guards::PROFESSORS
     end
+
+    field :completion_summary, GraphQL::Types::JSON, null: false do
+      guard Guards::ALL_STAFF
+    end
+    def completion_summary
+      gls_by_qnum = object.grading_locks.group_by(&:qnum)
+      object.questions.each_with_index.map do |q, qnum|
+        gls_by_pnum = (gls_by_qnum[qnum] || []).group_by(&:pnum)
+        q['parts'].each_with_index.map do |_, pnum|
+          { 
+            notStarted: gls_by_pnum[pnum].count { |gl| gl.grader_id.nil? && gl.completed_by_id.nil? },
+            inProgress: gls_by_pnum[pnum].count { |gl| gl.completed_by_id.nil? && !gl.grader_id.nil? },
+            finished: gls_by_pnum[pnum].count { |gl| !gl.completed_by_id.nil? },
+          } 
+        end
+      end
+    end
   end
 end

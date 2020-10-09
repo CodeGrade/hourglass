@@ -1007,6 +1007,7 @@ const Grade: React.FC<{
         points
       }
       examVersion {
+        id
         ...gradingRubric
         questions
         answers
@@ -1058,6 +1059,7 @@ const Grade: React.FC<{
           variables: {
             input: {
               examId,
+              examVersionId: examVersion.id,
               qnum,
               pnum,
             },
@@ -1337,6 +1339,13 @@ const SyncExamToBottlenoseButton: React.FC = () => {
   );
 };
 
+const allBlank = (stats) => {
+  if (stats instanceof Array) {
+    return stats.every(allBlank);
+  }
+  return stats.notStarted === 0;
+};
+
 const getCompletionStats = (version) => {
   const completionStats: {
     notStarted: number;
@@ -1466,12 +1475,12 @@ const BeginGradingButton: React.FC<{
         >
           Whatever is needed
         </Dropdown.Item>
-        {examVersions.edges.map(({ node }, index) => (
+        {examVersions.edges.map(({ node }, index) => (!allBlank(completionStats[index]) && (
           <>
             <Dropdown.Divider />
             <Dropdown.Header>{node.name}</Dropdown.Header>
-            {completionStats[index].map((qStats, qnum) => (
-              qStats.map((_pStat, pnum) => (
+            {completionStats[index].map((qStats, qnum) => (!allBlank(qStats) && (
+              qStats.map((pStat, pnum) => (pStat.notStarted > 0 && (
                 <Dropdown.Item
                   // eslint-disable-next-line react/no-array-index-key
                   key={`q${qnum}-p${pnum}`}
@@ -1480,6 +1489,7 @@ const BeginGradingButton: React.FC<{
                       variables: {
                         input: {
                           examId,
+                          examVersionId: node.id,
                           qnum,
                           pnum,
                         },
@@ -1489,10 +1499,10 @@ const BeginGradingButton: React.FC<{
                 >
                   {qStats.length > 1 ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}` : `Question ${qnum + 1}`}
                 </Dropdown.Item>
-              ))
-            ))}
+              )))
+            )))}
           </>
-        ))}
+        )))}
       </DropdownButton>
     </>
   );

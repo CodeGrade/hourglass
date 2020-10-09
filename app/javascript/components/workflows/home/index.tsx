@@ -14,6 +14,7 @@ import {
   Container,
   Row,
   Col,
+  Alert,
 } from 'react-bootstrap';
 import { DateTime } from 'luxon';
 import LinkButton from '@hourglass/common/linkbutton';
@@ -425,6 +426,11 @@ const Home: React.FC = () => {
         <ShowUpcomingRegistrations
           registrations={res.props.me.futureRegistrations}
         />
+        {res.props.me.currentRegistrations.length > 0 && (
+          <Alert variant="warning">
+            <div className="text-center"><b><i>Make sure that you are using Chrome or Firefox right now!</i></b></div>
+          </Alert>
+        )}
         <ShowRegistrations
           name="Active exams"
           registrations={res.props.me.currentRegistrations}

@@ -111,9 +111,9 @@ module Types
         gls_by_pnum = (gls_by_qnum[qnum] || []).group_by(&:pnum)
         q['parts'].each_with_index.map do |_, pnum|
           { 
-            notStarted: gls_by_pnum[pnum].count { |gl| gl.grader_id.nil? && gl.completed_by_id.nil? },
-            inProgress: gls_by_pnum[pnum].count { |gl| gl.completed_by_id.nil? && !gl.grader_id.nil? },
-            finished: gls_by_pnum[pnum].count { |gl| !gl.completed_by_id.nil? },
+            notStarted: gls_by_pnum[pnum]&.count { |gl| gl.grader_id.nil? && gl.completed_by_id.nil? } || 0,
+            inProgress: gls_by_pnum[pnum]&.count { |gl| gl.completed_by_id.nil? && !gl.grader_id.nil? } || 0,
+            finished: gls_by_pnum[pnum]&.count { |gl| !gl.completed_by_id.nil? } || 0,
           } 
         end
       end

@@ -3,7 +3,8 @@
 module Types
   class GradingLockType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
-    global_id_field :id
+    global_id_field :id 
+    field :id, ID, null: false, guard: ->(_obj, _args, _ctx) { true }
 
     guard Guards::VISIBILITY
 
@@ -11,11 +12,15 @@ module Types
     def registration
       RecordLoader.for(Registration).load(object.registration_id)
     end
-    field :grader, Types::UserType, null: true
+    field :grader, Types::UserType, null: true, guard: ->(obj, _args, ctx) {
+      obj.object.grader.nil? || obj.object.visible_to?(ctx[:current_user])
+    }
     def grader
       RecordLoader.for(User).load(object.grader_id)
     end
-    field :completed_by, Types::UserType, null: true
+    field :completed_by, Types::UserType, null: true, guard: ->(obj, _args, ctx) {
+      obj.object.completed_by.nil? || obj.object.visible_to?(ctx[:current_user])
+    }
     def completed_by
       RecordLoader.for(User).load(object.completed_by_id)
     end

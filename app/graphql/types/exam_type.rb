@@ -6,7 +6,7 @@ module Types
     global_id_field :id
 
     guard lambda { |obj, _, ctx|
-      (obj.object.visible_to?(ctx[:current_user]) ||
+      (obj.object.visible_to?(ctx[:current_user], Guards.exam_role(ctx[:current_user], ctx), Guards.course_role(ctx[:current_user], ctx)) ||
        obj.object.all_staff.exists?(ctx[:current_user].id))
     }
 

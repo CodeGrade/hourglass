@@ -33,6 +33,14 @@ class Exam < ApplicationRecord
     only_integer: true,
   }
 
+  enum role: {
+    no_reg: 0,
+    student: 1,
+    staff: 2,
+    proctor: 3,
+    professor: 4,
+  }
+
   validate :end_after_start
   validate :duration_valid
 
@@ -216,9 +224,15 @@ class Exam < ApplicationRecord
     end
   end
 
-  def visible_to?(check_user)
-    return true if proctors_and_professors.exists? check_user.id
-    return false unless student_ids.member? check_user.id
+  def visible_to?(check_user, role_for_exam, role_for_course)
+    if ([role_for_exam, role_for_course].max >= Exam.roles[:proctor]) ||
+       proctors_and_professors.exists?(check_user.id)
+      return true
+    end
+    unless ([role_for_exam, role_for_course].max == Exam.roles[:student]) ||
+           student_ids.member?(check_user.id)
+      return false
+    end
 
     reg = registrations.find_by(user: check_user)
     reg.available? || reg.over?

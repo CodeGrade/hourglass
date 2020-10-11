@@ -48,7 +48,7 @@ class Course < ApplicationRecord
     all_users.exists? check_user.id
   end
 
-  def visible_to?(check_user)
-    all_staff.exists? check_user.id
+  def visible_to?(check_user, _role_for_exam, role_for_course)
+    (role_for_course >= Exam.roles[:staff]) || all_staff.exists?(check_user.id)
   end
 end

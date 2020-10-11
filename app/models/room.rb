@@ -33,7 +33,8 @@ class Room < ApplicationRecord
     User.where(id: registrations.select(:user_id))
   end
 
-  def visible_to?(check_user)
-    proctors_and_professors.or(students).exists? check_user.id
+  def visible_to?(check_user, role_for_exam, _role_for_course)
+    (role_for_exam >= Exam.roles[:student] && role_for_exam != Exam.roles[:staff]) ||
+      proctors_and_professors.or(students).exists?(check_user.id)
   end
 end

@@ -19,7 +19,7 @@ class Accommodation < ApplicationRecord
     (percent_time_expansion.to_f / 100.0) + 1.0
   end
 
-  def visible_to?(check_user)
-    course.professors.exists? check_user.id
+  def visible_to?(check_user, role_for_exam, _role_for_course)
+    (role_for_exam >= Exam.roles[:professor]) || course.professors.exists?(check_user.id)
   end
 end

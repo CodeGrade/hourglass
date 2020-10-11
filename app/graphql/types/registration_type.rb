@@ -18,6 +18,9 @@ module Types
     field :end_time, GraphQL::Types::ISO8601DateTime, null: true
 
     field :user, Types::UserType, null: false
+    def user
+      RecordLoader.for(User).load(object.user_id)
+    end
     field :exam, Types::ExamType, null: false
     # field :exam_version, Types::ExamVersionType, null: true
     # def exam_version
@@ -32,6 +35,9 @@ module Types
       guard lambda { |obj, _args, ctx|
         !obj.object.in_future?
       }
+    end
+    def exam_version
+      RecordLoader.for(ExamVersion).load(object.exam_version_id)
     end
 
 

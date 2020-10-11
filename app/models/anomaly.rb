@@ -19,7 +19,7 @@ class Anomaly < ApplicationRecord
     HourglassSchema.subscriptions.trigger(:anomaly_was_created, { exam_id: exam_id }, self)
   end
 
-  def visible_to?(check_user)
-    exam.proctors_and_professors.exists? check_user.id
+  def visible_to?(check_user, role_for_exam, _role_for_course)
+    (role_for_exam >= Exam.roles[:proctor]) || exam.proctors_and_professors.exists?(check_user.id)
   end
 end

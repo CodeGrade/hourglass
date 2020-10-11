@@ -38,7 +38,7 @@ class GradingCheck < ApplicationRecord
     deduction.nil?
   end
 
-  def visible_to?(check_user)
-    (user == check_user) || course.all_staff.exists?(check_user.id)
+  def visible_to?(check_user, role_for_exam, _role_for_course)
+    (user == check_user) || (role_for_exam >= Exam.roles[:staff]) || course.all_staff.exists?(check_user.id)
   end
 end

@@ -36,8 +36,8 @@ class ExamVersion < ApplicationRecord
     message: ->(errors) { errors },
   }
 
-  def visible_to?(user)
-    everyone.exists? user.id
+  def visible_to?(user, role_for_exam, _role_for_course)
+    (role_for_exam >= Exam.roles[:student]) || everyone.exists?(user.id)
   end
 
   def everyone

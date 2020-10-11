@@ -10,7 +10,10 @@ module Types
     field :title, String, null: false
 
     field :exams, [Types::ExamType], null: false do
-      guard ->(obj, _, ctx) { obj.object.all_staff.exists? ctx[:current_user].id }
+      guard ->(obj, _, ctx) {
+        (Guards.course_role(ctx[:current_user], ctx) >= Exam.roles[:staff]) ||
+        obj.object.all_staff.exists?(ctx[:current_user].id)
+      }
     end
     def exams
       AssociationLoader.for(Course, :exams).load(object)

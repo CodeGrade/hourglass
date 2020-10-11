@@ -101,6 +101,9 @@ module Types
     field :grading_locks, Types::GradingLockType.connection_type, null: false do
       guard Guards::PROFESSORS
     end
+    def grading_locks
+      AssociationLoader.for(ExamVersion, :grading_locks).load(object)
+    end
 
     field :completion_summary, GraphQL::Types::JSON, null: false do
       guard Guards::ALL_STAFF

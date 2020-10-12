@@ -17,23 +17,17 @@ module Types
       context[:current_user]
     end
 
-    field :exam, ExamType, null: false do
-      argument :id, ID, required: true
-    end
-
-    def exam(id:)
-      exam = HourglassSchema.object_from_id(id, context)
-      course = exam.course
+    def cache_authorization!(exam, course)
       exam_role = Exam.roles[:no_reg]
       course_role = Exam.roles[:no_reg]
-      if course.user_is_professor(context[:current_user])
+      if course.user_is_professor?(context[:current_user])
         course_role = exam_role = Exam.roles[:professor]
-      elsif exam.proctors.exists?(context[:current_user].id)
+      elsif exam&.user_is_proctor?(context[:current_user].id)
         exam_role = Exam.roles[:proctor]
         course_role = Exam.roles[:staff]
-      elsif course.user_is_staff(context[:current_user])
+      elsif course.user_is_staff?(context[:current_user])
         course_role = Exam.roles[:staff]
-      elsif course.user_is_student(context[:current_user])
+      elsif course.user_is_student?(context[:current_user])
         course_role = Exam.roles[:student]
       end
       ac = context[:access_cache]
@@ -41,6 +35,15 @@ module Types
       ac[:role_for_exam][context[:current_user].id] = exam_role
       ac[:role_for_course] = {} unless ac.key? :role_for_course
       ac[:role_for_course][context[:current_user].id] = course_role
+    end
+
+    field :exam, ExamType, null: false do
+      argument :id, ID, required: true
+    end
+
+    def exam(id:)
+      exam = HourglassSchema.object_from_id(id, context)
+      cache_authorization!(exam, exam.course)
       exam
     end
 
@@ -49,7 +52,9 @@ module Types
     end
 
     def exam_version(id:)
-      HourglassSchema.object_from_id(id, context)
+      exam_version = HourglassSchema.object_from_id(id, context)
+      cache_authorization!(exam_version.exam, exam_version.exam.course)
+      exam_version
     end
 
     field :registration, Types::RegistrationType, null: true do
@@ -74,19 +79,7 @@ module Types
 
     def course(id:)
       course = HourglassSchema.object_from_id(id, context)
-      course_role = Exam.roles[:no_reg]
-      if course.user_is_professor(context[:current_user])
-        course_role = Exam.roles[:professor]
-      elsif exam.proctors.exists?(context[:current_user].id)
-        course_role = Exam.roles[:staff]
-      elsif course.user_is_staff(context[:current_user])
-        course_role = Exam.roles[:staff]
-      elsif course.user_is_student(context[:current_user])
-        course_role = Exam.roles[:student]
-      end
-      ac = context[:access_cache]
-      ac[:role_for_course] = {} unless ac.key? :role_for_course
-      ac[:role_for_course][context[:current_user].id] = course_role
+      cache_authorization!(nil, course)
       course
     end
 

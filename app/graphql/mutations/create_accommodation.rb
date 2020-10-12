@@ -11,10 +11,7 @@ module Mutations
     field :registration_id, ID, null: false
 
     def authorized?(registration:)
-      return true if ProfessorCourseRegistration.find_by(
-        user: context[:current_user],
-        course: registration.exam.course,
-      )
+      return true if registration.exam.user_is_professor?(context[:current_user])
 
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end

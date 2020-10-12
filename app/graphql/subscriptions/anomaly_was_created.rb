@@ -9,14 +9,8 @@ module Subscriptions
     field :anomaly_edge, Types::AnomalyType.edge_type, null: false
 
     def authorized?(exam:)
-      return true if ProctorRegistration.find_by(
-        user: context[:current_user],
-        exam: exam,
-      )
-      return true if ProfessorCourseRegistration.find_by(
-        user: context[:current_user],
-        course: exam.course,
-      )
+      return true if exam.user_is_proctor?(context[:current_user])
+      return true if exam.user_is_professor?(context[:current_user])
 
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end

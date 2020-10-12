@@ -27,6 +27,10 @@ class Exam < ApplicationRecord
   delegate :professors, to: :course
   delegate :all_staff, to: :course
 
+  delegate :user_is_student?, to: :course
+  delegate :user_is_staff?, to: :course
+  delegate :user_is_professor?, to: :course
+
   validates :course, presence: true
   validates :name, presence: true
   validates :duration, presence: true, numericality: {
@@ -62,6 +66,10 @@ class Exam < ApplicationRecord
 
   def proctors_and_professors
     User.where(id: proctor_ids + professor_ids)
+  end
+
+  def user_is_proctor?(user)
+    proctor_registrations.where(user: user).exists?
   end
 
   # All students and proctors registered for the exam.

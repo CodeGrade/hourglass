@@ -13,13 +13,13 @@ module Types
       RecordLoader.for(Registration).load(object.registration_id)
     end
     field :grader, Types::UserType, null: true, guard: ->(obj, _args, ctx) {
-      obj.object.grader.nil? || obj.object.visible_to?(ctx[:current_user], Guards.exam_role(ctx[:current_user], ctx), Guards.course_role(ctx[:current_user], ctx))
+      obj.object.grader_id.nil? || obj.object.visible_to?(ctx[:current_user], Guards.exam_role(ctx[:current_user], ctx), Guards.course_role(ctx[:current_user], ctx))
     }
     def grader
       RecordLoader.for(User).load(object.grader_id)
     end
     field :completed_by, Types::UserType, null: true, guard: ->(obj, _args, ctx) {
-      obj.object.completed_by.nil? || obj.object.visible_to?(ctx[:current_user], Guards.exam_role(ctx[:current_user], ctx), Guards.course_role(ctx[:current_user], ctx))
+      obj.object.completed_by_id.nil? || obj.object.visible_to?(ctx[:current_user], Guards.exam_role(ctx[:current_user], ctx), Guards.course_role(ctx[:current_user], ctx))
     }
     def completed_by
       RecordLoader.for(User).load(object.completed_by_id)

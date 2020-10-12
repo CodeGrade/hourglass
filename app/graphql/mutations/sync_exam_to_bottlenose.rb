@@ -8,16 +8,14 @@ module Mutations
     field :exam, Types::ExamType, null: false
 
     def authorized?(exam:)
-      return true if ProfessorCourseRegistration.find_by(
-        user: context[:current_user],
-        course: exam.course,
-      )
+      return true if exam.user_is_professor?(context[:current_user])
 
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
     def resolve(exam:)
       context[:bottlenose_api].create_exam(exam)
+      cache_authorization!(exam, exam.course)
       { exam: exam }
     rescue Bottlenose::UnauthorizedError => e
       raise GraphQL::ExecutionError, e.message

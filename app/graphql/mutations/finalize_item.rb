@@ -12,8 +12,8 @@ module Mutations
       obj = HourglassSchema.object_from_id(id, context)
       exam = exam_for_obj(obj)
       raise GraphQL::ExecutionError, 'Invalid target.' unless exam
-      return true if ProctorRegistration.find_by(user: context[:current_user], exam: exam)
-      return true if ProfessorCourseRegistration.find_by(user: context[:current_user], course: exam.course)
+      return true if exam.user_is_proctor?(context[:current_user])
+      return true if exam.user_is_professor?(context[:current_user])
 
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
@@ -26,6 +26,8 @@ module Mutations
         obj.finalize!
       end
       exam = exam_for_obj(obj)
+
+      cache_authorization!(exam, exam.course)
       { exam: exam }
     end
 

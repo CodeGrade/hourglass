@@ -12,10 +12,7 @@ module Mutations
     field :exam, Types::ExamType, null: true
 
     def authorized?(exam:, **_args)
-      return true if ProfessorCourseRegistration.find_by(
-        user: context[:current_user],
-        course: exam.course,
-      )
+      return true if exam.user_is_professor?(context[:current_user])
 
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
@@ -24,6 +21,7 @@ module Mutations
       updated = exam.update(args)
       raise GraphQL::ExecutionError, exam.errors.full_messages.to_sentence unless updated
 
+      cache_authorization!(exam, exam.course)
       { exam: exam }
     end
   end

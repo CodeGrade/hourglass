@@ -11,10 +11,7 @@ module Mutations
     field :rubric_preset, Types::RubricPresetType, null: false
 
     def authorized?(exam_version:, **_args)
-      return true if ProfessorCourseRegistration.find_by(
-        user: context[:current_user],
-        course: exam_version.course,
-      )
+      return true if exam_version.course.user_is_professor?(context[:current_user])
 
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end

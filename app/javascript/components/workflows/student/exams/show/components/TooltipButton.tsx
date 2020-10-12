@@ -6,7 +6,8 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 
 interface TooltipButtonProps {
   disabled: boolean;
-  disabledMessage: string;
+  disabledMessage?: string;
+  enabledMessage?: string;
   placement?: OverlayTriggerProps['placement'];
   onClick?: () => void;
   variant?: ButtonProps['variant'];
@@ -19,6 +20,7 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
   const {
     disabled,
     disabledMessage,
+    enabledMessage,
     onClick,
     variant = 'primary',
     placement = 'bottom',
@@ -29,8 +31,8 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
   } = props;
   return (
     <Tooltip
-      showTooltip={disabled}
-      message={disabledMessage}
+      showTooltip={disabled || !!enabledMessage}
+      message={disabled ? disabledMessage : enabledMessage}
       placement={placement}
     >
       <span

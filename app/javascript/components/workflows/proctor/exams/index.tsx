@@ -231,6 +231,7 @@ const FinalizeButton: React.FC<{
       <TooltipButton
         disabled={disabled}
         disabledMessage={reason}
+        enabledMessage="Finalize"
         variant="danger"
         onClick={() => {
           mutate({
@@ -243,7 +244,6 @@ const FinalizeButton: React.FC<{
         }}
       >
         <Icon I={FaThumbsDown} />
-        Finalize
       </TooltipButton>
     </Loading>
   );
@@ -298,6 +298,7 @@ const ClearButton: React.FC<{
       <TooltipButton
         disabled={loading}
         disabledMessage="Loading..."
+        enabledMessage="Clear anomaly"
         variant="success"
         onClick={() => {
           mutate({
@@ -310,7 +311,6 @@ const ClearButton: React.FC<{
         }}
       >
         <Icon I={FaThumbsUp} />
-        Clear anomaly
       </TooltipButton>
     </Loading>
   );
@@ -332,6 +332,7 @@ const ShowAnomaly: React.FC<{
       id
       createdAt
       reason
+      priorAnomalyCount
       registration {
         id
         final
@@ -353,22 +354,30 @@ const ShowAnomaly: React.FC<{
           value={DateTime.fromISO(anomaly.createdAt)}
         />
       </td>
+      <td>{anomaly.priorAnomalyCount}</td>
       <td>{anomaly.reason}</td>
-      <td>
-        <FinalizeButton
-          registrationId={anomaly.registration.id}
-          regFinal={anomaly.registration.final}
-        />
-        <ClearButton examId={examId} anomalyId={anomaly.id} />
-        <Button
-          variant="info"
-          onClick={() => {
-            replyTo(anomaly.registration.id);
-          }}
-        >
-          <Icon I={MdMessage} />
-          Message student
-        </Button>
+      <td className="d-flex">
+        <div className="d-flex flex-fill">
+          <FinalizeButton
+            registrationId={anomaly.registration.id}
+            regFinal={anomaly.registration.final}
+          />
+        </div>
+        <div className="d-flex flex-fill">
+          <ClearButton examId={examId} anomalyId={anomaly.id} />
+        </div>
+        <div className="d-flex flex-fill">
+          <TooltipButton
+            disabled={false}
+            enabledMessage="Message student"
+            variant="info"
+            onClick={() => {
+              replyTo(anomaly.registration.id);
+            }}
+          >
+            <Icon I={MdMessage} />
+          </TooltipButton>
+        </div>
       </td>
     </tr>
   );
@@ -693,6 +702,7 @@ const ExamAnomalies: React.FC<{
                 <tr>
                   <th>Student</th>
                   <th>Timestamp</th>
+                  <th># prior anomalies</th>
                   <th>Reason</th>
                   <th>Actions</th>
                 </tr>

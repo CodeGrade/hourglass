@@ -15,5 +15,7 @@ module Types
     end
 
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+
+    field :prior_anomaly_count, Integer, null: false
   end
 end

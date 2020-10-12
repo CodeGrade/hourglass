@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'marks_processor'
+require 'nokogiri'
 
 # A single version of an exam.
 class ExamVersion < ApplicationRecord
@@ -489,15 +490,15 @@ class ExamVersion < ApplicationRecord
       parts = q['parts']
       if parts.count == 1
         {
-          'name' => q.dig('name', 'value'),
+          'name' => Nokogiri::HTML.fragment(q.dig('name', 'value')).content,
           'weight' => parts.first['points'],
         }
       else
         {
-          'name' => q.dig('name', 'value'),
+          'name' => Nokogiri::HTML.fragment(q.dig('name', 'value')).content,
           'parts' => parts.map do |p|
             {
-              'name' => p.dig('name', 'value'),
+              'name' => Nokogiri::HTML.fragment(p.dig('name', 'value')).content,
               'weight' => p['points'],
             }.compact
           end,

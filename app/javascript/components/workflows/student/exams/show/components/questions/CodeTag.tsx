@@ -1,5 +1,10 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { FileRef, CodeTagInfo, CodeTagState } from '@student/exams/show/types';
+import {
+  FileRef,
+  CodeTagInfo,
+  CodeTagState,
+  ExamFile,
+} from '@student/exams/show/types';
 import {
   Row, Col, Modal, Button,
 } from 'react-bootstrap';
@@ -18,10 +23,21 @@ import {
 interface CodeTagValProps {
   value: CodeTagState;
   hideFile?: boolean;
+  filteredFiles: ExamFile[];
 }
 
 const CodeTagVal: React.FC<CodeTagValProps> = (props) => {
-  const { value, hideFile = false } = props;
+  const { value, hideFile = false, filteredFiles } = props;
+  const root = filteredFiles.find((f) => value?.selectedFile?.startsWith(f.relPath));
+  let display = value?.selectedFile;
+  if (display && root) {
+    if (root.text.endsWith('/')) {
+      display = display.replace(`${root.relPath}/`, root.text);
+    } else {
+      display = display.replace(root.relPath, root.text);
+    }
+  }
+  if (display?.startsWith('/')) display = display.substring(1);
   return (
     <div>
       {hideFile || (
@@ -30,7 +46,7 @@ const CodeTagVal: React.FC<CodeTagValProps> = (props) => {
           {value?.selectedFile
             ? (
               <Button disabled size="sm" variant="outline-dark">
-                {value.selectedFile}
+                {display}
               </Button>
           )
             : <i>Unanswered</i>}
@@ -119,7 +135,11 @@ const FileModal: React.FC<FileModalProps> = (props) => {
       </Modal.Body>
       <Modal.Footer>
         <div className="mr-auto">
-          <CodeTagVal value={selected} hideFile={countFiles(filteredFiles) === 1} />
+          <CodeTagVal
+            value={selected}
+            filteredFiles={filteredFiles}
+            hideFile={countFiles(filteredFiles) === 1}
+          />
         </div>
         <Button variant="secondary" onClick={onClose}>
           Close
@@ -178,7 +198,11 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
         <HTML value={prompt} />
         <Row className="mt-2 align-items-baseline">
           <Col>
-            <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />
+            <CodeTagVal
+              value={value}
+              hideFile={countFiles(filteredFiles) === 1}
+              filteredFiles={filteredFiles}
+            />
           </Col>
           <Col>
             <Button

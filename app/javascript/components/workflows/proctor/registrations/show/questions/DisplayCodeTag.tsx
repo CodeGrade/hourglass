@@ -57,7 +57,11 @@ const FileModal: React.FC<FileModalProps> = (props) => {
       </Modal.Body>
       <Modal.Footer className="align-items-baseline">
         <div className="mr-auto">
-          <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />
+          <CodeTagVal
+            value={value}
+            filteredFiles={filteredFiles}
+            hideFile={countFiles(filteredFiles) === 1}
+          />
         </div>
         <Button variant="secondary" onClick={onClose}>
           Close
@@ -102,7 +106,11 @@ const DisplayCodeTag: React.FC<CodeTagProps> = (props) => {
     return (
       <Row className="mt-2 align-items-baseline">
         <Col>
-          <CodeTagVal value={value} hideFile={countFiles(filteredFiles) === 1} />
+          <CodeTagVal
+            value={value}
+            filteredFiles={filteredFiles}
+            hideFile={countFiles(filteredFiles) === 1}
+          />
         </Col>
         <Col>
           <Button size="sm" onClick={(): void => setShowModal(true)} variant="outline-info">

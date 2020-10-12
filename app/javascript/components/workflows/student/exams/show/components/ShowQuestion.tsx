@@ -108,11 +108,11 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
                 separateSubparts={separateSubparts}
                 spyQuestion={spyQuestion}
               />
-              <div className={showArrows ? '' : 'd-none'}>
+              <div className={showArrows ? 'mb-5' : 'd-none'}>
                 <PaginationArrows />
               </div>
               {showSubmit && (
-                <div className="text-center">
+                <div className="text-center mb-5">
                   <SubmitButton
                     examTakeUrl={examTakeUrl}
                     cleanupBeforeSubmit={cleanupBeforeSubmit}

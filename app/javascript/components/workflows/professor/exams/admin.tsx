@@ -14,7 +14,7 @@ import {
   useLocation,
   Link,
 } from 'react-router-dom';
-import { useRefresher } from '@hourglass/common/helpers';
+import { pluralize, useRefresher } from '@hourglass/common/helpers';
 import { NumericInput } from '@hourglass/common/NumericInput';
 import {
   Card,
@@ -77,7 +77,9 @@ import './dnd.scss';
 
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
 import { admin_examInfo$key } from './__generated__/admin_examInfo.graphql';
+import { admin_publishGrades$key } from './__generated__/admin_publishGrades.graphql';
 import { adminUpdateExamMutation } from './__generated__/adminUpdateExamMutation.graphql';
+import { adminPublishGradesMutation } from './__generated__/adminPublishGradesMutation.graphql';
 import { ChecklistItemStatus, admin_checklist$key } from './__generated__/admin_checklist.graphql';
 import { admin_versionInfo$key } from './__generated__/admin_versionInfo.graphql';
 import { admin_version$key, LockdownPolicy } from './__generated__/admin_version.graphql';
@@ -973,6 +975,95 @@ const StartGradingButton: React.FC = () => {
   );
 };
 
+const PublishGradesButton: React.FC<{
+  examId: admin_publishGrades$key;
+}> = ({ examId }) => {
+  const res = useFragment(
+    graphql`
+    fragment admin_publishGrades on Exam {
+      id
+      graded
+    }
+    `,
+    examId,
+  );
+  const { alert } = useContext(AlertContext);
+  const [publish, { loading }] = useMutation<adminPublishGradesMutation>(
+    graphql`
+      mutation adminPublishGradesMutation($input: PublishGradesInput!) {
+        publishGrades(input: $input) {
+          published
+          count
+        }
+      }
+    `,
+    {
+      onCompleted: ({ publishGrades }) => {
+        const { count, published } = publishGrades;
+        alert({
+          variant: 'success',
+          autohide: true,
+          message: `${pluralize(count, 'exam', 'exams')} ${published ? 'published' : 'unpublished'}`,
+        });
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error publishing grades.',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+
+  const disabled = loading || !res.graded;
+  const reason = loading ? 'Loading...' : 'Not all exams are graded yet';
+  return (
+    <Tooltip
+      showTooltip={disabled}
+      message={reason}
+      placement="bottom"
+    >
+      <DropdownButton
+        disabled={disabled}
+        className="d-inline-block ml-2"
+        variant="success"
+        title="Publish..."
+      >
+        <Dropdown.Item
+          onClick={() => {
+            publish({
+              variables: {
+                input: {
+                  examId: res.id,
+                  published: true,
+                },
+              },
+            });
+          }}
+        >
+          Publish all grades
+        </Dropdown.Item>
+        <Dropdown.Item
+          onClick={() => {
+            publish({
+              variables: {
+                input: {
+                  examId: res.id,
+                  published: false,
+                },
+              },
+            });
+          }}
+        >
+          Unpublish all grades
+        </Dropdown.Item>
+      </DropdownButton>
+    </Tooltip>
+  );
+};
+
 const ExamAdmin: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
   const res = useQuery<adminExamQuery>(
@@ -984,6 +1075,7 @@ const ExamAdmin: React.FC = () => {
         startTime
         endTime
         duration
+        ...admin_publishGrades
         ...admin_examInfo
         ...admin_checklist
       }
@@ -1012,6 +1104,7 @@ const ExamAdmin: React.FC = () => {
             <Button className="mr-2" variant="success">Proctor!</Button>
           </Link>
           <StartGradingButton />
+          <PublishGradesButton examId={res.props.exam} />
           <Link to={`/exams/${res.props.exam.id}/submissions`}>
             <Button className="ml-2" variant="primary">View submissions</Button>
           </Link>

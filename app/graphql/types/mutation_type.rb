@@ -38,5 +38,7 @@ module Types
     field :send_message, mutation: Mutations::SendMessage
     field :destroy_anomaly, mutation: Mutations::DestroyAnomaly
     field :update_exam, mutation: Mutations::UpdateExam
+
+    field :publish_grades, mutation: Mutations::PublishGrades
   end
 end

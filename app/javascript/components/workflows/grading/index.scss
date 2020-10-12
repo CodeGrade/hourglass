@@ -17,8 +17,19 @@
   opacity: 100%;
   width: auto;
   position: fixed;
+  padding: 0.5em;
 
   &:hover {
     color: black !important;
   }
+}
+
+.carousel-control-prev:hover {
+  padding-right: 2em;
+  background: linear-gradient(to left, transparent, theme-color("secondary"));
+}
+
+.carousel-control-next:hover {
+  padding-left: 2em;
+  background: linear-gradient(to right, transparent, theme-color("secondary"));
 }

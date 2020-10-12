@@ -456,7 +456,7 @@ class ExamVersion < ApplicationRecord
   def qp_pairs
     questions.each_with_index.map do |q, qnum|
       q['parts'].each_with_index.map do |_, pnum|
-        [qnum, pnum]
+        {qnum: qnum, pnum: pnum}
       end
     end.flatten(1)
   end

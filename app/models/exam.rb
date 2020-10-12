@@ -219,7 +219,7 @@ class Exam < ApplicationRecord
     GradingLock.transaction do
       GradingLock.where(registration: registrations).update(grader: nil) if reset
       registrations.final.each do |registration|
-        pairs_by_version[registration.exam_version_id].each do |qnum, pnum|
+        pairs_by_version[registration.exam_version_id].each do |qnum:, pnum:|
           GradingLock.find_or_create_by(registration: registration, qnum: qnum, pnum: pnum)
         end
       end

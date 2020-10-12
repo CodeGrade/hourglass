@@ -18,6 +18,7 @@ import {
   Container,
   Dropdown,
   DropdownButton,
+  Carousel,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
@@ -74,6 +75,7 @@ import {
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
+import Part from '@proctor/registrations/show/Part';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import { RenderError } from '@hourglass/common/boundary';
 import { AlertContext } from '@hourglass/common/alerts';
@@ -88,11 +90,14 @@ import TooltipButton from '@student/exams/show/components/TooltipButton';
 import FourOhFour from '@hourglass/workflows/FourOhFour';
 import Spoiler from '@hourglass/common/Spoiler';
 import { NumericInput } from '@hourglass/common/NumericInput';
-import { assertType, isExamRubric } from '@professor/exams/types';
+import { assertType, CurrentGrading, isExamRubric } from '@professor/exams/types';
 import { ShowRubrics } from '@grading/UseRubrics';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
 
+import './index.scss';
+
 import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
+import { grading_showOne$key } from './__generated__/grading_showOne.graphql';
 import { gradingRubric$key } from './__generated__/gradingRubric.graphql';
 import { createCommentMutation } from './__generated__/createCommentMutation.graphql';
 import { gradingDestroyCommentMutation } from './__generated__/gradingDestroyCommentMutation.graphql';
@@ -1243,6 +1248,112 @@ const Grade: React.FC<{
   );
 };
 
+const ShowOnePart: React.FC<{
+  registrationKey: grading_showOne$key;
+  qnum: number;
+  pnum: number;
+}> = (props) => {
+  const {
+    registrationKey,
+    qnum,
+    pnum,
+  } = props;
+  const res = useFragment(
+    graphql`
+    fragment grading_showOne on Registration {
+      id
+      currentAnswers
+      currentGrading
+      gradingComments(
+        first: 100000
+      ) @connection(key: "Registration_gradingComments", filters: []) {
+        edges {
+          node {
+            id
+            qnum
+            pnum
+            bnum
+            points
+            message
+            presetComment {
+              id
+              points
+              graderHint
+              studentFeedback
+            }
+          }
+        }
+      }
+      gradingChecks {
+        id
+        qnum
+        pnum
+        bnum
+        points
+      }
+      examVersion {
+        id
+        ...gradingRubric
+        questions
+        answers
+        files
+      }
+    }
+    `,
+    registrationKey,
+  );
+  const { examVersion } = res;
+  const currentAnswers = res.currentAnswers as AnswersState;
+  const currentGrading = res.currentGrading as CurrentGrading;
+  const questions = examVersion.questions as QuestionInfo[];
+  const files = examVersion.files as ExamFile[];
+  const contextVal = useMemo(() => ({
+    files,
+    fmap: createMap(files),
+  }), [files]);
+  const viewerContextVal = useMemo(() => ({
+    answers: currentAnswers,
+  }), [currentAnswers]);
+  const anonymous = questions[qnum].parts.length === 1 && !questions[qnum].parts[pnum].name?.value;
+  return (
+    <ExamContext.Provider value={contextVal}>
+      <ExamViewerContext.Provider value={viewerContextVal}>
+        <div>
+          <Row>
+            <Col sm={{ span: 6, offset: 3 }}>
+              <h2><QuestionName qnum={qnum} name={questions[qnum].name} /></h2>
+            </Col>
+          </Row>
+          <PromptRow prompt={questions[qnum].description} />
+          {questions[qnum].reference.length !== 0 && (
+            <Row>
+              <Col sm={{ span: 9, offset: 3 }}>
+                <FileViewer
+                  references={questions[qnum].reference}
+                />
+              </Col>
+            </Row>
+          )}
+          <div>
+            <Row>
+              <Col sm={{ span: 6, offset: 3 }}>
+                <Part
+                  refreshCodeMirrorsDeps={[]}
+                  part={questions[qnum].parts[pnum]}
+                  qnum={qnum}
+                  pnum={pnum}
+                  anonymous={anonymous}
+                  currentGrading={currentGrading[qnum][pnum]}
+                />
+              </Col>
+            </Row>
+          </div>
+        </div>
+      </ExamViewerContext.Provider>
+    </ExamContext.Provider>
+  );
+};
+
 const GradeOnePart: React.FC = () => {
   const { registrationId, qnum, pnum } = useParams<{
     registrationId: string, qnum: string, pnum: string
@@ -1252,10 +1363,12 @@ const GradeOnePart: React.FC = () => {
     query gradingQuery($registrationId: ID!) {
       registration(id: $registrationId) {
         ...grading_one
+        ...grading_showOne
         exam {
           name
         }
         examVersion {
+          qpPairs { qnum pnum }
           answers
         }
       }
@@ -1263,6 +1376,7 @@ const GradeOnePart: React.FC = () => {
     `,
     { registrationId },
   );
+
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
@@ -1270,28 +1384,51 @@ const GradeOnePart: React.FC = () => {
     return <Container><p>Loading...</p></Container>;
   }
 
+  const { qpPairs } = res.props.registration.examVersion;
+  const indexOfQP = qpPairs.findIndex((qp) => (
+    qp.qnum === Number(qnum) && qp.pnum === Number(pnum)
+  ));
+
   return (
     <Container fluid>
       <Row>
-        <Col sm="auto">
-          <Icon I={FaChevronCircleLeft} size="3em" />
-        </Col>
-        <Col className="overflow-auto-y">
-          <Row>
-            <Col sm={{ span: 6, offset: 3 }}>
-              <h1>{res.props.registration.exam.name}</h1>
-            </Col>
-          </Row>
-          <Grade
-            registrationKey={res.props.registration}
-            qnum={Number(qnum)}
-            pnum={Number(pnum)}
-          />
-        </Col>
-        <Col sm="auto">
-          <Icon I={FaChevronCircleRight} size="3em" />
+        <Col sm={{ span: 6, offset: 3 }}>
+          <h1>{res.props.registration.exam.name}</h1>
         </Col>
       </Row>
+      <Carousel
+        defaultActiveIndex={indexOfQP}
+        indicators={false}
+        wrap={false}
+        interval={null}
+        keyboard={false}
+        nextIcon={<Icon I={FaChevronCircleRight} size="3em" />}
+        prevIcon={<Icon I={FaChevronCircleLeft} size="3em" />}
+      >
+        {qpPairs.map((qp, index) => (
+          <Carousel.Item
+            // eslint-disable-next-line react/no-array-index-key
+            key={index}
+            className="mb-4"
+          >
+            <Col className="overflow-auto-y">
+              {(index === indexOfQP) ? (
+                <Grade
+                  registrationKey={res.props.registration}
+                  qnum={qp.qnum}
+                  pnum={qp.pnum}
+                />
+              ) : (
+                <ShowOnePart
+                  registrationKey={res.props.registration}
+                  qnum={qp.qnum}
+                  pnum={qp.pnum}
+                />
+              )}
+            </Col>
+          </Carousel.Item>
+        ))}
+      </Carousel>
     </Container>
   );
 };

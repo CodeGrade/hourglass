@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 module Types
+  class QpPairType < Types::BaseObject
+    field :qnum, Integer, null: false
+    field :pnum, Integer, null: false
+  end
   class ExamVersionType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id
@@ -103,6 +107,10 @@ module Types
     end
     def grading_locks
       AssociationLoader.for(ExamVersion, :grading_locks).load(object)
+    end
+
+    field :qp_pairs, [Types::QpPairType], null: false do
+      guard Guards::ALL_STAFF
     end
 
     field :completion_summary, GraphQL::Types::JSON, null: false do

@@ -1,0 +1,24 @@
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+
+.carousel-indicators {
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  border-radius: 1em;
+  margin-bottom: 0;
+  background-color: theme-color("dark");
+  margin-left: 35%;
+  margin-right: 35%;
+}
+
+.carousel-control-prev, .carousel-control-next {
+  color: theme-color("dark") !important;
+  opacity: 100%;
+  width: auto;
+  position: fixed;
+
+  &:hover {
+    color: black !important;
+  }
+}

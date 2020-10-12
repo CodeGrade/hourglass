@@ -147,7 +147,11 @@ class Upload
             if b.key? 'AllThatApply'
               b['AllThatApply']['options'].map(&:values).flatten
             elsif b.key? 'Code'
-              { NO_ANS: true }
+              if b['Code']['correctAnswer'].is_a? String
+                { "text" => b['Code']['correctAnswer'], "marks" => [] }
+              else
+                { NO_ANS: true }
+              end
             elsif b.key? 'CodeTag'
               {
                 selectedFile: b['CodeTag']['correctAnswer']['filename'],
@@ -158,7 +162,7 @@ class Upload
             elsif b.key? 'MultipleChoice'
               b['MultipleChoice']['correctAnswer']
             elsif b.key? 'Text'
-              { NO_ANS: true }
+              b['Text']['correctAnswer'] || { NO_ANS: true }
             elsif b.key? 'TrueFalse'
               if (b['TrueFalse'] == true) || (b['TrueFalse'] == false)
                 b['TrueFalse']

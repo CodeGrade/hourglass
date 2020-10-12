@@ -485,20 +485,20 @@ class ExamVersion < ApplicationRecord
     end
   end
 
-  def bottlenose_summary
+  def bottlenose_summary(with_names = true)
     questions.map do |q|
       parts = q['parts']
       if parts.count == 1
         {
-          'name' => Nokogiri::HTML.fragment(q.dig('name', 'value')).content,
+          'name' => with_names ? Nokogiri::HTML.fragment(q.dig('name', 'value')).content : nil,
           'weight' => parts.first['points'],
         }
       else
         {
-          'name' => Nokogiri::HTML.fragment(q.dig('name', 'value')).content,
+          'name' => with_names ? Nokogiri::HTML.fragment(q.dig('name', 'value')).content : nil,
           'parts' => parts.map do |p|
             {
-              'name' => Nokogiri::HTML.fragment(p.dig('name', 'value')).content,
+              'name' => with_names ? Nokogiri::HTML.fragment(p.dig('name', 'value')).content : nil,
               'weight' => p['points'],
             }.compact
           end,

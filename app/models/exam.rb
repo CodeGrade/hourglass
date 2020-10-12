@@ -250,16 +250,22 @@ class Exam < ApplicationRecord
     if exam_versions.count == 1
       exam_versions.first.bottlenose_summary
     else
-      [{
-        'name' => 'Final grade',
-        'weight' => 100,
-      }]
+      all_versions = exam_versions.map{ |ev| ev.bottlenose_summary(false) }
+      if compatible_versions(all_versions)
+        all_versions.first
+      else
+        [{
+          'name' => 'Final grade',
+          'weight' => 100,
+        }]
+      end
     end
   end
 
   def bottlenose_exam_grades(regs = nil)
     regs = registrations if regs.nil?
-    if exam_versions.count == 1
+    all_versions = exam_versions.map{ |ev| ev.bottlenose_summary(false) }
+    if compatible_versions(all_versions)
       regs.map do |r|
         [
           r.user.username,
@@ -276,6 +282,10 @@ class Exam < ApplicationRecord
     end
   end
 
+  def compatible_versions(all_versions)
+    first_version = all_versions.pop
+    all_versions.all? { |v| v == first_version }
+  end
   def bottlenose_export
     {
       'name' => name,

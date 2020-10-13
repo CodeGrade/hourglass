@@ -148,7 +148,7 @@ class Upload
               b['AllThatApply']['options'].map(&:values).flatten
             elsif b.key? 'Code'
               if b['Code']['correctAnswer'].is_a? String
-                { "text" => b['Code']['correctAnswer'], "marks" => [] }
+                { 'text' => b['Code']['correctAnswer'], 'marks' => [] }
               else
                 { NO_ANS: true }
               end

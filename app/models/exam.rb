@@ -219,8 +219,8 @@ class Exam < ApplicationRecord
     GradingLock.transaction do
       GradingLock.where(registration: registrations).update(grader: nil) if reset
       registrations.final.each do |registration|
-        pairs_by_version[registration.exam_version_id].each do |qnum:, pnum:|
-          GradingLock.find_or_create_by(registration: registration, qnum: qnum, pnum: pnum)
+        pairs_by_version[registration.exam_version_id].each do |qp|
+          GradingLock.find_or_create_by(registration: registration, qnum: qp[:qnum], pnum: qp[:pnum])
         end
       end
     end
@@ -250,7 +250,7 @@ class Exam < ApplicationRecord
     if exam_versions.count == 1
       exam_versions.first.bottlenose_summary
     else
-      all_versions = exam_versions.map{ |ev| ev.bottlenose_summary(false) }
+      all_versions = exam_versions.map { |ev| ev.bottlenose_summary(false) }
       if compatible_versions(all_versions)
         all_versions.first
       else
@@ -264,7 +264,7 @@ class Exam < ApplicationRecord
 
   def bottlenose_exam_grades(regs = nil)
     regs = registrations if regs.nil?
-    all_versions = exam_versions.map{ |ev| ev.bottlenose_summary(false) }
+    all_versions = exam_versions.map { |ev| ev.bottlenose_summary(false) }
     if compatible_versions(all_versions)
       regs.map do |r|
         [
@@ -286,6 +286,7 @@ class Exam < ApplicationRecord
     first_version = all_versions.pop
     all_versions.all? { |v| v == first_version }
   end
+
   def bottlenose_export
     {
       'name' => name,

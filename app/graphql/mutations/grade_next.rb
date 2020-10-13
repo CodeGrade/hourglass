@@ -38,11 +38,22 @@ module Mutations
     end
 
     def next_incomplete(exam, exam_version, qnum, pnum)
-      sorted = exam.grading_locks.incomplete.no_grader
-      sorted = sorted.where(registration_id: exam_version.registration_ids) if exam_version && exam_version.exam == exam
-      sorted = sorted.where(qnum: qnum) if qnum && sorted.where(qnum: qnum).exists?
-      sorted = sorted.where(pnum: pnum) if pnum && sorted.where(pnum: pnum).exists?
-      sorted = sorted.sort_by { |l| [l.qnum, l.pnum] }
+      sorted = exam.grading_locks.incomplete.no_grader.to_a
+      if (exam_version && exam_version.exam == exam)
+        reg_ids = exam_version.registration_ids.to_set
+        for_cur_version = sorted.select { |s| reg_ids.member?(s.registration_id) } 
+        unless for_cur_version.empty?
+          sorted = for_cur_version 
+          by_qnum = qnum ? sorted.select { |s| s.qnum == qnum } : []
+          unless by_qnum.empty?
+            sorted = by_qnum
+            by_pnum = pnum ? sorted.select { |s| s.pnum == pnum } : []
+            unless by_pnum.empty?
+              sorted = by_pnum
+            end
+          end
+        end
+      end
       sorted.first
     end
   end

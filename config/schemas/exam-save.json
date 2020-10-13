@@ -40,6 +40,7 @@
       "properties": {
         "name": { "$ref": "#/definitions/HTML" },
         "description": { "$ref": "#/definitions/HTML" },
+        "extraCredit": { "type": "boolean" },
         "separateSubparts": { "type": "boolean" },
         "parts": { "$ref": "#/definitions/Parts" },
         "reference": { "$ref": "#/definitions/References" }
@@ -57,6 +58,7 @@
         "name": { "$ref": "#/definitions/HTML" },
         "description": { "$ref": "#/definitions/HTML" },
         "points": { "type": "number" },
+        "extraCredit": { "type": "boolean" },
         "body": { "$ref": "#/definitions/BodyItems" },
         "reference": { "$ref": "#/definitions/References" }
       }

@@ -33,6 +33,7 @@ const Part: React.FC<PartProps> = (props) => {
     reference,
     description,
     points,
+    extraCredit = false,
     body,
   } = part;
   const { rubric } = useContext(ExamViewerContext);
@@ -40,9 +41,9 @@ const Part: React.FC<PartProps> = (props) => {
   const strPoints = pluralize(points, 'point', 'points');
   let subtitle;
   if (currentGrading?.score !== undefined) {
-    subtitle = `${currentGrading?.score} / ${strPoints}`;
+    subtitle = `${currentGrading?.score} / ${strPoints}${extraCredit ? ' (Extra credit)' : ''}`;
   } else {
-    subtitle = `(${strPoints})`;
+    subtitle = `(${strPoints}${extraCredit ? ', extra credit' : ''})`;
   }
   const contextVal = useMemo(() => ({ references: reference }), [reference]);
   return (

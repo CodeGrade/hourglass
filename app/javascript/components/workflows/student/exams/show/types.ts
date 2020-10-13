@@ -371,6 +371,7 @@ export interface PartInfo {
   name?: HTMLVal;
   description: HTMLVal;
   points: number;
+  extraCredit?: boolean;
   reference: FileRef[];
   body: BodyItem[];
 }
@@ -378,6 +379,7 @@ export interface PartInfo {
 export interface QuestionInfo {
   name?: HTMLVal;
   description: HTMLVal;
+  extraCredit?: boolean;
   separateSubparts: boolean;
   parts: PartInfo[];
   reference: FileRef[];

@@ -211,6 +211,7 @@ class Upload
         name: make_html_val(q['name']),
         separateSubparts: q['separateSubparts'],
         description: make_html_val(q['description']),
+        extraCredit: q['extraCredit'],
         reference: q_reference,
         parts: q['parts'].map do |p|
           p_reference = p['reference']&.map { |r| map_reference r } || []
@@ -218,6 +219,7 @@ class Upload
             name: make_html_val(p['name']),
             description: make_html_val(p['description']),
             points: p['points'],
+            extraCredit: p['extraCredit'],
             reference: p_reference,
             body: p['body'].map do |b|
               if b.is_a? String

@@ -492,14 +492,17 @@ class ExamVersion < ApplicationRecord
         {
           'name' => with_names ? Nokogiri::HTML.fragment(q.dig('name', 'value')).content : nil,
           'weight' => parts.first['points'],
+          'extra' => q['extraCredit'] || parts.first['extraCredit'],
         }
       else
         {
           'name' => with_names ? Nokogiri::HTML.fragment(q.dig('name', 'value')).content : nil,
+          'extra' => q['extraCredit'],
           'parts' => parts.map do |p|
             {
               'name' => with_names ? Nokogiri::HTML.fragment(p.dig('name', 'value')).content : nil,
               'weight' => p['points'],
+              'extra' => p['extraCredit'],
             }.compact
           end,
         }

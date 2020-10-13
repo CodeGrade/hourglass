@@ -44,6 +44,7 @@
       "properties": {
         "name": { "type": "string" },
         "description": { "$ref": "#/definitions/HTML" },
+        "extraCredit": { "type": "boolean" },
         "separateSubparts": { "type": "boolean" },
         "parts": { "$ref": "#/definitions/Parts" },
         "reference": { "$ref": "#/definitions/FileDirs" },
@@ -63,6 +64,7 @@
         "name": { "type": "string" },
         "description": { "$ref": "#/definitions/HTML" },
         "points": { "type": "number" },
+        "extraCredit": { "type": "boolean" },
         "body": { "$ref": "#/definitions/BodyItems" },
         "reference": { "$ref": "#/definitions/FileDirs" },
         "partRubric": { "$ref": "#/definitions/Rubric" }

@@ -1108,7 +1108,10 @@ const Grade: React.FC<{
         <div>
           <Row>
             <Col sm={{ span: 6, offset: 3 }}>
-              <h2><QuestionName qnum={qnum} name={questions[qnum].name} /></h2>
+              <h2>
+                <QuestionName qnum={qnum} name={questions[qnum].name} />
+                {questions[qnum].extraCredit ? <span className="ml-4">(Extra credit)</span> : null}
+              </h2>
             </Col>
           </Row>
           <PromptRow prompt={questions[qnum].description} />
@@ -1613,7 +1616,8 @@ const BeginGradingButton: React.FC<{
           Whatever is needed
         </Dropdown.Item>
         {examVersions.edges.map(({ node }, index) => (!allBlank(completionStats[index]) && (
-          <>
+          // eslint-disable-next-line react/no-array-index-key
+          <React.Fragment key={index}>
             <Dropdown.Divider />
             <Dropdown.Header>{node.name}</Dropdown.Header>
             {completionStats[index].map((qStats, qnum) => (!allBlank(qStats) && (
@@ -1638,7 +1642,7 @@ const BeginGradingButton: React.FC<{
                 </Dropdown.Item>
               )))
             )))}
-          </>
+          </React.Fragment>
         )))}
       </DropdownButton>
     </>

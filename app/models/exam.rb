@@ -243,7 +243,7 @@ class Exam < ApplicationRecord
     end
 
     reg = registrations.find_by(user: check_user)
-    reg.available? || reg.over?
+    reg&.available? || reg&.over?
   end
 
   def bottlenose_exam_summary

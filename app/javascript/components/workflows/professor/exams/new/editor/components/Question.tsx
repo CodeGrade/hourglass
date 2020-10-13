@@ -41,7 +41,30 @@ const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {
   return (
     <>
       <Form.Label column sm="2">Separate subparts?</Form.Label>
-      <Col sm="10">
+      <Col sm="4">
+        <YesNo
+          className="bg-white rounded"
+          value={!!value}
+          info={SEP_SUB_YESNO}
+          onChange={onChange}
+        />
+      </Col>
+    </>
+  );
+};
+
+const QuestionExtraCredit: React.FC<WrappedFieldProps> = (props) => {
+  const {
+    input,
+  } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <>
+      <Form.Label column sm="2">Extra credit?</Form.Label>
+      <Col sm="4">
         <YesNo
           className="bg-white rounded"
           value={!!value}
@@ -133,6 +156,7 @@ const Question: React.FC<{
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-separate`}>
               <Field name="separateSubparts" component={QuestionSepSubParts} />
+              <Field name="extraCredit" component={QuestionExtraCredit} />
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-files`}>
               <Field

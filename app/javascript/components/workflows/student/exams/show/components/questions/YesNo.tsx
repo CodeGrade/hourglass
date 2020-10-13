@@ -1,5 +1,5 @@
 import React from 'react';
-import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+import { ButtonProps, ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
 import { YesNoInfo } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 
@@ -9,6 +9,7 @@ export interface YesNoProps {
   className?: string;
   onChange: (newValue: boolean) => void;
   disabled?: boolean;
+  variant?: ButtonProps['variant'];
 }
 
 const YesNo: React.FC<YesNoProps> = (props) => {
@@ -18,6 +19,7 @@ const YesNo: React.FC<YesNoProps> = (props) => {
     className,
     onChange,
     disabled,
+    variant = 'primary',
   } = props;
   const {
     prompt,
@@ -36,14 +38,14 @@ const YesNo: React.FC<YesNoProps> = (props) => {
       >
         <ToggleButton
           disabled={disabled}
-          variant={value ? 'primary' : 'outline-primary'}
+          variant={value ? variant : `outline-${variant}`}
           value
         >
           {yesLabel}
         </ToggleButton>
         <ToggleButton
           disabled={disabled}
-          variant={(value === false) ? 'primary' : 'outline-primary'}
+          variant={(value === false) ? variant : `outline-${variant}`}
           value={false}
         >
           {noLabel}

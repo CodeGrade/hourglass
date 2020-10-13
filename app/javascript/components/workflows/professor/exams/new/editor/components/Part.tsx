@@ -17,6 +17,8 @@ import { NumericInput } from '@hourglass/common/NumericInput';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
 import RubricEditor from '@professor/exams/new/editor/RubricEditor';
+import YesNo from '@student/exams/show/components/questions/YesNo';
+import { YesNoInfo } from '@student/exams/show/types';
 import { EditHTMLField } from './editHTMLs';
 import EditReference from './Reference';
 
@@ -29,7 +31,7 @@ const PartPoints: React.FC<WrappedFieldProps> = (props) => {
   return (
     <>
       <Form.Label column sm="2">Points</Form.Label>
-      <Col sm="10">
+      <Col sm="4">
         <NumericInput
           value={value}
           placeholder="Points for this part"
@@ -48,6 +50,39 @@ const PartPoints: React.FC<WrappedFieldProps> = (props) => {
             step={0.5}
             format="#.#"
             /> */}
+      </Col>
+    </>
+  );
+};
+
+const EC_YESNO: YesNoInfo = {
+  type: 'YesNo',
+  yesLabel: 'Yes',
+  noLabel: 'No',
+  prompt: {
+    type: 'HTML',
+    value: '',
+  },
+};
+const PartExtraCredit: React.FC<WrappedFieldProps> = (props) => {
+  const {
+    input,
+  } = props;
+  const {
+    value,
+    onChange,
+  } = input;
+  return (
+    <>
+      <Form.Label column sm="2">Extra credit?</Form.Label>
+      <Col sm="4">
+        <YesNo
+          variant="success"
+          className="bg-white rounded"
+          value={!!value}
+          info={EC_YESNO}
+          onChange={onChange}
+        />
       </Col>
     </>
   );
@@ -135,6 +170,7 @@ const Part: React.FC<{
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-${pnum}-points`}>
               <Field name="points" component={PartPoints} />
+              <Field name="extraCredit" component={PartExtraCredit} />
             </Form.Group>
             <Form.Group as={Row} controlId={`${qnum}-${pnum}-files`}>
               <Field

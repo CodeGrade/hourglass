@@ -36,6 +36,8 @@ interface Section {
 
 interface Student {
   id: string;
+  nuid: number;
+  username: string;
   displayName: string;
 }
 
@@ -119,7 +121,11 @@ const DraggableStudent: React.FC<{
 const StudentBadge: React.FC<{
   student: Student;
 }> = ({ student }) => (
-  <Button className="badge badge-primary badge-pill" size="sm">
+  <Button
+    className="badge badge-primary badge-pill"
+    size="sm"
+    title={`${student.username} (${student.nuid})`}
+  >
     {student.displayName}
   </Button>
 );
@@ -402,7 +408,7 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
               <p>No students</p>
             ) : unassigned.map((s) => (
               <li key={s.id} className="fixed-col-width">
-                <span>{s.displayName}</span>
+                <span title={`${s.username} (${s.nuid})`}>{s.displayName}</span>
               </li>
             ))}
           </ul>
@@ -418,7 +424,7 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
               <ul className="list-unstyled column-count-4">
                 {r.students.map((s) => (
                   <li key={s.id} className="fixed-col-width">
-                    <span>{s.displayName}</span>
+                    <span title={`${s.username} (${s.nuid})`}>{s.displayName}</span>
                   </li>
                 ))}
               </ul>
@@ -457,6 +463,8 @@ const AssignSeating: React.FC<{
           title
           students {
             id
+            nuid
+            username
             displayName
           }
         }
@@ -464,6 +472,8 @@ const AssignSeating: React.FC<{
       registrationsWithoutRooms {
         user {
           id
+          nuid
+          username
           displayName
         }
       }
@@ -473,6 +483,8 @@ const AssignSeating: React.FC<{
         registrations {
           user {
             id
+            nuid
+            username
             displayName
           }
         }

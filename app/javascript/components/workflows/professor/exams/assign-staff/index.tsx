@@ -41,6 +41,8 @@ type ItemTypes = DropStudent;
 
 interface Student {
   id: string;
+  nuid: number;
+  username: string;
   displayName: string;
 }
 
@@ -108,7 +110,11 @@ const DraggableStudent: React.FC<{
 const StudentBadge: React.FC<{
   student: Student;
 }> = ({ student }) => (
-  <Button className="badge badge-primary badge-pill" size="sm">
+  <Button
+    className="badge badge-primary badge-pill"
+    size="sm"
+    title={`${student.username} (${student.nuid})`}
+  >
     {student.displayName}
   </Button>
 );
@@ -424,7 +430,7 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
               <p>No students</p>
             ) : unassigned.map((s) => (
               <li key={s.id} className="fixed-col-width">
-                <span>{s.displayName}</span>
+                <span title={`${s.username} (${s.nuid})`}>{s.displayName}</span>
               </li>
             ))}
           </ul>
@@ -439,7 +445,7 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
             <ul className="list-unstyled column-count-4">
               {proctors.map((s) => (
                 <li key={s.user.id} className="fixed-col-width">
-                  <span>{s.user.displayName}</span>
+                  <span title={`${s.user.username} (${s.user.nuid})`}>{s.user.displayName}</span>
                 </li>
               ))}
             </ul>
@@ -456,7 +462,7 @@ const Readonly: React.FC<StaffAssignmentProps> = (props) => {
               <ul className="list-unstyled column-count-4">
                 {r.proctorRegistrations.map((p) => (
                   <li key={p.user.id} className="fixed-col-width">
-                    <span>{p.user.displayName}</span>
+                    <span title={`${p.user.username} (${p.user.nuid})`}>{p.user.displayName}</span>
                   </li>
                 ))}
               </ul>
@@ -480,6 +486,8 @@ const DND: React.FC<{
       id
       unassignedStaff {
         id
+        nuid
+        username
         displayName
       }
       rooms {
@@ -489,6 +497,8 @@ const DND: React.FC<{
           id
           user {
             id
+            nuid
+            username
             displayName
           }
         }
@@ -499,6 +509,8 @@ const DND: React.FC<{
           title
           staff {
             id
+            nuid
+            username
             displayName
           }
         }
@@ -506,6 +518,8 @@ const DND: React.FC<{
       proctorRegistrationsWithoutRooms {
         user {
           id
+          nuid
+          username
           displayName
         }
       }

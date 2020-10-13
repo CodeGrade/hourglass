@@ -10,6 +10,7 @@ FactoryBot.define do
     encrypted_password { Devise::Encryptor.digest(User, username) }
     display_name { username }
     email { "#{username}@localhost.localdomain" }
+    nuid { 100000000 + num }
 
     factory :admin do
       admin { true }

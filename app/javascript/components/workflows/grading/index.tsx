@@ -3,6 +3,7 @@ import React, {
   useState,
   useRef,
   useContext,
+  useEffect,
 } from 'react';
 import {
   Form,
@@ -56,7 +57,7 @@ import GradeYesNo from '@grading/questions/GradeYesNo';
 import GradeMatching from '@grading/questions/GradeMatching';
 import GradeMultipleChoice from '@grading/questions/GradeMultipleChoice';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
-import { ExhaustiveSwitchError, alphabetIdx } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, alphabetIdx, useRefresher } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import convertRubric from '@professor/exams/rubrics';
@@ -639,10 +640,12 @@ interface AnswersRowProps<T, V> {
   ShowStudent?: React.ComponentType<{
     info: T,
     value: V,
+    refreshProps: React.DependencyList;
   }>;
   ShowExpected: React.ComponentType<{
     info: T,
     value: V,
+    refreshProps: React.DependencyList;
   }>;
   info: T;
   studentAnswer: V;
@@ -653,6 +656,7 @@ interface AnswersRowProps<T, V> {
   bnum: number;
   comments: GradingComment[];
   registrationId: string;
+  refreshProps: React.DependencyList;
 }
 
 function AnswersRow<T, V>(
@@ -671,6 +675,7 @@ function AnswersRow<T, V>(
     comments,
     registrationId,
     children,
+    refreshProps,
   } = props;
   const res = useFragment<gradingRubric$key>(
     graphql`
@@ -732,6 +737,7 @@ function AnswersRow<T, V>(
             <ShowStudent
               info={info}
               value={studentAnswer}
+              refreshProps={refreshProps}
             >
               {children}
             </ShowStudent>
@@ -740,6 +746,7 @@ function AnswersRow<T, V>(
             <ShowExpected
               info={info}
               value={expectedAnswer}
+              refreshProps={refreshProps}
             />
           </Col>
         </Row>
@@ -784,6 +791,7 @@ const GradeBodyItem: React.FC<{
   check?: grading_one$data['gradingChecks'][number];
   comments: GradingComment[];
   registrationId: string;
+  refreshProps: React.DependencyList;
 }> = (props) => {
   const {
     expectedAnswer,
@@ -795,6 +803,7 @@ const GradeBodyItem: React.FC<{
     bnum,
     comments,
     registrationId,
+    refreshProps,
   } = props;
   switch (info.type) {
     case 'HTML':
@@ -816,6 +825,7 @@ const GradeBodyItem: React.FC<{
             expectedAnswer={expectedAnswer as CodeState}
             comments={comments}
             registrationId={registrationId}
+            refreshProps={refreshProps}
           />
         </>
       );
@@ -834,6 +844,7 @@ const GradeBodyItem: React.FC<{
             expectedAnswer={expectedAnswer as CodeTagState}
             comments={comments}
             registrationId={registrationId}
+            refreshProps={refreshProps}
           />
         </>
       );
@@ -853,6 +864,7 @@ const GradeBodyItem: React.FC<{
             expectedAnswer={expectedAnswer as YesNoState}
             comments={comments}
             registrationId={registrationId}
+            refreshProps={refreshProps}
           />
         </>
       );
@@ -871,6 +883,7 @@ const GradeBodyItem: React.FC<{
             expectedAnswer={expectedAnswer as TextState}
             comments={comments}
             registrationId={registrationId}
+            refreshProps={refreshProps}
           />
         </>
       );
@@ -890,6 +903,7 @@ const GradeBodyItem: React.FC<{
             expectedAnswer={expectedAnswer as MatchingState}
             comments={comments}
             registrationId={registrationId}
+            refreshProps={refreshProps}
           />
         </>
       );
@@ -908,6 +922,7 @@ const GradeBodyItem: React.FC<{
             expectedAnswer={expectedAnswer as AllThatApplyState}
             comments={comments}
             registrationId={registrationId}
+            refreshProps={refreshProps}
           />
         </>
       );
@@ -927,6 +942,7 @@ const GradeBodyItem: React.FC<{
             expectedAnswer={expectedAnswer as MultipleChoiceState}
             comments={comments}
             registrationId={registrationId}
+            refreshProps={refreshProps}
           />
         </>
       );
@@ -973,11 +989,13 @@ const Grade: React.FC<{
   registrationKey: grading_one$key;
   qnum: number;
   pnum: number;
+  refreshProps: React.DependencyList;
 }> = (props) => {
   const {
     registrationKey,
     qnum,
     pnum,
+    refreshProps,
   } = props;
   const res = useFragment(
     graphql`
@@ -1120,6 +1138,7 @@ const Grade: React.FC<{
               <Col sm={{ span: 9, offset: 3 }}>
                 <FileViewer
                   references={questions[qnum].reference}
+                  refreshProps={refreshProps}
                 />
               </Col>
             </Row>
@@ -1142,6 +1161,7 @@ const Grade: React.FC<{
                 <Col sm={{ span: 9, offset: 3 }}>
                   <FileViewer
                     references={questions[qnum].parts[pnum].reference}
+                    refreshProps={refreshProps}
                   />
                 </Col>
               </Row>
@@ -1178,6 +1198,7 @@ const Grade: React.FC<{
                   check={check}
                   comments={comments}
                   registrationId={res.id}
+                  refreshProps={refreshProps}
                 />
               );
             })}
@@ -1255,11 +1276,13 @@ const ShowOnePart: React.FC<{
   registrationKey: grading_showOne$key;
   qnum: number;
   pnum: number;
+  refreshProps: React.DependencyList;
 }> = (props) => {
   const {
     registrationKey,
     qnum,
     pnum,
+    refreshProps,
   } = props;
   const res = useFragment(
     graphql`
@@ -1333,6 +1356,7 @@ const ShowOnePart: React.FC<{
               <Col sm={{ span: 9, offset: 3 }}>
                 <FileViewer
                   references={questions[qnum].reference}
+                  refreshProps={refreshProps}
                 />
               </Col>
             </Row>
@@ -1341,7 +1365,7 @@ const ShowOnePart: React.FC<{
             <Row>
               <Col sm={{ span: 6, offset: 3 }}>
                 <Part
-                  refreshCodeMirrorsDeps={[]}
+                  refreshCodeMirrorsDeps={refreshProps}
                   part={questions[qnum].parts[pnum]}
                   qnum={qnum}
                   pnum={pnum}
@@ -1386,21 +1410,39 @@ const GradeOnePart: React.FC = () => {
   if (!res.props) {
     return <Container><p>Loading...</p></Container>;
   }
+  return <GradeOnePartHelp registration={res.props.registration} qnum={qnum} pnum={pnum} />;
+};
 
-  const { qpPairs } = res.props.registration.examVersion;
+const GradeOnePartHelp: React.FC<{
+  qnum: string,
+  pnum: string,
+  registration: gradingQuery['response']['registration'],
+}> = (props) => {
+  const { registration, qnum, pnum } = props;
+  const { qpPairs } = registration.examVersion;
   const indexOfQP = qpPairs.findIndex((qp) => (
     qp.qnum === Number(qnum) && qp.pnum === Number(pnum)
   ));
+  const [activeIndex, setActiveIndex] = useState(indexOfQP);
+  const [refresher, refresh] = useRefresher();
+  useEffect(() => {
+    setActiveIndex(indexOfQP);
+  }, [indexOfQP]);
 
   return (
     <Container fluid>
       <Row>
         <Col sm={{ span: 6, offset: 3 }}>
-          <h1>{res.props.registration.exam.name}</h1>
+          <h1>{registration.exam.name}</h1>
         </Col>
       </Row>
       <Carousel
-        defaultActiveIndex={indexOfQP}
+        activeIndex={activeIndex}
+        onSelect={(newIndex, _) => {
+          setActiveIndex(newIndex);
+        }}
+        onSlid={() => refresh()}
+        onSlide={() => refresh()}
         indicators={false}
         wrap={false}
         interval={null}
@@ -1417,15 +1459,17 @@ const GradeOnePart: React.FC = () => {
             <Col className="overflow-auto-y">
               {(index === indexOfQP) ? (
                 <Grade
-                  registrationKey={res.props.registration}
+                  registrationKey={registration}
                   qnum={qp.qnum}
                   pnum={qp.pnum}
+                  refreshProps={[indexOfQP, refresher]}
                 />
               ) : (
                 <ShowOnePart
-                  registrationKey={res.props.registration}
+                  registrationKey={registration}
                   qnum={qp.qnum}
                   pnum={qp.pnum}
+                  refreshProps={[indexOfQP, refresher]}
                 />
               )}
             </Col>

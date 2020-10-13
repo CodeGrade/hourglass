@@ -18,6 +18,7 @@
   width: auto;
   position: fixed;
   padding: 0.5em;
+  z-index: 1000;
 
   &:hover {
     color: black !important;

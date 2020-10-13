@@ -409,7 +409,7 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
               <ul className="list-unstyled column-count-4">
                 {v.students.map((s) => (
                   <li key={s.id} className="fixed-col-width">
-                    <span>{s.displayName}</span>
+                    <span title={`${s.username} (${s.nuid})`}>{s.displayName}</span>
                   </li>
                 ))}
               </ul>

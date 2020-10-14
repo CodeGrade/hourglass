@@ -197,12 +197,17 @@ mutation examsFinalizeItemMutation($input: FinalizeItemInput!) {
 
 const FinalizeButton: React.FC<{
   registrationId: string;
+  name: string;
   regFinal: boolean;
 }> = (props) => {
   const {
     registrationId,
+    name,
     regFinal,
   } = props;
+  const [showModal, setShowModal] = useState(false);
+  const openModal = useCallback(() => setShowModal(true), []);
+  const closeModal = useCallback(() => setShowModal(false), []);
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<examsFinalizeItemMutation>(
     finalizeItemMutation,
@@ -228,12 +233,15 @@ const FinalizeButton: React.FC<{
   const reason = loading ? 'Loading...' : 'Already final';
   return (
     <Loading loading={loading}>
-      <TooltipButton
-        disabled={disabled}
-        disabledMessage={reason}
-        enabledMessage="Finalize"
-        variant="danger"
-        onClick={() => {
+      <FinalizeDialog
+        loading={loading}
+        buttonText="Finalize this student"
+        subjectName={name}
+        subjectValue={registrationId}
+        showModal={showModal}
+        closeModal={closeModal}
+        finalize={() => {
+          closeModal();
           mutate({
             variables: {
               input: {
@@ -242,6 +250,13 @@ const FinalizeButton: React.FC<{
             },
           });
         }}
+      />
+      <TooltipButton
+        disabled={disabled}
+        disabledMessage={reason}
+        enabledMessage="Finalize"
+        variant="danger"
+        onClick={openModal}
       >
         <Icon I={FaThumbsDown} />
       </TooltipButton>
@@ -360,6 +375,7 @@ const ShowAnomaly: React.FC<{
         <div className="d-flex flex-fill">
           <FinalizeButton
             registrationId={anomaly.registration.id}
+            name={anomaly.registration.user.displayName}
             regFinal={anomaly.registration.final}
           />
         </div>

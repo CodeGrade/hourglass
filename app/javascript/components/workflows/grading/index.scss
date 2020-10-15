@@ -1,5 +1,6 @@
 @import "node_modules/bootstrap/scss/functions";
 @import "node_modules/bootstrap/scss/variables";
+@import "node_modules/bootstrap/scss/mixins";
 
 .carousel-indicators {
   text-align: center;
@@ -33,4 +34,29 @@
 .carousel-control-next:hover {
   padding-left: 2em;
   background: linear-gradient(to right, transparent, theme-color("secondary"));
+}
+
+.grouped-dropdown-holder {
+  margin-left: -$dropdown-border-width;
+  margin-right: -$dropdown-border-width;
+  margin-bottom: -$dropdown-border-width;
+  @include border-radius(4*$dropdown-border-radius);
+}
+
+.bordered-menu-group {
+  border: $dropdown-border-width solid $dropdown-border-color;
+  margin: -0.5 * $dropdown-border-width;
+  display: inline-block;
+}
+
+.grouped-dropdown-row {
+  .bordered-menu-group:first-child { border-left: 0; }
+  .bordered-menu-group:last-child { border-right: 0; }
+}
+
+.grouped-dropdown-row:last-child {
+  .bordered-menu-group { 
+    border-bottom: 0; 
+    padding-bottom: 0.5rem;
+  }
 }

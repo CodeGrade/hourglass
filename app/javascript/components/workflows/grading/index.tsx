@@ -1615,16 +1615,85 @@ const BeginGradingButton: React.FC<{
       },
     },
   );
+  const filtered = examVersions.edges.filter((_ver, index) => !allBlank(completionStats[index]));
+  const chunkSize = 4;
+  const versionsInChunks = Array.from(
+    { length: Math.ceil(filtered.length / chunkSize) },
+    (v, i) => examVersions.edges.slice(i * chunkSize, i * chunkSize + chunkSize),
+  );
   return (
     <>
       <div>
         <h3>Grading progress:</h3>
-        <ul>
-          {examVersions.edges.map(({ node }, index) => (
-            <li key={node.id}>
+        <Dropdown>
+          <Dropdown.Toggle disabled={loading} id="start-grading-any" variant="primary">
+            Begin grading...
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu className="pb-0">
+            <Dropdown.Item
+              className="mb-2"
+              onClick={() => {
+                mutate({
+                  variables: {
+                    input: {
+                      examId,
+                    },
+                  },
+                });
+              }}
+            >
+              Whatever is needed
+            </Dropdown.Item>
+            <div className="grouped-dropdown-holder">
+              {versionsInChunks.map((chunk, chunkIndex) => (
+                <div
+                  className="grouped-dropdown-row"
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={chunkIndex}
+                >
+                  {chunk.map(({ node }, nodeIndex) => {
+                    const index = chunkIndex * chunkSize + nodeIndex;
+                    return (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <div key={index} className="d-inline-block bordered-menu-group">
+                        <Dropdown.Header>{node.name}</Dropdown.Header>
+                        {completionStats[index % 2].map((qStats, qnum) => (!allBlank(qStats) && (
+                          qStats.map((pStat, pnum) => (pStat.notStarted > 0 && (
+                            <Dropdown.Item
+                              // eslint-disable-next-line react/no-array-index-key
+                              key={`q${qnum}-p${pnum}`}
+                              onClick={() => {
+                                mutate({
+                                  variables: {
+                                    input: {
+                                      examId,
+                                      examVersionId: node.id,
+                                      qnum,
+                                      pnum,
+                                    },
+                                  },
+                                });
+                              }}
+                            >
+                              {qStats.length > 1 ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}` : `Question ${qnum + 1}`}
+                            </Dropdown.Item>
+                          )))
+                        )))}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </Dropdown.Menu>
+        </Dropdown>
+        {examVersions.edges.map(({ node }, index) => (
+          <ul key={node.id} className="d-inline-block">
+            <li>
               {node.name}
               <ul>
-                {completionStats[index].map((qStats, qnum) => (
+                {completionStats[index % 2].map((qStats, qnum) => (
                   qStats.length > 1 ? (
                     qStats.map((pStat, pnum) => (
                       // eslint-disable-next-line react/no-array-index-key
@@ -1639,58 +1708,9 @@ const BeginGradingButton: React.FC<{
                 ))}
               </ul>
             </li>
-          ))}
-        </ul>
+          </ul>
+        ))}
       </div>
-      <DropdownButton
-        id="start-grading-any"
-        disabled={loading}
-        variant="primary"
-        title="Begin grading..."
-      >
-        <Dropdown.Item
-          onClick={() => {
-            mutate({
-              variables: {
-                input: {
-                  examId,
-                },
-              },
-            });
-          }}
-        >
-          Whatever is needed
-        </Dropdown.Item>
-        {examVersions.edges.map(({ node }, index) => (!allBlank(completionStats[index]) && (
-          // eslint-disable-next-line react/no-array-index-key
-          <React.Fragment key={index}>
-            <Dropdown.Divider />
-            <Dropdown.Header>{node.name}</Dropdown.Header>
-            {completionStats[index].map((qStats, qnum) => (!allBlank(qStats) && (
-              qStats.map((pStat, pnum) => (pStat.notStarted > 0 && (
-                <Dropdown.Item
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={`q${qnum}-p${pnum}`}
-                  onClick={() => {
-                    mutate({
-                      variables: {
-                        input: {
-                          examId,
-                          examVersionId: node.id,
-                          qnum,
-                          pnum,
-                        },
-                      },
-                    });
-                  }}
-                >
-                  {qStats.length > 1 ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}` : `Question ${qnum + 1}`}
-                </Dropdown.Item>
-              )))
-            )))}
-          </React.Fragment>
-        )))}
-      </DropdownButton>
     </>
   );
 };

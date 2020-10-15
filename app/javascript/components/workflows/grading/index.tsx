@@ -1619,7 +1619,7 @@ const BeginGradingButton: React.FC<{
   const chunkSize = 4;
   const versionsInChunks = Array.from(
     { length: Math.ceil(filtered.length / chunkSize) },
-    (v, i) => examVersions.edges.slice(i * chunkSize, i * chunkSize + chunkSize),
+    (v, i) => filtered.slice(i * chunkSize, i * chunkSize + chunkSize),
   );
   return (
     <>

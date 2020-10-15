@@ -31,7 +31,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   } = question;
   const { rubric } = useContext(ExamViewerContext);
   const qRubric = rubric?.questions[qnum]?.questionRubric;
-  const singlePart = parts.length === 1 && !parts[0].name?.value;
+  const singlePart = parts.length === 1 && !parts[0].name?.value?.trim();
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = pluralize(points, 'point', 'points');
   let curScore = 0;

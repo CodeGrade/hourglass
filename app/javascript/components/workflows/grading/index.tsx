@@ -1119,7 +1119,8 @@ const Grade: React.FC<{
     },
   );
   const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
-  const anonymous = questions[qnum].parts.length > 1 || !!questions[qnum].parts[pnum].name?.value;
+  const singlePart = questions[qnum].parts.length === 1
+    && !questions[qnum].parts[0].name?.value?.trim();
   return (
     <ExamContext.Provider value={contextVal}>
       <ExamViewerContext.Provider value={viewerContextVal}>
@@ -1148,7 +1149,7 @@ const Grade: React.FC<{
               <Col sm={{ span: 6, offset: 3 }}>
                 <h3>
                   <PartName
-                    anonymous={anonymous}
+                    anonymous={singlePart}
                     pnum={pnum}
                     name={questions[qnum].parts[pnum].name}
                   />
@@ -1340,7 +1341,8 @@ const ShowOnePart: React.FC<{
   const viewerContextVal = useMemo(() => ({
     answers: currentAnswers,
   }), [currentAnswers]);
-  const anonymous = questions[qnum].parts.length === 1 && !questions[qnum].parts[pnum].name?.value;
+  const singlePart = questions[qnum].parts.length === 1
+    && !questions[qnum].parts[0].name?.value?.trim();
   return (
     <ExamContext.Provider value={contextVal}>
       <ExamViewerContext.Provider value={viewerContextVal}>
@@ -1369,7 +1371,7 @@ const ShowOnePart: React.FC<{
                   part={questions[qnum].parts[pnum]}
                   qnum={qnum}
                   pnum={pnum}
-                  anonymous={anonymous}
+                  anonymous={singlePart}
                   currentGrading={currentGrading[qnum][pnum]}
                 />
               </Col>

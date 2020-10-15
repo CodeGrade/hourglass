@@ -20,6 +20,7 @@ import { AlertContext } from '@hourglass/common/alerts';
 import { examsFinalizeItemMutation } from '@proctor/exams/__generated__/examsFinalizeItemMutation.graphql';
 import Icon from '@student/exams/show/components/Icon';
 import { RenderError } from '@hourglass/common/boundary';
+import DocumentTitle from '@hourglass/common/documentTitle';
 import { CurrentGrading } from '@professor/exams/types';
 
 import { submissionsAllQuery, submissionsAllQueryResponse } from './__generated__/submissionsAllQuery.graphql';
@@ -32,6 +33,7 @@ const ExamSubmissions: React.FC = () => {
     graphql`
     query submissionsAllQuery($examId: ID!) {
       exam(id: $examId) {
+        name
         registrations {
           id
           user {
@@ -110,7 +112,7 @@ const ExamSubmissions: React.FC = () => {
   });
   const startedButNotFinished = groups.over.length > 0 || groups.started.length > 0;
   return (
-    <>
+    <DocumentTitle title={`${res.props.exam.name} -- All submissions`}>
       <h4>Completed submissions</h4>
       {groups.final.length === 0 ? (
         <i>No completed submissions yet</i>
@@ -189,7 +191,7 @@ const ExamSubmissions: React.FC = () => {
           ))}
         </ul>
       )}
-    </>
+    </DocumentTitle>
   );
 };
 
@@ -203,6 +205,7 @@ const ExamSubmission: React.FC = () => {
         currentGrading
         published
         user {
+          nuid
           displayName
         }
         exam { name }
@@ -229,10 +232,10 @@ const ExamSubmission: React.FC = () => {
   } = registration;
   if (currentAnswers === null && !published) {
     return (
-      <>
+      <DocumentTitle title={`${exam.name} -- Submission for ${user.displayName}`}>
         <h1>{`Submission for ${exam.name}`}</h1>
         <p>Your submission is not yet graded, and cannot be viewed at this time.</p>
-      </>
+      </DocumentTitle>
     );
   }
   const parsedContents: ContentsState = {
@@ -240,13 +243,13 @@ const ExamSubmission: React.FC = () => {
     answers: currentAnswers as AnswersState,
   };
   return (
-    <>
+    <DocumentTitle title={`${exam.name} -- Submission for ${user.displayName} (${user.nuid})`}>
       <h1>{`Submission by ${user.displayName}`}</h1>
       <ExamViewer
         contents={parsedContents}
         currentGrading={currentGrading as CurrentGrading}
       />
-    </>
+    </DocumentTitle>
   );
 };
 

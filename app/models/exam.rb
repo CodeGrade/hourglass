@@ -217,10 +217,17 @@ class Exam < ApplicationRecord
   def initialize_grading_locks!(reset = false)
     pairs_by_version = exam_versions.map { |v| [v.id, v.qp_pairs] }.to_h
     GradingLock.transaction do
-      GradingLock.where(registration: registrations).update(grader: nil) if reset
+      existing = GradingLock.where(registration: registrations)
+      existing.update(grader: nil) if reset
+      existing = existing.group_by { |gl| gl.registration_id }
       registrations.final.each do |registration|
-        pairs_by_version[registration.exam_version_id].each do |qp|
-          GradingLock.find_or_create_by(registration: registration, qnum: qp[:qnum], pnum: qp[:pnum])
+        existing_for_reg = existing[registration.id] || []
+        existing_pairs = existing_for_reg.map { |gl| {qnum: gl.qnum, pnum: gl.pnum} }
+        existing_pairs = existing_pairs.to_set
+        missing = pairs_by_version[registration.exam_version_id].reject { |qp| existing_pairs.member? qp }
+        puts "#{registration.user.display_name} => #{missing}"
+        missing.each do |qp|
+          GradingLock.create(registration: registration, qnum: qp[:qnum], pnum: qp[:pnum])
         end
       end
     end

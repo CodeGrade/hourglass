@@ -1439,46 +1439,48 @@ const GradeOnePartHelp: React.FC<{
         </Col>
       </Row>
       <Row>
-        <Carousel
-          activeIndex={activeIndex}
-          onSelect={(newIndex, _) => {
-            setActiveIndex(newIndex);
-          }}
-          onSlid={() => refresh()}
-          onSlide={() => refresh()}
-          indicators={false}
-          wrap={false}
-          interval={null}
-          keyboard={false}
-          nextIcon={<Icon I={FaChevronCircleRight} size="3em" />}
-          prevIcon={<Icon I={FaChevronCircleLeft} size="3em" />}
-        >
-          {qpPairs.map((qp, index) => (
-            <Carousel.Item
-              // eslint-disable-next-line react/no-array-index-key
-              key={index}
-              className="mb-4"
-            >
-              <Col className="overflow-auto-y">
-                {(index === indexOfQP) ? (
-                  <Grade
-                    registrationKey={registration}
-                    qnum={qp.qnum}
-                    pnum={qp.pnum}
-                    refreshProps={[indexOfQP, refresher]}
-                  />
-                ) : (
-                  <ShowOnePart
-                    registrationKey={registration}
-                    qnum={qp.qnum}
-                    pnum={qp.pnum}
-                    refreshProps={[indexOfQP, refresher]}
-                  />
-                )}
-              </Col>
-            </Carousel.Item>
-          ))}
-        </Carousel>
+        <Col sm={12}>
+          <Carousel
+            activeIndex={activeIndex}
+            onSelect={(newIndex, _) => {
+              setActiveIndex(newIndex);
+            }}
+            onSlid={() => refresh()}
+            onSlide={() => refresh()}
+            indicators={false}
+            wrap={false}
+            interval={null}
+            keyboard={false}
+            nextIcon={<Icon I={FaChevronCircleRight} size="3em" />}
+            prevIcon={<Icon I={FaChevronCircleLeft} size="3em" />}
+          >
+            {qpPairs.map((qp, index) => (
+              <Carousel.Item
+                // eslint-disable-next-line react/no-array-index-key
+                key={index}
+                className="mb-4"
+              >
+                <Col className="overflow-auto-y">
+                  {(index === indexOfQP) ? (
+                    <Grade
+                      registrationKey={registration}
+                      qnum={qp.qnum}
+                      pnum={qp.pnum}
+                      refreshProps={[indexOfQP, refresher]}
+                    />
+                  ) : (
+                    <ShowOnePart
+                      registrationKey={registration}
+                      qnum={qp.qnum}
+                      pnum={qp.pnum}
+                      refreshProps={[indexOfQP, refresher]}
+                    />
+                  )}
+                </Col>
+              </Carousel.Item>
+            ))}
+          </Carousel>
+        </Col>
       </Row>
     </Container>
   );

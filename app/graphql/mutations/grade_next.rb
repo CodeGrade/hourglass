@@ -54,6 +54,7 @@ module Mutations
           end
         end
       end
+      sorted = sorted.sort_by { |gl| [gl.qnum, gl.pnum] }
       sorted.first
     end
   end

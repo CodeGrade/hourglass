@@ -1660,7 +1660,7 @@ const BeginGradingButton: React.FC<{
                       // eslint-disable-next-line react/no-array-index-key
                       <div key={index} className="d-inline-block bordered-menu-group">
                         <Dropdown.Header>{node.name}</Dropdown.Header>
-                        {completionStats[index % 2].map((qStats, qnum) => (!allBlank(qStats) && (
+                        {completionStats[index].map((qStats, qnum) => (!allBlank(qStats) && (
                           qStats.map((pStat, pnum) => (pStat.notStarted > 0 && (
                             <Dropdown.Item
                               // eslint-disable-next-line react/no-array-index-key
@@ -1695,7 +1695,7 @@ const BeginGradingButton: React.FC<{
             <li>
               {node.name}
               <ul>
-                {completionStats[index % 2].map((qStats, qnum) => (
+                {completionStats[index].map((qStats, qnum) => (
                   qStats.length > 1 ? (
                     qStats.map((pStat, pnum) => (
                       // eslint-disable-next-line react/no-array-index-key

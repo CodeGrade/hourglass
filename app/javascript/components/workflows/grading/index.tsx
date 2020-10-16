@@ -211,6 +211,10 @@ const Feedback: React.FC<{
     status,
     error,
   } = props;
+  const [pointStr, setPointStr] = useState<number | string>(points);
+  useEffect(() => {
+    setPointStr(String(points));
+  }, [points]);
   const alertRef = useRef<HTMLDivElement>();
   const variant = variantForPoints(points);
   return (
@@ -228,9 +232,14 @@ const Feedback: React.FC<{
           <NumericInput
             disabled={disabled}
             step={0.5}
-            value={points}
+            value={pointStr}
             onChange={(val) => {
-              if (onChangePoints) onChangePoints(Number(val));
+              setPointStr(val);
+              // Don't propagate changes when the value is in an interim state
+              // When NumericInput loses focus, it'll send a corrected numeric value.
+              if (onChangePoints && val !== '' && Number.isFinite(Number(val))) {
+                onChangePoints(Number(val));
+              }
             }}
           />
         </Form.Group>

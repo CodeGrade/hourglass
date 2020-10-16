@@ -1130,6 +1130,12 @@ const Grade: React.FC<{
   const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
   const singlePart = questions[qnum].parts.length === 1
     && !questions[qnum].parts[0].name?.value?.trim();
+  const allComments = res.gradingComments.edges.map(({ node }) => node);
+  const anyUncommentedItems = questions[qnum].parts[pnum].body.some((b, bnum) => (
+    (b.type !== 'HTML')
+      && (allComments.filter((c) => (c.qnum === qnum && c.pnum === pnum && c.bnum === bnum))
+        .length === 0)
+  ));
   return (
     <ExamContext.Provider value={contextVal}>
       <ExamViewerContext.Provider value={viewerContextVal}>
@@ -1187,13 +1193,9 @@ const Grade: React.FC<{
                 && c.pnum === pnum
                 && c.bnum === bnum
               ));
-              const comments = res.gradingComments.edges
-                .map(({ node }) => node)
-                .filter((comment) => (
-                  comment.qnum === qnum
-                  && comment.pnum === pnum
-                  && comment.bnum === bnum
-                ));
+              const comments = allComments.filter((comment) => (
+                comment.qnum === qnum && comment.pnum === pnum && comment.bnum === bnum
+              ));
               return (
                 <GradeBodyItem
                   // eslint-disable-next-line react/no-array-index-key
@@ -1216,35 +1218,17 @@ const Grade: React.FC<{
         </div>
         <Row className="text-center pb-4">
           <Col className="text-center pb-4">
-            <Button
-              className="m-4"
-              variant="primary"
-              disabled={nextExamLoading}
-              onClick={() => {
-                mutateReleaseAndContinue({
-                  variables: {
-                    input: {
-                      markComplete: true,
-                      registrationId,
-                      qnum,
-                      pnum,
-                    },
-                  },
-                });
-              }}
-            >
-              Finish this submission and start next one
-            </Button>
-            <DropdownButton
-              className="m-4 d-inline-block"
-              variant="outline-primary"
-              disabled={nextExamLoading}
-              title="Exit grading and..."
-              drop="right"
-            >
-              <Dropdown.Item
+            <span className="m-4">
+              <TooltipButton
+                variant="primary"
+                disabled={nextExamLoading || anyUncommentedItems}
+                disabledMessage={nextExamLoading
+                  ? 'Please wait; still loading...'
+                  : 'Some items have no comments; please grade them'}
+                placement="top"
+                cursorClass=""
                 onClick={() => {
-                  mutateReleaseAndFinish({
+                  mutateReleaseAndContinue({
                     variables: {
                       input: {
                         markComplete: true,
@@ -1256,8 +1240,42 @@ const Grade: React.FC<{
                   });
                 }}
               >
-                Finish grading this question
-              </Dropdown.Item>
+                Finish this submission and start next one
+              </TooltipButton>
+            </span>
+            <DropdownButton
+              className="m-4 d-inline-block"
+              variant="outline-primary"
+              disabled={nextExamLoading}
+              title="Exit grading and..."
+              drop="right"
+            >
+              <Tooltip
+                showTooltip={nextExamLoading || anyUncommentedItems}
+                message={nextExamLoading
+                  ? 'Please wait; still loading...'
+                  : 'Some items have no comments; please grade them'}
+                placement="top"
+              >
+                <Dropdown.Item
+                  className="pointer-events-auto"
+                  disabled={anyUncommentedItems}
+                  onClick={() => {
+                    mutateReleaseAndFinish({
+                      variables: {
+                        input: {
+                          markComplete: true,
+                          registrationId,
+                          qnum,
+                          pnum,
+                        },
+                      },
+                    });
+                  }}
+                >
+                  Finish grading this question
+                </Dropdown.Item>
+              </Tooltip>
               <Dropdown.Item
                 onClick={() => {
                   mutateReleaseAndFinish({

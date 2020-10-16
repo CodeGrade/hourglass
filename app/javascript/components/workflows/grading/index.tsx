@@ -1441,6 +1441,7 @@ const GradeOnePartHelp: React.FC<{
       <Row>
         <Col sm={12}>
           <Carousel
+            className="question-carousel"
             activeIndex={activeIndex}
             onSelect={(newIndex, _) => {
               setActiveIndex(newIndex);

@@ -34,7 +34,9 @@ module Mutations
     private
 
     def my_currently_grading(exam)
-      exam.grading_locks.where(grader: context[:current_user]).incomplete.first
+      my_incomplete = exam.grading_locks.where(grader: context[:current_user]).incomplete
+      my_incomplete = my_incomplete.sort_by { |gl| [gl.qnum, gl.pnum] }
+      my_incomplete.first
     end
 
     def next_incomplete(exam, exam_version, qnum, pnum)

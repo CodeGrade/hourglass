@@ -37,7 +37,7 @@ const DisplayCode: React.FC<CodeProps> = (props) => {
   return (
     <Editor
       refreshProps={refreshProps}
-      disabled
+      readOnly
       value={text}
       markDescriptions={marks}
       language={lang}

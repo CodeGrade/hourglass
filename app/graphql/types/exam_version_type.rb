@@ -103,10 +103,26 @@ module Types
     field :version_announcements, Types::VersionAnnouncementType.connection_type, null: false
 
     field :grading_locks, Types::GradingLockType.connection_type, null: false do
-      guard Guards::PROFESSORS
+      argument :grader_id, ID, required: false, loads: Types::UserType
+      argument :completed_by_id, ID, required: false, loads: Types::UserType
     end
-    def grading_locks
-      AssociationLoader.for(ExamVersion, :grading_locks).load(object)
+    def grading_locks(grader: nil, completed_by: nil)
+      if grader && completed_by
+        puts "Grader #{grader}, completed_by #{completed_by}"
+        AssociationLoader.for(ExamVersion, :grading_locks, 
+          merge: -> { where(grader: grader, completed_by: completed_by).order(updated_at: :desc) }).load(object)
+      elsif grader
+        puts "Grader #{grader}"
+        AssociationLoader.for(ExamVersion, :grading_locks, 
+          merge: -> { where(grader: grader).order(updated_at: :desc) }).load(object)
+      elsif completed_by
+        puts "Completed_by #{completed_by}"
+        AssociationLoader.for(ExamVersion, :grading_locks, 
+          merge: -> { where(completed_by: completed_by).order(updated_at: :desc) }).load(object)
+      else
+        AssociationLoader.for(ExamVersion, :grading_locks,
+          merge: -> { order(updated_at: :desc) }).load(object)
+      end
     end
 
     field :qp_pairs, [Types::QpPairType], null: false do

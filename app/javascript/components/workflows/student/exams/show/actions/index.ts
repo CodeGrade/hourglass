@@ -221,7 +221,7 @@ function snapshotSaving(): SnapshotSaving {
   };
 }
 
-function describeTime(time: DateTime): string {
+export function describeTime(time: DateTime): string {
   const remaining = DateTime.local().diff(time);
   const left = remaining.shiftTo('weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds').normalize();
   if (left.weeks > 0) {

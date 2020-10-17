@@ -83,6 +83,7 @@ import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import { RenderError } from '@hourglass/common/boundary';
 import { AlertContext } from '@hourglass/common/alerts';
 import { IconType } from 'react-icons';
+import { describeTime } from '@student/exams/show/actions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import {
   BsPencilSquare,
@@ -96,6 +97,7 @@ import { NumericInput } from '@hourglass/common/NumericInput';
 import { assertType, CurrentGrading, isExamRubric } from '@professor/exams/types';
 import { ShowRubrics } from '@grading/UseRubrics';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
+import { DateTime } from 'luxon';
 
 import './index.scss';
 
@@ -113,6 +115,7 @@ import { gradingCompletion$key } from './__generated__/gradingCompletion.graphql
 import { gradingVersionAdmin$key } from './__generated__/gradingVersionAdmin.graphql';
 import { gradingExamAdmin$key } from './__generated__/gradingExamAdmin.graphql';
 import { gradingBeginGrading$key } from './__generated__/gradingBeginGrading.graphql';
+import { gradingMyGrading$key } from './__generated__/gradingMyGrading.graphql';
 import { gradingQuery } from './__generated__/gradingQuery.graphql';
 import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 import { gradingGraderQuery } from './__generated__/gradingGraderQuery.graphql';
@@ -1117,7 +1120,7 @@ const Grade: React.FC<{
     RELEASE_LOCK_MUTATION,
     {
       onCompleted: () => {
-        window.location.href = '/';
+        window.location.href = `/exams/${examId}/grading`;
       },
       onError: (err) => {
         alert({
@@ -1597,6 +1600,119 @@ const getCompletionStats = (version) => {
   return completionStats;
 };
 
+const MyGrading: React.FC<{
+  examKey: gradingMyGrading$key;
+}> = (props) => {
+  const { examKey } = props;
+  const res = useFragment(
+    graphql`
+    fragment gradingMyGrading on Exam {
+      id
+      examVersions {
+        edges {
+          node {
+            id
+            name
+            qpPairs { qnum pnum }
+            inProgress: gradingLocks(graderId:"VXNlci0y") {
+              edges {
+                node {
+                  id
+                  qnum
+                  pnum
+                  updatedAt
+                  registration { 
+                    id 
+                    user { displayName }
+                  }
+                }
+              }
+            }
+            finished: gradingLocks(completedById:"VXNlci0y") {
+              edges {
+                node {
+                  id
+                  qnum
+                  pnum
+                  updatedAt
+                  registration { 
+                    id
+                    user { displayName }
+                  }
+                }
+              }
+            }      
+          }
+        }
+      }
+    }
+    `,
+    examKey,
+  );
+  return (
+    <div>
+      <h3>My grading so far</h3>
+      {res.examVersions.edges.map(({ node }) => (
+        <ul key={node.id} className="d-inline-block align-top">
+          {node.inProgress.edges.length > 0 && (
+            <li>
+              {`${node.name}: In progress`}
+              <ul>
+                {node.inProgress.edges.map(({ node: inProgress }) => {
+                  const { registration, qnum, pnum } = inProgress;
+                  return (
+                    <li key={`${registration.id}-${qnum}-${pnum}`}>
+                      {describeTime(DateTime.fromISO(inProgress.updatedAt))}
+                      <Tooltip message="Opens submission for grading in new window" placement="top">
+                        <Link
+                          className="ml-2"
+                          target="_blank"
+                          to={`/exams/${res.id}/grading/${registration.id}/${qnum}/${pnum}`}
+                        >
+                          {node.qpPairs.some((qp) => (qp.qnum === qnum && qp.pnum > 0))
+                            ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}`
+                            : `Question ${qnum + 1}`}
+                        </Link>
+                      </Tooltip>
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          )}
+          {node.finished.edges.length > 0 && (
+            <li>
+              {`${node.name}: Completed`}
+              <ul>
+                {node.finished.edges.map(({ node: finished }) => {
+                  const { registration, qnum, pnum } = finished;
+                  return (
+                    <li key={`${registration.id}-${qnum}-${pnum}`}>
+                      <span className="mr-2">{describeTime(DateTime.fromISO(finished.updatedAt))}</span>
+                      <Spoiler text={registration.user.displayName} />
+                      <Tooltip message="Opens submission for viewing in new window" placement="top">
+                        <Link
+                          className="ml-2"
+                          target="_blank"
+                          to={`/exams/${res.id}/submissions/${registration.id}`}
+                          >
+                          {node.qpPairs.some((qp) => (qp.qnum === qnum && qp.pnum > 0))
+                            ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}`
+                            : `Question ${qnum + 1}`}
+                        </Link>
+                      </Tooltip>
+                    </li>
+                  );
+                })}
+              </ul>
+            </li>
+          )}
+        </ul>
+      ))}
+    </div>
+  );
+};
+
 const BeginGradingButton: React.FC<{
   examKey: gradingBeginGrading$key;
 }> = (props) => {
@@ -1657,96 +1773,94 @@ const BeginGradingButton: React.FC<{
     (v, i) => filtered.slice(i * chunkSize, i * chunkSize + chunkSize),
   );
   return (
-    <>
-      <div>
-        <h3>Grading progress:</h3>
-        <Dropdown>
-          <Dropdown.Toggle disabled={loading} id="start-grading-any" variant="primary">
-            Begin grading...
-          </Dropdown.Toggle>
+    <div>
+      <h3>Grading progress:</h3>
+      <Dropdown>
+        <Dropdown.Toggle disabled={loading} id="start-grading-any" variant="primary">
+          Begin grading...
+        </Dropdown.Toggle>
 
-          <Dropdown.Menu className="pb-0">
-            <Dropdown.Item
-              className="mb-2"
-              onClick={() => {
-                mutate({
-                  variables: {
-                    input: {
-                      examId,
-                    },
+        <Dropdown.Menu className="pb-0">
+          <Dropdown.Item
+            className="mb-2"
+            onClick={() => {
+              mutate({
+                variables: {
+                  input: {
+                    examId,
                   },
-                });
-              }}
-            >
-              Whatever is needed
-            </Dropdown.Item>
-            <div className="grouped-dropdown-holder">
-              {versionsInChunks.map((chunk, chunkIndex) => (
-                <div
-                  className="grouped-dropdown-row"
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={chunkIndex}
-                >
-                  {chunk.map(({ node }, nodeIndex) => {
-                    const index = chunkIndex * chunkSize + nodeIndex;
-                    return (
-                      // eslint-disable-next-line react/no-array-index-key
-                      <div key={index} className="d-inline-block bordered-menu-group">
-                        <Dropdown.Header>{node.name}</Dropdown.Header>
-                        {completionStats[index].map((qStats, qnum) => (!allBlank(qStats) && (
-                          qStats.map((pStat, pnum) => (pStat.notStarted > 0 && (
-                            <Dropdown.Item
-                              // eslint-disable-next-line react/no-array-index-key
-                              key={`q${qnum}-p${pnum}`}
-                              onClick={() => {
-                                mutate({
-                                  variables: {
-                                    input: {
-                                      examId,
-                                      examVersionId: node.id,
-                                      qnum,
-                                      pnum,
-                                    },
-                                  },
-                                });
-                              }}
-                            >
-                              {qStats.length > 1 ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}` : `Question ${qnum + 1}`}
-                            </Dropdown.Item>
-                          )))
-                        )))}
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
-          </Dropdown.Menu>
-        </Dropdown>
-        {examVersions.edges.map(({ node }, index) => (
-          <ul key={node.id} className="d-inline-block">
-            <li>
-              {node.name}
-              <ul>
-                {completionStats[index].map((qStats, qnum) => (
-                  qStats.length > 1 ? (
-                    qStats.map((pStat, pnum) => (
-                      // eslint-disable-next-line react/no-array-index-key
-                      <li key={`q${qnum}-p${pnum}`}>
-                        {`Question ${qnum + 1}, part ${alphabetIdx(pnum)}: ${pStat.notStarted} remaining`}
-                      </li>
-                    ))
-                  ) : (
+                },
+              });
+            }}
+          >
+            Whatever is needed
+          </Dropdown.Item>
+          <div className="grouped-dropdown-holder">
+            {versionsInChunks.map((chunk, chunkIndex) => (
+              <div
+                className="grouped-dropdown-row"
+                // eslint-disable-next-line react/no-array-index-key
+                key={chunkIndex}
+              >
+                {chunk.map(({ node }, nodeIndex) => {
+                  const index = chunkIndex * chunkSize + nodeIndex;
+                  return (
                     // eslint-disable-next-line react/no-array-index-key
-                    <li key={`q${qnum}-p0`}>{`Question ${qnum + 1}: ${qStats[0].notStarted} remaining`}</li>
-                  )
-                ))}
-              </ul>
-            </li>
-          </ul>
-        ))}
-      </div>
-    </>
+                    <div key={index} className="d-inline-block bordered-menu-group">
+                      <Dropdown.Header>{node.name}</Dropdown.Header>
+                      {completionStats[index].map((qStats, qnum) => (!allBlank(qStats) && (
+                        qStats.map((pStat, pnum) => (pStat.notStarted > 0 && (
+                          <Dropdown.Item
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={`q${qnum}-p${pnum}`}
+                            onClick={() => {
+                              mutate({
+                                variables: {
+                                  input: {
+                                    examId,
+                                    examVersionId: node.id,
+                                    qnum,
+                                    pnum,
+                                  },
+                                },
+                              });
+                            }}
+                          >
+                            {qStats.length > 1 ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}` : `Question ${qnum + 1}`}
+                          </Dropdown.Item>
+                        )))
+                      )))}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </Dropdown.Menu>
+      </Dropdown>
+      {examVersions.edges.map(({ node }, index) => (
+        <ul key={node.id} className="d-inline-block align-top">
+          <li>
+            {node.name}
+            <ul>
+              {completionStats[index].map((qStats, qnum) => (
+                qStats.length > 1 ? (
+                  qStats.map((pStat, pnum) => (
+                    // eslint-disable-next-line react/no-array-index-key
+                    <li key={`q${qnum}-p${pnum}`}>
+                      {`Question ${qnum + 1}, part ${alphabetIdx(pnum)}: ${pStat.notStarted} remaining`}
+                    </li>
+                  ))
+                ) : (
+                  // eslint-disable-next-line react/no-array-index-key
+                  <li key={`q${qnum}-p0`}>{`Question ${qnum + 1}: ${qStats[0].notStarted} remaining`}</li>
+                )
+              ))}
+            </ul>
+          </li>
+        </ul>
+      ))}
+    </div>
   );
 };
 
@@ -1757,6 +1871,7 @@ const GradingGrader: React.FC = () => {
     query gradingGraderQuery($examId: ID!) {
       exam(id: $examId) {
         ...gradingBeginGrading
+        ...gradingMyGrading
       }
     }
     `,
@@ -1771,6 +1886,7 @@ const GradingGrader: React.FC = () => {
   return (
     <Container>
       <BeginGradingButton examKey={res.props.exam} />
+      <MyGrading examKey={res.props.exam} />
     </Container>
   );
 };
@@ -2076,6 +2192,7 @@ const GradingAdmin: React.FC = () => {
       exam(id: $examId) {
         ...gradingExamAdmin
         ...gradingBeginGrading
+        ...gradingMyGrading
       }
     }
     `,
@@ -2091,6 +2208,7 @@ const GradingAdmin: React.FC = () => {
     <Container>
       <ExamGradingAdministration examKey={res.props.exam} />
       <BeginGradingButton examKey={res.props.exam} />
+      <MyGrading examKey={res.props.exam} />
     </Container>
   );
 };

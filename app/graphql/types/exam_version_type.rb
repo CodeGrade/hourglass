@@ -105,8 +105,12 @@ module Types
     field :grading_locks, Types::GradingLockType.connection_type, null: false do
       argument :grader_id, ID, required: false, loads: Types::UserType
       argument :completed_by_id, ID, required: false, loads: Types::UserType
+      argument :grader_current_user, Boolean, required: false
+      argument :completed_by_current_user, Boolean, required: false
     end
-    def grading_locks(grader: nil, completed_by: nil)
+    def grading_locks(grader: nil, completed_by: nil, grader_current_user: nil, completed_by_current_user: nil)
+      grader = context[:current_user] if grader_current_user
+      completed_by = context[:current_user] if completed_by_current_user
       if grader && completed_by
         puts "Grader #{grader}, completed_by #{completed_by}"
         AssociationLoader.for(ExamVersion, :grading_locks, 

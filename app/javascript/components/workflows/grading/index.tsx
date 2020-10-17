@@ -1614,7 +1614,7 @@ const MyGrading: React.FC<{
             id
             name
             qpPairs { qnum pnum }
-            inProgress: gradingLocks(graderId:"VXNlci0y") {
+            inProgress: gradingLocks(graderCurrentUser: true) {
               edges {
                 node {
                   id
@@ -1628,7 +1628,7 @@ const MyGrading: React.FC<{
                 }
               }
             }
-            finished: gradingLocks(completedById:"VXNlci0y") {
+            finished: gradingLocks(completedByCurrentUser:true) {
               edges {
                 node {
                   id

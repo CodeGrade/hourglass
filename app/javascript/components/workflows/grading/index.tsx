@@ -115,7 +115,7 @@ import { gradingCompletion$key } from './__generated__/gradingCompletion.graphql
 import { gradingVersionAdmin$key } from './__generated__/gradingVersionAdmin.graphql';
 import { gradingExamAdmin$key } from './__generated__/gradingExamAdmin.graphql';
 import { gradingBeginGrading$key } from './__generated__/gradingBeginGrading.graphql';
-import { gradingMyGrading$key } from './__generated__/gradingMyGrading.graphql';
+import { gradingMyGrading, gradingMyGrading$key } from './__generated__/gradingMyGrading.graphql';
 import { gradingQuery } from './__generated__/gradingQuery.graphql';
 import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 import { gradingGraderQuery } from './__generated__/gradingGraderQuery.graphql';
@@ -1600,6 +1600,231 @@ const getCompletionStats = (version) => {
   return completionStats;
 };
 
+type GradingLockInfo = gradingMyGrading['examVersions']['edges'][number]['node']['inProgress']['edges'][number]['node'];
+type QPInfo = gradingMyGrading['examVersions']['edges'][number]['node']['qpPairs'];
+
+const groupTree = (
+  collection: {readonly edges: readonly {readonly node: GradingLockInfo}[]},
+): GradingLockInfo[][][] => {
+  const tree : GradingLockInfo[][][] = [];
+  collection.edges.forEach(({ node }) => {
+    const { qnum, pnum } = node;
+    tree[qnum] = tree[qnum] ?? [];
+    tree[qnum][pnum] = tree[qnum][pnum] ?? [];
+    tree[qnum][pnum].push(node);
+  });
+  return tree;
+};
+
+const RenderQnumTree : React.FC<{
+  info: GradingLockInfo[][][],
+  examId: string,
+  qpPairs: QPInfo,
+  RenderItem: React.FC<{ item: GradingLockInfo, examId: string }>,
+}> = (props) => {
+  const {
+    info,
+    examId,
+    qpPairs,
+    RenderItem,
+  } = props;
+  return (
+    <ul>
+      {info.map((byQnum, qnum) => {
+        if (byQnum === undefined) { return null; }
+        if (byQnum.length === 0) { return null; }
+        const multipart = qpPairs.some((qp) => (qp.qnum === qnum && qp.pnum > 0));
+        if (multipart) {
+          return (
+            // eslint-disable-next-line react/no-array-index-key
+            <li key={qnum}>
+              {`Question ${qnum + 1}:`}
+              <RenderPnumTree
+                info={byQnum}
+                multipart={multipart}
+                examId={examId}
+                RenderItem={RenderItem}
+              />
+            </li>
+          );
+        }
+        return (
+          // eslint-disable-next-line react/no-array-index-key
+          <li key={qnum}>
+            <CollapsibleQnumTree
+              qnum={qnum}
+              info={byQnum}
+              multipart={multipart}
+              examId={examId}
+              RenderItem={RenderItem}
+            />
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
+const CollapsibleQnumTree : React.FC<{
+  qnum: number,
+  info: GradingLockInfo[][],
+  examId: string,
+  multipart: boolean,
+  RenderItem: React.FC<{ item: GradingLockInfo, examId: string }>,
+}> = (props) => {
+  const {
+    qnum,
+    info,
+    multipart,
+    examId,
+    RenderItem,
+  } = props;
+  const [open, setOpen] = useState(!multipart && info[0]?.length < 10);
+  return (
+    <>
+      <span
+        role="button"
+        onClick={(): void => setOpen((o) => !o)}
+        onKeyPress={(): void => setOpen((o) => !o)}
+        tabIndex={0}
+      >
+        {`Question ${qnum + 1}: `}
+        {open ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+      </span>
+      <Collapse in={open}>
+        <RenderPnumTree
+          info={info}
+          multipart={multipart}
+          examId={examId}
+          RenderItem={RenderItem}
+        />
+      </Collapse>
+    </>
+  );
+};
+
+const RenderPnumTree : React.FC<{
+  info: GradingLockInfo[][],
+  examId: string,
+  multipart: boolean,
+  RenderItem: React.FC<{ item: GradingLockInfo, examId: string }>,
+}> = (props) => {
+  const {
+    info,
+    examId,
+    multipart,
+    RenderItem,
+  } = props;
+  if (!multipart) {
+    return (
+      <ul>
+        {info[0].map((item) => <RenderItem item={item} examId={examId} />)}
+      </ul>
+    );
+  }
+  return (
+    <ul>
+      {info.map((items, pnum) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <li key={pnum}>
+          <CollapsiblePnumTree
+            pnum={pnum}
+            items={items}
+            examId={examId}
+            RenderItem={RenderItem}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+const CollapsiblePnumTree : React.FC<{
+  pnum: number,
+  items: GradingLockInfo[],
+  examId: string,
+  RenderItem: React.FC<{ item: GradingLockInfo, examId: string }>,
+}> = (props) => {
+  const {
+    pnum,
+    items,
+    examId,
+    RenderItem,
+  } = props;
+  const [open, setOpen] = useState(items.length < 10);
+  return (
+    <>
+      <span
+        role="button"
+        onClick={(): void => setOpen((o) => !o)}
+        onKeyPress={(): void => setOpen((o) => !o)}
+        tabIndex={0}
+      >
+        {`Part ${alphabetIdx(pnum)}: `}
+        {open ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+      </span>
+      <Collapse in={open}>
+        <ul>
+          {items.map((item) => <RenderItem key={item.id} item={item} examId={examId} />)}
+        </ul>
+      </Collapse>
+    </>
+  );
+};
+
+const RenderLinkToGrading : React.FC<{
+  item: GradingLockInfo,
+  examId: string,
+}> = (props) => {
+  const { item, examId } = props;
+  const {
+    registration,
+    updatedAt,
+    qnum,
+    pnum,
+  } = item;
+  return (
+    <li key={`${registration.id}-${qnum}-${pnum}`}>
+      <Tooltip message="Opens submission for grading in new window" placement="top">
+        <Link
+          className="ml-2"
+          target="_blank"
+          to={`/exams/${examId}/grading/${registration.id}/${qnum}/${pnum}`}
+        >
+          {describeTime(DateTime.fromISO(updatedAt))}
+        </Link>
+      </Tooltip>
+    </li>
+  );
+};
+
+const RenderLinkToSubmission : React.FC<{
+  item: GradingLockInfo,
+  examId: string,
+}> = (props) => {
+  const { item, examId } = props;
+  const {
+    registration,
+    updatedAt,
+    qnum,
+    pnum,
+  } = item;
+  return (
+    <li key={`${registration.id}-${qnum}-${pnum}`}>
+      <Spoiler text={registration.user.displayName} />
+      <Tooltip message="Opens submission for viewing in new window" placement="top">
+        <Link
+          className="ml-2"
+          target="_blank"
+          to={`/exams/${examId}/submissions/${registration.id}`}
+        >
+          <span className="mr-2">{describeTime(DateTime.fromISO(updatedAt))}</span>
+        </Link>
+      </Tooltip>
+    </li>
+  );
+};
+
 const MyGrading: React.FC<{
   examKey: gradingMyGrading$key;
 }> = (props) => {
@@ -1652,63 +1877,39 @@ const MyGrading: React.FC<{
   return (
     <div>
       <h3>My grading so far</h3>
-      {res.examVersions.edges.map(({ node }) => (
-        <ul key={node.id} className="d-inline-block align-top">
-          {node.inProgress.edges.length > 0 && (
-            <li>
-              {`${node.name}: In progress`}
-              <ul>
-                {node.inProgress.edges.map(({ node: inProgress }) => {
-                  const { registration, qnum, pnum } = inProgress;
-                  return (
-                    <li key={`${registration.id}-${qnum}-${pnum}`}>
-                      {describeTime(DateTime.fromISO(inProgress.updatedAt))}
-                      <Tooltip message="Opens submission for grading in new window" placement="top">
-                        <Link
-                          className="ml-2"
-                          target="_blank"
-                          to={`/exams/${res.id}/grading/${registration.id}/${qnum}/${pnum}`}
-                        >
-                          {node.qpPairs.some((qp) => (qp.qnum === qnum && qp.pnum > 0))
-                            ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}`
-                            : `Question ${qnum + 1}`}
-                        </Link>
-                      </Tooltip>
-                    </li>
-                  );
-                })}
-              </ul>
-            </li>
-          )}
-          {node.finished.edges.length > 0 && (
-            <li>
-              {`${node.name}: Completed`}
-              <ul>
-                {node.finished.edges.map(({ node: finished }) => {
-                  const { registration, qnum, pnum } = finished;
-                  return (
-                    <li key={`${registration.id}-${qnum}-${pnum}`}>
-                      <span className="mr-2">{describeTime(DateTime.fromISO(finished.updatedAt))}</span>
-                      <Spoiler text={registration.user.displayName} />
-                      <Tooltip message="Opens submission for viewing in new window" placement="top">
-                        <Link
-                          className="ml-2"
-                          target="_blank"
-                          to={`/exams/${res.id}/submissions/${registration.id}`}
-                        >
-                          {node.qpPairs.some((qp) => (qp.qnum === qnum && qp.pnum > 0))
-                            ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}`
-                            : `Question ${qnum + 1}`}
-                        </Link>
-                      </Tooltip>
-                    </li>
-                  );
-                })}
-              </ul>
-            </li>
-          )}
-        </ul>
-      ))}
+      {res.examVersions.edges.map(({ node }) => {
+        const inProgressTree = groupTree(node.inProgress);
+        const finishedTree = groupTree(node.finished);
+        if (inProgressTree.length === 0 && finishedTree.length === 0) return null;
+        return (
+          <ul className="d-inline-block align-top">
+            {node.inProgress.edges.length > 0 && (
+              <li key={`inprogress-${node.id}`}>
+                <b>{`${node.name}`}</b>
+                : In progress
+                <RenderQnumTree
+                  info={inProgressTree}
+                  examId={res.id}
+                  qpPairs={node.qpPairs}
+                  RenderItem={RenderLinkToGrading}
+                />
+              </li>
+            )}
+            {node.finished.edges.length > 0 && (
+              <li key={`finished-${node.id}`}>
+                <b>{`${node.name}`}</b>
+                : Finished
+                <RenderQnumTree
+                  info={finishedTree}
+                  examId={res.id}
+                  qpPairs={node.qpPairs}
+                  RenderItem={RenderLinkToSubmission}
+                />
+              </li>
+            )}
+          </ul>
+        );
+      })}
     </div>
   );
 };

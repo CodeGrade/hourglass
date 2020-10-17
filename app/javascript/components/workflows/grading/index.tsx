@@ -1617,19 +1617,21 @@ const groupTree = (
 };
 
 const RenderQnumTree : React.FC<{
+  className?: string,
   info: GradingLockInfo[][][],
   examId: string,
   qpPairs: QPInfo,
   RenderItem: React.FC<{ item: GradingLockInfo, examId: string }>,
 }> = (props) => {
   const {
+    className,
     info,
     examId,
     qpPairs,
     RenderItem,
   } = props;
   return (
-    <ul>
+    <ul className={className}>
       {info.map((byQnum, qnum) => {
         if (byQnum === undefined) { return null; }
         if (byQnum.length === 0) { return null; }
@@ -1704,12 +1706,14 @@ const CollapsibleQnumTree : React.FC<{
 };
 
 const RenderPnumTree : React.FC<{
+  className?: string,
   info: GradingLockInfo[][],
   examId: string,
   multipart: boolean,
   RenderItem: React.FC<{ item: GradingLockInfo, examId: string }>,
 }> = (props) => {
   const {
+    className,
     info,
     examId,
     multipart,
@@ -1717,13 +1721,13 @@ const RenderPnumTree : React.FC<{
   } = props;
   if (!multipart) {
     return (
-      <ul>
+      <ul className={className}>
         {info[0].map((item) => <RenderItem item={item} examId={examId} />)}
       </ul>
     );
   }
   return (
-    <ul>
+    <ul className={className}>
       {info.map((items, pnum) => (
         // eslint-disable-next-line react/no-array-index-key
         <li key={pnum}>

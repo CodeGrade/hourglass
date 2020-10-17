@@ -316,6 +316,7 @@ class ExamVersion < ApplicationRecord
     comments = multi_group_by(comments_and_rubrics, [:qnum, :pnum, :bnum, :preset_comment])
     checks = multi_group_by(reg.grading_checks.includes(:creator), [:qnum, :pnum, :bnum])
     rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)
+    locks = multi_group_by(reg.grading_locks, [:qnum, :pnum], true)
 
     exam_rubric = rubric_tree.dig(nil, nil, nil)
     # rubocop:disable Metrics/BlockLength
@@ -323,6 +324,7 @@ class ExamVersion < ApplicationRecord
       question_rubric = rubric_tree.dig(qnum, nil, nil)
       part_rubric = rubric_tree.dig(qnum, pnum, nil)
       part_rubric = rubric_tree.dig(qnum, pnum, nil)
+      graded = !locks[qnum][pnum].completed_by_id.nil?
       score = part['body'].each_with_index.map do |_, bnum|
         qpb = [qnum, pnum, bnum]
         nil_comments = comments.dig(qnum, pnum, bnum, nil) || []
@@ -367,6 +369,7 @@ class ExamVersion < ApplicationRecord
       end
       {
         'score' => score,
+        'graded' => graded,
         'body' => body_item_info,
       }
     end

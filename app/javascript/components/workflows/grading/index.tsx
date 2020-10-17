@@ -31,6 +31,7 @@ import {
 } from 'react-icons/fa';
 import { RiMessage2Line, RiChatDeleteLine, RiChatCheckLine } from 'react-icons/ri';
 import { FiCheckSquare } from 'react-icons/fi';
+import { VscGoToFile } from 'react-icons/vsc';
 import Icon from '@student/exams/show/components/Icon';
 import {
   HTMLVal,
@@ -66,6 +67,7 @@ import {
   Switch,
   Route,
   useHistory,
+  Link,
 } from 'react-router-dom';
 import {
   useQuery,
@@ -1400,6 +1402,7 @@ const ShowOnePart: React.FC<{
                   pnum={pnum}
                   anonymous={singlePart}
                   currentGrading={currentGrading[qnum][pnum]}
+                  showRequestGrading={res.id}
                 />
               </Col>
             </Row>
@@ -1785,13 +1788,10 @@ const GradingLock: React.FC<{
       pnum
       registration {
         id
-        user {
-          displayName
-        }
+        exam { id }
+        user { displayName }
       }
-      grader {
-        displayName
-      }
+      grader { displayName }
     }
     `,
     lockKey,
@@ -1846,6 +1846,17 @@ const GradingLock: React.FC<{
           <Icon I={FaTrash} className="mr-2" />
           Release lock
         </Button>
+        <Link
+          target="_blank"
+          to={`/exams/${lock.registration.exam.id}/submissions/${lock.registration.id}`}
+        >
+          <Tooltip message="Opens submission in new window">
+            <Button variant="info" className="ml-4">
+              <Icon I={VscGoToFile} className="mr-2" />
+              Show submission
+            </Button>
+          </Tooltip>
+        </Link>
       </td>
     </tr>
   );

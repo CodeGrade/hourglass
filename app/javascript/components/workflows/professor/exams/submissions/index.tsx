@@ -248,6 +248,7 @@ const ExamSubmission: React.FC = () => {
       <ExamViewer
         contents={parsedContents}
         currentGrading={currentGrading as CurrentGrading}
+        showRequestGrading={registrationId}
       />
     </DocumentTitle>
   );

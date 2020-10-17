@@ -90,6 +90,7 @@ export interface CurrentGrading {
   [qnum: number]: {
     [pnum: number]: {
       score: number;
+      graded: boolean;
       body: {
         checks: GradingCheck[];
         grouped: GroupedGradingComment;

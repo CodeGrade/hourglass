@@ -1,7 +1,7 @@
 import React, { useMemo, useContext } from 'react';
 import { QuestionInfo } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
-import Part from '@proctor/registrations/show/Part';
+import Part, { ClaimGradingButton } from '@proctor/registrations/show/Part';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import { QuestionFilesContext, ExamViewerContext } from '@hourglass/common/context';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
@@ -14,6 +14,7 @@ interface ShowQuestionProps {
   question: QuestionInfo;
   qnum: number;
   currentGrading?: CurrentGrading[number];
+  showRequestGrading?: string;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
@@ -22,6 +23,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     question,
     qnum,
     currentGrading = [],
+    showRequestGrading,
   } = props;
   const {
     name,
@@ -55,8 +57,13 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
         <h1 id={`question-${qnum}`} className="d-flex align-items-baseline">
           <QuestionName name={name} qnum={qnum} />
           {singlePart && (
-            <span className="ml-auto point-count">
-              {subtitle}
+            <span className="ml-auto">
+              <span className="point-count">
+                {subtitle}
+              </span>
+              <span className="ml-4">
+                <ClaimGradingButton registrationId={showRequestGrading} qnum={qnum} pnum={1} />
+              </span>
             </span>
           )}
         </h1>
@@ -79,6 +86,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             qnum={qnum}
             currentGrading={currentGrading[i]}
             refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+            showRequestGrading={singlePart ? null : showRequestGrading}
           />
         ))}
       </div>

@@ -7,6 +7,7 @@ interface DisplayQuestionsProps {
   refreshCodeMirrorsDeps: React.DependencyList;
   questions: QuestionInfo[];
   currentGrading?: CurrentGrading;
+  showRequestGrading?: string;
 }
 
 const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
@@ -14,6 +15,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
     refreshCodeMirrorsDeps,
     currentGrading = [],
     questions,
+    showRequestGrading,
   } = props;
   return (
     <>
@@ -26,6 +28,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           qnum={i}
           currentGrading={currentGrading[i]}
           refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+          showRequestGrading={showRequestGrading}
         />
       ))}
     </>

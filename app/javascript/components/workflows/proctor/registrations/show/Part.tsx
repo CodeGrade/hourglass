@@ -9,6 +9,10 @@ import { PartName } from '@student/exams/show/components/Part';
 import ShowRubric from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@hourglass/workflows/professor/exams/types';
 import { pluralize } from '@hourglass/common/helpers';
+import { Button } from 'react-bootstrap';
+import { graphql, useMutation } from 'relay-hooks';
+import { AlertContext } from '@hourglass/common/alerts';
+import { PartRequestGradingLockMutation } from './__generated__/PartRequestGradingLockMutation.graphql';
 
 interface PartProps {
   refreshCodeMirrorsDeps: React.DependencyList;
@@ -17,7 +21,73 @@ interface PartProps {
   pnum: number;
   currentGrading?: CurrentGrading[number][number];
   anonymous?: boolean;
+  showRequestGrading?: string;
 }
+const REQUEST_GRADE_MUTATION = graphql`
+mutation PartRequestGradingLockMutation($input: RequestGradingLockInput!) {
+  requestGradingLock(input: $input) {
+    acquired
+    currentOwner {
+      id
+      displayName
+    }
+  }
+}
+`;
+
+export const ClaimGradingButton: React.FC<{
+  registrationId: string;
+  qnum: number;
+  pnum: number;
+}> = (props) => {
+  const {
+    registrationId,
+    qnum,
+    pnum,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutateRequestGrade, {
+    loading: requestLoading,
+  }] = useMutation<PartRequestGradingLockMutation>(
+    REQUEST_GRADE_MUTATION,
+    {
+      onCompleted: () => {
+        alert({
+          variant: 'success',
+          title: 'Grading lock claimed',
+          message: 'You now hold the grading lock for this part',
+        });
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error claiming grading lock',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  return (
+    <Button
+      variant="info"
+      disabled={requestLoading}
+      onClick={() => {
+        mutateRequestGrade({
+          variables: {
+            input: {
+              registrationId,
+              qnum,
+              pnum,
+            },
+          },
+        });
+      }}
+    >
+      Claim this part for regrading
+    </Button>
+  );
+};
 
 const Part: React.FC<PartProps> = (props) => {
   const {
@@ -27,6 +97,7 @@ const Part: React.FC<PartProps> = (props) => {
     pnum,
     currentGrading,
     anonymous,
+    showRequestGrading = false,
   } = props;
   const {
     name,
@@ -46,16 +117,24 @@ const Part: React.FC<PartProps> = (props) => {
     subtitle = `(${strPoints}${extraCredit ? ', extra credit' : ''})`;
   }
   const contextVal = useMemo(() => ({ references: reference }), [reference]);
+
   return (
     <PartFilesContext.Provider value={contextVal}>
       <div>
         <h3 id={`question-${qnum}-part-${pnum}`} className="d-flex align-items-baseline">
           <PartName anonymous={anonymous} name={name} pnum={pnum} />
-          {anonymous || (
-            <span className="ml-auto point-count">
-              {subtitle}
-            </span>
-          )}
+          <span className="ml-auto">
+            {anonymous || (
+              <span className="point-count">
+                {subtitle}
+              </span>
+            )}
+            {showRequestGrading && (
+              <span className="ml-4">
+                <ClaimGradingButton registrationId={showRequestGrading} qnum={qnum} pnum={pnum} />
+              </span>
+            )}
+          </span>
         </h3>
         {description?.value && <HTML value={description} />}
         {reference.length !== 0 && (

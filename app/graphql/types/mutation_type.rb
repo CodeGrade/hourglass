@@ -40,5 +40,6 @@ module Types
     field :update_exam, mutation: Mutations::UpdateExam
 
     field :publish_grades, mutation: Mutations::PublishGrades
+    field :request_grading_lock, mutation: Mutations::RequestGradingLock
   end
 end

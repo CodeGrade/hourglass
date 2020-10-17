@@ -18,6 +18,7 @@ interface ExamViewerProps {
   currentGrading?: CurrentGrading;
   refreshCodeMirrorsDeps?: React.DependencyList;
   rubric?: ExamRubric;
+  showRequestGrading?: string;
 }
 
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {
@@ -26,6 +27,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     currentGrading,
     refreshCodeMirrorsDeps,
     rubric,
+    showRequestGrading,
   } = props;
   const {
     exam,
@@ -75,6 +77,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
                 questions={questions}
                 currentGrading={currentGrading}
+                showRequestGrading={showRequestGrading}
               />
             </div>
           </div>

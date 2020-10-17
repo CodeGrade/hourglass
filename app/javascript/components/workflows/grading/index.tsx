@@ -1695,7 +1695,7 @@ const MyGrading: React.FC<{
                           className="ml-2"
                           target="_blank"
                           to={`/exams/${res.id}/submissions/${registration.id}`}
-                          >
+                        >
                           {node.qpPairs.some((qp) => (qp.qnum === qnum && qp.pnum > 0))
                             ? `Question ${qnum + 1}, part ${alphabetIdx(pnum)}`
                             : `Question ${qnum + 1}`}

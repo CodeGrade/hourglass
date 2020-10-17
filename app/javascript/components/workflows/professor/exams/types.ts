@@ -91,6 +91,7 @@ export interface CurrentGrading {
     [pnum: number]: {
       score: number;
       graded: boolean;
+      inProgress: boolean;
       body: {
         checks: GradingCheck[];
         grouped: GroupedGradingComment;

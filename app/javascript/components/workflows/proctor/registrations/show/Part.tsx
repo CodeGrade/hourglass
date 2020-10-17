@@ -6,10 +6,10 @@ import DisplayBody from '@proctor/registrations/show/DisplayBody';
 import '@student/exams/show/components/Part.css';
 import { PartFilesContext, ExamViewerContext } from '@hourglass/common/context';
 import { PartName } from '@student/exams/show/components/Part';
+import TooltipButton from '@student/exams/show/components/TooltipButton';
 import ShowRubric from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@hourglass/workflows/professor/exams/types';
 import { pluralize } from '@hourglass/common/helpers';
-import { Button } from 'react-bootstrap';
 import { graphql, useMutation } from 'relay-hooks';
 import { AlertContext } from '@hourglass/common/alerts';
 import { PartRequestGradingLockMutation } from './__generated__/PartRequestGradingLockMutation.graphql';
@@ -39,11 +39,17 @@ export const ClaimGradingButton: React.FC<{
   registrationId: string;
   qnum: number;
   pnum: number;
+  graded?: boolean;
+  disabled?: boolean;
+  disalbedMessage?: string;
 }> = (props) => {
   const {
     registrationId,
     qnum,
     pnum,
+    graded,
+    disabled = false,
+    disalbedMessage,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutateRequestGrade, {
@@ -69,9 +75,12 @@ export const ClaimGradingButton: React.FC<{
     },
   );
   return (
-    <Button
+    <TooltipButton
       variant="info"
-      disabled={requestLoading}
+      disabled={disabled || requestLoading}
+      disabledMessage={disalbedMessage}
+      cursorClass=""
+      className=""
       onClick={() => {
         mutateRequestGrade({
           variables: {
@@ -84,8 +93,8 @@ export const ClaimGradingButton: React.FC<{
         });
       }}
     >
-      Claim this part for regrading
-    </Button>
+      {`Claim this part for ${graded ? 'regrading' : 'grading'}`}
+    </TooltipButton>
   );
 };
 
@@ -131,7 +140,14 @@ const Part: React.FC<PartProps> = (props) => {
             )}
             {showRequestGrading && (
               <span className="ml-4">
-                <ClaimGradingButton registrationId={showRequestGrading} qnum={qnum} pnum={pnum} />
+                <ClaimGradingButton
+                  registrationId={showRequestGrading}
+                  qnum={qnum}
+                  pnum={pnum}
+                  graded={currentGrading?.graded}
+                  disabled={currentGrading?.inProgress}
+                  disalbedMessage="This part is currently being graded"
+                />
               </span>
             )}
           </span>

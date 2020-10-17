@@ -324,7 +324,8 @@ class ExamVersion < ApplicationRecord
       question_rubric = rubric_tree.dig(qnum, nil, nil)
       part_rubric = rubric_tree.dig(qnum, pnum, nil)
       part_rubric = rubric_tree.dig(qnum, pnum, nil)
-      graded = !locks[qnum][pnum].completed_by_id.nil?
+      graded = !locks.dig(qnum, pnum)&.completed_by_id.nil?
+      in_progress = !locks.dig(qnum, pnum)&.grader_id.nil?
       score = part['body'].each_with_index.map do |_, bnum|
         qpb = [qnum, pnum, bnum]
         nil_comments = comments.dig(qnum, pnum, bnum, nil) || []
@@ -370,6 +371,7 @@ class ExamVersion < ApplicationRecord
       {
         'score' => score,
         'graded' => graded,
+        'inProgress' => in_progress,
         'body' => body_item_info,
       }
     end

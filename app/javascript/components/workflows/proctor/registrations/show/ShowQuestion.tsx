@@ -62,7 +62,14 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
                 {subtitle}
               </span>
               <span className="ml-4">
-                <ClaimGradingButton registrationId={showRequestGrading} qnum={qnum} pnum={1} />
+                <ClaimGradingButton
+                  registrationId={showRequestGrading}
+                  qnum={qnum}
+                  pnum={1}
+                  graded={currentGrading[0]?.graded}
+                  disabled={currentGrading[0]?.inProgress}
+                  disalbedMessage="This question is currently being graded"
+                />
               </span>
             </span>
           )}

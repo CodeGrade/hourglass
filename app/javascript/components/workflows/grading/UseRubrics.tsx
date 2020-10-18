@@ -234,7 +234,7 @@ export const ShowPresetSummary: React.FC<{
         </Button>
       )}
       {pointsMsg !== undefined && (
-        <Button variant="outline-secondary" className="bg-white" size="sm" disabled>
+        <Button variant="outline-secondary" className="bg-white text-nowrap" size="sm" disabled>
           {pointsMsg}
         </Button>
       )}
@@ -328,9 +328,11 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   const padDescription = (description ? 'mb-2' : '');
   const heading = (
     <h5 className="d-flex align-items-center">
-      Choose something from
-      <i className="mx-1">all</i>
-      entries
+      <span>
+        Choose something from
+        <i className="mx-1">all</i>
+        entries
+      </span>
       <span className="ml-auto">{summary}</span>
     </h5>
   );
@@ -405,9 +407,11 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
   }
   const heading = (
     <h5 className="d-flex align-items-center">
-      Choose exactly
-      <i className="mx-1">one</i>
-      entry
+      <span>
+        Choose exactly
+        <i className="mx-1">one</i>
+        entry
+      </span>
       <span className="ml-auto">{summary}</span>
     </h5>
   );
@@ -484,9 +488,11 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
   }
   const heading = (
     <h5 className="d-flex align-items-center">
-      Choose something from
-      <i className="mx-1">any</i>
-      appropriate entries
+      <span>
+        Choose something from
+        <i className="mx-1">any</i>
+        appropriate entries
+      </span>
       <span className="ml-auto">{summary}</span>
     </h5>
   );

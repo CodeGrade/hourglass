@@ -65,7 +65,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
                 <ClaimGradingButton
                   registrationId={showRequestGrading}
                   qnum={qnum}
-                  pnum={1}
+                  pnum={0}
                   graded={currentGrading[0]?.graded}
                   disabled={currentGrading[0]?.inProgress}
                   disalbedMessage="This question is currently being graded"

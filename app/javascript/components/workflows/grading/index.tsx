@@ -1972,6 +1972,7 @@ const BeginGradingButton: React.FC<{
     },
   );
   const filtered = examVersions.edges.filter((_ver, index) => !allBlank(completionStats[index]));
+  const filteredCompletionStats = completionStats.filter((ver) => !allBlank(ver));
   const chunkSize = 4;
   const versionsInChunks = Array.from(
     { length: Math.ceil(filtered.length / chunkSize) },
@@ -2013,7 +2014,7 @@ const BeginGradingButton: React.FC<{
                     // eslint-disable-next-line react/no-array-index-key
                     <div key={index} className="d-inline-block bordered-menu-group">
                       <Dropdown.Header>{node.name}</Dropdown.Header>
-                      {completionStats[index].map((qStats, qnum) => (!allBlank(qStats) && (
+                      {filteredCompletionStats[index].map((qStats, qnum) => (!allBlank(qStats) && (
                         qStats.map((pStat, pnum) => (pStat.notStarted > 0 && (
                           <Dropdown.Item
                             // eslint-disable-next-line react/no-array-index-key
@@ -2252,7 +2253,7 @@ const GradingCompletion: React.FC<{
             <th
               // eslint-disable-next-line react/no-array-index-key
               key={`q${qnum}`}
-              className="border-bottom-0 pb-0"
+              className="border-bottom-0 pb-0 text"
               colSpan={qStat.length}
             >
               {`Question ${qnum + 1}`}

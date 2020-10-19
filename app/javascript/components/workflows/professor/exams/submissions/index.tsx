@@ -210,6 +210,7 @@ const ExamSubmission: React.FC = () => {
         }
         exam { name }
         reviewExam
+        canIGrade
       }
     }
     `,
@@ -229,6 +230,7 @@ const ExamSubmission: React.FC = () => {
     published,
     user,
     exam,
+    canIGrade,
   } = registration;
   if (currentAnswers === null && !published) {
     return (
@@ -248,7 +250,7 @@ const ExamSubmission: React.FC = () => {
       <ExamViewer
         contents={parsedContents}
         currentGrading={currentGrading as CurrentGrading}
-        showRequestGrading={registrationId}
+        showRequestGrading={canIGrade ? registrationId : null}
       />
     </DocumentTitle>
   );

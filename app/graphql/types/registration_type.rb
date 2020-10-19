@@ -69,6 +69,11 @@ module Types
       object.accommodated_start_time
     end
 
+    field :can_i_grade, Boolean, null: false
+    def can_i_grade
+      Guards::ALL_STAFF.call(self, nil, context)
+    end
+
     field :current_answers, GraphQL::Types::JSON, null: true
     def current_answers
       if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)

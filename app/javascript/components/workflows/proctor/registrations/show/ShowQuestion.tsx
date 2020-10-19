@@ -61,16 +61,18 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               <span className="point-count">
                 {subtitle}
               </span>
-              <span className="ml-4">
-                <ClaimGradingButton
-                  registrationId={showRequestGrading}
-                  qnum={qnum}
-                  pnum={0}
-                  graded={currentGrading[0]?.graded}
-                  disabled={currentGrading[0]?.inProgress}
-                  disalbedMessage="This question is currently being graded"
-                />
-              </span>
+              {showRequestGrading && (
+                <span className="ml-4">
+                  <ClaimGradingButton
+                    registrationId={showRequestGrading}
+                    qnum={qnum}
+                    pnum={0}
+                    graded={currentGrading[0]?.graded}
+                    disabled={currentGrading[0]?.inProgress}
+                    disalbedMessage="This question is currently being graded"
+                  />
+                </span>
+              )}
             </span>
           )}
         </h1>

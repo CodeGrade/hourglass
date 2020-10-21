@@ -34,6 +34,7 @@ export interface BodyProps {
   pnum: number;
   bnum: number;
   currentGrading?: CurrentGrading[number][number]['body'][number];
+  fullyExpandCode: boolean;
 }
 
 const ShowComment: React.FC<{ comment: CommentJson }> = (props) => {
@@ -155,6 +156,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     pnum,
     bnum,
     currentGrading,
+    fullyExpandCode,
   } = props;
   const {
     answers,
@@ -174,6 +176,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
             info={body}
             value={value as CodeState}
             refreshProps={refreshCodeMirrorsDeps}
+            fullyExpandCode={fullyExpandCode}
           />
           {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}

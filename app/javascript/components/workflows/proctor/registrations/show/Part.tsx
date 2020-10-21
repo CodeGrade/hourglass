@@ -22,6 +22,7 @@ interface PartProps {
   currentGrading?: CurrentGrading[number][number];
   anonymous?: boolean;
   showRequestGrading?: string;
+  fullyExpandCode?: boolean;
 }
 const REQUEST_GRADE_MUTATION = graphql`
 mutation PartRequestGradingLockMutation($input: RequestGradingLockInput!) {
@@ -107,6 +108,7 @@ const Part: React.FC<PartProps> = (props) => {
     currentGrading,
     anonymous,
     showRequestGrading = false,
+    fullyExpandCode = false,
   } = props;
   const {
     name,
@@ -157,6 +159,7 @@ const Part: React.FC<PartProps> = (props) => {
           <FileViewer
             references={reference}
             refreshProps={refreshCodeMirrorsDeps}
+            fullyExpandCode={fullyExpandCode}
           />
         )}
         {pRubric && <ShowRubric rubric={pRubric} forWhat="part" />}
@@ -171,6 +174,7 @@ const Part: React.FC<PartProps> = (props) => {
               bnum={i}
               currentGrading={currentGrading?.body[i]}
               refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+              fullyExpandCode={fullyExpandCode}
             />
           </div>
         ))}

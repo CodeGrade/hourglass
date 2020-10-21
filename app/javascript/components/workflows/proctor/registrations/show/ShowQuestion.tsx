@@ -15,6 +15,7 @@ interface ShowQuestionProps {
   qnum: number;
   currentGrading?: CurrentGrading[number];
   showRequestGrading?: string;
+  fullyExpandCode: boolean;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
@@ -24,6 +25,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     qnum,
     currentGrading = [],
     showRequestGrading,
+    fullyExpandCode,
   } = props;
   const {
     name,
@@ -81,6 +83,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           <FileViewer
             references={reference}
             refreshProps={refreshCodeMirrorsDeps}
+            fullyExpandCode={fullyExpandCode}
           />
         )}
         {qRubric && <ShowRubric rubric={qRubric} forWhat="question" />}
@@ -96,6 +99,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             currentGrading={currentGrading[i]}
             refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
             showRequestGrading={singlePart ? null : showRequestGrading}
+            fullyExpandCode={fullyExpandCode}
           />
         ))}
       </div>

@@ -57,6 +57,7 @@ interface FileContentsProps {
   onChangeLine?: (lineNum: number) => void;
   refreshProps?: React.DependencyList;
   fmap: FileMap;
+  fullyExpandCode?: boolean;
 }
 
 const FileContents: React.FC<FileContentsProps> = (props) => {
@@ -66,6 +67,7 @@ const FileContents: React.FC<FileContentsProps> = (props) => {
     onChangeLine,
     refreshProps = [],
     fmap,
+    fullyExpandCode = false,
   } = props;
   const f = fmap[selectedFile];
   let cursor: CodeMirror.Position;
@@ -109,6 +111,7 @@ const FileContents: React.FC<FileContentsProps> = (props) => {
         cursor={cursor}
         onCursor={handleCursor}
         onFocus={handleFocus}
+        autosize={fullyExpandCode}
       />
     );
   }
@@ -152,6 +155,7 @@ interface FileViewerProps {
   references: FileRef[];
   alwaysShowTreeView?: boolean;
   refreshProps?: React.DependencyList;
+  fullyExpandCode?: boolean;
 }
 
 export const FileViewer: React.FC<FileViewerProps> = (props) => {
@@ -159,6 +163,7 @@ export const FileViewer: React.FC<FileViewerProps> = (props) => {
     references,
     alwaysShowTreeView = false,
     refreshProps,
+    fullyExpandCode = false,
   } = props;
   const { fmap } = useContext(ExamContext);
   const filteredFiles = getFilesForRefs(fmap, references);
@@ -183,6 +188,7 @@ export const FileViewer: React.FC<FileViewerProps> = (props) => {
           fmap={fmap}
           selectedFile={selectedID}
           refreshProps={refreshProps}
+          fullyExpandCode={fullyExpandCode}
         />
       </Col>
     </Row>

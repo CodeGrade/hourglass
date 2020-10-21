@@ -655,11 +655,13 @@ interface AnswersRowProps<T, V> {
     info: T,
     value: V,
     refreshProps: React.DependencyList;
+    fullyExpandCode?: boolean;
   }>;
   ShowExpected: React.ComponentType<{
     info: T,
     value: V,
     refreshProps: React.DependencyList;
+    fullyExpandCode?: boolean;
   }>;
   info: T;
   studentAnswer: V;

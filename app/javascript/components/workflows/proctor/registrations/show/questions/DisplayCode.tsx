@@ -7,6 +7,7 @@ interface CodeProps {
   info: CodeInfo;
   value?: CodeState;
   refreshProps?: React.DependencyList;
+  fullyExpandCode?: boolean;
 }
 
 const DisplayCode: React.FC<CodeProps> = (props) => {
@@ -14,6 +15,7 @@ const DisplayCode: React.FC<CodeProps> = (props) => {
     info,
     value,
     refreshProps,
+    fullyExpandCode = false,
   } = props;
   const { lang, initial } = info;
   const { fmap } = useContext(ExamContext);
@@ -49,6 +51,7 @@ const DisplayCode: React.FC<CodeProps> = (props) => {
       value={text}
       markDescriptions={marks}
       language={lang}
+      autosize={fullyExpandCode}
     />
   );
 };

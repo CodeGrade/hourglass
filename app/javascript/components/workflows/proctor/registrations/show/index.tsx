@@ -78,6 +78,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
                 questions={questions}
                 currentGrading={currentGrading}
                 showRequestGrading={showRequestGrading}
+                fullyExpandCode
               />
             </div>
           </div>

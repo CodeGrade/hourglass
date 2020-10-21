@@ -159,7 +159,7 @@ const Part: React.FC<PartProps> = (props) => {
             refreshProps={refreshCodeMirrorsDeps}
           />
         )}
-        {pRubric && <ShowRubric rubric={pRubric} />}
+        {pRubric && <ShowRubric rubric={pRubric} forWhat="part" />}
         {body.map((b, i) => (
           // Body numbers are STATIC.
           // eslint-disable-next-line react/no-array-index-key

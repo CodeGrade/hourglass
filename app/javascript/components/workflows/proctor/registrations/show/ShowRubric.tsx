@@ -81,8 +81,8 @@ const ShowRubricPresets: React.FC<{ choices: RubricPresets }> = (props) => {
   );
 };
 
-const ShowRubricAll: React.FC<{ rubric: RubricAll }> = (props) => {
-  const { rubric } = props;
+const ShowRubricAll: React.FC<{ rubric: RubricAll, forWhat: string }> = (props) => {
+  const { rubric, forWhat } = props;
   const { description, choices } = rubric;
   const [open, setOpen] = useState(false);
   let summary;
@@ -104,7 +104,7 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll }> = (props) => {
       <>
         {choices.map((c, index) => (
           // eslint-disable-next-line react/no-array-index-key
-          <ShowRubric key={index} rubric={c} />
+          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
         ))}
       </>
     );
@@ -140,8 +140,8 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll }> = (props) => {
   );
 };
 
-const ShowRubricAny: React.FC<{ rubric: RubricAny }> = (props) => {
-  const { rubric } = props;
+const ShowRubricAny: React.FC<{ rubric: RubricAny, forWhat: string }> = (props) => {
+  const { rubric, forWhat } = props;
   const { points, description, choices } = rubric;
   const [open, setOpen] = useState(false);
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
@@ -166,7 +166,7 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny }> = (props) => {
       <>
         {choices.map((c, index) => (
           // eslint-disable-next-line react/no-array-index-key
-          <ShowRubric key={index} rubric={c} />
+          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
         ))}
       </>
     );
@@ -202,8 +202,8 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny }> = (props) => {
   );
 };
 
-const ShowRubricOne: React.FC<{ rubric: RubricOne }> = (props) => {
-  const { rubric } = props;
+const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) => {
+  const { rubric, forWhat } = props;
   const { points, description, choices } = rubric;
   const [open, setOpen] = useState(false);
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
@@ -228,7 +228,7 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne }> = (props) => {
       <>
         {choices.map((c, index) => (
           // eslint-disable-next-line react/no-array-index-key
-          <ShowRubric key={index} rubric={c} />
+          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
         ))}
       </>
     );
@@ -264,13 +264,13 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne }> = (props) => {
   );
 };
 
-const ShowRubric: React.FC<{ rubric: Rubric }> = (props) => {
-  const { rubric } = props;
+const ShowRubric: React.FC<{ rubric: Rubric, forWhat: string }> = (props) => {
+  const { rubric, forWhat } = props;
   switch (rubric.type) {
-    case 'none': return <div><i>No rubric</i></div>;
-    case 'all': return <ShowRubricAll rubric={rubric} />;
-    case 'any': return <ShowRubricAny rubric={rubric} />;
-    case 'one': return <ShowRubricOne rubric={rubric} />;
+    case 'none': return <div><i>{`No ${forWhat} rubric`}</i></div>;
+    case 'all': return <ShowRubricAll rubric={rubric} forWhat={forWhat} />;
+    case 'any': return <ShowRubricAny rubric={rubric} forWhat={forWhat} />;
+    case 'one': return <ShowRubricOne rubric={rubric} forWhat={forWhat} />;
     default:
       throw new ExhaustiveSwitchError(rubric);
   }

@@ -175,7 +175,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
             value={value as CodeState}
             refreshProps={refreshCodeMirrorsDeps}
           />
-          {bRubric && <ShowRubric rubric={bRubric} />}
+          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -183,7 +183,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.prompt}>
           <DisplayAllThatApply info={body} value={value as AllThatApplyState} />
-          {bRubric && <ShowRubric rubric={bRubric} />}
+          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -191,7 +191,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.prompt}>
           <DisplayCodeTag info={body} value={value as CodeTagState} />
-          {bRubric && <ShowRubric rubric={bRubric} />}
+          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -199,7 +199,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.prompt}>
           <DisplayYesNo info={body} value={value as YesNoState} />
-          {bRubric && <ShowRubric rubric={bRubric} />}
+          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -207,7 +207,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.prompt}>
           <DisplayMultipleChoice info={body} value={value as MultipleChoiceState} />
-          {bRubric && <ShowRubric rubric={bRubric} />}
+          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -215,7 +215,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.prompt}>
           <DisplayText info={body} value={value as TextState} />
-          {bRubric && <ShowRubric rubric={bRubric} />}
+          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -223,7 +223,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.prompt}>
           <DisplayMatching info={body} value={value as MatchingState} />
-          {bRubric && <ShowRubric rubric={bRubric} />}
+          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );

@@ -71,7 +71,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
                 references={reference}
               />
             )}
-            {rubric?.examRubric && <ShowRubric rubric={rubric.examRubric} />}
+            {rubric?.examRubric && <ShowRubric rubric={rubric.examRubric} forWhat="exam" />}
             <div>
               <DisplayQuestions
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}

@@ -83,7 +83,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             refreshProps={refreshCodeMirrorsDeps}
           />
         )}
-        {qRubric && <ShowRubric rubric={qRubric} />}
+        {qRubric && <ShowRubric rubric={qRubric} forWhat="question" />}
         {parts.map((p, i) => (
           <Part
             // Part numbers are STATIC.

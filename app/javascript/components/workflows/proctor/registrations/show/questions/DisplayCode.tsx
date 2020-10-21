@@ -17,6 +17,14 @@ const DisplayCode: React.FC<CodeProps> = (props) => {
   } = props;
   const { lang, initial } = info;
   const { fmap } = useContext(ExamContext);
+  if (value === undefined) {
+    return (
+      <>
+        <b>Answer: </b>
+        <i>No answer given</i>
+      </>
+    );
+  }
   let text = value?.text ?? undefined;
   let marks = value?.marks ?? undefined;
   if (initial) {

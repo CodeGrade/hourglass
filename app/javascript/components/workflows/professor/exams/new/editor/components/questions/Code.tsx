@@ -150,7 +150,7 @@ const EditCodeAnswerValues: React.FC<{
       <Editor
         value={answerText}
         markDescriptions={answerMarks}
-        valueUpdate={[answerMarks]}
+        valueUpdate={answerMarks}
         language={lang}
         onSelection={(editor, data): void => {
           const { ranges, origin } = data;

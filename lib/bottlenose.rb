@@ -26,32 +26,40 @@ module Bottlenose
 
     def sync_course_regs(course)
       got = bottlenose_get("/api/courses/#{course.bottlenose_id}/registrations")
-      got.each do |sec_id, sec_obj|
-        sec = course.sections.find_or_initialize_by(bottlenose_id: sec_id)
-        sec.title = sec_obj['title']
-        sec.save!
-        sec_obj['students'].each do |student|
-          user = sync_user(student)
-          reg = sec.student_registrations.find_or_initialize_by(user: user)
-          reg.save!
-        end
-        sec_obj['graders'].each do |grader|
-          user = sync_user(grader)
-          reg = sec.staff_registrations.find_or_initialize_by(user: user)
-          reg.save!
-        end
-        sec_obj['assistants'].each do |ta|
-          user = sync_user(ta)
-          reg = sec.staff_registrations.find_or_initialize_by(user: user)
-          reg.ta = true
-          reg.save!
-        end
-        sec_obj['professors'].each do |prof|
-          user = sync_user(prof)
-          reg = course.professor_course_registrations.find_or_initialize_by(user: user)
-          reg.save!
+      all_usernames = got.map do |_sec_id, sec_obj|
+        sec_obj.map { |_role, users| users.map { |u| u['username'] } }
+      end.flatten
+      all_users = User.where(username: all_usernames).index_by(&:username)
+      # rubocop:disable  Metrics/BlockLength
+      User.transaction do
+        got.each do |sec_id, sec_obj|
+          sec = course.sections.find_or_initialize_by(bottlenose_id: sec_id)
+          sec.title = sec_obj['title']
+          sec.save!
+          sec_obj['students'].each do |student|
+            user = sync_user(student, all_users)
+            reg = sec.student_registrations.find_or_initialize_by(user: user)
+            reg.save!
+          end
+          sec_obj['graders'].each do |grader|
+            user = sync_user(grader, all_users)
+            reg = sec.staff_registrations.find_or_initialize_by(user: user)
+            reg.save!
+          end
+          sec_obj['assistants'].each do |ta|
+            user = sync_user(ta, all_users)
+            reg = sec.staff_registrations.find_or_initialize_by(user: user)
+            reg.ta = true
+            reg.save!
+          end
+          sec_obj['professors'].each do |prof|
+            user = sync_user(prof, all_users)
+            reg = course.professor_course_registrations.find_or_initialize_by(user: user)
+            reg.save!
+          end
         end
       end
+      # rubocop:enable  Metrics/BlockLength
     end
 
     def create_exam(exam)
@@ -67,8 +75,8 @@ module Bottlenose
 
     private
 
-    def sync_user(raw_user)
-      user = User.where(username: raw_user['username']).first_or_initialize
+    def sync_user(raw_user, all_users)
+      user = all_users[raw_user['username']] || User.new(username: raw_user['username]'])
       user.display_name = raw_user['display_name']
       user.nuid = raw_user['nuid']
       user.email = raw_user['email']

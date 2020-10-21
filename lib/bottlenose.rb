@@ -65,7 +65,7 @@ module Bottlenose
           end
           sec_obj['professors'].each do |prof|
             user = sync_user(prof, all_users)
-            reg = prog_regs[user.id] || ProfessorCourseRegistration.new(course: course, user: user)
+            reg = prof_regs[user.id] || ProfessorCourseRegistration.new(course: course, user: user)
             reg.save!
           end
         end

@@ -27,7 +27,13 @@ module Bottlenose
     def sync_course_regs(course)
       got = bottlenose_get("/api/courses/#{course.bottlenose_id}/registrations")
       all_usernames = got.map do |_sec_id, sec_obj|
-        sec_obj.map { |_role, users| users.map { |u| u['username'] } }
+        sec_obj.map do |role, users|
+          if role == 'title'
+            []
+          else
+            users.map { |u| u['username'] }
+          end
+        end
       end.flatten
       all_users = User.where(username: all_usernames).index_by(&:username)
       # rubocop:disable  Metrics/BlockLength

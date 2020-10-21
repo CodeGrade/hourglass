@@ -11,6 +11,9 @@ class Section < ApplicationRecord
   has_many :staff, through: :staff_registrations, source: :user
 
   validates :course, presence: true
+  validates :bottlenose_id, presence: true, uniqueness: {
+    message: 'id already exists for another record'
+  }
 
   delegate :professors, to: :course
 end

@@ -38,29 +38,34 @@ module Bottlenose
       all_users = User.where(username: all_usernames).index_by(&:username)
       # rubocop:disable  Metrics/BlockLength
       User.transaction do
+        sections = course.sections.index_by(&:bottlenose_id)
+        prof_regs = course.professor_course_registrations.includes(:user).index_by(&:user_id)
         got.each do |sec_id, sec_obj|
-          sec = course.sections.find_or_initialize_by(bottlenose_id: sec_id)
+          sec = sections[sec_id.to_i] || Section.new(course_id: course.id, bottlenose_id: sec_id)
           sec.title = sec_obj['title']
           sec.save!
+          student_regs = sec.student_registrations.includes(:user).index_by(&:user_id)
           sec_obj['students'].each do |student|
             user = sync_user(student, all_users)
-            reg = sec.student_registrations.find_or_initialize_by(user: user)
+            reg = student_regs[user.id] || StudentRegistration.new(section: sec, user: user)
             reg.save!
           end
+          staff_regs = sec.staff_registrations.includes(:user).index_by(&:user_id)
           sec_obj['graders'].each do |grader|
             user = sync_user(grader, all_users)
-            reg = sec.staff_registrations.find_or_initialize_by(user: user)
+            reg = staff_regs[user.id] || StaffRegistration.new(section: sec, user: user)
+            reg.ta = false
             reg.save!
           end
           sec_obj['assistants'].each do |ta|
             user = sync_user(ta, all_users)
-            reg = sec.staff_registrations.find_or_initialize_by(user: user)
+            reg = staff_regs[user.id] || StaffRegistration.new(section: sec, user: user)
             reg.ta = true
             reg.save!
           end
           sec_obj['professors'].each do |prof|
             user = sync_user(prof, all_users)
-            reg = course.professor_course_registrations.find_or_initialize_by(user: user)
+            reg = prog_regs[user.id] || ProfessorCourseRegistration.new(course: course, user: user)
             reg.save!
           end
         end

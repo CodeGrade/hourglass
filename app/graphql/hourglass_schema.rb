@@ -89,6 +89,32 @@ class HourglassSchema < GraphQL::Schema
     raise GraphQL::ExecutionError, "Unknown error while trying to access #{type_name} #{item_id}: #{e.message}."
   end
 
+  def self.objects_from_ids(ids, _query_ctx)
+    to_load = ids.map { |id| GraphQL::Schema::UniqueWithinType.decode(id) }.group_by(&:first)
+    to_load.map do |type_name, item_ids|
+      begin
+        # Now, based on `type_name` and `item_id`
+        # find an object in your application
+        ans = Object.const_get(type_name).where(id: item_ids.map(&:second)).to_a
+        if ans.length != item_ids.length
+          if Rails.env.development?
+            missing = item_ids.to_set - ans.map(&:id)
+            raise GraphQL::ExecutionError, "Cannot find #{type_name} with ids #{missing.to_a}."
+          else
+            raise GraphQL::ExecutionError, "You do not have permission to view that data."
+          end
+        end
+        ans
+      end
+    end.flatten
+  rescue ActiveRecord::RecordNotFound => e
+    raise GraphQL::ExecutionError, "You do not have permission to view that data"
+  rescue RuntimeError => e
+    Rails.logger.debug "Object_from_id: #{id} ==> #{e.message}\n#{e.backtrace.join("\n")}"
+    raise GraphQL::ExecutionError, "Unknown error while trying to access #{type_name} #{item_id}: #{e.message}."
+  end
+
+
   def self.resolve_type(type, obj, _ctx)
     case obj
     when Accommodation

@@ -8,6 +8,9 @@ module Types
     guard Guards::VISIBILITY
 
     field :room, Types::RoomType, null: true
+    def room
+      RecordLoader.for(Room).load(object.room_id)
+    end
     field :start_time, GraphQL::Types::ISO8601DateTime, null: true
     field :end_time, GraphQL::Types::ISO8601DateTime, null: true
 

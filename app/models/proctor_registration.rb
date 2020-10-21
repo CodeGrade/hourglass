@@ -23,7 +23,7 @@ class ProctorRegistration < ApplicationRecord
   end
 
   def visible_to?(check_user, role_for_exam, _role_for_course)
-    (user == check_user) ||
+    ((user_id || user&.id) == check_user.id) ||
       (role_for_exam >= Exam.roles[:professor]) ||
       professors.exists?(check_user.id)
   end

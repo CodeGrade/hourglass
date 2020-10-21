@@ -26,9 +26,15 @@ module Types
     field :exam_versions, Types::ExamVersionType.connection_type, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
+    def exam_versions
+      AssociationLoader.for(Exam, :exam_versions).load(object)
+    end
 
     field :rooms, [Types::RoomType], null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
+    end
+    def rooms
+      AssociationLoader.for(Exam, :rooms).load(object)
     end
 
     field :checklist, Types::ExamChecklistType, null: false do

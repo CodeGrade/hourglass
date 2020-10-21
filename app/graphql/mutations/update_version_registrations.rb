@@ -4,14 +4,17 @@ module Types
   class VersionAssignment < Types::BaseInputObject
     description 'Assignment for students to a version.'
     argument :version_id, ID, required: true, loads: Types::ExamVersionType
-    argument :student_ids, [ID], required: true, loads: Types::UserType
+    argument :student_ids, [ID], required: true
+    def students
+      HourglassSchema.objects_from_ids(student_ids, context)
+    end
   end
 end
 
 module Mutations
   class UpdateVersionRegistrations < BaseMutation
     argument :exam_id, ID, required: true, loads: Types::ExamType
-    argument :unassigned, [ID], required: true, loads: Types::UserType, description: 'Students to unassign.'
+    argument :unassigned, [ID], required: true, description: 'Students to unassign.'
     argument :versions, [Types::VersionAssignment], required: true, description: 'Version assignments to create.'
 
     field :exam, Types::ExamType, null: false
@@ -23,19 +26,23 @@ module Mutations
     end
 
     def resolve(exam:, unassigned:, versions:)
-      delete_unassigned! exam, unassigned
-      assign_versions! exam, versions
-      cache_authorization!(exam, exam.course)
-      {
-        exam: exam,
-      }
+      Registration.transaction do
+        @cur_regs = exam.registrations.index_by(&:user_id)
+        delete_unassigned! exam, lookup_ids(unassigned)
+        @cur_regs = exam.registrations.index_by(&:user_id)
+        assign_versions! exam, versions
+        cache_authorization!(exam, exam.course)
+        {
+          exam: exam,
+        }
+      end
     end
 
     private
 
     def delete_unassigned!(exam, unassigned)
       unassigned.each do |user|
-        student_reg = exam.registrations.find_by(user: user)
+        student_reg = @cur_regs[user.id]
         next unless student_reg
 
         if student_reg.started?
@@ -47,7 +54,7 @@ module Mutations
     end
 
     def assign_student!(exam, version, student)
-      student_reg = exam.registrations.find_or_initialize_by(user: student)
+      student_reg = @cur_regs[student.id] || Registration.new(user: student)
       return if student_reg.exam_version == version
 
       err = "Cannot update already started student '#{student.display_name}'"
@@ -65,7 +72,7 @@ module Mutations
 
     def assign_versions!(exam, versions)
       versions.each do |item|
-        assign_version!(exam, item[:version], item[:students])
+        assign_version!(exam, item[:version], item.students)
       end
     end
   end

@@ -175,10 +175,10 @@ class Exam < ApplicationRecord
       checklist_na 'No rooms created for this exam.'
     elsif registrations.blank?
       checklist_not_started 'No registered students for this exam.'
-    elsif registrations.all?(&:room)
+    elsif registrations.all?(&:room_id)
       total = registrations.length
       checklist_complete "All registered students (#{total}) have assigned rooms."
-    elsif registrations.none?(&:room)
+    elsif registrations.none?(&:room_id)
       checklist_not_started 'Students have not been assigned seating.'
     else
       missing = registrations_without_rooms.length

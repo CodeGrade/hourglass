@@ -27,5 +27,9 @@ module Mutations
       ac[:role_for_course] = {} unless ac.key? :role_for_course
       ac[:role_for_course][context[:current_user].id] = course_role
     end
+
+    def lookup_ids(ids)
+      HourglassSchema.objects_from_ids(ids, context)
+    end 
   end
 end

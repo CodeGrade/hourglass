@@ -9,6 +9,7 @@ interface DisplayQuestionsProps {
   currentGrading?: CurrentGrading;
   showRequestGrading?: string;
   fullyExpandCode: boolean;
+  showStarterCode: boolean;
 }
 
 const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
@@ -18,6 +19,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
     questions,
     showRequestGrading,
     fullyExpandCode,
+    showStarterCode,
   } = props;
   return (
     <>
@@ -32,6 +34,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
           showRequestGrading={showRequestGrading}
           fullyExpandCode={fullyExpandCode}
+          showStarterCode={showStarterCode}
         />
       ))}
     </>

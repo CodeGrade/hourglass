@@ -251,6 +251,7 @@ const ExamSubmission: React.FC = () => {
         contents={parsedContents}
         currentGrading={currentGrading as CurrentGrading}
         showRequestGrading={canIGrade ? registrationId : null}
+        showStarterCode={false}
       />
     </DocumentTitle>
   );

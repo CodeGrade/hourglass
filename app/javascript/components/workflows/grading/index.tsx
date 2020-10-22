@@ -1408,6 +1408,7 @@ const ShowOnePart: React.FC<{
                   anonymous={singlePart}
                   currentGrading={currentGrading[qnum][pnum]}
                   showRequestGrading={res.id}
+                  showStarterCode={false}
                 />
               </Col>
             </Row>

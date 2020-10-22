@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { ExamViewerContext } from '@hourglass/common/context';
 import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
@@ -22,7 +22,12 @@ import {
   CommentJson,
   RubricPresetJson,
 } from '@professor/exams/types';
-import { Alert, Button } from 'react-bootstrap';
+import {
+  Alert,
+  Button,
+  Card,
+  Collapse,
+} from 'react-bootstrap';
 import { variantForPoints, iconForPoints } from '@hourglass/workflows/grading';
 import Icon from '@student/exams/show/components/Icon';
 import ErrorBoundary from '@hourglass/common/boundary';
@@ -35,6 +40,7 @@ export interface BodyProps {
   bnum: number;
   currentGrading?: CurrentGrading[number][number]['body'][number];
   fullyExpandCode: boolean;
+  showStarterCode: boolean;
 }
 
 const ShowComment: React.FC<{ comment: CommentJson }> = (props) => {
@@ -157,11 +163,13 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     bnum,
     currentGrading,
     fullyExpandCode,
+    showStarterCode,
   } = props;
   const {
     answers,
     rubric,
   } = useContext(ExamViewerContext);
+  const [open, setOpen] = useState(false);
   const answer = answers.answers[qnum]?.[pnum]?.[bnum];
   const value = isNoAns(answer) ? undefined : answer;
   const bRubric = rubric?.questions[qnum]?.parts[pnum]?.body[bnum];
@@ -169,9 +177,36 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
   switch (body.type) {
     case 'HTML':
       return <HTML value={body} />;
-    case 'Code':
+    case 'Code': {
+      let initial = null;
+      if (showStarterCode && body.initial) {
+        initial = (
+          <Card bg="secondary" border="info" className="mt-2 mb-3">
+            <Card.Header
+              as="p"
+              role="button"
+              onClick={() => setOpen((o) => !o)}
+              onKeyPress={() => setOpen((o) => !o)}
+              tabIndex={0}
+            >
+              Starter:
+            </Card.Header>
+            <Collapse in={open}>
+              <Card.Body>
+                <DisplayCode
+                  info={body}
+                  value={null}
+                  refreshProps={[...refreshCodeMirrorsDeps, open]}
+                  fullyExpandCode={fullyExpandCode}
+                />
+              </Card.Body>
+            </Collapse>
+          </Card>
+        );
+      }
       return (
         <Prompted prompt={body.prompt}>
+          {initial}
           <DisplayCode
             info={body}
             value={value as CodeState}
@@ -182,6 +217,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
+    }
     case 'AllThatApply':
       return (
         <Prompted prompt={body.prompt}>

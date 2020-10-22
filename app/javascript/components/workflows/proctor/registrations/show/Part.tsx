@@ -23,6 +23,7 @@ interface PartProps {
   anonymous?: boolean;
   showRequestGrading?: string;
   fullyExpandCode?: boolean;
+  showStarterCode: boolean;
 }
 const REQUEST_GRADE_MUTATION = graphql`
 mutation PartRequestGradingLockMutation($input: RequestGradingLockInput!) {
@@ -109,6 +110,7 @@ const Part: React.FC<PartProps> = (props) => {
     anonymous,
     showRequestGrading = false,
     fullyExpandCode = false,
+    showStarterCode,
   } = props;
   const {
     name,
@@ -175,6 +177,7 @@ const Part: React.FC<PartProps> = (props) => {
               currentGrading={currentGrading?.body[i]}
               refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
               fullyExpandCode={fullyExpandCode}
+              showStarterCode={showStarterCode}
             />
           </div>
         ))}

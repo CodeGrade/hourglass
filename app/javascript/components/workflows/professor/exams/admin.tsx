@@ -919,6 +919,7 @@ const PreviewVersion: React.FC<{
         <div className="border p-2">
           <ExamViewer
             contents={contents}
+            showStarterCode
             refreshCodeMirrorsDeps={[open]}
             rubric={rubric}
           />

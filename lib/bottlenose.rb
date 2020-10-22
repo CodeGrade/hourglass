@@ -24,6 +24,7 @@ module Bottlenose
       end
     end
 
+    # rubocop:disable  Metrics/BlockLength, Metrics/PerceivedComplexity
     def sync_course_regs(course)
       got = bottlenose_get("/api/courses/#{course.bottlenose_id}/registrations")
       all_usernames = got.map do |_sec_id, sec_obj|
@@ -36,7 +37,6 @@ module Bottlenose
         end
       end.flatten
       all_users = User.where(username: all_usernames).index_by(&:username)
-      # rubocop:disable  Metrics/BlockLength
       User.transaction do
         sections = course.sections.index_by(&:bottlenose_id)
         prof_regs = course.professor_course_registrations.includes(:user).index_by(&:user_id)
@@ -70,8 +70,8 @@ module Bottlenose
           end
         end
       end
-      # rubocop:enable  Metrics/BlockLength
     end
+    # rubocop:enable  Metrics/BlockLength, Metrics/PerceivedComplexity
 
     def create_exam(exam)
       res = bottlenose_post(

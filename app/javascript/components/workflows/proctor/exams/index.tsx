@@ -69,7 +69,11 @@ export interface Recipient {
 export interface SplitRecipients {
   rooms: Recipient[];
   students: Recipient[];
+  studentsByRoom: Record<RoomAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>>;
+  studentsByVersion: Record<VersionAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>>;
   versions: Recipient[];
+  versionsByRoom: Record<RoomAnnouncement['id'], Record<VersionAnnouncement['id'], boolean>>;
+  roomsByVersion: Record<VersionAnnouncement['id'], Record<RoomAnnouncement['id'], boolean>>;
 }
 
 enum MessageType {
@@ -91,7 +95,14 @@ interface DirectMessage {
   };
   registration: {
     id: string;
+    room: {
+      id: string;
+    };
+    examVersion: {
+      id: string;
+    };
     user: {
+      id: string;
       displayName: string;
     };
   };
@@ -104,7 +115,14 @@ interface Question {
   body: string;
   registration: {
     id: string;
+    room: {
+      id: string;
+    };
+    examVersion: {
+      id: string;
+    };
     user: {
+      id: string;
       displayName: string;
     };
   };
@@ -115,6 +133,7 @@ interface VersionAnnouncement {
   time: DateTime;
   id: string;
   version: {
+    id: string;
     name: string;
   };
   body: string;
@@ -125,6 +144,7 @@ interface RoomAnnouncement {
   time: DateTime;
   id: string;
   room: {
+    id: string;
     name: string;
   };
   body: string;
@@ -879,10 +899,10 @@ const SingleMessage: React.FC<{
   }
 };
 
-type FilterVals = SelectOptions<string>;
-
 const ShowMessages: React.FC<{
   replyTo: (regId: string) => void;
+  recipients: SplitRecipients;
+  recipientOptions: RecipientOptions;
   receivedOnly?: boolean;
   sentOnly?: boolean;
   sent: DirectMessage[];
@@ -893,6 +913,8 @@ const ShowMessages: React.FC<{
 }> = (props) => {
   const {
     replyTo,
+    recipients,
+    recipientOptions,
     receivedOnly = false,
     sentOnly = false,
     questions,
@@ -903,7 +925,7 @@ const ShowMessages: React.FC<{
   } = props;
   const [lastViewed, setLastViewed] = useState<DateTime>(DateTime.local());
   const resetLastViewed = useCallback(() => setLastViewed(DateTime.local()), []);
-  const [filter, setFilter] = useState<FilterVals>(undefined);
+  const [filter, setFilter] = useState<MessageFilterOption[]>(undefined);
   let all: Array<Message> = [];
   if (!receivedOnly) {
     all = all
@@ -916,49 +938,56 @@ const ShowMessages: React.FC<{
     all = all.concat(questions);
   }
 
-  const filterSet = all.reduce((acc, m) => {
-    let option;
-    switch (m.type) {
-      case MessageType.Direct:
-        option = m.registration.user.displayName;
-        break;
-      case MessageType.Question:
-        option = m.registration.user.displayName;
-        break;
-      case MessageType.Room:
-        option = m.room.name;
-        break;
-      case MessageType.Version:
-        option = m.version.name;
-        break;
-      case MessageType.Exam:
-        break;
-      default:
-        throw new ExhaustiveSwitchError(m);
-    }
-    if (option) {
-      return acc.add(option);
-    }
-    return acc;
-  }, new Set<FilterVals>());
-  const filterOptions = [];
-  filterSet.forEach((o) => {
-    filterOptions.push({ value: o, label: o });
-  });
-
   if (filter) {
     all = all.filter((m) => {
       switch (m.type) {
+        case MessageType.Exam: return true;
         case MessageType.Direct:
-          return filter.some((f) => m.registration.user.displayName === f.value);
         case MessageType.Question:
-          return filter.some((f) => m.registration.user.displayName === f.value);
+          return filter.some((f) => {
+            switch (f.value.type) {
+              case MessageType.Direct:
+                return f.value.name === m.registration.user.displayName;
+              case MessageType.Room:
+                return f.value.id === m.registration.room?.id;
+              case MessageType.Version:
+                return f.value.id === m.registration.examVersion.id;
+              case MessageType.Exam:
+                return true;
+              default:
+                throw new ExhaustiveSwitchError(f.value.type);
+            }
+          });
         case MessageType.Room:
-          return filter.some((f) => m.room.name === f.value);
+          return filter.some((f) => {
+            switch (f.value.type) {
+              case MessageType.Direct:
+                return recipients.studentsByRoom[m.room?.id]?.[f.value.id];
+              case MessageType.Room:
+                return f.value.id === m.room?.id;
+              case MessageType.Version:
+                return recipients.versionsByRoom[m.room?.id]?.[f.value.id];
+              case MessageType.Exam:
+                return true;
+              default:
+                throw new ExhaustiveSwitchError(f.value.type);
+            }
+          });
         case MessageType.Version:
-          return filter.some((f) => m.version.name === f.value);
-        case MessageType.Exam:
-          return true;
+          return filter.some((f) => {
+            switch (f.value.type) {
+              case MessageType.Direct:
+                return recipients.studentsByVersion[m.version.id]?.[f.value.id];
+              case MessageType.Version:
+                return f.value.id === m.version.id;
+              case MessageType.Room:
+                return recipients.roomsByVersion[m.version.id]?.[f.value.id];
+              case MessageType.Exam:
+                return true;
+              default:
+                throw new ExhaustiveSwitchError(f.value.type);
+            }
+          });
         default:
           throw new ExhaustiveSwitchError(m);
       }
@@ -969,7 +998,6 @@ const ShowMessages: React.FC<{
   const earlier = idx === -1 ? [] : all.slice(idx);
   const later = idx === -1 ? all : all.slice(0, idx);
   const dividerClass = later.length === 0 ? 'd-none' : '';
-
   return (
     <>
       <Form.Group className="d-flex" controlId="message-filter">
@@ -981,14 +1009,15 @@ const ShowMessages: React.FC<{
             isMulti
             placeholder="Choose selection criteria..."
             value={filter}
-            onChange={(value: FilterVals, _action) => {
+            onChange={(value: MessageFilterOption[], _action) => {
               if (value?.length > 0) {
                 setFilter(value);
               } else {
                 setFilter(undefined);
               }
             }}
-            options={filterOptions}
+            formatGroupLabel={formatGroupLabel}
+            options={recipientOptions}
           />
         </Col>
       </Form.Group>
@@ -1088,9 +1117,9 @@ const newMessageSubscriptionSpec = graphql`
         }
         registration {
           id
-          user {
-            displayName
-          }
+          room { id }
+          examVersion { id }
+          user { displayName }
         }
       }
       messagesEdge {
@@ -1110,9 +1139,9 @@ const newQuestionSubscriptionSpec = graphql`
         createdAt
         registration {
           id
-          user {
-            displayName
-          }
+          room { id }
+          examVersion { id }
+          user { displayName }
         }
         body
       }
@@ -1132,6 +1161,7 @@ const Loaded: React.FC<{
   replyTo: (regId: string) => void;
   examId: string;
   response: Response;
+  recipients: SplitRecipients;
   recipientOptions: RecipientOptions;
 }> = (props) => {
   const {
@@ -1141,6 +1171,7 @@ const Loaded: React.FC<{
     replyTo,
     examId,
     response,
+    recipients,
     recipientOptions,
   } = props;
   const {
@@ -1281,6 +1312,8 @@ const Loaded: React.FC<{
                     <div className="inner-wrapper h-100">
                       <ShowMessages
                         replyTo={replyTo}
+                        recipients={recipients}
+                        recipientOptions={recipientOptions}
                         sent={sent}
                         questions={questions}
                         version={version}
@@ -1295,6 +1328,8 @@ const Loaded: React.FC<{
                     <div className="inner-wrapper h-100">
                       <ShowMessages
                         replyTo={replyTo}
+                        recipients={recipients}
+                        recipientOptions={recipientOptions}
                         sent={sent}
                         questions={questions}
                         version={version}
@@ -1310,6 +1345,8 @@ const Loaded: React.FC<{
                     <div className="inner-wrapper h-100">
                       <ShowMessages
                         replyTo={replyTo}
+                        recipients={recipients}
+                        recipientOptions={recipientOptions}
                         sent={sent}
                         questions={questions}
                         version={version}
@@ -1342,6 +1379,7 @@ const ExamMessages: React.FC<{
   setSelectedRecipient: (option: MessageFilterOption) => void;
   messageRef: React.Ref<HTMLTextAreaElement>;
   replyTo: (registrationId: string) => void;
+  recipients: SplitRecipients;
   recipientOptions: RecipientOptions;
   exam: exams_messages$key;
 }> = (props) => {
@@ -1350,6 +1388,7 @@ const ExamMessages: React.FC<{
     setSelectedRecipient,
     messageRef,
     replyTo,
+    recipients,
     recipientOptions,
     exam,
   } = props;
@@ -1364,6 +1403,7 @@ const ExamMessages: React.FC<{
               createdAt
               body
               examVersion {
+                id
                 name
               }
             }
@@ -1376,6 +1416,7 @@ const ExamMessages: React.FC<{
               createdAt
               body
               room {
+                id
                 name
               }
             }
@@ -1397,7 +1438,14 @@ const ExamMessages: React.FC<{
               createdAt
               registration {
                 id
+                room {
+                  id
+                }
+                examVersion {
+                  id
+                }
                 user {
+                  id
                   displayName
                 }
               }
@@ -1417,7 +1465,14 @@ const ExamMessages: React.FC<{
               }
               registration {
                 id
+                room {
+                  id
+                }
+                examVersion {
+                  id
+                }
                 user {
+                  id
                   displayName
                 }
               }
@@ -1474,6 +1529,7 @@ const ExamMessages: React.FC<{
   return (
     <Loaded
       examId={res.id}
+      recipients={recipients}
       recipientOptions={recipientOptions}
       response={response}
       selectedRecipient={selectedRecipient}
@@ -1626,6 +1682,15 @@ const SplitViewLoaded: React.FC<{
   } = props;
   const { alert } = useContext(AlertContext);
   const messageRef = useRef<HTMLTextAreaElement>();
+  const roomOptions: SelectOptions<Recipient> = recipients.rooms.map((r) => ({
+    label: r.name,
+    // This toString is needed because otherwise some CSS
+    // mangler tries to convert this value directly to a string
+    // to be used as a key, and then we get duplicate keys
+    // since they're all [object Object]
+    value: { ...r, toString: ((): string => r.id), type: MessageType.Room },
+  }));
+  roomOptions.unshift({ label: 'No room', value: { type: MessageType.Room, id: undefined, name: 'No room' } });
   const recipientOptions = useMemo<RecipientOptions>(() => ([
     {
       label: 'Entire exam',
@@ -1634,29 +1699,33 @@ const SplitViewLoaded: React.FC<{
         value: {
           type: MessageType.Exam,
           id: examId,
+          // This toString is needed because otherwise some CSS
+          // mangler tries to convert this value directly to a string
+          // to be used as a key, and then we get duplicate keys
+          // since they're all [object Object]
+          toString: () => examId,
           name: 'Entire exam',
         },
       }],
     },
     {
       label: 'Rooms',
-      options: recipients.rooms.map((r) => ({
-        label: r.name,
-        value: { ...r, type: MessageType.Room },
-      })),
+      options: roomOptions,
     },
     {
       label: 'Versions',
       options: recipients.versions.map((r) => ({
         label: r.name,
-        value: { ...r, type: MessageType.Version },
+        // ditto
+        value: { ...r, toString: ((): string => r.id), type: MessageType.Version },
       })),
     },
     {
       label: 'Students',
       options: recipients.students.map((r) => ({
         label: r.name,
-        value: { ...r, type: MessageType.Direct },
+        // ditto
+        value: { ...r, toString: ((): string => r.id), type: MessageType.Direct },
       })),
     },
   ]), [recipients]);
@@ -1688,6 +1757,7 @@ const SplitViewLoaded: React.FC<{
       <Col sm={6}>
         <ExamMessages
           exam={exam}
+          recipients={recipients}
           recipientOptions={recipientOptions}
           selectedRecipient={selectedRecipient}
           setSelectedRecipient={setSelectedRecipient}
@@ -1721,6 +1791,8 @@ const ProctoringSplitView: React.FC<{
       }
       registrations {
         id
+        room { id }
+        examVersion { id }
         user {
           id
           displayName
@@ -1734,6 +1806,28 @@ const ProctoringSplitView: React.FC<{
     `,
     exam,
   );
+  const students: Recipient[] = [];
+  const studentsByRoom: Record<RoomAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>> = {};
+  const versionsByRoom: Record<RoomAnnouncement['id'], Record<VersionAnnouncement['id'], boolean>> = {};
+  const studentsByVersion: Record<VersionAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>> = {};
+  const roomsByVersion: Record<VersionAnnouncement['id'], Record<RoomAnnouncement['id'], boolean>> = {};
+  res.registrations.forEach((reg) => {
+    const r: Recipient = {
+      type: MessageType.Direct,
+      id: reg.id,
+      name: reg.user.displayName,
+    };
+    students.push(r);
+    studentsByRoom[reg.room?.id] = studentsByRoom[reg.room?.id] ?? {};
+    studentsByRoom[reg.room?.id][reg.id] = true;
+    studentsByVersion[reg.examVersion.id] = studentsByVersion[reg.examVersion.id] ?? {};
+    studentsByVersion[reg.examVersion.id][reg.id] = true;
+    versionsByRoom[reg.room?.id] = versionsByRoom[reg.room?.id] ?? {};
+    versionsByRoom[reg.room?.id][reg.examVersion.id] = true;
+    roomsByVersion[reg.examVersion.id] = roomsByVersion[reg.examVersion.id] ?? {};
+    roomsByVersion[reg.examVersion.id][reg.room?.id] = true;
+  });
+  const sortByName = (a, b) => a.name.localeCompare(b.name);
   const recipients: SplitRecipients = useMemo(() => ({
     versions: res.examVersions.edges.map(({ node: ev }) => {
       const r: Recipient = {
@@ -1742,15 +1836,10 @@ const ProctoringSplitView: React.FC<{
         name: ev.name,
       };
       return r;
-    }).sort((a, b) => a.name.localeCompare(b.name)),
-    students: res.registrations.map((registration) => {
-      const r: Recipient = {
-        type: MessageType.Direct,
-        id: registration.id,
-        name: registration.user.displayName,
-      };
-      return r;
-    }).sort((a, b) => a.name.localeCompare(b.name)),
+    }).sort(sortByName),
+    students: students.sort(sortByName),
+    studentsByRoom,
+    studentsByVersion,
     rooms: res.rooms.map((room) => {
       const r: Recipient = {
         type: MessageType.Room,
@@ -1758,7 +1847,9 @@ const ProctoringSplitView: React.FC<{
         name: room.name,
       };
       return r;
-    }).sort((a, b) => a.name.localeCompare(b.name)),
+    }).sort(sortByName),
+    versionsByRoom,
+    roomsByVersion,
   }), [res.examVersions, res.registrations, res.rooms]);
   return (
     <SplitViewLoaded

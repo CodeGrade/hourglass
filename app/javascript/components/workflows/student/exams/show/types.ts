@@ -479,6 +479,7 @@ export type AnomalyDetected = (reason: string, event: Event) => void;
 export interface AnomalyListener {
   event: string;
   handler: (e: Event) => void;
+  capture?: boolean;
 }
 
 export enum Policy {

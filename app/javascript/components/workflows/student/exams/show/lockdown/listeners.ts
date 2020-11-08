@@ -9,7 +9,59 @@ import { isFullscreen } from './helpers';
 const listeners: {
   event: string;
   handler: (anomalyDetected: AnomalyDetected) => (e: Event) => void;
+  capture?: boolean;
+  repeated?: boolean;
 }[] = [
+  {
+    event: 'keydown',
+    handler: (_detected) => (e: KeyboardEvent): void => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 's':
+          case 'S': // save dialog
+          case 'r':
+          case 'R': // reload
+          case 'h':
+          case 'H': // history
+          case 'w':
+          case 'W': // close window
+          case 'q':
+          case 'Q': // quit
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+          default:
+        }
+      }
+    },
+    capture: true,
+    repeated: true,
+  },
+  {
+    event: 'keypress',
+    handler: (_detected) => (e: KeyboardEvent): void => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 's':
+          case 'S': // save dialog
+          case 'r':
+          case 'R': // reload
+          case 'h':
+          case 'H': // history
+          case 'w':
+          case 'W': // close window
+          case 'q':
+          case 'Q': // quit
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+          default:
+        }
+      }
+    },
+    capture: true,
+    repeated: true,
+  },
   {
     event: 'mouseout',
     handler: (detected) => (e: MouseEvent): void => {
@@ -54,14 +106,19 @@ export function installListeners(
 ): AnomalyListener[] {
   if (policyPermits(policies, Policy.ignoreLockdown)) return [];
   const skipCleanup = policyPermits(policies, Policy.mockLockdown);
-  const handlers = listeners.map(({ event, handler }) => {
+  const handlers = listeners.map(({
+    event,
+    handler,
+    capture,
+    repeated,
+  }) => {
     const f: EventListener = (...args) => {
       handler(detected)(...args);
-      if (!skipCleanup) {
-        window.removeEventListener(event, f);
+      if (!skipCleanup && !repeated) {
+        window.removeEventListener(event, f, capture);
       }
     };
-    window.addEventListener(event, f);
+    window.addEventListener(event, f, capture);
     return {
       event,
       handler: f,
@@ -71,7 +128,7 @@ export function installListeners(
 }
 
 export function removeListeners(lst: AnomalyListener[]): void {
-  lst.forEach(({ event, handler }) => {
-    window.removeEventListener(event, handler);
+  lst.forEach(({ event, handler, capture }) => {
+    window.removeEventListener(event, handler, capture);
   });
 }

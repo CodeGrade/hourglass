@@ -33,10 +33,11 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   GRAPHQL
 
   def deep_delete_in_use(obj)
-    if obj.is_a? Hash
+    case obj
+    when Hash
       obj.delete 'inUse'
       obj.each { |_, v| deep_delete_in_use v }
-    elsif obj.is_a? Array
+    when Array
       obj.each { |v| deep_delete_in_use v }
     end
   end
@@ -64,7 +65,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
 
   def assert_not_updatable(ver, user:)
     old_name = ver.name
-    result = try_update(ver, new_name: old_name + '!', user: user)
+    result = try_update(ver, new_name: "#{old_name}!", user: user)
     assert result['errors']
     assert_not result['errors'].empty?
     ver.reload

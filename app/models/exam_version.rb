@@ -224,7 +224,7 @@ class ExamVersion < ApplicationRecord
       err = "Mismatched keys at #{path}: #{rub1.keys} ^ #{rub2.keys} = #{mismatch}"
       raise err
     end
-    rub1.keys.each do |k|
+    rub1.each_key do |k|
       next if k == 'railsId'
 
       compare_help "#{path}.#{k}", rub1[k], rub2[k]
@@ -253,7 +253,8 @@ class ExamVersion < ApplicationRecord
     # Each key in grouped has non-nil points, eventually bottoming out
     # at a rubric_preset with a direction and label, that contains
     # 1+ preset_comments.
-    if obj.is_a? Hash
+    case obj
+    when Hash
       obj.map do |k, v|
         flat_key = flatten_groups k
         flat_v = flatten_groups v
@@ -266,9 +267,9 @@ class ExamVersion < ApplicationRecord
           },
         ]
       end.to_h
-    elsif obj.is_a? Array
+    when Array
       obj.map { |v| flatten_groups v }
-    elsif obj.is_a? Rubric
+    when Rubric
       {
         railsId: obj.id,
         points: obj.new_record? ? nil : obj.points,
@@ -277,20 +278,20 @@ class ExamVersion < ApplicationRecord
         bnum: obj.bnum,
         description: obj.description,
       }.stringify_keys
-    elsif obj.is_a? RubricPreset
+    when RubricPreset
       {
         railsId: obj.id,
         label: obj.label,
         direction: obj.direction,
         mercy: obj.mercy,
       }.stringify_keys
-    elsif obj.is_a? PresetComment
+    when PresetComment
       {
         railsId: obj.id,
         label: obj.label,
         points: obj.points,
       }.stringify_keys
-    elsif obj.is_a? GradingComment
+    when GradingComment
       {
         railsId: obj.id,
         qnum: obj.qnum,
@@ -311,7 +312,7 @@ class ExamVersion < ApplicationRecord
   def detailed_grade_breakdown_for(reg)
     comments_and_rubrics = reg.grading_comments.includes(
       :creator,
-      preset_comment: [rubric_preset: [rubric: [parent_section: [parent_section: :parent_section]]]],
+      preset_comment: [{ rubric_preset: [{ rubric: [{ parent_section: [{ parent_section: :parent_section }] }] }] }],
     )
     comments = multi_group_by(comments_and_rubrics, [:qnum, :pnum, :bnum, :preset_comment])
     checks = multi_group_by(reg.grading_checks.includes(:creator), [:qnum, :pnum, :bnum])
@@ -342,8 +343,8 @@ class ExamVersion < ApplicationRecord
         body_comments = comments.dig(qnum, pnum, bnum) || {}
 
         grouped = body_comments.group_by { |pc, _cs| pc&.rubric_preset || RubricPreset.new(direction: 'deduction') }
-                               .map { |k, v| [k, v.to_h] }.to_h
-        grouped = grouped.group_by { |rp, _pccs| rp&.rubric || Any.new(points: 0) }.map { |k, v| [k, v.to_h] }.to_h
+                               .transform_values(&:to_h)
+        grouped = grouped.group_by { |rp, _pccs| rp&.rubric || Any.new(points: 0) }.transform_values(&:to_h)
         while grouped.keys.any? { |r, _| (r.is_a?(One) || r.is_a?(Any)) && r.points.nil? }
           pointless, pointed = grouped.partition { |r, _| (r.is_a?(One) || r.is_a?(Any)) && r.points.nil? }
           pointless = pointless.group_by do |r, _rppccs|
@@ -444,11 +445,12 @@ class ExamVersion < ApplicationRecord
 
   def export_files(path, files)
     files.each do |f|
-      if f['filedir'] == 'dir'
+      case f['filedir']
+      when 'dir'
         dpath = path.join(f['path'])
         FileUtils.mkdir_p dpath
         export_files dpath, f['nodes']
-      elsif f['filedir'] == 'file'
+      when 'file'
         fpath = path.join(f['path'])
         contents = MarksProcessor.process_marks_reverse(f['contents'], f['marks'])
         File.write fpath, contents
@@ -472,9 +474,9 @@ class ExamVersion < ApplicationRecord
 
   def rubrics_for_grading
     root_rubrics.includes(rubric_preset: :preset_comments,
-                          subsections: [rubric_preset: :preset_comments,
-                                        subsections: [rubric_preset: :preset_comments,
-                                                      subsections: [rubric_preset: :preset_comments]]])
+                          subsections: [{ rubric_preset: :preset_comments,
+                                          subsections: [{ rubric_preset: :preset_comments,
+                                                          subsections: [{ rubric_preset: :preset_comments }] }] }])
   end
 
   def part_tree
@@ -490,7 +492,7 @@ class ExamVersion < ApplicationRecord
     end
   end
 
-  def bottlenose_summary(with_names = true)
+  def bottlenose_summary(with_names: true)
     questions.map do |q|
       parts = q['parts']
       if parts.count == 1
@@ -520,9 +522,10 @@ class ExamVersion < ApplicationRecord
   end
 
   def deep_delete_keys!(obj, keys)
-    if obj.is_a? Array
+    case obj
+    when Array
       obj.each { |o| deep_delete_keys!(o, keys) }
-    elsif obj.is_a? Hash
+    when Hash
       keys.each { |k| obj.delete k }
       obj.each do |k, v|
         deep_delete_keys! k, keys

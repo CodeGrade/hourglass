@@ -166,10 +166,10 @@ class ArchiveUtils
 
   # Custom exception for when a file can't be read
   class FileReadError < RuntimeError
-    attr_accessor :file
-    attr_accessor :type
-    attr_accessor :exn
+    attr_accessor :file, :type, :exn
+
     def initialize(file, type, exn)
+      super
       @file = file
       @type = type
       @exn = exn
@@ -182,9 +182,10 @@ class ArchiveUtils
 
   # Custom exception for when the archive contains too many files
   class FileCountLimit < RuntimeError
-    attr_accessor :limit
-    attr_accessor :file
+    attr_accessor :limit, :file
+
     def initialize(limit, file)
+      super
       @limit = limit
       @file = file
     end
@@ -196,9 +197,10 @@ class ArchiveUtils
 
   # Custom exception for when the archive expands too large
   class FileSizeLimit < RuntimeError
-    attr_accessor :limit
-    attr_accessor :file
+    attr_accessor :limit, :file
+
     def initialize(limit, file)
+      super
       @limit = limit
       @file = file
     end
@@ -211,10 +213,10 @@ class ArchiveUtils
 
   # Custom exception for when the archive extracts outside its root directory
   class SafeExtractionError < RuntimeError
-    attr_accessor :file
-    attr_accessor :link
-    attr_accessor :dest
+    attr_accessor :file, :link, :dest
+
     def initialize(file, dest, link)
+      super
       @file = file
       @dest = dest
       @link =
@@ -573,7 +575,7 @@ class ArchiveUtils
     if str.valid_encoding?
       str
     else
-      str.scrub { |bytes| '<' + bytes.unpack1('H*') + '>' }
+      str.scrub { |bytes| "<#{bytes.unpack1('H*')}>" }
     end
   end
 

@@ -1,5 +1,6 @@
 require: rubocop-rails
 AllCops:
+  NewCops: enable
   Exclude:
     - 'node_modules/**/*'
     - 'tmp/**/*'

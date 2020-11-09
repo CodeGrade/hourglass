@@ -27,8 +27,7 @@ require 'find'
 class Upload
   include UploadsHelper
 
-  attr_reader :files
-  attr_reader :info
+  attr_reader :files, :info
 
   def initialize(upload)
     @upload = upload
@@ -141,9 +140,10 @@ class Upload
     answers = contents['questions'].map do |q|
       q['parts'].map do |p|
         p['body'].map do |b|
-          if b.is_a? String
+          case b
+          when String
             { NO_ANS: true }
-          elsif b.is_a? Hash
+          when Hash
             if b.key? 'AllThatApply'
               b['AllThatApply']['options'].map(&:values).flatten
             elsif b.key? 'Code'
@@ -222,12 +222,13 @@ class Upload
             extraCredit: p['extraCredit'],
             reference: p_reference,
             body: p['body'].map do |b|
-              if b.is_a? String
+              case b
+              when String
                 {
                   type: 'HTML',
                   value: b,
                 }
-              elsif b.is_a? Hash
+              when Hash
                 if b.key? 'AllThatApply'
                   {
                     type: 'AllThatApply',
@@ -257,15 +258,16 @@ class Upload
                   }.compact
                 elsif b.key? 'CodeTag'
                   referent =
-                    if b['CodeTag']['choices'] == 'part'
+                    case b['CodeTag']['choices']
+                    when 'part'
                       raise 'No reference for part.' if p_reference.nil?
 
                       'part'
-                    elsif b['CodeTag']['choices'] == 'question'
+                    when 'question'
                       raise 'No reference for question.' if q_reference.nil?
 
                       'question'
-                    elsif b['CodeTag']['choices'] == 'exam'
+                    when 'exam'
                       raise 'No reference for exam.' if e_reference.nil?
 
                       'exam'
@@ -439,7 +441,7 @@ class Upload
       return nil if item[:path] == '__MACOSX'
 
       item[:filedir] = 'dir'
-      item[:text] = item[:path] + '/'
+      item[:text] = "#{item[:path]}/"
       item[:nodes] = item[:children].map { |n| with_extracted(n) }.compact
       item.delete(:children)
     end

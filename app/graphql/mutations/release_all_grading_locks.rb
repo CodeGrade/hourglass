@@ -13,7 +13,7 @@ module Mutations
     end
 
     def resolve(exam:)
-      exam.initialize_grading_locks!(true)
+      exam.initialize_grading_locks!(reset: true)
       { released: true }
     end
   end

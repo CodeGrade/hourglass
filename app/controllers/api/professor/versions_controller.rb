@@ -30,12 +30,12 @@ module Api
       end
 
       def export_file
-        fname = @version.name.gsub(/ /, '-') + '.json'
+        fname = "#{@version.name.gsub(/ /, '-')}.json"
         send_data @version.export_json, type: :json, disposition: 'attachment', filename: fname
       end
 
       def export_archive
-        fname = @version.name.gsub(/ /, '-') + '.zip'
+        fname = "#{@version.name.gsub(/ /, '-')}.zip"
         ArchiveUtils.mktmpdir do |path|
           pathname = Pathname.new(path)
           zip_path = pathname.join(fname)

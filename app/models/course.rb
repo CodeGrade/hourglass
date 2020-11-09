@@ -21,15 +21,15 @@ class Course < ApplicationRecord
   validates :bottlenose_id, presence: true
 
   def user_is_student?(user)
-    student_registrations.where(user: user).exists?
+    student_registrations.exists?(user: user)
   end
 
   def user_is_staff?(user)
-    staff_registrations.where(user: user).exists?
+    staff_registrations.exists?(user: user)
   end
 
   def user_is_professor?(user)
-    professor_course_registrations.where(user: user).exists?
+    professor_course_registrations.exists?(user: user)
   end
 
   def all_staff

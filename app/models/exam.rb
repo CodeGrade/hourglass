@@ -69,7 +69,7 @@ class Exam < ApplicationRecord
   end
 
   def user_is_proctor?(user)
-    proctor_registrations.where(user: user).exists?
+    proctor_registrations.exists?(user: user)
   end
 
   # All students and proctors registered for the exam.
@@ -214,7 +214,7 @@ class Exam < ApplicationRecord
     }
   end
 
-  def initialize_grading_locks!(reset = false)
+  def initialize_grading_locks!(reset: false)
     pairs_by_version = exam_versions.map { |v| [v.id, v.qp_pairs] }.to_h
     GradingLock.transaction do
       existing = GradingLock.where(registration: registrations)
@@ -256,7 +256,7 @@ class Exam < ApplicationRecord
     if exam_versions.count == 1
       exam_versions.first.bottlenose_summary
     else
-      all_versions = exam_versions.map { |ev| ev.bottlenose_summary(false) }
+      all_versions = exam_versions.map { |ev| ev.bottlenose_summary(with_names: false) }
       if compatible_versions(all_versions)
         all_versions.first
       else
@@ -270,7 +270,7 @@ class Exam < ApplicationRecord
 
   def bottlenose_exam_grades(regs = nil)
     regs = registrations if regs.nil?
-    all_versions = exam_versions.map { |ev| ev.bottlenose_summary(false) }
+    all_versions = exam_versions.map { |ev| ev.bottlenose_summary(with_names: false) }
     if compatible_versions(all_versions)
       regs.map do |r|
         [

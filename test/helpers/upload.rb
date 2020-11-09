@@ -17,10 +17,8 @@ module UploadTestHelper
     end
   end
 
-  def self.with_temp_fixture_zip(name)
-    with_temp_zip(Rails.root.join('test', 'fixtures', 'files', name, '**')) do |f|
-      yield f
-    end
+  def self.with_temp_fixture_zip(name, &block)
+    with_temp_zip(Rails.root.join('test', 'fixtures', 'files', name, '**'), &block)
   end
 
   def self.with_test_uploaded_fixture_zip(name, mime_type = nil)

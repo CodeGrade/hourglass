@@ -248,7 +248,6 @@ class ExamVersion < ApplicationRecord
     Rails.logger.debug e.backtrace
   end
 
-  # rubocop:disable Metrics/PerceivedComplexity
   def flatten_groups(obj)
     # Each key in grouped has non-nil points, eventually bottoming out
     # at a rubric_preset with a direction and label, that contains
@@ -305,7 +304,6 @@ class ExamVersion < ApplicationRecord
       obj
     end
   end
-  # rubocop:enable Metrics/PerceivedComplexity
 
   # Tree of questions to parts to score for that part
   # rubocop:disable Metrics/PerceivedComplexity

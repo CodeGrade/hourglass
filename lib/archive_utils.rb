@@ -13,78 +13,77 @@ TAR_LONGLINK = '././@LongLink'
 # simply reopening the classes will fail.  These two patches
 # harmonize the interfaces to both Zips and Tars, so that we
 # can extract them using the same logic.
-# rubocop:disable Metrics/BlockLength
-Zip::File.class_exec do
-  # A helper class to make the ZipEntry type more uniform
-  class WrapZipEntry
-    def initialize(entry)
-      @entry = entry
-    end
+# A helper class to make the ZipEntry type more uniform
+class WrapZipEntry
+  def initialize(entry)
+    @entry = entry
+  end
 
-    def read
-      @entry.get_input_stream.read
-    end
+  def read
+    @entry.get_input_stream.read
+  end
 
-    def directory?
-      @entry.directory?
-    end
+  def directory?
+    @entry.directory?
+  end
 
-    def file?
-      @entry.file?
-    end
+  def file?
+    @entry.file?
+  end
 
-    def symlink?
-      @entry.symlink?
-    end
+  def symlink?
+    @entry.symlink?
+  end
 
-    def name
-      @entry.name
-    end
+  def name
+    @entry.name
+  end
 
-    def unix_perms
-      if @entry.directory?
-        nil
-      else
-        @entry.unix_perms
-      end
+  def unix_perms
+    if @entry.directory?
+      nil
+    else
+      @entry.unix_perms
     end
   end
+end
+Zip::File.class_exec do
   def safe_each
     each do |e|
       yield(WrapZipEntry.new(e))
     end
   end
 end
-Gem::Package::TarReader.class_exec do
-  # A helper class to make the TarEntry type more uniform
-  class WrapTarEntry
-    def initialize(entry, name)
-      @entry = entry
-      @name = name
-    end
-
-    def read
-      @entry.read
-    end
-
-    def directory?
-      @entry.directory?
-    end
-
-    def file?
-      @entry.file?
-    end
-
-    def symlink?
-      @entry.symlink?
-    end
-
-    attr_reader :name
-
-    def unix_perms
-      @entry.header.mode
-    end
+# A helper class to make the TarEntry type more uniform
+class WrapTarEntry
+  def initialize(entry, name)
+    @entry = entry
+    @name = name
   end
+
+  def read
+    @entry.read
+  end
+
+  def directory?
+    @entry.directory?
+  end
+
+  def file?
+    @entry.file?
+  end
+
+  def symlink?
+    @entry.symlink?
+  end
+
+  attr_reader :name
+
+  def unix_perms
+    @entry.header.mode
+  end
+end
+Gem::Package::TarReader.class_exec do
   def safe_each
     # from https://dracoater.blogspot.com/2013/10/extracting-files-from-targz-with-ruby.html
     rewind
@@ -100,7 +99,6 @@ Gem::Package::TarReader.class_exec do
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
 
 # Utility class for uniformly dealing with archives
 class ArchiveUtils

@@ -36,6 +36,8 @@ FactoryBot.define do
       end
     end
 
-    to_create {}
+    to_create do
+      # deliberately do nothing
+    end
   end
 end

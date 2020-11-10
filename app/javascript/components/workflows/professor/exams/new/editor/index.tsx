@@ -418,7 +418,7 @@ function transformForSubmit(values: FormValues): Version {
       ...restOfQ
     } = q;
     rubrics.questions[qnum] = {
-      questionRubric: stripInUse(questionRubric),
+      questionRubric: transformRubricPoints(stripInUse(questionRubric)),
       parts: [],
     };
     const newParts: PartInfo[] = [];

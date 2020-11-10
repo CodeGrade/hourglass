@@ -364,6 +364,44 @@ function stripInUse(rubric: Rubric): Rubric {
   }
 }
 
+function transformRubricPresetsPoints(presets: RubricPresets): RubricPresets {
+  return {
+    ...presets,
+    presets: presets.presets.map((p) => {
+      if (typeof p.points === 'string' && p.points === '') {
+        return {
+          ...p,
+          points: 0,
+        };
+      }
+      return p;
+    }),
+  };
+}
+
+function transformRubricPoints(rubric: Rubric): Rubric {
+  if (rubric === undefined) return rubric;
+  switch (rubric.type) {
+    case 'none': {
+      return rubric;
+    }
+    case 'all':
+    case 'any':
+    case 'one': {
+      const { choices, ...rest } = rubric;
+      return {
+        ...rest,
+        choices: (choices instanceof Array
+          ? choices.map(transformRubricPoints)
+          : transformRubricPresetsPoints(choices)
+        ),
+      };
+    }
+    default:
+      throw new ExhaustiveSwitchError(rubric);
+  }
+}
+
 function transformForSubmit(values: FormValues): Version {
   const { all } = values;
   const questions: QuestionInfo[] = [];
@@ -389,10 +427,11 @@ function transformForSubmit(values: FormValues): Version {
       const {
         body,
         partRubric,
+        points,
         ...restOfP
       } = p;
       rubrics.questions[qnum].parts[pnum] = {
-        partRubric: stripInUse(partRubric),
+        partRubric: transformRubricPoints(stripInUse(partRubric)),
         body: [],
       };
       const newBody: BodyItem[] = [];
@@ -429,6 +468,7 @@ function transformForSubmit(values: FormValues): Version {
       });
       newParts.push({
         ...restOfP,
+        points: typeof points === 'string' ? 0 : points,
         body: newBody,
       });
     });

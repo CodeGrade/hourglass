@@ -407,7 +407,7 @@ function transformForSubmit(values: FormValues): Version {
   const questions: QuestionInfo[] = [];
   const answers: AnswersState['answers'] = [];
   const rubrics: ExamRubric = {
-    examRubric: stripInUse(all.exam.examRubric),
+    examRubric: transformRubricPoints(stripInUse(all.exam.examRubric)),
     questions: [],
   };
   all.exam.questions.forEach((q, qnum) => {
@@ -438,7 +438,7 @@ function transformForSubmit(values: FormValues): Version {
       body.forEach((b, bnum) => {
         let itemAnswer: AnswerState;
         let bodyItem: BodyItem;
-        const bodyRubric = stripInUse(b.rubric || { type: 'none' });
+        const bodyRubric = transformRubricPoints(stripInUse(b.rubric || { type: 'none' }));
         rubrics.questions[qnum].parts[pnum].body[bnum] = bodyRubric;
         switch (b.type) {
           case 'AllThatApply': {

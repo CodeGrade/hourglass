@@ -18,6 +18,18 @@ def make_sample_data
   end
 end
 
+NUM_SIM_USERS = 1000
+
+def create_simulation_users(lecture:, lab:, room:, exam_version:)
+  (0..NUM_SIM_USERS).each do |i|
+    student = create(:user, username: "user#{i}")
+    create(:student_registration, user: student, section: lecture)
+    create(:student_registration, user: student, section: lab)
+    reg = create(:registration, user: student, room: room, exam_version: exam_version)
+    create(:snapshot, registration: reg)
+  end
+end
+
 def make_cs2500
   cs2500 = create(:course, title: 'CS 2500')
   cs2500lec = create(:section, :lecture, course: cs2500)
@@ -49,6 +61,8 @@ def make_cs2500
   create(:student_registration, user: cs2500student, section: cs2500lab)
   cs2500student_reg = create(:registration, user: cs2500student, room: cs2500_room1, exam_version: cs2500_v1)
   create(:snapshot, registration: cs2500student_reg)
+
+  create_simulation_users(lecture: cs2500lec, lab: cs2500lab, room: cs2500_room1, exam_version: cs2500_v1)
 
   create(:question, registration: cs2500student_reg)
   create(:message, sender: cs2500prof, registration: cs2500student_reg)

@@ -1,19 +1,14 @@
-# development:
-#   adapter: async
-#
-# test:
-#   adapter: test
-#
-# production:
-#   adapter: redis
-#   url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
-#   channel_prefix: hourglass_production
+redisconf: &redisconf
+  adapter: redis
+  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
 
 production:
-  adapter: postgresql
+  <<: *redisconf
+  channel_prefix: hourglass_production
 
 development:
-  adapter: postgresql
+  <<: *redisconf
+  channel_prefix: hourglass_development
 
 test:
   adapter: postgresql

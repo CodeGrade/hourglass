@@ -20,6 +20,7 @@ echo Updating persisted relay queries.
 yarn run relay-persist
 
 echo Compiling webpack assets.
+rails webpacker:compile
 rails assets:precompile
 
 echo Setting up database.

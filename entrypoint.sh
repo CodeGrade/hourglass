@@ -7,6 +7,9 @@ if [ ! -f "README.md" ]; then
   exit 1
 fi
 
+echo Generating rails secret.
+export SECRET_KEY_BASE=$(rails secret)
+
 echo Updating graphql schema file.
 rails graphql:update_schema
 

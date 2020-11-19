@@ -14,9 +14,9 @@ echo Updating graphql schema file.
 rails graphql:update_schema
 
 echo Compiling webpack assets.
-rails webpacker:compile
+rails assets:precompile
 
-echo Compiling relay queries.
-yarn run relay-persist
+echo Setting up database.
+rails db:setup
 
 exec bundle exec "$@"

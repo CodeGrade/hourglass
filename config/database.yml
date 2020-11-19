@@ -81,6 +81,7 @@ test:
 #
 production:
   <<: *default
+  host: <%= ENV.fetch('HOURGLASS_DATABASE_HOST') { 'localhost' } %>
   database: hourglass_production
   username: hourglass
   password: <%= ENV['HOURGLASS_DATABASE_PASSWORD'] %>

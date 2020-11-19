@@ -386,15 +386,17 @@ function transformRubricPoints(rubric: Rubric): Rubric {
       return rubric;
     }
     case 'any':
-    case 'one':
-      if (typeof rubric.points === 'string' && rubric.points === '') {
-        // eslint-disable-next-line no-param-reassign
-        rubric = {
-          ...rubric,
-          points: 0,
-        };
-      }
-    // eslint-disable-next-line no-fallthrough
+    case 'one': {
+      const { points, choices, ...rest } = rubric;
+      return {
+        ...rest,
+        points: (typeof points === 'string' && points === '') ? 0 : points,
+        choices: (choices instanceof Array
+          ? choices.map(transformRubricPoints)
+          : transformRubricPresetsPoints(choices)
+        ),
+      };
+    }
     case 'all': {
       const { choices, ...rest } = rubric;
       return {

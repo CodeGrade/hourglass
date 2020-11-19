@@ -11,7 +11,10 @@ echo Generating rails secret.
 export SECRET_KEY_BASE=$(rails secret)
 
 echo Updating graphql schema file.
-rails graphql:update_schema
+RAILS_ENV=development rails graphql:update_schema
+
+echo Updating persisted relay queries.
+yarn run relay-persist
 
 echo Compiling webpack assets.
 rails assets:precompile

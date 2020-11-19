@@ -13,6 +13,9 @@ export SECRET_KEY_BASE=$(rails secret)
 echo Updating graphql schema file.
 RAILS_ENV=development rails graphql:update_schema
 
+echo Updating yarn packages.
+yarn install --frozen-lockfile
+
 echo Updating persisted relay queries.
 yarn run relay-persist
 

@@ -23,6 +23,7 @@ default: &default
 
 development:
   <<: *default
+  host: <%= ENV.fetch('HOURGLASS_DATABASE_HOST') { 'localhost' } %>
   database: hourglass_development
 
   # The specified database role being used to connect to postgres.
@@ -32,7 +33,7 @@ development:
   username: hourglass
 
   # The password associated with the postgres role (username).
-  #password:
+  password: <%= ENV.fetch('HOURGLASS_DATABASE_PASSWORD') { '' } %>
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have

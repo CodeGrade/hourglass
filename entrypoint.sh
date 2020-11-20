@@ -19,8 +19,7 @@ yarn install --frozen-lockfile
 echo Updating persisted relay queries.
 yarn run relay-persist
 
-echo Compiling webpack assets.
-rails webpacker:compile
+echo Precompiling assets.
 rails assets:precompile
 
 echo Setting up database.

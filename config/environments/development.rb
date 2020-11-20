@@ -50,4 +50,9 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  hg_host = ENV['HOURGLASS_HOST']
+  if hg_host.present?
+    config.hosts << hg_host
+  end
 end

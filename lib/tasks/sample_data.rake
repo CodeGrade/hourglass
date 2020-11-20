@@ -18,11 +18,11 @@ def make_sample_data
   end
 end
 
-NUM_SIM_USERS = 1000
+NUM_SIM_USERS = 500
 
 def create_simulation_users(lecture:, lab:, room:, exam_version:)
   (0..NUM_SIM_USERS).each do |i|
-    student = create(:user, username: "user#{i}")
+    student = create(:user, username: "stresstest#{i}")
     create(:student_registration, user: student, section: lecture)
     create(:student_registration, user: student, section: lab)
     reg = create(:registration, user: student, room: room, exam_version: exam_version)

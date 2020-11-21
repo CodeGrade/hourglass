@@ -1,1 +1,47 @@
-.gitignore
+# Ignore bundler config.
+/.bundle
+
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Ignore uploaded files in development
+/storage/*
+!/storage/.keep
+
+/node_modules
+/yarn-error.log
+
+/public/assets
+.byebug_history
+
+# Ignore master key for decrypting credentials and more.
+/config/master.key
+
+# Ignore uploaded files and submissions.
+/private/uploads
+/private/submissions
+
+# nix ignores
+/.nix-gems/
+/postgres/
+/postgres_data/
+
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity
+
+/.log/
+__generated__/
+/app/javascript/relay/
+
+config/schemas/graphql-queries.json
+
+Exams/
+
+.git

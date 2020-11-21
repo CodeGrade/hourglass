@@ -6,7 +6,7 @@ namespace :db do
     require 'factory_bot_rails'
     include FactoryBot::Syntax::Methods
 
-    make_sample_data if Rails.env.development?
+    make_sample_data # if Rails.env.development?
   end
 end
 
@@ -18,7 +18,7 @@ def make_sample_data
   end
 end
 
-NUM_SIM_USERS = 500
+NUM_SIM_USERS = 1000
 
 def create_simulation_users(lecture:, lab:, room:, exam_version:)
   (0..NUM_SIM_USERS).each do |i|

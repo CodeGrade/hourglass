@@ -45,3 +45,4 @@ config/schemas/graphql-queries.json
 Exams/
 
 .git
+.envrc

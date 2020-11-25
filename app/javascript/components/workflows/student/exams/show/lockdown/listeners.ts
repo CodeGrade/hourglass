@@ -27,6 +27,8 @@ const listeners: {
           case 'W': // close window
           case 'q':
           case 'Q': // quit
+          case 'i':
+          case 'I': // page info
             e.preventDefault();
             e.stopPropagation();
             break;

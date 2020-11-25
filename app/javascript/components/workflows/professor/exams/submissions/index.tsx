@@ -14,6 +14,7 @@ import {
   ContentsState,
   ExamVersion,
 } from '@student/exams/show/types';
+import Spoiler from '@hourglass/common/Spoiler';
 import ExamViewer from '@proctor/registrations/show';
 import { FinalizeDialog, finalizeItemMutation } from '@proctor/exams';
 import { AlertContext } from '@hourglass/common/alerts';
@@ -216,6 +217,7 @@ const ExamSubmission: React.FC = () => {
     `,
     { registrationId },
   );
+  const [title, setTitle] = useState<string>(undefined);
   if (res.error) {
     return <RenderError error={res.error} />;
   }
@@ -232,6 +234,9 @@ const ExamSubmission: React.FC = () => {
     exam,
     canIGrade,
   } = registration;
+  const userInfo = `${user.displayName} (${user.nuid})`;
+  const titleInfo = published ? userInfo : '<redacted>';
+  if (title === undefined) setTitle(`${exam.name} -- Submission for ${titleInfo}`);
   if (currentAnswers === null && !published) {
     return (
       <DocumentTitle title={`${exam.name} -- Submission for ${user.displayName}`}>
@@ -245,8 +250,18 @@ const ExamSubmission: React.FC = () => {
     answers: currentAnswers as AnswersState,
   };
   return (
-    <DocumentTitle title={`${exam.name} -- Submission for ${user.displayName} (${user.nuid})`}>
-      <h1>{`Submission by ${user.displayName}`}</h1>
+    <DocumentTitle title={title}>
+      <h1>
+        {'Submission by '}
+        {(published ? userInfo : (
+          <Spoiler
+            text={userInfo}
+            onToggle={(newOpen) => {
+              setTitle(`${exam.name} -- Submission for ${newOpen ? userInfo : '<redacted>'}`);
+            }}
+          />
+        ))}
+      </h1>
       <ExamViewer
         contents={parsedContents}
         currentGrading={currentGrading as CurrentGrading}

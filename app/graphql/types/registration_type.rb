@@ -25,6 +25,11 @@ module Types
       RecordLoader.for(User).load(object.user_id)
     end
     field :exam, Types::ExamType, null: false
+    def exam
+      RecordLoader.for(ExamVersion).load(object.exam_version_id).then do |ev|
+        RecordLoader.for(Exam).load(ev.exam_id)
+      end
+    end
     # field :exam_version, Types::ExamVersionType, null: true
     # def exam_version
     #   return object.exam_version if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
@@ -36,7 +41,7 @@ module Types
     # end
     field :exam_version, Types::ExamVersionType, null: false do
       guard lambda { |obj, _args, ctx|
-        !obj.object.in_future?
+        ALL_STAFF_OR_PUBLISHED.call(obj, nil, ctx) || !obj.object.in_future?
       }
     end
     def exam_version

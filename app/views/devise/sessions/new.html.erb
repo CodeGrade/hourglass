@@ -26,7 +26,7 @@
     </div>
   </div>
 
-  <% if Rails.env.development? %>
+  <% #if Rails.env.development? %>
     <%= bootstrap_form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
       <div class="form-signin text-center">
         <h1 class="h4 mb-4 font-weight-normal">DEV LOGIN</h1>
@@ -36,5 +36,5 @@
         <%= f.submit "Log in", class: "btn btn-lg btn-primary btn-block" %>
       </div>
     <% end %>
-  <% end %>
+  <% #end %>
 </div>

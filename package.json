@@ -12,7 +12,8 @@
     "uml": "tplant -C --input app/javascript/components/workflows/student/exams/show/types.ts --output types.svg",
     "relay-dev": "relay-compiler --watch",
     "relay": "relay-compiler --watchman false",
-    "relay-persist": "relay-compiler --watchman false --persist-output ./config/schemas/graphql-queries.json",
+    "relay-persist": "relay-compiler --watchman false --persistOutput ./config/schemas/graphql-queries.json",
+    "relay-new": "relay-compiler --watchman false --persistOutput ./config/schemas/graphql-queries.json --src ./app/javascript/components --schema ./app/javascript/relay/data/schema.json --language typescript --noFutureProofEnums true --customScalars.ISO8601DateTime=String",
     "dev": "concurrently \"yarn run webpack-dev\" \"yarn run relay-dev\"",
     "unused": "ts-prune"
   },
@@ -75,7 +76,8 @@
     "style-loader": "^1.2.1",
     "ts-loader": "^7.0.5",
     "typescript": "^3.8.3",
-    "webpack": "^4.0.0"
+    "webpack": "^4.0.0",
+    "webpack-cli": "^3.3.11"
   },
   "devDependencies": {
     "@types/actioncable": "^5.2.3",
@@ -105,7 +107,6 @@
     "relay-config": "^10.0.1",
     "tplant": "^2.3.3",
     "ts-prune": "^0.6.4",
-    "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
   }
 }

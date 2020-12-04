@@ -272,7 +272,7 @@ class Exam < ApplicationRecord
     regs = registrations if regs.nil?
     all_versions = exam_versions.map { |ev| ev.bottlenose_summary(with_names: false) }
     if compatible_versions(all_versions)
-      regs.map do |r|
+      regs.reject { |r| r.current_answers == r.exam_version.default_answers }.map do |r|
         [
           r.user.username,
           r.current_part_scores,

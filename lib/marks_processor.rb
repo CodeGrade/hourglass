@@ -88,7 +88,7 @@ class MarksProcessor
     inserted_marks.each do |m|
       # After removing marks, it's possible that we have a line that
       # is completely blank, so `contents.lines` could drop that line,
-      # So just in case, we'll ensure the line is present and at least 
+      # So just in case, we'll ensure the line is present and at least
       # as long as where the mark should be
       lines[m[:location]['line']] = (' ' * m[:location]['ch']) if lines[m[:location]['line']].nil?
       lines[m[:location]['line']].insert(m[:location]['ch'], m[:key])

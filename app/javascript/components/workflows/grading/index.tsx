@@ -750,7 +750,7 @@ function AnswersRow<T, V>(
         </Row>
         <hr />
         <Row>
-          <Col md={studentWidth} className="pr-4">
+          <Col md={studentWidth} className="pr-3">
             <ShowStudent
               info={info}
               value={studentAnswer}

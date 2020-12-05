@@ -66,8 +66,22 @@ const validateNumericInput : KeyboardEventHandler<HTMLInputElement> = (e) => {
   if (validKeys[e.key] || validKeyCodes[e.keyCode] || validKeyCodes[e.which]) return;
   if (e.key.match(/^F\d+$/)) return;
   if (!Number.isNaN(Number(e.key)) && (Number(e.key) === Number.parseInt(e.key, 10))) return;
-  if (e.key === '.' && e.currentTarget.value.indexOf('.') < 0) return;
-  if (e.key === '-' && e.currentTarget.value.indexOf('-') < 0 && e.currentTarget.selectionStart === 0) return;
+  if (e.key === '.') {
+    const indexOfDot = e.currentTarget.value.indexOf('.');
+    if (indexOfDot < 0) return;
+    if (e.currentTarget.selectionStart <= indexOfDot
+        && indexOfDot < e.currentTarget.selectionEnd) {
+      return;
+    }
+  }
+  if (e.key === '-') {
+    const indexOfMinus = e.currentTarget.value.indexOf('-');
+    if (indexOfMinus < 0 && e.currentTarget.selectionStart === 0) return;
+    if (e.currentTarget.selectionStart <= indexOfMinus
+        && indexOfMinus < e.currentTarget.selectionEnd) {
+      return;
+    }
+  }
   if (e.ctrlKey || e.altKey || e.metaKey) return;
   e.preventDefault();
 };

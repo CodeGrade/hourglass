@@ -735,6 +735,7 @@ function AnswersRow<T, V>(
     `,
     examVersionKey,
   );
+  const [studentWidth, setStudentWidth] = useState(6);
   const rubrics = assertType(isExamRubric, convertRubric(res.rubrics));
   const { examRubric } = rubrics;
   const qnumRubric = rubrics.questions[qnum]?.questionRubric;
@@ -744,12 +745,12 @@ function AnswersRow<T, V>(
     <Card>
       <Card.Body>
         <Row>
-          <Col md={6}><b>Student</b></Col>
-          <Col md={6}><b>Rubric</b></Col>
+          <Col md={studentWidth}><b>Student</b></Col>
+          <Col md={12 - studentWidth}><b>Rubric</b></Col>
         </Row>
         <hr />
         <Row>
-          <Col md={6}>
+          <Col md={studentWidth} className="pr-4">
             <ShowStudent
               info={info}
               value={studentAnswer}
@@ -758,7 +759,17 @@ function AnswersRow<T, V>(
               {children}
             </ShowStudent>
           </Col>
-          <Col md={6}>
+          <div className="m-0 w-0 p-0 z-1000 d-flex" style={{ maxWidth: '0px' }}>
+            <Button
+              size="sm"
+              variant="secondary"
+              className="float-left mx-n2 px-0 h-100"
+              onClick={() => setStudentWidth(studentWidth === 6 ? 10 : 6)}
+            >
+              {'< >'}
+            </Button>
+          </div>
+          <Col md={12 - studentWidth}>
             <ShowExpected
               info={info}
               value={expectedAnswer}

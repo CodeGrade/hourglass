@@ -364,13 +364,13 @@ const NewComments: React.FC<{
   const lastId = useRef<number>(0);
   const [commentMap, setCommentMap] = useState<NewCommentMap>({});
   const addNew = () => {
-    setCommentMap({
-      ...commentMap,
+    setCommentMap((curMap) => ({
+      ...curMap,
       [lastId.current]: {
         points: 0,
         message: '',
       },
-    });
+    }));
     lastId.current += 1;
   };
   const [mutate, { loading }] = useMutation<createCommentMutation>(
@@ -379,49 +379,64 @@ const NewComments: React.FC<{
       configs: [addCommentConfig(registrationId)],
     },
   );
+  const [needingSaving, setNeedingSaving] = useState<string[]>([]);
+  useEffect(() => {
+    needingSaving.forEach((id) => {
+      const { message, points } = commentMap[id];
+      mutate({
+        variables: {
+          input: {
+            registrationId,
+            qnum,
+            pnum,
+            bnum,
+            message,
+            points,
+          },
+        },
+      }).then(() => {
+        setCommentMap((curMap) => {
+          const newMap = { ...curMap };
+          delete newMap[id];
+          return newMap;
+        });
+      }).catch((err) => {
+        setCommentMap((curMap) => ({
+          ...curMap,
+          [id]: {
+            ...curMap[id],
+            error: err.message,
+          },
+        }));
+      });
+    });
+    if (needingSaving.length > 0) { setNeedingSaving([]); }
+  }, [needingSaving]);
   return (
     <>
       {Object.entries(commentMap).map(([id, { message, points, error }]) => {
         const onChange = (pts: number, msg: string) => {
-          setCommentMap({
-            ...commentMap,
+          setCommentMap((curMap) => ({
+            ...curMap,
             [id]: {
               message: msg,
               points: pts,
             },
-          });
+          }));
         };
         const onRemove = () => {
-          const newMap = { ...commentMap };
-          delete newMap[id];
-          setCommentMap(newMap);
-        };
-        const setError = (errMsg: string) => {
-          setCommentMap({
-            ...commentMap,
-            [id]: {
-              ...commentMap[id],
-              error: errMsg,
-            },
+          setCommentMap((curMap) => {
+            const newMap = { ...curMap };
+            delete newMap[id];
+            return newMap;
           });
         };
         const onCreate = () => {
-          mutate({
-            variables: {
-              input: {
-                registrationId,
-                qnum,
-                pnum,
-                bnum,
-                message,
-                points,
-              },
-            },
-          }).then(() => {
-            onRemove();
-          }).catch((err) => {
-            setError(err.message);
-          });
+          // The last onChange event will fire *after* the onBlur event triggers
+          // this onCreate handler, which means that `message` and `points` might
+          // be out of data.  So delay the actual saving until the next tick,
+          // so that it will reload the values from the current `commentMap`.
+          setNeedingSaving([...needingSaving, id]);
         };
         return (
           <NewComment

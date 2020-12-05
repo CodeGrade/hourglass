@@ -87,7 +87,7 @@ export const NumericInput: React.FC<{
   min?: number,
   max?: number,
   step?: number,
-  onChange?: (string) => void,
+  onChange?: (val: string | number, focused: boolean) => void,
   value?: number | string,
 }> = (props) => {
   const {
@@ -114,10 +114,10 @@ export const NumericInput: React.FC<{
         onKeyDown={(e) => {
           if (e.key === 'ArrowUp') {
             e.preventDefault();
-            if (onChange) onChange(clamp(numValue + step, min, max));
+            if (onChange) onChange(clamp(numValue + step, min, max), true);
           } else if (e.key === 'ArrowDown') {
             e.preventDefault();
-            if (onChange) onChange(clamp(numValue - step, min, max));
+            if (onChange) onChange(clamp(numValue - step, min, max), true);
           }
         }}
         onPaste={(e) => {
@@ -130,12 +130,16 @@ export const NumericInput: React.FC<{
           const nextVal = `${curVal.slice(0, selStart)}${data}${curVal.slice(selEnd)}`;
           const nextAsNum = Number(nextVal);
           if (Number.isFinite(nextAsNum)) {
-            onChange(clamp(nextAsNum, min, max));
+            onChange(clamp(nextAsNum, min, max), true);
           }
         }}
         disabled={disabled}
-        onChange={(e) => { if (onChange) onChange(e.target.value); }}
-        onBlur={() => { if (onChange) onChange(clamp(numValue, min, max)); }}
+        onChange={(e) => {
+          if (onChange) {
+            onChange(e.target.value, true);
+          }
+        }}
+        onBlur={() => { if (onChange) onChange(clamp(numValue, min, max), false); }}
       />
       <InputGroup.Append className="align-self-stretch">
         <ButtonGroup vertical className="h-100">
@@ -145,7 +149,7 @@ export const NumericInput: React.FC<{
             variant={variant}
             disabled={disabled || (max !== undefined && numValue >= max)}
             tabIndex={-1}
-            onClick={() => onChange(clamp(numValue + step, min, max))}
+            onClick={() => onChange(clamp(numValue + step, min, max), false)}
           >
             <Icon className="m-0 p-0" size={size === 'lg' ? '0.75em' : '0.5em'} I={FaChevronUp} />
           </Button>
@@ -155,7 +159,7 @@ export const NumericInput: React.FC<{
             variant={variant}
             disabled={disabled || (min !== undefined && numValue <= min)}
             tabIndex={-1}
-            onClick={() => onChange(clamp(numValue - step, min, max))}
+            onClick={() => onChange(clamp(numValue - step, min, max), false)}
           >
             <Icon size={size === 'lg' ? '0.75em' : '0.5em'} I={FaChevronDown} />
           </Button>

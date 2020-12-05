@@ -498,7 +498,7 @@ export const ExamInfoEditor: React.FC<{
   const [name, setName] = useState<string>(defaultName);
   const [start, setStart] = useState<DateTime>(defaultStartTime);
   const [end, setEnd] = useState<DateTime>(defaultEndTime);
-  const [duration, setDuration] = useState<string>(`${defaultDuration / 60.0}`);
+  const [duration, setDuration] = useState<number | string>(`${defaultDuration / 60.0}`);
 
   return (
     <Card className="mb-4">

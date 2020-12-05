@@ -43,7 +43,7 @@ const AccommodationEditor: React.FC<{
     percentTimeExpansion,
   } = props;
   const [startTime, setStartTime] = useState(newStartTime);
-  const [extraTime, setExtraTime] = useState(`${percentTimeExpansion}`);
+  const [extraTime, setExtraTime] = useState<number | string>(`${percentTimeExpansion}`);
   return (
     <tr>
       <td className="align-middle">

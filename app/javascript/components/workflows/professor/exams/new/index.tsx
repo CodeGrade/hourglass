@@ -50,7 +50,7 @@ const NewExamForm: React.FC<{
   const [name, setName] = useState<string>('');
   const [start, setStart] = useState<DateTime>(today);
   const [end, setEnd] = useState<DateTime>(todayEnd);
-  const [duration, setDuration] = useState<string>('5');
+  const [duration, setDuration] = useState<number | string>('5');
 
   return (
     <>

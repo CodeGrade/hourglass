@@ -238,11 +238,11 @@ const Feedback: React.FC<{
             disabled={disabled}
             step={0.5}
             value={pointStr}
-            onChange={(val) => {
+            onChange={(val, focused) => {
               setPointStr(val);
               // Don't propagate changes when the value is in an interim state
               // When NumericInput loses focus, it'll send a corrected numeric value.
-              if (onChangePoints && val !== '' && Number.isFinite(Number(val))) {
+              if (!focused && onChangePoints && val !== '' && Number.isFinite(Number(val))) {
                 onChangePoints(Number(val));
               }
             }}

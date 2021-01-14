@@ -45,7 +45,7 @@ class Rubric < ApplicationRecord
   end
 
   def points_if_preset
-    # Note: for new_records, the class is still Rubric, not All
+    # NOTE: for new_records, the class is still Rubric, not All
     return if type == 'All'
     return if rubric_preset.nil?
 

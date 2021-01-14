@@ -51,3 +51,5 @@ Metrics/ModuleLength:
     - app/helpers/**/*
 Style/RescueModifier:
   Enabled: false
+Lint/DuplicateBranch:
+  Enabled: false

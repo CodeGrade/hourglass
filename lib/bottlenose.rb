@@ -66,6 +66,7 @@ module Bottlenose
           sec_obj['professors'].each do |prof|
             user = sync_user(prof, all_users)
             reg = prof_regs[user.id] || ProfessorCourseRegistration.new(course: course, user: user)
+            prof_regs[user.id] = reg if prof_regs[user.id].nil?
             reg.save!
           end
         end
@@ -87,7 +88,8 @@ module Bottlenose
     private
 
     def sync_user(raw_user, all_users)
-      user = all_users[raw_user['username']] || User.new(username: raw_user['username]'])
+      user = all_users[raw_user['username']] || User.new(username: raw_user['username'])
+      all_users[user.username] = user if all_users[user.username].nil?
       user.display_name = raw_user['display_name']
       user.nuid = raw_user['nuid']
       user.email = raw_user['email']

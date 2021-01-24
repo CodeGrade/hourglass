@@ -34,19 +34,19 @@ const YesNo: React.FC<YesNoProps> = (props) => {
         type="radio"
         value={value}
         className={className}
-        onChange={onChange}
+        onChange={(newVal: 'yes' | 'no') => onChange(newVal === 'yes')}
       >
         <ToggleButton
           disabled={disabled}
           variant={value ? variant : `outline-${variant}`}
-          value
+          value="yes"
         >
           {yesLabel}
         </ToggleButton>
         <ToggleButton
           disabled={disabled}
           variant={(value === false) ? variant : `outline-${variant}`}
-          value={false}
+          value="no"
         >
           {noLabel}
         </ToggleButton>

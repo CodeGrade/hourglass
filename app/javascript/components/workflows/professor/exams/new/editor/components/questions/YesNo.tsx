@@ -23,9 +23,9 @@ const EditLabels: React.FC<WrappedFieldsProps> = (props) => {
           className="bg-white rounded"
           name="wording"
           type="radio"
-          value={isYesNo}
-          onChange={(v): void => {
-            if (v) {
+          value={isYesNo ? 'yn' : 'tf'}
+          onChange={(v: 'yn' | 'tf'): void => {
+            if (v === 'yn') {
               yesLabel.input.onChange('Yes');
               noLabel.input.onChange('No');
             } else {
@@ -36,13 +36,13 @@ const EditLabels: React.FC<WrappedFieldsProps> = (props) => {
         >
           <ToggleButton
             variant={isYesNo ? 'primary' : 'outline-primary'}
-            value
+            value="yn"
           >
             Yes/No
           </ToggleButton>
           <ToggleButton
             variant={(isYesNo === false) ? 'primary' : 'outline-primary'}
-            value={false}
+            value="tf"
           >
             True/False
           </ToggleButton>
@@ -66,18 +66,18 @@ const EditAnswer: React.FC<WrappedFieldsProps> = (props) => {
           className="bg-white rounded"
           name="tbg"
           type="radio"
-          value={answer.input.value}
-          onChange={answer.input.onChange}
+          value={answer.input.value ? 'yes' : 'no'}
+          onChange={(newVal: 'yes' | 'no') => answer.input.onChange(newVal === 'yes')}
         >
           <ToggleButton
             variant={answer.input.value ? 'primary' : 'outline-primary'}
-            value
+            value="yes"
           >
             {yesLabel.input.value}
           </ToggleButton>
           <ToggleButton
             variant={(answer.input.value === false) ? 'primary' : 'outline-primary'}
-            value={false}
+            value="no"
           >
             {noLabel.input.value}
           </ToggleButton>

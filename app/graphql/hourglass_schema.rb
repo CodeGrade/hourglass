@@ -9,8 +9,6 @@ class HourglassSchema < GraphQL::Schema
   query(Types::QueryType)
   subscription(Types::SubscriptionType)
 
-  use GraphQL::Execution::Interpreter
-  use GraphQL::Analysis::AST
   use GraphQL::Batch
 
 
@@ -58,9 +56,6 @@ class HourglassSchema < GraphQL::Schema
       super(query_str, **kwargs)
     end
   end
-
-  # Add built-in connections for pagination
-  use GraphQL::Pagination::Connections
 
   use GraphQL::Subscriptions::ActionCableSubscriptions
 

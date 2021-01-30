@@ -1504,9 +1504,9 @@
   integrity sha512-1oO6+dN5kdIA3sKPZhRGJTfGVP4SWV6KqlMOwry4J3HfyD68sl/3KmG7DeYUzvN+RbhXDnv/D8vNNB8168tAMg==
 
 "@rails/ujs@^6.0.0":
-  version "6.0.3"
-  resolved "https://registry.yarnpkg.com/@rails/ujs/-/ujs-6.0.3.tgz#e68a03278e30daea6a110aac5dfa33c60c53055d"
-  integrity sha512-CM9OEvoN9eXkaX7PXEnbsQLULJ97b9rVmwliZbz/iBOERLJ68Rk3ClJe+fQEMKU4CBZfky2lIRnfslOdUs9SLQ==
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/@rails/ujs/-/ujs-6.1.1.tgz#25c4e60018274b37e5ba0850134f6445429de2f5"
+  integrity sha512-uF6zEbXpGkNa7Vvxrd9Yqas8xsbc3lsC733V6I7fXgPuj8xXiuZakdE4uIyQSFRVmZKe12qmC6CNJNtIEvt4bA==
 
 "@rails/webpacker@5.1.1":
   version "5.1.1"
@@ -6725,15 +6725,10 @@ mime@1.6.0:
   resolved "https://registry.yarnpkg.com/mime/-/mime-1.6.0.tgz#32cd9e5c64553bd58d19a568af452acff04981b1"
   integrity sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==
 
-mime@^2.4.4:
+mime@^2.4.4, mime@^2.4.6:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/mime/-/mime-2.5.0.tgz#2b4af934401779806ee98026bb42e8c1ae1876b1"
   integrity sha512-ft3WayFSFUVBuJj7BMLKAQcSlItKtfjsKDDsii3rqFDAZ7t11zRe8ASw/GlmivGwVUYtwkQrxiGGpL6gFvB0ag==
-
-mime@^2.4.6:
-  version "2.4.6"
-  resolved "https://registry.yarnpkg.com/mime/-/mime-2.4.6.tgz#e5b407c90db442f2beb5b162373d07b69affa4d1"
-  integrity sha512-RZKhC3EmpBchfTGBVb8fb+RL2cWyw/32lshnsETttkBAyAUXSGHxbEJWWRXc751DrIxG1q04b8QwMbAwkRPpUA==
 
 min-document@^2.19.0:
   version "2.19.0"
@@ -8603,9 +8598,9 @@ react-dnd@^11.1.1:
     scheduler "^0.19.1"
 
 react-hot-loader@^4.12.21:
-  version "4.12.21"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.12.21.tgz#332e830801fb33024b5a147d6b13417f491eb975"
-  integrity sha512-Ynxa6ROfWUeKWsTHxsrL2KMzujxJVPjs385lmB2t5cHUxdoRPGind9F00tOkdc1l5WBleOF4XEAMILY1KPIIDA==
+  version "4.13.0"
+  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.13.0.tgz#c27e9408581c2a678f5316e69c061b226dc6a202"
+  integrity sha512-JrLlvUPqh6wIkrK2hZDfOyq/Uh/WeVEr8nc7hkn2/3Ul0sx1Kr5y4kOGNacNRoj7RhwLNcQ3Udf1KJXrqc0ZtA==
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"

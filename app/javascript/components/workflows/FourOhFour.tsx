@@ -45,10 +45,10 @@ const FourOhFour: React.FC = () => {
                     <td>Time:</td>
                     <td><code>{DateTime.local().toISO()}</code></td>
                   </tr>
-                  {res.props && (
+                  {res.data && (
                     <tr>
                       <td>Username:</td>
-                      <td><code>{res.props.me.displayName}</code></td>
+                      <td><code>{res.data.me.displayName}</code></td>
                     </tr>
                   )}
                 </tbody>

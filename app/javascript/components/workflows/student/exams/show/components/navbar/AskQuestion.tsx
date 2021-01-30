@@ -164,27 +164,6 @@ const SendQuestion: React.FC<{
   );
 };
 
-const questionPaginationConfig = {
-  getVariables(_props, { count, cursor }, fragmentVariables) {
-    return {
-      count,
-      cursor,
-      examId: fragmentVariables.examId,
-    };
-  },
-  query: graphql`
-  query AskQuestionPaginationQuery(
-    $count: Int!
-    $cursor: String
-    $examId: ID!
-  ) {
-    exam: node(id: $examId) {
-      ...AskQuestion @arguments(count: $count, cursor: $cursor)
-    }
-  }
-  `,
-};
-
 interface AskQuestionProps {
   examKey: AskQuestion$key;
 }
@@ -194,13 +173,19 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
     examKey,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [res, { isLoading, hasMore, loadMore }] = usePagination(
+  const {
+    data,
+    isLoading,
+    hasNext,
+    loadNext,
+  } = usePagination(
     graphql`
     fragment AskQuestion on Exam
     @argumentDefinitions(
       count: { type: "Int", defaultValue: 10 }
       cursor: { type: "String" }
-    ) {
+    )
+    @refetchable(queryName: "AskQuestionPaginationQuery") {
       myRegistration {
         id
         questions(
@@ -220,10 +205,10 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
     `,
     examKey,
   );
-  const { edges } = res.myRegistration.questions;
+  const { edges } = data.myRegistration.questions;
   return (
     <div>
-      <SendQuestion registrationId={res.myRegistration.id} />
+      <SendQuestion registrationId={data.myRegistration.id} />
       <span className="clearfix" />
       <hr className="my-2" />
       {edges.length === 0 && (
@@ -236,23 +221,23 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
             qKey={node}
           />
         ))}
-        {hasMore() && (
+        {hasNext && (
           <li className="text-center">
             <Button
               onClick={() => {
-                if (!hasMore() || isLoading()) return;
-                loadMore(
-                  questionPaginationConfig,
+                if (!hasNext || isLoading) return;
+                loadNext(
                   10,
-                  (error) => {
-                    if (!error) return;
-                    alert({
-                      variant: 'danger',
-                      title: 'Error fetching additional questions.',
-                      message: error.message,
-                    });
+                  {
+                    onComplete: (error?: Error) => {
+                      if (!error) return;
+                      alert({
+                        variant: 'danger',
+                        title: 'Error fetching additional questions.',
+                        message: error.message,
+                      });
+                    },
                   },
-                  {},
                 );
               }}
               variant="success"

@@ -1087,26 +1087,26 @@ const ExamAdmin: React.FC = () => {
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
-  if (!res.props) {
+  if (!res.data) {
     return <Container><p>Loading...</p></Container>;
   }
   return (
-    <DocumentTitle title={res.props.exam.name}>
+    <DocumentTitle title={res.data.exam.name}>
       <Container>
-        <ExamInformation exam={res.props.exam} />
+        <ExamInformation exam={res.data.exam} />
         <Form.Group>
           <TabbedChecklist
-            exam={res.props.exam}
+            exam={res.data.exam}
             examId={examId}
           />
         </Form.Group>
         <Form.Group>
-          <Link to={`/exams/${res.props.exam.id}/proctoring`}>
+          <Link to={`/exams/${res.data.exam.id}/proctoring`}>
             <Button className="mr-2" variant="success">Proctor!</Button>
           </Link>
           <StartGradingButton />
-          <PublishGradesButton examId={res.props.exam} />
-          <Link to={`/exams/${res.props.exam.id}/submissions`}>
+          <PublishGradesButton examId={res.data.exam} />
+          <Link to={`/exams/${res.data.exam.id}/submissions`}>
             <Button className="ml-2" variant="primary">View submissions</Button>
           </Link>
         </Form.Group>

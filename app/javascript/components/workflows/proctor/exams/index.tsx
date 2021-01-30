@@ -442,27 +442,6 @@ const anomalyDestroyedSubscriptionSpec = graphql`
   }
 `;
 
-const paginationConfig = {
-  getVariables(_props, { count, cursor }, fragmentVariables) {
-    return {
-      count,
-      cursor,
-      examId: fragmentVariables.examId,
-    };
-  },
-  query: graphql`
-  query examsAnomalyPaginationQuery(
-    $count: Int!
-    $cursor: String
-    $examId: ID!
-  ) {
-    exam: node(id: $examId) {
-      ...exams_anomalies @arguments(count: $count, cursor: $cursor)
-    }
-  }
-  `,
-};
-
 const ShowAnomalies: React.FC<{
   replyTo: (userId: string) => void;
   exam: exams_anomalies$key;
@@ -472,13 +451,19 @@ const ShowAnomalies: React.FC<{
     exam,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [res, { isLoading, hasMore, loadMore }] = usePagination(
+  const {
+    data,
+    isLoading,
+    hasNext,
+    loadNext,
+  } = usePagination(
     graphql`
       fragment exams_anomalies on Exam
       @argumentDefinitions(
         count: { type: "Int", defaultValue: 20 }
         cursor: { type: "String" }
-      ) {
+      )
+      @refetchable(queryName: "examsAnomalyPaginationQuery") {
         id
         anomalies(
           first: $count
@@ -499,60 +484,60 @@ const ShowAnomalies: React.FC<{
   useSubscription(useMemo(() => ({
     subscription: newAnomalySubscriptionSpec,
     variables: {
-      examId: res.id,
+      examId: data.id,
     },
     configs: [{
       type: 'RANGE_ADD',
-      parentID: res.id,
+      parentID: data.id,
       connectionInfo: [{
         key: 'Exam_anomalies',
         rangeBehavior: 'prepend',
       }],
       edgeName: 'anomalyEdge',
     }],
-  }), [res.id]));
+  }), [data.id]));
 
   useSubscription(useMemo(() => ({
     subscription: anomalyDestroyedSubscriptionSpec,
     variables: {
-      examId: res.id,
+      examId: data.id,
     },
     configs: [{
       type: 'RANGE_DELETE',
-      parentID: res.id,
+      parentID: data.id,
       connectionKeys: [{
         key: 'Exam_anomalies',
       }],
       pathToConnection: ['exam', 'anomalies'],
       deletedIDFieldName: 'deletedId',
     }],
-  }), [res.id]));
+  }), [data.id]));
 
   return (
     <>
-      {res.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
-      {res.anomalies.edges.map((edge) => (
-        <ShowAnomaly key={edge.node.id} replyTo={replyTo} examId={res.id} anomalyKey={edge.node} />
+      {data.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
+      {data.anomalies.edges.map((edge) => (
+        <ShowAnomaly key={edge.node.id} replyTo={replyTo} examId={data.id} anomalyKey={edge.node} />
       ))}
-      {hasMore() && (
+      {hasNext && (
         <tr>
           <td colSpan={4} className="text-center">
             <Button
               onClick={() => {
-                if (!hasMore() || isLoading()) return;
-                loadMore(
-                  paginationConfig,
+                if (!hasNext || isLoading) return;
+                loadNext(
                   10,
-                  (error) => {
-                    if (!error) return;
-                    alert({
-                      variant: 'danger',
-                      title: 'Error fetching additional anomalies.',
-                      message: error.message,
-                      copyButton: true,
-                    });
+                  {
+                    onComplete: (error?: Error) => {
+                      if (!error) return;
+                      alert({
+                        variant: 'danger',
+                        title: 'Error fetching additional anomalies.',
+                        message: error.message,
+                        copyButton: true,
+                      });
+                    },
                   },
-                  {},
                 );
               }}
               variant="success"
@@ -1879,7 +1864,7 @@ const ExamProctoring: React.FC = () => {
   if (res.error) {
     return <RenderError error={res.error} />;
   }
-  if (!res.props) {
+  if (!res.data) {
     return (
       <Container fluid>
         <RegularNavbar className="row" />
@@ -1888,19 +1873,19 @@ const ExamProctoring: React.FC = () => {
     );
   }
   return (
-    <DocumentTitle title={`${res.props.exam.name} - Proctoring`}>
+    <DocumentTitle title={`${res.data.exam.name} - Proctoring`}>
       <Container fluid>
         <div className="wrapper vh-100">
           <div className="inner-wrapper">
             <RegularNavbar className="row" />
             <Row>
               <Col>
-                <h1>{res.props.exam.name}</h1>
+                <h1>{res.data.exam.name}</h1>
               </Col>
             </Row>
             <div className="content-wrapper">
               <div className="content h-100">
-                <ProctoringSplitView exam={res.props.exam} />
+                <ProctoringSplitView exam={res.data.exam} />
               </div>
             </div>
           </div>

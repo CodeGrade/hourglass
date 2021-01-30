@@ -71,7 +71,7 @@ const ShowExam: React.FC = () => {
       </>
     );
   }
-  if (!res.props) {
+  if (!res.data) {
     return (
       <>
         <RegularNavbar />
@@ -81,7 +81,7 @@ const ShowExam: React.FC = () => {
       </>
     );
   }
-  const { myRegistration } = res.props.exam;
+  const { myRegistration } = res.data.exam;
   if (!myRegistration) {
     return (
       <Redirect to="/" />
@@ -106,8 +106,8 @@ const ShowExam: React.FC = () => {
   }
 
   return (
-    <DocumentTitle title={res.props.exam.name}>
-      <Exam examKey={res.props.exam} />
+    <DocumentTitle title={res.data.exam.name}>
+      <Exam examKey={res.data.exam} />
     </DocumentTitle>
   );
 };

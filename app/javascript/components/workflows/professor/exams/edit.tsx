@@ -81,16 +81,16 @@ const EditExamVersion: React.FC = () => {
       title: 'Students have already started taking this version',
       message: 'Changing the questions will likely result in nonsensical answers, and changing the structure of this version will result in undefined behavior. Be careful!',
     },
-    res.props?.examVersion?.anyStarted || res.props?.examVersion?.anyFinalized,
-    [res.props?.examVersion?.anyStarted || res.props?.examVersion?.anyFinalized],
+    res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized,
+    [res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized],
   );
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
-  if (!res.props) {
+  if (!res.data) {
     return <Container><p>Loading...</p></Container>;
   }
-  const { examVersion } = res.props;
+  const { examVersion } = res.data;
   const parsedContents: ContentsState = {
     exam: {
       questions: examVersion.questions as QuestionInfo[],
@@ -103,7 +103,7 @@ const EditExamVersion: React.FC = () => {
       scratch: '',
     },
   };
-  const rubrics = convertRubric(res.props.examVersion.rubrics);
+  const rubrics = convertRubric(res.data.examVersion.rubrics);
   return (
     <Container>
       <Editor

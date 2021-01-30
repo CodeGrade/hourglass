@@ -357,10 +357,10 @@ const Admin: React.FC = () => {
   if (res.error) {
     return <RenderError error={res.error} />;
   }
-  if (!res.props) {
+  if (!res.data) {
     return <p>Loading...</p>;
   }
-  const userOptions: ImpersonateVal[] = res.props.users.map((user) => ({
+  const userOptions: ImpersonateVal[] = res.data.users.map((user) => ({
     label: user.displayName,
     value: user.id,
   }));
@@ -404,16 +404,16 @@ const Home: React.FC = () => {
   if (res.error) {
     return <RenderError error={res.error} />;
   }
-  if (!res.props) {
+  if (!res.data) {
     return <p>Loading...</p>;
   }
   const allEmpty = (
-    res.props.me.futureRegistrations.length === 0
-    && res.props.me.currentRegistrations.length === 0
-    && res.props.me.priorRegistrations.length === 0
-    && res.props.me.professorCourseRegistrations.nodes.length === 0
-    && res.props.me.proctorRegistrations.nodes.length === 0
-    && res.props.me.staffRegistrations.nodes.length === 0
+    res.data.me.futureRegistrations.length === 0
+    && res.data.me.currentRegistrations.length === 0
+    && res.data.me.priorRegistrations.length === 0
+    && res.data.me.professorCourseRegistrations.nodes.length === 0
+    && res.data.me.proctorRegistrations.nodes.length === 0
+    && res.data.me.staffRegistrations.nodes.length === 0
   );
   return (
     <Container>
@@ -424,31 +424,31 @@ const Home: React.FC = () => {
           </DocumentTitle>
         )}
         <ShowUpcomingRegistrations
-          registrations={res.props.me.futureRegistrations}
+          registrations={res.data.me.futureRegistrations}
         />
-        {res.props.me.currentRegistrations.length > 0 && (
+        {res.data.me.currentRegistrations.length > 0 && (
           <Alert variant="warning">
             <div className="text-center"><b><i>Make sure that you are using Chrome or Firefox right now!</i></b></div>
           </Alert>
         )}
         <ShowRegistrations
           name="Active exams"
-          registrations={res.props.me.currentRegistrations}
+          registrations={res.data.me.currentRegistrations}
         />
         <ShowRegistrations
           name="Prior exams"
-          registrations={res.props.me.priorRegistrations}
+          registrations={res.data.me.priorRegistrations}
         />
         <ShowProctorRegs
-          proctorRegistrations={res.props.me.proctorRegistrations.nodes}
+          proctorRegistrations={res.data.me.proctorRegistrations.nodes}
         />
         <ShowStaffRegs
-          staffRegistrations={res.props.me.staffRegistrations.nodes}
+          staffRegistrations={res.data.me.staffRegistrations.nodes}
         />
         <ShowProfRegs
-          professorCourseRegistrations={res.props.me.professorCourseRegistrations.nodes}
+          professorCourseRegistrations={res.data.me.professorCourseRegistrations.nodes}
         />
-        {res.props.me.admin && (
+        {res.data.me.admin && (
           <Admin />
         )}
       </DocumentTitle>

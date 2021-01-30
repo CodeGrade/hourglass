@@ -1471,10 +1471,10 @@ const GradeOnePart: React.FC = () => {
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
-  if (!res.props) {
+  if (!res.data) {
     return <Container><p>Loading...</p></Container>;
   }
-  return <GradeOnePartHelp registration={res.props.registration} qnum={qnum} pnum={pnum} />;
+  return <GradeOnePartHelp registration={res.data.registration} qnum={qnum} pnum={pnum} />;
 };
 
 const GradeOnePartHelp: React.FC<{
@@ -2115,13 +2115,13 @@ const GradingGrader: React.FC = () => {
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
-  if (!res.props) {
+  if (!res.data) {
     return <Container><p>Loading...</p></Container>;
   }
   return (
     <Container>
-      <BeginGradingButton examKey={res.props.exam} />
-      <MyGrading examKey={res.props.exam} />
+      <BeginGradingButton examKey={res.data.exam} />
+      <MyGrading examKey={res.data.exam} />
     </Container>
   );
 };
@@ -2436,14 +2436,14 @@ const GradingAdmin: React.FC = () => {
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
-  if (!res.props) {
+  if (!res.data) {
     return <Container><p>Loading...</p></Container>;
   }
   return (
     <Container>
-      <ExamGradingAdministration examKey={res.props.exam} />
-      <BeginGradingButton examKey={res.props.exam} />
-      <MyGrading examKey={res.props.exam} />
+      <ExamGradingAdministration examKey={res.data.exam} />
+      <BeginGradingButton examKey={res.data.exam} />
+      <MyGrading examKey={res.data.exam} />
     </Container>
   );
 };

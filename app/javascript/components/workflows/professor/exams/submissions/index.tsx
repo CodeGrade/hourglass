@@ -88,12 +88,12 @@ const ExamSubmissions: React.FC = () => {
   if (res.error) {
     return <RenderError error={res.error} />;
   }
-  if (!res.props) {
+  if (!res.data) {
     return <p>Loading...</p>;
   }
   const {
     registrations,
-  } = res.props.exam;
+  } = res.data.exam;
   const groups: {
     notStarted: Registration[],
     started: Registration[],
@@ -113,7 +113,7 @@ const ExamSubmissions: React.FC = () => {
   });
   const startedButNotFinished = groups.over.length > 0 || groups.started.length > 0;
   return (
-    <DocumentTitle title={`${res.props.exam.name} -- All submissions`}>
+    <DocumentTitle title={`${res.data.exam.name} -- All submissions`}>
       <h4>Completed submissions</h4>
       {groups.final.length === 0 ? (
         <i>No completed submissions yet</i>
@@ -221,10 +221,10 @@ const ExamSubmission: React.FC = () => {
   if (res.error) {
     return <RenderError error={res.error} />;
   }
-  if (!res.props) {
+  if (!res.data) {
     return <p>Loading...</p>;
   }
-  const { registration } = res.props;
+  const { registration } = res.data;
   const {
     reviewExam,
     currentAnswers,

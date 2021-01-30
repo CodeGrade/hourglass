@@ -59,7 +59,7 @@ const RN: React.FC<{
       },
     },
   );
-  if (res.error || !res.props) {
+  if (res.error || !res.data) {
     return <NotLoggedIn />;
   }
   return (
@@ -79,12 +79,12 @@ const RN: React.FC<{
           className="mr-2"
         >
           <span>
-            {res.props.impersonating && 'Impersonating '}
-            {res.props.me.displayName}
+            {res.data.impersonating && 'Impersonating '}
+            {res.data.me.displayName}
           </span>
         </Navbar.Text>
         <Form inline>
-          {res.props.impersonating && (
+          {res.data.impersonating && (
             <Button
               disabled={loading}
               className="mr-2"

@@ -77,27 +77,27 @@ const ShowCourse: React.FC = () => {
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
-  if (!res.props) {
+  if (!res.data) {
     return <Container><p>Loading...</p></Container>;
   }
   const userOptions: GroupedOptionsType<ImpersonateVal> = [
     {
       label: 'Students',
-      options: res.props.course.students.map((user) => ({
+      options: res.data.course.students.map((user) => ({
         label: user.displayName,
         value: user.id,
       })),
     },
     {
       label: 'Staff',
-      options: res.props.course.staff.map((user) => ({
+      options: res.data.course.staff.map((user) => ({
         label: user.displayName,
         value: user.id,
       })),
     },
     {
       label: 'Professors',
-      options: res.props.course.professors.map((user) => ({
+      options: res.data.course.professors.map((user) => ({
         label: user.displayName,
         value: user.id,
       })),
@@ -107,7 +107,7 @@ const ShowCourse: React.FC = () => {
     <Container>
       <div className="d-flex align-items-center justify-content-between">
         <h1>
-          {res.props.course.title}
+          {res.data.course.title}
         </h1>
         <div>
           <Link to={`/courses/${courseId}/sync`}>
@@ -127,22 +127,22 @@ const ShowCourse: React.FC = () => {
         </div>
       </div>
       <Route path="/courses/:courseId" exact>
-        <DocumentTitle title={res.props.course.title}>
-          <CourseExams courseExams={res.props.course.exams} />
+        <DocumentTitle title={res.data.course.title}>
+          <CourseExams courseExams={res.data.course.exams} />
           <ImpersonateUser
             userOptions={userOptions}
-            courseId={res.props.course.id}
+            courseId={res.data.course.id}
           />
         </DocumentTitle>
       </Route>
       <Route path="/courses/:courseId/sync" exact>
-        <DocumentTitle title={`Sync - ${res.props.course.title}`}>
-          <SyncCourse courseId={res.props.course.id} />
+        <DocumentTitle title={`Sync - ${res.data.course.title}`}>
+          <SyncCourse courseId={res.data.course.id} />
         </DocumentTitle>
       </Route>
       <Route path="/courses/:courseId/new" exact>
-        <DocumentTitle title={`New Exam - ${res.props.course.title}`}>
-          <NewExam courseId={res.props.course.id} />
+        <DocumentTitle title={`New Exam - ${res.data.course.title}`}>
+          <NewExam courseId={res.data.course.id} />
         </DocumentTitle>
       </Route>
     </Container>

@@ -12,11 +12,16 @@ const ObjectiveGrade: React.FC<ObjectiveGradeProps> = (props) => {
   const { className } = props;
   const [value, setValue] = useState<boolean>(undefined);
   return (
-    <ToggleButtonGroup name="correctness" type="radio" className={className}>
+    <ToggleButtonGroup
+      name="correctness"
+      type="radio"
+      className={className}
+      value={value ? 'right' : 'wrong'}
+    >
       <ToggleButton
         className="d-inline-flex align-items-center"
         size="sm"
-        value
+        value="right"
         variant={value === true ? 'success' : 'outline-success'}
         onChange={() => setValue(true)}
       >
@@ -26,7 +31,7 @@ const ObjectiveGrade: React.FC<ObjectiveGradeProps> = (props) => {
       <ToggleButton
         className="d-inline-flex align-items-center"
         size="sm"
-        value={false}
+        value="wrong"
         variant={value === false ? 'danger' : 'outline-danger'}
         onChange={() => setValue(false)}
       >

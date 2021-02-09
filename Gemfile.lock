@@ -1,7 +1,6 @@
 GIT
   remote: https://github.com/CodeGrade/omniauth-bottlenose
   revision: 3e7c696c9b1da6823f5936a5bc7b061f3630720a
-  branch: update-omniauth
   specs:
     omniauth-bottlenose (0.1.0)
       omniauth-oauth2 (~> 1.7.0)

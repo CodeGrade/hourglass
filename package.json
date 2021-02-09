@@ -88,7 +88,7 @@
     "@types/react-redux": "^7.1.9",
     "@types/react-relay": "^7.0.17",
     "@types/react-router-dom": "^5.1.5",
-    "@types/react-select": "^3.0.13",
+    "@types/react-select": "3.0.13",
     "@types/redux-form": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
     "@typescript-eslint/parser": "^3.1.0",

@@ -14,6 +14,9 @@ module ApplicationCable
     private
 
     def find_verified_user
+      if Rails.env.development?
+        return User.fourth
+      end
       env['warden'].user
     end
   end

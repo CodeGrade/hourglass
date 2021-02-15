@@ -58,6 +58,12 @@ const EditAnswer: React.FC<WrappedFieldsProps> = (props) => {
     yesLabel,
     noLabel,
   } = props;
+  let tbgVal;
+  if (answer.input.value === true) {
+    tbgVal = 'yes';
+  } else if (answer.input.value === false) {
+    tbgVal = 'no';
+  }
   return (
     <>
       <Form.Label column sm={2}>Correct answer</Form.Label>
@@ -66,7 +72,7 @@ const EditAnswer: React.FC<WrappedFieldsProps> = (props) => {
           className="bg-white rounded"
           name="tbg"
           type="radio"
-          value={answer.input.value ? 'yes' : 'no'}
+          value={tbgVal}
           onChange={(newVal: 'yes' | 'no') => answer.input.onChange(newVal === 'yes')}
         >
           <ToggleButton

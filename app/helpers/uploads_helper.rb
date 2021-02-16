@@ -273,7 +273,7 @@ module UploadsHelper
                         { unmake_html_val(opt) => ans }
                       end,
                       rubric: revert_rubric(b_rubric),
-                    },
+                    }.compact,
                   }.compact.deep_stringify_keys
                 when 'Code'
                   initial = b['initial']
@@ -336,7 +336,12 @@ module UploadsHelper
                   {
                     Text: {
                       prompt: unmake_html_val(b['prompt'], true),
-                      correctAnswer: b_answer,
+                      correctAnswer:
+                        if b_answer['NO_ANS'] || b_answer['text'].blank?
+                          nil
+                        else
+                          b_answer
+                        end,
                       rubric: revert_rubric(b_rubric),
                     }.compact,
                   }.compact.deep_stringify_keys
@@ -351,7 +356,7 @@ module UploadsHelper
                           prompt: unmake_html_val(b['prompt'], true),
                           correctAnswer: b_answer,
                           rubric: revert_rubric(b_rubric),
-                        },
+                        }.compact,
                       }.compact.deep_stringify_keys
                     end
                   else
@@ -363,7 +368,7 @@ module UploadsHelper
                           prompt: unmake_html_val(b['prompt'], true),
                           correctAnswer: b_answer,
                           rubric: revert_rubric(b_rubric),
-                        },
+                        }.compact,
                       }.compact.deep_stringify_keys
                     end
                   end
@@ -504,7 +509,7 @@ module UploadsHelper
           end,
         }.compact
       end
-      
+
       def ensure_utf8(str, mimetype)
         return str if ApplicationHelper.binary?(mimetype)
         return str if str.is_utf8?

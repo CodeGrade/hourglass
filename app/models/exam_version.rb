@@ -438,7 +438,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def export_info_file(path)
-    File.write path.join('exam.yaml'), info_no_ids.to_yaml
+    File.write path.join('exam.yaml'), Upload.unparse_info(info_no_ids).to_yaml
   end
 
   def export_files(path, files)

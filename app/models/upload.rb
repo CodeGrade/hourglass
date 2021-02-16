@@ -46,11 +46,18 @@ class Upload
     FileUtils.remove_entry_secure @dir
   end
 
-  def map_reference(ref)
+  def self.map_reference(ref)
+    return nil if ref.nil?
     {
       type: ref.keys.first,
       path: ref.values.first,
     }
+  end
+
+  def self.unmap_reference(ref)
+    return nil if ref.nil?
+
+    { ref['type'] => ref['path'] }
   end
 
   EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload.json').to_s
@@ -71,7 +78,7 @@ class Upload
     else
       begin
         JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
-        @info = parse_info(properties).deep_stringify_keys
+        @info = Upload.parse_info(properties).deep_stringify_keys
       rescue JSON::Schema::ValidationError
         JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties)
         @info = properties
@@ -79,7 +86,7 @@ class Upload
     end
   end
 
-  def make_html_val(str)
+  def self.make_html_val(str)
     return nil if str.nil?
 
     {
@@ -88,13 +95,26 @@ class Upload
     }
   end
 
-  def make_html_vals(arr)
+  def self.unmake_html_val(html, nil_if_blank = false)
+    return nil if html.nil?
+    return nil if html.blank? && nil_if_blank
+
+    return html['value']
+  end
+
+  def self.make_html_vals(arr)
     return nil if arr.nil?
 
     arr.map { |i| make_html_val(i) }
   end
 
-  def convert_presets(preset)
+  def self.unmake_html_vals(arr)
+    return nil if arr.nil?
+
+    arr.map { |i| unmake_html_val(i) }
+  end
+
+  def self.convert_presets(preset)
     return nil if preset.nil?
 
     {
@@ -112,7 +132,26 @@ class Upload
     }.compact
   end
 
-  def convert_rubric(rubric)
+  def self.revert_presets(preset)
+    # N.B. seems to be an identity function; are there any changes to be made?
+    return nil if preset.nil?
+
+    {
+      label: preset['label'].blank? ? nil : preset['label'],
+      direction: preset['direction'],
+      mercy: preset['mercy'],
+      presets: preset['presets']&.map do |p|
+        {
+          label: p['label'].blank? ? nil : p['label'],
+          graderHint: p['graderHint'],
+          studentFeedback: p['studentFeedback'],
+          points: p['points'],
+        }.compact
+      end&.compact,
+    }.compact
+  end
+
+  def self.convert_rubric(rubric)
     return { type: 'none' } if rubric.nil?
 
     {
@@ -128,8 +167,24 @@ class Upload
     }.compact
   end
 
+  def self.revert_rubric(rubric)
+    return nil if rubric.nil? || rubric['type'] == 'none'
+
+    {
+      type: rubric['type'],
+      description: unmake_html_val(rubric['description'], true),
+      points: rubric['points'],
+      choices:
+      if rubric['choices'].is_a? Array
+        rubric['choices'].map { |c| revert_rubric(c) }
+      else
+        revert_presets(rubric['choices'])
+      end,
+    }.compact
+  end
+
   # rubocop:disable Metrics/PerceivedComplexity, Metrics/BlockLength, Metrics/BlockNesting
-  def parse_info(properties)
+  def self.parse_info(properties)
     contents = properties['contents']
     contents['questions'].each do |q|
       if q['parts'].length == 1 && q['separateSubparts']
@@ -351,6 +406,160 @@ class Upload
       answers: answers,
       rubrics: rubrics,
     }
+  end
+
+  def self.unparse_info(info)
+    info = info.deep_stringify_keys
+    questions = info['contents']['questions'].each_with_index.map do |q, qnum|
+      q_answers = info['answers'][qnum]
+      q_rubrics = info['rubrics']['questions'][qnum]
+      q_reference = q['reference']&.map { |r| unmap_reference r }
+      q_reference = nil if q_reference.blank?
+      {
+        name: unmake_html_val(q['name']),
+        description: unmake_html_val(q['description'], true),
+        extraCredit: q['extraCredit'],
+        reference: q_reference,
+        separateSubparts: q['separateSubparts'],
+        questionRubric: revert_rubric(q_rubrics['questionRubric']),
+        parts: q['parts'].each_with_index.map do |p, pnum|
+          p_answers = q_answers[pnum]
+          p_rubrics = q_rubrics['parts'][pnum]
+          p_reference = p['reference']&.map { |r| unmap_reference r }
+          p_reference = nil if p_reference.blank?
+          {
+            name: unmake_html_val(p['name']),
+            description: unmake_html_val(p['description'], true),
+            points: p['points'],
+            extraCredit: p['extraCredit'],
+            reference: p_reference,
+            partRubric: revert_rubric(p_rubrics['partRubric']),
+            body: p['body'].each_with_index.map do |b, bnum|
+              b_answer = p_answers[bnum]
+              b_rubric = p_rubrics['body'][bnum]
+              case b['type']
+              when 'HTML'
+                b['value']
+              when 'AllThatApply'
+                {
+                  AllThatApply: {
+                    prompt: unmake_html_val(b['prompt'], true),
+                    options: b['options'].zip(b_answer).map do |opt, ans|
+                      { unmake_html_val(opt) => ans }
+                    end,
+                    rubric: revert_rubric(b_rubric),
+                  },
+                }.compact.deep_stringify_keys
+              when 'Code'
+                initial = b['initial']
+                unless initial.nil?
+                  if initial.key? 'file'
+                  else
+                    unprocessed = MarksProcessor.process_marks_reverse(initial['text'], initial['marks'])
+                    initial = { 'code' => unprocessed }
+                  end
+                end
+                {
+                  Code: {
+                    prompt: unmake_html_val(b['prompt'], true),
+                    lang: b['lang'],
+                    initial: initial,
+                    correctAnswer: 
+                      if b_answer['NO_ANS'] || b_answer['text'].blank?
+                        nil
+                      else
+                        MarksProcessor.process_marks_reverse(b_answer['text'], b_answer['marks'])
+                      end,
+                    rubric: revert_rubric(b_rubric),
+                  }.compact,
+                }.compact.deep_stringify_keys
+              when 'CodeTag'
+                {
+                  CodeTag: {
+                    prompt: unmake_html_val(b['prompt'], true),
+                    choices: b['choices'],
+                    correctAnswer: {
+                      filename: b_answer['selectedFile'],
+                      line: b_answer['lineNumber'],
+                    },
+                    rubric: revert_rubric(b_rubric),
+                  }.compact,
+                }.compact.deep_stringify_keys
+              when 'Matching'
+                {
+                  Matching: {
+                    prompt: unmake_html_val(b['prompt'], true),
+                    promptsLabel: unmake_html_val(b['promptsLabel'], true),
+                    valuesLabel: unmake_html_val(b['valuesLabel'], true),
+                    prompts: unmake_html_vals(b['prompts']),
+                    values: unmake_html_vals(b['values']),
+                    correctAnswers: b_answer,
+                    rubric: revert_rubric(b_rubric),
+                  }.compact,
+                }.compact.deep_stringify_keys
+              when 'MultipleChoice'
+                {
+                  MultipleChoice: {
+                    prompt: unmake_html_val(b['prompt'], true),
+                    options: unmake_html_vals(b['options']),
+                    correctAnswer: b_answer,
+                    rubric: revert_rubric(b_rubric),
+                  }.compact,
+                }.compact.deep_stringify_keys
+              when 'Text'
+                {
+                  Text: {
+                    prompt: unmake_html_val(b['prompt'], true),
+                    correctAnswer: b_answer,
+                    rubric: revert_rubric(b_rubric),
+                  }.compact,
+                }.compact.deep_stringify_keys
+              when 'YesNo'
+                if b['yesLabel'] == 'Yes'
+                  if b['prompt'] == ''
+                    { 'YesNo' => b_answer }
+                  else
+                    { 
+                      YesNo: {
+                        prompt: unmake_html_val(b['prompt'], true),
+                        correctAnswer: b_answer,
+                        rubric: revert_rubric(b_rubric)
+                      },
+                    }.compact.deep_stringify_keys
+                  end
+                else
+                  if b['prompt'] == ''
+                    { 'TrueFalse' => b_answer }
+                  else
+                    { 
+                      TrueFalse: {
+                        prompt: unmake_html_val(b['prompt'], true),
+                        correctAnswer: b_answer,
+                        rubric: revert_rubric(b_rubric)
+                      },
+                    }.compact.deep_stringify_keys
+                  end
+                end
+              else
+                raise 'Bad body item.'
+              end
+            end
+          }.compact
+        end
+      }.compact
+    end
+
+    e_reference = info.dig('contents', 'reference')&.map { |r| unmap_reference r }
+    e_reference = nil if e_reference.blank?
+    {
+      policies: info['policies'],
+      contents: {
+        instructions: unmake_html_val(info.dig('contents', 'instructions'), true),
+        questions: questions,
+        reference: e_reference,
+        examRubric: revert_rubric(info.dig('rubrics', 'examRubric')),
+      }.compact,
+    }.compact.deep_stringify_keys
   end
   # rubocop:enable Metrics/PerceivedComplexity, Metrics/BlockLength, Metrics/BlockNesting
 

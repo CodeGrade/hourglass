@@ -133,18 +133,16 @@ module ApplicationHelper
       begin
         i.write stdin_data
       rescue Errno::EPIPE
+        # nothing to be done here; we attempted to write data and it didn't go through
       end
       i.close
       timed_out = false
-      if timeout
-        if !t.join(timeout)
-          timed_out = true
-          Process.kill(signal, t.pid)
-          # t.value below will implicitly .wait on the process
-        end
+      if timeout && !t.join(timeout)
+        timed_out = true
+        Process.kill(signal, t.pid)
+        # t.value below will implicitly .wait on the process
       end
       [out_reader.value, err_reader.value, t.value, timed_out]
     end
   end
-
 end

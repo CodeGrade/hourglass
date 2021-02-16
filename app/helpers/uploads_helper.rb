@@ -504,6 +504,21 @@ module UploadsHelper
           end,
         }.compact
       end
+      
+      def ensure_utf8(str, mimetype)
+        return str if ApplicationHelper.binary?(mimetype)
+        return str if str.is_utf8?
+    
+        begin
+          if str.dup.force_encoding(Encoding::CP1252).valid_encoding?
+            str.encode(Encoding::UTF_8, Encoding::CP1252)
+          else
+            str.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '?')
+          end
+        rescue RuntimeError
+          str
+        end
+      end
     end
   end
 

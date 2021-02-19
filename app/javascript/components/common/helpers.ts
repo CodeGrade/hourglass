@@ -44,7 +44,7 @@ export function pluralize(number: number, singular: string, plural: string): str
   if (number === 0) {
     return `${number} ${plural}`;
   }
-  if (number === 1) {
+  if (Math.abs(number) === 1) {
     return `${number} ${singular}`;
   }
   return `${number} ${plural}`;

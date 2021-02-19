@@ -109,7 +109,7 @@ const ShowPreset: React.FC<{
           }}
         >
           <Icon I={VariantIcon} className="mr-2" />
-          {`${preset.points} points`}
+          {pluralize(preset.points, 'point', 'points')}
         </Button>
       </Tooltip>
       <span>{graderHint}</span>

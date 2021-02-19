@@ -1323,7 +1323,7 @@ const Grade: React.FC<{
                   });
                 }}
               >
-                Abandon gradng this question
+                Abandon grading this question
               </Dropdown.Item>
             </DropdownButton>
           </Col>

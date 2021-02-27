@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE tsung SYSTEM "/nix/store/lvbv9p2rf38xa3qwzvby2lr06wzwz8a1-tsung-1.7.0/share/tsung/tsung-1.0.dtd">
+<!DOCTYPE tsung SYSTEM "/nix/store/yl7q0gjanvqhq33pbwnx10dq8jkr9l5q-tsung-1.7.0/share/tsung/tsung-1.0.dtd">
 <tsung loglevel="debug" version="1.0">
   <clients>
     <client host="localhost" use_controller_vm="true" maxusers="60000"/>
@@ -11,8 +11,7 @@
 
   <load>
     <arrivalphase phase="1" duration="60" unit="second">
-      <!-- <users maxnumber="1" arrivalrate="1" unit="second"/> -->
-      <users maxnumber="1000" arrivalrate="10" unit="second"/>
+      <users maxnumber="800" arrivalrate="100" unit="second"/>
     </arrivalphase>
   </load>
 
@@ -22,33 +21,6 @@
 
   <sessions>
     <session name="http-example" probability="100" type="ts_websocket">
-    <!-- <session name="http-example" probability="100" type="ts_http"> -->
-
-    <!--   <request> -->
-    <!--     <dyn_variable name="authenticity_token" /> -->
-    <!--     <http url="/users/sign_in" method="GET" version="1.1" /> -->
-    <!--   </request> -->
-
-    <!--   <setdynvars sourcetype="eval" -->
-    <!--               code="fun({Pid,DynVars})-> -->
-    <!--                         {ok,Val}=ts_dynvars:lookup(authenticity_token,DynVars), -->
-    <!--                         http_uri:encode(Val) end."> -->
-    <!--     <var name="encoded_authenticity_token" /> -->
-    <!--   </setdynvars> -->
-
-    <!--   <request subst="true"> -->
-    <!--     <http url="/users/sign_in" method="POST" version="1.1" -->
-    <!--       content_type='application/x-www-form-urlencoded' -->
-    <!--       contents='authenticity_token=%%_encoded_authenticity_token%%&amp;user[username]=cs2500student&amp;user[password]=cs2500student' -->
-    <!--     /> -->
-    <!--   </request> -->
-
-    <!--   <request> -->
-    <!--     <http url="/exams/RXhhbS03" method="GET" version="1.1" /> -->
-    <!--   </request> -->
-
-    <!--   <thinktime value="10" /> -->
-
       <request>
         <websocket type="connect" path="/cable"/>
       </request>
@@ -63,8 +35,8 @@
 
       <thinktime value="10" />
 
-      <for var="i" from="1" to="5" incr="1">
-        <thinktime min="1" max="10" random="true"/>
+      <for var="i" from="1" to="400" incr="1">
+        <thinktime min="1" max="4" random="true"/>
         <request subst="true">
           <websocket type="message" frame="text">
             {"command":"message","data":"{\"variables\":{\"roomId\":\"Um9vbS0x\"},\"operationName\":\"ExamMessagesNewRoomAnnouncementSubscription\",\"query\":\"subscription ExamMessagesNewRoomAnnouncementSubscription( $roomId: ID!) { roomAnnouncementReceived(roomId: $roomId) { roomAnnouncement { id createdAt body } roomAnnouncementsEdge { node { id } } } } \",\"action\":\"execute\"}","identifier":"{\"channel\":\"GraphqlChannel\"}"}

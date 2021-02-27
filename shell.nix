@@ -60,6 +60,7 @@ in mkShell {
     which
     lzma
     watchman
+    tsung
   ];
 
   shellHook = ''

@@ -6,7 +6,7 @@ namespace :db do
     require 'factory_bot_rails'
     include FactoryBot::Syntax::Methods
 
-    make_sample_data if Rails.env.development?
+    make_sample_data # if Rails.env.development?
   end
 end
 
@@ -15,6 +15,19 @@ def make_sample_data
     create(:admin, username: 'admin')
     make_cs2500
     make_cs3500
+  end
+end
+
+NUM_SIM_USERS = 300
+
+def create_simulation_users(lecture:, lab:, room:, exam_version:)
+  (0..NUM_SIM_USERS).each do |i|
+    puts "Created user\t#{i}"
+    student = create(:user, username: "stresstest#{i}", password: "stresstest#{i}")
+    create(:student_registration, user: student, section: lecture)
+    create(:student_registration, user: student, section: lab)
+    reg = create(:registration, user: student, room: room, exam_version: exam_version)
+    create(:snapshot, registration: reg)
   end
 end
 
@@ -49,6 +62,8 @@ def make_cs2500
   create(:student_registration, user: cs2500student, section: cs2500lab)
   cs2500student_reg = create(:registration, user: cs2500student, room: cs2500_room1, exam_version: cs2500_v1)
   create(:snapshot, registration: cs2500student_reg)
+
+  create_simulation_users(lecture: cs2500lec, lab: cs2500lab, room: cs2500_room1, exam_version: cs2500_v1)
 
   create(:question, registration: cs2500student_reg)
   create(:message, sender: cs2500prof, registration: cs2500student_reg)

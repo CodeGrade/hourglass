@@ -11,7 +11,7 @@
 
   <load>
     <arrivalphase phase="1" duration="60" unit="second">
-      <users maxnumber="800" arrivalrate="100" unit="second"/>
+      <users maxnumber="300" arrivalrate="100" unit="second"/>
     </arrivalphase>
   </load>
 
@@ -20,7 +20,7 @@
   </options>
 
   <sessions>
-    <session name="ask-question" probability="50" type="ts_http">
+    <session name="ask-question" probability="100" type="ts_http">
       <request>
         <dyn_variable name="authenticity_token" />
         <http url="/users/sign_in" method="GET" version="1.1" />
@@ -34,19 +34,26 @@
       <request subst="true">
         <http url="/users/sign_in" method="POST" version="1.1"
           content_type='application/x-www-form-urlencoded'
-          contents='authenticity_token=%%_encoded_authenticity_token%%&amp;user[username]=cs2500student&amp;user[password]=cs2500student'
+          contents='authenticity_token=%%_encoded_authenticity_token%%&amp;user[username]=stresstest%%ts_user_server:get_unique_id%%&amp;user[password]=stresstest%%ts_user_server:get_unique_id%%'
         />
       </request>
-      <request>
+      <setdynvars
+        sourcetype="eval"
+        code='fun({Pid,DynVars})->
+                {ok,Val}=ts_dynvars:lookup(tsung_userid, DynVars),
+                base64:encode_to_string(string:concat("Registration-", integer_to_list(Val + 2))) end.'>
+        <var name="reg_id_enc" />
+      </setdynvars>
+      <request subst="true">
         <http url="/graphql" method="POST" version="1.1"
           content_type='application/json'
-          contents='{"query":"mutation AskQuestionMutation(\n  $input: AskQuestionInput!\n) {\n  askQuestion(input: $input) {\n    question {\n      ...AskQuestion_single\n      id\n    }\n    questionEdge {\n      node {\n        id\n      }\n    }\n  }\n}\n\nfragment AskQuestion_single on Question {\n  createdAt\n  body\n}\n","variables":{"input":{"registrationId":"UmVnaXN0cmF0aW9uLTE=","body":"pls help"}}}'
+          contents='{"query":"mutation AskQuestionMutation(\n  $input: AskQuestionInput!\n) {\n  askQuestion(input: $input) {\n    question {\n      ...AskQuestion_single\n      id\n    }\n    questionEdge {\n      node {\n        id\n      }\n    }\n  }\n}\n\nfragment AskQuestion_single on Question {\n  createdAt\n  body\n}\n","variables":{"input":{"registrationId":"%%_reg_id_enc%%","body":"pls help"}}}'
         >
           <http_header name="X-CSRF-Token" value="%%_encoded_authenticity_token%%"/>
         </http>
       </request>
     </session>
-    <session name="subscribe-announcements" probability="50" type="ts_websocket">
+    <session name="subscribe-announcements" probability="0" type="ts_websocket">
       <request>
         <websocket type="connect" path="/cable"/>
       </request>

@@ -41,7 +41,9 @@
         <http url="/graphql" method="POST" version="1.1"
           content_type='application/json'
           contents='{"query":"mutation AskQuestionMutation(\n  $input: AskQuestionInput!\n) {\n  askQuestion(input: $input) {\n    question {\n      ...AskQuestion_single\n      id\n    }\n    questionEdge {\n      node {\n        id\n      }\n    }\n  }\n}\n\nfragment AskQuestion_single on Question {\n  createdAt\n  body\n}\n","variables":{"input":{"registrationId":"UmVnaXN0cmF0aW9uLTE=","body":"pls help"}}}'
-        />
+        >
+          <http_header name="X-CSRF-Token" value="%%_encoded_authenticity_token%%"/>
+        </http>
       </request>
     </session>
     <session name="subscribe-announcements" probability="50" type="ts_websocket">

@@ -44,14 +44,17 @@
                 base64:encode_to_string(string:concat("Registration-", integer_to_list(Val + 2))) end.'>
         <var name="reg_id_enc" />
       </setdynvars>
-      <request subst="true">
-        <http url="/graphql" method="POST" version="1.1"
-          content_type='application/json'
-          contents='{"query":"mutation AskQuestionMutation(\n  $input: AskQuestionInput!\n) {\n  askQuestion(input: $input) {\n    question {\n      ...AskQuestion_single\n      id\n    }\n    questionEdge {\n      node {\n        id\n      }\n    }\n  }\n}\n\nfragment AskQuestion_single on Question {\n  createdAt\n  body\n}\n","variables":{"input":{"registrationId":"%%_reg_id_enc%%","body":"pls help"}}}'
-        >
-          <http_header name="X-CSRF-Token" value="%%_encoded_authenticity_token%%"/>
-        </http>
-      </request>
+      <for var="i" from="1" to="400" incr="1">
+        <thinktime min="1" max="4" random="true"/>
+        <request subst="true">
+          <http url="/graphql" method="POST" version="1.1"
+            content_type='application/json'
+            contents='{"query":"mutation AskQuestionMutation(\n  $input: AskQuestionInput!\n) {\n  askQuestion(input: $input) {\n    question {\n      ...AskQuestion_single\n      id\n    }\n    questionEdge {\n      node {\n        id\n      }\n    }\n  }\n}\n\nfragment AskQuestion_single on Question {\n  createdAt\n  body\n}\n","variables":{"input":{"registrationId":"%%_reg_id_enc%%","body":"pls help"}}}'
+            >
+            <http_header name="X-CSRF-Token" value="%%_encoded_authenticity_token%%"/>
+          </http>
+        </request>
+      </for>
     </session>
     <session name="subscribe-announcements" probability="0" type="ts_websocket">
       <request>

@@ -22,7 +22,7 @@ def make_cs2500
   cs2500 = create(:course, title: 'CS 2500')
   cs2500lec = create(:section, :lecture, course: cs2500)
   cs2500lab = create(:section, :lab, course: cs2500)
-  cs2500midterm = create(:exam, name: 'CS2500 Midterm', course: cs2500, duration: 5.minutes)
+  cs2500midterm = create(:exam, name: 'CS2500 Midterm', course: cs2500, end_time: DateTime.now + 6.hours, duration: 5.hours)
   create(:exam_announcement, exam: cs2500midterm)
 
   cs2500_v1 = create(:exam_version, :cs2500_v1, exam: cs2500midterm)

@@ -14,7 +14,7 @@ class HourglassSchema < GraphQL::Schema
 
   # Feedback and error messages in development mode will be 
   # more informative than in production/test modes.
-  if Rails.env.development?
+  if Rails.env.development? || true
     use GraphQL::Guard.new(
       not_authorized:  lambda do |type, field|
         GraphQL::ExecutionError.new("Not authorized to access #{type}.#{field}")
@@ -74,7 +74,7 @@ class HourglassSchema < GraphQL::Schema
     # find an object in your application
     Object.const_get(type_name).find(item_id)
   rescue ActiveRecord::RecordNotFound => e
-    if Rails.env.development?
+    if Rails.env.development? || true
       raise GraphQL::ExecutionError, "Cannot find #{type_name} with id #{item_id}."
     else
       raise GraphQL::ExecutionError, "You do not have permission to view that data."
@@ -92,7 +92,7 @@ class HourglassSchema < GraphQL::Schema
         # find an object in your application
         ans = Object.const_get(type_name).where(id: item_ids.map(&:second)).to_a
         if ans.length != item_ids.length
-          if Rails.env.development?
+          if Rails.env.development? || true
             missing = item_ids.to_set - ans.map(&:id)
             raise GraphQL::ExecutionError, "Cannot find #{type_name} with ids #{missing.to_a}."
           else

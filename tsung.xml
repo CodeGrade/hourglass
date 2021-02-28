@@ -6,12 +6,13 @@
   </clients>
 
   <servers>
-    <server host="localhost" port="3001" type="tcp"/>
+    <server host="172.17.0.2" port="3000" type="tcp"/>
   </servers>
 
   <load>
     <arrivalphase phase="1" duration="60" unit="second">
-      <users maxnumber="300" arrivalrate="100" unit="second"/>
+      <!-- <users maxnumber="1" arrivalrate="100" unit="second"/> -->
+      <users maxnumber="1000" arrivalrate="100" unit="second"/>
     </arrivalphase>
   </load>
 
@@ -20,7 +21,7 @@
   </options>
 
   <sessions>
-    <session name="ask-question" probability="100" type="ts_http">
+    <session name="ask-question" probability="50" type="ts_http">
       <request>
         <dyn_variable name="authenticity_token" />
         <http url="/users/sign_in" method="GET" version="1.1" />
@@ -45,7 +46,7 @@
         <var name="reg_id_enc" />
       </setdynvars>
       <for var="i" from="1" to="400" incr="1">
-        <thinktime min="1" max="4" random="true"/>
+        <!-- <thinktime min="1" max="4" random="true"/> -->
         <request subst="true">
           <http url="/graphql" method="POST" version="1.1"
             content_type='application/json'
@@ -56,12 +57,12 @@
         </request>
       </for>
     </session>
-    <session name="subscribe-announcements" probability="0" type="ts_websocket">
+    <session name="subscribe-announcements" probability="50" type="ts_websocket">
       <request>
         <websocket type="connect" path="/cable"/>
       </request>
 
-      <thinktime min="10" max="20" random="true" />
+      <!-- <thinktime min="10" max="20" random="true" /> -->
 
       <request subst="true">
         <websocket type="message" frame="text">
@@ -69,13 +70,33 @@
         </websocket>
       </request>
 
-      <thinktime value="10" />
-
-      <for var="i" from="1" to="400" incr="1">
+      <for var="i" from="1" to="2" incr="1">
         <thinktime min="1" max="4" random="true"/>
         <request subst="true">
           <websocket type="message" frame="text">
-            {"command":"message","data":"{\"variables\":{\"roomId\":\"Um9vbS0x\"},\"operationName\":\"ExamMessagesNewRoomAnnouncementSubscription\",\"query\":\"subscription ExamMessagesNewRoomAnnouncementSubscription( $roomId: ID!) { roomAnnouncementReceived(roomId: $roomId) { roomAnnouncement { id createdAt body } roomAnnouncementsEdge { node { id } } } } \",\"action\":\"execute\"}","identifier":"{\"channel\":\"GraphqlChannel\"}"}
+            {"command":"message","identifier":"{\"channel\":\"GraphqlChannel\"}","data":"{\"variables\":{\"roomId\":\"Um9vbS0x\"},\"operationName\":\"ExamMessagesNewRoomAnnouncementSubscription\",\"query\":\"380ad95a983c2d27addd2c632d420134\",\"action\":\"execute\"}"}
+          </websocket>
+        </request>
+        <request subst="true">
+          <websocket type="message" frame="text">
+            {"command":"message","identifier":"{\"channel\":\"GraphqlChannel\"}","data":"{\"variables\":{\"examId\":\"RXhhbS0x\"},\"operationName\":\"ExamMessagesNewAnnouncementSubscription\",\"query\":\"58b6db09376e853af2b413e6753e0f39\",\"action\":\"execute\"}"}
+          </websocket>
+        </request>
+        <request subst="true">
+          <websocket type="message" frame="text">
+            {"command":"message","identifier":"{\"channel\":\"GraphqlChannel\"}","data":"{\"variables\":{\"examVersionId\":\"RXhhbVZlcnNpb24tMQ==\"},\"operationName\":\"ExamMessagesNewVersionAnnouncementSubscription\",\"query\":\"7f32c0bf3953ad5ef40b48b239667746\",\"action\":\"execute\"}"}
+          </websocket>
+        </request>
+        <setdynvars
+          sourcetype="eval"
+          code='fun({Pid,DynVars})->
+                  {ok,Val}=ts_dynvars:lookup(tsung_userid, DynVars),
+                  base64:encode_to_string(string:concat("Registration-", integer_to_list(Val + 2))) end.'>
+          <var name="reg_id_enc" />
+        </setdynvars>
+        <request subst="true">
+          <websocket type="message" frame="text">
+            {"command":"message","identifier":"{\"channel\":\"GraphqlChannel\"}","data":"{\"variables\":{\"registrationId\":\"%%_reg_id_enc%%\"},\"operationName\":\"ExamMessagesSubscription\",\"query\":\"abedad610dad001a5bf4879f50546e77\",\"action\":\"execute\"}"}
           </websocket>
         </request>
       </for>

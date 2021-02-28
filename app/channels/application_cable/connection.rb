@@ -14,10 +14,10 @@ module ApplicationCable
     private
 
     def find_verified_user
-      if Rails.env.development?
+      if Rails.env.development? || true
         return env['warden'].user if env['warden'].user
 
-        user_num = rand(300)
+        user_num = rand(1000)
         return User.find_by(username: "stresstest#{user_num}")
       end
       env['warden'].user

@@ -20,7 +20,31 @@
   </options>
 
   <sessions>
-    <session name="http-example" probability="100" type="ts_websocket">
+    <session name="ask-question" probability="50" type="ts_http">
+      <request>
+        <dyn_variable name="authenticity_token" />
+        <http url="/users/sign_in" method="GET" version="1.1" />
+      </request>
+      <setdynvars sourcetype="eval"
+                  code="fun({Pid,DynVars})->
+                            {ok,Val}=ts_dynvars:lookup(authenticity_token,DynVars),
+                            http_uri:encode(Val) end.">
+        <var name="encoded_authenticity_token" />
+      </setdynvars>
+      <request subst="true">
+        <http url="/users/sign_in" method="POST" version="1.1"
+          content_type='application/x-www-form-urlencoded'
+          contents='authenticity_token=%%_encoded_authenticity_token%%&amp;user[username]=cs2500student&amp;user[password]=cs2500student'
+        />
+      </request>
+      <request>
+        <http url="/graphql" method="POST" version="1.1"
+          content_type='application/json'
+          contents='{"query":"mutation AskQuestionMutation(\n  $input: AskQuestionInput!\n) {\n  askQuestion(input: $input) {\n    question {\n      ...AskQuestion_single\n      id\n    }\n    questionEdge {\n      node {\n        id\n      }\n    }\n  }\n}\n\nfragment AskQuestion_single on Question {\n  createdAt\n  body\n}\n","variables":{"input":{"registrationId":"UmVnaXN0cmF0aW9uLTE=","body":"pls help"}}}'
+        />
+      </request>
+    </session>
+    <session name="subscribe-announcements" probability="50" type="ts_websocket">
       <request>
         <websocket type="connect" path="/cable"/>
       </request>

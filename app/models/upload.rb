@@ -27,13 +27,14 @@ require 'find'
 class Upload
   include UploadsHelper
 
-  attr_reader :files, :info
+  attr_reader :files, :info, :rubrics
 
   def initialize(upload)
     @upload = upload
     @upload_data = @upload.read
     @files = []
     @info = {}
+    @rubrics = []
     @dir = Pathname.new(ArchiveUtils.mktmpdir)
     extract_contents!
     parse_info!
@@ -57,6 +58,7 @@ class Upload
       end
     properties = YAML.safe_load(File.read(file)).deep_stringify_keys
     if properties.key? 'files'
+      # TODO `info` here should be in the UPLOAD_SCHEMA, update where this thing is created
       JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties['info'])
       JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, properties['files'])
       @info = properties['info']
@@ -64,8 +66,11 @@ class Upload
     else
       begin
         JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
-        @info = FormatConverter.parse_info(properties).deep_stringify_keys
+        @info, @rubrics = FormatConverter.parse_info(properties)
+        @info.deep_stringify_keys!
+        @rubrics.map!(&:deep_stringify_keys)
       rescue JSON::Schema::ValidationError
+        # TODO save exams in the UPLOAD_SCHEMA (when exporting as single file)
         JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties)
         @info = properties
       end

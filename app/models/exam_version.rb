@@ -25,6 +25,8 @@ class ExamVersion < ApplicationRecord
   delegate :proctors_and_professors, to: :exam
   delegate :all_staff, to: :exam
 
+  before_save :create_all_none_rubrics
+
   EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save.json').to_s
   validates :info, presence: true, json: {
     schema: -> { EXAM_SAVE_SCHEMA },
@@ -90,26 +92,36 @@ class ExamVersion < ApplicationRecord
     }
   end
 
-  # Because activerecord_json_validator defines its own
-  # attr_writer for :info=, we need to wrap it here
-  # instead of just calling super
-  orig_info_eq = instance_method(:info=)
-  define_method(:info=) do |*args, &block|
-    res = orig_info_eq.bind(self).call(*args, &block)
-    rubrics = res['rubrics'] || {}
-    convert_rubric(rubrics['examRubric'], [nil, nil, nil])
-    rubrics['questions']&.each_with_index do |qrubric, qnum|
-      convert_rubric(qrubric['questionRubric'], [qnum, nil, nil])
-      qrubric['parts']&.each_with_index do |prubric, pnum|
-        convert_rubric(prubric['partRubric'], [qnum, pnum, nil])
-        prubric['body']&.each_with_index do |brubric, bnum|
-          convert_rubric(brubric, [qnum, pnum, bnum])
+  # Creates empty rubrics for any (q?,p?,b?) triple that does not already have a rubric in the database.
+  def create_all_none_rubrics
+    create_none_rubric(nil, nil, nil) # exam rubric
+    questions.each_with_index do |q, qnum|
+      create_none_rubric(qnum, nil, nil)
+      q['parts'].each_with_index do |p, pnum|
+        create_none_rubric(qnum, pnum, nil)
+        p['body'].each_with_index do |_b, bnum|
+          create_none_rubric(qnum, pnum, bnum)
         end
       end
     end
-    res
   end
 
+  def create_none_rubric(qnum, pnum, bnum)
+    r = rubrics.find_or_initialize_by(
+      qnum: qnum,
+      pnum: pnum,
+      bnum: bnum,
+    )
+    return unless r.new_record?
+
+    r.assign_attributes(
+      type: 'None',
+      exam_version: self,
+    )
+  end
+
+  # TODO finish splitting this
+  # we want to make a second method that updates rubrics that already exist based on the uploaded rubrics
   def convert_rubric(raw, qpb, order = nil, parent = nil)
     qnum, pnum, bnum = qpb
     if raw.nil?

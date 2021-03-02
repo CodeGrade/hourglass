@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button, ButtonProps } from 'react-bootstrap';
+import { SplitButton, SplitButtonProps } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 
-const LinkButton: React.FC<ButtonProps & {
+const LinkSplitButton: React.FC<SplitButtonProps & {
   to: string;
-  onClick?: React.DOMAttributes<HTMLButtonElement>['onClick'];
+  onClick?: SplitButtonProps['onClick'];
 }> = (props) => {
   const {
     children,
@@ -13,7 +13,7 @@ const LinkButton: React.FC<ButtonProps & {
   } = props;
   const history = useHistory();
   return (
-    <Button
+    <SplitButton
       onClick={(event): void => {
         if (onClick) onClick(event);
         history.push(to);
@@ -22,7 +22,7 @@ const LinkButton: React.FC<ButtonProps & {
       {...props}
     >
       {children}
-    </Button>
+    </SplitButton>
   );
 };
-export default LinkButton;
+export default LinkSplitButton;

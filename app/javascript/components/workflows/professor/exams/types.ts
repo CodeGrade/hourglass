@@ -36,7 +36,7 @@ interface GradingCheck {
 }
 
 export interface CommentJson {
-  railsId: string;
+  id: string;
   qnum: number;
   pnum: number;
   bnum: number;
@@ -45,7 +45,7 @@ export interface CommentJson {
   message: string;
 }
 interface PresetCommentInfo {
-  railsId: string;
+  id: string;
   label: string;
   points: number;
 }
@@ -55,7 +55,7 @@ export interface PresetCommentsJson {
   values: CommentJson[];
 }
 interface RubricPresetInfo {
-  railsId: number;
+  id: string;
   label: string;
   direction: 'credit' | 'deduction';
   mercy?: number;
@@ -64,11 +64,11 @@ export interface RubricPresetJson {
   type: 'rubric_preset';
   info: RubricPresetInfo;
   values: {
-    [railsId: string]: PresetCommentsJson;
+    [id: string]: PresetCommentsJson;
   }
 }
 interface RubricInfo {
-  railsId: string;
+  id: string;
   points?: number;
   qnum?: number;
   pnum?: number;
@@ -79,11 +79,11 @@ export interface RubricJson {
   type?: 'any' | 'all' | 'one' | 'none';
   info?: RubricInfo;
   values: {
-    [railsId: string]: (RubricJson | RubricPresetJson);
+    [id: string]: (RubricJson | RubricPresetJson);
   }
 }
 export interface GroupedGradingComment {
-  [railsId: string]: RubricJson;
+  [id: string]: RubricJson;
 }
 
 export interface CurrentGrading {
@@ -120,12 +120,10 @@ export interface CurrentGrading {
 
 export interface CodeInfoWithAnswer extends CodeInfo {
   answer: CodeState;
-  rubric?: Rubric;
 }
 
 export interface HTMLValWithAnswer extends HTMLVal {
   answer: NoAnswerState;
-  rubric?: Rubric;
 }
 
 export interface AllThatApplyOptionWithAnswer {
@@ -135,15 +133,12 @@ export interface AllThatApplyOptionWithAnswer {
 
 export interface AllThatApplyInfoWithAnswer extends Omit<AllThatApplyInfo, 'options'> {
   options: AllThatApplyOptionWithAnswer[];
-  rubric?: Rubric;
 }
 export interface YesNoInfoWithAnswer extends YesNoInfo {
   answer?: YesNoState;
-  rubric?: Rubric;
 }
 export interface CodeTagInfoWithAnswer extends CodeTagInfo {
   answer?: CodeTagState;
-  rubric?: Rubric;
 }
 
 export interface MatchingPromptWithAnswer {
@@ -153,17 +148,14 @@ export interface MatchingPromptWithAnswer {
 
 export interface MatchingInfoWithAnswer extends Omit<MatchingInfo, 'prompts'> {
   prompts: MatchingPromptWithAnswer[];
-  rubric?: Rubric;
 }
 
 export interface MultipleChoiceInfoWithAnswer extends MultipleChoiceInfo {
   answer?: MultipleChoiceState;
-  rubric?: Rubric;
 }
 
 export interface TextInfoWithAnswer extends TextInfo {
   answer: TextState;
-  rubric?: Rubric;
 }
 
 export type BodyItemWithAnswer =
@@ -173,23 +165,23 @@ export type BodyItemWithAnswer =
 
 export interface PartInfoWithAnswers extends Omit<PartInfo, 'body'> {
   body: BodyItemWithAnswer[];
-  partRubric?: Rubric;
 }
 
 export interface QuestionInfoWithAnswers extends Omit<QuestionInfo, 'parts'> {
   parts: PartInfoWithAnswers[];
-  questionRubric?: Rubric;
 }
 
 export interface ExamVersionWithAnswers extends Omit<ExamVersion, 'questions'> {
   questions: QuestionInfoWithAnswers[];
-  examRubric?: Rubric;
+}
+
+export interface BodyRubric {
+  rubric?: Rubric;
 }
 
 type GradingComment = string;
 
 export type Preset = {
-  railsId?: number;
   id?: string;
   label?: string;
   graderHint: GradingComment;
@@ -199,7 +191,7 @@ export type Preset = {
 }
 
 export type RubricPresets = {
-  railsId?: number;
+  id?: string;
   label?: string;
   direction: 'credit' | 'deduction';
   mercy?: number;
@@ -265,7 +257,7 @@ export function isRubric(obj : unknown): obj is Rubric {
 
 export type RubricNone = {
   type: 'none';
-  railsId?: number;
+  id?: string;
   inUse?: boolean;
 }
 export function isRubricNone(obj : unknown): obj is RubricNone {
@@ -275,7 +267,7 @@ export function isRubricNone(obj : unknown): obj is RubricNone {
 
 export type RubricAll = {
   type: 'all';
-  railsId?: number;
+  id?: string;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
   inUse?: boolean;
@@ -290,7 +282,7 @@ export function isRubricAll(obj : unknown): obj is RubricAll {
 
 export type RubricAny = {
   type: 'any';
-  railsId?: number;
+  id?: string;
   points: number;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
@@ -308,7 +300,7 @@ export function isRubricAny(obj : unknown): obj is RubricAny {
 
 export type RubricOne = {
   type: 'one';
-  railsId?: number;
+  id?: string;
   points: number;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
@@ -325,7 +317,7 @@ export function isRubricOne(obj : unknown): obj is RubricOne {
 }
 
 export type PartRubric = {
-  partRubric?: Rubric;
+  partRubric: Rubric;
   body: Rubric[];
 }
 
@@ -337,7 +329,7 @@ export function isPartRubric(obj : unknown): obj is PartRubric {
 }
 
 export type QuestionRubric = {
-  questionRubric?: Rubric;
+  questionRubric: Rubric;
   parts: PartRubric[];
 }
 
@@ -349,7 +341,7 @@ export function isQuestionRubric(obj : unknown): obj is QuestionRubric {
 }
 
 export type ExamRubric = {
-  examRubric?: Rubric;
+  examRubric: Rubric;
   questions: QuestionRubric[];
 }
 

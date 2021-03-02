@@ -18,7 +18,6 @@ import { QuestionFilesContext } from '@hourglass/common/context';
 import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
 import EditReference from '@professor/exams/new/editor/components/Reference';
 import { YesNoInfo } from '@student/exams/show/types';
-import RubricEditor from '@professor/exams/new/editor/RubricEditor';
 
 const SEP_SUB_YESNO: YesNoInfo = {
   type: 'YesNo',
@@ -168,14 +167,6 @@ const Question: React.FC<{
           </Card.Subtitle>
         </div>
         <Card.Body>
-          <Field
-            name="questionRubric"
-            fieldName="questionRubric"
-            component={RubricEditor}
-            format={null}
-            enableDelete={false}
-            disabledDeleteMessage="Cannot delete root rubric"
-          />
           <Field
             name="reference"
             component={QuestionReferenceProvider}

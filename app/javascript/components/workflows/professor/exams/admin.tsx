@@ -73,6 +73,8 @@ import {
 import { uploadFile } from '@hourglass/common/types/api';
 import { ExamRubric } from '@professor/exams/types';
 import convertRubric from '@professor/exams/rubrics';
+import LinkSplitButton from '@hourglass/common/linksplitbutton';
+import LinkDropdownItem from '@hourglass/common/linkdropdownitem';
 import './dnd.scss';
 
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
@@ -620,7 +622,7 @@ const VersionInfo: React.FC<{
     `,
     {
       onCompleted: ({ createExamVersion }) => {
-        history.push(`/exams/${res.id}/versions/${createExamVersion.examVersion.id}/edit`);
+        history.push(`/exams/${res.id}/versions/${createExamVersion.examVersion.id}/edit/questions`);
       },
       onError: (err) => {
         alert({
@@ -646,7 +648,7 @@ const VersionInfo: React.FC<{
               const [f] = files;
               if (!f) return;
               uploadFile<{ id: number; }>(res.examVersionUploadUrl, f).then((innerRes) => {
-                history.push(`/exams/${res.id}/versions/${innerRes.id}/edit`);
+                history.push(`/exams/${res.id}/versions/${innerRes.id}/edit/questions`);
                 alert({
                   variant: 'success',
                   autohide: true,
@@ -728,7 +730,6 @@ const ShowVersion: React.FC<{
       answers
       rubrics {
         id
-        railsId
         type
         parentSectionId
         qnum
@@ -742,13 +743,11 @@ const ShowVersion: React.FC<{
         }
         rubricPreset {
           id
-          railsId
           direction
           label
           mercy
           presetComments {
             id
-            railsId
             label
             order
             points
@@ -856,14 +855,25 @@ const ShowVersion: React.FC<{
               Export as archive
             </Dropdown.Item>
           </DropdownButton>
-          <LinkButton
+          <LinkSplitButton
+            id={`edit-${res.id}`}
             disabled={loading}
             variant="info"
-            to={`/exams/${examId}/versions/${res.id}/edit`}
+            to={`/exams/${examId}/versions/${res.id}/edit/questions`}
             className="mr-2"
+            title="Edit"
           >
-            Edit
-          </LinkButton>
+            <LinkDropdownItem
+              to={`/exams/${examId}/versions/${res.id}/edit/questions`}
+            >
+              Edit Questions
+            </LinkDropdownItem>
+            <LinkDropdownItem
+              to={`/exams/${examId}/versions/${res.id}/edit/rubric`}
+            >
+              Edit Rubric
+            </LinkDropdownItem>
+          </LinkSplitButton>
           <TooltipButton
             variant="danger"
             disabled={res.anyStarted || res.anyFinalized || loading}

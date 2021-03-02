@@ -11,7 +11,6 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Card } from 'react-bootstrap';
 import { Field, WrappedFieldProps, FormSection } from 'redux-form';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
-import RubricEditor from '@professor/exams/new/editor/RubricEditor';
 import { EditHTMLField } from './editHTMLs';
 
 const OneItem: React.FC<WrappedFieldProps & {
@@ -128,16 +127,6 @@ const Body: React.FC<BodyProps> = (props) => {
           bnum={bnum}
           memberName={memberName}
         />
-        <FormSection name={memberName}>
-          <Field
-            name="rubric"
-            fieldName="rubric"
-            format={null}
-            component={RubricEditor}
-            enableDelete={false}
-            disabledDeleteMessage="Cannot delete root rubric"
-          />
-        </FormSection>
       </Card.Body>
     </Card>
   );

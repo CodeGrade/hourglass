@@ -1,12 +1,10 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import Editor from '@professor/exams/new/editor';
-import { useAlert } from '@hourglass/common/alerts';
+import RubricEditor from '@professor/exams/new/rubric-editor';
 import { useQuery, graphql } from 'relay-hooks';
 import {
   ContentsState,
-  Policy,
   QuestionInfo,
   FileRef,
   HTMLVal,
@@ -15,39 +13,27 @@ import {
 } from '@student/exams/show/types';
 import { RenderError } from '@hourglass/common/boundary';
 
-import { editVersionQuery } from './__generated__/editVersionQuery.graphql';
+import { editRubricQuery } from './__generated__/editRubricQuery.graphql';
 
-const EditExamVersion: React.FC = () => {
+const EditExamVersionRubric: React.FC = () => {
   const { versionId } = useParams<{ versionId: string }>();
-  const res = useQuery<editVersionQuery>(
+  const res = useQuery<editRubricQuery>(
     graphql`
-    query editVersionQuery($examVersionId: ID!) {
+    query editRubricQuery($examVersionId: ID!) {
       examVersion(id: $examVersionId) {
         id
         name
-        policies
         questions
         reference
         instructions
         files
         answers
-        anyStarted
-        anyFinalized
       }
     }
     `,
     {
       examVersionId: versionId,
     },
-  );
-  useAlert(
-    {
-      variant: 'warning',
-      title: 'Students have already started taking this version',
-      message: 'Changing the questions will likely result in nonsensical answers, and changing the structure of this version will result in undefined behavior. Be careful!',
-    },
-    res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized,
-    [res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized],
   );
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
@@ -69,16 +55,15 @@ const EditExamVersion: React.FC = () => {
     },
   };
   return (
-    <Container>
-      <Editor
+    <Container fluid>
+      <RubricEditor
         examVersionId={examVersion.id}
         exam={parsedContents.exam}
         versionName={examVersion.name}
-        versionPolicies={examVersion.policies as readonly Policy[]}
         answers={parsedContents.answers}
       />
     </Container>
   );
 };
 
-export default EditExamVersion;
+export default EditExamVersionRubric;

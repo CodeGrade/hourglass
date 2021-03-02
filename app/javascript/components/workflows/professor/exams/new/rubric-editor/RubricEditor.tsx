@@ -75,6 +75,7 @@ const RubricPresetEditor: React.FC<{
         onDelete={remove}
       />
       <Card.Body>
+        <Field name="railsId" component="input" type="hidden" />
         <Form.Group as={Row}>
           <Form.Label column sm="2">Label</Form.Label>
           <Col sm="4">

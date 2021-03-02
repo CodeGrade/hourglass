@@ -39,7 +39,7 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
     direction,
     presets: presetComments.map((c) => {
       const {
-        railsId,
+        id,
         // eslint-disable-next-line no-shadow
         label,
         graderHint,
@@ -48,7 +48,7 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
       } = c;
       // eslint-disable-next-line no-shadow
       const ans: Preset = {
-        railsId,
+        id,
         graderHint,
         points,
       };
@@ -65,18 +65,18 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
 function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric {
   const {
     type,
-    railsId,
+    id,
     description,
     subsections,
     rubricPreset,
     points,
   } = rawRubric;
   switch (type) {
-    case 'none': return { type, railsId };
+    case 'none': return { type, id };
     case 'all': {
       const ans : RubricAll = {
         type,
-        railsId,
+        id,
         choices: (
           expandPreset(rubricPreset)
            ?? subsections.map((s) => expandRubric(rubricsByID[s.id], rubricsByID))
@@ -90,7 +90,7 @@ function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric 
       const ans : RubricAny | RubricOne = {
         type,
         points,
-        railsId,
+        id,
         choices: (
           expandPreset(rubricPreset)
            ?? subsections.map((s) => expandRubric(rubricsByID[s.id], rubricsByID))

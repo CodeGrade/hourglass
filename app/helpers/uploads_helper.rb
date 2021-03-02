@@ -221,7 +221,7 @@ module UploadsHelper
           end,
         }.compact
       end
-      {
+      info = {
         policies: properties['policies'] || [],
         contents: {
           questions: questions,
@@ -229,8 +229,9 @@ module UploadsHelper
           instructions: make_html_val(contents['instructions']),
         }.compact,
         answers: answers,
-        rubrics: rubrics,
       }
+
+      [info, rubrics]
     end
 
     def self.unparse_info(info)

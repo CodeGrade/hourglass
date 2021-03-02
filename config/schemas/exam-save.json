@@ -11,8 +11,7 @@
   "properties": {
     "policies": { "$ref": "#/definitions/Policies" },
     "answers": { "$ref": "#/definitions/ExamAnswers" },
-    "contents": { "$ref": "#/definitions/Contents" },
-    "rubrics": { "$ref": "#/definitions/VersionRubric" }
+    "contents": { "$ref": "#/definitions/Contents" }
   },
   "definitions": {
     "ExamAnswers": {
@@ -216,137 +215,6 @@
     "BodyItemAnswers": {
       "type": "array",
       "items": { "$ref": "#/definitions/BodyItemAnswer" }
-    },
-    "VersionRubric": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["questions"],
-      "properties": {
-        "examRubric": { "$ref": "#/definitions/Rubric" },
-        "questions": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/QuestionRubric" }
-        }
-      }
-    },
-    "QuestionRubric": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["parts"],
-      "properties": {
-        "questionRubric": { "$ref": "#/definitions/Rubric" },
-        "parts": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/PartRubric" }
-        }
-      }
-    },
-    "PartRubric": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["body"],
-      "properties": {
-        "partRubric": { "$ref": "#/definitions/Rubric" },
-        "body": { "$ref": "#/definitions/Rubrics" }
-      }
-    },
-    "Rubrics": {
-      "type": "array",
-      "items": { "$ref": "#/definitions/Rubric" }
-    },
-    "Rubric": {
-      "anyOf": [
-        { "$ref": "#/definitions/RubricAll" },
-        { "$ref": "#/definitions/RubricAny" },
-        { "$ref": "#/definitions/RubricOne" },
-        { "$ref": "#/definitions/NoRubric" }
-      ]
-    },
-    "NoRubric": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["type"],
-      "properties": {
-        "railsId": { "type": "integer"},
-        "type": { "enum": ["none"] }
-      }
-    },
-    "RubricAll": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["type", "choices"],
-      "properties": {
-        "railsId": { "type": "integer"},
-        "type": { "enum": ["all"] },
-        "description": { "$ref": "#/definitions/HTML" },
-        "choices": {
-          "oneOf": [
-            { "$ref": "#/definitions/Rubrics" }, 
-            { "$ref": "#/definitions/RubricPresets" }
-          ]
-        }
-      }
-    },
-    "RubricAny": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["type", "points", "choices"],
-      "properties": {
-        "railsId": { "type": "integer"},
-        "type": { "enum": ["any"] },
-        "points": { "type": "number" },
-        "description": { "$ref": "#/definitions/HTML" },
-        "choices": {
-          "oneOf": [
-            { "$ref": "#/definitions/Rubrics" }, 
-            { "$ref": "#/definitions/RubricPresets" }
-          ]
-        }
-      }
-    },
-    "RubricOne": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["type", "points", "choices"],
-      "properties": {
-        "railsId": { "type": "integer"},
-        "type": { "enum": ["one"] },
-        "points": { "type": "number" },
-        "description": { "$ref": "#/definitions/HTML" },
-        "choices": {
-          "oneOf": [
-            { "$ref": "#/definitions/Rubrics" }, 
-            { "$ref": "#/definitions/RubricPresets" }
-          ]
-        }
-      }
-    },
-    "RubricPresets": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["direction", "presets"],
-      "properties": {
-        "railsId": { "type": "integer"},
-        "label": { "type": "string" },
-        "direction": { "enum": ["credit", "deduction"] },
-        "mercy": { "type": "number"},
-        "presets": {
-          "type": "array",
-          "items": { "$ref": "#/definitions/Preset" }
-        }
-      }
-    },
-    "Preset": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["graderHint", "points"],
-      "properties": {
-        "railsId": { "type": "integer"},
-        "label": { "type": "string" },
-        "graderHint": { "type": "string" },
-        "studentFeedback": { "type": "string" },
-        "points": { "type": "number" }
-      }
     },
     "BodyItemAnswer": {
       "anyOf": [

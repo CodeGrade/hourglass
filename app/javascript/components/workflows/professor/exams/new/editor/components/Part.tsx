@@ -183,14 +183,6 @@ const Part: React.FC<{
         </div>
         <Card.Body>
           <Field
-            name="partRubric"
-            fieldName="partRubric"
-            component={RubricEditor}
-            format={null}
-            enableDelete={false}
-            disabledDeleteMessage="Cannot delete root rubric"
-          />
-          <Field
             name="reference"
             component={PartReferenceProvider}
           >

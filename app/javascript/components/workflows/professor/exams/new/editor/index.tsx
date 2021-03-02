@@ -58,7 +58,6 @@ import Instructions from '@professor/exams/new/editor/components/Instructions';
 import EditReference from '@professor/exams/new/editor/components/Reference';
 import FileUploader from '@professor/exams/new/editor/components/FileUploader';
 import ShowQuestions from '@professor/exams/new/editor/components/ShowQuestions';
-import RubricEditor from '@professor/exams/new/editor/RubricEditor';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import { useMutation, graphql } from 'relay-hooks';
 import { editorUpdateExamVersionMutation } from './__generated__/editorUpdateExamVersionMutation.graphql';
@@ -73,7 +72,6 @@ export interface Version {
       questions: ExamVersion['questions'];
       reference: ExamVersion['reference'];
     };
-    rubrics: ExamRubric;
   };
   files: ExamVersion['files'];
 }
@@ -81,7 +79,6 @@ export interface Version {
 function transformATAReverse(
   ata: AllThatApplyInfo,
   answer: AllThatApplyState,
-  rubric: Rubric,
 ): AllThatApplyInfoWithAnswer {
   const {
     options,
@@ -93,7 +90,6 @@ function transformATAReverse(
   }));
   return {
     ...rest,
-    rubric,
     options: newOptions,
   };
 }
@@ -101,7 +97,6 @@ function transformATAReverse(
 function transformMatchingReverse(
   matching: MatchingInfo,
   answer: MatchingState,
-  rubric: Rubric,
 ): MatchingInfoWithAnswer {
   const {
     prompts,
@@ -113,15 +108,13 @@ function transformMatchingReverse(
   }));
   return {
     ...rest,
-    rubric,
     prompts: newPrompts,
   };
 }
 
-function examWithAnswersAndRubrics(
+export function examWithAnswers(
   exam: ExamVersion,
   answers: AnswersState['answers'],
-  rubric: ExamRubric,
 ): ExamVersionWithAnswers {
   const {
     questions,
@@ -133,32 +126,28 @@ function examWithAnswersAndRubrics(
       parts,
       ...restOfQ
     } = q;
-    const qRubric = rubric?.questions[qnum];
     const newParts: PartInfoWithAnswers[] = [];
     parts.forEach((p, pnum) => {
       const {
         body,
         ...restOfP
       } = p;
-      const pRubric = qRubric?.parts[pnum];
       const newBody: BodyItemWithAnswer[] = [];
       body.forEach((b, bnum) => {
-        const bRubric = pRubric?.body[bnum];
         const ans = answers[qnum][pnum][bnum];
         let newItem: BodyItemWithAnswer;
         switch (b.type) {
           case 'AllThatApply': {
-            newItem = transformATAReverse(b, ans as AllThatApplyState, bRubric);
+            newItem = transformATAReverse(b, ans as AllThatApplyState);
             break;
           }
           case 'Matching': {
-            newItem = transformMatchingReverse(b, ans as MatchingState, bRubric);
+            newItem = transformMatchingReverse(b, ans as MatchingState);
             break;
           }
           default:
             newItem = {
               ...b,
-              rubric: bRubric,
               answer: isNoAns(ans) ? undefined : ans,
             } as BodyItemWithAnswer;
         }
@@ -166,19 +155,16 @@ function examWithAnswersAndRubrics(
       });
       newParts.push({
         ...restOfP,
-        partRubric: pRubric?.partRubric,
         body: newBody,
       });
     });
     newQuestions.push({
       ...restOfQ,
       parts: newParts,
-      questionRubric: qRubric?.questionRubric,
     });
   });
   return {
     ...restOfE,
-    examRubric: rubric.examRubric,
     questions: newQuestions,
   };
 }
@@ -189,7 +175,6 @@ export interface ExamEditorProps {
   versionName: string;
   versionPolicies: readonly Policy[];
   answers: AnswersState;
-  rubrics: ExamRubric;
 }
 
 const Editor: React.FC<ExamEditorProps> = (props) => {
@@ -199,15 +184,14 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
     versionName,
     versionPolicies,
     answers,
-    rubrics,
   } = props;
   const initialValues = useMemo(() => ({
     all: {
       name: versionName,
       policies: versionPolicies,
-      exam: examWithAnswersAndRubrics(exam, answers.answers, rubrics),
+      exam: examWithAnswers(exam, answers.answers),
     },
-  }), [versionName, versionPolicies, answers.answers, exam, rubrics]);
+  }), [versionName, versionPolicies, answers.answers, exam]);
   return (
     <Provider store={store}>
       <ExamEditorForm
@@ -283,7 +267,6 @@ function transformATA(
 } {
   const {
     options,
-    rubric,
     ...rest
   } = ata;
   const answer = [];
@@ -309,7 +292,6 @@ function transformMatching(
 } {
   const {
     prompts,
-    rubric,
     ...rest
   } = matching;
   const answer = [];
@@ -332,46 +314,10 @@ function stripInUsePreset(preset: Preset): Preset {
   return presetClean;
 }
 
-function stripInUsePresets(rubric: RubricPresets): RubricPresets {
-  const { inUse: _, presets, ...rest } = rubric;
-  return {
-    ...rest,
-    presets: presets.map(stripInUsePreset),
-  };
-}
-
-function stripInUse(rubric: Rubric): Rubric {
-  if (rubric === undefined) return rubric;
-  switch (rubric.type) {
-    case 'none': {
-      const { inUse: _, ...rest } = rubric;
-      return rest;
-    }
-    case 'all':
-    case 'any':
-    case 'one': {
-      const { inUse: _, choices, ...rest } = rubric;
-      return {
-        ...rest,
-        choices: (choices instanceof Array
-          ? choices.map(stripInUse)
-          : stripInUsePresets(choices)
-        ),
-      };
-    }
-    default:
-      throw new ExhaustiveSwitchError(rubric);
-  }
-}
-
 function transformForSubmit(values: FormValues): Version {
   const { all } = values;
   const questions: QuestionInfo[] = [];
   const answers: AnswersState['answers'] = [];
-  const rubrics: ExamRubric = {
-    examRubric: stripInUse(all.exam.examRubric),
-    questions: [],
-  };
   all.exam.questions.forEach((q, qnum) => {
     answers[qnum] = [];
     const {
@@ -379,10 +325,6 @@ function transformForSubmit(values: FormValues): Version {
       questionRubric,
       ...restOfQ
     } = q;
-    rubrics.questions[qnum] = {
-      questionRubric: stripInUse(questionRubric),
-      parts: [],
-    };
     const newParts: PartInfo[] = [];
     parts.forEach((p, pnum) => {
       answers[qnum][pnum] = [];
@@ -391,16 +333,10 @@ function transformForSubmit(values: FormValues): Version {
         partRubric,
         ...restOfP
       } = p;
-      rubrics.questions[qnum].parts[pnum] = {
-        partRubric: stripInUse(partRubric),
-        body: [],
-      };
       const newBody: BodyItem[] = [];
       body.forEach((b, bnum) => {
         let itemAnswer: AnswerState;
         let bodyItem: BodyItem;
-        const bodyRubric = stripInUse(b.rubric || { type: 'none' });
-        rubrics.questions[qnum].parts[pnum].body[bnum] = bodyRubric;
         switch (b.type) {
           case 'AllThatApply': {
             const res = transformATA(b);
@@ -417,7 +353,6 @@ function transformForSubmit(values: FormValues): Version {
           default: {
             const {
               answer,
-              rubric,
               ...restOfB
             } = b;
             itemAnswer = answer;
@@ -448,7 +383,6 @@ function transformForSubmit(values: FormValues): Version {
         questions,
         reference: all.exam.reference ?? [],
       },
-      rubrics,
     },
     files: all.exam.files,
   };
@@ -459,30 +393,6 @@ mutation editorUpdateExamVersionMutation($input: UpdateExamVersionInput!) {
   updateExamVersion(input: $input) {
     examVersion {
       id
-      rubrics {
-        id
-        railsId
-        type
-        rubricPreset {
-          id
-          railsId
-          direction
-          label
-          mercy
-          presetComments {
-            id
-            railsId
-            label
-            order
-            points
-            graderHint
-            studentFeedback
-          }
-        }
-        subsections {
-          id
-        }
-      }
     }
   }
 }
@@ -611,13 +521,6 @@ const ExamEditor: React.FC<
                 label="the entire exam"
               />
             </Form.Group>
-            <Field
-              name="examRubric"
-              fieldName="examRubric"
-              component={RubricEditor}
-              enableDelete={false}
-              disabledDeleteMessage="Cannot delete root rubric"
-            />
             <FieldArray
               name="questions"
               component={ShowQuestions}

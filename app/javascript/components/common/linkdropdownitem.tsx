@@ -1,10 +1,11 @@
 import React from 'react';
-import { Button, ButtonProps } from 'react-bootstrap';
+import { Dropdown } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
+import { DropdownItemProps } from 'react-bootstrap/esm/DropdownItem';
 
-const LinkButton: React.FC<ButtonProps & {
+const LinkDropdownItem: React.FC<DropdownItemProps & {
   to: string;
-  onClick?: React.DOMAttributes<HTMLButtonElement>['onClick'];
+  onClick?: DropdownItemProps['onClick'];
 }> = (props) => {
   const {
     children,
@@ -13,7 +14,7 @@ const LinkButton: React.FC<ButtonProps & {
   } = props;
   const history = useHistory();
   return (
-    <Button
+    <Dropdown.Item
       onClick={(event): void => {
         if (onClick) onClick(event);
         history.push(to);
@@ -22,7 +23,7 @@ const LinkButton: React.FC<ButtonProps & {
       {...props}
     >
       {children}
-    </Button>
+    </Dropdown.Item>
   );
 };
-export default LinkButton;
+export default LinkDropdownItem;

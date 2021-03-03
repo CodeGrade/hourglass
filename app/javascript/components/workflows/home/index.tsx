@@ -132,7 +132,7 @@ const ShowRegistrations: React.FC<{
             <li key={regs[0].id}>
               <h2>{courseTitle}</h2>
               <ul>
-                {res.map((reg) => (
+                {regs.map((reg) => (
                   <li key={reg.id}>
                     <Link to={`/exams/${reg.exam.id}`}>
                       {reg.exam.name}

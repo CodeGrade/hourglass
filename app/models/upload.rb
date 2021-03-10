@@ -68,7 +68,7 @@ class Upload
         JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
         @info, @rubrics = FormatConverter.parse_info(properties)
         @info.deep_stringify_keys!
-        @rubrics.map!(&:deep_stringify_keys)
+        @rubrics.deep_stringify_keys!
       rescue JSON::Schema::ValidationError
         # TODO save exams in the UPLOAD_SCHEMA (when exporting as single file)
         JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties)

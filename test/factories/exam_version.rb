@@ -4,6 +4,10 @@ FactoryBot.define do
   factory :exam_version do
     cs2500_v1
 
+    before(:create) do |ev, context|
+      ev.import_rubrics(context.upload.rubrics)
+    end
+
     trait :cs2500_v1 do
       name { 'CS2500 Midterm Version 1' }
       transient do

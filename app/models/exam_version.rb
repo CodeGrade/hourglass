@@ -433,11 +433,11 @@ class ExamVersion < ApplicationRecord
     registrations.in_progress.empty?
   end
 
-  def export_json
-    JSON.pretty_generate({
-      info: info,
-      files: files,
-    })
+  def export_json(include_files: false)
+    res_obj = export_exam_info
+    res_obj['files'] = files if include_files
+
+    JSON.pretty_generate(res_obj)
   end
 
   def export_all(dir)
@@ -449,7 +449,11 @@ class ExamVersion < ApplicationRecord
   end
 
   def export_info_file(path)
-    File.write path.join('exam.yaml'), UploadsHelper::FormatConverter.unparse_info(info, rubric_as_json).to_yaml
+    File.write path.join('exam.yaml'), export_exam_info.to_yaml
+  end
+
+  def export_exam_info
+    UploadsHelper::FormatConverter.unparse_info(info, rubric_as_json)
   end
 
   def export_files(path, files)

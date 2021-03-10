@@ -34,7 +34,6 @@ class RubricPreset < ApplicationRecord
   def as_json(preset_comments_in_use = nil)
     presets_as_json = preset_comments.sort_by(&:order).map { |p| p.as_json(preset_comments_in_use) }
     {
-      railsId: id,
       label: label,
       direction: direction,
       mercy: mercy,

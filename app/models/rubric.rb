@@ -98,7 +98,6 @@ class Rubric < ApplicationRecord
     rubric_preset_as_json = rubric_preset&.as_json(preset_comments_in_use)
     subsections_as_json = subsections.sort_by(&:order).map { |s| s.as_json(preset_comments_in_use) }
     {
-      railsId: id,
       type: type.downcase,
       description: description && { type: 'HTML', value: description },
       points: points,

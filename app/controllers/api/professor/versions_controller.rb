@@ -32,7 +32,7 @@ module Api
 
       def export_file
         fname = "#{@version.name.gsub(/ /, '-')}.json"
-        send_data @version.export_json, type: :json, disposition: 'attachment', filename: fname
+        send_data @version.export_json(include_files: true), type: :json, disposition: 'attachment', filename: fname
       end
 
       def export_archive

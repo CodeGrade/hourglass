@@ -57,24 +57,15 @@ class Upload
         @dir.join('exam.yaml')
       end
     properties = YAML.safe_load(File.read(file)).deep_stringify_keys
-    if properties.key? 'files'
-      # TODO `info` here should be in the UPLOAD_SCHEMA, update where this thing is created
-      JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties['info'])
-      JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, properties['files'])
-      @info = properties['info']
-      @files = properties['files']
-    else
-      begin
-        JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
-        @info, @rubrics = FormatConverter.parse_info(properties)
-        @info.deep_stringify_keys!
-        @rubrics.deep_stringify_keys!
-      rescue JSON::Schema::ValidationError
-        # TODO save exams in the UPLOAD_SCHEMA (when exporting as single file)
-        JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties)
-        @info = properties
-      end
-    end
+    files = properties.delete('files')
+    raise 'Specify files either in YAML or a directory, not both' if files.present? && @files.present?
+
+    JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
+    JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, files) if files
+    @info, @rubrics = FormatConverter.parse_info(properties)
+    @info.deep_stringify_keys!
+    @rubrics.deep_stringify_keys!
+    @files = files if files
   end
 
   def rec_path(base_path, path)

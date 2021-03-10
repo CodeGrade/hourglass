@@ -15,7 +15,6 @@ class PresetComment < ApplicationRecord
 
   def as_json(preset_comments_in_use = nil)
     {
-      railsId: id,
       label: label,
       graderHint: grader_hint,
       studentFeedback: student_feedback,

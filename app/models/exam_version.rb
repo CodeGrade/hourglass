@@ -107,7 +107,8 @@ class ExamVersion < ApplicationRecord
   end
 
   def create_none_rubric(qnum, pnum, bnum)
-    r = rubrics.find_or_initialize_by(
+    r = Rubric.find_or_initialize_by(
+      exam_version: self,
       qnum: qnum,
       pnum: pnum,
       bnum: bnum,
@@ -116,66 +117,67 @@ class ExamVersion < ApplicationRecord
 
     r.assign_attributes(
       type: 'None',
-      exam_version: self,
     )
   end
 
-  # TODO finish splitting this
-  # we want to make a second method that updates rubrics that already exist based on the uploaded rubrics
-  def convert_rubric(raw, qpb, order = nil, parent = nil)
-    qnum, pnum, bnum = qpb
-    if raw.nil?
-      rubric = Rubric.new(
-        type: 'None',
-        qnum: qnum,
-        pnum: pnum,
-        bnum: bnum,
-        order: order,
-        parent_section: parent,
-        exam_version: self,
-      )
-      rubrics << rubric
-      return rubric
-    end
-    rubric = rubrics.find_or_initialize_by(id: raw['railsId'])
-    rubric.assign_attributes(
-      type: raw['type'].capitalize,
-      qnum: qnum,
-      pnum: pnum,
-      bnum: bnum,
-      order: order,
-      parent_section: parent,
-      description: raw.dig('description', 'value'),
-      points: raw['points'],
-      exam_version: self,
-    )
-    rubrics << rubric
-    if raw['choices'].is_a? Hash
-      convert_presets(raw['choices'], rubric)
-    else
-      subsection_ids = raw['choices']&.map { |sub| sub['railsId'] }&.compact
-      to_be_deleted = rubric.subsections.where.not(id: subsection_ids)
-      to_be_deleted.destroy_all
-      raw['choices']&.each_with_index do |c, cindex|
-        convert_rubric(c, qpb, cindex, rubric)
+  # update this version's rubrics from a set of imported rubrics
+  # { examRubric: ..., questions: { questionRubric: ..., ...} ... }
+  def import_rubrics(rubrics)
+    import_rubric(rubrics['examRubric'], [nil, nil, nil])
+    rubrics['questions']&.each_with_index do |qrubric, qnum|
+      old = self.rubrics.length
+      import_rubric(qrubric['questionRubric'], [qnum, nil, nil])
+      new = self.rubrics.length
+      qrubric['parts']&.each_with_index do |prubric, pnum|
+        old = self.rubrics.length
+        import_rubric(prubric['partRubric'], [qnum, pnum, nil])
+        new = self.rubrics.length
+        prubric['body']&.each_with_index do |brubric, bnum|
+          old = self.rubrics.length
+          import_rubric(brubric, [qnum, pnum, bnum])
+          new = self.rubrics.length
+        end
       end
     end
   end
 
-  def convert_presets(presets, rubric)
-    p = RubricPreset.find_or_initialize_by(id: presets['railsId'])
-    p.assign_attributes(
+  def import_rubric(raw, qpb, order = nil, parent = nil)
+    qnum, pnum, bnum = qpb
+    raise 'Given raw rubric was nil' if raw.nil?
+
+    rubric = Rubric.find_or_initialize_by(
+      exam_version: self,
+      qnum: qnum,
+      pnum: pnum,
+      bnum: bnum,
+      parent_section: parent,
+    )
+    rubric.assign_attributes(
+      type: raw['type'].capitalize,
+      order: order,
+      description: raw.dig('description', 'value'),
+      points: raw['points'],
+    )
+    rubrics << rubric
+    if raw['choices'].is_a? Hash
+      import_presets(raw['choices'], rubric)
+    else
+      rubric.subsections.destroy_all # this should always be empty anyway
+      raw['choices']&.each_with_index do |c, cindex|
+        import_rubric(c, qpb, cindex, rubric)
+      end
+    end
+  end
+
+  def import_presets(presets, rubric)
+    p = RubricPreset.new(
       label: presets['label'],
       direction: presets['direction'],
       mercy: presets['mercy']&.to_f,
     )
     rubric.rubric_preset = p
-    comment_ids = presets['presets']&.map { |pre| pre['railsId'] }&.compact
-    to_be_deleted = p.preset_comments.where.not(id: comment_ids)
-    to_be_deleted.destroy_all
     presets['presets']&.each_with_index do |preset, pindex|
-      c = p.preset_comments.find_or_initialize_by(id: preset['railsId'])
-      c.assign_attributes(
+      c = PresetComment.new(
         label: preset['label'],
         points: preset['points'],
         grader_hint: preset['graderHint'],
@@ -231,14 +233,11 @@ class ExamVersion < ApplicationRecord
 
   def compare_hashes(path, rub1, rub2)
     mismatch = rub1.keys.to_set ^ rub2.keys.to_set
-    mismatch.delete 'railsId' # Ignore tedious bookeeping
     unless mismatch.empty?
       err = "Mismatched keys at #{path}: #{rub1.keys} ^ #{rub2.keys} = #{mismatch}"
       raise err
     end
     rub1.each_key do |k|
-      next if k == 'railsId'
-
       compare_help "#{path}.#{k}", rub1[k], rub2[k]
     end
   end
@@ -270,7 +269,7 @@ class ExamVersion < ApplicationRecord
         flat_key = flatten_groups k
         flat_v = flatten_groups v
         [
-          flat_key&.dig('railsId'),
+          flat_key&.dig('id'),
           {
             'type' => k&.class&.name&.underscore,
             'info' => flat_key,
@@ -282,7 +281,7 @@ class ExamVersion < ApplicationRecord
       obj.map { |v| flatten_groups v }
     when Rubric
       {
-        railsId: obj.id,
+        id: obj.id,
         points: obj.new_record? ? nil : obj.points,
         qnum: obj.qnum,
         pnum: obj.pnum,
@@ -291,20 +290,20 @@ class ExamVersion < ApplicationRecord
       }.stringify_keys
     when RubricPreset
       {
-        railsId: obj.id,
+        id: obj.id,
         label: obj.label,
         direction: obj.direction,
         mercy: obj.mercy,
       }.stringify_keys
     when PresetComment
       {
-        railsId: obj.id,
+        id: obj.id,
         label: obj.label,
         points: obj.points,
       }.stringify_keys
     when GradingComment
       {
-        railsId: obj.id,
+        id: obj.id,
         qnum: obj.qnum,
         pnum: obj.pnum,
         bnum: obj.bnum,
@@ -436,7 +435,7 @@ class ExamVersion < ApplicationRecord
 
   def export_json
     JSON.pretty_generate({
-      info: info_no_ids,
+      info: info,
       files: files,
     })
   end
@@ -450,7 +449,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def export_info_file(path)
-    File.write path.join('exam.yaml'), UploadsHelper::FormatConverter.unparse_info(info_no_ids).to_yaml
+    File.write path.join('exam.yaml'), UploadsHelper::FormatConverter.unparse_info(info).to_yaml
   end
 
   def export_files(path, files)
@@ -525,10 +524,6 @@ class ExamVersion < ApplicationRecord
         }
       end.compact
     end
-  end
-
-  def info_no_ids
-    deep_delete_keys! info.deep_stringify_keys, ['railsId']
   end
 
   def deep_delete_keys!(obj, keys)

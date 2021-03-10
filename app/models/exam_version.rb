@@ -158,7 +158,7 @@ class ExamVersion < ApplicationRecord
       description: raw.dig('description', 'value'),
       points: raw['points'],
     )
-    rubrics << rubric
+    association(:rubrics).add_to_target(rubric)
     if raw['choices'].is_a? Hash
       import_presets(raw['choices'], rubric)
     else
@@ -185,7 +185,7 @@ class ExamVersion < ApplicationRecord
         order: pindex,
         rubric_preset: p,
       )
-      p.preset_comments << c
+      p.association(:preset_comments).add_to_target(c)
     end
   end
 

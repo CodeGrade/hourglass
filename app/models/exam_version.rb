@@ -27,6 +27,9 @@ class ExamVersion < ApplicationRecord
 
   before_save :create_all_none_rubrics
 
+  # TODO: we should move the `answers` field in the upload_schema s.t. answers are next to body items like in
+  # save_schema, and then destroy the save_schema
+  # GraphQL field permissions would then be set to not allow students to get answer fields from bodyitems
   EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save.json').to_s
   validates :info, presence: true, json: {
     schema: -> { EXAM_SAVE_SCHEMA },

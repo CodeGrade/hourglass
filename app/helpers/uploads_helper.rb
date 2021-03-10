@@ -234,11 +234,11 @@ module UploadsHelper
       [info, rubrics]
     end
 
-    def self.unparse_info(info)
+    def self.unparse_info(info, rubrics)
       info = info.deep_stringify_keys
       questions = info['contents']['questions'].each_with_index.map do |q, qnum|
         q_answers = info['answers'][qnum]
-        q_rubrics = info['rubrics']['questions'][qnum]
+        q_rubrics = rubrics['questions'][qnum]
         q_reference = q['reference']&.map { |r| unmap_reference r }
         q_reference = nil if q_reference.blank?
         {
@@ -390,7 +390,7 @@ module UploadsHelper
           instructions: unmake_html_val(info.dig('contents', 'instructions'), true),
           questions: questions,
           reference: e_reference,
-          examRubric: revert_rubric(info.dig('rubrics', 'examRubric')),
+          examRubric: revert_rubric(rubrics['examRubric']),
         }.compact,
       }.compact.deep_stringify_keys
     end

@@ -369,9 +369,9 @@ const defaultOptions: Record<Rubric['type'], SelectOption<Rubric['type']>> = {
 };
 const options: SelectOptions<Rubric['type']> = Object.values(defaultOptions);
 
-const ChangeRubricType: React.FC<{
-  value: Rubric;
-  onChange: (newVal: Rubric) => void;
+export const ChangeRubricType: React.FC<{
+  value: Rubric['type'];
+  onChange: (newVal: Rubric['type']) => void;
 }> = (props) => {
   const { value, onChange } = props;
   const changeRubricType = useCallback((newtype: SelectOption<Rubric['type']>) => {

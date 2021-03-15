@@ -18,8 +18,30 @@ class Rubric < ApplicationRecord
 
   validate :sensible_coordinates
   validate :points_if_preset
+  validate :not_both_presets_and_subsections
+  validate :all_rubric_does_not_have_comments
+
   delegate :exam, to: :exam_version
 
+  # Ensure that preset comments exist, or subsections exist, but not both
+  def not_both_presets_and_subsections
+    if rubric_preset.blank?
+      errors.add(:subsections, 'must be empty if preset comments exist') unless subsections.blank?
+    end
+
+    if subsections.blank?
+      errors.add(:rubric_preset, 'must be empty if subsections exist') unless rubric_preset.blank?
+    end
+  end
+
+  # Ensure that All rubrics do not have preset comments, since they should only have subsections
+  def all_rubric_does_not_have_comments
+    return unless type == 'all'
+    return if rubric_preset.blank?
+
+    errors.add(:rubric_preset, 'cannot be used with All-type rubrics')
+  end
+  
   def sensible_coordinates
     if qnum.nil?
       if pnum.nil?
@@ -104,6 +126,25 @@ class Rubric < ApplicationRecord
       choices: (rubric_preset_as_json || subsections_as_json),
       inUse: (rubric_preset_as_json&.dig('inUse') || subsections_as_json.any? { |s| s['inUse'] }),
     }.compact
+  end
+
+  def change_type(new_type)
+    Rubric.transaction do
+      update(type: new_type)
+      case new_type
+      when 'none'
+        rubric_preset.destroy!
+        subsections.destroy_all!
+        becomes!(None)
+      when 'all'
+        update(points: nil)
+        becomes!(All)
+      when 'any'
+        becomes!(Any)
+      when 'one'
+        becomes!(One)
+      end
+    end
   end
 
   protected

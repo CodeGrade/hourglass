@@ -12,11 +12,13 @@ import {
 } from '@professor/exams/types';
 import { examWithAnswers } from '../editor';
 import { useMutation, graphql, useQuery, useFragment } from 'relay-hooks';
+import Select from 'react-select';
+import { ChangeRubricType } from '@professor/exams/new/rubric-editor/RubricEditor';
 
 import { rubricEditorQuery } from './__generated__/rubricEditorQuery.graphql';
 import { RenderError } from '@hourglass/common/boundary';
 import convertRubric from '../../rubrics';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import { rubricEditorSingleFragment$key } from './__generated__/rubricEditorSingleFragment.graphql';
 
 export interface RubricEditorProps {
@@ -146,6 +148,25 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
 };
 export default RubricEditor;
 
+const defaultOptions: Record<Rubric['type'], SelectOption<Rubric['type']>> = {
+  none: {
+    label: 'No rubric',
+    value: 'none',
+  },
+  all: {
+    label: 'Use something from all entries',
+    value: 'all',
+  },
+  any: {
+    label: 'Use any applicable entries',
+    value: 'any',
+  },
+  one: {
+    label: 'Use exactly one entry',
+    value: 'one',
+  },
+};
+
 interface SingleRubricEditorProps {
   rubric?: Rubric;
 }
@@ -154,7 +175,14 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
   const {
     rubric,
   } = props;
+const options: SelectOptions<Rubric['type']> = Object.values(defaultOptions);
   return (
-    <p>editing: {JSON.stringify(rubric)}</p>
+    <>
+      <p>editing: {JSON.stringify(rubric)}</p>
+      <ChangeRubricType
+        value={rubric}
+        onChange={console.log}
+      />
+    </>
   );
 };

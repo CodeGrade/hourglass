@@ -41,5 +41,7 @@ module Types
 
     field :publish_grades, mutation: Mutations::PublishGrades
     field :request_grading_lock, mutation: Mutations::RequestGradingLock
+
+    field :change_rubric_type, mutation: Mutations::ChangeRubricType
   end
 end

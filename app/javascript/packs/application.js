@@ -9,4 +9,6 @@ require('@rails/ujs').start();
 const componentRequireContext = require.context('components', true);
 const ReactRailsUJS = require('react_ujs');
 
+const images = require.context('../images', true);
+
 ReactRailsUJS.useContext(componentRequireContext);

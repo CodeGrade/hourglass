@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { graphql, useQuery, useMutation } from 'relay-hooks';
 import { AlertContext } from '@hourglass/common/alerts';
 import NotLoggedIn from './NotLoggedIn';
+import NavbarLogo from '../../../images/navbar.png';
 
 import { navbarQuery } from './__generated__/navbarQuery.graphql';
 
@@ -69,8 +70,9 @@ const RN: React.FC<{
       className={className}
     >
       <Navbar.Brand>
-        <Link to="/">
-          Hourglass
+        <Link to="/" className="d-inline-flex align-items-center">
+          <img src={NavbarLogo} alt="Hourglass" className="px-2 d-inline-block" style={{ height: 30 }} />
+          <span className="d-inline-block">Hourglass</span>
         </Link>
       </Navbar.Brand>
       <Navbar.Toggle />

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Types
-  class QuestionType < Types::BaseObject
+  class StudentQuestionType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 

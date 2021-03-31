@@ -12,7 +12,7 @@ class Exam < ApplicationRecord
   has_many :registrations, through: :exam_versions
   has_many :grading_locks, through: :registrations
   has_many :messages, through: :registrations
-  has_many :questions, through: :registrations
+  has_many :student_questions, through: :registrations
   has_many :accommodations, through: :registrations
   has_many :version_announcements, through: :exam_versions
   has_many :room_announcements, through: :rooms

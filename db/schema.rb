@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_01_005626) do
+ActiveRecord::Schema.define(version: 2021_03_31_014304) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,6 +31,15 @@ ActiveRecord::Schema.define(version: 2021_03_01_005626) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["registration_id"], name: "index_anomalies_on_registration_id"
+  end
+
+  create_table "body_items", force: :cascade do |t|
+    t.jsonb "info", null: false
+    t.jsonb "answer"
+    t.bigint "part_id", null: false
+    t.integer "index", null: false
+    t.index ["index", "part_id"], name: "unique_body_item_per_part", unique: true
+    t.index ["part_id"], name: "index_body_items_on_part_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -57,6 +66,8 @@ ActiveRecord::Schema.define(version: 2021_03_01_005626) do
     t.bigint "exam_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "instructions", default: "", null: false
+    t.string "policies", default: "", null: false
     t.index ["exam_id"], name: "index_exam_versions_on_exam_id"
   end
 
@@ -126,6 +137,17 @@ ActiveRecord::Schema.define(version: 2021_03_01_005626) do
     t.index ["sender_id"], name: "index_messages_on_sender_id"
   end
 
+  create_table "parts", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.float "points", null: false
+    t.boolean "extra_credit", default: false, null: false
+    t.bigint "question_id", null: false
+    t.integer "index", null: false
+    t.index ["index", "question_id"], name: "unique_part_index_per_question", unique: true
+    t.index ["question_id"], name: "index_parts_on_question_id"
+  end
+
   create_table "preset_comments", force: :cascade do |t|
     t.bigint "rubric_preset_id", null: false
     t.string "label"
@@ -163,11 +185,29 @@ ActiveRecord::Schema.define(version: 2021_03_01_005626) do
   end
 
   create_table "questions", force: :cascade do |t|
-    t.bigint "registration_id", null: false
-    t.text "body", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["registration_id"], name: "index_questions_on_registration_id"
+    t.string "name"
+    t.string "description"
+    t.boolean "extra_credit", default: false, null: false
+    t.boolean "separate_subparts", default: false, null: false
+    t.bigint "exam_version_id", null: false
+    t.integer "index", null: false
+    t.index ["exam_version_id"], name: "index_questions_on_exam_version_id"
+    t.index ["index", "exam_version_id"], name: "unique_question_index_per_exam", unique: true
+  end
+
+  create_table "references", force: :cascade do |t|
+    t.string "path", null: false
+    t.string "type", null: false
+    t.bigint "exam_version_id", null: false
+    t.bigint "question_id"
+    t.bigint "part_id"
+    t.integer "index", null: false
+    t.index ["exam_version_id"], name: "index_references_on_exam_version_id"
+    t.index ["index", "exam_version_id", "question_id", "part_id"], name: "unique_reference_index_per_part", unique: true
+    t.index ["index", "exam_version_id", "question_id"], name: "unique_reference_index_per_question", unique: true, where: "(part_id IS NULL)"
+    t.index ["index", "exam_version_id"], name: "unique_reference_index_per_exam", unique: true, where: "((question_id IS NULL) AND (part_id IS NULL))"
+    t.index ["part_id"], name: "index_references_on_part_id"
+    t.index ["question_id"], name: "index_references_on_question_id"
   end
 
   create_table "registrations", force: :cascade do |t|
@@ -264,6 +304,14 @@ ActiveRecord::Schema.define(version: 2021_03_01_005626) do
     t.index ["user_id"], name: "index_staff_registrations_on_user_id"
   end
 
+  create_table "student_questions", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_id"], name: "index_student_questions_on_registration_id"
+  end
+
   create_table "student_registrations", force: :cascade do |t|
     t.bigint "section_id", null: false
     t.bigint "user_id", null: false
@@ -320,7 +368,6 @@ ActiveRecord::Schema.define(version: 2021_03_01_005626) do
   add_foreign_key "proctor_registrations", "users"
   add_foreign_key "professor_course_registrations", "courses"
   add_foreign_key "professor_course_registrations", "users"
-  add_foreign_key "questions", "registrations"
   add_foreign_key "registrations", "exam_versions"
   add_foreign_key "registrations", "rooms"
   add_foreign_key "registrations", "users"
@@ -333,6 +380,7 @@ ActiveRecord::Schema.define(version: 2021_03_01_005626) do
   add_foreign_key "snapshots", "registrations"
   add_foreign_key "staff_registrations", "sections"
   add_foreign_key "staff_registrations", "users"
+  add_foreign_key "student_questions", "registrations"
   add_foreign_key "student_registrations", "sections"
   add_foreign_key "student_registrations", "users"
   add_foreign_key "version_announcements", "exam_versions"

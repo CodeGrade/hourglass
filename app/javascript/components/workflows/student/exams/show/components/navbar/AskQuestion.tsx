@@ -34,7 +34,7 @@ const ShowQuestion: React.FC<{
   } = props;
   const res = useFragment(
     graphql`
-    fragment AskQuestion_single on Question {
+    fragment AskQuestion_single on StudentQuestion {
       createdAt
       body
     }
@@ -84,10 +84,10 @@ const SendQuestion: React.FC<{
     graphql`
     mutation AskQuestionMutation($input: AskQuestionInput!) {
       askQuestion(input: $input) {
-        question {
+        studentQuestion {
           ...AskQuestion_single
         }
-        questionEdge {
+        studentQuestionEdge {
           node {
             id
           }
@@ -101,10 +101,10 @@ const SendQuestion: React.FC<{
           type: 'RANGE_ADD',
           parentID: registrationId,
           connectionInfo: [{
-            key: 'AskQuestion_questions',
+            key: 'AskQuestion_studentQuestions',
             rangeBehavior: 'prepend',
           }],
-          edgeName: 'questionEdge',
+          edgeName: 'studentQuestionEdge',
         },
       ],
       onCompleted: () => {
@@ -188,10 +188,10 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
     @refetchable(queryName: "AskQuestionPaginationQuery") {
       myRegistration {
         id
-        questions(
+        studentQuestions(
           first: $count
           after: $cursor
-        ) @connection(key: "AskQuestion_questions", filters: []) {
+        ) @connection(key: "AskQuestion_studentQuestions", filters: []) {
           edges {
             node {
               id
@@ -205,7 +205,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
     `,
     examKey,
   );
-  const { edges } = data.myRegistration.questions;
+  const { edges } = data.myRegistration.studentQuestions;
   return (
     <div>
       <SendQuestion registrationId={data.myRegistration.id} />

@@ -25,13 +25,10 @@ class Rubric < ApplicationRecord
 
   # Ensure that preset comments exist, or subsections exist, but not both
   def not_both_presets_and_subsections
-    if rubric_preset.blank?
-      errors.add(:subsections, 'must be empty if preset comments exist') unless subsections.blank?
-    end
+    return unless rubric_preset.present? && subsections.present?
 
-    if subsections.blank?
-      errors.add(:rubric_preset, 'must be empty if subsections exist') unless rubric_preset.blank?
-    end
+    errors.add(:subsections, 'must be empty if preset comments exist')
+    errors.add(:rubric_preset, 'must be empty if subsections exist')
   end
 
   # Ensure that All rubrics do not have preset comments, since they should only have subsections

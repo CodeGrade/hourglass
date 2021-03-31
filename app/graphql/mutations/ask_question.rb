@@ -5,9 +5,9 @@ module Mutations
     argument :registration_id, ID, required: true, loads: Types::RegistrationType
     argument :body, String, required: true
 
-    field :question, Types::QuestionType, null: false
-    field :questions_connection, Types::QuestionType.connection_type, null: false
-    field :question_edge, Types::QuestionType.edge_type, null: false
+    field :student_question, Types::StudentQuestionType, null: false
+    field :student_questions_connection, Types::StudentQuestionType.connection_type, null: false
+    field :student_question_edge, Types::StudentQuestionType.edge_type, null: false
 
     def authorized?(registration:, **_args)
       return true if registration.user == context[:current_user]

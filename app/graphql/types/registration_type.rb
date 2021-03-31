@@ -158,9 +158,9 @@ module Types
       object.snapshots.last&.created_at
     end
 
-    field :questions, Types::QuestionType.connection_type, null: false
-    def questions
-      object.questions.order(created_at: :desc)
+    field :student_questions, Types::StudentQuestionType.connection_type, null: false
+    def student_questions
+      object.student_questions.order(created_at: :desc)
     end
 
     field :messages, Types::MessageType.connection_type, null: false

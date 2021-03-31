@@ -18,6 +18,9 @@ class ExamVersion < ApplicationRecord
   has_many :rubric_presets, through: :rubrics
   has_many :preset_comments, through: :rubric_presets
 
+  has_many :db_references, class_name: 'Reference', dependent: :destroy
+  has_many :db_questions, class_name: 'Question', dependent: :destroy
+
   validates :exam, presence: true
 
   delegate :course, to: :exam
@@ -125,17 +128,11 @@ class ExamVersion < ApplicationRecord
   def import_rubrics(rubrics)
     import_rubric(rubrics['examRubric'], [nil, nil, nil])
     rubrics['questions']&.each_with_index do |qrubric, qnum|
-      old = self.rubrics.length
       import_rubric(qrubric['questionRubric'], [qnum, nil, nil])
-      new = self.rubrics.length
       qrubric['parts']&.each_with_index do |prubric, pnum|
-        old = self.rubrics.length
         import_rubric(prubric['partRubric'], [qnum, pnum, nil])
-        new = self.rubrics.length
         prubric['body']&.each_with_index do |brubric, bnum|
-          old = self.rubrics.length
           import_rubric(brubric, [qnum, pnum, bnum])
-          new = self.rubrics.length
         end
       end
     end
@@ -157,6 +154,7 @@ class ExamVersion < ApplicationRecord
       order: order,
       description: raw.dig('description', 'value'),
       points: raw['points'],
+      parent_section: parent,
     )
     association(:rubrics).add_to_target(rubric)
     if raw['choices'].is_a? Hash

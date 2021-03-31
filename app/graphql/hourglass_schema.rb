@@ -136,8 +136,8 @@ class HourglassSchema < GraphQL::Schema
       Types::ProctorRegistrationType
     when ProfessorCourseRegistration
       Types::ProfessorCourseRegistrationType
-    when Question
-      Types::QuestionType
+    when StudentQuestion
+      Types::StudentQuestionType
     when Registration
       Types::RegistrationType
     when RoomAnnouncement

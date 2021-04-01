@@ -68,8 +68,17 @@ module Types
     end
 
     field :qnum, Integer, null: true
+    def qnum
+      object.question&.index
+    end
     field :pnum, Integer, null: true
+    def pnum
+      object.part&.index
+    end
     field :bnum, Integer, null: true
+    def bnum
+      object.body_item&.index
+    end
     field :order, Integer, null: true
 
     field :points, Float, null: true

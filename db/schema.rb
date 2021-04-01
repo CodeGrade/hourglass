@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_31_014304) do
+ActiveRecord::Schema.define(version: 2021_03_31_111730) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -86,14 +86,19 @@ ActiveRecord::Schema.define(version: 2021_03_31_014304) do
   create_table "grading_checks", force: :cascade do |t|
     t.bigint "creator_id", null: false
     t.bigint "registration_id", null: false
-    t.integer "qnum", null: false
-    t.integer "pnum", null: false
-    t.integer "bnum", null: false
     t.float "points"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "question_id", null: false
+    t.bigint "part_id", null: false
+    t.bigint "body_item_id", null: false
+    t.index ["body_item_id"], name: "index_grading_checks_on_body_item_id"
     t.index ["creator_id"], name: "index_grading_checks_on_creator_id"
-    t.index ["registration_id", "qnum", "pnum", "bnum"], name: "unique_check_per_item", unique: true
+    t.index ["part_id"], name: "index_grading_checks_on_part_id"
+    t.index ["question_id", "part_id", "body_item_id"], name: "index_grading_checks_on_coords"
+    t.index ["question_id", "part_id"], name: "index_grading_checks_on_question_id_and_part_id"
+    t.index ["question_id"], name: "index_grading_checks_on_question_id"
+    t.index ["registration_id", "question_id", "part_id", "body_item_id"], name: "unique_check_per_item", unique: true
     t.index ["registration_id"], name: "index_grading_checks_on_registration_id"
   end
 
@@ -102,28 +107,36 @@ ActiveRecord::Schema.define(version: 2021_03_31_014304) do
     t.text "message", null: false
     t.bigint "registration_id", null: false
     t.bigint "preset_comment_id"
-    t.integer "qnum", null: false
-    t.integer "pnum", null: false
-    t.integer "bnum", null: false
     t.float "points", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "question_id", null: false
+    t.bigint "part_id", null: false
+    t.bigint "body_item_id", null: false
+    t.index ["body_item_id"], name: "index_grading_comments_on_body_item_id"
     t.index ["creator_id"], name: "index_grading_comments_on_creator_id"
+    t.index ["part_id"], name: "index_grading_comments_on_part_id"
     t.index ["preset_comment_id"], name: "index_grading_comments_on_preset_comment_id"
+    t.index ["question_id", "part_id", "body_item_id"], name: "index_grading_comments_on_coords"
+    t.index ["question_id", "part_id"], name: "index_grading_comments_on_question_id_and_part_id"
+    t.index ["question_id"], name: "index_grading_comments_on_question_id"
     t.index ["registration_id"], name: "index_grading_comments_on_registration_id"
   end
 
   create_table "grading_locks", force: :cascade do |t|
     t.bigint "registration_id", null: false
     t.bigint "grader_id"
-    t.integer "qnum", null: false
-    t.integer "pnum", null: false
     t.bigint "completed_by_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "question_id", null: false
+    t.bigint "part_id", null: false
     t.index ["completed_by_id"], name: "index_grading_locks_on_completed_by_id"
     t.index ["grader_id"], name: "index_grading_locks_on_grader_id"
-    t.index ["registration_id", "qnum", "pnum"], name: "index_grading_locks_on_registration_id_and_qnum_and_pnum", unique: true
+    t.index ["part_id"], name: "index_grading_locks_on_part_id"
+    t.index ["question_id", "part_id"], name: "index_grading_locks_on_question_id_and_part_id"
+    t.index ["question_id"], name: "index_grading_locks_on_question_id"
+    t.index ["registration_id", "question_id", "part_id"], name: "index_grading_locks_on_registration_id_and_qnum_and_pnum", unique: true
     t.index ["registration_id"], name: "index_grading_locks_on_registration_id"
   end
 
@@ -262,16 +275,21 @@ ActiveRecord::Schema.define(version: 2021_03_31_014304) do
     t.string "type", null: false
     t.string "description"
     t.float "points"
-    t.integer "qnum"
-    t.integer "pnum"
-    t.integer "bnum"
     t.integer "order"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["exam_version_id", "qnum", "pnum", "bnum", "order"], name: "unique_rubric_order_per_coords", unique: true, where: "(parent_section_id IS NOT NULL)"
-    t.index ["exam_version_id", "qnum", "pnum", "bnum"], name: "unique_rubric_root_coords", unique: true, where: "(parent_section_id IS NULL)"
+    t.bigint "question_id"
+    t.bigint "part_id"
+    t.bigint "body_item_id"
+    t.index ["body_item_id"], name: "index_rubrics_on_body_item_id"
+    t.index ["exam_version_id", "question_id", "part_id", "body_item_id", "order"], name: "unique_rubric_order_per_coords", unique: true, where: "(parent_section_id IS NOT NULL)"
+    t.index ["exam_version_id", "question_id", "part_id", "body_item_id"], name: "unique_rubric_root_coords", unique: true, where: "(parent_section_id IS NULL)"
     t.index ["exam_version_id"], name: "index_rubrics_on_exam_version_id"
     t.index ["parent_section_id"], name: "index_rubrics_on_parent_section_id"
+    t.index ["part_id"], name: "index_rubrics_on_part_id"
+    t.index ["question_id", "part_id", "body_item_id"], name: "index_rubrics_on_question_id_and_part_id_and_body_item_id"
+    t.index ["question_id", "part_id"], name: "index_rubrics_on_question_id_and_part_id"
+    t.index ["question_id"], name: "index_rubrics_on_question_id"
   end
 
   create_table "sections", force: :cascade do |t|

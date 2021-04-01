@@ -3,6 +3,9 @@
 # Rubrics in an exam form a tree, whose leaves are RubricPresets
 class Rubric < ApplicationRecord
   belongs_to :exam_version
+  belongs_to :question, optional: true
+  belongs_to :part, optional: true
+  belongs_to :body_item, optional: true
   belongs_to :parent_section,
              class_name: 'Rubric',
              inverse_of: 'subsections',
@@ -26,7 +29,7 @@ class Rubric < ApplicationRecord
   # Ensure that preset comments exist, or subsections exist, but not both
   def not_both_presets_and_subsections
     return unless rubric_preset.present? && subsections.present?
-
+    
     errors.add(:subsections, 'must be empty if preset comments exist')
     errors.add(:rubric_preset, 'must be empty if subsections exist')
   end
@@ -40,26 +43,26 @@ class Rubric < ApplicationRecord
   end
   
   def sensible_coordinates
-    if qnum.nil?
-      if pnum.nil?
-        if bnum.nil?
+    if question.nil?
+      if part.nil?
+        if body_item.nil?
           # Nothing: this is a valid coordinate triple
         else
-          errors.add(:bnum, 'must be nil if qnum and pnum are nil')
+          errors.add(:body_item, 'must be nil if question and part are nil')
         end
       else
-        errors.add(:qnum, 'must be nil if qnum is nil')
+        errors.add(:part, 'must be nil if question is nil')
       end
     end
 
-    return if qnum.nil? || pnum.nil? || bnum.nil?
+    return if question.nil? || part.nil? || body_item.nil?
 
     if parent_section.nil?
       return if order.nil?
 
-      errors.add(:order, "must be nil if this is the root of (#{qnum}, #{pnum}, #{bnum})")
+      errors.add(:order, "must be nil if this is the root of (#{question.index}, #{part.index}, #{body_item.index})")
     elsif order.nil?
-      errors.add(:order, "cannot be nil if this is a subrubric within (#{qnum}, #{pnum}, #{bnum})")
+      errors.add(:order, "cannot be nil if this is a subrubric within (#{question.index}, #{part.index}, #{body_item.index})")
     end
   end
 
@@ -72,19 +75,19 @@ class Rubric < ApplicationRecord
   end
 
   def exam_rubric?
-    qnum.nil? && pnum.nil? && bnum.nil?
+    question.nil? && part.nil? && body_item.nil?
   end
 
   def question_rubric?
-    qnum && pnum.nil? && bnum.nil?
+    question && part.nil? && body_item.nil?
   end
 
   def part_rubric?
-    qnum && pnum && bnum.nil?
+    question && part && body_item.nil?
   end
 
   def body_rubric
-    qnum && pnum && bnum && true
+    question && part && body_item && true
   end
 
   def in_use?

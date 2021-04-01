@@ -3,16 +3,29 @@
 # Locks a particular (qnum, pnum) pair in a registration for grading.
 class GradingLock < ApplicationRecord
   belongs_to :registration
+  belongs_to :question
+  belongs_to :part
   belongs_to :grader, class_name: 'User', optional: true
   belongs_to :completed_by, class_name: 'User', optional: true
-
+  
   validates :registration, presence: true
-
-  validates :pnum, uniqueness: {
-    scope: [:registration_id, :qnum],
+  
+  validates :part, uniqueness: {
+    scope: [:registration_id, :question],
     message: 'is already being graded',
   }
 
+  validate :valid_qp
+
+  def valid_qp
+    if (question && question.exam_version != exam_version) ||
+      (part && part.question != question)
+    
+      errors.add(:base, 'Question and part must be self-consistent for the exam version.')
+    end
+  end
+ 
+  delegate :exam_version, to: :registration
   delegate :exam, to: :registration
 
   scope :incomplete, -> { where(completed_by: nil) }

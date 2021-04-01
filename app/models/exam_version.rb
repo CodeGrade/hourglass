@@ -98,23 +98,23 @@ class ExamVersion < ApplicationRecord
   # Creates empty rubrics for any (q?,p?,b?) triple that does not already have a rubric in the database.
   def create_all_none_rubrics
     create_none_rubric(nil, nil, nil) # exam rubric
-    questions.each_with_index do |q, qnum|
-      create_none_rubric(qnum, nil, nil)
-      q['parts'].each_with_index do |p, pnum|
-        create_none_rubric(qnum, pnum, nil)
-        p['body'].each_with_index do |_b, bnum|
-          create_none_rubric(qnum, pnum, bnum)
+    db_questions.each do |q|
+      create_none_rubric(q, nil, nil)
+      q.parts.each do |p|
+        create_none_rubric(q, p, nil)
+        p.body_items.each do |b|
+          create_none_rubric(q, p, b)
         end
       end
     end
   end
 
-  def create_none_rubric(qnum, pnum, bnum)
+  def create_none_rubric(q, p, b)
     r = Rubric.find_or_initialize_by(
       exam_version: self,
-      qnum: qnum,
-      pnum: pnum,
-      bnum: bnum,
+      question: q,
+      part: p,
+      body_item: b,
     )
     return unless r.new_record?
 
@@ -128,25 +128,28 @@ class ExamVersion < ApplicationRecord
   def import_rubrics(rubrics)
     import_rubric(rubrics['examRubric'], [nil, nil, nil])
     rubrics['questions']&.each_with_index do |qrubric, qnum|
-      import_rubric(qrubric['questionRubric'], [qnum, nil, nil])
+      q = db_questions.find_by(index: qnum)
+      import_rubric(qrubric['questionRubric'], [q, nil, nil])
       qrubric['parts']&.each_with_index do |prubric, pnum|
-        import_rubric(prubric['partRubric'], [qnum, pnum, nil])
+        p = q&.parts&.find_by(index: pnum)
+        import_rubric(prubric['partRubric'], [q, p, nil])
         prubric['body']&.each_with_index do |brubric, bnum|
-          import_rubric(brubric, [qnum, pnum, bnum])
+          b = p&.body_items&.find_by(index: bnum)
+          import_rubric(brubric, [q, p, b])
         end
       end
     end
   end
 
   def import_rubric(raw, qpb, order = nil, parent = nil)
-    qnum, pnum, bnum = qpb
+    q, p, b = qpb
     raise 'Given raw rubric was nil' if raw.nil?
 
     rubric = Rubric.find_or_initialize_by(
       exam_version: self,
-      qnum: qnum,
-      pnum: pnum,
-      bnum: bnum,
+      question: q,
+      part: p,
+      body_item: b,
       parent_section: parent,
     )
     rubric.assign_attributes(
@@ -281,9 +284,9 @@ class ExamVersion < ApplicationRecord
       {
         id: obj.id,
         points: obj.new_record? ? nil : obj.points,
-        qnum: obj.qnum,
-        pnum: obj.pnum,
-        bnum: obj.bnum,
+        qnum: obj.question&.index,
+        pnum: obj.part&.index,
+        bnum: obj.body_item&.index,
         description: obj.description,
       }.stringify_keys
     when RubricPreset
@@ -302,9 +305,9 @@ class ExamVersion < ApplicationRecord
     when GradingComment
       {
         id: obj.id,
-        qnum: obj.qnum,
-        pnum: obj.pnum,
-        bnum: obj.bnum,
+        qnum: obj.question&.index,
+        pnum: obj.part&.index,
+        bnum: obj.body_item&.index,
         grader: obj.creator.display_name,
         points: obj.points,
         message: obj.message,
@@ -472,9 +475,9 @@ class ExamVersion < ApplicationRecord
   end
 
   def qp_pairs
-    questions.each_with_index.map do |q, qnum|
-      q['parts'].each_with_index.map do |_, pnum|
-        { qnum: qnum, pnum: pnum }
+    db_questions.map do |q|
+      q.parts.map do |p|
+        { qnum: q.index, pnum: p.index }
       end
     end.flatten(1)
   end
@@ -491,36 +494,36 @@ class ExamVersion < ApplicationRecord
   end
 
   def part_tree
-    questions.each_with_index.map do |q, qnum|
-      q['parts'].each_with_index.map do |p, pnum|
+    db_questions.map do |q|
+      q.parts.map do |p|
         yield(**{
           question: q,
           part: p,
-          qnum: qnum,
-          pnum: pnum,
+          qnum: q.index,
+          pnum: p.index,
         })
       end
     end
   end
 
   def bottlenose_summary(with_names: true)
-    questions.map do |q|
-      parts = q['parts']
+    db_questions.map do |q|
+      parts = q.parts
       if parts.count == 1
         {
-          'name' => with_names ? Nokogiri::HTML.fragment(q.dig('name', 'value')).content : nil,
+          'name' => with_names ? Nokogiri::HTML.fragment(q.name).content : nil,
           'weight' => parts.first['points'],
-          'extra' => q['extraCredit'] || parts.first['extraCredit'],
+          'extra' => q.extraCredit || parts.first.extraCredit,
         }
       else
         {
-          'name' => with_names ? Nokogiri::HTML.fragment(q.dig('name', 'value')).content : nil,
-          'extra' => q['extraCredit'],
+          'name' => with_names ? Nokogiri::HTML.fragment(q.name).content : nil,
+          'extra' => q.extraCredit,
           'parts' => parts.map do |p|
             {
-              'name' => with_names ? Nokogiri::HTML.fragment(p.dig('name', 'value')).content : nil,
-              'weight' => p['points'],
-              'extra' => p['extraCredit'],
+              'name' => with_names ? Nokogiri::HTML.fragment(p.name).content : nil,
+              'weight' => p.points,
+              'extra' => p.extraCredit,
             }.compact
           end,
         }

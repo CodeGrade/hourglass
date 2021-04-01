@@ -19,6 +19,7 @@ module Api
           files: upload.files,
           info: upload.info,
         )
+        # TODO: Mimic ConvertExamVersionInfoToModels#up here, to create the needed records!
         @version.import_rubrics(upload.rubrics)
         @version.save!
         render json: {

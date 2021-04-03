@@ -137,14 +137,14 @@ module Types
       guard Guards::ALL_STAFF
     end
     def completion_summary
-      gls_by_qnum = object.grading_locks.group_by(&:qnum)
-      object.questions.each_with_index.map do |q, qnum|
-        gls_by_pnum = (gls_by_qnum[qnum] || []).group_by(&:pnum)
-        q['parts'].each_with_index.map do |_, pnum|
+      gls_by_qnum = object.grading_locks.group_by(&:question_id)
+      object.db_questions.includes(:parts).map do |q|
+        gls_by_pnum = (gls_by_qnum[q.id] || []).group_by(&:part)
+        q.parts.map do |p|
           { 
-            notStarted: gls_by_pnum[pnum]&.count { |gl| gl.grader_id.nil? && gl.completed_by_id.nil? } || 0,
-            inProgress: gls_by_pnum[pnum]&.count { |gl| gl.completed_by_id.nil? && !gl.grader_id.nil? } || 0,
-            finished: gls_by_pnum[pnum]&.count { |gl| !gl.completed_by_id.nil? } || 0,
+            notStarted: gls_by_pnum[p.id]&.count { |gl| gl.grader_id.nil? && gl.completed_by_id.nil? } || 0,
+            inProgress: gls_by_pnum[p.id]&.count { |gl| gl.completed_by_id.nil? && !gl.grader_id.nil? } || 0,
+            finished: gls_by_pnum[p.id]&.count { |gl| !gl.completed_by_id.nil? } || 0,
           } 
         end
       end

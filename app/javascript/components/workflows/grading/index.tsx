@@ -58,7 +58,12 @@ import GradeYesNo from '@grading/questions/GradeYesNo';
 import GradeMatching from '@grading/questions/GradeMatching';
 import GradeMultipleChoice from '@grading/questions/GradeMultipleChoice';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
-import { ExhaustiveSwitchError, alphabetIdx, useRefresher } from '@hourglass/common/helpers';
+import {
+  ExhaustiveSwitchError,
+  alphabetIdx,
+  useRefresher,
+  pluralize,
+} from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
 import convertRubric from '@professor/exams/rubrics';
@@ -217,80 +222,114 @@ const Feedback: React.FC<{
     error,
   } = props;
   const [pointStr, setPointStr] = useState<number | string>(points);
+  const [isFocused, setFocused] = useState(true);
+  const [blurredBecauseClickedAlert, setBlurredBecauseClickedAlert] = useState(false);
   useEffect(() => {
     setPointStr(String(points));
   }, [points]);
   const alertRef = useRef<HTMLDivElement>();
   const variant = variantForPoints(points);
+  const VariantIcon = iconForPoints(points);
   return (
     <Alert
       ref={alertRef}
       variant={variant}
       onBlur={(e) => {
+        const dontClearFocus = !blurredBecauseClickedAlert;
+        setBlurredBecauseClickedAlert(false);
         if (isNode(e.relatedTarget) && alertRef.current.contains(e.relatedTarget)) return;
         if (onBlur) onBlur(e);
+        if (dontClearFocus) { setFocused(false); }
       }}
+      onFocus={() => setBlurredBecauseClickedAlert(false)}
+      onClick={() => {
+        setBlurredBecauseClickedAlert(true);
+      }}
+      className={isFocused ? 'pb-0' : ''}
     >
-      <Row>
-        <Form.Group as={Col} lg="auto">
-          <Form.Label>Points</Form.Label>
-          <NumericInput
-            disabled={disabled}
-            step={0.5}
-            value={pointStr}
-            onChange={(val, focused) => {
-              setPointStr(val);
-              // Don't propagate changes when the value is in an interim state
-              // When NumericInput loses focus, it'll send a corrected numeric value.
-              if (!focused && onChangePoints && val !== '' && Number.isFinite(Number(val))) {
-                onChangePoints(Number(val));
-              }
-            }}
-          />
-        </Form.Group>
-        <Form.Group className="ml-auto mr-3">
-          <Form.Label>Status</Form.Label>
-          <div>
-            {couldReset && (
-              <Button
-                className="mr-2"
-                variant="outline-warning"
-                size="sm"
-                onClick={onReset}
-                title="Reset to suggested preset values"
-              >
-                <Icon I={FaUndo} />
-              </Button>
-            )}
-            <span>
-              <ShowStatusIcon error={error} status={status} />
-            </span>
-            <Button
+      {isFocused ? (
+        <Row>
+          <Form.Group as={Col} sm={2}>
+            <Form.Label>Points</Form.Label>
+            <NumericInput
               disabled={disabled}
-              className="ml-2"
-              variant="outline-danger"
-              size="sm"
-              onClick={onRemove}
-              title="Delete this comment"
-            >
-              <Icon I={FaTrash} />
-            </Button>
-          </div>
-        </Form.Group>
-      </Row>
-      <Row>
-        <Form.Group as={Col}>
-          <Form.Label>Comment</Form.Label>
-          <Form.Control
-            as="textarea"
-            disabled={disabled}
-            value={message}
-            onChange={(e) => {
-              if (onChangeMessage) onChangeMessage(e.target.value);
-            }}
-          />
-        </Form.Group>
-      </Row>
+              step={0.5}
+              value={pointStr}
+              onChange={(val, focused) => {
+                setPointStr(val);
+                // Don't propagate changes when the value is in an interim state
+                // When NumericInput loses focus, it'll send a corrected numeric value.
+                if (!focused && onChangePoints && val !== '' && Number.isFinite(Number(val))) {
+                  onChangePoints(Number(val));
+                }
+              }}
+            />
+          </Form.Group>
+          <Form.Group as={Col} className="pl-0">
+            <Form.Label>Comment</Form.Label>
+            <Form.Control
+              as="textarea"
+              disabled={disabled}
+              value={message}
+              onChange={(e) => {
+                if (onChangeMessage) onChangeMessage(e.target.value);
+              }}
+            />
+          </Form.Group>
+          <Form.Group className="ml-auto mr-3">
+            <Form.Label>Status</Form.Label>
+            <div>
+              {couldReset && (
+                <Button
+                  className="mr-2"
+                  variant="outline-warning"
+                  size="sm"
+                  onClick={onReset}
+                  title="Reset to suggested preset values"
+                >
+                  <Icon I={FaUndo} />
+                </Button>
+              )}
+              <span>
+                <ShowStatusIcon error={error} status={status} />
+              </span>
+              <Button
+                disabled={disabled}
+                className="ml-2"
+                variant="outline-danger"
+                size="sm"
+                onClick={onRemove}
+                title="Delete this comment"
+              >
+                <Icon I={FaTrash} />
+              </Button>
+            </div>
+          </Form.Group>
+        </Row>
+      ) : (
+        <Row>
+          <Button
+            disabled
+            variant={variant}
+            size="sm"
+            className="mx-2 align-self-center"
+          >
+            <Icon I={VariantIcon} className="mr-2" />
+            {pluralize(points, 'point', 'points')}
+          </Button>
+          <Col>{message}</Col>
+          <TooltipButton
+            disabled={false}
+            variant="outline-info"
+            size="sm"
+            enabledMessage="Click to edit this comment"
+            onClick={() => setFocused(true)}
+            className="mx-2 float-right"
+          >
+            <Icon I={BsPencilSquare} />
+          </TooltipButton>
+        </Row>
+      )}
     </Alert>
   );
 };

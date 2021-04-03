@@ -321,34 +321,34 @@ class ExamVersion < ApplicationRecord
   # rubocop:disable Metrics/PerceivedComplexity
   def detailed_grade_breakdown_for(reg)
     comments_and_rubrics = reg.grading_comments.includes(
-      :creator,
+      :creator, :question, :part, :body_item,
       preset_comment: [{ rubric_preset: [{ rubric: [{ parent_section: [{ parent_section: :parent_section }] }] }] }],
     )
-    comments = multi_group_by(comments_and_rubrics, [:qnum, :pnum, :bnum, :preset_comment])
-    checks = multi_group_by(reg.grading_checks.includes(:creator), [:qnum, :pnum, :bnum])
-    rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)
-    locks = multi_group_by(reg.grading_locks, [:qnum, :pnum], true)
+    comments = multi_group_by(comments_and_rubrics, [:question, :part, :body_item, :preset_comment])
+    checks = multi_group_by(reg.grading_checks.includes(:creator, :question, :part, :body_item), [:question, :part, :body_item])
+    rubric_tree = multi_group_by(rubrics_for_grading, [:question, :part, :body_item], true)
+    locks = multi_group_by(reg.grading_locks.includes(:question, :part), [:question, :part], true)
 
     exam_rubric = rubric_tree.dig(nil, nil, nil)
     # rubocop:disable Metrics/BlockLength
-    part_tree do |qnum:, pnum:, part:, **|
-      question_rubric = rubric_tree.dig(qnum, nil, nil)
+    part_tree do |qnum:, pnum:, question:, part:, **|
+      question_rubric = rubric_tree.dig(question, nil, nil)
+      part_rubric = rubric_tree.dig(question, part, nil)
       part_rubric = rubric_tree.dig(qnum, pnum, nil)
-      part_rubric = rubric_tree.dig(qnum, pnum, nil)
-      graded = !locks.dig(qnum, pnum)&.completed_by_id.nil?
-      in_progress = !locks.dig(qnum, pnum)&.grader_id.nil?
-      score = part['body'].each_with_index.map do |_, bnum|
-        qpb = [qnum, pnum, bnum]
-        nil_comments = comments.dig(qnum, pnum, bnum, nil) || []
+      graded = !locks.dig(question, part)&.completed_by_id.nil?
+      in_progress = !locks.dig(question, part)&.grader_id.nil?
+      score = part.body_items.each_with_index.map do |_, body_item|
+        qpb = [question, part, body_item]
+        nil_comments = comments.dig(question, part, body_item, nil) || []
         extra_comment_score = nil_comments.sum(&:points)
         body_rubric = rubric_tree.dig(*qpb)
-        rubric_score = [exam_rubric, question_rubric, part_rubric, body_rubric].sum do |r|
+        rubric_score = [exam_rubric, question_rubric, part_rubric, body_rubric].compact.sum do |r|
           r_score = r.compute_grade_for(reg, comments, checks, qpb)
           r_score
         end
         extra_comment_score + rubric_score
       end.sum
-      body_item_info = part['body'].each_with_index.map do |_, bnum|
+      body_item_info = part.body_items.each_with_index.map do |_, bnum|
         body_checks = checks.dig(qnum, pnum, bnum) || []
         body_comments = comments.dig(qnum, pnum, bnum) || {}
 
@@ -487,10 +487,13 @@ class ExamVersion < ApplicationRecord
   end
 
   def rubrics_for_grading
-    root_rubrics.includes(rubric_preset: :preset_comments,
-                          subsections: [{ rubric_preset: :preset_comments,
-                                          subsections: [{ rubric_preset: :preset_comments,
-                                                          subsections: [{ rubric_preset: :preset_comments }] }] }])
+    root_rubrics.includes(:question, :part,
+                          rubric_preset: :preset_comments,
+                          subsections: [:question, :part, 
+                                        { rubric_preset: :preset_comments,
+                                          subsections: [:question, :part,
+                                                        { rubric_preset: :preset_comments,
+                                                          subsections: [:question, :part, { rubric_preset: :preset_comments }] }] }])
   end
 
   def part_tree

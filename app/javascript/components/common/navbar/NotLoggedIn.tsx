@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navbar } from 'react-bootstrap';
+import NavbarLogo from '../../../images/hourglass.svg';
 
 const NotLoggedIn: React.FC = () => (
   <Navbar
@@ -7,7 +8,8 @@ const NotLoggedIn: React.FC = () => (
     expand="md"
   >
     <Navbar.Brand>
-      <a href="/">
+      <a href="/" className="d-inline-flex align-items-center">
+        <img src={NavbarLogo} alt="Hourglass" className="px-2 d-inline-block" style={{ height: 20 }} />
         Hourglass
       </a>
     </Navbar.Brand>

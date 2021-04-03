@@ -26,7 +26,13 @@ module Types
     end
 
     field :qnum, Integer, null: false
+    def qnum
+      object.question.index
+    end
     field :pnum, Integer, null: false
+    def pnum
+      object.part.index
+    end
 
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false

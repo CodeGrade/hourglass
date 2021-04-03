@@ -27,36 +27,36 @@ module Mutations
         raise GraphQL::ExecutionError, updated.errors.full_messages.to_sentence unless updated
 
         reg_id = HourglassSchema.id_from_object(lock.registration, Types::RegistrationType, context)
-        { registration_id: reg_id, qnum: lock.qnum, pnum: lock.pnum }
+        { registration_id: reg_id, qnum: lock.question.index, pnum: lock.part.index }
       end
     end
 
     private
 
     def my_currently_grading(exam)
-      my_incomplete = exam.grading_locks.where(grader: context[:current_user]).incomplete
-      my_incomplete = my_incomplete.sort_by { |gl| [gl.qnum, gl.pnum] }
+      my_incomplete = exam.grading_locks.includes(:question, :part).where(grader: context[:current_user]).incomplete
+      my_incomplete = my_incomplete.sort_by { |gl| [gl.question.index, gl.part.index] }
       my_incomplete.first
     end
 
     def next_incomplete(exam, exam_version, qnum, pnum)
-      sorted = exam.grading_locks.incomplete.no_grader.to_a
+      sorted = exam.grading_locks.includes(:question, :part).incomplete.no_grader.to_a
       if (exam_version && exam_version.exam == exam)
         reg_ids = exam_version.registration_ids.to_set
         for_cur_version = sorted.select { |s| reg_ids.member?(s.registration_id) } 
         unless for_cur_version.empty?
           sorted = for_cur_version 
-          by_qnum = qnum ? sorted.select { |s| s.qnum == qnum } : []
+          by_qnum = qnum ? sorted.select { |s| s.question.index == qnum } : []
           unless by_qnum.empty?
             sorted = by_qnum
-            by_pnum = pnum ? sorted.select { |s| s.pnum == pnum } : []
+            by_pnum = pnum ? sorted.select { |s| s.part.index == pnum } : []
             unless by_pnum.empty?
               sorted = by_pnum
             end
           end
         end
       end
-      sorted = sorted.sort_by { |gl| [gl.qnum, gl.pnum] }
+      sorted = sorted.sort_by { |gl| [gl.question.index, gl.part.index] }
       sorted.first
     end
   end

@@ -52,15 +52,29 @@ module Mutations
       comment
     end
 
-    def build_comment(**args)
-      GradingComment.new(creator: context[:current_user], **args)
+    def build_comment(registration:, qnum:, pnum:, bnum:, **args)
+      ev = registration.exam_version
+      question = ev.db_questions.find_by(index: qnum)
+      part = question.parts.find_by(index: pnum)
+      body_item = part.body_items.find_by(index: bnum)
+      GradingComment.new(
+        creator: context[:current_user], 
+        registration: registration,
+        question: question,
+        part: part,
+        body_item: body_item,
+        **args,
+      )
     end
 
-    def require_my_lock!(**args)
-      lock = args[:registration].grading_locks.find_by(
-        registration: args[:registration],
-        qnum: args[:qnum],
-        pnum: args[:pnum],
+    def require_my_lock!(registration:, qnum:, pnum:, **args)
+      ev = registration.exam_version
+      question = ev.db_questions.find_by(index: qnum)
+      part = question.parts.find_by(index: pnum)
+      lock = registration.grading_locks.find_by(
+        registration: registration,
+        question: question,
+        part: part,
       )
       my_lock = lock&.grader == context[:current_user]
       raise GraphQL::ExecutionError, 'You do not have a lock for that part number.' unless my_lock

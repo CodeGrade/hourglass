@@ -73,7 +73,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
                     pnum={0}
                     graded={currentGrading[0]?.graded}
                     disabled={currentGrading[0]?.inProgress}
-                    disalbedMessage="This question is currently being graded"
+                    disabledMessage="This question is currently being graded"
                   />
                 </span>
               )}

@@ -43,7 +43,7 @@ export const ClaimGradingButton: React.FC<{
   pnum: number;
   graded?: boolean;
   disabled?: boolean;
-  disalbedMessage?: string;
+  disabledMessage?: string;
 }> = (props) => {
   const {
     registrationId,
@@ -51,7 +51,7 @@ export const ClaimGradingButton: React.FC<{
     pnum,
     graded,
     disabled = false,
-    disalbedMessage,
+    disabledMessage,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutateRequestGrade, {
@@ -80,7 +80,7 @@ export const ClaimGradingButton: React.FC<{
     <TooltipButton
       variant="info"
       disabled={disabled || requestLoading}
-      disabledMessage={disalbedMessage}
+      disabledMessage={disabledMessage}
       cursorClass=""
       className=""
       onClick={() => {
@@ -150,7 +150,7 @@ const Part: React.FC<PartProps> = (props) => {
                   pnum={pnum}
                   graded={currentGrading?.graded}
                   disabled={currentGrading?.inProgress}
-                  disalbedMessage="This part is currently being graded"
+                  disabledMessage="This part is currently being graded"
                 />
               </span>
             )}

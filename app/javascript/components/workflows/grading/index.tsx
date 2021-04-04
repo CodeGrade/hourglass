@@ -4,6 +4,7 @@ import React, {
   useRef,
   useContext,
   useEffect,
+  useLayoutEffect,
 } from 'react';
 import {
   Form,
@@ -223,27 +224,24 @@ const Feedback: React.FC<{
   } = props;
   const [pointStr, setPointStr] = useState<number | string>(points);
   const [isFocused, setFocused] = useState(true);
-  const [blurredBecauseClickedAlert, setBlurredBecauseClickedAlert] = useState(false);
   useEffect(() => {
     setPointStr(String(points));
   }, [points]);
   const alertRef = useRef<HTMLDivElement>();
+  useLayoutEffect(() => {
+    if (isFocused) { alertRef.current.focus(); }
+  }, [isFocused]);
   const variant = variantForPoints(points);
   const VariantIcon = iconForPoints(points);
   return (
     <Alert
       ref={alertRef}
       variant={variant}
+      tabIndex={-1}
       onBlur={(e) => {
-        const dontClearFocus = !blurredBecauseClickedAlert;
-        setBlurredBecauseClickedAlert(false);
         if (isNode(e.relatedTarget) && alertRef.current.contains(e.relatedTarget)) return;
         if (onBlur) onBlur(e);
-        if (dontClearFocus) { setFocused(false); }
-      }}
-      onFocus={() => setBlurredBecauseClickedAlert(false)}
-      onClick={() => {
-        setBlurredBecauseClickedAlert(true);
+        setFocused(false);
       }}
       className={isFocused ? 'pb-0' : ''}
     >
@@ -318,16 +316,19 @@ const Feedback: React.FC<{
             {pluralize(points, 'point', 'points')}
           </Button>
           <Col>{message}</Col>
-          <TooltipButton
-            disabled={false}
-            variant="outline-info"
-            size="sm"
-            enabledMessage="Click to edit this comment"
-            onClick={() => setFocused(true)}
-            className="mx-2 float-right"
-          >
-            <Icon I={BsPencilSquare} />
-          </TooltipButton>
+          <div className="mx-2 float-right">
+            <span><ShowStatusIcon error={error} status={status} /></span>
+            <TooltipButton
+              disabled={false}
+              variant="outline-info"
+              size="sm"
+              enabledMessage="Click to edit this comment"
+              onClick={() => setFocused(true)}
+              className="ml-2"
+            >
+              <Icon I={BsPencilSquare} />
+            </TooltipButton>
+          </div>
         </Row>
       )}
     </Alert>

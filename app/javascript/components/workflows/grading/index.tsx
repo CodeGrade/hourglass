@@ -239,15 +239,18 @@ const Feedback: React.FC<{
       variant={variant}
       tabIndex={-1}
       onBlur={(e) => {
+        if (alertRef.current === e.relatedTarget) {
+          if (onBlur) onBlur(e);
+          return; // don't setFocused and collapse this editor yet.
+        }
         if (isNode(e.relatedTarget) && alertRef.current.contains(e.relatedTarget)) return;
         if (onBlur) onBlur(e);
         setFocused(false);
       }}
-      className={isFocused ? 'pb-0' : ''}
     >
       {isFocused ? (
         <Row>
-          <Form.Group as={Col} sm={2}>
+          <Form.Group as={Col} sm={2} className="mb-0">
             <Form.Label>Points</Form.Label>
             <NumericInput
               disabled={disabled}
@@ -263,7 +266,7 @@ const Feedback: React.FC<{
               }}
             />
           </Form.Group>
-          <Form.Group as={Col} className="pl-0">
+          <Form.Group as={Col} className="pl-0 mb-0">
             <Form.Label>Comment</Form.Label>
             <Form.Control
               as="textarea"
@@ -274,7 +277,7 @@ const Feedback: React.FC<{
               }}
             />
           </Form.Group>
-          <Form.Group className="ml-auto mr-3">
+          <Form.Group className="ml-auto mr-3 mb-0">
             <Form.Label>Status</Form.Label>
             <div>
               {couldReset && (
@@ -306,17 +309,19 @@ const Feedback: React.FC<{
         </Row>
       ) : (
         <Row>
-          <Button
-            disabled
-            variant={variant}
-            size="sm"
-            className="mx-2 align-self-center"
-          >
-            <Icon I={VariantIcon} className="mr-2" />
-            {pluralize(points, 'point', 'points')}
-          </Button>
-          <Col>{message}</Col>
-          <div className="mx-2 float-right">
+          <Form.Group as={Col} sm={2} className="mb-0">
+            <Button
+              disabled
+              variant={variant}
+              size="sm"
+              className="align-self-center w-100"
+            >
+              <Icon I={VariantIcon} className="mr-2" />
+              {pluralize(points, 'point', 'points')}
+            </Button>
+          </Form.Group>
+          <Form.Group as={Col} className="pl-0 mb-0">{message}</Form.Group>
+          <div className="mr-3 mb-0 float-right">
             <span><ShowStatusIcon error={error} status={status} /></span>
             <TooltipButton
               disabled={false}

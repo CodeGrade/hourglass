@@ -23,22 +23,32 @@
     opacity: initial;
     width: auto;
     position: fixed;
-    padding: 0.5em;
+    padding: 7em 0.5em;
     z-index: 1000;
+    top: calc(50% - 7em);
+    bottom: calc(50% - 7em);
 
     &:hover {
       color: black !important;
     }
   }
 
-  .carousel-control-prev:hover {
-    padding-right: 2em;
-    background: linear-gradient(to left, transparent, theme-color("secondary"));
+  .carousel-control-prev {
+    border-top-right-radius: 2em;
+    border-bottom-right-radius: 2em;
+    &:hover {
+      padding-right: 2em;
+      background: linear-gradient(to left, transparent, theme-color("secondary"));
+    }
   }
 
-  .carousel-control-next:hover {
-    padding-left: 2em;
-    background: linear-gradient(to right, transparent, theme-color("secondary"));
+  .carousel-control-next{
+    border-top-left-radius: 2em;
+    border-bottom-left-radius: 2em;
+    &:hover {
+      padding-left: 2em;
+      background: linear-gradient(to right, transparent, theme-color("secondary"));
+    }
   }
 }
 

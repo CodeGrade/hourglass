@@ -150,7 +150,11 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
 
   test 'release multiple locks' do
     lock1 = create(:grading_lock, registration: @student_reg1, grader: @grader)
-    lock2 = create(:grading_lock, registration: @student_reg1, grader: @ta, part: lock1.question.parts.find_by(index: 1))
+    create(
+      :grading_lock,
+      registration: @student_reg1, grader: @ta,
+      part: lock1.question.parts.find_by(index: 1)
+    )
     assert 2, @exam.grading_locks.length
     res = attempt_unlock_all(@prof, @exam)
     assert_not res['errors']

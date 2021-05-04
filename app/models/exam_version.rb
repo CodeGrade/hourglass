@@ -94,12 +94,12 @@ class ExamVersion < ApplicationRecord
     end
   end
 
-  def create_none_rubric(q, p, b)
+  def create_none_rubric(question, part, body_item)
     r = Rubric.find_or_initialize_by(
       exam_version: self,
-      question: q,
-      part: p,
-      body_item: b,
+      question: question,
+      part: part,
+      body_item: body_item,
     )
     return unless r.new_record?
 
@@ -117,13 +117,14 @@ class ExamVersion < ApplicationRecord
       question: nil,
       part: nil,
       body_item: nil,
-      order: nil
+      order: nil,
     )
-    rubric_as_json = if root_rubric.nil? || root_rubric.is_a?(None)
-      nil
-    else
-      root_rubric.as_json(nil, true).deep_stringify_keys
-    end
+    rubric_as_json =
+      if root_rubric.nil? || root_rubric.is_a?(None)
+        nil
+      else
+        root_rubric.as_json(no_inuse: true).deep_stringify_keys
+      end
     {
       'policies' => policies,
       'contents' => {
@@ -131,16 +132,16 @@ class ExamVersion < ApplicationRecord
         'questions' => db_questions.order(:index).map(&:as_json),
         'reference' => blank_to_nil(db_references.where(
           question: nil,
-          part: nil
+          part: nil,
         ).order(:index).map(&:as_json)),
         'examRubric' => rubric_as_json,
-      }.compact
+      }.compact,
     }
   end
 
   def blank_to_nil(val)
     return nil if val.blank?
-    
+
     val
   end
 
@@ -263,6 +264,7 @@ class ExamVersion < ApplicationRecord
     Rails.logger.debug e.backtrace
   end
 
+  # rubocop:disable Metrics/PerceivedComplexity
   def flatten_groups(obj)
     # Each key in grouped has non-nil points, eventually bottoming out
     # at a rubric_preset with a direction and label, that contains
@@ -319,16 +321,20 @@ class ExamVersion < ApplicationRecord
       obj
     end
   end
+  # rubocop:enable Metrics/PerceivedComplexity
 
   # Tree of questions to parts to score for that part
   # rubocop:disable Metrics/PerceivedComplexity
   def detailed_grade_breakdown_for(reg)
     comments_and_rubrics = reg.grading_comments.includes(
       :creator, :question, :part, :body_item,
-      preset_comment: [{ rubric_preset: [{ rubric: [{ parent_section: [{ parent_section: :parent_section }] }] }] }],
+      preset_comment: [{ rubric_preset: [{ rubric: [{ parent_section: [{ parent_section: :parent_section }] }] }] }]
     )
     comments = multi_group_by(comments_and_rubrics, [:question, :part, :body_item, :preset_comment])
-    checks = multi_group_by(reg.grading_checks.includes(:creator, :question, :part, :body_item), [:question, :part, :body_item])
+    checks = multi_group_by(
+      reg.grading_checks.includes(:creator, :question, :part, :body_item),
+      [:question, :part, :body_item],
+    )
     rubric_tree = multi_group_by(rubrics_for_grading, [:question, :part, :body_item], true)
     locks = multi_group_by(reg.grading_locks.includes(:question, :part), [:question, :part], true)
 
@@ -490,13 +496,17 @@ class ExamVersion < ApplicationRecord
   end
 
   def rubrics_for_grading
-    root_rubrics.includes(:question, :part,
-                          rubric_preset: :preset_comments,
-                          subsections: [:question, :part, 
-                                        { rubric_preset: :preset_comments,
-                                          subsections: [:question, :part,
-                                                        { rubric_preset: :preset_comments,
-                                                          subsections: [:question, :part, { rubric_preset: :preset_comments }] }] }])
+    root_rubrics.includes(
+      :question, :part,
+      rubric_preset: :preset_comments,
+      subsections: [:question, :part,
+                    { rubric_preset: :preset_comments,
+                      subsections: [:question, :part,
+                                    { rubric_preset: :preset_comments,
+                                      subsections: [
+                                        :question, :part, { rubric_preset: :preset_comments }
+                                      ] }] }]
+    )
   end
 
   def part_tree

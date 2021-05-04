@@ -31,7 +31,7 @@ class Rubric < ApplicationRecord
   # Ensure that preset comments exist, or subsections exist, but not both
   def not_both_presets_and_subsections
     return unless rubric_preset.present? && subsections.present?
-    
+
     errors.add(:subsections, 'must be empty if preset comments exist')
     errors.add(:rubric_preset, 'must be empty if subsections exist')
   end
@@ -43,7 +43,7 @@ class Rubric < ApplicationRecord
 
     errors.add(:rubric_preset, 'cannot be used with All-type rubrics')
   end
-  
+
   def sensible_coordinates
     if question.nil?
       if part.nil?
@@ -62,9 +62,11 @@ class Rubric < ApplicationRecord
     if parent_section.nil?
       return if order.nil?
 
-      errors.add(:order, "must be nil if this is the root of (#{question.index}, #{part.index}, #{body_item.index})")
+      qpb = "(#{question.index}, #{part.index}, #{body_item.index})"
+      errors.add(:order, "must be nil if this is the root of #{qpb}")
     elsif order.nil?
-      errors.add(:order, "cannot be nil if this is a subrubric within (#{question.index}, #{part.index}, #{body_item.index})")
+      qpb = "(#{question.index}, #{part.index}, #{body_item.index})"
+      errors.add(:order, "cannot be nil if this is a subrubric within #{qpb}")
     end
   end
 
@@ -118,15 +120,22 @@ class Rubric < ApplicationRecord
     points
   end
 
-  def as_json(preset_comments_in_use = nil, no_inuse = false)
-    rubric_preset_as_json = rubric_preset&.as_json(preset_comments_in_use, no_inuse)
-    subsections_as_json = subsections.sort_by(&:order).map { |s| s.as_json(preset_comments_in_use, no_inuse) }
+  def as_json(preset_comments_in_use = nil, no_inuse: false)
+    rubric_preset_as_json = rubric_preset&.as_json(preset_comments_in_use, no_inuse: no_inuse)
+    subsections_as_json = subsections.sort_by(&:order).map do |s|
+      s.as_json(preset_comments_in_use, no_inuse: no_inuse)
+    end
     {
       type: type.downcase,
       description: description,
       points: points,
       choices: (rubric_preset_as_json || subsections_as_json),
-      inUse: no_inuse ? nil : (rubric_preset_as_json&.dig('inUse') || subsections_as_json.any? { |s| s['inUse'] }),
+      inUse:
+        if no_inuse
+          nil
+        else
+          (rubric_preset_as_json&.dig('inUse') || subsections_as_json.any? { |s| s['inUse'] })
+        end,
     }.compact
   end
 

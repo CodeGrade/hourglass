@@ -13,7 +13,7 @@ class PresetComment < ApplicationRecord
     !grading_comments.empty?
   end
 
-  def as_json(preset_comments_in_use = nil, no_inuse = false)
+  def as_json(preset_comments_in_use = nil, no_inuse: false)
     {
       label: label,
       graderHint: grader_hint,

@@ -33,8 +33,10 @@ class RubricPreset < ApplicationRecord
     end
   end
 
-  def as_json(preset_comments_in_use = nil, no_inuse = false)
-    presets_as_json = preset_comments.sort_by(&:order).map { |p| p.as_json(preset_comments_in_use, no_inuse) }
+  def as_json(preset_comments_in_use = nil, no_inuse: false)
+    presets_as_json = preset_comments.sort_by(&:order).map do |p|
+      p.as_json(preset_comments_in_use, no_inuse: no_inuse)
+    end
     {
       label: label,
       direction: direction,

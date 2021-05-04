@@ -31,9 +31,9 @@ class GradingCheck < ApplicationRecord
 
   def valid_qpb
     if (question && question.exam_version != exam_version) ||
-      (part && part.question != question) ||
-      (body_item && body_item.part != part)
-    
+       (part && part.question != question) ||
+       (body_item && body_item.part != part)
+
       errors.add(:base, 'Question, part, and body item must be self-consistent for the exam version.')
     end
   end

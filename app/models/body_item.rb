@@ -21,9 +21,9 @@ class BodyItem < ApplicationRecord
 
   def self.from_yaml(type, rest)
     if rest.is_a? Hash
-      self.send("from_yaml_#{type}", type, **(rest.symbolize_keys))
+      send("from_yaml_#{type}", type, **rest.transform_keys { |key| key.to_s.underscore.to_sym })
     else
-      self.send("from_yaml_#{type}", type, entireValue: rest)
+      send("from_yaml_#{type}", type, entire_value: rest)
     end
   rescue NoMethodError => e
     raise "Bad body item type: #{type}: #{e}."
@@ -34,125 +34,143 @@ class BodyItem < ApplicationRecord
       info
     else
       root_rubric = rubrics.find_by(order: nil)
-      rubric_as_json = if root_rubric.nil? || root_rubric.is_a?(None)
-        nil
-      else
-        root_rubric.as_json(nil, true).deep_stringify_keys
-      end
-      case info['type']
-      when 'HTML'
-        info['value']
-      when 'AllThatApply'
-        {
-          'AllThatApply' => {
-            'prompt' => unhtml(info['prompt']),
-            'options' => info['options'].zip(answer).map do |opt, ans|
-              { unhtml(opt) => ans }
-            end,
-            'rubric' => rubric_as_json,
-          }.compact
-        }
-      when 'Code'
-        initial = info['initial']
-        unless initial.nil?
-          if initial.key? 'file'
-            # potentially nothing to do here; confirm with parse_info
-          else
-            unprocessed = MarksProcessor.process_marks_reverse(initial['text'], initial['marks'])
-            initial = { 'code' => unprocessed }
-          end
+      rubric_as_json =
+        if root_rubric.nil? || root_rubric.is_a?(None)
+          nil
+        else
+          root_rubric.as_json(no_inuse: true).deep_stringify_keys
         end
+      send("as_json_#{info['type']}", rubric_as_json)
+    end
+  end
+
+  # rubocop:disable Naming/MethodName
+  def as_json_HTML(_rubric_as_json)
+    info['value']
+  end
+
+  def as_json_AllThatApply(rubric_as_json)
+    {
+      'AllThatApply' => {
+        'prompt' => unhtml(info['prompt']),
+        'options' => info['options'].zip(answer).map do |opt, ans|
+          { unhtml(opt) => ans }
+        end,
+        'rubric' => rubric_as_json,
+      }.compact,
+    }
+  end
+
+  def as_json_Code(rubric_as_json)
+    initial = info['initial']
+    unless initial.nil?
+      if initial.key? 'file'
+        # potentially nothing to do here; confirm with parse_info
+      else
+        unprocessed = MarksProcessor.process_marks_reverse(initial['text'], initial['marks'])
+        initial = { 'code' => unprocessed }
+      end
+    end
+    {
+      'Code' => {
+        'prompt' => unhtml(info['prompt']),
+        'lang' => unhtml(info['lang']),
+        'initial' => initial,
+        'correctAnswer' =>
+          if answer.blank? || answer['text'].blank?
+            nil
+          else
+            MarksProcessor.process_marks_reverse(answer['text'], answer['marks'])
+          end,
+        'rubric' => rubric_as_json,
+      }.compact,
+    }
+  end
+
+  def as_json_CodeTag(rubric_as_json)
+    {
+      'CodeTag' => {
+        'prompt' => unhtml(info['prompt']),
+        'choices' => unhtml(info['choices']),
+        'correctAnswer' => {
+          'filename' => answer['selectedFile'],
+          'line' => answer['lineNumber'],
+        },
+        'rubric' => rubric_as_json,
+      }.compact,
+    }
+  end
+
+  def as_json_Matching(rubric_as_json)
+    {
+      'Matching' => {
+        'prompt' => unhtml(info['prompt']),
+        'promptsLabel' => unhtml(info['promptsLabel']),
+        'valuesLabel' => unhtml(info['valuesLabel']),
+        'prompts' => unhtmls(info['prompts']),
+        'values' => unhtmls(info['values']),
+        'correctAnswers' => answer,
+        'rubric' => rubric_as_json,
+      }.compact,
+    }
+  end
+
+  def as_json_MultipleChoice(rubric_as_json)
+    {
+      'MultipleChoice' => {
+        'prompt' => unhtml(info['prompt']),
+        'options' => unhtmls(info['options']),
+        'correctAnswer' => answer,
+        'rubric' => rubric_as_json,
+      }.compact,
+    }
+  end
+
+  def as_json_Text(rubric_as_json)
+    {
+      'Text' => {
+        'prompt' => unhtml(info['prompt']),
+        'correctAnswer' => unhtml(answer&.dig('text')),
+        'rubric' => rubric_as_json,
+      }.compact,
+    }
+  end
+
+  def as_json_YesNo(rubric_as_json)
+    case info['yesLabel']
+    when 'Yes'
+      if info['prompt'].blank?
+        { 'YesNo' => answer }
+      else
         {
-          'Code' => {
+          'YesNo' => {
             'prompt' => unhtml(info['prompt']),
-            'lang' => unhtml(info['lang']),
-            'initial' => initial,
-            'correctAnswer' => 
-              if answer.blank? || answer.dig("text").blank?
-                nil
-              else
-                MarksProcessor.process_marks_reverse(answer['text'], answer['marks'])
-              end,
-            'rubric' => rubric_as_json,
-          }.compact
-        }
-      when 'CodeTag'
-        {
-          'CodeTag' => {
-            'prompt' => unhtml(info['prompt']),
-            'choices' => unhtml(info['choices']),
-            'correctAnswer' => {
-              'filename' => answer['selectedFile'],
-              'line' => answer['lineNumber'],
-            },
-            'rubric' => rubric_as_json,
-          }.compact
-        }
-      when 'Matching'
-        {
-          'Matching' => {
-            'prompt' => unhtml(info['prompt']),
-            'promptsLabel' => unhtml(info['promptsLabel']),
-            'valuesLabel' => unhtml(info['valuesLabel']),
-            'prompts' => unhtmls(info['prompts']),
-            'values' => unhtmls(info['values']),
-            'correctAnswers' => answer,
-            'rubric' => rubric_as_json,
-          }.compact
-        }
-      when 'MultipleChoice'
-        {
-          'MultipleChoice' => {
-            'prompt' => unhtml(info['prompt']),
-            'options' => unhtmls(info['options']),
             'correctAnswer' => answer,
             'rubric' => rubric_as_json,
-          }.compact
+          }.compact,
         }
-      when 'Text'
+      end
+    else
+      if info['prompt'].blank?
+        { 'TrueFalse' => @answer }
+      else
         {
-          'Text' => {
+          'TrueFalse' => {
             'prompt' => unhtml(info['prompt']),
-            'correctAnswer' => unhtml(answer&.dig("text")),
+            'correctAnswer' => answer,
             'rubric' => rubric_as_json,
-          }.compact
+          }.compact,
         }
-      when 'YesNo'
-        case info['yesLabel']
-        when 'Yes'
-          if info['prompt'].blank?
-            { 'YesNo' => answer }
-          else 
-            {
-              'YesNo' => {
-                'prompt' => unhtml(info['prompt']),
-                'correctAnswer' => answer,
-                'rubric' => rubric_as_json,
-              }.compact
-            }
-          end
-        else
-          if info['prompt'].blank?
-            { 'TrueFalse' => @answer }
-          else 
-            {
-              'TrueFalse' => {
-                'prompt' => unhtml(info['prompt']),
-                'correctAnswer' => answer,
-                'rubric' => rubric_as_json,
-              }.compact
-            }
-          end
-        end
       end
     end
   end
+  # rubocop:enable Naming/MethodName
 
   private
 
   def unhtml(val)
     return nil if val.blank? || (val['type'] == 'HTML' && val['value'].blank?)
-    
+
     if val.is_a? Hash
       val['value']
     else
@@ -167,8 +185,8 @@ class BodyItem < ApplicationRecord
   end
 
   class << self
-
-    def from_yaml_AllThatApply(type, prompt: nil, options:)
+    # rubocop:disable Naming/MethodName
+    def from_yaml_AllThatApply(type, options:, prompt: nil)
       BodyItem.new(
         info: {
           type: type,
@@ -179,7 +197,7 @@ class BodyItem < ApplicationRecord
       )
     end
 
-    def from_yaml_Code(type, initial: nil, prompt: nil, lang: nil, correctAnswer: nil)
+    def from_yaml_Code(type, initial: nil, prompt: nil, lang: nil, correct_answer: nil)
       unless initial.nil?
         if initial.key? 'file'
           # TODO, was:
@@ -195,9 +213,9 @@ class BodyItem < ApplicationRecord
         end
       end
       answer = nil
-      if correctAnswer.is_a? String
+      if correct_answer.is_a? String
         answer = {
-          'text' => correctAnswer,
+          'text' => correct_answer,
           'marks' => [],
         }
       end
@@ -212,7 +230,7 @@ class BodyItem < ApplicationRecord
       )
     end
 
-    def from_yaml_CodeTag(type, choices:, prompt: nil, correctAnswer:)
+    def from_yaml_CodeTag(type, choices:, correct_answer:, prompt: nil)
       BodyItem.new(
         info: {
           type: type,
@@ -220,53 +238,63 @@ class BodyItem < ApplicationRecord
           prompt: prompt,
         }.compact,
         answer: {
-          selectedFile: correctAnswer['filename'],
-          lineNumber: correctAnswer['line'],
+          selectedFile: correct_answer['filename'],
+          lineNumber: correct_answer['line'],
         },
       )
     end
 
-    def from_yaml_Matching(type, prompt: nil, promptsLabel: nil, valuesLabel: nil, prompts:, values:, correctAnswers:)
+    # rubocop:disable Metrics/ParameterLists
+    def from_yaml_Matching(
+      type,
+      prompts:,
+      values:,
+      correct_answers:,
+      prompt: nil,
+      prompts_label: nil,
+      values_label: nil
+    )
       BodyItem.new(
         info: {
           type: type,
           prompt: prompt,
-          promptsLabel: promptsLabel,
-          valuesLabel: valuesLabel,
+          promptsLabel: prompts_label,
+          valuesLabel: values_label,
           prompts: prompts,
           values: values,
         }.compact,
-        answer: correctAnswers,
+        answer: correct_answers,
       )
     end
+    # rubocop:enable Metrics/ParameterLists
 
-    def from_yaml_MultipleChoice(type, prompt: nil, options:, correctAnswer:)
+    def from_yaml_MultipleChoice(type, options:, correct_answer:, prompt: nil)
       BodyItem.new(
         info: {
           type: type,
           prompt: prompt,
           options: options,
         }.compact,
-        answer: correctAnswer,
+        answer: correct_answer,
       )
     end
 
-    def from_yaml_Text(type, entireValue: nil, prompt: nil, correctAnswer: nil)
+    def from_yaml_Text(type, entire_value: nil, prompt: nil, correct_answer: nil)
       BodyItem.new(
         info: {
           type: type,
-          prompt: prompt || entireValue.to_s,
+          prompt: prompt || entire_value.to_s,
         }.compact,
-        answer: correctAnswer,
+        answer: correct_answer,
       )
     end
 
-    def from_yaml_TrueFalse(type, entireValue: nil, prompt: nil, correctAnswer: nil)
+    def from_yaml_TrueFalse(_type, entire_value: nil, prompt: nil, correct_answer: nil)
       answer =
-        if entireValue == true || entireValue == false
-          entireValue
+        if [true, false].include?(entire_value)
+          entire_value
         else
-          correctAnswer
+          correct_answer
         end
       BodyItem.new(
         info: {
@@ -279,12 +307,12 @@ class BodyItem < ApplicationRecord
       )
     end
 
-    def from_yaml_YesNo(type, entireValue: nil, prompt: nil, correctAnswer: nil)
+    def from_yaml_YesNo(_type, entire_value: nil, prompt: nil, correct_answer: nil)
       answer =
-        if entireValue == true || entireValue == false
-          entireValue
+        if [true, false].include?(entire_value)
+          entire_value
         else
-          correctAnswer
+          correct_answer
         end
       BodyItem.new(
         info: {
@@ -296,11 +324,12 @@ class BodyItem < ApplicationRecord
         answer: answer,
       )
     end
+    # rubocop:enable Naming/MethodName
 
     def ensure_utf8(str, mimetype)
       return str if ApplicationHelper.binary?(mimetype)
       return str if str.is_utf8?
-  
+
       begin
         if str.dup.force_encoding(Encoding::CP1252).valid_encoding?
           str.encode(Encoding::UTF_8, Encoding::CP1252)

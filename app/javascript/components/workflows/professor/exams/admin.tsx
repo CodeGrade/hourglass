@@ -727,7 +727,7 @@ const ShowVersion: React.FC<{
       reference
       instructions
       files
-      answers
+      # answers
       rubrics {
         id
         type

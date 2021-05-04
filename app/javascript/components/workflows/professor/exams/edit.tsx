@@ -30,7 +30,7 @@ const EditExamVersion: React.FC = () => {
         reference
         instructions
         files
-        answers
+        # answers
         anyStarted
         anyFinalized
       }

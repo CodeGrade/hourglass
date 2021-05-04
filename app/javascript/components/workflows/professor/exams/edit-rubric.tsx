@@ -27,7 +27,7 @@ const EditExamVersionRubric: React.FC = () => {
         reference
         instructions
         files
-        answers
+        # answers
       }
     }
     `,

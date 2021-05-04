@@ -158,6 +158,12 @@ class HourglassSchema < GraphQL::Schema
       Types::RubricPresetType
     when PresetComment
       Types::PresetCommentType
+    when Question
+      Types::QuestionType
+    when Part
+      Types::PartType
+    when BodyItem
+      Types::BodyItemType
     else
       raise("Unexpected object of type '#{type}': #{obj}")
     end

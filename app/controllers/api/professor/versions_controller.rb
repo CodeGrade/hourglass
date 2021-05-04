@@ -12,16 +12,12 @@ module Api
       def import
         uploaded_file = params.require(:upload)
         n = @exam.exam_versions.length + 1
+        default_name = "#{@exam.name} Version #{n}"
         upload = Upload.new(uploaded_file)
-        @version = ExamVersion.create(
-          exam: @exam,
-          name: "#{@exam.name} Version #{n}",
-          files: upload.files,
-          info: upload.info,
-        )
-        # TODO: Mimic ConvertExamVersionInfoToModels#up here, to create the needed records!
-        @version.import_rubrics(upload.rubrics)
+        @version = upload.build_exam_version(default_name)
+        @version.exam = @exam
         @version.save!
+
         render json: {
           id: HourglassSchema.id_from_object(@version, Types::ExamVersionType, {}),
         }, status: :created

@@ -30,12 +30,6 @@ class ExamVersion < ApplicationRecord
 
   before_save :create_all_none_rubrics
 
-  EXAM_SAVE_SCHEMA = Rails.root.join('config/schemas/exam-save.json').to_s
-  validates :info, presence: true, json: {
-    schema: -> { EXAM_SAVE_SCHEMA },
-    message: ->(errors) { errors },
-  }
-
   FILES_SCHEMA = Rails.root.join('config/schemas/files.json').to_s
   validates :files, presence: true, allow_blank: true, json: {
     schema: -> { FILES_SCHEMA },
@@ -55,19 +49,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def policies
-    info['policies']
-  end
-
-  def contents
-    info['contents']
-  end
-
-  def answers
-    info['answers']
-  end
-
-  def questions
-    contents['questions']
+    @policies.to_s.split ','
   end
 
   def reference
@@ -123,72 +105,54 @@ class ExamVersion < ApplicationRecord
     )
   end
 
-  # update this version's rubrics from a set of imported rubrics
-  # { examRubric: ..., questions: { questionRubric: ..., ...} ... }
-  def import_rubrics(rubrics)
-    import_rubric(rubrics['examRubric'], [nil, nil, nil])
-    rubrics['questions']&.each_with_index do |qrubric, qnum|
-      q = db_questions.find_by(index: qnum)
-      import_rubric(qrubric['questionRubric'], [q, nil, nil])
-      qrubric['parts']&.each_with_index do |prubric, pnum|
-        p = q&.parts&.find_by(index: pnum)
-        import_rubric(prubric['partRubric'], [q, p, nil])
-        prubric['body']&.each_with_index do |brubric, bnum|
-          b = p&.body_items&.find_by(index: bnum)
-          import_rubric(brubric, [q, p, b])
-        end
-      end
-    end
-  end
+  # def import_rubric(raw, qpb, order = nil, parent = nil)
+  #   q, p, b = qpb
+  #   raise 'Given raw rubric was nil' if raw.nil?
 
-  def import_rubric(raw, qpb, order = nil, parent = nil)
-    q, p, b = qpb
-    raise 'Given raw rubric was nil' if raw.nil?
+  #   rubric = Rubric.find_or_initialize_by(
+  #     exam_version: self,
+  #     question: q,
+  #     part: p,
+  #     body_item: b,
+  #     parent_section: parent,
+  #   )
+  #   rubric.assign_attributes(
+  #     type: raw['type'].capitalize,
+  #     order: order,
+  #     description: raw.dig('description', 'value'),
+  #     points: raw['points'],
+  #     parent_section: parent,
+  #   )
+  #   association(:rubrics).add_to_target(rubric)
+  #   if raw['choices'].is_a? Hash
+  #     import_presets(raw['choices'], rubric)
+  #   else
+  #     rubric.subsections.destroy_all # this should always be empty anyway
+  #     raw['choices']&.each_with_index do |c, cindex|
+  #       import_rubric(c, qpb, cindex, rubric)
+  #     end
+  #   end
+  # end
 
-    rubric = Rubric.find_or_initialize_by(
-      exam_version: self,
-      question: q,
-      part: p,
-      body_item: b,
-      parent_section: parent,
-    )
-    rubric.assign_attributes(
-      type: raw['type'].capitalize,
-      order: order,
-      description: raw.dig('description', 'value'),
-      points: raw['points'],
-      parent_section: parent,
-    )
-    association(:rubrics).add_to_target(rubric)
-    if raw['choices'].is_a? Hash
-      import_presets(raw['choices'], rubric)
-    else
-      rubric.subsections.destroy_all # this should always be empty anyway
-      raw['choices']&.each_with_index do |c, cindex|
-        import_rubric(c, qpb, cindex, rubric)
-      end
-    end
-  end
-
-  def import_presets(presets, rubric)
-    p = RubricPreset.new(
-      label: presets['label'],
-      direction: presets['direction'],
-      mercy: presets['mercy']&.to_f,
-    )
-    rubric.rubric_preset = p
-    presets['presets']&.each_with_index do |preset, pindex|
-      c = PresetComment.new(
-        label: preset['label'],
-        points: preset['points'],
-        grader_hint: preset['graderHint'],
-        student_feedback: preset['studentFeedback'],
-        order: pindex,
-        rubric_preset: p,
-      )
-      p.association(:preset_comments).add_to_target(c)
-    end
-  end
+  # def import_presets(presets, rubric)
+  #   p = RubricPreset.new(
+  #     label: presets['label'],
+  #     direction: presets['direction'],
+  #     mercy: presets['mercy']&.to_f,
+  #   )
+  #   rubric.rubric_preset = p
+  #   presets['presets']&.each_with_index do |preset, pindex|
+  #     c = PresetComment.new(
+  #       label: preset['label'],
+  #       points: preset['points'],
+  #       grader_hint: preset['graderHint'],
+  #       student_feedback: preset['studentFeedback'],
+  #       order: pindex,
+  #       rubric_preset: p,
+  #     )
+  #     p.association(:preset_comments).add_to_target(c)
+  #   end
+  # end
 
   def rubric_as_json
     rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)

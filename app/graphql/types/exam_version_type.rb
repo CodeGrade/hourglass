@@ -56,15 +56,13 @@ module Types
       guard Guards::ALL_STAFF
     end
 
+    field :db_questions, [Types::QuestionType], null: false
+
     field :reference, GraphQL::Types::JSON, null: false do
       guard Guards::ALL_STAFF
     end
 
     field :instructions, GraphQL::Types::JSON, null: false do
-      guard Guards::ALL_STAFF
-    end
-
-    field :answers, GraphQL::Types::JSON, null: false do
       guard Guards::ALL_STAFF
     end
 

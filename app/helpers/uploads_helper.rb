@@ -9,231 +9,128 @@ module UploadsHelper
   # Converts back and forth between upload and saved exam.yaml formats
   class FormatConverter
     # rubocop:disable Metrics/PerceivedComplexity, Metrics/BlockLength, Metrics/BlockNesting
-    def self.parse_info(properties)
+    def self.build_exam_version(properties, default_name, files, destination = nil)
       contents = properties['contents']
+
+      policies = properties['policies'] || []
+      str_policies = policies.join(',')
+      instructions = contents.dig('instructions') || ''
+
+      version = destination || ExamVersion.new
+      version.assign_attributes(
+        name: default_name,
+        files: files || [],
+        policies: str_policies,
+        instructions: instructions,
+        info: {placeholder: true},
+      )
+
+      avail_references = {
+        "exam" => false,
+        "question" => false,
+        "part" => false,
+      }
+
+      contents['reference']&.each_with_index do |ref, refnum|
+        new_ref = convert_reference(ref, refnum, ev)
+        next unless new_ref
+        ev.association(:db_references).add_to_target(new_ref)
+        avail_references["exam"] = true
+      end
+
       contents['questions'].each do |q|
         if q['parts'].length == 1 && q['separateSubparts']
           raise 'Cannot separateSubparts for a question with only one part'
         end
       end
 
-      answers = contents['questions'].map do |q|
-        q['parts'].map do |p|
-          p['body'].map do |b|
-            case b
+      e_rubric = convert_rubric({exam_version: version}, contents['examRubric'])
+      version.association(:rubrics).add_to_target(e_rubric)
+
+      contents['questions'].each_with_index do |qinfo, qnum|
+        question = Question.new(
+          name: qinfo['name'],
+          separate_subparts: !!qinfo['separateSubparts'],
+          description: qinfo['description'],
+          extra_credit: !!qinfo['extraCredit'],
+          index: qnum,
+        )
+        version.association(:db_questions).add_to_target(question)
+        q_rubric = convert_rubric({exam_version: version, question: question}, qinfo['questionRubric'])
+        question.association(:rubrics).add_to_target(q_rubric)
+        avail_references["question"] = false
+        qinfo['reference']&.each_with_index do |ref, refnum|
+          new_ref = convert_reference(ref, refnum, version)
+          next unless new_ref
+          question.association(:references).add_to_target(new_ref)
+          avail_references["question"] = true
+        end
+
+        qinfo['parts'].each_with_index do |pinfo, pnum|
+          part = Part.new(
+            name: pinfo['name'],
+            description: pinfo['description'],
+            points: pinfo['points'],
+            extra_credit: !!pinfo['extraCredit'],
+            index: pnum,
+          )
+          question.association(:parts).add_to_target(part)
+          p_rubric = convert_rubric({exam_version: version, question: question, part: part}, pinfo['partRubric'])
+          part.association(:rubrics).add_to_target(p_rubric)
+          avail_references["part"] = false
+          pinfo['reference']&.each_with_index do |ref, refnum|
+            new_ref = convert_reference(ref, refnum, ev)
+            next unless new_ref
+            part.association(:references).add_to_target(new_ref)
+            avail_references["part"] = true
+          end
+
+          pinfo['body'].each_with_index do |binfo, bnum|
+            item = nil
+            b_rubric = nil
+            case binfo
             when String
-              { NO_ANS: true }
+              item = BodyItem.new(info: binfo)
+              owners = {exam_version: version, question: question, part: part, body_item: item}
+              b_rubric = convert_rubric(owners, nil)
             when Hash
-              if b.key? 'AllThatApply'
-                b['AllThatApply']['options'].map(&:values).flatten
-              elsif b.key? 'Code'
-                if b['Code']['correctAnswer'].is_a? String
-                  { 'text' => b['Code']['correctAnswer'], 'marks' => [] }
-                else
-                  { NO_ANS: true }
+              rubric_val = binfo.values.first.delete('rubric')
+              if binfo['CodeTag']
+                choices = binfo['CodeTag']['choices']
+                unless avail_references[choices]
+                  raise "No reference for #{choices} @(#{qnum}, #{pnum}, #{bnum})."
                 end
-              elsif b.key? 'CodeTag'
-                {
-                  selectedFile: b['CodeTag']['correctAnswer']['filename'],
-                  lineNumber: b['CodeTag']['correctAnswer']['line'],
-                }
-              elsif b.key? 'Matching'
-                b['Matching']['correctAnswers']
-              elsif b.key? 'MultipleChoice'
-                b['MultipleChoice']['correctAnswer']
-              elsif b.key? 'Text'
-                b['Text']['correctAnswer'] || { NO_ANS: true }
-              elsif b.key? 'TrueFalse'
-                if (b['TrueFalse'] == true) || (b['TrueFalse'] == false)
-                  b['TrueFalse']
-                else
-                  b['TrueFalse']['correctAnswer']
-                end
-              elsif b.key? 'YesNo'
-                if (b['YesNo'] == true) || (b['YesNo'] == false)
-                  b['YesNo']
-                else
-                  b['YesNo']['correctAnswer']
-                end
-              else
-                raise 'Bad body item'
               end
+              item = BodyItem.from_yaml(binfo.keys.first, binfo.values.first)
+              owners = {exam_version: version, question: question, part: part, body_item: item}
+              b_rubric = convert_rubric(owners, rubric_val)
+            else
+              raise 'Bad body item.'
             end
+            item.index = bnum
+            item.association(:rubrics).add_to_target(b_rubric)
+            part.association(:body_items).add_to_target(item)
           end
         end
       end
 
-      rubrics = {
-        examRubric: convert_rubric(contents['examRubric']),
-        questions: contents['questions'].map do |q|
-          {
-            questionRubric: convert_rubric(q['questionRubric']),
-            parts: q['parts']&.map do |p|
-              {
-                partRubric: convert_rubric(p['partRubric']),
-                body: p['body']&.map do |b|
-                  if (b.is_a? Hash)
-                    convert_rubric(b.values.first['rubric'])
-                  else
-                    convert_rubric(nil)
-                  end
-                end || [],
-              }
-            end || [],
-          }
-        end || [],
-      }
-
-      e_reference = contents['reference']&.map { |r| map_reference r } || []
-      questions = contents['questions'].map do |q|
-        q_reference = q['reference']&.map { |r| map_reference r } || []
-        {
-          name: make_html_val(q['name']),
-          separateSubparts: q['separateSubparts'],
-          description: make_html_val(q['description']),
-          extraCredit: q['extraCredit'],
-          reference: q_reference,
-          parts: q['parts'].map do |p|
-            p_reference = p['reference']&.map { |r| map_reference r } || []
-            {
-              name: make_html_val(p['name']),
-              description: make_html_val(p['description']),
-              points: p['points'],
-              extraCredit: p['extraCredit'],
-              reference: p_reference,
-              body: p['body'].map do |b|
-                case b
-                when String
-                  {
-                    type: 'HTML',
-                    value: b,
-                  }
-                when Hash
-                  if b.key? 'AllThatApply'
-                    {
-                      type: 'AllThatApply',
-                      prompt: make_html_val(b['AllThatApply']['prompt']),
-                      options: make_html_vals(b['AllThatApply']['options'].map(&:keys).flatten),
-                    }
-                  elsif b.key? 'Code'
-                    initial = b['Code']['initial']
-                    unless initial.nil?
-                      if initial.key? 'file'
-                      #   filename = initial['file']
-                      #   file = files[filename]
-                      #   raise "Invalid file for Code initial: #{filename}" if file.nil?
-                      else
-                        processed = MarksProcessor.process_marks(ensure_utf8(initial['code'], 'text/plain'))
-                        initial = {
-                          text: processed[:text],
-                          marks: processed[:marks],
-                        }
-                      end
-                    end
-                    {
-                      type: 'Code',
-                      prompt: make_html_val(b['Code']['prompt']),
-                      lang: b['Code']['lang'],
-                      initial: initial,
-                    }.compact
-                  elsif b.key? 'CodeTag'
-                    referent =
-                      case b['CodeTag']['choices']
-                      when 'part'
-                        raise 'No reference for part.' if p_reference.nil?
-
-                        'part'
-                      when 'question'
-                        raise 'No reference for question.' if q_reference.nil?
-
-                        'question'
-                      when 'exam'
-                        raise 'No reference for exam.' if e_reference.nil?
-
-                        'exam'
-                      else
-                        raise 'CodeTag reference is invalid.'
-                      end
-                    {
-                      type: 'CodeTag',
-                      choices: referent,
-                      prompt: make_html_val(b['CodeTag']['prompt']),
-                    }
-                  elsif b.key? 'Matching'
-                    {
-                      type: 'Matching',
-                      prompt: make_html_val(b['Matching']['prompt']),
-                      promptsLabel: make_html_val(b['Matching']['promptsLabel']),
-                      valuesLabel: make_html_val(b['Matching']['valuesLabel']),
-                      prompts: make_html_vals(b['Matching']['prompts']),
-                      values: make_html_vals(b['Matching']['values']),
-                    }.compact
-                  elsif b.key? 'MultipleChoice'
-                    {
-                      type: 'MultipleChoice',
-                      prompt: make_html_val(b['MultipleChoice']['prompt']),
-                      options: make_html_vals(b['MultipleChoice']['options']),
-                    }
-                  elsif b.key? 'Text'
-                    if b['Text'].nil?
-                      {
-                        type: 'Text',
-                        prompt: '',
-                      }
-                    else
-                      {
-                        type: 'Text',
-                        prompt: make_html_val(b['Text']['prompt']),
-                      }
-                    end
-                  elsif b.key? 'TrueFalse'
-                    {
-                      type: 'YesNo',
-                      yesLabel: 'True',
-                      noLabel: 'False',
-                      prompt:
-                        if (b['TrueFalse'] == true) || (b['TrueFalse'] == false)
-                          ''
-                        else
-                          make_html_val(b['TrueFalse']['prompt'])
-                        end,
-                    }
-                  elsif b.key? 'YesNo'
-                    {
-                      type: 'YesNo',
-                      yesLabel: 'Yes',
-                      noLabel: 'No',
-                      prompt:
-                        if (b['YesNo'] == true) || (b['YesNo'] == false)
-                          ''
-                        else
-                          make_html_val(b['YesNo']['prompt'])
-                        end,
-                    }
-                  else
-                    raise 'Bad question type.'
-                  end
-                else
-                  raise 'Bad body item.'
-                end
-              end,
-            }.compact
-          end,
-        }.compact
-      end
-      info = {
-        policies: properties['policies'] || [],
-        contents: {
-          questions: questions,
-          reference: e_reference,
-          instructions: make_html_val(contents['instructions']),
-        }.compact,
-        answers: answers,
-      }
-
-      [info, rubrics]
+      version
     end
 
+    def self.convert_reference(ref, refnum, ev)
+      return if ref.nil?
+      type = ref.keys.first
+      path = ref.values.first
+
+      new_ref = Reference.new(
+        path: path,
+        type: type,
+        index: refnum,
+        exam_version: ev,
+      )
+    end
+
+    # TODO fixme and unparse_preset OR rubric_as_json
     def self.unparse_info(info, rubrics)
       info = info.deep_stringify_keys
       questions = info['contents']['questions'].each_with_index.map do |q, qnum|
@@ -442,22 +339,27 @@ module UploadsHelper
         arr.map { |i| unmake_html_val(i) }
       end
 
-      def convert_presets(preset)
+      def convert_presets(preset, parent)
         return nil if preset.nil?
 
-        {
+        rp = RubricPreset.new(
           label: preset['label'],
           direction: preset['direction'],
           mercy: preset['mercy'],
-          presets: preset['presets']&.map do |p|
-            {
-              label: p['label'],
-              graderHint: p['graderHint'],
-              studentFeedback: p['studentFeedback'],
-              points: p['points'],
-            }.compact
-          end&.compact,
-        }.compact
+        )
+        preset['presets']&.map do |p|
+          pc = PresetComment.new(
+            label: p['label'],
+            grader_hint: p['graderHint'],
+            student_feedback: p['studentFeedback'],
+            points: p['points'],
+          )
+          rp.association(:preset_comments).add_to_target(pc)
+        end
+
+        parent.rubric_preset = rp
+
+        rp
       end
 
       def revert_presets(preset)
@@ -479,20 +381,30 @@ module UploadsHelper
         }.compact
       end
 
-      def convert_rubric(rubric)
-        return { type: 'none' } if rubric.nil?
+      def convert_rubric(owners, rubric, parent = nil)
+        if rubric.nil?
+          ret = Rubric.new(
+            **owners,
+            type: 'None',
+          )
+          parent.association(:subsections).add_to_target(ret) if parent.present?
+          return ret
+        end
 
-        {
-          type: rubric['type'],
-          description: make_html_val(rubric['description']),
+        ret = Rubric.new(
+          **owners,
+          type: rubric['type'].capitalize,
+          description: rubric['description'],
           points: rubric['points'],
-          choices:
-            if rubric['choices'].is_a? Array
-              rubric['choices'].map { |c| convert_rubric(c) }
-            else
-              convert_presets(rubric['choices'])
-            end,
-        }.compact
+        )
+        parent.association(:subsections).add_to_target(ret) if parent.present?
+        if rubric['choices'].is_a? Array
+          rubric['choices'].map { |c| convert_rubric(owners, c, ret) }
+        else
+          convert_presets(rubric['choices'], ret)
+        end
+
+        ret
       end
 
       def revert_rubric(rubric)

@@ -33,23 +33,11 @@ class Upload
     @upload = upload
     @upload_data = @upload.read
     @files = []
-    @info = {}
-    @rubrics = []
     @dir = Pathname.new(ArchiveUtils.mktmpdir)
+  end
+
+  def build_exam_version(default_name, destination = nil)
     extract_contents!
-    parse_info!
-    purge!
-  end
-
-  private
-
-  def purge!
-    FileUtils.remove_entry_secure @dir
-  end
-
-  EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload.json').to_s
-
-  def parse_info!
     file =
       if @dir.children.length == 1
         @dir.children.first
@@ -62,11 +50,20 @@ class Upload
 
     JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
     JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, files) if files
-    @info, @rubrics = FormatConverter.parse_info(properties)
-    @info.deep_stringify_keys!
-    @rubrics.deep_stringify_keys!
-    @files = files if files
+
+    answer = FormatConverter.build_exam_version(properties, default_name, files, destination)
+    purge!
+
+    answer
   end
+
+  private
+
+  def purge!
+    FileUtils.remove_entry_secure @dir
+  end
+
+  EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload.json').to_s
 
   def rec_path(base_path, path)
     if path.symlink?

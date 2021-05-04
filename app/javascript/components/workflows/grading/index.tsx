@@ -1117,7 +1117,7 @@ const Grade: React.FC<{
         id
         ...gradingRubric
         questions
-        answers
+        # answers
         files
       }
     }
@@ -1424,7 +1424,7 @@ const ShowOnePart: React.FC<{
         id
         ...gradingRubric
         questions
-        answers
+        # answers
         files
       }
     }
@@ -1502,7 +1502,7 @@ const GradeOnePart: React.FC = () => {
         }
         examVersion {
           qpPairs { qnum pnum }
-          answers
+          # answers
         }
       }
     }

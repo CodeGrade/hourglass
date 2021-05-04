@@ -52,19 +52,11 @@ class ExamVersion < ApplicationRecord
   end
 
   def policies
-    @policies.to_s.split ','
-  end
-
-  def reference
-    contents['reference'] || []
-  end
-
-  def instructions
-    contents['instructions'] || { type: 'HTML', value: '' }
+    self[:policies].to_s.split ','
   end
 
   def total_points
-    questions.map { |q| q['parts'].map { |p| p['points'] }.sum }.sum
+    db_questions.flat_map(&:parts).flat_map(&:points).sum
   end
 
   def default_answers
@@ -128,9 +120,9 @@ class ExamVersion < ApplicationRecord
     {
       'policies' => policies,
       'contents' => {
-        'instructions' => blank_to_nil(@instructions),
+        'instructions' => compact_blank(instructions),
         'questions' => db_questions.order(:index).map(&:as_json),
-        'reference' => blank_to_nil(db_references.where(
+        'reference' => compact_blank(db_references.where(
           question: nil,
           part: nil,
         ).order(:index).map(&:as_json)),
@@ -138,61 +130,6 @@ class ExamVersion < ApplicationRecord
       }.compact,
     }
   end
-
-  def blank_to_nil(val)
-    return nil if val.blank?
-
-    val
-  end
-
-  # def import_rubric(raw, qpb, order = nil, parent = nil)
-  #   q, p, b = qpb
-  #   raise 'Given raw rubric was nil' if raw.nil?
-
-  #   rubric = Rubric.find_or_initialize_by(
-  #     exam_version: self,
-  #     question: q,
-  #     part: p,
-  #     body_item: b,
-  #     parent_section: parent,
-  #   )
-  #   rubric.assign_attributes(
-  #     type: raw['type'].capitalize,
-  #     order: order,
-  #     description: raw.dig('description', 'value'),
-  #     points: raw['points'],
-  #     parent_section: parent,
-  #   )
-  #   association(:rubrics).add_to_target(rubric)
-  #   if raw['choices'].is_a? Hash
-  #     import_presets(raw['choices'], rubric)
-  #   else
-  #     rubric.subsections.destroy_all # this should always be empty anyway
-  #     raw['choices']&.each_with_index do |c, cindex|
-  #       import_rubric(c, qpb, cindex, rubric)
-  #     end
-  #   end
-  # end
-
-  # def import_presets(presets, rubric)
-  #   p = RubricPreset.new(
-  #     label: presets['label'],
-  #     direction: presets['direction'],
-  #     mercy: presets['mercy']&.to_f,
-  #   )
-  #   rubric.rubric_preset = p
-  #   presets['presets']&.each_with_index do |preset, pindex|
-  #     c = PresetComment.new(
-  #       label: preset['label'],
-  #       points: preset['points'],
-  #       grader_hint: preset['graderHint'],
-  #       student_feedback: preset['studentFeedback'],
-  #       order: pindex,
-  #       rubric_preset: p,
-  #     )
-  #     p.association(:preset_comments).add_to_target(c)
-  #   end
-  # end
 
   def rubric_as_json
     rubric_tree = multi_group_by(rubrics_for_grading, [:question, :part, :body_item], true)
@@ -447,7 +384,7 @@ class ExamVersion < ApplicationRecord
     res_obj = { info: export_exam_info }
     res_obj['files'] = files if include_files
 
-    JSON.pretty_generate(res_obj)
+    JSON.pretty_generate(compact_blank(res_obj))
   end
 
   def export_all(dir)

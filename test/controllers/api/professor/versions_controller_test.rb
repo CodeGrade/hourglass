@@ -30,8 +30,8 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
 
     get export_file_api_professor_version_path(ev)
     parsed = JSON.parse(response.body)
-    assert_equal ev.info, parsed['info']
-    assert_equal ev.files, parsed['files']
+    assert_equal compact_blank(ev.info), compact_blank(parsed['info'])
+    assert_equal compact_blank(ev.files) || [], compact_blank(parsed['files']) || []
   end
 
   test 'should not export exam version single file for student' do

@@ -130,7 +130,12 @@ class BodyItem < ApplicationRecord
     {
       'Text' => {
         'prompt' => unhtml(info['prompt']),
-        'correctAnswer' => unhtml(answer&.dig('text')),
+        'correctAnswer' =>
+          if answer.is_a? String
+            answer
+          else
+            unhtml(answer&.dig('text'))
+          end,
         'rubric' => rubric_as_json,
       }.compact,
     }

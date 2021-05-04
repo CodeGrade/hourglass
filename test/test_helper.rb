@@ -31,5 +31,18 @@ module ActiveSupport
     fixtures :all
     require 'factory_bot_rails'
     include FactoryBot::Syntax::Methods
+
+    def compact_blank(val)
+      return nil if val.blank? && (val != false)
+
+      case val
+      when Hash
+        val.transform_values { |v| compact_blank(v) }.reject { |_, v| v.blank? && (v != false) }
+      when Array
+        val.map { |v| compact_blank(v) }
+      else
+        val
+      end
+    end
   end
 end

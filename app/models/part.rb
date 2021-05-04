@@ -24,19 +24,13 @@ class Part < ApplicationRecord
         root_rubric.as_json(no_inuse: true).deep_stringify_keys
       end
     {
-      'name' => blank_to_nil(name),
-      'description' => blank_to_nil(description),
+      'name' => compact_blank(name),
+      'description' => compact_blank(description),
       'points' => points,
-      'extraCredit' => extra_credit,
-      'reference' => blank_to_nil(references.order(:index).map(&:as_json)),
+      'extraCredit' => extra_credit || nil,
+      'reference' => compact_blank(references.order(:index).map(&:as_json)),
       'partRubric' => rubric_as_json,
       'body' => body_items.order(:index).map(&:as_json),
     }.compact
-  end
-
-  def blank_to_nil(val)
-    return nil if val.blank?
-
-    val
   end
 end

@@ -9,4 +9,8 @@ class Reference < ApplicationRecord
   def self.inheritance_column
     nil
   end
+
+  def as_json
+    { type => path }
+  end
 end

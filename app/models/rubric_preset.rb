@@ -31,14 +31,14 @@ class RubricPreset < ApplicationRecord
     end
   end
 
-  def as_json(preset_comments_in_use = nil)
-    presets_as_json = preset_comments.sort_by(&:order).map { |p| p.as_json(preset_comments_in_use) }
+  def as_json(preset_comments_in_use = nil, no_inuse = false)
+    presets_as_json = preset_comments.sort_by(&:order).map { |p| p.as_json(preset_comments_in_use, no_inuse) }
     {
       label: label,
       direction: direction,
       mercy: mercy,
       presets: presets_as_json,
-      inUse: presets_as_json.any? { |p| p['inUse'] },
+      inUse: no_inuse ? nil : presets_as_json.any? { |p| p['inUse'] },
     }.compact
   end
 end

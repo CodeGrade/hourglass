@@ -105,6 +105,38 @@ class ExamVersion < ApplicationRecord
     )
   end
 
+  def as_json
+    root_rubric = rubrics.find_by(
+      question: nil,
+      part: nil,
+      body_item: nil,
+      order: nil
+    )
+    rubric_as_json = if root_rubric.nil? || root_rubric.is_a?(None)
+      nil
+    else
+      root_rubric.as_json(nil, true).deep_stringify_keys
+    end
+    {
+      'policies' => policies,
+      'contents' => {
+        'instructions' => blank_to_nil(@instructions),
+        'questions' => db_questions.order(:index).map(&:as_json),
+        'reference' => blank_to_nil(db_references.where(
+          question: nil,
+          part: nil
+        ).order(:index).map(&:as_json)),
+        'examRubric' => rubric_as_json,
+      }.compact
+    }
+  end
+
+  def blank_to_nil(val)
+    return nil if val.blank?
+    
+    val
+  end
+
   # def import_rubric(raw, qpb, order = nil, parent = nil)
   #   q, p, b = qpb
   #   raise 'Given raw rubric was nil' if raw.nil?
@@ -418,7 +450,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def export_exam_info
-    UploadsHelper::FormatConverter.unparse_info(info, rubric_as_json)
+    as_json
   end
 
   def export_files(path, files)

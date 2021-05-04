@@ -26,4 +26,48 @@ class ApplicationRecord < ActiveRecord::Base
       val
     end
   end
+
+  def swap_association(assocClass, assoc, key, index_from, index_to)
+    return if index_from == index_to
+    assocClass.transaction do
+      found = multi_group_by(assoc.where(key => [index_from, index_to]), [key], true)
+      r_from = found[index_from]
+      r_to = found[index_to]
+      raise "Could not find #{key} #{index_from} on #{assocClass} for #{self}" unless r_from
+      raise "Could not find #{key} #{index_to} on #{assocClass} for #{self}" unless r_to
+      r_from.update_columns(key => assoc.count + 1)
+      r_to.update_columns(key =>  index_from)
+      r_from.update_columns(key => index_to)
+    end
+    assoc.reset; nil
+  end
+
+  def move_association(assocClass, assoc, key, index_from, index_to)
+    return if index_from == index_to
+    assocClass.transaction do
+      count = assoc.count
+      [index_from, index_to].each do |index|
+        raise "Invalid #{key} #{index} on #{assocClass}" if index < 0 || index >= count
+      end
+      if index_from < index_to
+        range = (index_from..index_to).to_a
+        offset = -1
+      else
+        range = (index_to..index_from).to_a.reverse
+        offset = 1
+      end
+      found = multi_group_by(assoc.where(key => range), [key], true)
+      raise "Could not find all #{range.size} #{key} on #{assocClass}" unless found.size == range.size
+      todo = range.map do |idx|
+        [found[idx], idx + offset]
+      end
+      todo.shift # toss the first item, since it's the wrong index
+      todo.push([found[range.first], range.last]) # cycle the first item to the end,
+      todo.unshift([found[range.first], count + 1]) # and add a placeholder in front
+      todo.each do |obj, idx|
+        obj.update_columns(key => idx)
+      end
+      assoc.reset; nil
+    end
+  end
 end

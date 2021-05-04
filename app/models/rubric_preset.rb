@@ -3,7 +3,7 @@
 # A collection of preset comments for an individual subsection of a rubric
 class RubricPreset < ApplicationRecord
   belongs_to :rubric
-  has_many :preset_comments, dependent: :destroy
+  has_many :preset_comments, -> { order(:order) }, dependent: :destroy
 
   delegate :exam_version, to: :rubric
   delegate :exam, to: :exam_version
@@ -44,5 +44,13 @@ class RubricPreset < ApplicationRecord
       presets: presets_as_json,
       inUse: no_inuse ? nil : presets_as_json.any? { |p| p['inUse'] },
     }.compact
+  end
+
+  def swap_preset_comments(index_from, index_to)
+    swap_association(PresetComment, preset_comments, :order, index_from, index_to)
+  end
+
+  def move_preset_comments(index_from, index_to)
+    move_association(PresetComment, preset_comments, :order, index_from, index_to)
   end
 end

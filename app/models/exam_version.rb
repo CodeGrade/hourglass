@@ -156,44 +156,6 @@ class ExamVersion < ApplicationRecord
     }.compact.deep_stringify_keys
   end
 
-  def compare_rubrics(rub1, rub2)
-    compare_help('ROOT', rub1, rub2)
-    true
-  rescue RuntimeError => e
-    e.message
-  end
-
-  def compare_help(path, rub1, rub2)
-    if rub1.is_a?(Hash) && rub2.is_a?(Hash)
-      compare_hashes(path, rub1, rub2)
-    elsif rub1.is_a?(Array) && rub2.is_a?(Array)
-      compare_arrays(path, rub1, rub2)
-    elsif rub1 != rub2
-      raise "Not equal at #{path}: #{rub1} != #{rub2}"
-    end
-  end
-
-  def compare_hashes(path, rub1, rub2)
-    mismatch = rub1.keys.to_set ^ rub2.keys.to_set
-    unless mismatch.empty?
-      err = "Mismatched keys at #{path}: #{rub1.keys} ^ #{rub2.keys} = #{mismatch}"
-      raise err
-    end
-    rub1.each_key do |k|
-      compare_help "#{path}.#{k}", rub1[k], rub2[k]
-    end
-  end
-
-  def compare_arrays(path, rub1, rub2)
-    unless rub1.length == rub2.length
-      err = "Mismatched lengths at #{path}: #{rub1.length} vs #{rub2.length}"
-      raise err
-    end
-    (0...rub1.length).each do |i|
-      compare_help "#{path}[#{i}]", rub1[i], rub2[i]
-    end
-  end
-
   def score_for(reg)
     part_scores_for(reg).flatten.sum
   rescue RuntimeError => e
@@ -482,19 +444,5 @@ class ExamVersion < ApplicationRecord
         }
       end.compact
     end
-  end
-
-  def deep_delete_keys!(obj, keys)
-    case obj
-    when Array
-      obj.each { |o| deep_delete_keys!(o, keys) }
-    when Hash
-      keys.each { |k| obj.delete k }
-      obj.each do |k, v|
-        deep_delete_keys! k, keys
-        deep_delete_keys! v, keys
-      end
-    end
-    obj
   end
 end

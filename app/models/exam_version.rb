@@ -14,12 +14,12 @@ class ExamVersion < ApplicationRecord
   has_many :anomalies, through: :registrations
   has_many :grading_locks, through: :registrations
 
-  has_many :rubrics, dependent: :destroy
+  has_many :rubrics, -> { order(:order) }, dependent: :destroy
   has_many :rubric_presets, through: :rubrics
-  has_many :preset_comments, through: :rubric_presets
+  has_many :preset_comments, -> { order(:rubric_preset_id, :order) }, through: :rubric_presets
 
-  has_many :db_references, class_name: 'Reference', dependent: :destroy
-  has_many :db_questions, class_name: 'Question', dependent: :destroy
+  has_many :db_references, -> { order(:index) }, class_name: 'Reference', dependent: :destroy
+  has_many :db_questions, -> { order(:index) }, class_name: 'Question', dependent: :destroy
 
   validates :exam, presence: true
 
@@ -98,6 +98,22 @@ class ExamVersion < ApplicationRecord
     r.assign_attributes(
       type: 'None',
     )
+  end
+
+  def swap_questions(index_from, index_to)
+    swap_association(Question, db_questions, :index, index_from, index_to)
+  end
+
+  def move_questions(index_from, index_to)
+    move_association(Question, db_questions, :index, index_from, index_to)
+  end
+
+  def swap_references(index_from, index_to)
+    swap_association(Reference, db_references, :index, index_from, index_to)
+  end
+
+  def move_references(index_from, index_to)
+    move_association(Reference, db_references, :index, index_from, index_to)
   end
 
   def info

@@ -4,9 +4,9 @@
 class Question < ApplicationRecord
   belongs_to :exam_version
 
-  has_many :parts, dependent: :destroy
-  has_many :references, dependent: :destroy
-  has_many :rubrics, dependent: :destroy
+  has_many :parts, -> { order(:index) }, dependent: :destroy
+  has_many :references, -> { order(:index) }, dependent: :destroy
+  has_many :rubrics, -> { order(:order) }, dependent: :destroy
   has_many :rubric_presets, through: :rubrics
   has_many :preset_comments, through: :rubric_presets
 
@@ -38,5 +38,21 @@ class Question < ApplicationRecord
       'questionRubric' => rubric_as_json,
       'parts' => parts.order(:index).map(&:as_json),
     }.compact
+  end
+
+  def swap_parts(index_from, index_to)
+    swap_association(Part, parts, :index, index_from, index_to)
+  end
+
+  def move_parts(index_from, index_to)
+    move_association(Part, parts, :index, index_from, index_to)
+  end
+
+  def swap_references(index_from, index_to)
+    swap_association(Reference, references, :index, index_from, index_to)
+  end
+
+  def move_references(index_from, index_to)
+    move_association(Reference, references, :index, index_from, index_to)
   end
 end

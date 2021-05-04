@@ -11,7 +11,7 @@ class Rubric < ApplicationRecord
              inverse_of: 'subsections',
              optional: true
 
-  has_many :subsections,
+  has_many :subsections, -> { order(:order) },
            class_name: 'Rubric',
            foreign_key: 'parent_section_id',
            inverse_of: 'parent_section',
@@ -68,6 +68,14 @@ class Rubric < ApplicationRecord
       qpb = "(#{question.index}, #{part.index}, #{body_item.index})"
       errors.add(:order, "cannot be nil if this is a subrubric within #{qpb}")
     end
+  end
+
+  def swap_subsections(index_from, index_to)
+    swap_association(Rubric, subsections, :order, index_from, index_to)
+  end
+
+  def move_subsections(index_from, index_to)
+    move_association(Rubric, subsections, :order, index_from, index_to)
   end
 
   def points_if_preset

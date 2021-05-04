@@ -26,6 +26,8 @@ class Rubric < ApplicationRecord
 
   delegate :exam, to: :exam_version
 
+  accepts_nested_attributes_for :subsections, :rubric_preset
+
   # Ensure that preset comments exist, or subsections exist, but not both
   def not_both_presets_and_subsections
     return unless rubric_preset.present? && subsections.present?

@@ -16,7 +16,10 @@ module Mutations
 
     def resolve(registration:, qnum:, pnum:)
       GradingLock.transaction do
-        lock = registration.grading_locks.find_or_initialize_by(registration: registration, qnum: qnum, pnum: pnum)
+        ev = registration.exam_version
+        question = ev.db_questions.find_by(index: qnum)
+        part = question.parts.find_by(index: pnum)
+        lock = registration.grading_locks.find_or_initialize_by(registration: registration, question: question, part: part)
         raise GraphQL::ExecutionError, 'That part is already being graded.' if lock&.grader
 
         lock.grader = context[:current_user]

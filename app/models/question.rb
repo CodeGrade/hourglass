@@ -13,6 +13,8 @@ class Question < ApplicationRecord
   delegate :visible_to?, to: :exam_version
   delegate :course, to: :exam_version
 
+  accepts_nested_attributes_for :parts, :rubrics, :references
+
   def as_json
     root_rubric = rubrics.find_by(
       part: nil,

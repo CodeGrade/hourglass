@@ -8,6 +8,8 @@ class RubricPreset < ApplicationRecord
   delegate :exam_version, to: :rubric
   delegate :exam, to: :exam_version
 
+  accepts_nested_attributes_for :preset_comments
+
   def total_points
     preset_comments.sum(&:points)
   end

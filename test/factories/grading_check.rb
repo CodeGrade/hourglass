@@ -9,8 +9,8 @@ FactoryBot.define do
     registration
     creator { staff_registration.user }
 
-    qnum { 0 }
-    pnum { 0 }
-    bnum { 0 }
+    question { registration.exam_version.db_questions.find_by(index: 0) }
+    part { question.parts.find_by(index: 0) }
+    body_item { part.body_items.find_by(index: 0) }
   end
 end

@@ -130,6 +130,11 @@ module Types
     field :qp_pairs, [Types::QpPairType], null: false do
       guard Guards::ALL_STAFF
     end
+    def qp_pairs
+      object.qp_pairs.map do |qp|
+        { qnum: qp.question.index, pnum: qp.part.index }
+      end
+    end
 
     field :completion_summary, GraphQL::Types::JSON, null: false do
       guard Guards::ALL_STAFF

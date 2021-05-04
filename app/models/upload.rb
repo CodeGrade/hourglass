@@ -48,7 +48,7 @@ class Upload
     files = properties.delete('files')
     raise 'Specify files either in YAML or a directory, not both' if files.present? && @files.present?
 
-    JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
+    JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, properties)
     JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, files) if files
 
     answer = FormatConverter.build_exam_version(properties, default_name, files, destination)
@@ -62,8 +62,6 @@ class Upload
   def purge!
     FileUtils.remove_entry_secure @dir
   end
-
-  EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload.json').to_s
 
   def rec_path(base_path, path)
     if path.symlink?

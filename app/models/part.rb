@@ -12,4 +12,28 @@ class Part < ApplicationRecord
 
   delegate :visible_to?, to: :question
   delegate :course, to: :question
+
+  def as_json
+    root_rubric = rubrics.find_by(body_item: nil, order: nil)
+    rubric_as_json = if root_rubric.nil? || root_rubric.is_a?(None)
+      nil
+    else
+      root_rubric.as_json(nil, true).deep_stringify_keys
+    end
+    {
+      'name' => blank_to_nil(name),
+      'description' => blank_to_nil(description),
+      'points' => points,
+      'extraCredit' => extra_credit,
+      'reference' => blank_to_nil(references.order(:index).map(&:as_json)),
+      'partRubric' => rubric_as_json,
+      'body' => body_items.order(:index).map(&:as_json),
+    }.compact
+  end
+
+  def blank_to_nil(val)
+    return nil if val.blank?
+    
+    val
+  end
 end

@@ -27,7 +27,142 @@ class BodyItem < ApplicationRecord
     raise "Bad body item type: #{type}."
   end
 
+  def as_json
+    if @info.is_a? String
+      @info
+    else
+      root_rubric = rubrics.find_by(order: nil)
+      rubric_as_json = if root_rubric.nil? || root_rubric.is_a?(None)
+        nil
+      else
+        root_rubric.as_json(nil, true).deep_stringify_keys
+      end
+      case info['type']
+      when 'HTML'
+        info['value']
+      when 'AllThatApply'
+        {
+          'AllThatApply' => {
+            'prompt' => unhtml(info['prompt']),
+            'options' => info['options'].zip(answer).map do |opt, ans|
+              { unhtml(opt) => ans }
+            end,
+            'rubric' => rubric_as_json,
+          }.compact
+        }
+      when 'Code'
+        initial = info['initial']
+        unless initial.nil?
+          if initial.key? 'file'
+            # potentially nothing to do here; confirm with parse_info
+          else
+            unprocessed = MarksProcessor.process_marks_reverse(initial['text'], initial['marks'])
+            initial = { 'code' => unprocessed }
+          end
+        end
+        {
+          'Code' => {
+            'prompt' => unhtml(info['prompt']),
+            'lang' => unhtml(info['lang']),
+            'initial' => initial,
+            'correctAnswer' => 
+              if answer.blank? || answer.dig("text").blank?
+                nil
+              else
+                MarksProcessor.process_marks_reverse(answer['text'], answer['marks'])
+              end,
+            'rubric' => rubric_as_json,
+          }.compact
+        }
+      when 'CodeTag'
+        {
+          'CodeTag' => {
+            'prompt' => unhtml(info['prompt']),
+            'choices' => unhtml(info['choices']),
+            'correctAnswer' => {
+              'filename' => answer['selectedFile'],
+              'line' => answer['lineNumber'],
+            },
+            'rubric' => rubric_as_json,
+          }.compact
+        }
+      when 'Matching'
+        {
+          'Matching' => {
+            'prompt' => unhtml(info['prompt']),
+            'promptsLabel' => unhtml(info['promptsLabel']),
+            'valuesLabel' => unhtml(info['valuesLabel']),
+            'prompts' => unhtmls(info['prompts']),
+            'values' => unhtmls(info['values']),
+            'correctAnswers' => answer,
+            'rubric' => rubric_as_json,
+          }.compact
+        }
+      when 'MultipleChoice'
+        {
+          'MultipleChoice' => {
+            'prompt' => unhtml(info['prompt']),
+            'options' => unhtmls(info['options']),
+            'correctAnswer' => answer,
+            'rubric' => rubric_as_json,
+          }.compact
+        }
+      when 'Text'
+        {
+          'Text' => {
+            'prompt' => unhtml(info['prompt']),
+            'correctAnswer' => unhtml(answer&.dig("text")),
+            'rubric' => rubric_as_json,
+          }.compact
+        }
+      when 'YesNo'
+        case info['yesLabel']
+        when 'Yes'
+          if info['prompt'].blank?
+            { 'YesNo' => answer }
+          else 
+            {
+              'YesNo' => {
+                'prompt' => unhtml(info['prompt']),
+                'correctAnswer' => answer,
+                'rubric' => rubric_as_json,
+              }.compact
+            }
+          end
+        else
+          if info['prompt'].blank?
+            { 'TrueFalse' => @answer }
+          else 
+            {
+              'TrueFalse' => {
+                'prompt' => unhtml(info['prompt']),
+                'correctAnswer' => answer,
+                'rubric' => rubric_as_json,
+              }.compact
+            }
+          end
+        end
+      end
+    end
+  end
+
   private
+
+  def unhtml(val)
+    return nil if val.blank? || (val['type'] == 'HTML' && val['value'].blank?)
+    
+    if val.is_a? Hash
+      val['value']
+    else
+      val
+    end
+  end
+
+  def unhtmls(val)
+    return nil if val.nil?
+
+    val.map { |o| unhtml(o) }
+  end
 
   class << self
 

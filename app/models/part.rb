@@ -13,6 +13,8 @@ class Part < ApplicationRecord
   delegate :visible_to?, to: :question
   delegate :course, to: :question
 
+  accepts_nested_attributes_for :body_items, :rubrics, :references
+
   def as_json
     root_rubric = rubrics.find_by(body_item: nil, order: nil)
     rubric_as_json = if root_rubric.nil? || root_rubric.is_a?(None)

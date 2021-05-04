@@ -11,6 +11,8 @@ class BodyItem < ApplicationRecord
   has_many :rubric_presets, through: :rubrics
   has_many :preset_comments, through: :rubric_presets
 
+  accepts_nested_attributes_for :rubrics
+
   # TODO: validate answer with JSON schema
 
   def self.inheritance_column
@@ -23,13 +25,13 @@ class BodyItem < ApplicationRecord
     else
       self.send("from_yaml_#{type}", type, entireValue: rest)
     end
-  rescue NoMethodError
-    raise "Bad body item type: #{type}."
+  rescue NoMethodError => e
+    raise "Bad body item type: #{type}: #{e}."
   end
 
   def as_json
-    if @info.is_a? String
-      @info
+    if info.is_a? String
+      info
     else
       root_rubric = rubrics.find_by(order: nil)
       rubric_as_json = if root_rubric.nil? || root_rubric.is_a?(None)
@@ -293,6 +295,21 @@ class BodyItem < ApplicationRecord
         }.compact,
         answer: answer,
       )
+    end
+
+    def ensure_utf8(str, mimetype)
+      return str if ApplicationHelper.binary?(mimetype)
+      return str if str.is_utf8?
+  
+      begin
+        if str.dup.force_encoding(Encoding::CP1252).valid_encoding?
+          str.encode(Encoding::UTF_8, Encoding::CP1252)
+        else
+          str.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '?')
+        end
+      rescue RuntimeError
+        str
+      end
     end
   end
 end

@@ -32,9 +32,9 @@ module UploadsHelper
       }
 
       contents['reference']&.each_with_index do |ref, refnum|
-        new_ref = convert_reference(ref, refnum, ev)
+        new_ref = convert_reference(ref, refnum, version)
         next unless new_ref
-        ev.association(:db_references).add_to_target(new_ref)
+        version.association(:db_references).add_to_target(new_ref)
         avail_references["exam"] = true
       end
 
@@ -79,7 +79,7 @@ module UploadsHelper
           part.association(:rubrics).add_to_target(p_rubric)
           avail_references["part"] = false
           pinfo['reference']&.each_with_index do |ref, refnum|
-            new_ref = convert_reference(ref, refnum, ev)
+            new_ref = convert_reference(ref, refnum, version)
             next unless new_ref
             part.association(:references).add_to_target(new_ref)
             avail_references["part"] = true
@@ -158,10 +158,11 @@ module UploadsHelper
         rp
       end
 
-      def convert_rubric(owners, rubric, parent = nil)
+      def convert_rubric(owners, rubric, parent = nil, order = nil)
         if rubric.nil?
           ret = Rubric.new(
             **owners,
+            order: order,
             type: 'None',
           )
           parent.association(:subsections).add_to_target(ret) if parent.present?
@@ -173,30 +174,18 @@ module UploadsHelper
           type: rubric['type'].capitalize,
           description: rubric['description'],
           points: rubric['points'],
+          order: order,
         )
         parent.association(:subsections).add_to_target(ret) if parent.present?
         if rubric['choices'].is_a? Array
-          rubric['choices'].map { |c| convert_rubric(owners, c, ret) }
+          rubric['choices'].each_with_index do |c, cindex|
+            convert_rubric(owners, c, ret, cindex)
+          end
         else
           convert_presets(rubric['choices'], ret)
         end
 
         ret
-      end
-
-      def ensure_utf8(str, mimetype)
-        return str if ApplicationHelper.binary?(mimetype)
-        return str if str.is_utf8?
-    
-        begin
-          if str.dup.force_encoding(Encoding::CP1252).valid_encoding?
-            str.encode(Encoding::UTF_8, Encoding::CP1252)
-          else
-            str.encode(Encoding::UTF_8, invalid: :replace, undef: :replace, replace: '?')
-          end
-        rescue RuntimeError
-          str
-        end
       end
     end
   end

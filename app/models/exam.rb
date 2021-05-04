@@ -222,11 +222,11 @@ class Exam < ApplicationRecord
       existing = existing.group_by(&:registration_id)
       registrations.final.each do |registration|
         existing_for_reg = existing[registration.id] || []
-        existing_pairs = existing_for_reg.map { |gl| { qnum: gl.qnum, pnum: gl.pnum } }
+        existing_pairs = existing_for_reg.map { |gl| { question: gl.question, part: gl.part } }
         existing_pairs = existing_pairs.to_set
         missing = pairs_by_version[registration.exam_version_id].reject { |qp| existing_pairs.member? qp }
         missing.each do |qp|
-          GradingLock.create(registration: registration, qnum: qp[:qnum], pnum: qp[:pnum])
+          GradingLock.create(registration: registration, question: qp[:question], part: qp[:part])
         end
       end
     end

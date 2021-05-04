@@ -5,7 +5,7 @@ FactoryBot.define do
     cs2500_v1
 
     before(:create) do |ev, context|
-      ev.import_rubrics(context.upload.rubrics)
+      context.upload.build_exam_version(context.name, ev)
     end
 
     trait :cs2500_v1 do
@@ -59,7 +59,5 @@ FactoryBot.define do
     end
 
     exam
-    files { upload.files }
-    info { upload.info }
   end
 end

@@ -30,6 +30,9 @@ class ExamVersion < ApplicationRecord
 
   before_save :create_all_none_rubrics
 
+  accepts_nested_attributes_for :db_questions, :rubrics, :db_references
+
+  EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload.json').to_s
   FILES_SCHEMA = Rails.root.join('config/schemas/files.json').to_s
   validates :files, presence: true, allow_blank: true, json: {
     schema: -> { FILES_SCHEMA },
@@ -103,6 +106,10 @@ class ExamVersion < ApplicationRecord
     r.assign_attributes(
       type: 'None',
     )
+  end
+
+  def info
+    as_json
   end
 
   def as_json
@@ -187,7 +194,7 @@ class ExamVersion < ApplicationRecord
   # end
 
   def rubric_as_json
-    rubric_tree = multi_group_by(rubrics_for_grading, [:qnum, :pnum, :bnum], true)
+    rubric_tree = multi_group_by(rubrics_for_grading, [:question, :part, :body_item], true)
     preset_comments_in_use = preset_comments.joins(:grading_comments).pluck(:id)
     exam_rubric = rubric_tree.delete(nil)&.dig(nil, nil)&.as_json(preset_comments_in_use)
     q_rubrics = rubric_tree.sort.map do |_qnum, rubrics_q|
@@ -431,7 +438,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def export_json(include_files: false)
-    res_obj = export_exam_info
+    res_obj = { info: export_exam_info }
     res_obj['files'] = files if include_files
 
     JSON.pretty_generate(res_obj)
@@ -473,7 +480,7 @@ class ExamVersion < ApplicationRecord
   def qp_pairs
     db_questions.map do |q|
       q.parts.map do |p|
-        { qnum: q.index, pnum: p.index }
+        { question: q, part: p }
       end
     end.flatten(1)
   end

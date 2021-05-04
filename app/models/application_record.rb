@@ -13,4 +13,17 @@ class ApplicationRecord < ActiveRecord::Base
       Hash[hash.group_by(&(keys[index])).map { |k, v| [k, multi_group_by(v, keys, last_key_unique, index + 1)]}]
     end
   end
+
+  def compact_blank(val)
+    return nil if val.blank? && (val != false)
+
+    case val
+    when Hash
+      val.transform_values { |v| compact_blank(v) }.reject { |k, v| v.blank? && (v != false) }
+    when Array
+      val.map { |v| compact_blank(v) }
+    else
+      val
+    end
+  end
 end

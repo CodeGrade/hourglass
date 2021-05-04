@@ -46,6 +46,7 @@ class Upload
       end
     properties = YAML.safe_load(File.read(file)).deep_stringify_keys
     files = properties.delete('files')
+    properties = properties['info'] if properties['info']
     raise 'Specify files either in YAML or a directory, not both' if files.present? && @files.present?
 
     JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, properties)

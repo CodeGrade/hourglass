@@ -28,21 +28,15 @@ class Question < ApplicationRecord
         root_rubric.as_json(no_inuse: true).deep_stringify_keys
       end
     {
-      'name' => blank_to_nil(name),
-      'description' => blank_to_nil(description),
-      'extraCredit' => extra_credit,
+      'name' => compact_blank(name),
+      'description' => compact_blank(description),
+      'extraCredit' => extra_credit || nil,
       'separateSubparts' => separate_subparts,
-      'reference' => blank_to_nil(references.where(
+      'reference' => compact_blank(references.where(
         part: nil,
       ).order(:index).map(&:as_json)),
       'questionRubric' => rubric_as_json,
       'parts' => parts.order(:index).map(&:as_json),
     }.compact
-  end
-
-  def blank_to_nil(val)
-    return nil if val.blank?
-
-    val
   end
 end

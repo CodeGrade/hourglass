@@ -2,16 +2,16 @@
 
 # Rubrics in an exam form a tree, whose leaves are RubricPresets
 class Rubric < ApplicationRecord
-  belongs_to :exam_version
-  belongs_to :question, optional: true
-  belongs_to :part, optional: true
-  belongs_to :body_item, optional: true
+  belongs_to :exam_version, inverse_of: :rubrics
+  belongs_to :question, optional: true, inverse_of: :rubrics
+  belongs_to :part, optional: true, inverse_of: :rubrics
+  belongs_to :body_item, optional: true, inverse_of: :rubrics
   belongs_to :parent_section,
              class_name: 'Rubric',
              inverse_of: 'subsections',
              optional: true
 
-  has_many :subsections, -> { order(:order) },
+  has_many :subsections,
            class_name: 'Rubric',
            foreign_key: 'parent_section_id',
            inverse_of: 'parent_section',

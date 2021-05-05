@@ -2,11 +2,11 @@
 
 # An question part, part of a question.
 class Part < ApplicationRecord
-  belongs_to :question
+  belongs_to :question, inverse_of: :parts
 
-  has_many :body_items, -> { order(:index) }, dependent: :destroy
-  has_many :references, -> { order(:index) }, dependent: :destroy
-  has_many :rubrics, -> { order(:order) }, dependent: :destroy
+  has_many :body_items, -> { order(:index) }, dependent: :destroy, inverse_of: :part
+  has_many :references, -> { order(:index) }, dependent: :destroy, inverse_of: :part
+  has_many :rubrics, -> { order(:order) }, dependent: :destroy, inverse_of: :part
   has_many :rubric_presets, through: :rubrics
   has_many :preset_comments, through: :rubric_presets
 

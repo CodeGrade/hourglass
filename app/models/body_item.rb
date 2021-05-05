@@ -2,7 +2,7 @@
 
 # A body item, part of a question part.
 class BodyItem < ApplicationRecord
-  belongs_to :part
+  belongs_to :part, inverse_of: :body_items
 
   delegate :visible_to?, to: :part
   delegate :course, to: :part

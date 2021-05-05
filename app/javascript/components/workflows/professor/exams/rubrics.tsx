@@ -9,6 +9,7 @@ import {
   RubricOne,
   RubricAny,
 } from './types';
+import { showExamViewer$data } from '@hourglass/workflows/proctor/registrations/show/__generated__/showExamViewer.graphql';
 
 const nullNumComp = (n1, n2) => {
   if (n1 === n2) return 0;
@@ -23,7 +24,7 @@ const nullStrComp = (s1, s2) => {
   return (s1 < s2 ? -1 : 1);
 };
 
-type RawRubric = admin_version$data['rubrics'][number];
+type RawRubric = showExamViewer$data['rubrics'][number];
 type RawRubricMap = Record<RawRubric['id'], RawRubric>;
 type RawPreset = RawRubric['rubricPreset'];
 
@@ -108,8 +109,11 @@ function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric 
 }
 
 function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
-  const rubric : ExamRubric = {
+  const rubric: ExamRubric = {
     questions: [],
+    examRubric: {
+      type: 'none',
+    },
   };
   const rubricCopy = [...rawRubrics];
   const rubricsByID : RawRubricMap = { };
@@ -133,6 +137,9 @@ function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
       if (rubric.questions[r.qnum] === undefined) {
         rubric.questions[r.qnum] = {
           parts: [],
+          questionRubric: {
+            type: 'none',
+          },
         };
       }
       const byQ = rubric.questions[r.qnum];
@@ -142,6 +149,9 @@ function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
         if (byQ.parts[r.pnum] === undefined) {
           byQ.parts[r.pnum] = {
             body: [],
+            partRubric: {
+              type: 'none',
+            },
           };
         }
         const byP = byQ.parts[r.pnum];

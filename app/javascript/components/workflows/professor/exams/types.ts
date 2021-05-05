@@ -122,10 +122,6 @@ export interface CodeInfoWithAnswer extends CodeInfo {
   answer: CodeState;
 }
 
-export interface HTMLValWithAnswer extends HTMLVal {
-  answer: NoAnswerState;
-}
-
 export interface AllThatApplyOptionWithAnswer {
   html: HTMLVal;
   answer: boolean;
@@ -159,7 +155,7 @@ export interface TextInfoWithAnswer extends TextInfo {
 }
 
 export type BodyItemWithAnswer =
-  HTMLValWithAnswer | AllThatApplyInfoWithAnswer | CodeInfoWithAnswer | YesNoInfoWithAnswer |
+  HTMLVal | AllThatApplyInfoWithAnswer | CodeInfoWithAnswer | YesNoInfoWithAnswer |
   CodeTagInfoWithAnswer | MultipleChoiceInfoWithAnswer |
   TextInfoWithAnswer | MatchingInfoWithAnswer;
 
@@ -207,62 +203,12 @@ export type EditablePreset = Editable<Preset, 'points'>
 
 export type EditableRubricPresets = Editable<RubricPresets, 'points'>
 
-function isHTMLVal(obj : unknown): obj is HTMLVal {
-  return obj !== undefined && obj !== null
-    && (obj as HTMLVal).type === 'HTML'
-    && (typeof (obj as HTMLVal).value === 'string');
-}
-
-function isPreset(obj : unknown): obj is Preset {
-  if (obj === undefined || obj === null) return false;
-  const objAsPreset = (obj as Preset);
-  return (typeof objAsPreset.graderHint === 'string')
-    && (objAsPreset.studentFeedback === undefined || typeof objAsPreset.studentFeedback === 'string')
-    && (typeof objAsPreset.points === 'number');
-}
-
-export function isRubricPresets(obj : unknown): obj is RubricPresets {
-  if (obj === null || obj === undefined) return false;
-  const objAsRubricPresets = (obj as RubricPresets);
-  return (objAsRubricPresets.label === undefined || typeof objAsRubricPresets.label === 'string')
-    && (objAsRubricPresets.direction === 'credit' || objAsRubricPresets.direction === 'deduction')
-    && (objAsRubricPresets.mercy === undefined || typeof objAsRubricPresets.mercy === 'number')
-    && array(isPreset)(objAsRubricPresets.presets);
-}
-
-function isEditablePreset(obj : unknown): obj is EditablePreset {
-  if (obj === undefined || obj === null) return false;
-  const objAsPreset = (obj as Preset);
-  return (typeof objAsPreset.graderHint === 'string')
-    && (objAsPreset.studentFeedback === undefined || typeof objAsPreset.studentFeedback === 'string')
-    && (typeof objAsPreset.points === 'number' || typeof objAsPreset.points === 'string');
-}
-
-export function isEditableRubricPresets(obj : unknown): obj is EditableRubricPresets {
-  if (obj === null || obj === undefined) return false;
-  const objAsRubricPresets = (obj as RubricPresets);
-  return (objAsRubricPresets.label === undefined || typeof objAsRubricPresets.label === 'string')
-    && (objAsRubricPresets.direction === 'credit' || objAsRubricPresets.direction === 'deduction')
-    && (objAsRubricPresets.mercy === undefined || typeof objAsRubricPresets.mercy === 'number')
-    && array(isEditablePreset)(objAsRubricPresets.presets);
-}
-
 export type Rubric = RubricAll | RubricAny | RubricOne | RubricNone;
-
-export function isRubric(obj : unknown): obj is Rubric {
-  // mutual recursion trips up this rule
-  // eslint-disable-next-line no-use-before-define
-  return isRubricAll(obj) || isRubricAny(obj) || isRubricOne(obj) || isRubricNone(obj);
-}
 
 export type RubricNone = {
   type: 'none';
   id?: string;
   inUse?: boolean;
-}
-export function isRubricNone(obj : unknown): obj is RubricNone {
-  return (obj !== undefined && obj !== null)
-    && (obj as RubricNone).type === 'none';
 }
 
 export type RubricAll = {
@@ -271,13 +217,6 @@ export type RubricAll = {
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
   inUse?: boolean;
-}
-export function isRubricAll(obj : unknown): obj is RubricAll {
-  if (obj === undefined || obj === null) return false;
-  const objAsRubricAll = obj as RubricAll;
-  return objAsRubricAll.type === 'all'
-    && maybe(isHTMLVal)(objAsRubricAll.description)
-    && (array(isRubric)(objAsRubricAll.choices) || isRubricPresets(objAsRubricAll.choices));
 }
 
 export type RubricAny = {
@@ -288,15 +227,6 @@ export type RubricAny = {
   choices: Rubric[] | RubricPresets;
   inUse?: boolean;
 }
-export function isRubricAny(obj : unknown): obj is RubricAny {
-  if (obj === undefined || obj === null) return false;
-  const objAsRubricAny = obj as RubricAny;
-  const ans = objAsRubricAny.type === 'any'
-    && (typeof objAsRubricAny.points === 'number')
-    && maybe(isHTMLVal)(objAsRubricAny.description)
-    && (array(isRubric)(objAsRubricAny.choices) || isRubricPresets(objAsRubricAny.choices));
-  return ans;
-}
 
 export type RubricOne = {
   type: 'one';
@@ -306,26 +236,10 @@ export type RubricOne = {
   choices: Rubric[] | RubricPresets;
   inUse?: boolean;
 }
-export function isRubricOne(obj : unknown): obj is RubricOne {
-  if (obj === undefined || obj === null) return false;
-  const objAsRubricOne = obj as RubricOne;
-  const ans = objAsRubricOne.type === 'one'
-    && (typeof objAsRubricOne.points === 'number')
-    && maybe(isHTMLVal)(objAsRubricOne.description)
-    && (array(isRubric)(objAsRubricOne.choices) || isRubricPresets(objAsRubricOne.choices));
-  return ans;
-}
 
 export type PartRubric = {
   partRubric: Rubric;
   body: Rubric[];
-}
-
-export function isPartRubric(obj : unknown): obj is PartRubric {
-  const ans = obj !== null && obj !== undefined
-    && maybe(isRubric)((obj as PartRubric).partRubric)
-    && array(isRubric)((obj as PartRubric).body);
-  return ans;
 }
 
 export type QuestionRubric = {
@@ -333,21 +247,7 @@ export type QuestionRubric = {
   parts: PartRubric[];
 }
 
-export function isQuestionRubric(obj : unknown): obj is QuestionRubric {
-  const ans = obj !== null && obj !== undefined
-    && maybe(isRubric)((obj as QuestionRubric).questionRubric)
-    && array(isPartRubric)((obj as QuestionRubric).parts);
-  return ans;
-}
-
 export type ExamRubric = {
   examRubric: Rubric;
   questions: QuestionRubric[];
-}
-
-export function isExamRubric(obj : unknown): obj is ExamRubric {
-  const ans = obj !== null && obj !== undefined
-    && maybe(isRubric)((obj as ExamRubric).examRubric)
-    && array(isQuestionRubric)((obj as ExamRubric).questions);
-  return ans;
 }

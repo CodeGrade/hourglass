@@ -49,7 +49,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   } = props;
   const {
     name,
-    reference,
+    references,
     description,
     parts,
     separateSubparts,
@@ -58,13 +58,13 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const isCurrent = selectedQuestion === qnum;
   const active = !paginated || isCurrent;
   const classes = active ? '' : 'd-none';
-  const singlePart = parts.length === 1 && !parts[0].name?.value?.trim();
+  const singlePart = parts.length === 1 && !parts[0].name?.trim();
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
   const questionFilesContextVal = useMemo(() => ({
-    references: reference,
-  }), [reference]);
+    references,
+  }), [references]);
   return (
     <QuestionFilesContext.Provider value={questionFilesContextVal}>
       <div className={classes}>
@@ -81,7 +81,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           )}
         </h1>
         <HTML value={description} />
-        {reference.length !== 0 && <FileViewer references={reference} />}
+        {references.length !== 0 && <FileViewer references={references} />}
         <BottomScrollspy
           question={qnum}
           separateSubparts={separateSubparts}

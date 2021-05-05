@@ -210,6 +210,9 @@ const ExamSubmission: React.FC = () => {
           displayName
         }
         exam { name }
+        examVersion {
+          ...showExamViewer
+        }
         reviewExam
         canIGrade
       }
@@ -263,7 +266,7 @@ const ExamSubmission: React.FC = () => {
         ))}
       </h1>
       <ExamViewer
-        contents={parsedContents}
+        version={registration.examVersion}
         currentGrading={currentGrading as CurrentGrading}
         showRequestGrading={canIGrade ? registrationId : null}
         showStarterCode={false}

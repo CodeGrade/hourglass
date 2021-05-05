@@ -89,15 +89,9 @@ const ShowParts: React.FC<{
               }).then((result) => {
                 const { rubric } = result.createRubric;
                 const p: PartInfoWithAnswers = {
-                  reference: [],
-                  name: {
-                    type: 'HTML',
-                    value: '',
-                  },
-                  description: {
-                    type: 'HTML',
-                    value: '',
-                  },
+                  references: [],
+                  name: '',
+                  description: '',
                   points: 0,
                   body: [],
                   partRubric: {

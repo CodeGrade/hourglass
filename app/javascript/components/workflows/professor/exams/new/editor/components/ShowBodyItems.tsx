@@ -122,10 +122,7 @@ const ShowBodyItems: React.FC<{
               onClick={(): void => {
                 createNewItem({
                   type: 'AllThatApply',
-                  prompt: {
-                    type: 'HTML',
-                    value: '',
-                  },
+                  prompt: '',
                   options: [],
                 });
               }}
@@ -137,10 +134,7 @@ const ShowBodyItems: React.FC<{
                 createNewItem({
                   type: 'Code',
                   lang: Object.keys(languages)[0],
-                  prompt: {
-                    type: 'HTML',
-                    value: '',
-                  },
+                  prompt: '',
                   answer: {
                     text: '',
                     marks: [],
@@ -155,10 +149,7 @@ const ShowBodyItems: React.FC<{
                 createNewItem({
                   type: 'CodeTag',
                   choices: 'exam',
-                  prompt: {
-                    type: 'HTML',
-                    value: '',
-                  },
+                  prompt: '',
                 });
               }}
             >
@@ -168,10 +159,7 @@ const ShowBodyItems: React.FC<{
               onClick={(): void => {
                 createNewItem({
                   type: 'Matching',
-                  prompt: {
-                    type: 'HTML',
-                    value: '',
-                  },
+                  prompt: '',
                   prompts: [],
                   values: [],
                 });
@@ -183,10 +171,7 @@ const ShowBodyItems: React.FC<{
               onClick={(): void => {
                 createNewItem({
                   type: 'MultipleChoice',
-                  prompt: {
-                    type: 'HTML',
-                    value: '',
-                  },
+                  prompt: '',
                   options: [],
                 });
               }}
@@ -197,10 +182,7 @@ const ShowBodyItems: React.FC<{
               onClick={(): void => {
                 createNewItem({
                   type: 'Text',
-                  prompt: {
-                    type: 'HTML',
-                    value: '',
-                  },
+                  prompt: '',
                   answer: '',
                 });
               }}
@@ -213,10 +195,7 @@ const ShowBodyItems: React.FC<{
                   type: 'YesNo',
                   yesLabel: 'Yes',
                   noLabel: 'No',
-                  prompt: {
-                    type: 'HTML',
-                    value: '',
-                  },
+                  prompt: '',
                 });
               }}
             >

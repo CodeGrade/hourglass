@@ -16,7 +16,6 @@ import { PartFilesContext } from '@hourglass/common/context';
 import { NumericInput } from '@hourglass/common/NumericInput';
 import MoveItem from '@professor/exams/new/editor/components/MoveItem';
 import ShowBodyItems from '@professor/exams/new/editor/components/ShowBodyItems';
-import RubricEditor from '@professor/exams/new/editor/RubricEditor';
 import YesNo from '@student/exams/show/components/questions/YesNo';
 import { YesNoInfo } from '@student/exams/show/types';
 import { EditHTMLField } from './editHTMLs';
@@ -59,10 +58,7 @@ const EC_YESNO: YesNoInfo = {
   type: 'YesNo',
   yesLabel: 'Yes',
   noLabel: 'No',
-  prompt: {
-    type: 'HTML',
-    value: '',
-  },
+  prompt: '',
 };
 const PartExtraCredit: React.FC<WrappedFieldProps> = (props) => {
   const {

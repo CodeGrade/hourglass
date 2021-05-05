@@ -21,8 +21,6 @@ import Select from 'react-select';
 import ErrorBoundary from '@hourglass/common/boundary';
 import {
   Rubric,
-  isRubricPresets,
-  isEditableRubricPresets,
   RubricPresets,
   EditableRubricPresets,
 } from '@professor/exams/types';
@@ -277,7 +275,7 @@ const RubricEntriesEditor: React.FC<WrappedFieldProps & RubricEntriesProps> = (p
     input,
   } = props;
   const { value, onChange } = input;
-  const anyPresets = (isEditableRubricPresets(value) && value.presets.length > 0);
+  const anyPresets = ((value as EditableRubricPresets).presets?.length > 0);
   const anySections = (value instanceof Array && value.length > 0);
   const freeChoice = !(anyPresets || anySections);
   if (freeChoice) {
@@ -402,7 +400,7 @@ const ChangeRubricType: React.FC<{
   const disableAllWhenPreset = (option) => {
     if (option.value !== 'all') { return false; } // only disable 'all'...
     if (value && 'choices' in value) { //  if we have any saved choices...
-      if (isRubricPresets(value.choices)) { //        that are presets,...
+      if (!(value.choices instanceof Array)) { //     that are presets,...
         if (value.choices.presets.length > 0) { // and presets are present
           return true;
         }

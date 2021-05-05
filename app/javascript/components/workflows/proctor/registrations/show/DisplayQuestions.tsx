@@ -14,7 +14,6 @@ interface DisplayQuestionsProps {
   showStarterCode: boolean;
   version: DisplayQuestions$key;
 }
-  // questions: QuestionInfo[];
 
 const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
   const {
@@ -63,7 +62,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           // Question numbers are STATIC.
           // eslint-disable-next-line react/no-array-index-key
           key={i}
-          question={q}
+          question={q as QuestionInfo}
           qnum={i}
           currentGrading={currentGrading[i]}
           refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}

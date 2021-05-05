@@ -2,7 +2,6 @@ import {
   CodeInfo,
   CodeState,
   HTMLVal,
-  NoAnswerState,
   AllThatApplyInfo,
   YesNoInfo,
   YesNoState,
@@ -21,13 +20,6 @@ import {
 export function assertType<T>(isT: (val: unknown) => val is T, val: unknown): T {
   if (isT(val)) return val;
   throw new Error("value doesn't meet its type specification");
-}
-
-function maybe<T>(isT: (val: unknown) => val is T): (val: unknown) => val is T {
-  return (val: unknown): val is T => (val === undefined || isT(val));
-}
-function array<T>(isT: (val: unknown) => val is T): (val: unknown) => val is T[] {
-  return (val: unknown): val is T[] => (val instanceof Array) && val.every(isT);
 }
 
 interface GradingCheck {

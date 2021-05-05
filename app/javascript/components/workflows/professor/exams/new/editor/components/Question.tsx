@@ -23,10 +23,7 @@ const SEP_SUB_YESNO: YesNoInfo = {
   type: 'YesNo',
   yesLabel: 'Yes',
   noLabel: 'No',
-  prompt: {
-    type: 'HTML',
-    value: '',
-  },
+  prompt: '',
 };
 
 const QuestionSepSubParts: React.FC<WrappedFieldProps> = (props) => {

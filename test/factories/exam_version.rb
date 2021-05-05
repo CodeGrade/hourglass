@@ -13,7 +13,7 @@ FactoryBot.define do
       transient do
         upload { create(:upload, :blank) }
       end
-      before(:create) do |ev, context|
+      before(:create) do |ev, _context|
         ev.db_questions.delete_all
       end
     end

@@ -5,8 +5,8 @@ class Question < ApplicationRecord
   belongs_to :exam_version, inverse_of: :db_questions
 
   has_many :parts, -> { order(:index) }, dependent: :destroy, inverse_of: :question
-  has_many :references, -> { order(:index) }, dependent: :destroy
-  has_many :rubrics, -> { order(:order) }, dependent: :destroy
+  has_many :references, -> { order(:index) }, dependent: :destroy, inverse_of: :question
+  has_many :rubrics, -> { order(:order) }, dependent: :destroy, inverse_of: :question
   has_many :rubric_presets, through: :rubrics
   has_many :preset_comments, through: :rubric_presets
 

@@ -14,7 +14,7 @@ class ExamVersion < ApplicationRecord
   has_many :anomalies, through: :registrations
   has_many :grading_locks, through: :registrations
 
-  has_many :rubrics, -> { order(:order) }, dependent: :destroy
+  has_many :rubrics, -> { order(:order) }, dependent: :destroy, inverse_of: :exam_version
   has_many :rubric_presets, through: :rubrics
   has_many :preset_comments, -> { order(:rubric_preset_id, :order) }, through: :rubric_presets
 

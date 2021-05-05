@@ -6,6 +6,12 @@ FactoryBot.define do
   factory :upload do
     cs2500_v1
 
+    trait :blank do
+      transient do
+        file_name { 'blank' }
+      end
+    end
+
     trait :cs2500_v1 do
       transient do
         file_name { 'cs2500midterm-v1' }

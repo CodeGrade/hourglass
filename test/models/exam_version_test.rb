@@ -71,4 +71,35 @@ class ExamVersionTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'questions are ordered' do
+    ev = create(:exam_version, :blank)
+    assert ev.db_questions.empty?
+    (0..4).to_a.shuffle.each do |i|
+      ev.db_questions << Question.new(name: "Question #{i}", index: i)
+    end
+    ev.db_questions.reset
+    assert_equal ev.db_questions.count, 5
+    assert ev.db_questions.sorted_by?(&:index)
+  end
+
+  test 'can swap questions' do
+    num_questions = 5
+    (0...num_questions).each do |from|
+      (0...num_questions).each do |to|
+        ev = create(:exam_version, :blank)
+        assert ev.db_questions.empty?
+        (0...num_questions).to_a.shuffle.each do |i|
+          ev.db_questions << Question.new(name: "Question #{i}", index: i)
+        end
+        ev.db_questions.reset
+        assert_equal ev.db_questions.count, num_questions
+        assert ev.db_questions.sorted_by?(&:index)
+        q_order = ev.db_questions.pluck(:id)
+        ev.swap_questions(from, to)
+        q_order[from], q_order[to] = q_order[to], q_order[from]
+        assert_equal ev.db_questions.pluck(:id), q_order
+      end
+    end
+  end
 end

@@ -18,8 +18,8 @@ class ExamVersion < ApplicationRecord
   has_many :rubric_presets, through: :rubrics
   has_many :preset_comments, -> { order(:rubric_preset_id, :order) }, through: :rubric_presets
 
-  has_many :db_references, -> { order(:index) }, class_name: 'Reference', dependent: :destroy
-  has_many :db_questions, -> { order(:index) }, class_name: 'Question', dependent: :destroy
+  has_many :db_references, -> { order(:index) }, class_name: 'Reference', dependent: :destroy, inverse_of: :exam_version
+  has_many :db_questions, -> { order(:index) }, class_name: 'Question', dependent: :destroy, inverse_of: :exam_version
 
   validates :exam, presence: true
 

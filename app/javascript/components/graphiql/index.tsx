@@ -24,12 +24,8 @@ const graphQLFetcher: Fetcher = async (graphQLParams) => (
 
 const defaultQuery = `
 {
-  courses {
-    title
-    exams {
-      id
-      name
-    }
+  me {
+    username
   }
 }
 `;

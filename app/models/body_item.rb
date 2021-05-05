@@ -229,7 +229,7 @@ class BodyItem < ApplicationRecord
           type: type,
           prompt: prompt,
           lang: lang,
-          intial: initial,
+          initial: initial,
         }.compact,
         answer: answer,
       )

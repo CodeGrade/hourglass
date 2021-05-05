@@ -51,8 +51,9 @@ class Upload
 
     JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, properties)
     JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, files) if files
+    @files = files if files
 
-    answer = FormatConverter.build_exam_version(properties, default_name, files, destination)
+    answer = FormatConverter.build_exam_version(properties, default_name, @files, destination)
     purge!
 
     answer

@@ -26,11 +26,14 @@ const EditExamVersion: React.FC = () => {
         id
         name
         policies
-        questions
-        reference
+        # questions
+        dbReferences {
+          type
+          path
+        }
         instructions
         files
-        # answers
+        answers
         anyStarted
         anyFinalized
       }

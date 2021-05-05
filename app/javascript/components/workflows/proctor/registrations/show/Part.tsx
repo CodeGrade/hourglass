@@ -114,11 +114,11 @@ const Part: React.FC<PartProps> = (props) => {
   } = props;
   const {
     name,
-    reference,
+    references,
     description,
     points,
     extraCredit = false,
-    body,
+    bodyItems,
   } = part;
   const { rubric } = useContext(ExamViewerContext);
   const pRubric = rubric?.questions[qnum]?.parts[pnum]?.partRubric;
@@ -129,7 +129,7 @@ const Part: React.FC<PartProps> = (props) => {
   } else {
     subtitle = `(${strPoints}${extraCredit ? ', extra credit' : ''})`;
   }
-  const contextVal = useMemo(() => ({ references: reference }), [reference]);
+  const contextVal = useMemo(() => ({ references }), [references]);
 
   return (
     <PartFilesContext.Provider value={contextVal}>
@@ -156,31 +156,39 @@ const Part: React.FC<PartProps> = (props) => {
             )}
           </span>
         </h3>
-        {description?.value && <HTML value={description} />}
-        {reference.length !== 0 && (
+        {description && <HTML value={description} />}
+        {references.length !== 0 && (
           <FileViewer
-            references={reference}
+            references={references}
             refreshProps={refreshCodeMirrorsDeps}
             fullyExpandCode={fullyExpandCode}
           />
         )}
         {pRubric && <ShowRubric rubric={pRubric} forWhat="part" />}
-        {body.map((b, i) => (
-          // Body numbers are STATIC.
-          // eslint-disable-next-line react/no-array-index-key
-          <div className={`p-2 bodyitem ${b.type}`} key={i}>
-            <DisplayBody
-              body={b}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={i}
-              currentGrading={currentGrading?.body[i]}
-              refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
-              fullyExpandCode={fullyExpandCode}
-              showStarterCode={showStarterCode}
-            />
-          </div>
-        ))}
+        {bodyItems.map((b, i) => {
+          let htmlClass = '';
+          if (typeof b.info === 'string') {
+            htmlClass = 'HTML';
+          } else {
+            htmlClass = b.info.type;
+          }
+          return (
+            // Body numbers are STATIC.
+            // eslint-disable-next-line react/no-array-index-key
+            <div className={`p-2 bodyitem ${htmlClass}`} key={i}>
+              <DisplayBody
+                body={b}
+                qnum={qnum}
+                pnum={pnum}
+                bnum={i}
+                currentGrading={currentGrading?.body[i]}
+                refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+                fullyExpandCode={fullyExpandCode}
+                showStarterCode={showStarterCode}
+              />
+            </div>
+          );
+        })}
       </div>
     </PartFilesContext.Provider>
   );

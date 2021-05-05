@@ -23,11 +23,14 @@ const EditExamVersionRubric: React.FC = () => {
       examVersion(id: $examVersionId) {
         id
         name
-        questions
-        reference
+        # questions
+        dbReferences {
+          type
+          path
+        }
         instructions
         files
-        # answers
+        answers
       }
     }
     `,

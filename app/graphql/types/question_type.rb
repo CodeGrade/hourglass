@@ -13,5 +13,7 @@ module Types
     field :extra_credit, Boolean, null: false
     field :separate_subparts, Boolean, null: false
     field :index, Integer, null: false
+
+    field :references, [Types::ReferenceType], null: false
   end
 end

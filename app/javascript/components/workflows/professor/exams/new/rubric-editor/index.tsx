@@ -48,10 +48,7 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
           bnum
           order
           points
-          description { 
-            type
-            value
-          }
+          description
           rubricPreset {
             id
             direction

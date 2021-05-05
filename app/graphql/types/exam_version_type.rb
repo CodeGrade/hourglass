@@ -52,14 +52,26 @@ module Types
       object.registrations.final.count
     end
 
-    field :questions, GraphQL::Types::JSON, null: false do
+    # field :questions, GraphQL::Types::JSON, null: false do
+    #   guard Guards::ALL_STAFF
+    # end
+    # def questions
+    #   object.db_questions.as_json
+    # end
+
+    field :db_questions, [Types::QuestionType], null: false do
       guard Guards::ALL_STAFF
     end
 
-    field :db_questions, [Types::QuestionType], null: false
-
-    field :reference, GraphQL::Types::JSON, null: false do
+    field :db_references, [Types::ReferenceType], null: false do
       guard Guards::ALL_STAFF
+    end
+
+    field :answers, GraphQL::Types::JSON, null: false do
+      guard Guards::ALL_STAFF
+    end
+    def answers
+      object.answers
     end
 
     field :instructions, GraphQL::Types::JSON, null: false do

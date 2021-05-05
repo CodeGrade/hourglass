@@ -2,28 +2,63 @@ import React from 'react';
 import { QuestionInfo } from '@student/exams/show/types';
 import ShowQuestion from '@proctor/registrations/show/ShowQuestion';
 import { CurrentGrading } from '@professor/exams/types';
+import { graphql, useFragment } from 'relay-hooks';
+
+import { DisplayQuestions$key } from './__generated__/DisplayQuestions.graphql';
 
 interface DisplayQuestionsProps {
   refreshCodeMirrorsDeps: React.DependencyList;
-  questions: QuestionInfo[];
   currentGrading?: CurrentGrading;
   showRequestGrading?: string;
   fullyExpandCode: boolean;
   showStarterCode: boolean;
+  version: DisplayQuestions$key;
 }
+  // questions: QuestionInfo[];
 
 const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
     currentGrading = [],
-    questions,
     showRequestGrading,
     fullyExpandCode,
     showStarterCode,
+    version,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment DisplayQuestions on ExamVersion {
+      dbQuestions {
+        id
+        name
+        description
+        separateSubparts
+        references {
+          type
+          path
+        }
+        parts {
+          id
+          name
+          description
+          points
+          references {
+            type
+            path
+          }
+          bodyItems {
+            id
+            info
+          }
+        }
+      }
+    }
+    `,
+    version,
+  );
   return (
     <>
-      {questions.map((q, i) => (
+      {res.dbQuestions.map((q, i) => (
         <ShowQuestion
           // Question numbers are STATIC.
           // eslint-disable-next-line react/no-array-index-key

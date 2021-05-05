@@ -174,12 +174,13 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
   const value = isNoAns(answer) ? undefined : answer;
   const bRubric = rubric?.questions[qnum]?.parts[pnum]?.body[bnum];
 
-  switch (body.type) {
-    case 'HTML':
-      return <HTML value={body} />;
+  if (typeof body.info === 'string') {
+    return <HTML value={body.info} />;
+  }
+  switch (body.info.type) {
     case 'Code': {
       let initial = null;
-      if (showStarterCode && body.initial) {
+      if (showStarterCode && body.info.initial) {
         initial = (
           <Card bg="secondary" border="info" className="mt-2 mb-3">
             <Card.Header
@@ -194,7 +195,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
             <Collapse in={open}>
               <Card.Body>
                 <DisplayCode
-                  info={body}
+                  info={body.info}
                   value={null}
                   refreshProps={[...refreshCodeMirrorsDeps, open]}
                   fullyExpandCode={fullyExpandCode}
@@ -205,10 +206,10 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
         );
       }
       return (
-        <Prompted prompt={body.prompt}>
+        <Prompted prompt={body.info.prompt}>
           {initial}
           <DisplayCode
-            info={body}
+            info={body.info}
             value={value as CodeState}
             refreshProps={refreshCodeMirrorsDeps}
             fullyExpandCode={fullyExpandCode}
@@ -220,54 +221,54 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     }
     case 'AllThatApply':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayAllThatApply info={body} value={value as AllThatApplyState} />
+        <Prompted prompt={body.info.prompt}>
+          <DisplayAllThatApply info={body.info} value={value as AllThatApplyState} />
           {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     case 'CodeTag':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayCodeTag info={body} value={value as CodeTagState} />
+        <Prompted prompt={body.info.prompt}>
+          <DisplayCodeTag info={body.info} value={value as CodeTagState} />
           {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     case 'YesNo':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayYesNo info={body} value={value as YesNoState} />
+        <Prompted prompt={body.info.prompt}>
+          <DisplayYesNo info={body.info} value={value as YesNoState} />
           {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     case 'MultipleChoice':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayMultipleChoice info={body} value={value as MultipleChoiceState} />
+        <Prompted prompt={body.info.prompt}>
+          <DisplayMultipleChoice info={body.info} value={value as MultipleChoiceState} />
           {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     case 'Text':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayText info={body} value={value as TextState} />
+        <Prompted prompt={body.info.prompt}>
+          <DisplayText info={body.info} value={value as TextState} />
           {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     case 'Matching':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayMatching info={body} value={value as MatchingState} />
+        <Prompted prompt={body.info.prompt}>
+          <DisplayMatching info={body.info} value={value as MatchingState} />
           {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     default:
-      throw new ExhaustiveSwitchError(body);
+      throw new ExhaustiveSwitchError(body.info);
   }
 };
 

@@ -74,7 +74,7 @@ module Types
       object.answers
     end
 
-    field :instructions, GraphQL::Types::JSON, null: false do
+    field :instructions, String, null: false do
       guard Guards::ALL_STAFF
     end
 

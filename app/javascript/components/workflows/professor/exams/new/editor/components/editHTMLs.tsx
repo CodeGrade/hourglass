@@ -68,10 +68,7 @@ const EditHTMLs: React.FC<WrappedFieldArrayProps<HTMLVal> & EditHTMLsProps> = (p
           <Button
             variant="dark"
             onClick={(): void => {
-              fields.push({
-                type: 'HTML',
-                value: '',
-              });
+              fields.push('');
             }}
           >
             {prompt}

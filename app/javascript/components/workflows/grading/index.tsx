@@ -36,7 +36,6 @@ import { VscGoToFile } from 'react-icons/vsc';
 import Icon from '@student/exams/show/components/Icon';
 import {
   HTMLVal,
-  BodyItem,
   AnswerState,
   TextState,
   CodeState,
@@ -47,8 +46,8 @@ import {
   YesNoState,
   ExamFile,
   AnswersState,
-  QuestionInfo,
   BodyItemInfo,
+  PartInfo,
 } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
@@ -1118,6 +1117,7 @@ const Grade: React.FC<{
         dbQuestions {
           name
           description
+          extraCredit
           references {
             type
             path
@@ -1288,13 +1288,13 @@ const Grade: React.FC<{
                 comment.qnum === qnum && comment.pnum === pnum && comment.bnum === bnum
               ));
               if (typeof b.info === 'string') {
-                return <PromptRow prompt={b.info} />
+                return <PromptRow prompt={b.info} />;
               }
               return (
                 <GradeBodyItem
                   // eslint-disable-next-line react/no-array-index-key
                   key={bnum}
-                  info={b.info}
+                  info={b.info as BodyItemInfo}
                   studentAnswer={studentAnswer}
                   expectedAnswer={expectedAnswer}
                   qnum={qnum}
@@ -1442,7 +1442,28 @@ const ShowOnePart: React.FC<{
       examVersion {
         id
         ...gradingRubric
-        # questions
+        dbQuestions {
+          name
+          description
+          extraCredit
+          references {
+            type
+            path
+          }
+          parts {
+            name
+            description
+            points
+            references {
+              type
+              path
+            }
+            bodyItems {
+              id
+              info
+            }
+          }
+        }
         answers
         files
       }
@@ -1453,7 +1474,7 @@ const ShowOnePart: React.FC<{
   const { examVersion } = res;
   const currentAnswers = res.currentAnswers as AnswersState;
   const currentGrading = res.currentGrading as CurrentGrading;
-  const questions = examVersion.questions as QuestionInfo[];
+  const questions = examVersion.dbQuestions;
   const files = examVersion.files as ExamFile[];
   const contextVal = useMemo(() => ({
     files,
@@ -1463,7 +1484,7 @@ const ShowOnePart: React.FC<{
     answers: currentAnswers,
   }), [currentAnswers]);
   const singlePart = questions[qnum].parts.length === 1
-    && !questions[qnum].parts[0].name?.value?.trim();
+    && !questions[qnum].parts[0].name?.trim();
   return (
     <ExamContext.Provider value={contextVal}>
       <ExamViewerContext.Provider value={viewerContextVal}>
@@ -1474,11 +1495,11 @@ const ShowOnePart: React.FC<{
             </Col>
           </Row>
           <PromptRow prompt={questions[qnum].description} />
-          {questions[qnum].reference.length !== 0 && (
+          {questions[qnum].references.length !== 0 && (
             <Row>
               <Col sm={{ span: 9, offset: 3 }}>
                 <FileViewer
-                  references={questions[qnum].reference}
+                  references={questions[qnum].references}
                   refreshProps={refreshProps}
                 />
               </Col>
@@ -1489,7 +1510,7 @@ const ShowOnePart: React.FC<{
               <Col sm={{ span: 6, offset: 3 }}>
                 <Part
                   refreshCodeMirrorsDeps={refreshProps}
-                  part={questions[qnum].parts[pnum]}
+                  part={questions[qnum].parts[pnum] as PartInfo}
                   qnum={qnum}
                   pnum={pnum}
                   anonymous={singlePart}

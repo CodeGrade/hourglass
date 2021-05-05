@@ -38,14 +38,6 @@ import {
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
-import {
-  ContentsState,
-  QuestionInfo,
-  FileRef,
-  HTMLVal,
-  ExamFile,
-  AnswerState,
-} from '@student/exams/show/types';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { AlertContext } from '@hourglass/common/alerts';
@@ -71,8 +63,6 @@ import {
   useQuery,
 } from 'relay-hooks';
 import { uploadFile } from '@hourglass/common/types/api';
-import { ExamRubric } from '@professor/exams/types';
-import convertRubric from '@professor/exams/rubrics';
 import LinkSplitButton from '@hourglass/common/linksplitbutton';
 import LinkDropdownItem from '@hourglass/common/linkdropdownitem';
 import './dnd.scss';
@@ -84,7 +74,7 @@ import { adminUpdateExamMutation } from './__generated__/adminUpdateExamMutation
 import { adminPublishGradesMutation } from './__generated__/adminPublishGradesMutation.graphql';
 import { ChecklistItemStatus, admin_checklist$key } from './__generated__/admin_checklist.graphql';
 import { admin_versionInfo$key } from './__generated__/admin_versionInfo.graphql';
-import { admin_version$key, LockdownPolicy } from './__generated__/admin_version.graphql';
+import { admin_version$key } from './__generated__/admin_version.graphql';
 import { admin_preview_version$key } from './__generated__/admin_preview_version.graphql';
 import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMutation.graphql';
 import { adminDestroyVersionMutation } from './__generated__/adminDestroyVersionMutation.graphql';
@@ -871,7 +861,7 @@ const PreviewVersion: React.FC<{
     }
     `,
     version,
-  )
+  );
   return (
     <Collapse in={open}>
       <div>

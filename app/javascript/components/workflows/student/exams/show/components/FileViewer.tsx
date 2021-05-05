@@ -152,7 +152,7 @@ const FileTree: React.FC<FileTreeProps> = (props) => {
 };
 
 interface FileViewerProps {
-  references: FileRef[];
+  references: readonly FileRef[];
   alwaysShowTreeView?: boolean;
   refreshProps?: React.DependencyList;
   fullyExpandCode?: boolean;
@@ -196,7 +196,7 @@ export const FileViewer: React.FC<FileViewerProps> = (props) => {
 };
 
 interface ControlledFileViewerProps {
-  references: FileRef[];
+  references: readonly FileRef[];
   alwaysShowTreeView?: boolean;
   selection?: CodeTagState;
   onChangeLine: (lineNumber: number) => void;

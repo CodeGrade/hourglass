@@ -69,7 +69,7 @@ const CodeTagVal: React.FC<CodeTagValProps> = (props) => {
 export { CodeTagVal };
 
 interface FileModalProps {
-  references: FileRef[];
+  references: readonly FileRef[];
   show: boolean;
   onClose: () => void;
   onSave: (newState: CodeTagState) => void;
@@ -176,7 +176,7 @@ const CodeTag: React.FC<CodeTagProps> = (props) => {
   const examReferences = useContext(ExamFilesContext);
   const questionReferences = useContext(QuestionFilesContext);
   const partReferences = useContext(PartFilesContext);
-  let references: FileRef[];
+  let references: readonly FileRef[];
   switch (choices) {
     case 'exam':
       references = examReferences.references;

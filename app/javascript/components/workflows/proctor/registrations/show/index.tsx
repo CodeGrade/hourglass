@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { AnswerState, ContentsState } from '@student/exams/show/types';
+import { AnswerState, ExamFile } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import {
   ExamContext,
@@ -10,13 +10,13 @@ import { createMap } from '@student/exams/show/files';
 import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
-import { ExamRubric, CurrentGrading } from '@professor/exams/types';
+import { CurrentGrading } from '@professor/exams/types';
 import ShowRubric from '@proctor/registrations/show/ShowRubric';
 import { useFragment } from 'relay-hooks';
 import { graphql } from 'relay-runtime';
+import convertRubric from '@professor/exams/rubrics';
 
 import { showExamViewer$key } from './__generated__/showExamViewer.graphql';
-import convertRubric from '@hourglass/workflows/professor/exams/rubrics';
 
 interface ExamViewerProps {
   version: showExamViewer$key;
@@ -105,8 +105,8 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     scratch: '',
   };
   const examContextVal = useMemo(() => ({
-    files,
-    fmap: createMap(files),
+    files: files as ExamFile[],
+    fmap: createMap(files as ExamFile[]),
   }), [files]);
   const examViewerContextVal = useMemo(() => ({
     answers,

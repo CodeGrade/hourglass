@@ -85,15 +85,9 @@ const ShowQuestions: React.FC<{
               }).then((result) => {
                 const { rubric } = result.createRubric;
                 const q: QuestionInfoWithAnswers = {
-                  reference: [],
-                  name: {
-                    type: 'HTML',
-                    value: '',
-                  },
-                  description: {
-                    type: 'HTML',
-                    value: '',
-                  },
+                  references: [],
+                  name: '',
+                  description: '',
                   parts: [],
                   separateSubparts: false,
                   questionRubric: {

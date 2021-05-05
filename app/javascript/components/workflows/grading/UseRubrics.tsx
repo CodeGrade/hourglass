@@ -4,7 +4,6 @@ import {
   RubricOne,
   RubricAll,
   RubricAny,
-  isRubricPresets,
   RubricPresets,
   Preset,
 } from '@professor/exams/types';
@@ -286,7 +285,25 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   const { description, choices } = rubric;
   let summary;
   let body;
-  if (isRubricPresets(choices)) {
+  if (choices instanceof Array) {
+    body = (
+      <>
+        {choices.map((c, index) => (
+          <ShowRubric
+            /* eslint-disable-next-line react/no-array-index-key */
+            key={index}
+            showCompletenessAgainst={showCompletenessAgainst}
+            parentRubricType="all"
+            rubric={c}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
+            registrationId={registrationId}
+          />
+        ))}
+      </>
+    );
+  } else {
     const { direction, label, mercy } = choices;
     summary = (
       <span className="ml-auto">
@@ -305,24 +322,6 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
         bnum={bnum}
         registrationId={registrationId}
       />
-    );
-  } else {
-    body = (
-      <>
-        {choices.map((c, index) => (
-          <ShowRubric
-            /* eslint-disable-next-line react/no-array-index-key */
-            key={index}
-            showCompletenessAgainst={showCompletenessAgainst}
-            parentRubricType="all"
-            rubric={c}
-            qnum={qnum}
-            pnum={pnum}
-            bnum={bnum}
-            registrationId={registrationId}
-          />
-        ))}
-      </>
     );
   }
   const showAnyway = (collapseKey === undefined ? 'show' : '');
@@ -366,26 +365,7 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
   let summary;
   let body;
-  if (isRubricPresets(choices)) {
-    const { direction, label, mercy } = choices;
-    summary = (
-      <ShowPresetSummary
-        direction={direction}
-        label={label}
-        mercy={mercy}
-        pointsMsg={pointsMsg}
-      />
-    );
-    body = (
-      <ShowRubricPresets
-        rubric={choices}
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
-        registrationId={registrationId}
-      />
-    );
-  } else {
+  if (choices instanceof Array) {
     summary = <>{pointsMsg}</>;
     body = (
       <Accordion defaultActiveKey="0">
@@ -404,6 +384,25 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
           />
         ))}
       </Accordion>
+    );
+  } else {
+    const { direction, label, mercy } = choices;
+    summary = (
+      <ShowPresetSummary
+        direction={direction}
+        label={label}
+        mercy={mercy}
+        pointsMsg={pointsMsg}
+      />
+    );
+    body = (
+      <ShowRubricPresets
+        rubric={choices}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
     );
   }
   const heading = (
@@ -446,7 +445,25 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
   const { description, choices, points } = rubric;
   let summary;
   let body;
-  if (isRubricPresets(choices)) {
+  if (choices instanceof Array) {
+    body = (
+      <>
+        {choices.map((c, index) => (
+          <ShowRubric
+            /* eslint-disable-next-line react/no-array-index-key */
+            key={index}
+            rubric={c}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
+            registrationId={registrationId}
+            parentRubricType="any"
+            showCompletenessAgainst={showCompletenessAgainst}
+          />
+        ))}
+      </>
+    );
+  } else {
     const { direction, label, mercy } = choices;
     const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
     summary = (
@@ -467,24 +484,6 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
         bnum={bnum}
         registrationId={registrationId}
       />
-    );
-  } else {
-    body = (
-      <>
-        {choices.map((c, index) => (
-          <ShowRubric
-            /* eslint-disable-next-line react/no-array-index-key */
-            key={index}
-            rubric={c}
-            qnum={qnum}
-            pnum={pnum}
-            bnum={bnum}
-            registrationId={registrationId}
-            parentRubricType="any"
-            showCompletenessAgainst={showCompletenessAgainst}
-          />
-        ))}
-      </>
     );
   }
   const heading = (

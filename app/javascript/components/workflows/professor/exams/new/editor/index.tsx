@@ -364,7 +364,7 @@ function transformForSubmit(values: FormValues): Version {
       });
       newParts.push({
         ...restOfP,
-        body: newBody,
+        bodyItems: newBody,
       });
     });
     questions.push({

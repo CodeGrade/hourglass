@@ -59,6 +59,16 @@ class ExamVersion < ApplicationRecord
     db_questions.flat_map(&:parts).flat_map(&:points).sum
   end
 
+  def answers
+    db_questions.map do |q|
+      q.parts.map do |p|
+        p.body_items.map do |b|
+          b.answer.nil? ? { NO_ANS: true } : b.answer
+        end
+      end
+    end
+  end
+
   def default_answers
     def_answers = answers.map do |ans_q|
       ans_q.map do |ans_p|

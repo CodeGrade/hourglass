@@ -3,7 +3,7 @@ import * as React from 'react';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import GraphiQL from 'graphiql/dist/index';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { Fetcher } from 'graphiql/dist/components/GraphiQL';
+import { Fetcher } from '@graphiql/toolkit';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import 'graphiql/graphiql.min.css';
 

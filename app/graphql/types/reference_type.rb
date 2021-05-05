@@ -1,7 +1,7 @@
 module Types
   class ReferenceTypeType < Types::BaseEnum
-    value 'file', value: :file
-    value 'dir', value: :dir
+    value 'file'
+    value 'dir'
   end
 
   class ReferenceType < Types::BaseObject

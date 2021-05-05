@@ -13,5 +13,7 @@ module Types
     field :points, Float, null: false
     field :extra_credit, Boolean, null: false
     field :index, Integer, null: false
+
+    field :references, [Types::ReferenceType], null: false
   end
 end

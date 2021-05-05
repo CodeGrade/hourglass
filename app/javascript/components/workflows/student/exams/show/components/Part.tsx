@@ -24,10 +24,10 @@ interface PartProps {
 export const PartName: React.FC<{
   anonymous: boolean;
   pnum: number;
-  name?: HTMLVal;
+  name?: string;
 }> = ({ anonymous, pnum, name }) => {
   if (anonymous) { return (<></>); }
-  if (name === undefined || name.value === '') {
+  if (name === undefined || name === '') {
     return <div className="d-inline-block">{`Part ${alphabetIdx(pnum)}`}</div>;
   }
   return (

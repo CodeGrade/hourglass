@@ -31,7 +31,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   } = props;
   const {
     name,
-    reference,
+    references,
     description,
     parts,
   } = question;
@@ -54,7 +54,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   } else {
     subtitle = `(${strPoints})`;
   }
-  const contextVal = useMemo(() => ({ references: reference }), [reference]);
+  const contextVal = useMemo(() => ({ references }), [references]);
   return (
     <QuestionFilesContext.Provider value={contextVal}>
       <div>
@@ -81,9 +81,9 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           )}
         </h1>
         <HTML value={description} />
-        {reference.length !== 0 && (
+        {references.length !== 0 && (
           <FileViewer
-            references={reference}
+            references={references}
             refreshProps={refreshCodeMirrorsDeps}
             fullyExpandCode={fullyExpandCode}
           />

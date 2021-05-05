@@ -85,6 +85,7 @@ import { adminPublishGradesMutation } from './__generated__/adminPublishGradesMu
 import { ChecklistItemStatus, admin_checklist$key } from './__generated__/admin_checklist.graphql';
 import { admin_versionInfo$key } from './__generated__/admin_versionInfo.graphql';
 import { admin_version$key, LockdownPolicy } from './__generated__/admin_version.graphql';
+import { admin_preview_version$key } from './__generated__/admin_preview_version.graphql';
 import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMutation.graphql';
 import { adminDestroyVersionMutation } from './__generated__/adminDestroyVersionMutation.graphql';
 
@@ -718,47 +719,11 @@ const ShowVersion: React.FC<{
     fragment admin_version on ExamVersion {
       id
       name
-      policies
       anyStarted
       anyFinalized
       fileExportUrl
       archiveExportUrl
-      questions
-      reference
-      instructions
-      files
-      # answers
-      rubrics {
-        id
-        type
-        parentSectionId
-        qnum
-        pnum
-        bnum
-        order
-        points
-        description { 
-          type
-          value
-        }
-        rubricPreset {
-          id
-          direction
-          label
-          mercy
-          presetComments {
-            id
-            label
-            order
-            points
-            graderHint
-            studentFeedback
-          }
-        }
-        subsections {
-          id
-        }
-      }
+      ...admin_preview_version
     }
     `,
     version,
@@ -802,19 +767,6 @@ const ShowVersion: React.FC<{
       ],
     },
   );
-  const parsedContents: ContentsState = {
-    exam: {
-      questions: res.questions as QuestionInfo[],
-      reference: res.reference as FileRef[],
-      instructions: res.instructions as HTMLVal,
-      files: res.files as ExamFile[],
-    },
-    answers: {
-      answers: res.answers as AnswerState[][][],
-      scratch: '',
-    },
-  };
-  const rubrics = convertRubric(res.rubrics);
   let disabledDeleteMessage = '';
   if (res.anyFinalized) {
     disabledDeleteMessage = 'Students have already finished taking this exam version';
@@ -896,9 +848,7 @@ const ShowVersion: React.FC<{
       <ErrorBoundary>
         <PreviewVersion
           open={preview}
-          contents={parsedContents}
-          rubric={rubrics}
-          policies={res.policies}
+          version={res}
         />
       </ErrorBoundary>
     </>
@@ -907,31 +857,35 @@ const ShowVersion: React.FC<{
 
 const PreviewVersion: React.FC<{
   open: boolean;
-  contents: ContentsState;
-  rubric?: ExamRubric;
-  policies: readonly LockdownPolicy[];
+  version: admin_preview_version$key;
 }> = (props) => {
   const {
     open,
-    contents,
-    rubric,
-    policies,
+    version,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment admin_preview_version on ExamVersion {
+      policies
+      ...showExamViewer
+    }
+    `,
+    version,
+  )
   return (
     <Collapse in={open}>
       <div>
         <h6>
           Policies:
           <span className="ml-4">
-            {policies.map(policyToString).join(', ')}
+            {res.policies.map(policyToString).join(', ')}
           </span>
         </h6>
         <div className="border p-2">
           <ExamViewer
-            contents={contents}
+            version={res}
             showStarterCode
             refreshCodeMirrorsDeps={[open]}
-            rubric={rubric}
           />
         </div>
       </div>

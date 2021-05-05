@@ -1,15 +1,14 @@
 import React from 'react';
-import { HTMLVal } from '@student/exams/show/types';
 
 export interface HTMLProps {
-  value: HTMLVal;
+  value: string;
   className?: string;
 }
 
 const HTML: React.FC<HTMLProps> = (props) => {
   const { value, className = 'no-hover' } = props;
   const theHTML = {
-    __html: value?.value ?? '',
+    __html: value,
   };
 
   return (

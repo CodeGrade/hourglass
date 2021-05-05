@@ -164,6 +164,8 @@ class HourglassSchema < GraphQL::Schema
       Types::PartType
     when BodyItem
       Types::BodyItemType
+    when Reference
+      Types::ReferenceType
     else
       raise("Unexpected object of type '#{type}': #{obj}")
     end

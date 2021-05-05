@@ -766,10 +766,7 @@ function AnswersRow<T, V>(
         bnum
         order
         points
-        description { 
-          type
-          value
-        }
+        description
         rubricPreset {
           id
           direction
@@ -1116,8 +1113,8 @@ const Grade: React.FC<{
       examVersion {
         id
         ...gradingRubric
-        questions
-        # answers
+        # questions
+        answers
         files
       }
     }
@@ -1423,8 +1420,8 @@ const ShowOnePart: React.FC<{
       examVersion {
         id
         ...gradingRubric
-        questions
-        # answers
+        # questions
+        answers
         files
       }
     }
@@ -1502,7 +1499,7 @@ const GradeOnePart: React.FC = () => {
         }
         examVersion {
           qpPairs { qnum pnum }
-          # answers
+          answers
         }
       }
     }

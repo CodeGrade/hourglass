@@ -292,10 +292,7 @@ export type CodeState = {
   marks: MarkDescription[];
 };
 
-export interface HTMLVal {
-  type: 'HTML';
-  value: string;
-}
+export type HTMLVal = string;
 
 export interface AllThatApplyInfo {
   type: 'AllThatApply';
@@ -353,10 +350,14 @@ export interface MatchingState {
   [index: number]: number;
 }
 
-export type BodyItem =
+export type BodyItemInfo =
   HTMLVal | AllThatApplyInfo | CodeInfo | YesNoInfo |
   CodeTagInfo | MultipleChoiceInfo |
   TextInfo | MatchingInfo;
+export interface BodyItem {
+  id: string;
+  info: BodyItemInfo;
+}
 
 export type AnswerState =
   AllThatApplyState | CodeState | YesNoState |
@@ -368,21 +369,21 @@ export interface NoAnswerState {
 }
 
 export interface PartInfo {
-  name?: HTMLVal;
-  description: HTMLVal;
+  name?: string;
+  description: string;
   points: number;
   extraCredit?: boolean;
-  reference: FileRef[];
-  body: BodyItem[];
+  references: FileRef[];
+  bodyItems: BodyItem[];
 }
 
 export interface QuestionInfo {
-  name?: HTMLVal;
-  description: HTMLVal;
+  name?: string;
+  description: string;
   extraCredit?: boolean;
   separateSubparts: boolean;
   parts: PartInfo[];
-  reference: FileRef[];
+  references: FileRef[];
 }
 
 export interface RailsTimeInfo {

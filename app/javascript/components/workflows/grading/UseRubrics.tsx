@@ -215,6 +215,7 @@ export const ShowPresetSummary: React.FC<{
     ? 'Credits counting up'
     : 'Deductions counting down'
   );
+  console.log('pts', pointsMsg);
   return (
     <ButtonGroup>
       {label && <Button variant="outline-secondary" className="bg-white" size="sm" disabled>{label}</Button>}

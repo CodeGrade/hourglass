@@ -23,8 +23,8 @@ interface ShowQuestionProps {
   cleanupBeforeSubmit: () => void;
 }
 
-export const QuestionName: React.FC<{ qnum: number; name?: HTMLVal }> = ({ qnum, name }) => {
-  if (name === undefined || name.value === '') {
+export const QuestionName: React.FC<{ qnum: number; name?: string }> = ({ qnum, name }) => {
+  if (name === undefined || name === '') {
     return <div className="d-inline-block">{`Question ${qnum + 1}`}</div>;
   }
   return (

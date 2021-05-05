@@ -21,9 +21,11 @@ const Body: React.FC<BodyProps> = (props) => {
   const {
     body, qnum, pnum, bnum,
   } = props;
-  switch (body.type) {
-    case 'HTML':
-      return <HTML value={body} />;
+  const { info } = body;
+  if (typeof info === 'string') {
+    return <HTML value={info} />;
+  }
+  switch (info.type) {
     case 'Code':
       return <Code info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'AllThatApply':
@@ -39,7 +41,7 @@ const Body: React.FC<BodyProps> = (props) => {
     case 'Matching':
       return <Matching info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     default:
-      throw new ExhaustiveSwitchError(body);
+      throw new ExhaustiveSwitchError(info);
   }
 };
 

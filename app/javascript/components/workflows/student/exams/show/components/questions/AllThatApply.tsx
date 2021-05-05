@@ -37,7 +37,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
       {options.map((o, i) => {
         const val = !!value?.[i];
         return (
-          <Form.Group key={o.value}>
+          <Form.Group key={o}>
             <Form.Check
               disabled={disabled}
               type="checkbox"

@@ -49,16 +49,16 @@ const Part: React.FC<PartProps> = (props) => {
   } = props;
   const {
     name,
-    reference,
+    references,
     description,
     points,
-    body,
+    bodyItems,
   } = part;
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
   const partFilesContextVal = useMemo(() => ({
-    references: reference,
-  }), [reference]);
+    references,
+  }), [references]);
   return (
     <PartFilesContext.Provider value={partFilesContextVal}>
       <div
@@ -82,16 +82,24 @@ const Part: React.FC<PartProps> = (props) => {
           )}
         </h3>
         <div><HTML value={description} /></div>
-        {reference.length !== 0 && <FileViewer references={reference} />}
-        {body.map((b, i) => (
-          // Body numbers are STATIC.
-          // eslint-disable-next-line react/no-array-index-key
-          <div className={`p-2 bodyitem ${b.type}`} key={i}>
-            <ErrorBoundary>
-              <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
-            </ErrorBoundary>
-          </div>
-        ))}
+        {references.length !== 0 && <FileViewer references={references} />}
+        {bodyItems.map((b, i) => {
+          let htmlClass = '';
+          if (typeof b.info === 'string') {
+            htmlClass = 'HTML';
+          } else {
+            htmlClass = b.info.type;
+          }
+          return (
+            // Body numbers are STATIC.
+            // eslint-disable-next-line react/no-array-index-key
+            <div className={`p-2 bodyitem ${htmlClass}`} key={i}>
+              <ErrorBoundary>
+                <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
+              </ErrorBoundary>
+            </div>
+          );
+        })}
         {anonymous || (
           <BottomScrollspy
             question={qnum}

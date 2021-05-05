@@ -209,7 +209,17 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
   let summary;
   let body;
-  if (isRubricPresets(choices)) {
+  if (choices instanceof Array) {
+    summary = <span className="ml-auto">{pointsMsg}</span>;
+    body = (
+      <>
+        {choices.map((c, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
+        ))}
+      </>
+    );
+  } else {
     const { direction, label, mercy } = choices;
     summary = (
       <span className="ml-auto">
@@ -222,16 +232,6 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
       </span>
     );
     body = <ShowRubricPresets choices={choices} />;
-  } else {
-    summary = <span className="ml-auto">{pointsMsg}</span>;
-    body = (
-      <>
-        {choices.map((c, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
-        ))}
-      </>
-    );
   }
   const heading = (
     <h5 className="d-flex align-items-center">

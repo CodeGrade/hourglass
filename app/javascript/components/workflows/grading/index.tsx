@@ -48,6 +48,7 @@ import {
   ExamFile,
   AnswersState,
   QuestionInfo,
+  BodyItemInfo,
 } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
@@ -100,7 +101,7 @@ import TooltipButton from '@student/exams/show/components/TooltipButton';
 import FourOhFour from '@hourglass/workflows/FourOhFour';
 import Spoiler from '@hourglass/common/Spoiler';
 import { NumericInput } from '@hourglass/common/NumericInput';
-import { assertType, CurrentGrading, isExamRubric } from '@professor/exams/types';
+import { CurrentGrading } from '@professor/exams/types';
 import { ShowRubrics } from '@grading/UseRubrics';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
 import { DateTime } from 'luxon';
@@ -790,7 +791,7 @@ function AnswersRow<T, V>(
     examVersionKey,
   );
   const [studentWidth, setStudentWidth] = useState(6);
-  const rubrics = assertType(isExamRubric, convertRubric(res.rubrics));
+  const rubrics = convertRubric(res.rubrics);
   const { examRubric } = rubrics;
   const qnumRubric = rubrics.questions[qnum]?.questionRubric;
   const pnumRubric = rubrics.questions[qnum]?.parts[pnum]?.partRubric;
@@ -864,7 +865,7 @@ function AnswersRow<T, V>(
 const GradeBodyItem: React.FC<{
   expectedAnswer: AnswerState;
   studentAnswer: AnswerState;
-  info: BodyItem;
+  info: BodyItemInfo;
   qnum: number;
   pnum: number;
   bnum: number;
@@ -886,11 +887,12 @@ const GradeBodyItem: React.FC<{
     registrationId,
     refreshProps,
   } = props;
+  if (typeof info === 'string') {
+    return (
+      <PromptRow prompt={info} />
+    );
+  }
   switch (info.type) {
-    case 'HTML':
-      return (
-        <PromptRow prompt={info} />
-      );
     case 'Code':
       return (
         <>
@@ -1113,7 +1115,25 @@ const Grade: React.FC<{
       examVersion {
         id
         ...gradingRubric
-        # questions
+        dbQuestions {
+          name
+          description
+          references {
+            type
+            path
+          }
+          parts {
+            name
+            description
+            references {
+              type
+              path
+            }
+            bodyItems {
+              info
+            }
+          }
+        }
         answers
         files
       }
@@ -1126,8 +1146,7 @@ const Grade: React.FC<{
   const { examId, registrationId } = useParams<{ examId: string; registrationId: string }>();
   const { examVersion } = res;
   const currentAnswers = res.currentAnswers as AnswersState;
-  const { answers } = examVersion;
-  const questions = examVersion.questions as QuestionInfo[];
+  const { answers, dbQuestions } = examVersion;
   const files = examVersion.files as ExamFile[];
   const contextVal = useMemo(() => ({
     files,
@@ -1200,11 +1219,11 @@ const Grade: React.FC<{
     },
   );
   const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
-  const singlePart = questions[qnum].parts.length === 1
-    && !questions[qnum].parts[0].name?.value?.trim();
+  const singlePart = dbQuestions[qnum].parts.length === 1
+    && !dbQuestions[qnum].parts[0].name?.trim();
   const allComments = res.gradingComments.edges.map(({ node }) => node);
-  const anyUncommentedItems = questions[qnum].parts[pnum].body.some((b, bnum) => (
-    (b.type !== 'HTML')
+  const anyUncommentedItems = dbQuestions[qnum].parts[pnum].bodyItems.some((b, bnum) => (
+    (typeof b !== 'string')
       && (allComments.filter((c) => (c.qnum === qnum && c.pnum === pnum && c.bnum === bnum))
         .length === 0)
   ));
@@ -1215,17 +1234,17 @@ const Grade: React.FC<{
           <Row>
             <Col sm={{ span: 6, offset: 3 }}>
               <h2>
-                <QuestionName qnum={qnum} name={questions[qnum].name} />
-                {questions[qnum].extraCredit ? <span className="ml-4">(Extra credit)</span> : null}
+                <QuestionName qnum={qnum} name={dbQuestions[qnum].name} />
+                {dbQuestions[qnum].extraCredit ? <span className="ml-4">(Extra credit)</span> : null}
               </h2>
             </Col>
           </Row>
-          <PromptRow prompt={questions[qnum].description} />
-          {questions[qnum].reference.length !== 0 && (
+          <PromptRow prompt={dbQuestions[qnum].description} />
+          {dbQuestions[qnum].references.length !== 0 && (
             <Row>
               <Col sm={{ span: 9, offset: 3 }}>
                 <FileViewer
-                  references={questions[qnum].reference}
+                  references={dbQuestions[qnum].references}
                   refreshProps={refreshProps}
                 />
               </Col>
@@ -1238,23 +1257,23 @@ const Grade: React.FC<{
                   <PartName
                     anonymous={singlePart}
                     pnum={pnum}
-                    name={questions[qnum].parts[pnum].name}
+                    name={dbQuestions[qnum].parts[pnum].name}
                   />
                 </h3>
               </Col>
             </Row>
-            <PromptRow prompt={questions[qnum].parts[pnum].description} />
-            {questions[qnum].parts[pnum].reference.length !== 0 && (
+            <PromptRow prompt={dbQuestions[qnum].parts[pnum].description} />
+            {dbQuestions[qnum].parts[pnum].references.length !== 0 && (
               <Row>
                 <Col sm={{ span: 9, offset: 3 }}>
                   <FileViewer
-                    references={questions[qnum].parts[pnum].reference}
+                    references={dbQuestions[qnum].parts[pnum].references}
                     refreshProps={refreshProps}
                   />
                 </Col>
               </Row>
             )}
-            {questions[qnum].parts[pnum].body.map((b, bnum) => {
+            {dbQuestions[qnum].parts[pnum].bodyItems.map((b, bnum) => {
               const studentAns = currentAnswers.answers[qnum][pnum][bnum];
               const studentAnswer = isNoAns(studentAns) ? undefined : studentAns;
 
@@ -1268,11 +1287,14 @@ const Grade: React.FC<{
               const comments = allComments.filter((comment) => (
                 comment.qnum === qnum && comment.pnum === pnum && comment.bnum === bnum
               ));
+              if (typeof b.info === 'string') {
+                return <PromptRow prompt={b.info} />
+              }
               return (
                 <GradeBodyItem
                   // eslint-disable-next-line react/no-array-index-key
                   key={bnum}
-                  info={b}
+                  info={b.info}
                   studentAnswer={studentAnswer}
                   expectedAnswer={expectedAnswer}
                   qnum={qnum}

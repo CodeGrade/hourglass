@@ -83,21 +83,53 @@ class ExamVersionTest < ActiveSupport::TestCase
     assert ev.db_questions.sorted_by?(&:index)
   end
 
+  def create_numbered_questions(version, num_questions)
+    assert version.db_questions.empty?
+    (0...num_questions).to_a.shuffle.each do |i|
+      version.db_questions << Question.new(name: "Question #{i}", index: i)
+    end
+    assert_equal version.db_questions.count, num_questions
+  end
+
+  def reset_numbered_questions(version)
+    Question.transaction do
+      # rubocop:disable Rails/SkipsModelValidations, Style/CombinableLoops
+      version.db_questions.each { |q| q.update_columns(index: 1000 + q.index) }
+      version.db_questions.each { |q| q.update_columns(index: q.name.split[1].to_i) }
+      # rubocop:enable Rails/SkipsModelValidations, Style/CombinableLoops
+    end
+    version.db_questions.reset
+  end
+
   test 'can swap questions' do
     num_questions = 5
+    ev = create(:exam_version, :blank)
+    create_numbered_questions(ev, num_questions)
     (0...num_questions).each do |from|
       (0...num_questions).each do |to|
-        ev = create(:exam_version, :blank)
-        assert ev.db_questions.empty?
-        (0...num_questions).to_a.shuffle.each do |i|
-          ev.db_questions << Question.new(name: "Question #{i}", index: i)
-        end
-        ev.db_questions.reset
-        assert_equal ev.db_questions.count, num_questions
+        reset_numbered_questions(ev)
         assert ev.db_questions.sorted_by?(&:index)
         q_order = ev.db_questions.pluck(:id)
         ev.swap_questions(from, to)
         q_order[from], q_order[to] = q_order[to], q_order[from]
+        assert_equal ev.db_questions.pluck(:id), q_order
+      end
+    end
+  end
+
+  test 'can move questions' do
+    num_questions = 5
+    ev = create(:exam_version, :blank)
+    create_numbered_questions(ev, num_questions)
+    (0...num_questions).each do |from|
+      (0...num_questions).each do |to|
+        reset_numbered_questions(ev)
+        assert ev.db_questions.sorted_by?(&:index)
+        q_order = ev.db_questions.pluck(:id)
+        ev.move_questions(from, to)
+        cycle = q_order.slice!([from, to].min..[from, to].max)
+        cycle.rotate!(from < to ? 1 : -1)
+        q_order.insert([from, to].min, *cycle)
         assert_equal ev.db_questions.pluck(:id), q_order
       end
     end

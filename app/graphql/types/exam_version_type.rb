@@ -150,7 +150,7 @@ module Types
     end
     def qp_pairs
       object.qp_pairs.map do |qp|
-        { qnum: qp.question.index, pnum: qp.part.index }
+        { qnum: qp[:question].index, pnum: qp[:part].index }
       end
     end
 

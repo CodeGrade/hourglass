@@ -422,14 +422,24 @@ class ExamVersion < ApplicationRecord
   def rubric_includes
     [
       :question, :part,
-      rubric_preset: :preset_comments,
-      subsections: [:question, :part,
-                    { rubric_preset: :preset_comments,
-                      subsections: [:question, :part,
-                                    { rubric_preset: :preset_comments,
-                                      subsections: [
-                                        :question, :part, { rubric_preset: :preset_comments }
-                                      ] }] }]
+      {
+        rubric_preset: :preset_comments,
+        subsections: [
+          :question, :part,
+          {
+            rubric_preset: :preset_comments,
+            subsections: [
+              :question, :part,
+              {
+                rubric_preset: :preset_comments,
+                subsections: [
+                  :question, :part, { rubric_preset: :preset_comments }
+                ],
+              }
+            ],
+          }
+        ],
+      }
     ]
   end
 

@@ -1237,7 +1237,7 @@ const Grade: React.FC<{
     && !dbQuestions[qnum].parts[0].name?.value?.trim();
   const allComments = res.gradingComments.edges.map(({ node }) => node);
   const anyUncommentedItems = dbQuestions[qnum].parts[pnum].bodyItems.some((b, bnum) => (
-    (b.info.type !== 'HTML')
+    ((b.info as BodyItemInfo).type !== 'HTML')
       && (allComments.filter((c) => (c.qnum === qnum && c.pnum === pnum && c.bnum === bnum))
         .length === 0)
   ));
@@ -1507,7 +1507,7 @@ const ShowOnePart: React.FC<{
     answers: currentAnswers,
   }), [currentAnswers]);
   const singlePart = questions[qnum].parts.length === 1
-    && !questions[qnum].parts[0].name?.trim();
+    && !questions[qnum].parts[0].name?.value?.trim();
   return (
     <ExamContext.Provider value={contextVal}>
       <ExamViewerContext.Provider value={viewerContextVal}>

@@ -357,6 +357,7 @@ export type BodyItemInfo =
   HTMLVal | AllThatApplyInfo | CodeInfo | YesNoInfo |
   CodeTagInfo | MultipleChoiceInfo |
   TextInfo | MatchingInfo;
+
 export interface BodyItem {
   id: string;
   info: BodyItemInfo;

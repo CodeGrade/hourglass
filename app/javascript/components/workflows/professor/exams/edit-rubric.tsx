@@ -28,7 +28,10 @@ const EditExamVersionRubric: React.FC = () => {
           type
           path
         }
-        instructions
+        instructions {
+          type
+          value
+        }
         files
         answers
       }
@@ -49,7 +52,7 @@ const EditExamVersionRubric: React.FC = () => {
     exam: {
       questions: examVersion.questions as QuestionInfo[],
       reference: examVersion.reference as FileRef[],
-      instructions: examVersion.instructions as HTMLVal,
+      instructions: examVersion.instructions,
       files: examVersion.files as ExamFile[],
     },
     answers: {

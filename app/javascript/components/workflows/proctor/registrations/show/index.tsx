@@ -26,22 +26,6 @@ interface ExamViewerProps {
   showStarterCode: boolean;
 }
 
-  // contents: ContentsState;
-  // rubric?: ExamRubric;
-
-  // const parsedContents: ContentsState = {
-  //   exam: {
-  //     questions: res.questions as QuestionInfo[],
-  //     reference: res.reference as FileRef[],
-  //     instructions: res.instructions as HTMLVal,
-  //     files: res.files as ExamFile[],
-  //   },
-  //   answers: {
-  //     answers: res.answers ,
-  //     scratch: '',
-  //   },
-  // };
-
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {
   const {
     version,
@@ -60,7 +44,10 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
         type
         path
       }
-      instructions
+      instructions {
+        type
+        value
+      }
       files
       rubrics {
         id
@@ -71,7 +58,10 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
         bnum
         order
         points
-        description
+        description {
+          type
+          value
+        }
         rubricPreset {
           id
           direction

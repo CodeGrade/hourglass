@@ -15,6 +15,7 @@ import {
   PartInfo,
   MatchingInfo,
   ExamVersion,
+  NoAnswerState,
 } from '@student/exams/show/types';
 
 export function assertType<T>(isT: (val: unknown) => val is T, val: unknown): T {
@@ -147,9 +148,13 @@ export interface TextInfoWithAnswer extends TextInfo {
 }
 
 export type BodyItemWithAnswer =
-  HTMLVal | AllThatApplyInfoWithAnswer | CodeInfoWithAnswer | YesNoInfoWithAnswer |
+  HTMLValWithAnswer | AllThatApplyInfoWithAnswer | CodeInfoWithAnswer | YesNoInfoWithAnswer |
   CodeTagInfoWithAnswer | MultipleChoiceInfoWithAnswer |
   TextInfoWithAnswer | MatchingInfoWithAnswer;
+
+export interface HTMLValWithAnswer extends HTMLVal {
+  answer: NoAnswerState;
+}
 
 export interface PartInfoWithAnswers extends Omit<PartInfo, 'body'> {
   body: BodyItemWithAnswer[];

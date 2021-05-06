@@ -156,7 +156,7 @@ const Part: React.FC<PartProps> = (props) => {
             )}
           </span>
         </h3>
-        {description && <HTML value={description} />}
+        {description?.value && <HTML value={description} />}
         {references.length !== 0 && (
           <FileViewer
             references={references}
@@ -165,30 +165,22 @@ const Part: React.FC<PartProps> = (props) => {
           />
         )}
         {pRubric && <ShowRubric rubric={pRubric} forWhat="part" />}
-        {bodyItems.map((b, i) => {
-          let htmlClass = '';
-          if (typeof b.info === 'string') {
-            htmlClass = 'HTML';
-          } else {
-            htmlClass = b.info.type;
-          }
-          return (
-            // Body numbers are STATIC.
-            // eslint-disable-next-line react/no-array-index-key
-            <div className={`p-2 bodyitem ${htmlClass}`} key={i}>
-              <DisplayBody
-                body={b}
-                qnum={qnum}
-                pnum={pnum}
-                bnum={i}
-                currentGrading={currentGrading?.body[i]}
-                refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
-                fullyExpandCode={fullyExpandCode}
-                showStarterCode={showStarterCode}
-              />
-            </div>
-          );
-        })}
+        {bodyItems.map((b, i) => (
+          // Body numbers are STATIC.
+          // eslint-disable-next-line react/no-array-index-key
+          <div className={`p-2 bodyitem ${b.info.type}`} key={i}>
+            <DisplayBody
+              body={b}
+              qnum={qnum}
+              pnum={pnum}
+              bnum={i}
+              currentGrading={currentGrading?.body[i]}
+              refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+              fullyExpandCode={fullyExpandCode}
+              showStarterCode={showStarterCode}
+            />
+          </div>
+        ))}
       </div>
     </PartFilesContext.Provider>
   );

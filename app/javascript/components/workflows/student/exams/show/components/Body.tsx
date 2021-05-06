@@ -22,10 +22,9 @@ const Body: React.FC<BodyProps> = (props) => {
     body, qnum, pnum, bnum,
   } = props;
   const { info } = body;
-  if (typeof info === 'string') {
-    return <HTML value={info} />;
-  }
   switch (info.type) {
+    case 'HTML':
+      return <HTML value={info} />;
     case 'Code':
       return <Code info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'AllThatApply':

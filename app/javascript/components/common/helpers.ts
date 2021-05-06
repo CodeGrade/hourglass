@@ -34,7 +34,10 @@ export function alphabetIdx(idx: number, lowercase = false): string {
 }
 
 export function htmlValOrDefault(val: HTMLVal | undefined | null, defVal: string): HTMLVal {
-  return (val !== undefined && val !== '') ? val : defVal;
+  return {
+    type: 'HTML',
+    value: (val?.value !== undefined && val?.value !== '') ? val.value : defVal,
+  };
 }
 
 export function pluralize(number: number, singular: string, plural: string): string {

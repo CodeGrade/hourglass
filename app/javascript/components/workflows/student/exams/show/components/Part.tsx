@@ -24,10 +24,10 @@ interface PartProps {
 export const PartName: React.FC<{
   anonymous: boolean;
   pnum: number;
-  name?: string;
+  name?: HTMLVal;
 }> = ({ anonymous, pnum, name }) => {
   if (anonymous) { return (<></>); }
-  if (name === undefined || name === '') {
+  if (name === undefined || name.value === '') {
     return <div className="d-inline-block">{`Part ${alphabetIdx(pnum)}`}</div>;
   }
   return (
@@ -83,23 +83,15 @@ const Part: React.FC<PartProps> = (props) => {
         </h3>
         <div><HTML value={description} /></div>
         {references.length !== 0 && <FileViewer references={references} />}
-        {bodyItems.map((b, i) => {
-          let htmlClass = '';
-          if (typeof b.info === 'string') {
-            htmlClass = 'HTML';
-          } else {
-            htmlClass = b.info.type;
-          }
-          return (
-            // Body numbers are STATIC.
-            // eslint-disable-next-line react/no-array-index-key
-            <div className={`p-2 bodyitem ${htmlClass}`} key={i}>
-              <ErrorBoundary>
-                <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
-              </ErrorBoundary>
-            </div>
-          );
-        })}
+        {bodyItems.map((b, i) => (
+          // Body numbers are STATIC.
+          // eslint-disable-next-line react/no-array-index-key
+          <div className={`p-2 bodyitem ${b.info.type}`} key={i}>
+            <ErrorBoundary>
+              <Body body={b} qnum={qnum} pnum={pnum} bnum={i} />
+            </ErrorBoundary>
+          </div>
+        ))}
         {anonymous || (
           <BottomScrollspy
             question={qnum}

@@ -23,8 +23,8 @@ interface ShowQuestionProps {
   cleanupBeforeSubmit: () => void;
 }
 
-export const QuestionName: React.FC<{ qnum: number; name?: string }> = ({ qnum, name }) => {
-  if (name === undefined || name === '') {
+export const QuestionName: React.FC<{ qnum: number; name?: HTMLVal }> = ({ qnum, name }) => {
+  if (name === undefined || name.value === '') {
     return <div className="d-inline-block">{`Question ${qnum + 1}`}</div>;
   }
   return (
@@ -58,7 +58,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const isCurrent = selectedQuestion === qnum;
   const active = !paginated || isCurrent;
   const classes = active ? '' : 'd-none';
-  const singlePart = parts.length === 1 && !parts[0].name?.trim();
+  const singlePart = parts.length === 1 && !parts[0].name?.value?.trim();
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;

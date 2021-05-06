@@ -29,8 +29,14 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
     fragment DisplayQuestions on ExamVersion {
       dbQuestions {
         id
-        name
-        description
+        name {
+          type
+          value
+        }
+        description {
+          type
+          value
+        }
         separateSubparts
         references {
           type
@@ -38,8 +44,14 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
         }
         parts {
           id
-          name
-          description
+          name {
+            type
+            value
+          }
+          description {
+            type
+            value
+          }
           points
           references {
             type

@@ -292,7 +292,10 @@ export type CodeState = {
   marks: MarkDescription[];
 };
 
-export type HTMLVal = string;
+export interface HTMLVal {
+  type: 'HTML';
+  value: string;
+}
 
 export interface AllThatApplyInfo {
   type: 'AllThatApply';
@@ -369,8 +372,8 @@ export interface NoAnswerState {
 }
 
 export interface PartInfo {
-  name?: string;
-  description: string;
+  name?: HTMLVal;
+  description?: HTMLVal;
   points: number;
   extraCredit?: boolean;
   references: readonly FileRef[];
@@ -378,8 +381,8 @@ export interface PartInfo {
 }
 
 export interface QuestionInfo {
-  name?: string;
-  description: string;
+  name?: HTMLVal;
+  description?: HTMLVal;
   extraCredit?: boolean;
   separateSubparts: boolean;
   parts: readonly PartInfo[];

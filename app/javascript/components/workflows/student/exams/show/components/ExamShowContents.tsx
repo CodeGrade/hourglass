@@ -79,7 +79,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const {
     questions,
     instructions,
-    reference,
+    references,
     files,
   } = exam;
   const examContextVal = useMemo(() => ({
@@ -87,8 +87,8 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     fmap: createMap(files),
   }), [files]);
   const examFilesContextVal = useMemo(() => ({
-    references: reference,
-  }), [reference]);
+    references,
+  }), [references]);
   return (
     <ExamContext.Provider value={examContextVal}>
       <BlockNav
@@ -134,7 +134,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
 
         <h1>{res.name}</h1>
         <HTML value={instructions} />
-        {reference.length !== 0 && <FileViewer references={reference} />}
+        {references.length !== 0 && <FileViewer references={references} />}
         <Row>
           <Col>
             {questions.map((q, i) => (

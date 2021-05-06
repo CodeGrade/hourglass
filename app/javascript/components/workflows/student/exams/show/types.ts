@@ -377,7 +377,7 @@ export interface PartInfo {
   description?: HTMLVal;
   points: number;
   extraCredit?: boolean;
-  references: readonly FileRef[];
+  references?: readonly FileRef[];
   bodyItems: readonly BodyItem[];
 }
 
@@ -387,7 +387,7 @@ export interface QuestionInfo {
   extraCredit?: boolean;
   separateSubparts: boolean;
   parts: readonly PartInfo[];
-  references: readonly FileRef[];
+  references?: readonly FileRef[];
 }
 
 export interface RailsTimeInfo {
@@ -411,7 +411,7 @@ export interface TimeInfo {
 
 export interface ExamVersion {
   questions: QuestionInfo[];
-  reference?: FileRef[];
+  references?: FileRef[];
   instructions?: HTMLVal;
   files: ExamFile[];
 }

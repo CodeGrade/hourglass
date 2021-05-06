@@ -81,7 +81,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           )}
         </h1>
         <HTML value={description} />
-        {references.length !== 0 && <FileViewer references={references} />}
+        {references && references.length !== 0 && <FileViewer references={references} />}
         <BottomScrollspy
           question={qnum}
           separateSubparts={separateSubparts}

@@ -62,9 +62,12 @@ module Api
         {
           type: 'CONTENTS',
           exam: {
-            questions: version.questions,
-            reference: version.reference,
-            instructions: version.instructions,
+            questions: version.db_questions.as_json,
+            references: version.db_references.as_json,
+            instructions: {
+              type: 'HTML',
+              value: version.instructions,
+            },
             files: version.files,
           },
           time: {

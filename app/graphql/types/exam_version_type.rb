@@ -74,8 +74,14 @@ module Types
       object.answers
     end
 
-    field :instructions, String, null: false do
+    field :instructions, Types::HtmlType, null: false do
       guard Guards::ALL_STAFF
+    end
+    def instructions
+      {
+        type: 'HTML',
+        value: object.instructions,
+      }
     end
 
     field :files, GraphQL::Types::JSON, null: false do

@@ -82,7 +82,13 @@ module Types
     field :order, Integer, null: true
 
     field :points, Float, null: true
-    field :description, GraphQL::Types::String, null: true
+    field :description, Types::HtmlType, null: true
+    def description
+      object.description && {
+        type: 'HTML',
+        value: object.description,
+      }
+    end
 
     field :parent_section_id, ID, null: true
     def parent_section_id

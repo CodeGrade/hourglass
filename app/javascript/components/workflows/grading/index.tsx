@@ -766,7 +766,10 @@ function AnswersRow<T, V>(
         bnum
         order
         points
-        description
+        description {
+          type
+          value
+        }
         rubricPreset {
           id
           direction
@@ -886,12 +889,11 @@ const GradeBodyItem: React.FC<{
     registrationId,
     refreshProps,
   } = props;
-  if (typeof info === 'string') {
-    return (
-      <PromptRow prompt={info} />
-    );
-  }
   switch (info.type) {
+    case 'HTML':
+      return (
+        <PromptRow prompt={info} />
+      );
     case 'Code':
       return (
         <>
@@ -1115,16 +1117,28 @@ const Grade: React.FC<{
         id
         ...gradingRubric
         dbQuestions {
-          name
-          description
+          name {
+            type
+            value
+          }
+          description {
+            type
+            value
+          }
           extraCredit
           references {
             type
             path
           }
           parts {
-            name
-            description
+            name {
+              type
+              value
+            }
+            description {
+              type
+              value
+            }
             references {
               type
               path
@@ -1220,10 +1234,10 @@ const Grade: React.FC<{
   );
   const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
   const singlePart = dbQuestions[qnum].parts.length === 1
-    && !dbQuestions[qnum].parts[0].name?.trim();
+    && !dbQuestions[qnum].parts[0].name?.value?.trim();
   const allComments = res.gradingComments.edges.map(({ node }) => node);
   const anyUncommentedItems = dbQuestions[qnum].parts[pnum].bodyItems.some((b, bnum) => (
-    (typeof b !== 'string')
+    (b.info.type !== 'HTML')
       && (allComments.filter((c) => (c.qnum === qnum && c.pnum === pnum && c.bnum === bnum))
         .length === 0)
   ));
@@ -1287,9 +1301,6 @@ const Grade: React.FC<{
               const comments = allComments.filter((comment) => (
                 comment.qnum === qnum && comment.pnum === pnum && comment.bnum === bnum
               ));
-              if (typeof b.info === 'string') {
-                return <PromptRow prompt={b.info} />;
-              }
               return (
                 <GradeBodyItem
                   // eslint-disable-next-line react/no-array-index-key
@@ -1443,16 +1454,28 @@ const ShowOnePart: React.FC<{
         id
         ...gradingRubric
         dbQuestions {
-          name
-          description
+          name {
+            type
+            value
+          }
+          description {
+            type
+            value
+          }
           extraCredit
           references {
             type
             path
           }
           parts {
-            name
-            description
+            name {
+              type
+              value
+            }
+            description {
+              type
+              value
+            }
             points
             references {
               type

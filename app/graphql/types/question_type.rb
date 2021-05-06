@@ -8,8 +8,22 @@ module Types
 
     field :parts, [Types::PartType], null: false
 
-    field :name, String, null: true
-    field :description, String, null: true
+    field :name, Types::HtmlType, null: true
+    def name
+      object.name && {
+        type: 'HTML',
+        value: object.name,
+      }
+    end
+
+    field :description, Types::HtmlType, null: true
+    def description
+      object.description && {
+        type: 'HTML',
+        value: object.description,
+      }
+    end
+
     field :extra_credit, Boolean, null: false
     field :separate_subparts, Boolean, null: false
     field :index, Integer, null: false

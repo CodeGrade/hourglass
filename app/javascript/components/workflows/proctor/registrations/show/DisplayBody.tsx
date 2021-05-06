@@ -174,10 +174,9 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
   const value = isNoAns(answer) ? undefined : answer;
   const bRubric = rubric?.questions[qnum]?.parts[pnum]?.body[bnum];
 
-  if (typeof body.info === 'string') {
-    return <HTML value={body.info} />;
-  }
   switch (body.info.type) {
+    case 'HTML':
+      return <HTML value={body.info} />;
     case 'Code': {
       let initial = null;
       if (showStarterCode && body.info.initial) {

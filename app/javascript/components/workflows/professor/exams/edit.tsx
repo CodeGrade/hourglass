@@ -31,7 +31,10 @@ const EditExamVersion: React.FC = () => {
           type
           path
         }
-        instructions
+        instructions {
+          type
+          value
+        }
         files
         answers
         anyStarted

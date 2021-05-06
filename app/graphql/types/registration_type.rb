@@ -54,9 +54,12 @@ module Types
       if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
         ev = object.exam_version
         {
-          questions: ev.questions,
-          reference: ev.reference,
-          instructions: ev.instructions,
+          questions: ev.db_questions.as_json,
+          reference: ev.db_references.as_json,
+          instructions: {
+            type: 'HTML',
+            value: ev.instructions,
+          },
           files: ev.files,
         }
       else

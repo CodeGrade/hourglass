@@ -27,7 +27,7 @@ export const PartName: React.FC<{
   name?: HTMLVal;
 }> = ({ anonymous, pnum, name }) => {
   if (anonymous) { return (<></>); }
-  if (name === undefined || name.value === '') {
+  if (name?.value === undefined || name.value === '') {
     return <div className="d-inline-block">{`Part ${alphabetIdx(pnum)}`}</div>;
   }
   return (

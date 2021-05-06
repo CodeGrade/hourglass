@@ -32,5 +32,8 @@ module Types
     field :index, Integer, null: false
 
     field :references, [Types::ReferenceType], null: false
+    def references
+      AssociationLoader.for(Part, :references).load(object)
+    end
   end
 end

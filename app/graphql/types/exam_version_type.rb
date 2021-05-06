@@ -9,7 +9,29 @@ module Types
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 
-    guard Guards::VISIBILITY
+    guard ->(obj, args, ctx) {
+      ans = Guards::VISIBILITY.call(obj, args, ctx)
+      all_qpbs = obj.object.db_questions.includes(parts: :body_items).map do |q|
+        [ q, q.parts.map do |p| [p, p.body_items.to_a] end ]
+      end.flatten
+      all_qpbs.each do |qpb|
+        resolved = HourglassSchema.resolve_type(qpb.class, qpb, ctx)
+        Guards.cache(
+          ctx[:access_cache], 
+          [resolved.name, qpb.id, :visible, ctx[:current_user].id],
+          ans,
+        )
+      end
+      [obj.object.rubrics, obj.object.db_references, obj.object.rubric_presets, obj.object.preset_comments].flatten.each do |r|
+        resolved = HourglassSchema.resolve_type(r.class, r, ctx)
+        Guards.cache(
+          ctx[:access_cache], 
+          [resolved.name, r.id, :visible, ctx[:current_user].id],
+          ans,
+        )
+      end
+      ans
+    }
 
     field :name, String, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS

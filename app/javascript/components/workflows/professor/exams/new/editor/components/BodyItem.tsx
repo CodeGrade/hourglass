@@ -29,7 +29,7 @@ const OneItem: React.FC<WrappedFieldProps & {
   const {
     value,
   }: {
-    value: BodyItem['type'];
+    value: BodyItem['info']['type'];
   } = input;
   if (value === 'HTML') {
     return (

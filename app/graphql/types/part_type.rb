@@ -7,6 +7,9 @@ module Types
     guard Guards::VISIBILITY
 
     field :body_items, [Types::BodyItemType], null: false
+    def body_items
+      AssociationLoader.for(Part, :body_items).load(object)
+    end
 
     field :name, Types::HtmlType, null: true
     def name

@@ -7,6 +7,9 @@ module Types
     guard Guards::VISIBILITY
 
     field :parts, [Types::PartType], null: false
+    def parts
+      AssociationLoader.for(Question, :parts).load(object)
+    end
 
     field :name, Types::HtmlType, null: true
     def name

@@ -82,7 +82,7 @@ const Part: React.FC<PartProps> = (props) => {
           )}
         </h3>
         <div><HTML value={description} /></div>
-        {references.length !== 0 && <FileViewer references={references} />}
+        {references && references.length !== 0 && <FileViewer references={references} />}
         {bodyItems.map((b, i) => (
           // Body numbers are STATIC.
           // eslint-disable-next-line react/no-array-index-key

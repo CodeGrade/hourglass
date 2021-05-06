@@ -28,9 +28,9 @@ class Part < ApplicationRecord
       'description' => compact_blank(description),
       'points' => points,
       'extraCredit' => extra_credit || nil,
-      'reference' => compact_blank(references.order(:index).map(&:as_json)),
+      'references' => compact_blank(references.order(:index).map(&:as_json)),
       'partRubric' => rubric_as_json,
-      'body' => body_items.order(:index).map(&:as_json),
+      'bodyItems' => body_items.order(:index).map(&:as_json),
     }.compact
   end
 

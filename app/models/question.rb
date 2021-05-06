@@ -32,7 +32,7 @@ class Question < ApplicationRecord
       'description' => compact_blank(description),
       'extraCredit' => extra_credit || nil,
       'separateSubparts' => separate_subparts,
-      'reference' => compact_blank(references.where(
+      'references' => compact_blank(references.where(
         part: nil,
       ).order(:index).map(&:as_json)),
       'questionRubric' => rubric_as_json,

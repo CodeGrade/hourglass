@@ -148,7 +148,7 @@ class ExamVersion < ApplicationRecord
       'contents' => {
         'instructions' => compact_blank(instructions),
         'questions' => db_questions.order(:index).map(&:as_json),
-        'reference' => compact_blank(db_references.where(
+        'references' => compact_blank(db_references.where(
           question: nil,
           part: nil,
         ).order(:index).map(&:as_json)),

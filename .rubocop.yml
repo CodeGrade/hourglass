@@ -53,3 +53,5 @@ Style/RescueModifier:
   Enabled: false
 Lint/DuplicateBranch:
   Enabled: false
+Rails/EnvironmentVariableAccess:
+  AllowReads: true

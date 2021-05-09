@@ -15,22 +15,24 @@ class Part < ApplicationRecord
 
   accepts_nested_attributes_for :body_items, :rubrics, :references
 
-  def as_json
+  def as_json(format:)
     root_rubric = rubrics.find_by(body_item: nil, order: nil)
     rubric_as_json =
       if root_rubric.nil? || root_rubric.is_a?(None)
         nil
       else
-        root_rubric.as_json(no_inuse: true).deep_stringify_keys
+        root_rubric.as_json(format: format).deep_stringify_keys
       end
     {
       'name' => compact_blank(name),
       'description' => compact_blank(description),
       'points' => points,
       'extraCredit' => extra_credit || nil,
-      'references' => compact_blank(references.order(:index).map(&:as_json)),
+      (format == :export ? 'reference' : 'references') =>
+        compact_blank(references.order(:index).map(&:as_json)),
       'partRubric' => rubric_as_json,
-      'bodyItems' => body_items.order(:index).map(&:as_json),
+      (format == :export ? 'body' : 'bodyItems') =>
+        body_items.order(:index).map { |b| b.as_json(format: format) },
     }.compact
   end
 

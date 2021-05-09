@@ -15,7 +15,7 @@ class Question < ApplicationRecord
 
   accepts_nested_attributes_for :parts, :rubrics, :references
 
-  def as_json
+  def as_json(format:)
     root_rubric = rubrics.find_by(
       part: nil,
       body_item: nil,
@@ -25,18 +25,17 @@ class Question < ApplicationRecord
       if root_rubric.nil? || root_rubric.is_a?(None)
         nil
       else
-        root_rubric.as_json(no_inuse: true).deep_stringify_keys
+        root_rubric.as_json(format: format).deep_stringify_keys
       end
     {
       'name' => compact_blank(name),
       'description' => compact_blank(description),
       'extraCredit' => extra_credit || nil,
       'separateSubparts' => separate_subparts,
-      'references' => compact_blank(references.where(
-        part: nil,
-      ).order(:index).map(&:as_json)),
+      (format == :export ? 'reference' : 'references') =>
+        compact_blank(references.where(part: nil).order(:index).map(&:as_json)),
       'questionRubric' => rubric_as_json,
-      'parts' => parts.order(:index).map(&:as_json),
+      'parts' => parts.order(:index).map { |p| p.as_json(format: format) },
     }.compact
   end
 

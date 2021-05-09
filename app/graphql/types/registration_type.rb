@@ -54,7 +54,7 @@ module Types
       if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
         ev = object.exam_version
         {
-          questions: ev.db_questions.as_json,
+          questions: ev.db_questions.as_json(format: :graphql),
           reference: ev.db_references.as_json,
           instructions: {
             type: 'HTML',

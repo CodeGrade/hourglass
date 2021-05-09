@@ -53,5 +53,7 @@ Style/RescueModifier:
   Enabled: false
 Lint/DuplicateBranch:
   Enabled: false
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true
 Rails/EnvironmentVariableAccess:
   AllowReads: true

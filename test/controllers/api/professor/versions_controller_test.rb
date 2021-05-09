@@ -19,7 +19,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
 
     created = exam.exam_versions.first
     ev = create(:exam_version, :cs3500_v1)
-    assert_equal ev.info, created.info
+    assert_equal ev.export_exam_info, created.export_exam_info
     assert_equal ev.files, created.files
   end
 
@@ -30,7 +30,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
 
     get export_file_api_professor_version_path(ev)
     parsed = JSON.parse(response.body)
-    assert_equal compact_blank(ev.info), compact_blank(parsed['info'])
+    assert_equal compact_blank(ev.export_exam_info), compact_blank(parsed['info'])
     assert_equal compact_blank(ev.files) || [], compact_blank(parsed['files']) || []
   end
 
@@ -60,7 +60,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
       zip.rewind
       up = Upload.new(Rack::Test::UploadedFile.new(zip, 'application/zip'))
       new_ev = create(:exam_version, :cs2500_v1, upload: up)
-      assert_equal ev.info, new_ev.info
+      assert_equal ev.export_exam_info, new_ev.export_exam_info
       assert_equal ev.files, new_ev.files
     end
   end

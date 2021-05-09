@@ -29,39 +29,41 @@ class BodyItem < ApplicationRecord
     raise "Bad body item type: #{type}: #{e}."
   end
 
-  def as_json
+  def as_json(format:)
     if info.is_a? String
       info
     else
-      root_rubric = rubrics.find_by(order: nil)
-      rubric_as_json =
-        if root_rubric.nil? || root_rubric.is_a?(None)
-          nil
-        else
-          root_rubric.as_json(no_inuse: true).deep_stringify_keys
-        end
-      send("as_json_#{info['type']}", rubric_as_json)
+      send("as_json_#{info['type']}", format: format)
+    end
+  end
+
+  def rubric_as_json(format:)
+    root_rubric = rubrics.find_by(order: nil)
+    if root_rubric.nil? || root_rubric.is_a?(None)
+      nil
+    else
+      root_rubric.as_json(format: format).deep_stringify_keys
     end
   end
 
   # rubocop:disable Naming/MethodName
-  def as_json_HTML(_rubric_as_json)
+  def as_json_HTML(format:)
     info['value']
   end
 
-  def as_json_AllThatApply(rubric_as_json)
+  def as_json_AllThatApply(format:)
     {
       'AllThatApply' => {
         'prompt' => unhtml(info['prompt']),
         'options' => info['options'].zip(answer).map do |opt, ans|
           { unhtml(opt) => ans }
         end,
-        'rubric' => rubric_as_json,
+        'rubric' => rubric_as_json(format: format),
       }.compact,
     }
   end
 
-  def as_json_Code(rubric_as_json)
+  def as_json_Code(format:)
     initial = info['initial']
     unless initial.nil?
       if initial.key? 'file'
@@ -82,12 +84,12 @@ class BodyItem < ApplicationRecord
           else
             MarksProcessor.process_marks_reverse(answer['text'], answer['marks'])
           end,
-        'rubric' => rubric_as_json,
+        'rubric' => rubric_as_json(format: format),
       }.compact,
     }
   end
 
-  def as_json_CodeTag(rubric_as_json)
+  def as_json_CodeTag(format:)
     {
       'CodeTag' => {
         'prompt' => unhtml(info['prompt']),
@@ -96,12 +98,12 @@ class BodyItem < ApplicationRecord
           'filename' => answer['selectedFile'],
           'line' => answer['lineNumber'],
         },
-        'rubric' => rubric_as_json,
+        'rubric' => rubric_as_json(format: format),
       }.compact,
     }
   end
 
-  def as_json_Matching(rubric_as_json)
+  def as_json_Matching(format:)
     {
       'Matching' => {
         'prompt' => unhtml(info['prompt']),
@@ -110,23 +112,23 @@ class BodyItem < ApplicationRecord
         'prompts' => unhtmls(info['prompts']),
         'values' => unhtmls(info['values']),
         'correctAnswers' => answer,
-        'rubric' => rubric_as_json,
+        'rubric' => rubric_as_json(format: format),
       }.compact,
     }
   end
 
-  def as_json_MultipleChoice(rubric_as_json)
+  def as_json_MultipleChoice(format:)
     {
       'MultipleChoice' => {
         'prompt' => unhtml(info['prompt']),
         'options' => unhtmls(info['options']),
         'correctAnswer' => answer,
-        'rubric' => rubric_as_json,
+        'rubric' => rubric_as_json(format: format),
       }.compact,
     }
   end
 
-  def as_json_Text(rubric_as_json)
+  def as_json_Text(format:)
     {
       'Text' => {
         'prompt' => unhtml(info['prompt']),
@@ -136,12 +138,12 @@ class BodyItem < ApplicationRecord
           else
             unhtml(answer&.dig('text'))
           end,
-        'rubric' => rubric_as_json,
+        'rubric' => rubric_as_json(format: format),
       }.compact,
     }
   end
 
-  def as_json_YesNo(rubric_as_json)
+  def as_json_YesNo(format:)
     case info['yesLabel']
     when 'Yes'
       if info['prompt'].blank?
@@ -151,7 +153,7 @@ class BodyItem < ApplicationRecord
           'YesNo' => {
             'prompt' => unhtml(info['prompt']),
             'correctAnswer' => answer,
-            'rubric' => rubric_as_json,
+            'rubric' => rubric_as_json(format: format),
           }.compact,
         }
       end
@@ -163,7 +165,7 @@ class BodyItem < ApplicationRecord
           'TrueFalse' => {
             'prompt' => unhtml(info['prompt']),
             'correctAnswer' => answer,
-            'rubric' => rubric_as_json,
+            'rubric' => rubric_as_json(format: format),
           }.compact,
         }
       end

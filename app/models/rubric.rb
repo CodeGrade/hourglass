@@ -128,10 +128,10 @@ class Rubric < ApplicationRecord
     points
   end
 
-  def as_json(preset_comments_in_use = nil, no_inuse: false)
-    rubric_preset_as_json = rubric_preset&.as_json(preset_comments_in_use, no_inuse: no_inuse)
+  def as_json(preset_comments_in_use = nil, format:)
+    rubric_preset_as_json = rubric_preset&.as_json(preset_comments_in_use, format: format)
     subsections_as_json = subsections.sort_by(&:order).map do |s|
-      s.as_json(preset_comments_in_use, no_inuse: no_inuse)
+      s.as_json(preset_comments_in_use, format: format)
     end
     {
       type: type.downcase,
@@ -139,7 +139,7 @@ class Rubric < ApplicationRecord
       points: points,
       choices: (rubric_preset_as_json || subsections_as_json),
       inUse:
-        if no_inuse
+        if format == :export
           nil
         else
           (rubric_preset_as_json&.dig('inUse') || subsections_as_json.any? { |s| s['inUse'] })

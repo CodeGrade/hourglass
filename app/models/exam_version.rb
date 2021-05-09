@@ -126,11 +126,14 @@ class ExamVersion < ApplicationRecord
     move_association(Reference, db_references, :index, index_from, index_to)
   end
 
-  def info
-    as_json
+  def info(format:)
+    as_json(format: :graphql)
   end
 
-  def as_json
+  # NOTE: format should be either :export or :graphql
+  # Use :export when reproducing the exam-upload schema
+  # USe :graphql when passing JSON data to the front-end
+  def as_json(format:)
     root_rubric = rubrics.find_by(
       question: nil,
       part: nil,
@@ -141,14 +144,14 @@ class ExamVersion < ApplicationRecord
       if root_rubric.nil? || root_rubric.is_a?(None)
         nil
       else
-        root_rubric.as_json(no_inuse: true).deep_stringify_keys
+        root_rubric.as_json(format: format).deep_stringify_keys
       end
     {
       'policies' => policies,
       'contents' => {
         'instructions' => compact_blank(instructions),
-        'questions' => db_questions.map(&:as_json),
-        'references' => compact_blank(db_references.where(
+        'questions' => db_questions.map { |q| q.as_json(format: format) },
+        (format == :export ? 'reference' : 'references') => compact_blank(db_references.where(
           question: nil,
           part: nil,
         ).map(&:as_json)),
@@ -157,15 +160,15 @@ class ExamVersion < ApplicationRecord
     }
   end
 
-  def rubric_as_json
+  def rubric_as_json(format:)
     rubric_tree = multi_group_by(rubrics_for_grading, [:question, :part, :body_item], true)
     preset_comments_in_use = preset_comments.joins(:grading_comments).pluck(:id)
-    exam_rubric = rubric_tree.delete(nil)&.dig(nil, nil)&.as_json(preset_comments_in_use)
+    exam_rubric = rubric_tree.delete(nil)&.dig(nil, nil)&.as_json(preset_comments_in_use, format: format)
     q_rubrics = rubric_tree.sort.map do |_qnum, rubrics_q|
-      question_rubric = rubrics_q.delete(nil)&.dig(nil)&.as_json(preset_comments_in_use)
+      question_rubric = rubrics_q.delete(nil)&.dig(nil)&.as_json(preset_comments_in_use, format: format)
       p_rubrics = rubrics_q.sort.map do |_pnum, rubrics_p|
-        part_rubric = rubrics_p.delete(nil)&.as_json(preset_comments_in_use)
-        b_rubrics = rubrics_p.sort.map { |_, b| b.as_json(preset_comments_in_use) }
+        part_rubric = rubrics_p.delete(nil)&.as_json(preset_comments_in_use, format: format)
+        b_rubrics = rubrics_p.sort.map { |_, b| b.as_json(preset_comments_in_use, format: format) }
         {
           partRubric: part_rubric,
           body: b_rubrics,
@@ -387,7 +390,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def export_exam_info
-    as_json
+    as_json(format: :export)
   end
 
   def export_files(path, files)

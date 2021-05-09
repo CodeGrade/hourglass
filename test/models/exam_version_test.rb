@@ -18,25 +18,25 @@ class ExamVersionTest < ActiveSupport::TestCase
 
   test 'cs2500_v1 info validates' do
     ev = create(:exam_version, :cs2500_v1)
-    assert JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, ev.info)
+    assert JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, ev.export_exam_info)
     assert JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, ev.files)
   end
 
   test 'cs2500_v2 info validates' do
     ev = create(:exam_version, :cs2500_v2)
-    assert JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, ev.info)
+    assert JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, ev.export_exam_info)
     assert JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, ev.files)
   end
 
   test 'cs3500_v1 exam info validates' do
     ev = create(:exam_version, :cs3500_v1)
-    assert JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, ev.info)
+    assert JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, ev.export_exam_info)
     assert JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, ev.files)
   end
 
   test 'cs3500_v2 exam info validates' do
     ev = create(:exam_version, :cs3500_v2)
-    assert JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, ev.info)
+    assert JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, ev.export_exam_info)
     assert JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, ev.files)
   end
 
@@ -49,7 +49,7 @@ class ExamVersionTest < ActiveSupport::TestCase
   test 'cs3500_v2 info is the same as its input' do
     ev = create(:exam_version, :cs3500_v2)
     parsed = parse_yaml 'cs3500final-v2'
-    assert_equal compact_blank(parsed['info']), compact_blank(ev.info)
+    assert_equal compact_blank(parsed['info']), compact_blank(ev.export_exam_info)
     assert_equal compact_blank(parsed['files']) || [], compact_blank(ev.files) || []
   end
 
@@ -66,7 +66,7 @@ class ExamVersionTest < ActiveSupport::TestCase
       UploadTestHelper.with_temp_zip(Pathname.new(path).join('**')) do |zip|
         up = Upload.new(Rack::Test::UploadedFile.new(zip))
         new_ev = create(:exam_version, :cs2500_v1, upload: up)
-        assert_equal ev.info, new_ev.info
+        assert_equal ev.export_exam_info, new_ev.export_exam_info
         assert_equal ev.files, new_ev.files
       end
     end

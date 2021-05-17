@@ -258,7 +258,7 @@ class ExamVersion < ApplicationRecord
       :creator, :question, :part, :body_item,
       preset_comment: [{ rubric_preset: [{ rubric: [{ parent_section: [{ parent_section: :parent_section }] }] }] }]
     )
-    comments = multi_group_by(comments_and_rubrics, [:question_id, :part_id, :body_item_id, :preset_comment_id])
+    comments = multi_group_by(comments_and_rubrics, [:question_id, :part_id, :body_item_id, :preset_comment])
     checks = multi_group_by(
       reg.grading_checks.includes(:creator, :question, :part, :body_item),
       [:question_id, :part_id, :body_item_id],
@@ -268,13 +268,13 @@ class ExamVersion < ApplicationRecord
 
     exam_rubric = rubric_tree.dig(nil, nil, nil)
     # rubocop:disable Metrics/BlockLength
-    part_tree do |qnum:, pnum:, question:, part:, **|
+    part_tree do |question:, part:, **|
       question_rubric = rubric_tree.dig(question.id, nil, nil)
       part_rubric = rubric_tree.dig(question.id, part.id, nil)
       graded = !locks.dig(question.id, part.id)&.completed_by_id.nil?
       in_progress = !locks.dig(question.id, part.id)&.grader_id.nil?
       score = part.body_items.map do |body_item|
-        qpb = [question, part, body_item.index]
+        qpb = [question.id, part.id, body_item.id]
         nil_comments = comments.dig(question.id, part.id, body_item.id, nil) || []
         extra_comment_score = nil_comments.sum(&:points)
         body_rubric = rubric_tree.dig(question.id, part.id, body_item.id)
@@ -284,9 +284,9 @@ class ExamVersion < ApplicationRecord
         end
         extra_comment_score + rubric_score
       end.sum
-      body_item_info = part.body_items.each_with_index.map do |_, bnum|
-        body_checks = checks.dig(qnum, pnum, bnum) || []
-        body_comments = comments.dig(qnum, pnum, bnum) || {}
+      body_item_info = part.body_items.each_with_index.map do |body_item, bnum|
+        body_checks = checks.dig(question.id, part.id, body_item.id) || []
+        body_comments = comments.dig(question.id, part.id, body_item.id) || {}
 
         grouped = body_comments.group_by { |pc, _cs| pc&.rubric_preset || RubricPreset.new(direction: 'deduction') }
                                .transform_values(&:to_h)

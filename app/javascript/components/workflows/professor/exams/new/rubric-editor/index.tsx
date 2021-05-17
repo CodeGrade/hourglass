@@ -1,6 +1,4 @@
-import React, {
-  useMemo,
-} from 'react';
+import React from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
 import {
@@ -8,18 +6,17 @@ import {
   AnswersState,
 } from '@student/exams/show/types';
 import {
-  ExamRubric, Rubric,
+  Rubric,
 } from '@professor/exams/types';
-import { examWithAnswers } from '../editor';
-import { useMutation, graphql, useQuery, useFragment } from 'relay-hooks';
-import Select from 'react-select';
+import { examWithAnswers } from '@professor/exams/new/editor';
+import { graphql, useQuery } from 'relay-hooks';
 import { ChangeRubricType } from '@professor/exams/new/rubric-editor/RubricEditor';
 
-import { rubricEditorQuery } from './__generated__/rubricEditorQuery.graphql';
 import { RenderError } from '@hourglass/common/boundary';
-import convertRubric from '../../rubrics';
-import { Col, Form, Row } from 'react-bootstrap';
-import { rubricEditorSingleFragment$key } from './__generated__/rubricEditorSingleFragment.graphql';
+import convertRubric from '@professor/exams/rubrics';
+import { Col, Row } from 'react-bootstrap';
+import { SelectOption, SelectOptions } from '@hourglass/common/helpers';
+import { rubricEditorQuery } from './__generated__/rubricEditorQuery.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -94,7 +91,7 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
     >
       <ExamFilesContext.Provider
         value={{
-          references: exam.reference,
+          references: exam.references,
         }}
       >
         <Row>

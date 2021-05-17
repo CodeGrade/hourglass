@@ -8,7 +8,6 @@ import {
   ContentsState,
   Policy,
   QuestionInfo,
-  FileRef,
   HTMLVal,
   ExamFile,
   AnswerState,
@@ -26,7 +25,41 @@ const EditExamVersion: React.FC = () => {
         id
         name
         policies
-        # questions
+        dbQuestions {
+          name {
+            type
+            value
+          }
+          description {
+            type
+            value
+          }
+          extraCredit
+          separateSubparts
+          references {
+            type
+            path
+          }
+          parts {
+            name {
+              type
+              value
+            }
+            description {
+              type
+              value
+            }
+            points
+            references {
+              type
+              path
+            }
+            bodyItems {
+              id
+              info
+            }
+          }
+        }
         dbReferences {
           type
           path
@@ -64,8 +97,8 @@ const EditExamVersion: React.FC = () => {
   const { examVersion } = res.data;
   const parsedContents: ContentsState = {
     exam: {
-      questions: examVersion.questions as QuestionInfo[],
-      reference: examVersion.reference as FileRef[],
+      questions: examVersion.dbQuestions as QuestionInfo[],
+      references: examVersion.dbReferences,
       instructions: examVersion.instructions as HTMLVal,
       files: examVersion.files as ExamFile[],
     },

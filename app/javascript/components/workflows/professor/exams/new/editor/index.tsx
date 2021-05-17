@@ -70,7 +70,7 @@ export interface Version {
     contents: {
       instructions: ExamVersion['instructions'];
       questions: ExamVersion['questions'];
-      reference: ExamVersion['reference'];
+      reference: ExamVersion['references'];
     };
   };
   files: ExamVersion['files'];
@@ -129,25 +129,25 @@ export function examWithAnswers(
     const newParts: PartInfoWithAnswers[] = [];
     parts.forEach((p, pnum) => {
       const {
-        body,
+        bodyItems,
         ...restOfP
       } = p;
       const newBody: BodyItemWithAnswer[] = [];
-      body.forEach((b, bnum) => {
+      bodyItems.forEach((b, bnum) => {
         const ans = answers[qnum][pnum][bnum];
         let newItem: BodyItemWithAnswer;
-        switch (b.type) {
+        switch (b.info.type) {
           case 'AllThatApply': {
-            newItem = transformATAReverse(b, ans as AllThatApplyState);
+            newItem = transformATAReverse(b.info, ans as AllThatApplyState);
             break;
           }
           case 'Matching': {
-            newItem = transformMatchingReverse(b, ans as MatchingState);
+            newItem = transformMatchingReverse(b.info, ans as MatchingState);
             break;
           }
           default:
             newItem = {
-              ...b,
+              ...b.info,
               answer: isNoAns(ans) ? undefined : ans,
             } as BodyItemWithAnswer;
         }
@@ -155,7 +155,7 @@ export function examWithAnswers(
       });
       newParts.push({
         ...restOfP,
-        body: newBody,
+        bodyItems: newBody,
       });
     });
     newQuestions.push({
@@ -322,19 +322,17 @@ function transformForSubmit(values: FormValues): Version {
     answers[qnum] = [];
     const {
       parts,
-      questionRubric,
       ...restOfQ
     } = q;
     const newParts: PartInfo[] = [];
     parts.forEach((p, pnum) => {
       answers[qnum][pnum] = [];
       const {
-        body,
-        partRubric,
+        bodyItems,
         ...restOfP
       } = p;
       const newBody: BodyItem[] = [];
-      body.forEach((b, bnum) => {
+      bodyItems.forEach((b, bnum) => {
         let itemAnswer: AnswerState;
         let bodyItem: BodyItem;
         switch (b.type) {
@@ -381,7 +379,7 @@ function transformForSubmit(values: FormValues): Version {
       contents: {
         instructions: all.exam.instructions,
         questions,
-        reference: all.exam.reference ?? [],
+        reference: all.exam.references ?? [],
       },
     },
     files: all.exam.files,

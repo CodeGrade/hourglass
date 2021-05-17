@@ -99,7 +99,7 @@ const ShowParts: React.FC<{
                     value: '',
                   },
                   points: 0,
-                  body: [],
+                  bodyItems: [],
                   partRubric: {
                     type: 'none',
                     railsId: rubric.railsId,

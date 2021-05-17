@@ -58,7 +58,7 @@ const EC_YESNO: YesNoInfo = {
   type: 'YesNo',
   yesLabel: 'Yes',
   noLabel: 'No',
-  prompt: '',
+  prompt: { type: 'HTML', value: '' },
 };
 const PartExtraCredit: React.FC<WrappedFieldProps> = (props) => {
   const {

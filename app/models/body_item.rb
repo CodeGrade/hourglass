@@ -31,7 +31,7 @@ class BodyItem < ApplicationRecord
 
   def as_json(format:)
     if info.is_a? String
-      info
+      html_val(format, info)
     else
       send("as_json_#{info['type']}", format: format)
     end
@@ -48,19 +48,31 @@ class BodyItem < ApplicationRecord
 
   # rubocop:disable Naming/MethodName
   def as_json_HTML(format:)
-    info['value']
+    html_val(format, info)
   end
 
   def as_json_AllThatApply(format:)
-    {
-      'AllThatApply' => {
-        'prompt' => unhtml(info['prompt']),
-        'options' => info['options'].zip(answer).map do |opt, ans|
-          { unhtml(opt) => ans }
-        end,
-        'rubric' => rubric_as_json(format: format),
-      }.compact,
-    }
+    if format == :graphql
+      {
+        'AllThatApply' => {
+          'prompt' => html_val(format, info['prompt']),
+          'options' => info['options'].zip(answer).map do |opt, ans|
+            { html_val(format, opt) => ans }
+          end,
+          'rubric' => rubric_as_json(format: format),
+        }.compact,
+      }
+    else
+      {
+        'AllThatApply' => {
+          'prompt' => html_val(format, info['prompt']),
+          'options' => info['options'].zip(answer).map do |opt, ans|
+            { html_val(format, opt) => ans }
+          end,
+          'rubric' => rubric_as_json(format: format),
+        }.compact,
+      }
+    end
   end
 
   def as_json_Code(format:)
@@ -75,8 +87,8 @@ class BodyItem < ApplicationRecord
     end
     {
       'Code' => {
-        'prompt' => unhtml(info['prompt']),
-        'lang' => unhtml(info['lang']),
+        'prompt' => html_val(format, info['prompt']),
+        'lang' => html_val(format, info['lang']),
         'initial' => initial,
         'correctAnswer' =>
           if answer.blank? || answer['text'].blank?
@@ -92,8 +104,8 @@ class BodyItem < ApplicationRecord
   def as_json_CodeTag(format:)
     {
       'CodeTag' => {
-        'prompt' => unhtml(info['prompt']),
-        'choices' => unhtml(info['choices']),
+        'prompt' => html_val(format, info['prompt']),
+        'choices' => html_val(format, info['choices']),
         'correctAnswer' => {
           'filename' => answer['selectedFile'],
           'line' => answer['lineNumber'],
@@ -106,11 +118,11 @@ class BodyItem < ApplicationRecord
   def as_json_Matching(format:)
     {
       'Matching' => {
-        'prompt' => unhtml(info['prompt']),
-        'promptsLabel' => unhtml(info['promptsLabel']),
-        'valuesLabel' => unhtml(info['valuesLabel']),
-        'prompts' => unhtmls(info['prompts']),
-        'values' => unhtmls(info['values']),
+        'prompt' => html_val(format, info['prompt']),
+        'promptsLabel' => html_val(format, info['promptsLabel']),
+        'valuesLabel' => html_val(format, info['valuesLabel']),
+        'prompts' => html_vals(format, info['prompts']),
+        'values' => html_vals(format, info['values']),
         'correctAnswers' => answer,
         'rubric' => rubric_as_json(format: format),
       }.compact,
@@ -120,8 +132,8 @@ class BodyItem < ApplicationRecord
   def as_json_MultipleChoice(format:)
     {
       'MultipleChoice' => {
-        'prompt' => unhtml(info['prompt']),
-        'options' => unhtmls(info['options']),
+        'prompt' => html_val(format, info['prompt']),
+        'options' => html_vals(format, info['options']),
         'correctAnswer' => answer,
         'rubric' => rubric_as_json(format: format),
       }.compact,
@@ -131,12 +143,12 @@ class BodyItem < ApplicationRecord
   def as_json_Text(format:)
     {
       'Text' => {
-        'prompt' => unhtml(info['prompt']),
+        'prompt' => html_val(format, info['prompt']),
         'correctAnswer' =>
           if answer.is_a? String
             answer
           else
-            unhtml(answer&.dig('text'))
+            html_val(format, answer&.dig('text'))
           end,
         'rubric' => rubric_as_json(format: format),
       }.compact,
@@ -151,7 +163,7 @@ class BodyItem < ApplicationRecord
       else
         {
           'YesNo' => {
-            'prompt' => unhtml(info['prompt']),
+            'prompt' => html_val(format, info['prompt']),
             'correctAnswer' => answer,
             'rubric' => rubric_as_json(format: format),
           }.compact,
@@ -163,7 +175,7 @@ class BodyItem < ApplicationRecord
       else
         {
           'TrueFalse' => {
-            'prompt' => unhtml(info['prompt']),
+            'prompt' => html_val(format, info['prompt']),
             'correctAnswer' => answer,
             'rubric' => rubric_as_json(format: format),
           }.compact,
@@ -175,30 +187,41 @@ class BodyItem < ApplicationRecord
 
   private
 
-  def unhtml(val)
-    return nil if val.blank? || (val['type'] == 'HTML' && val['value'].blank?)
-
-    if val.is_a? Hash
-      val['value']
-    else
-      val
-    end
-  end
-
-  def unhtmls(val)
-    return nil if val.nil?
-
-    val.map { |o| unhtml(o) }
-  end
-
   class << self
+    def html_val(format, val)
+      if format == :graphql
+        return nil if val.blank? || (val['type'] == 'HTML' && val['value'].blank?)
+
+        if val.is_a? Hash
+          val
+        else
+          {
+            type: 'HTML',
+            value: val,
+          }
+        end
+      else
+        if val.is_a? Hash
+          val['value']
+        else
+          val
+        end
+      end
+    end
+
+    def html_vals(format, val)
+      return nil if val.nil?
+
+      val.map { |o| html_val(format, o) }
+    end
+
     # rubocop:disable Naming/MethodName
     def from_yaml_AllThatApply(type, options:, prompt: nil)
       BodyItem.new(
         info: {
           type: type,
-          prompt: prompt,
-          options: options.map(&:keys).flatten,
+          prompt: html_val(:graphql, prompt),
+          options: html_vals(:graphql, options.map(&:keys).flatten),
         }.compact,
         answer: options.map(&:values).flatten,
       )
@@ -229,7 +252,7 @@ class BodyItem < ApplicationRecord
       BodyItem.new(
         info: {
           type: type,
-          prompt: prompt,
+          prompt: html_val(:graphql, prompt),
           lang: lang,
           initial: initial,
         }.compact,
@@ -242,7 +265,7 @@ class BodyItem < ApplicationRecord
         info: {
           type: type,
           choices: choices,
-          prompt: prompt,
+          prompt: html_val(:graphql, prompt),
         }.compact,
         answer: {
           selectedFile: correct_answer['filename'],
@@ -264,11 +287,11 @@ class BodyItem < ApplicationRecord
       BodyItem.new(
         info: {
           type: type,
-          prompt: prompt,
-          promptsLabel: prompts_label,
-          valuesLabel: values_label,
-          prompts: prompts,
-          values: values,
+          prompt: html_val(:graphql, prompt),
+          promptsLabel: html_val(:graphql, prompts_label),
+          valuesLabel: html_val(:graphql, values_label),
+          prompts: html_vals(:graphql, prompts),
+          values: html_vals(:graphql, values),
         }.compact,
         answer: correct_answers,
       )
@@ -279,8 +302,8 @@ class BodyItem < ApplicationRecord
       BodyItem.new(
         info: {
           type: type,
-          prompt: prompt,
-          options: options,
+          prompt: html_val(:graphql, prompt),
+          options: html_vals(:graphql, options),
         }.compact,
         answer: correct_answer,
       )
@@ -290,7 +313,7 @@ class BodyItem < ApplicationRecord
       BodyItem.new(
         info: {
           type: type,
-          prompt: prompt || entire_value.to_s,
+          prompt: html_val(:graphql, prompt || entire_value.to_s),
         }.compact,
         answer: correct_answer,
       )
@@ -308,7 +331,7 @@ class BodyItem < ApplicationRecord
           type: 'YesNo',
           yesLabel: 'True',
           noLabel: 'False',
-          prompt: prompt.to_s,
+          prompt: html_val(:graphql, prompt.to_s),
         }.compact,
         answer: answer,
       )
@@ -326,7 +349,7 @@ class BodyItem < ApplicationRecord
           type: 'YesNo',
           yesLabel: 'Yes',
           noLabel: 'No',
-          prompt: prompt.to_s,
+          prompt: html_val(:graphql, prompt.to_s),
         }.compact,
         answer: answer,
       )

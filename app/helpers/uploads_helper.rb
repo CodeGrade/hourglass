@@ -90,7 +90,7 @@ module UploadsHelper
             b_rubric = nil
             case binfo
             when String
-              item = BodyItem.new(info: binfo)
+              item = BodyItem.new(info: convert_html(binfo))
               owners = {exam_version: version, question: question, part: part, body_item: item}
               b_rubric = convert_rubric(owners, nil)
             when Hash
@@ -134,6 +134,13 @@ module UploadsHelper
 
     class << self
       private
+
+      def convert_html(val)
+        {
+          type: 'HTML',
+          value: val,
+        }
+      end
 
       def convert_presets(preset, parent)
         return nil if preset.nil?

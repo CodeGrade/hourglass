@@ -26,7 +26,7 @@ const Instructions: React.FC<TextProps> = (props) => {
         <p>Exam instructions</p>
         <CustomEditor
           className="bg-white"
-          value={value}
+          value={value.value}
           placeholder="Give exam-wide instructions here"
           onChange={handleChange}
         />

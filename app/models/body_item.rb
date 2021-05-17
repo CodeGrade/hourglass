@@ -31,7 +31,7 @@ class BodyItem < ApplicationRecord
 
   def as_json(format:)
     if info.is_a? String
-      html_val(format, info)
+      BodyItem.html_val(format, info)
     else
       send("as_json_#{info['type']}", format: format)
     end
@@ -48,16 +48,16 @@ class BodyItem < ApplicationRecord
 
   # rubocop:disable Naming/MethodName
   def as_json_HTML(format:)
-    html_val(format, info)
+    BodyItem.html_val(format, info)
   end
 
   def as_json_AllThatApply(format:)
     if format == :graphql
       {
         'AllThatApply' => {
-          'prompt' => html_val(format, info['prompt']),
+          'prompt' => BodyItem.html_val(format, info['prompt']),
           'options' => info['options'].zip(answer).map do |opt, ans|
-            { html_val(format, opt) => ans }
+            { BodyItem.html_val(format, opt) => ans }
           end,
           'rubric' => rubric_as_json(format: format),
         }.compact,
@@ -65,9 +65,9 @@ class BodyItem < ApplicationRecord
     else
       {
         'AllThatApply' => {
-          'prompt' => html_val(format, info['prompt']),
+          'prompt' => BodyItem.html_val(format, info['prompt']),
           'options' => info['options'].zip(answer).map do |opt, ans|
-            { html_val(format, opt) => ans }
+            { BodyItem.html_val(format, opt) => ans }
           end,
           'rubric' => rubric_as_json(format: format),
         }.compact,
@@ -87,8 +87,8 @@ class BodyItem < ApplicationRecord
     end
     {
       'Code' => {
-        'prompt' => html_val(format, info['prompt']),
-        'lang' => html_val(format, info['lang']),
+        'prompt' => BodyItem.html_val(format, info['prompt']),
+        'lang' => BodyItem.html_val(format, info['lang']),
         'initial' => initial,
         'correctAnswer' =>
           if answer.blank? || answer['text'].blank?
@@ -104,8 +104,8 @@ class BodyItem < ApplicationRecord
   def as_json_CodeTag(format:)
     {
       'CodeTag' => {
-        'prompt' => html_val(format, info['prompt']),
-        'choices' => html_val(format, info['choices']),
+        'prompt' => BodyItem.html_val(format, info['prompt']),
+        'choices' => BodyItem.html_val(format, info['choices']),
         'correctAnswer' => {
           'filename' => answer['selectedFile'],
           'line' => answer['lineNumber'],
@@ -118,11 +118,11 @@ class BodyItem < ApplicationRecord
   def as_json_Matching(format:)
     {
       'Matching' => {
-        'prompt' => html_val(format, info['prompt']),
-        'promptsLabel' => html_val(format, info['promptsLabel']),
-        'valuesLabel' => html_val(format, info['valuesLabel']),
-        'prompts' => html_vals(format, info['prompts']),
-        'values' => html_vals(format, info['values']),
+        'prompt' => BodyItem.html_val(format, info['prompt']),
+        'promptsLabel' => BodyItem.html_val(format, info['promptsLabel']),
+        'valuesLabel' => BodyItem.html_val(format, info['valuesLabel']),
+        'prompts' => BodyItem.html_vals(format, info['prompts']),
+        'values' => BodyItem.html_vals(format, info['values']),
         'correctAnswers' => answer,
         'rubric' => rubric_as_json(format: format),
       }.compact,
@@ -132,8 +132,8 @@ class BodyItem < ApplicationRecord
   def as_json_MultipleChoice(format:)
     {
       'MultipleChoice' => {
-        'prompt' => html_val(format, info['prompt']),
-        'options' => html_vals(format, info['options']),
+        'prompt' => BodyItem.html_val(format, info['prompt']),
+        'options' => BodyItem.html_vals(format, info['options']),
         'correctAnswer' => answer,
         'rubric' => rubric_as_json(format: format),
       }.compact,
@@ -143,12 +143,12 @@ class BodyItem < ApplicationRecord
   def as_json_Text(format:)
     {
       'Text' => {
-        'prompt' => html_val(format, info['prompt']),
+        'prompt' => BodyItem.html_val(format, info['prompt']),
         'correctAnswer' =>
           if answer.is_a? String
             answer
           else
-            html_val(format, answer&.dig('text'))
+            BodyItem.html_val(format, answer&.dig('text'))
           end,
         'rubric' => rubric_as_json(format: format),
       }.compact,
@@ -163,7 +163,7 @@ class BodyItem < ApplicationRecord
       else
         {
           'YesNo' => {
-            'prompt' => html_val(format, info['prompt']),
+            'prompt' => BodyItem.html_val(format, info['prompt']),
             'correctAnswer' => answer,
             'rubric' => rubric_as_json(format: format),
           }.compact,
@@ -175,7 +175,7 @@ class BodyItem < ApplicationRecord
       else
         {
           'TrueFalse' => {
-            'prompt' => html_val(format, info['prompt']),
+            'prompt' => BodyItem.html_val(format, info['prompt']),
             'correctAnswer' => answer,
             'rubric' => rubric_as_json(format: format),
           }.compact,

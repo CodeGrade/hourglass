@@ -410,8 +410,8 @@ export interface TimeInfo {
 }
 
 export interface ExamVersion {
-  questions: QuestionInfo[];
-  references?: FileRef[];
+  questions: readonly QuestionInfo[];
+  references?: readonly FileRef[];
   instructions?: HTMLVal;
   files: ExamFile[];
 }

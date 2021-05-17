@@ -156,8 +156,8 @@ export interface HTMLValWithAnswer extends HTMLVal {
   answer: NoAnswerState;
 }
 
-export interface PartInfoWithAnswers extends Omit<PartInfo, 'body'> {
-  body: BodyItemWithAnswer[];
+export interface PartInfoWithAnswers extends Omit<PartInfo, 'bodyItems'> {
+  bodyItems: BodyItemWithAnswer[];
 }
 
 export interface QuestionInfoWithAnswers extends Omit<QuestionInfo, 'parts'> {
@@ -206,6 +206,7 @@ export type RubricNone = {
   type: 'none';
   id?: string;
   inUse?: boolean;
+  railsId?: string;
 }
 
 export type RubricAll = {
@@ -214,6 +215,7 @@ export type RubricAll = {
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
   inUse?: boolean;
+  railsId?: string;
 }
 
 export type RubricAny = {
@@ -223,6 +225,7 @@ export type RubricAny = {
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
   inUse?: boolean;
+  railsId?: string;
 }
 
 export type RubricOne = {
@@ -232,6 +235,7 @@ export type RubricOne = {
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
   inUse?: boolean;
+  railsId?: string;
 }
 
 export type PartRubric = {

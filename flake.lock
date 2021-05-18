@@ -14,9 +14,26 @@
         "type": "indirect"
       }
     },
+    "nixpkgs-ruby": {
+      "locked": {
+        "lastModified": 1617769200,
+        "narHash": "sha256-sSU3SfkB9H4xgHigpMmZFB2w5cA0QgOtiCr81aH/EOA=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "3d7c1202df37383279bdfe8f8f9cd373d19ea467",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "3d7c120",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "nixpkgs-ruby": "nixpkgs-ruby"
       }
     }
   },

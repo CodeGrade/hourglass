@@ -1,6 +1,8 @@
-{ pkgs ? import <nixpkgs> {} }:
+{
+  pkgs ? import <nixpkgs> {},
+  ruby ? pkgs.ruby_2_7,
+}:
 let
-  ruby = pkgs.ruby_2_7;
   psql_setup_file = pkgs.writeText "setup.sql" ''
     DO
     $do$

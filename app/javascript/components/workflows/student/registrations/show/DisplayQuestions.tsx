@@ -4,29 +4,27 @@ import ShowQuestion from '@proctor/registrations/show/ShowQuestion';
 import { CurrentGrading } from '@professor/exams/types';
 import { graphql, useFragment } from 'relay-hooks';
 
-import { DisplayQuestions$key } from './__generated__/DisplayQuestions.graphql';
+import { DisplayQuestionsStudent$key } from './__generated__/DisplayQuestionsStudent.graphql';
 
 interface DisplayQuestionsProps {
   refreshCodeMirrorsDeps: React.DependencyList;
   currentGrading?: CurrentGrading;
-  registrationId?: string;
   fullyExpandCode: boolean;
   overviewMode: boolean;
-  version: DisplayQuestions$key;
+  version: DisplayQuestionsStudent$key;
 }
 
 const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
     currentGrading = [],
-    registrationId,
     fullyExpandCode,
     overviewMode,
     version,
   } = props;
   const res = useFragment(
     graphql`
-    fragment DisplayQuestions on ExamVersion {
+    fragment DisplayQuestionsStudent on ExamVersion {
       dbQuestions {
         id
         name {
@@ -78,7 +76,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           qnum={i}
           currentGrading={currentGrading[i]}
           refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
-          registrationId={registrationId}
+          registrationId={null}
           fullyExpandCode={fullyExpandCode}
           overviewMode={overviewMode}
         />

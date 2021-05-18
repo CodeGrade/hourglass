@@ -33,6 +33,12 @@ module Types
       ans
     }
 
+    ALL_STAFF_OR_PUBLISHED = lambda { |obj, args, ctx|
+      return true if Guards::ALL_STAFF.call(obj, args, ctx)
+      reg = ctx[:current_user].reg_for(obj.object.exam)
+      return reg&.published
+    }
+
     field :name, String, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
@@ -78,15 +84,15 @@ module Types
     #   guard Guards::ALL_STAFF
     # end
     # def questions
-    #   object.db_questions.as_json
+    #   object.db_questions.as_json(format: :graphql)
     # end
 
     field :db_questions, [Types::QuestionType], null: false do
-      guard Guards::ALL_STAFF
+      guard ALL_STAFF_OR_PUBLISHED
     end
 
     field :db_references, [Types::ReferenceType], null: false do
-      guard Guards::ALL_STAFF
+      guard ALL_STAFF_OR_PUBLISHED
     end
 
     field :answers, GraphQL::Types::JSON, null: false do
@@ -97,7 +103,7 @@ module Types
     end
 
     field :instructions, Types::HtmlType, null: false do
-      guard Guards::ALL_STAFF
+      guard ALL_STAFF_OR_PUBLISHED
     end
     def instructions
       {
@@ -107,7 +113,7 @@ module Types
     end
 
     field :files, GraphQL::Types::JSON, null: false do
-      guard Guards::ALL_STAFF
+      guard ALL_STAFF_OR_PUBLISHED
     end
 
     field :rubrics, [Types::RubricType], null: true do
@@ -121,7 +127,7 @@ module Types
       guard Guards::PROFESSORS
     end
     def raw_rubrics
-      object.rubric_as_json
+      object.rubric_as_json(format: :graphql)
     end
 
     field :file_export_url, String, null: false do

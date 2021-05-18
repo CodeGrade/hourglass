@@ -1,7 +1,7 @@
-with import <nixpkgs> {};
+{ pkgs ? import <nixpkgs> {} }:
 let
-  ruby = ruby_2_7;
-  psql_setup_file = writeText "setup.sql" ''
+  ruby = pkgs.ruby_2_7;
+  psql_setup_file = pkgs.writeText "setup.sql" ''
     DO
     $do$
     BEGIN
@@ -32,16 +32,16 @@ let
       initdb $PGDATA --auth=trust >/dev/null
     fi
   '';
-  start_postgres = writeShellScriptBin "start_postgres" ''
+  start_postgres = pkgs.writeShellScriptBin "start_postgres" ''
     pg_ctl start -l $LOG_PATH -o "-c listen_addresses= -c unix_socket_directories=$PGHOST"
     psql -f ${psql_setup_file} > /dev/null
   '';
-  stop_postgres = writeShellScriptBin "stop_postgres" ''
+  stop_postgres = pkgs.writeShellScriptBin "stop_postgres" ''
     pg_ctl -D $PGDATA stop
   '';
-in mkShell {
+in pkgs.mkShell {
   name = "hourglass";
-  buildInputs = [
+  buildInputs = with pkgs; [
     solargraph
     ruby.devEnv
     bundler

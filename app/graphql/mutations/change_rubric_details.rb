@@ -5,8 +5,8 @@ module Mutations
     argument :rubric_id, ID, required: true, loads: Types::RubricType
     argument :points, Float, required: false
     argument :update_points, Boolean, required: true
-    argument :update_description, Boolean, required: true
     argument :description, String, required: false
+    argument :update_description, Boolean, required: true
 
     field :rubric, Types::RubricType, null: false
 
@@ -17,12 +17,10 @@ module Mutations
     end
 
     def resolve(rubric:, update_points:, update_description:, points: nil, description: nil)
-      exam_version = rubric.exam_version
       rubric.description = description if update_description
       rubric.points = points if update_points
       rubric.save!
 
-      cache_authorization!(exam_version.exam, exam_version.exam.course)
       { rubric: rubric }
     end
   end

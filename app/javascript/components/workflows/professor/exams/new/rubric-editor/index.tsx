@@ -290,7 +290,7 @@ export const ChangeRubricType: React.FC<{
       <Form.Label column sm="2"><h5 className="my-0">Rubric type</h5></Form.Label>
       <Col sm="10">
         <Select
-          disabled={disabled}
+          isDisabled={disabled}
           classNamePrefix="select"
           className="z-1000-select"
           options={options}

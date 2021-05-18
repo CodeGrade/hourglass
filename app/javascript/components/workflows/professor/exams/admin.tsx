@@ -874,7 +874,7 @@ const PreviewVersion: React.FC<{
         <div className="border p-2">
           <ExamViewer
             version={res}
-            showStarterCode
+            overviewMode
             refreshCodeMirrorsDeps={[open]}
           />
         </div>

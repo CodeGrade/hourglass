@@ -40,7 +40,7 @@ export interface BodyProps {
   bnum: number;
   currentGrading?: CurrentGrading[number][number]['body'][number];
   fullyExpandCode: boolean;
-  showStarterCode: boolean;
+  overviewMode: boolean;
 }
 
 const ShowComment: React.FC<{ comment: CommentJson }> = (props) => {
@@ -163,7 +163,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     bnum,
     currentGrading,
     fullyExpandCode,
-    showStarterCode,
+    overviewMode,
   } = props;
   const {
     answers,
@@ -179,7 +179,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return <HTML value={body.info} />;
     case 'Code': {
       let initial = null;
-      if (showStarterCode && body.info.initial) {
+      if (overviewMode && body.info.initial) {
         initial = (
           <Card bg="secondary" border="info" className="mt-2 mb-3">
             <Card.Header
@@ -213,7 +213,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
             refreshProps={refreshCodeMirrorsDeps}
             fullyExpandCode={fullyExpandCode}
           />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -222,7 +222,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayAllThatApply info={body.info} value={value as AllThatApplyState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -230,7 +230,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayCodeTag info={body.info} value={value as CodeTagState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -238,7 +238,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayYesNo info={body.info} value={value as YesNoState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -246,7 +246,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayMultipleChoice info={body.info} value={value as MultipleChoiceState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -254,7 +254,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayText info={body.info} value={value as TextState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -262,7 +262,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayMatching info={body.info} value={value as MatchingState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );

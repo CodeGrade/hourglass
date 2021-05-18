@@ -48,25 +48,6 @@ module Types
       RecordLoader.for(ExamVersion).load(object.exam_version_id)
     end
 
-
-    field :review_exam, GraphQL::Types::JSON, null: true 
-    def review_exam
-      if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
-        ev = object.exam_version
-        {
-          questions: ev.db_questions.as_json(format: :graphql),
-          reference: ev.db_references.as_json,
-          instructions: {
-            type: 'HTML',
-            value: ev.instructions,
-          },
-          files: ev.files,
-        }
-      else
-        nil
-      end
-    end
-
     field :course_title, String, null: false
     def course_title
       object.exam.course.title

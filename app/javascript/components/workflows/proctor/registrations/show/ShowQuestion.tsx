@@ -14,7 +14,7 @@ interface ShowQuestionProps {
   question: QuestionInfo;
   qnum: number;
   currentGrading?: CurrentGrading[number];
-  currentGraderId?: string;
+  registrationId?: string;
   fullyExpandCode: boolean;
   overviewMode: boolean;
 }
@@ -25,7 +25,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     question,
     qnum,
     currentGrading = [],
-    currentGraderId,
+    registrationId,
     fullyExpandCode,
     overviewMode,
   } = props;
@@ -65,10 +65,10 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               <span className="point-count">
                 {subtitle}
               </span>
-              {currentGraderId && (
+              {registrationId && (
                 <span className="ml-4">
                   <ClaimGradingButton
-                    registrationId={currentGraderId}
+                    registrationId={registrationId}
                     qnum={qnum}
                     pnum={0}
                     graded={currentGrading[0]?.graded}
@@ -100,7 +100,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             qnum={qnum}
             currentGrading={currentGrading[i]}
             refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
-            showRequestGrading={singlePart ? null : currentGraderId}
+            showRequestGrading={singlePart ? null : registrationId}
             fullyExpandCode={fullyExpandCode}
             overviewMode={overviewMode}
           />

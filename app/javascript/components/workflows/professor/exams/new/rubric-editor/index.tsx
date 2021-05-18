@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useContext } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
 import {
@@ -10,13 +10,16 @@ import {
 } from '@professor/exams/types';
 import { examWithAnswers } from '@professor/exams/new/editor';
 import { graphql, useQuery } from 'relay-hooks';
-import { ChangeRubricType } from '@professor/exams/new/rubric-editor/RubricEditor';
 
 import { RenderError } from '@hourglass/common/boundary';
 import convertRubric from '@professor/exams/rubrics';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import { SelectOption, SelectOptions } from '@hourglass/common/helpers';
 import { rubricEditorQuery } from './__generated__/rubricEditorQuery.graphql';
+import Select from 'react-select';
+import { useMutation } from 'relay-hooks';
+import { rubricEditorChangeRubricTypeMutation } from './__generated__/rubricEditorChangeRubricTypeMutation.graphql';
+import { AlertContext } from '@hourglass/common/alerts';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -172,14 +175,130 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
   const {
     rubric,
   } = props;
-const options: SelectOptions<Rubric['type']> = Object.values(defaultOptions);
   return (
     <>
       <p>editing: {JSON.stringify(rubric)}</p>
-      <ChangeRubricType
-        value={rubric}
-        onChange={console.log}
-      />
+      <RubricTypeEditor
+        rubric={rubric}
+        />
     </>
+  );
+};
+
+// given a rubric, hook up GraphQL mutation for type changes
+const RubricTypeEditor: React.FC<{
+  rubric: Rubric;
+}> = (props) => {
+  const { rubric } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorChangeRubricTypeMutation>(
+    graphql`
+    mutation rubricEditorChangeRubricTypeMutation($input: ChangeRubricTypeInput!) {
+      changeRubricType(input: $input) {
+        rubric {
+          id
+          type
+          parentSectionId
+          qnum
+          pnum
+          bnum
+          order
+          points
+          description {
+            type
+            value
+          }
+          rubricPreset {
+            id
+            direction
+            label
+            mercy
+            presetComments {
+              id
+              label
+              order
+              points
+              graderHint
+              studentFeedback
+            }
+          }
+          subsections {
+            id
+          }
+        }
+      }
+    }
+    `,
+    {
+      onCompleted: ({ changeRubricType }) => {
+        const { rubric: changedRubric } = changeRubricType;
+        console.log('updated rubric:', changedRubric);
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing rubric type',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const onChange = (newType: Rubric['type']) => {
+    mutate({
+      variables: {
+        input: {
+          rubricId: rubric.id,
+          type: newType,
+        },
+      },
+    });
+  };
+  return (
+    <ChangeRubricType
+      disabled={loading}
+      value={rubric.type}
+      onChange={onChange}
+      disableAllWhenPreset={ // only disable 'all'
+        'choices' in rubric && // if we have any saved choices...
+        'presets' in rubric.choices && // that are presets,
+        rubric.choices.presets.length > 0 // and presets are present
+      }
+    />
+  );
+};
+
+type RubricSelectOption = SelectOption<Rubric['type']>;
+
+// just UI for displaying a Rubric type, and calling the callback when changed
+export const ChangeRubricType: React.FC<{
+  disabled?: boolean;
+  value: Rubric['type'];
+  onChange: (newVal: Rubric['type']) => void;
+  disableAllWhenPreset: boolean;
+}> = (props) => {
+  const options: RubricSelectOption[] = Object.values(defaultOptions);
+  const { value, onChange, disabled = false } = props;
+  const changeRubricType = useCallback((newtype: RubricSelectOption) => {
+    onChange(newtype.value);
+  }, [value, onChange]);
+  const disableAllWhenPreset = useCallback((option: RubricSelectOption) => {
+    return option.value === 'all' && props.disableAllWhenPreset;
+  }, [props.disableAllWhenPreset]);
+  return (
+    <Form.Group as={Row}>
+      <Form.Label column sm="2"><h5 className="my-0">Rubric type</h5></Form.Label>
+      <Col sm="10">
+        <Select
+          disabled={disabled}
+          classNamePrefix="select"
+          className="z-1000-select"
+          options={options}
+          value={defaultOptions[value || 'none']}
+          isOptionDisabled={disableAllWhenPreset}
+          onChange={changeRubricType}
+        />
+      </Col>
+    </Form.Group>
   );
 };

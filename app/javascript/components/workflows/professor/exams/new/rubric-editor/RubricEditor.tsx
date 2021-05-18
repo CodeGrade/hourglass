@@ -374,7 +374,7 @@ export const ChangeRubricType: React.FC<{
   const { value, onChange } = props;
   const changeRubricType = useCallback((newtype: SelectOption<Rubric['type']>) => {
     if (newtype.value === 'none') {
-      onChange({ type: 'none', railsId: value?.railsId });
+      onChange({ type: 'none' });
     } else if (newtype.value === 'all') {
       const copy = { ...value };
       if ('points' in copy) { delete copy.points; }

@@ -2,7 +2,6 @@ module Types
   class QuestionType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id
-    field :id, ID, null: false
 
     guard Guards::VISIBILITY
 

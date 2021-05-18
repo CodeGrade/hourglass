@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_31_111730) do
+ActiveRecord::Schema.define(version: 2021_05_18_175335) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -282,9 +282,15 @@ ActiveRecord::Schema.define(version: 2021_03_31_111730) do
     t.bigint "part_id"
     t.bigint "body_item_id"
     t.index ["body_item_id"], name: "index_rubrics_on_body_item_id"
-    t.index ["exam_version_id", "question_id", "part_id", "body_item_id", "order"], name: "unique_rubric_order_per_coords", unique: true, where: "(parent_section_id IS NOT NULL)"
-    t.index ["exam_version_id", "question_id", "part_id", "body_item_id"], name: "unique_rubric_root_coords", unique: true, where: "(parent_section_id IS NULL)"
+    t.index ["exam_version_id", "order"], name: "unique_rubric_order_per_ev", unique: true, where: "((parent_section_id IS NOT NULL) AND (question_id IS NULL) AND (part_id IS NULL) AND (body_item_id IS NULL))"
+    t.index ["exam_version_id", "question_id", "order"], name: "unique_rubric_order_per_question", unique: true, where: "((parent_section_id IS NOT NULL) AND (question_id IS NOT NULL) AND (part_id IS NULL) AND (body_item_id IS NULL))"
+    t.index ["exam_version_id", "question_id", "part_id", "body_item_id", "order"], name: "unique_rubric_order_per_body_item", unique: true, where: "((parent_section_id IS NOT NULL) AND (question_id IS NOT NULL) AND (part_id IS NOT NULL) AND (body_item_id IS NOT NULL))"
+    t.index ["exam_version_id", "question_id", "part_id", "body_item_id"], name: "unique_rubric_root_coords_body_items", unique: true, where: "((parent_section_id IS NULL) AND (question_id IS NOT NULL) AND (part_id IS NOT NULL) AND (body_item_id IS NOT NULL))"
+    t.index ["exam_version_id", "question_id", "part_id", "order"], name: "unique_rubric_order_per_part", unique: true, where: "((parent_section_id IS NOT NULL) AND (question_id IS NOT NULL) AND (part_id IS NOT NULL) AND (body_item_id IS NULL))"
+    t.index ["exam_version_id", "question_id", "part_id"], name: "unique_rubric_root_coords_parts", unique: true, where: "((parent_section_id IS NULL) AND (question_id IS NOT NULL) AND (part_id IS NOT NULL) AND (body_item_id IS NULL))"
+    t.index ["exam_version_id", "question_id"], name: "unique_rubric_root_coords_questions", unique: true, where: "((parent_section_id IS NULL) AND (question_id IS NOT NULL) AND (part_id IS NULL) AND (body_item_id IS NULL))"
     t.index ["exam_version_id"], name: "index_rubrics_on_exam_version_id"
+    t.index ["exam_version_id"], name: "unique_rubric_root_coords_ev", unique: true, where: "((parent_section_id IS NULL) AND (question_id IS NULL) AND (part_id IS NULL) AND (body_item_id IS NULL))"
     t.index ["parent_section_id"], name: "index_rubrics_on_parent_section_id"
     t.index ["part_id"], name: "index_rubrics_on_part_id"
     t.index ["question_id", "part_id", "body_item_id"], name: "index_rubrics_on_question_id_and_part_id_and_body_item_id"

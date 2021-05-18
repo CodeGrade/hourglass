@@ -370,6 +370,7 @@ const ExamSubmissionStaff: React.FC = () => {
       <ExamViewer
         version={registration.examVersion}
         currentGrading={currentGrading as CurrentGrading}
+        currentAnswers={currentAnswers as AnswersState}
         registrationId={registrationId}
         overviewMode={false}
       />

@@ -26,19 +26,19 @@ const Body: React.FC<BodyProps> = (props) => {
     case 'HTML':
       return <HTML value={info} />;
     case 'Code':
-      return <Code info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
+      return <Code info={body.info} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'AllThatApply':
-      return <AllThatApply info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
+      return <AllThatApply info={body.info} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'CodeTag':
-      return <CodeTag info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
+      return <CodeTag info={body.info} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'YesNo':
-      return <YesNoInput info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
+      return <YesNoInput info={body.info} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'MultipleChoice':
-      return <MultipleChoice info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
+      return <MultipleChoice info={body.info} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'Text':
-      return <Text info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
+      return <Text info={body.info} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'Matching':
-      return <Matching info={body} qnum={qnum} pnum={pnum} bnum={bnum} />;
+      return <Matching info={body.info} qnum={qnum} pnum={pnum} bnum={bnum} />;
     default:
       throw new ExhaustiveSwitchError(info);
   }

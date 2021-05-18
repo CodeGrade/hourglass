@@ -33,6 +33,13 @@ class BodyItem < ApplicationRecord
     if info.is_a? String
       BodyItem.html_val(format, info)
     else
+      if format == :graphql
+        return {
+          info: info,
+          id: HourglassSchema.id_from_object(self, Types::BodyItemType, {}),
+        }
+      end
+
       send("as_json_#{info['type']}", format: format)
     end
   end
@@ -52,27 +59,15 @@ class BodyItem < ApplicationRecord
   end
 
   def as_json_AllThatApply(format:)
-    if format == :graphql
-      {
-        'AllThatApply' => {
-          'prompt' => BodyItem.html_val(format, info['prompt']),
-          'options' => info['options'].zip(answer).map do |opt, ans|
-            { BodyItem.html_val(format, opt) => ans }
-          end,
-          'rubric' => rubric_as_json(format: format),
-        }.compact,
-      }
-    else
-      {
-        'AllThatApply' => {
-          'prompt' => BodyItem.html_val(format, info['prompt']),
-          'options' => info['options'].zip(answer).map do |opt, ans|
-            { BodyItem.html_val(format, opt) => ans }
-          end,
-          'rubric' => rubric_as_json(format: format),
-        }.compact,
-      }
-    end
+    {
+      'AllThatApply' => {
+        'prompt' => BodyItem.html_val(format, info['prompt']),
+        'options' => info['options'].zip(answer).map do |opt, ans|
+          { BodyItem.html_val(format, opt) => ans }
+        end,
+        'rubric' => rubric_as_json(format: format),
+      }.compact,
+    }
   end
 
   def as_json_Code(format:)

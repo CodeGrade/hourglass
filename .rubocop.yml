@@ -57,3 +57,5 @@ Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true
 Rails/EnvironmentVariableAccess:
   AllowReads: true
+Style/WordArray:
+  EnforcedStyle: brackets

@@ -9,9 +9,9 @@ import { DisplayQuestions$key } from './__generated__/DisplayQuestions.graphql';
 interface DisplayQuestionsProps {
   refreshCodeMirrorsDeps: React.DependencyList;
   currentGrading?: CurrentGrading;
-  showRequestGrading?: string;
+  currentGraderId?: string;
   fullyExpandCode: boolean;
-  showStarterCode: boolean;
+  overviewMode: boolean;
   version: DisplayQuestions$key;
 }
 
@@ -19,9 +19,9 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
     currentGrading = [],
-    showRequestGrading,
+    currentGraderId,
     fullyExpandCode,
-    showStarterCode,
+    overviewMode,
     version,
   } = props;
   const res = useFragment(
@@ -78,9 +78,9 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           qnum={i}
           currentGrading={currentGrading[i]}
           refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
-          showRequestGrading={showRequestGrading}
+          currentGraderId={currentGraderId}
           fullyExpandCode={fullyExpandCode}
-          showStarterCode={showStarterCode}
+          overviewMode={overviewMode}
         />
       ))}
     </>

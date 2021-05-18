@@ -214,7 +214,6 @@ const ExamSubmission: React.FC = () => {
           ...showExamViewer
         }
         reviewExam
-        canIGrade
       }
     }
     `,
@@ -235,7 +234,6 @@ const ExamSubmission: React.FC = () => {
     published,
     user,
     exam,
-    canIGrade,
   } = registration;
   const userInfo = `${user.displayName} (${user.nuid})`;
   const titleInfo = published ? userInfo : '<redacted>';
@@ -268,8 +266,8 @@ const ExamSubmission: React.FC = () => {
       <ExamViewer
         version={registration.examVersion}
         currentGrading={currentGrading as CurrentGrading}
-        showRequestGrading={canIGrade ? registrationId : null}
-        showStarterCode={false}
+        currentGraderId={registrationId}
+        overviewMode={false}
       />
     </DocumentTitle>
   );

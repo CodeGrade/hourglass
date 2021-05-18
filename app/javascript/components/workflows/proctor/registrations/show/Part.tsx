@@ -23,7 +23,7 @@ interface PartProps {
   anonymous?: boolean;
   showRequestGrading?: string;
   fullyExpandCode?: boolean;
-  showStarterCode: boolean;
+  overviewMode: boolean;
 }
 const REQUEST_GRADE_MUTATION = graphql`
 mutation PartRequestGradingLockMutation($input: RequestGradingLockInput!) {
@@ -110,7 +110,7 @@ const Part: React.FC<PartProps> = (props) => {
     anonymous,
     showRequestGrading = false,
     fullyExpandCode = false,
-    showStarterCode,
+    overviewMode,
   } = props;
   const {
     name,
@@ -164,7 +164,7 @@ const Part: React.FC<PartProps> = (props) => {
             fullyExpandCode={fullyExpandCode}
           />
         )}
-        {pRubric && <ShowRubric rubric={pRubric} forWhat="part" />}
+        {pRubric && overviewMode && <ShowRubric rubric={pRubric} forWhat="part" />}
         {bodyItems.map((b, i) => (
           // Body numbers are STATIC.
           // eslint-disable-next-line react/no-array-index-key
@@ -177,7 +177,7 @@ const Part: React.FC<PartProps> = (props) => {
               currentGrading={currentGrading?.body[i]}
               refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
               fullyExpandCode={fullyExpandCode}
-              showStarterCode={showStarterCode}
+              overviewMode={overviewMode}
             />
           </div>
         ))}

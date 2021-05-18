@@ -14,9 +14,9 @@ interface ShowQuestionProps {
   question: QuestionInfo;
   qnum: number;
   currentGrading?: CurrentGrading[number];
-  showRequestGrading?: string;
+  currentGraderId?: string;
   fullyExpandCode: boolean;
-  showStarterCode: boolean;
+  overviewMode: boolean;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
@@ -25,9 +25,9 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     question,
     qnum,
     currentGrading = [],
-    showRequestGrading,
+    currentGraderId,
     fullyExpandCode,
-    showStarterCode,
+    overviewMode,
   } = props;
   const {
     name,
@@ -65,10 +65,10 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               <span className="point-count">
                 {subtitle}
               </span>
-              {showRequestGrading && (
+              {currentGraderId && (
                 <span className="ml-4">
                   <ClaimGradingButton
-                    registrationId={showRequestGrading}
+                    registrationId={currentGraderId}
                     qnum={qnum}
                     pnum={0}
                     graded={currentGrading[0]?.graded}
@@ -88,7 +88,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             fullyExpandCode={fullyExpandCode}
           />
         )}
-        {qRubric && <ShowRubric rubric={qRubric} forWhat="question" />}
+        {qRubric && overviewMode && <ShowRubric rubric={qRubric} forWhat="question" />}
         {parts.map((p, i) => (
           <Part
             // Part numbers are STATIC.
@@ -100,9 +100,9 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             qnum={qnum}
             currentGrading={currentGrading[i]}
             refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
-            showRequestGrading={singlePart ? null : showRequestGrading}
+            showRequestGrading={singlePart ? null : currentGraderId}
             fullyExpandCode={fullyExpandCode}
-            showStarterCode={showStarterCode}
+            overviewMode={overviewMode}
           />
         ))}
       </div>

@@ -57,8 +57,6 @@ class Rubric < ApplicationRecord
       end
     end
 
-    return if question.nil? || part.nil? || body_item.nil?
-
     if parent_section.nil?
       return if order.nil?
 

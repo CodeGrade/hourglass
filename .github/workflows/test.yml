@@ -9,11 +9,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install nix
-      uses: cachix/install-nix-action@v12
+      uses: cachix/install-nix-action@v13
       with:
         install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210429_d15a196/install
         extra_nix_config: |
           experimental-features = nix-command flakes
+    - name: Install cachix
+      uses: cachix/cachix-action@v10
+      with:
+        name: hourglass
+        # authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Get nix deps
       run: nix develop -c 'echo'
     - name: Install ruby gems

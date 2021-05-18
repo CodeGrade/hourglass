@@ -154,7 +154,7 @@ class ExamVersion < ApplicationRecord
         (format == :export ? 'reference' : 'references') => compact_blank(db_references.where(
           question: nil,
           part: nil,
-        ).map(&:as_json)),
+        ).map { |ref| ref.as_json(format: format) }),
         'examRubric' => rubric_as_json,
       }.compact,
     }

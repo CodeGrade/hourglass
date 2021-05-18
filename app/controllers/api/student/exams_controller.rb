@@ -63,7 +63,7 @@ module Api
           type: 'CONTENTS',
           exam: {
             questions: version.db_questions.as_json(format: :graphql), # TODO: RUBRICS, ANSWERS SHOULD NOT BE INCLUDED HERE
-            references: version.db_references.as_json,
+            references: version.db_references.as_json(format: :graphql),
             instructions: {
               type: 'HTML',
               value: version.instructions,

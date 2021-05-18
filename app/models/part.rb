@@ -29,7 +29,7 @@ class Part < ApplicationRecord
       'points' => points,
       'extraCredit' => extra_credit || nil,
       (format == :export ? 'reference' : 'references') =>
-        compact_blank(references.order(:index).map(&:as_json)),
+        compact_blank(references.order(:index).map { |ref| ref.as_json(format: format) }),
       'partRubric' => rubric_as_json,
       (format == :export ? 'body' : 'bodyItems') =>
         body_items.order(:index).map { |b| b.as_json(format: format) },

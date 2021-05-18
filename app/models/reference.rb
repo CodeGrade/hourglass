@@ -10,7 +10,14 @@ class Reference < ApplicationRecord
     nil
   end
 
-  def as_json
-    { type => path }
+  def as_json(format:)
+    if format == :graphql
+      {
+        type: type,
+        path: path,
+      }
+    else
+      { type => path }
+    end
   end
 end

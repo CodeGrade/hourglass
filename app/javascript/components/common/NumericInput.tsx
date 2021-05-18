@@ -92,6 +92,10 @@ const clamp = (val : number, min ?: number, max ?: number) : number => {
   return val;
 };
 
+export type ChangeHandler =
+  ((val: string | number, focused: true) => void)
+  & ((val: number, focused: false) => void);
+
 export const NumericInput: React.FC<{
   size?: FormControlProps['size'],
   className?: string,
@@ -101,7 +105,7 @@ export const NumericInput: React.FC<{
   min?: number,
   max?: number,
   step?: number,
-  onChange?: (val: string | number, focused: boolean) => void,
+  onChange?: ChangeHandler;
   value?: number | string,
 }> = (props) => {
   const {

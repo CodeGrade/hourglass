@@ -1,4 +1,4 @@
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
 import {
@@ -7,7 +7,7 @@ import {
   HTMLVal,
 } from '@student/exams/show/types';
 import {
-  Rubric,
+  Rubric, RubricAll, RubricAny, RubricOne,
 } from '@professor/exams/types';
 import { examWithAnswers } from '@professor/exams/new/editor';
 import { graphql, useQuery } from 'relay-hooks';
@@ -22,8 +22,10 @@ import { useMutation } from 'relay-hooks';
 import { rubricEditorChangeRubricTypeMutation } from './__generated__/rubricEditorChangeRubricTypeMutation.graphql';
 import { AlertContext } from '@hourglass/common/alerts';
 import CustomEditor from '../editor/components/CustomEditor';
-import { useDebouncedCallback } from 'use-debounce/lib';
+import { useDebounce, useDebouncedCallback } from 'use-debounce/lib';
 import { rubricEditorChangeRubricDetailsDescriptionMutation } from './__generated__/rubricEditorChangeRubricDetailsDescriptionMutation.graphql';
+import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/NumericInput';
+import { rubricEditorChangeRubricDetailsPointsMutation } from './__generated__/rubricEditorChangeRubricDetailsPointsMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -185,11 +187,28 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
       <RubricTypeEditor
         rubric={rubric}
       />
-      {rubric.type !== 'none' && (
+      {'description' in rubric && (
         <RubricDescriptionEditor
           rubric={rubric}
         />
       )}
+      <Form.Group as={Row}>
+        <Form.Label column sm="2">Label</Form.Label>
+        <Col sm="4">
+          TODO
+          {/* <Field name="label" component="input" type="text" className="w-100" /> */}
+        </Col>
+        {'points' in rubric && (
+          <>
+            <Form.Label column sm="2">Points</Form.Label>
+            <Col sm="4">
+              <RubricPointsEditor
+                rubric={rubric}
+              />
+            </Col>
+          </>
+        )}
+      </Form.Group>
       <hr></hr>
     </>
   );
@@ -310,10 +329,10 @@ export const ChangeRubricType: React.FC<{
 };
 
 const RubricDescriptionEditor: React.FC<{
-  rubric: Rubric & { type: Exclude<Rubric['type'], 'none'> };
+  rubric: RubricAll | RubricOne | RubricAny;
 }> = (props) => {
   const { rubric } = props;
-  const { description } = rubric;
+  const { description = { type: 'HTML', value: '' } } = rubric;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangeRubricDetailsDescriptionMutation>(
     graphql`
@@ -333,7 +352,7 @@ const RubricDescriptionEditor: React.FC<{
       onError: (err) => {
         alert({
           variant: 'danger',
-          title: 'Error changing rubric details',
+          title: 'Error changing rubric description',
           message: err.message,
           copyButton: true,
         });
@@ -345,8 +364,9 @@ const RubricDescriptionEditor: React.FC<{
       variables: {
         input: {
           rubricId: rubric.id,
-          description: newDescription.value,
           updatePoints: false,
+          updateDescription: true,
+          description: newDescription.value,
         },
       },
     })
@@ -394,11 +414,70 @@ const EditHTMLVal: React.FC<{
   return (
     <CustomEditor
       disabled={disabled}
-      value={value?.value || ''}
+      value={value.value}
       placeholder={placeholder}
       theme="bubble"
       onChange={handleChange}
       refreshProps={refreshProps}
+    />
+  );
+};
+
+const RubricPointsEditor: React.FC<{
+  rubric: RubricOne | RubricAny;
+}> = (props) => {
+  const { rubric } = props;
+  const [pointsVal, setPointsVal] = useState(rubric.points.toString());
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorChangeRubricDetailsPointsMutation>(
+    graphql`
+    mutation rubricEditorChangeRubricDetailsPointsMutation($input: ChangeRubricDetailsInput!) {
+      changeRubricDetails(input: $input) {
+        rubric {
+          id
+          points
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing rubric points',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    }
+  )
+  const handleChange: ChangeHandler = (newVal: string | number, focused: boolean) => {
+    if (focused) {
+      const normalized = normalizeNumber(newVal.toString(), pointsVal);
+      setPointsVal(normalized);
+    } else {
+      mutate({
+        variables: {
+          input: {
+            rubricId: rubric.id,
+            updatePoints: true,
+            updateDescription: false,
+            points: newVal as number,
+          },
+        },
+      });
+    }
+  };
+  useEffect(() => {
+    setPointsVal(rubric.points.toString());
+  }, [rubric.points]);
+  return (
+    <NumericInput
+      disabled={loading}
+      value={pointsVal}
+      step={0.5}
+      variant="warning"
+      onChange={handleChange}
     />
   );
 };

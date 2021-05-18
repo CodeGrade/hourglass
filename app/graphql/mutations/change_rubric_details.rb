@@ -5,7 +5,8 @@ module Mutations
     argument :rubric_id, ID, required: true, loads: Types::RubricType
     argument :points, Float, required: false
     argument :update_points, Boolean, required: true
-    argument :description, String, required: true
+    argument :update_description, Boolean, required: true
+    argument :description, String, required: false
 
     field :rubric, Types::RubricType, null: false
 
@@ -15,9 +16,9 @@ module Mutations
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
-    def resolve(rubric:, update_points:, description:, points: nil)
+    def resolve(rubric:, update_points:, update_description:, points: nil, description: nil)
       exam_version = rubric.exam_version
-      rubric.description = description
+      rubric.description = description if update_description
       rubric.points = points if update_points
       rubric.save!
 

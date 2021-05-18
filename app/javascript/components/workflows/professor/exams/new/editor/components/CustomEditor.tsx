@@ -13,6 +13,7 @@ export interface CustomEditorProps {
   theme?: string;
   onChange?: ReactQuill.ReactQuillProps['onChange'];
   refreshProps?: React.DependencyList;
+  disabled?: boolean;
 }
 
 const toolbarOptions = [
@@ -59,6 +60,7 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
     theme,
     onChange,
     refreshProps = [],
+    disabled = false,
   } = props;
 
   const filteredOnChange = useCallback((val, delta, source, editor) => {
@@ -73,6 +75,7 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
 
   return (
     <ReactQuill
+      readOnly={disabled}
       id={id}
       key={key}
       className={className}

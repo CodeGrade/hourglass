@@ -23,6 +23,7 @@ import { rubricEditorChangeRubricTypeMutation } from './__generated__/rubricEdit
 import { AlertContext } from '@hourglass/common/alerts';
 import CustomEditor from '../editor/components/CustomEditor';
 import { useDebouncedCallback } from 'use-debounce/lib';
+import { rubricEditorChangeRubricDetailsDescriptionMutation } from './__generated__/rubricEditorChangeRubricDetailsDescriptionMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -184,9 +185,11 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
       <RubricTypeEditor
         rubric={rubric}
       />
-      <RubricDescriptionEditor
-        rubric={rubric}
-      />
+      {rubric.type !== 'none' && (
+        <RubricDescriptionEditor
+          rubric={rubric}
+        />
+      )}
       <hr></hr>
     </>
   );
@@ -237,10 +240,6 @@ const RubricTypeEditor: React.FC<{
     }
     `,
     {
-      onCompleted: ({ changeRubricType }) => {
-        const { rubric: changedRubric } = changeRubricType;
-        console.log('updated rubric:', changedRubric);
-      },
       onError: (err) => {
         alert({
           variant: 'danger',
@@ -311,17 +310,52 @@ export const ChangeRubricType: React.FC<{
 };
 
 const RubricDescriptionEditor: React.FC<{
-  rubric: Rubric;
+  rubric: Rubric & { type: Exclude<Rubric['type'], 'none'> };
 }> = (props) => {
   const { rubric } = props;
-  if (rubric.type === 'none') return null;
   const { description } = rubric;
-  const loading = false; // TODO mutation
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorChangeRubricDetailsDescriptionMutation>(
+    graphql`
+    mutation rubricEditorChangeRubricDetailsDescriptionMutation($input: ChangeRubricDetailsInput!) {
+      changeRubricDetails(input: $input) {
+        rubric {
+          id
+          description {
+            type
+            value
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing rubric details',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    }
+  );
+  const onChange = (newDescription: HTMLVal) => {
+    mutate({
+      variables: {
+        input: {
+          rubricId: rubric.id,
+          description: newDescription.value,
+          updatePoints: false,
+        },
+      },
+    })
+  };
   return (
     <EditHTMLVal
       disabled={loading}
       value={description}
-      onChange={console.log}
+      onChange={onChange}
       placeholder={`Give use-${rubric.type} rubric instructions here`}
       debounceDelay={1000}
       refreshProps={[rubric.type]}

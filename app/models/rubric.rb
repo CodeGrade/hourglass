@@ -150,7 +150,7 @@ class Rubric < ApplicationRecord
       update(type: new_type.capitalize)
       case new_type
       when 'none'
-        update(points: 0)
+        update(points: 0, description: nil)
         rubric_preset&.destroy!
         subsections.destroy_all
         becomes(None)

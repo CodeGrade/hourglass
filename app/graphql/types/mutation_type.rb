@@ -43,5 +43,6 @@ module Types
     field :request_grading_lock, mutation: Mutations::RequestGradingLock
 
     field :change_rubric_type, mutation: Mutations::ChangeRubricTypeType
+    field :change_rubric_details, mutation: Mutations::ChangeRubricDetails
   end
 end

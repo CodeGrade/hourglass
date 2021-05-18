@@ -28,6 +28,7 @@ import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/
 import { rubricEditorChangeRubricDetailsPointsMutation } from './__generated__/rubricEditorChangeRubricDetailsPointsMutation.graphql';
 import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
 import { rubricEditorChangeRubricPresetLabelMutation } from './__generated__/rubricEditorChangeRubricPresetLabelMutation.graphql';
+import { rubricEditorChangeRubricPresetDirectionMutation } from './__generated__/rubricEditorChangeRubricPresetDirectionMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -211,8 +212,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
               <Form.Label column sm="1">Direction</Form.Label>
               <Col sm="3">
                 <RubricPresetDirectionEditor
-                  value={rubric.choices.direction}
-                  onChange={console.log}
+                  rubricPreset={rubric.choices}
                 />
               </Col>
             </>
@@ -241,12 +241,69 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
   );
 };
 
-interface RubricPresetsDirectionProps {
+
+const RubricPresetDirectionEditor: React.FC<{
+  rubricPreset: RubricPresets;
+}> = (props) => {
+  const {
+    rubricPreset,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorChangeRubricPresetDirectionMutation>(
+    graphql`
+    mutation rubricEditorChangeRubricPresetDirectionMutation($input: ChangeRubricPresetDetailsInput!) {
+      changeRubricPresetDetails(input: $input) {
+        rubricPreset {
+          id
+          direction
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing rubric preset direction',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    }
+  );
+  const handleChange = (newDirection: RubricPresets['direction']) => {
+    mutate({
+      variables: {
+        input: {
+          rubricPresetId: rubricPreset.id,
+          updateLabel: false,
+          updateDirection: true,
+          direction: newDirection,
+        },
+      },
+    })
+  };
+  return (
+    <ChangeRubricPresetDirection
+      value={rubricPreset.direction}
+      onChange={handleChange}
+      disabled={loading}
+    >
+    </ChangeRubricPresetDirection>
+  );
+};
+
+interface ChangeRubricPresetDirectionProps {
   value: RubricPresets['direction'];
   onChange: (newval: RubricPresets['direction']) => void;
+  disabled?: boolean;
 }
-const RubricPresetDirectionEditor: React.FC<RubricPresetsDirectionProps> = (props) => {
-  const { value, onChange } = props;
+const ChangeRubricPresetDirection: React.FC<ChangeRubricPresetDirectionProps> = (props) => {
+  const {
+    value,
+    onChange,
+    disabled = false,
+  } = props;
   const values: {
     name: string;
     value: RubricPresets['direction'];
@@ -265,6 +322,7 @@ const RubricPresetDirectionEditor: React.FC<RubricPresetsDirectionProps> = (prop
             message={val.message}
           >
             <ToggleButton
+              disabled={disabled}
               type="radio"
               variant={checked ? 'secondary' : 'outline-secondary'}
               className={checked ? '' : 'bg-white text-dark'}

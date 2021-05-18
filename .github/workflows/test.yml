@@ -20,24 +20,24 @@ jobs:
         name: hourglass
         # authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Get nix deps
-      run: nix develop -c 'echo'
+      run: nix develop -c echo
     - name: Install ruby gems
-      run: nix develop -c 'bundle install --jobs 4 --retry 3'
+      run: nix develop -c bundle install --jobs 4 --retry 3
     - name: Install npm packages
-      run: nix develop -c 'yarn install --frozen-lockfile'
+      run: nix develop -c yarn install --frozen-lockfile
     - name: Setup postgres
       run: |
-        nix develop -c 'start_postgres'
-        nix develop -c 'rails db:setup'
+        nix develop -c start_postgres
+        nix develop -c rails db:setup
     - name: Write graphql schema file
-      run: nix develop -c 'rails graphql:update_schema'
+      run: nix develop -c rails graphql:update_schema
     - name: Compile relay queries
-      run: nix develop -c 'yarn run relay-persist'
+      run: nix develop -c yarn run relay-persist
     - name: Typecheck
-      run: nix develop -c 'yarn run typecheck'
+      run: nix develop -c yarn run typecheck
     - name: Lint factories
-      run: nix develop -c 'rails factory_bot:lint'
+      run: nix develop -c rails factory_bot:lint
     - name: Run tests
-      run: nix develop -c 'rails test'
+      run: nix develop -c rails test
     - name: Lint
-      run: nix develop -c 'yarn run lint'
+      run: nix develop -c yarn run lint

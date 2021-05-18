@@ -8,28 +8,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: cachix/install-nix-action@v12
+    - name: Install nix
+      uses: cachix/install-nix-action@v12
       with:
-        nix_path: nixpkgs=channel:nixos-unstable
+        install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210429_d15a196/install
+        extra_nix_config: |
+          experimental-features = nix-command flakes
     - name: Get nix deps
-      run: nix-shell --run 'echo'
+      run: nix develop -c 'echo'
     - name: Install ruby gems
-      run: nix-shell --run 'bundle install --jobs 4 --retry 3'
+      run: nix develop -c 'bundle install --jobs 4 --retry 3'
     - name: Install npm packages
-      run: nix-shell --run 'yarn install --frozen-lockfile'
+      run: nix develop -c 'yarn install --frozen-lockfile'
     - name: Setup postgres
       run: |
-        nix-shell --run 'start_postgres'
-        nix-shell --run 'rails db:setup'
+        nix develop -c 'start_postgres'
+        nix develop -c 'rails db:setup'
     - name: Write graphql schema file
-      run: nix-shell --run 'rails graphql:update_schema'
+      run: nix develop -c 'rails graphql:update_schema'
     - name: Compile relay queries
-      run: nix-shell --run 'yarn run relay-persist'
+      run: nix develop -c 'yarn run relay-persist'
     - name: Typecheck
-      run: nix-shell --run 'yarn run typecheck'
+      run: nix develop -c 'yarn run typecheck'
     - name: Lint factories
-      run: nix-shell --run 'rails factory_bot:lint'
+      run: nix develop -c 'rails factory_bot:lint'
     - name: Run tests
-      run: nix-shell --run 'rails test'
+      run: nix develop -c 'rails test'
     - name: Lint
-      run: nix-shell --run 'yarn run lint'
+      run: nix develop -c 'yarn run lint'

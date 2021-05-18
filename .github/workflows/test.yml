@@ -18,7 +18,7 @@ jobs:
       uses: cachix/cachix-action@v10
       with:
         name: hourglass
-        # authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Get nix deps
       run: nix develop -c echo
     - name: Install ruby gems

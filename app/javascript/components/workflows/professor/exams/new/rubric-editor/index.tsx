@@ -4,6 +4,7 @@ import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
 import {
   ExamVersion,
   AnswersState,
+  HTMLVal,
 } from '@student/exams/show/types';
 import {
   Rubric,
@@ -20,6 +21,8 @@ import Select from 'react-select';
 import { useMutation } from 'relay-hooks';
 import { rubricEditorChangeRubricTypeMutation } from './__generated__/rubricEditorChangeRubricTypeMutation.graphql';
 import { AlertContext } from '@hourglass/common/alerts';
+import CustomEditor from '../editor/components/CustomEditor';
+import { useDebouncedCallback } from 'use-debounce/lib';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -111,21 +114,21 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
               />
             ) : 'TODO: NONE'}
             {questions.map((q, qnum) => (
-              <Row>
+              <Row key={qnum}>
                 <Col>
                   <p>Question {qnum} rubric:</p>
                   <SingleRubricEditor
                     rubric={q.questionRubric}
                   />
                   {q.parts.map((p, pnum) => (
-                    <Row>
+                    <Row key={pnum}>
                       <Col>
                         <p>Question {qnum} part {pnum} rubric:</p>
                         <SingleRubricEditor
                           rubric={p.partRubric}
                         />
                         {p.body.map((b, bnum) => (
-                          <Row>
+                          <Row key={bnum}>
                             <Col>
                               <p>Question {qnum} part {pnum} body {bnum} rubric:</p>
                               <SingleRubricEditor
@@ -180,7 +183,11 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
       <p>editing: {JSON.stringify(rubric)}</p>
       <RubricTypeEditor
         rubric={rubric}
-        />
+      />
+      <RubricDescriptionEditor
+        rubric={rubric}
+      />
+      <hr></hr>
     </>
   );
 };
@@ -300,5 +307,64 @@ export const ChangeRubricType: React.FC<{
         />
       </Col>
     </Form.Group>
+  );
+};
+
+const RubricDescriptionEditor: React.FC<{
+  rubric: Rubric;
+}> = (props) => {
+  const { rubric } = props;
+  if (rubric.type === 'none') return null;
+  const { description } = rubric;
+  const loading = false; // TODO mutation
+  return (
+    <EditHTMLVal
+      disabled={loading}
+      value={description}
+      onChange={console.log}
+      placeholder={`Give use-${rubric.type} rubric instructions here`}
+      debounceDelay={1000}
+      refreshProps={[rubric.type]}
+    />
+  );
+};
+
+const EditHTMLVal: React.FC<{
+  disabled?: boolean;
+  value: HTMLVal;
+  onChange: (newVal: HTMLVal) => void;
+  placeholder?: string;
+  debounceDelay?: number;
+  refreshProps?: React.DependencyList;
+}> = (props) => {
+  const {
+    disabled = false,
+    value,
+    onChange,
+    placeholder,
+    debounceDelay = 0,
+    refreshProps,
+  } = props;
+  const debouncedOnChange = useDebouncedCallback(
+    onChange,
+    debounceDelay,
+  );
+  const handleChange = useCallback((newVal, _delta, source, _editor): void => {
+    if (source === 'user') {
+      debouncedOnChange({
+        type: 'HTML',
+        value: newVal,
+      });
+    }
+  }, [onChange]);
+  return (
+    <CustomEditor
+      disabled={disabled}
+      value={value?.value || ''}
+      placeholder={placeholder}
+      theme="bubble"
+      onChange={handleChange}
+      refreshProps={refreshProps}
+    />
   );
 };

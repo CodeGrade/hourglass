@@ -208,8 +208,11 @@ const ExamSubmission: React.FC = () => {
         id
       }
       registration(id: $registrationId) {
+        published
+        exam { name }
         user {
           id
+          displayName
         }
       }
     }
@@ -225,6 +228,15 @@ const ExamSubmission: React.FC = () => {
   const myRegistration = res.data.me.id == res.data.registration.user.id;
   // TODO: better error message if the request fails because it is someone else's registration
   if (myRegistration) {
+    if (!res.data.registration.published) {
+      const title = `${res.data.registration.exam.name} -- Submission for ${res.data.registration.user.displayName}`;
+      return (
+        <DocumentTitle title={title}>
+          <h1>{`Submission for ${res.data.registration.exam.name}`}</h1>
+          <p>Your submission is not yet graded, and cannot be viewed at this time.</p>
+        </DocumentTitle>
+      );
+    }
     return (
       <ExamSubmissionStudent />
     );

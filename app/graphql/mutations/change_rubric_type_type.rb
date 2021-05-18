@@ -1,9 +1,9 @@
 module Mutations
-  class ChangeRubricType < BaseMutation
+  class ChangeRubricTypeType < BaseMutation
     argument :rubric_id, ID, required: true, loads: Types::RubricType
     argument :type, Types::RubricVariantType, required: true
 
-    field :exam_version, Types::ExamVersionType, null: false
+    field :rubric, Types::RubricType, null: false
 
     def authorized?(rubric:, **_args)
       return true if rubric.exam_version.course.user_is_professor?(context[:current_user])
@@ -13,11 +13,10 @@ module Mutations
 
     def resolve(rubric:, type:)
       exam_version = rubric.exam_version
-      rubric.change_type(type: type)
-      exam_version.reload
+      rubric = rubric.change_type(type)
 
       cache_authorization!(exam_version.exam, exam_version.exam.course)
-      { exam_version: exam_version }
+      { rubric: rubric }
     end
   end
 end

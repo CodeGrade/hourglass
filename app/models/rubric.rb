@@ -149,19 +149,22 @@ class Rubric < ApplicationRecord
 
   def change_type(new_type)
     Rubric.transaction do
-      update(type: new_type)
+      update(type: new_type.capitalize)
       case new_type
       when 'none'
-        rubric_preset.destroy!
-        subsections.destroy_all!
-        becomes!(None)
+        update(points: 0)
+        rubric_preset&.destroy!
+        subsections.destroy_all
+        becomes(None)
       when 'all'
         update(points: nil)
-        becomes!(All)
+        becomes(All)
       when 'any'
-        becomes!(Any)
+        update(points: 0)
+        becomes(Any)
       when 'one'
-        becomes!(One)
+        update(points: 0)
+        becomes(One)
       end
     end
   end

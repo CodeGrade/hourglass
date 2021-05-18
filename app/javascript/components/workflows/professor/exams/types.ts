@@ -204,38 +204,34 @@ export type Rubric = RubricAll | RubricAny | RubricOne | RubricNone;
 
 export type RubricNone = {
   type: 'none';
-  id?: string;
+  id: string;
   inUse?: boolean;
-  railsId?: string;
 }
 
 export type RubricAll = {
   type: 'all';
-  id?: string;
+  id: string;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
   inUse?: boolean;
-  railsId?: string;
 }
 
 export type RubricAny = {
   type: 'any';
-  id?: string;
+  id: string;
   points: number;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
   inUse?: boolean;
-  railsId?: string;
 }
 
 export type RubricOne = {
   type: 'one';
-  id?: string;
+  id: string;
   points: number;
   description?: HTMLVal;
   choices: Rubric[] | RubricPresets;
   inUse?: boolean;
-  railsId?: string;
 }
 
 export type PartRubric = {

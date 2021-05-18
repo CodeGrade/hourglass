@@ -7,14 +7,14 @@ import {
   HTMLVal,
 } from '@student/exams/show/types';
 import {
-  Rubric, RubricAll, RubricAny, RubricOne,
+  Rubric, RubricAll, RubricAny, RubricOne, RubricPresets,
 } from '@professor/exams/types';
 import { examWithAnswers } from '@professor/exams/new/editor';
 import { graphql, useQuery } from 'relay-hooks';
 
 import { RenderError } from '@hourglass/common/boundary';
 import convertRubric from '@professor/exams/rubrics';
-import { Col, Form, Row } from 'react-bootstrap';
+import { ButtonGroup, Card, Col, Form, Row, ToggleButton } from 'react-bootstrap';
 import { SelectOption, SelectOptions } from '@hourglass/common/helpers';
 import { rubricEditorQuery } from './__generated__/rubricEditorQuery.graphql';
 import Select from 'react-select';
@@ -26,6 +26,7 @@ import { useDebounce, useDebouncedCallback } from 'use-debounce/lib';
 import { rubricEditorChangeRubricDetailsDescriptionMutation } from './__generated__/rubricEditorChangeRubricDetailsDescriptionMutation.graphql';
 import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/NumericInput';
 import { rubricEditorChangeRubricDetailsPointsMutation } from './__generated__/rubricEditorChangeRubricDetailsPointsMutation.graphql';
+import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -119,21 +120,21 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
             {questions.map((q, qnum) => (
               <Row key={qnum}>
                 <Col>
-                  <p>Question {qnum} rubric:</p>
+                  <p>Question {qnum+1} rubric:</p>
                   <SingleRubricEditor
                     rubric={q.questionRubric}
                   />
                   {q.parts.map((p, pnum) => (
                     <Row key={pnum}>
                       <Col>
-                        <p>Question {qnum} part {pnum} rubric:</p>
+                        <p>Question {qnum+1} part {pnum+1} rubric:</p>
                         <SingleRubricEditor
                           rubric={p.partRubric}
                         />
                         {p.body.map((b, bnum) => (
                           <Row key={bnum}>
                             <Col>
-                              <p>Question {qnum} part {pnum} body {bnum} rubric:</p>
+                              <p>Question {qnum+1} part {pnum+1} body {bnum+1} rubric:</p>
                               <SingleRubricEditor
                                 rubric={b}
                               />
@@ -182,35 +183,111 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
     rubric,
   } = props;
   return (
-    <>
-      <p>editing: {JSON.stringify(rubric)}</p>
-      <RubricTypeEditor
-        rubric={rubric}
-      />
-      {'description' in rubric && (
-        <RubricDescriptionEditor
+    <Card
+      className="mb-3 alert-dark rubric p-0"
+      border="secondary"
+    >
+      <Card.Body>
+        <RubricTypeEditor
           rubric={rubric}
         />
-      )}
-      <Form.Group as={Row}>
-        <Form.Label column sm="2">Label</Form.Label>
-        <Col sm="4">
-          TODO
-          {/* <Field name="label" component="input" type="text" className="w-100" /> */}
-        </Col>
-        {'points' in rubric && (
-          <>
-            <Form.Label column sm="2">Points</Form.Label>
-            <Col sm="4">
-              <RubricPointsEditor
-                rubric={rubric}
-              />
-            </Col>
-          </>
+        {'description' in rubric && (
+          <Form.Group>
+            <RubricDescriptionEditor
+              rubric={rubric}
+            />
+          </Form.Group>
         )}
-      </Form.Group>
-      <hr></hr>
-    </>
+        <Form.Group as={Row}>
+          <Form.Label column sm="1">Label</Form.Label>
+          <Col sm="4">
+            <RubricPresetLabelEditor
+            // rubric={rubric.}
+            />
+            {/* <Field name="label" component="input" type="text" className="w-100" /> */}
+          </Col>
+          {('choices' in rubric && 'direction' in rubric.choices) && (
+            <>
+              <Form.Label column sm="1">Direction</Form.Label>
+              <Col sm="3">
+                <RubricPresetDirectionEditor
+                  value={rubric.choices.direction}
+                  onChange={console.log}
+                />
+              </Col>
+            </>
+          )}
+          {'points' in rubric && (
+            <>
+              <Form.Label column sm="1">Points</Form.Label>
+              <Col sm="2">
+                <RubricPointsEditor
+                  rubric={rubric}
+                />
+              </Col>
+            </>
+          )}
+        </Form.Group>
+        {('choices' in rubric && rubric.choices instanceof Array) && (
+          rubric.choices.map((subRubric) => (
+            <SingleRubricEditor
+              key={subRubric.id}
+              rubric={subRubric}
+            />
+          ))
+        )}
+      </Card.Body>
+    </Card>
+  );
+};
+
+interface RubricPresetsDirectionProps {
+  value: RubricPresets['direction'];
+  onChange: (newval: RubricPresets['direction']) => void;
+}
+const RubricPresetDirectionEditor: React.FC<RubricPresetsDirectionProps> = (props) => {
+  const { value, onChange } = props;
+  const values: {
+    name: string;
+    value: RubricPresets['direction'];
+    message: string;
+  }[] = [
+    { name: 'Credit', value: 'credit', message: 'Grade counts up from zero' },
+    { name: 'Deduction', value: 'deduction', message: 'Grade counts down from this section of points' },
+  ];
+  return (
+    <ButtonGroup toggle>
+      {values.map((val) => {
+        const checked = (value === val.value);
+        return (
+          <Tooltip
+            key={val.value}
+            message={val.message}
+          >
+            <ToggleButton
+              type="radio"
+              variant={checked ? 'secondary' : 'outline-secondary'}
+              className={checked ? '' : 'bg-white text-dark'}
+              name="radio"
+              value={val.value}
+              checked={checked}
+              onChange={(e) => onChange(e.currentTarget.value as RubricPresets['direction'])}
+            >
+              {val.name}
+            </ToggleButton>
+          </Tooltip>
+        );
+      })}
+    </ButtonGroup>
+  );
+};
+
+const RubricPresetLabelEditor: React.FC<{
+}> = (props) => {
+  // TODO
+  return (
+    <Form.Control>
+    </Form.Control>
   );
 };
 
@@ -373,6 +450,7 @@ const RubricDescriptionEditor: React.FC<{
   };
   return (
     <EditHTMLVal
+      className="bg-white border rounded"
       disabled={loading}
       value={description}
       onChange={onChange}
@@ -390,6 +468,7 @@ const EditHTMLVal: React.FC<{
   placeholder?: string;
   debounceDelay?: number;
   refreshProps?: React.DependencyList;
+  className?: string;
 }> = (props) => {
   const {
     disabled = false,
@@ -398,6 +477,7 @@ const EditHTMLVal: React.FC<{
     placeholder,
     debounceDelay = 0,
     refreshProps,
+    className,
   } = props;
   const debouncedOnChange = useDebouncedCallback(
     onChange,
@@ -419,6 +499,7 @@ const EditHTMLVal: React.FC<{
       theme="bubble"
       onChange={handleChange}
       refreshProps={refreshProps}
+      className={className}
     />
   );
 };

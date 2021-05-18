@@ -247,6 +247,11 @@ const ExamSubmission: React.FC = () => {
   }
 };
 
+function round(value: number, places: number): number {
+  const multiplier = Math.pow(10, places);
+  return Math.round(value * multiplier) / multiplier;
+}
+
 const ExamSubmissionStudent: React.FC = () => {
   const { registrationId } = useParams<{ registrationId: string }>();
   const res = useQuery<submissionsStudentQuery>(
@@ -255,7 +260,7 @@ const ExamSubmissionStudent: React.FC = () => {
       registration(id: $registrationId) {
         currentAnswers
         currentGrading
-        published
+        currentScorePercentage
         user {
           nuid
           displayName
@@ -276,22 +281,21 @@ const ExamSubmissionStudent: React.FC = () => {
     return <p>Loading...</p>;
   }
   const { registration } = res.data;
-  const { exam, user, currentAnswers, currentGrading, published } = registration;
+  const {
+    exam,
+    user,
+    currentAnswers,
+    currentGrading,
+    currentScorePercentage,
+  } = registration;
   const title = `${exam.name} -- Submission for ${user.displayName}`;
-  if (currentAnswers === null && !published) {
-    return (
-      <DocumentTitle title={title}>
-        <h1>{`Submission for ${exam.name}`}</h1>
-        <p>Your submission is not yet graded, and cannot be viewed at this time.</p>
-      </DocumentTitle>
-    );
-  }
   const userInfo = `${user.displayName} (${user.nuid})`;
   return (
     <DocumentTitle title={title}>
       <h1>
         {`Submission by ${userInfo}`}
       </h1>
+      <h2>Grade: {round(currentScorePercentage, 2).toFixed(2)}%</h2>
       <ExamViewerStudent
         version={registration.examVersion}
         currentGrading={currentGrading as CurrentGrading}

@@ -79,6 +79,15 @@ module Types
       end
     end
 
+    field :current_score_percentage, Float, null: true
+    def current_score_percentage
+      if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
+        object.current_score_percentage
+      else
+        nil
+      end
+    end
+
     field :grading_checks, [Types::GradingCheckType], null: true
     def grading_checks
       if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)

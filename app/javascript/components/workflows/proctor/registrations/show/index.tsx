@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { AnswerState, ExamFile } from '@student/exams/show/types';
+import { AnswersState, AnswerState, ExamFile } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import {
   ExamContext,
@@ -21,6 +21,7 @@ import { showExamViewer$key } from './__generated__/showExamViewer.graphql';
 interface ExamViewerProps {
   version: showExamViewer$key;
   currentGrading?: CurrentGrading;
+  currentAnswers?: AnswersState;
   refreshCodeMirrorsDeps?: React.DependencyList;
   registrationId?: string;
   overviewMode: boolean;
@@ -30,6 +31,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
   const {
     version,
     currentGrading,
+    currentAnswers,
     refreshCodeMirrorsDeps,
     registrationId,
     overviewMode,
@@ -90,10 +92,10 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     dbReferences: references,
     files,
   } = res;
-  const answers = {
+  const answers = overviewMode ? {
     answers: res.answers as AnswerState[][][],
     scratch: '',
-  };
+  } : currentAnswers;
   const examContextVal = useMemo(() => ({
     files: files as ExamFile[],
     fmap: createMap(files as ExamFile[]),

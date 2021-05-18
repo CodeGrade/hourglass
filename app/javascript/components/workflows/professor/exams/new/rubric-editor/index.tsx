@@ -27,6 +27,7 @@ import { rubricEditorChangeRubricDetailsDescriptionMutation } from './__generate
 import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/NumericInput';
 import { rubricEditorChangeRubricDetailsPointsMutation } from './__generated__/rubricEditorChangeRubricDetailsPointsMutation.graphql';
 import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
+import { rubricEditorChangeRubricPresetLabelMutation } from './__generated__/rubricEditorChangeRubricPresetLabelMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -199,15 +200,14 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
           </Form.Group>
         )}
         <Form.Group as={Row}>
-          <Form.Label column sm="1">Label</Form.Label>
-          <Col sm="4">
-            <RubricPresetLabelEditor
-            // rubric={rubric.}
-            />
-            {/* <Field name="label" component="input" type="text" className="w-100" /> */}
-          </Col>
           {('choices' in rubric && 'direction' in rubric.choices) && (
             <>
+              <Form.Label column sm="1">Label</Form.Label>
+              <Col sm="4">
+                <RubricPresetLabelEditor
+                  rubricPreset={rubric.choices}
+                />
+              </Col>
               <Form.Label column sm="1">Direction</Form.Label>
               <Col sm="3">
                 <RubricPresetDirectionEditor
@@ -283,10 +283,57 @@ const RubricPresetDirectionEditor: React.FC<RubricPresetsDirectionProps> = (prop
 };
 
 const RubricPresetLabelEditor: React.FC<{
+  rubricPreset: RubricPresets;
 }> = (props) => {
-  // TODO
+  const {
+    rubricPreset,
+  } = props;
+  const [currentLabel, setCurrentLabel] = useState(rubricPreset.label);
+  const [debouncedLabel] = useDebounce(currentLabel, 1000);
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorChangeRubricPresetLabelMutation>(
+    graphql`
+    mutation rubricEditorChangeRubricPresetLabelMutation($input: ChangeRubricPresetDetailsInput!) {
+      changeRubricPresetDetails(input: $input) {
+        rubricPreset {
+          id
+          label
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing rubric preset label',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    }
+  );
+  useEffect(() => {
+    if (debouncedLabel === rubricPreset.label) {
+      return;
+    }
+    mutate({
+      variables: {
+        input: {
+          rubricPresetId: rubricPreset.id,
+          updateDirection: false,
+          updateLabel: true,
+          label: debouncedLabel,
+        },
+      },
+    })
+  }, [debouncedLabel]);
   return (
-    <Form.Control>
+    <Form.Control
+      disabled={loading}
+      value={currentLabel}
+      onChange={(e) => setCurrentLabel(e.target.value)}
+    >
     </Form.Control>
   );
 };

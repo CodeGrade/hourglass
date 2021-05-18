@@ -35,8 +35,10 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
     label,
     mercy,
     presetComments,
+    id,
   } = rawPreset;
   const ans : RubricPresets = {
+    id,
     direction,
     presets: presetComments.map((c) => {
       const {
@@ -113,6 +115,7 @@ function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
     questions: [],
     examRubric: {
       type: 'none',
+      id: 'not-set',
     },
   };
   const rubricCopy = [...rawRubrics];
@@ -139,6 +142,7 @@ function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
           parts: [],
           questionRubric: {
             type: 'none',
+            id: 'not-set',
           },
         };
       }
@@ -151,6 +155,7 @@ function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
             body: [],
             partRubric: {
               type: 'none',
+              id: 'not-set',
             },
           };
         }

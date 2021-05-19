@@ -53,6 +53,7 @@ import { rubricEditorCreatePresetCommentMutation } from './__generated__/rubricE
 import Loading from '@hourglass/common/loading';
 import { rubricEditorCreateRubricMutation } from './__generated__/rubricEditorCreateRubricMutation.graphql';
 import { MutationParameters } from 'relay-runtime';
+import { rubricEditorCreateRubricPresetMutation } from './__generated__/rubricEditorCreateRubricPresetMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -471,7 +472,42 @@ const CreateRubricItemDropdown: React.FC<{
     bodyItemId,
   } = props;
   const [sectionMutate, { loading: sectionLoading }] = useCreateRubricMutation();
-  const presetCommentLoading = false; // TODO
+  const { alert } = useContext(AlertContext);
+  const [presetCommentMutate, { loading: presetCommentLoading }] = useMutation<rubricEditorCreateRubricPresetMutation>(
+    graphql`
+    mutation rubricEditorCreateRubricPresetMutation($input: CreateRubricPresetInput!) {
+      createRubricPreset(input: $input) {
+        rubric {
+          id
+          rubricPreset {
+            id
+            direction
+            label
+            mercy
+            presetComments {
+              id
+              label
+              order
+              points
+              graderHint
+              studentFeedback
+            }
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating preset comment',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    }
+  )
   const loading = sectionLoading || presetCommentLoading;
   return (
     <Row className="text-center">
@@ -499,7 +535,18 @@ const CreateRubricItemDropdown: React.FC<{
           >
             Rubric section
           </Dropdown.Item>
-          <Dropdown.Item>
+          <Dropdown.Item
+            onClick={() => {
+              presetCommentMutate({
+                variables: {
+                  input: {
+                    rubricId: parentSectionId,
+                    direction: 'credit',
+                  },
+                },
+              });
+            }}
+          >
             Preset comment
           </Dropdown.Item>
         </DropdownButton>

@@ -7,7 +7,7 @@ module Mutations
     argument :direction, String, required: true
     argument :label, String, required: false
     argument :mercy, Float, required: false
-    
+
     field :rubric_preset, Types::RubricPresetType, null: false
 
     def authorized?(exam_version:, **_args)

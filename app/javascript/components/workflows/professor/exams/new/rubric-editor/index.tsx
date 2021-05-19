@@ -21,12 +21,12 @@ import { graphql, useQuery, useMutation } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
 import convertRubric from '@professor/exams/rubrics';
 import {
+  Button,
   ButtonGroup,
   ButtonProps,
   Card,
   Col,
   Form,
-  FormControlProps,
   Row,
   ToggleButton,
 } from 'react-bootstrap';
@@ -47,6 +47,7 @@ import { rubricEditorChangePresetCommentPointsMutation } from './__generated__/r
 import { rubricEditorChangePresetCommentLabelMutation } from './__generated__/rubricEditorChangePresetCommentLabelMutation.graphql';
 import { rubricEditorChangePresetCommentGraderHintMutation } from './__generated__/rubricEditorChangePresetCommentGraderHintMutation.graphql';
 import { rubricEditorChangePresetCommentStudentFeedbackMutation } from './__generated__/rubricEditorChangePresetCommentStudentFeedbackMutation.graphql';
+import { rubricEditorCreatePresetCommentMutation } from './__generated__/rubricEditorCreatePresetCommentMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -257,8 +258,8 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
           ))
         )}
         {('choices' in rubric && 'presets' in rubric.choices) && (
-          <Col>
-            <Form.Group as={Row}>
+          <Form.Group as={Row}>
+            <Col>
               <Form.Label>
                 Presets
                 <span className="mx-2">
@@ -272,11 +273,73 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
               {rubric.choices.presets.map((p) => (
                 <RubricPresetEditor key={p.id} preset={p} />
               ))}
-            </Form.Group>
-          </Col>
+              <div className="text-center">
+                <CreatePresetCommentButton
+                  rubricPresetId={rubric.choices.id}
+                />
+              </div>
+            </Col>
+          </Form.Group>
         )}
       </Card.Body>
     </Card>
+  );
+};
+
+const CreatePresetCommentButton: React.FC<{
+  rubricPresetId: string;
+}> = (props) => {
+  const {
+    rubricPresetId,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorCreatePresetCommentMutation>(
+    graphql`
+    mutation rubricEditorCreatePresetCommentMutation($input: CreatePresetCommentInput!) {
+      createPresetComment(input: $input) {
+        rubricPreset {
+          id
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating rubric preset',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  return (
+    <Button
+      disabled={loading}
+      variant="warning"
+      onClick={() => {
+        mutate({
+          variables: {
+            input: {
+              rubricPresetId,
+              graderHint: '',
+              points: 0,
+            },
+          },
+        });
+      }}
+    >
+      Add new preset
+    </Button>
   );
 };
 
@@ -449,7 +512,7 @@ const PresetCommentGraderHintEditor: React.FC<{
           copyButton: true,
         });
       },
-    }
+    },
   );
   const handleChange = (newVal: string) => {
     mutate({
@@ -499,7 +562,7 @@ const PresetCommentStudentFeedbackEditor: React.FC<{
           copyButton: true,
         });
       },
-    }
+    },
   );
   const handleChange = (newVal: string) => {
     mutate({
@@ -953,7 +1016,7 @@ const DebouncedFormControl: React.FC<{
   const [text, setText] = useState(defaultValue);
   const [debouncedText] = useDebounce(text, debounceMillis);
   useEffect(() => {
-    if (debouncedText == defaultValue) {
+    if (debouncedText === defaultValue) {
       return;
     }
     onChange(debouncedText);

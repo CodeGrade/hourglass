@@ -252,9 +252,17 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
       border="secondary"
     >
       <Card.Body>
-        <RubricTypeEditor
-          rubric={rubric}
-        />
+        {/* <DestroyButton
+        TODO
+        /> */}
+        <Form.Group as={Row} className="mr-4">
+          <Form.Label column sm="2"><h5 className="my-0">Rubric type</h5></Form.Label>
+          <Col sm="10">
+            <RubricTypeEditor
+              rubric={rubric}
+            />
+          </Col>
+        </Form.Group>
         {'description' in rubric && (
           <Form.Group>
             <RubricDescriptionEditor
@@ -265,29 +273,39 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
         <Form.Group as={Row}>
           {('choices' in rubric && 'direction' in rubric.choices && rubric.choices.presets.length > 0) && (
             <>
-              <Form.Label column sm="1">Label</Form.Label>
-              <Col sm="4">
-                <RubricPresetLabelEditor
-                  rubricPreset={rubric.choices}
-                />
+              <Col sm="12" md="4">
+                <Row>
+                  <Form.Label column sm="2" md="auto">Label</Form.Label>
+                  <Col>
+                    <RubricPresetLabelEditor
+                      rubricPreset={rubric.choices}
+                    />
+                  </Col>
+                </Row>
               </Col>
-              <Form.Label column sm="1">Direction</Form.Label>
-              <Col sm="3">
-                <RubricPresetDirectionEditor
-                  rubricPreset={rubric.choices}
-                />
+              <Col sm="12" md="auto">
+                <Row>
+                  <Form.Label column sm="2" md="auto">Direction</Form.Label>
+                  <Col>
+                    <RubricPresetDirectionEditor
+                      rubricPreset={rubric.choices}
+                    />
+                  </Col>
+                </Row>
               </Col>
             </>
           )}
           {'points' in rubric && (
-            <>
-              <Form.Label column sm="1">Points</Form.Label>
-              <Col sm="2">
-                <RubricPointsEditor
-                  rubric={rubric}
-                />
-              </Col>
-            </>
+            <Col sm="12" md="3">
+              <Row>
+                <Form.Label column sm="2" md="auto">Points</Form.Label>
+                <Col>
+                  <RubricPointsEditor
+                    rubric={rubric}
+                  />
+                </Col>
+              </Row>
+            </Col>
           )}
         </Form.Group>
         {('choices' in rubric && rubric.choices instanceof Array) && (
@@ -1164,21 +1182,16 @@ export const ChangeRubricType: React.FC<{
     option.value === 'all' && disableAllWhenPreset
   ), [disableAllWhenPreset]);
   return (
-    <Form.Group as={Row}>
-      <Form.Label column sm="2"><h5 className="my-0">Rubric type</h5></Form.Label>
-      <Col sm="10">
-        <Loading loading={disabled} noText>
-          <Select
-            classNamePrefix="select"
-            className="z-1000-select"
-            options={options}
-            value={defaultOptions[value || 'none']}
-            isOptionDisabled={disableAllOptionWhenPreset}
-            onChange={changeRubricType}
-          />
-        </Loading>
-      </Col>
-    </Form.Group>
+    <Loading loading={disabled} noText>
+      <Select
+        classNamePrefix="select"
+        className="z-1000-select"
+        options={options}
+        value={defaultOptions[value || 'none']}
+        isOptionDisabled={disableAllOptionWhenPreset}
+        onChange={changeRubricType}
+      />
+    </Loading>
   );
 };
 

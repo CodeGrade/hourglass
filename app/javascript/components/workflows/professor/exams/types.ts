@@ -234,12 +234,19 @@ export type RubricOne = {
   inUse?: boolean;
 }
 
+export type BodyItemRubric = {
+  id: string;
+  rubric: Rubric
+};
+
 export type PartRubric = {
+  id: string;
   partRubric: Rubric;
-  body: Rubric[];
+  body: BodyItemRubric[];
 }
 
 export type QuestionRubric = {
+  id: string;
   questionRubric: Rubric;
   parts: PartRubric[];
 }

@@ -12,8 +12,6 @@ import { useRefresher } from '@hourglass/common/helpers';
 import BodyItem from '@professor/exams/new/editor/components/BodyItem';
 import { languages } from '@professor/exams/new/editor/components/questions/Code';
 import { AlertContext } from '@hourglass/common/alerts';
-import CREATE_RUBRIC_MUTATION from '@professor/exams/new/editor/components/manageRubrics';
-import { manageRubricsCreateRubricMutation } from './__generated__/manageRubricsCreateRubricMutation.graphql';
 
 const ShowBodyItems: React.FC<{
   examVersionId: string;
@@ -28,41 +26,41 @@ const ShowBodyItems: React.FC<{
   } = props;
   const { alert } = useContext(AlertContext);
   const [refresher, refresh] = useRefresher();
-  const [createRubric, { loading }] = useMutation<manageRubricsCreateRubricMutation>(
-    CREATE_RUBRIC_MUTATION,
-    {
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error creating rubric for new question.',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
-  );
+  // const [createRubric, { loading }] = useMutation<manageRubricsCreateRubricMutation>(
+  //   CREATE_RUBRIC_MUTATION,
+  //   {
+  //     onError: (err) => {
+  //       alert({
+  //         variant: 'danger',
+  //         title: 'Error creating rubric for new question.',
+  //         message: err.message,
+  //         copyButton: true,
+  //       });
+  //     },
+  //   },
+  // );
   const createNewItem = (item: BodyItemWithAnswer) => {
-    createRubric({
-      variables: {
-        input: {
-          examVersionId,
-          type: 'none',
-          qnum,
-          pnum,
-          bnum: fields.length,
-        },
-      },
-    }).then((result) => {
-      const { rubric } = result.createRubric;
-      const b: BodyItemWithAnswer = {
-        ...item,
-        rubric: {
-          type: 'none',
-          railsId: rubric.railsId,
-        },
-      };
-      fields.push(b);
-    });
+    // createRubric({
+    //   variables: {
+    //     input: {
+    //       examVersionId,
+    //       type: 'none',
+    //       qnum,
+    //       pnum,
+    //       bnum: fields.length,
+    //     },
+    //   },
+    // }).then((result) => {
+    //   const { rubric } = result.createRubric;
+    //   const b: BodyItemWithAnswer = {
+    //     ...item,
+    //     rubric: {
+    //       type: 'none',
+    //       railsId: rubric.railsId,
+    //     },
+    //   };
+    //   fields.push(b);
+    // });
   };
   return (
     <>
@@ -102,7 +100,7 @@ const ShowBodyItems: React.FC<{
         <Col>
           <DropdownButton
             id={`${qnum}-${pnum}-newBodyItem`}
-            disabled={loading}
+            // disabled={loading}
             variant="secondary"
             title="Add new item..."
           >

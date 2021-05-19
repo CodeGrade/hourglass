@@ -24,7 +24,7 @@ const nullStrComp = (s1, s2) => {
 };
 
 type RawRubric = showExamViewer$data['rubrics'][number];
-type RawRubricMap = Record<RawRubric['id'], RawRubric>;
+type RawRubricMap = Record<RawRubric['id'], RawRubric & { qnum?: number; pnum?: number; bnum?: number; }>;
 type RawPreset = RawRubric['rubricPreset'];
 
 function expandPreset(rawPreset: RawPreset): RubricPresets {
@@ -103,14 +103,19 @@ function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric 
       return ans;
     }
     default:
+      const qnum = rubricsByID[rawRubric.id].qnum;
+      const pnum = rubricsByID[rawRubric.id].pnum;
+      const bnum = rubricsByID[rawRubric.id].bnum;
       throw new ExhaustiveSwitchError(
         type,
-        `showing rubric for q${rawRubric.qnum}-p${rawRubric.pnum}-b${rawRubric.bnum}`,
+        `showing rubric for q${qnum}-p${pnum}-b${bnum}`,
       );
   }
 }
 
-function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
+type ExamRubricTree = showExamViewer$data['dbQuestions'];
+
+function convertRubric(rawRubrics : readonly RawRubric[], qTree: ExamRubricTree): ExamRubric {
   const rubric: ExamRubric = {
     questions: [],
     examRubric: {
@@ -118,27 +123,44 @@ function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
       id: 'not-set',
     },
   };
+  const rubricsByID: RawRubricMap = { };
+  rawRubrics.forEach((r) => { rubricsByID[r.id] = {...r, qnum: null, pnum: null, bnum: null}; });
+  // const qpbById = {};
+  qTree.forEach((q, qnum) => {
+    q.rubrics.forEach(({ id }) => {
+      rubricsByID[id].qnum = qnum;
+    });
+    // qpbById[q.id] = qnum;
+    q.parts.forEach((p, pnum) => {
+      // qpbById[p.id] = pnum;
+      p.rubrics.forEach(({ id }) => {
+        rubricsByID[id].pnum = pnum;
+      });
+      p.bodyItems.forEach((b, bnum) => {
+        // qpbById[b.id] = bnum;
+        b.rubrics.forEach(({ id }) => {
+          rubricsByID[id].bnum = bnum;
+        });
+      });
+    });
+  });
   const rubricCopy = [...rawRubrics];
-  const rubricsByID : RawRubricMap = { };
-  rawRubrics.forEach((r) => { rubricsByID[r.id] = r; });
-  rubricCopy.sort((r1 : RawRubric, r2 : RawRubric) => {
+  rubricCopy.sort((r1, r2) => {
     const compParent = nullStrComp(r1.parentSectionId, r2.parentSectionId);
-    if (compParent !== 0) return compParent; // Roots first
-    const compQ = nullNumComp(r1.qnum, r2.qnum);
-    if (compQ !== 0) return compQ; // Then by question,
-    const compP = nullNumComp(r1.pnum, r2.pnum);
-    if (compP !== 0) return compP; // by part,
-    const compB = nullNumComp(r1.bnum, r2.bnum);
-    if (compB !== 0) return compB; // by body,
-    return nullNumComp(r1.order, r2.order); // and finally ordered within body
+    if (compParent !== 0) return compParent;
+    return nullNumComp(r1.order, r2.order);
   });
   rawRubrics.forEach((r) => {
     if (r.parentSectionId !== null) return; // only process roots
-    if (r.qnum === null) {
+    const qnum = rubricsByID[r.id].qnum;
+    const pnum = rubricsByID[r.id].pnum;
+    const bnum = rubricsByID[r.id].bnum;
+    if (qnum === null) {
       rubric.examRubric = expandRubric(r, rubricsByID);
     } else {
-      if (rubric.questions[r.qnum] === undefined) {
-        rubric.questions[r.qnum] = {
+      if (rubric.questions[qnum] === undefined) {
+        rubric.questions[qnum] = {
+          id: qTree[qnum].id,
           parts: [],
           questionRubric: {
             type: 'none',
@@ -146,12 +168,13 @@ function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
           },
         };
       }
-      const byQ = rubric.questions[r.qnum];
-      if (r.pnum === null) {
+      const byQ = rubric.questions[qnum];
+      if (pnum === null) {
         byQ.questionRubric = expandRubric(r, rubricsByID);
       } else {
-        if (byQ.parts[r.pnum] === undefined) {
-          byQ.parts[r.pnum] = {
+        if (byQ.parts[pnum] === undefined) {
+          byQ.parts[pnum] = {
+            id: qTree[qnum].parts[pnum].id,
             body: [],
             partRubric: {
               type: 'none',
@@ -159,11 +182,14 @@ function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
             },
           };
         }
-        const byP = byQ.parts[r.pnum];
-        if (r.bnum === null) {
+        const byP = byQ.parts[pnum];
+        if (bnum === null) {
           byP.partRubric = expandRubric(r, rubricsByID);
         } else if (r.parentSectionId === null) {
-          byP.body[r.bnum] = expandRubric(r, rubricsByID);
+          byP.body[bnum] = {
+            id: qTree[qnum].parts[pnum].bodyItems[bnum].id,
+            rubric: expandRubric(r, rubricsByID),
+          };
         }
       }
     }

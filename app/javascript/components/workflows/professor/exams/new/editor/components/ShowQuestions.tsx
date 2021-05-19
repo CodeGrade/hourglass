@@ -10,8 +10,6 @@ import { useRefresher } from '@hourglass/common/helpers';
 import { QuestionInfoWithAnswers } from '@professor/exams/types';
 import Question from '@professor/exams/new/editor/components/Question';
 import { AlertContext } from '@hourglass/common/alerts';
-import CREATE_RUBRIC_MUTATION from '@professor/exams/new/editor/components/manageRubrics';
-import { manageRubricsCreateRubricMutation } from './__generated__/manageRubricsCreateRubricMutation.graphql';
 
 const ShowQuestions: React.FC<{
   examVersionId: string;
@@ -22,19 +20,19 @@ const ShowQuestions: React.FC<{
   } = props;
   const { alert } = useContext(AlertContext);
   const [refresher, refresh] = useRefresher();
-  const [createRubric, { loading }] = useMutation<manageRubricsCreateRubricMutation>(
-    CREATE_RUBRIC_MUTATION,
-    {
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error creating rubric for new question.',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
-  );
+  // const [createRubric, { loading }] = useMutation<manageRubricsCreateRubricMutation>(
+  //   CREATE_RUBRIC_MUTATION,
+  //   {
+  //     onError: (err) => {
+  //       alert({
+  //         variant: 'danger',
+  //         title: 'Error creating rubric for new question.',
+  //         message: err.message,
+  //         copyButton: true,
+  //       });
+  //     },
+  //   },
+  // );
   return (
     <>
       <Row className="py-3">
@@ -72,37 +70,37 @@ const ShowQuestions: React.FC<{
         <Col>
           <Button
             variant="primary"
-            disabled={loading}
+            // disabled={loading}
             onClick={(): void => {
-              createRubric({
-                variables: {
-                  input: {
-                    examVersionId,
-                    type: 'none',
-                    qnum: fields.length,
-                  },
-                },
-              }).then((result) => {
-                const { rubric } = result.createRubric;
-                const q: QuestionInfoWithAnswers = {
-                  references: [],
-                  name: {
-                    type: 'HTML',
-                    value: '',
-                  },
-                  description: {
-                    type: 'HTML',
-                    value: '',
-                  },
-                  parts: [],
-                  separateSubparts: false,
-                  questionRubric: {
-                    type: 'none',
-                    railsId: rubric.railsId,
-                  },
-                };
-                fields.push(q);
-              });
+              // createRubric({
+              //   variables: {
+              //     input: {
+              //       examVersionId,
+              //       type: 'none',
+              //       qnum: fields.length,
+              //     },
+              //   },
+              // }).then((result) => {
+              //   const { rubric } = result.createRubric;
+              //   const q: QuestionInfoWithAnswers = {
+              //     references: [],
+              //     name: {
+              //       type: 'HTML',
+              //       value: '',
+              //     },
+              //     description: {
+              //       type: 'HTML',
+              //       value: '',
+              //     },
+              //     parts: [],
+              //     separateSubparts: false,
+              //     questionRubric: {
+              //       type: 'none',
+              //       railsId: rubric.railsId,
+              //     },
+              //   };
+              //   fields.push(q);
+              // });
             }}
           >
             Add question

@@ -8,7 +8,6 @@ module Mutations
     argument :grader_hint, String, required: true
     argument :student_feedback, String, required: false
     argument :points, Float, required: true
-    argument :order, Integer, required: false
 
     field :rubric_preset, Types::RubricPresetType, null: false
 
@@ -19,7 +18,8 @@ module Mutations
     end
 
     def resolve(**args)
-      preset_comment = PresetComment.new(args)
+      order = args[:rubric_preset]&.preset_comments&.count || 0
+      preset_comment = PresetComment.new(order: order, **args)
       saved = preset_comment.save
       raise GraphQL::ExecutionError, preset_comment.errors.full_messages, to_sentence unless saved
 

@@ -172,7 +172,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
   const [open, setOpen] = useState(false);
   const answer = answers.answers[qnum]?.[pnum]?.[bnum];
   const value = isNoAns(answer) ? undefined : answer;
-  const bRubric = rubric?.questions[qnum]?.parts[pnum]?.body[bnum];
+  const bRubric = rubric?.questions[qnum]?.parts[pnum]?.body[bnum]?.rubric;
 
   switch (body.info.type) {
     case 'HTML':

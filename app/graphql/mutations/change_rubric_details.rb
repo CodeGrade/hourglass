@@ -21,7 +21,8 @@ module Mutations
     def resolve(rubric:, update_points:, update_description:, points: nil, description: nil)
       rubric.description = description if update_description
       rubric.points = points if update_points
-      rubric.save!
+      saved = rubric.save
+      raise GraphQL::ExecutionError, rubric.errors.full_messages.to_sentence unless saved
 
       { rubric: rubric }
     end

@@ -292,6 +292,9 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
               key={subRubric.id}
               rubric={subRubric}
               examVersionId={examVersionId}
+              questionId={questionId}
+              partId={partId}
+              bodyItemId={bodyItemId}
             />
           ))
         )}

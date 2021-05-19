@@ -46,5 +46,6 @@ module Types
     field :change_rubric_details, mutation: Mutations::ChangeRubricDetails
 
     field :change_rubric_preset_details, mutation: Mutations::ChangeRubricPresetDetails
+    field :change_preset_comment_details, mutation: Mutations::ChangePresetCommentDetails
   end
 end

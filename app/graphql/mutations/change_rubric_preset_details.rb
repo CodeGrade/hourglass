@@ -1,10 +1,12 @@
 module Mutations
   class ChangeRubricPresetDetails < BaseMutation
     argument :rubric_preset_id, ID, required: true, loads: Types::RubricPresetType
+
     argument :label, String, required: false
-    argument :update_label, Boolean, required: true
+    argument :update_label, Boolean, required: false, default_value: false
+
     argument :direction, Types::RubricDirectionType, required: false
-    argument :update_direction, Boolean, required: true
+    argument :update_direction, Boolean, required: false, default_value: false
 
     field :rubric_preset, Types::RubricPresetType, null: false
 

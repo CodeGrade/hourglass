@@ -180,8 +180,6 @@ class BodyItem < ApplicationRecord
   end
   # rubocop:enable Naming/MethodName
 
-  private
-
   class << self
     def html_val(format, val)
       if format == :graphql
@@ -196,7 +194,7 @@ class BodyItem < ApplicationRecord
           }
         end
       else
-        if val.is_a? Hash
+        if val.is_a? Hash # rubocop:disable Style/IfInsideElse
           val['value']
         else
           val

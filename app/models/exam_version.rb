@@ -284,7 +284,7 @@ class ExamVersion < ApplicationRecord
         end
         extra_comment_score + rubric_score
       end.sum
-      body_item_info = part.body_items.each_with_index.map do |body_item, bnum|
+      body_item_info = part.body_items.each_with_index.map do |body_item, _bnum|
         body_checks = checks.dig(question.id, part.id, body_item.id) || []
         body_comments = comments.dig(question.id, part.id, body_item.id) || {}
 

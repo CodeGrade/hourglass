@@ -46,6 +46,7 @@ import { rubricEditorChangeRubricPresetDirectionMutation } from './__generated__
 import { rubricEditorChangePresetCommentPointsMutation } from './__generated__/rubricEditorChangePresetCommentPointsMutation.graphql';
 import { rubricEditorChangePresetCommentLabelMutation } from './__generated__/rubricEditorChangePresetCommentLabelMutation.graphql';
 import { rubricEditorChangePresetCommentGraderHintMutation } from './__generated__/rubricEditorChangePresetCommentGraderHintMutation.graphql';
+import { rubricEditorChangePresetCommentStudentFeedbackMutation } from './__generated__/rubricEditorChangePresetCommentStudentFeedbackMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -361,12 +362,9 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
         <Form.Group as={Row}>
           <Form.Label column sm="2">Student feedback</Form.Label>
           <Col sm="10">
-            TODO
-            {/* <Form.Control
-              name="studentFeedback"
-              defaultValue={studentFeedback}
-              placeholder="Give a default message to students -- if blank, will use the grader hint"
-            /> */}
+            <PresetCommentStudentFeedbackEditor
+              presetComment={preset}
+            />
           </Col>
         </Form.Group>
       </Card.Body>
@@ -467,7 +465,57 @@ const PresetCommentGraderHintEditor: React.FC<{
   return (
     <DebouncedFormControl
       placeholder="Give a description to graders to use"
-      defaultValue={presetComment.graderHint}
+      defaultValue={presetComment.graderHint || ''}
+      onChange={handleChange}
+      disabled={loading}
+    />
+  );
+};
+
+const PresetCommentStudentFeedbackEditor: React.FC<{
+  presetComment: Preset;
+}> = (props) => {
+  const {
+    presetComment,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorChangePresetCommentStudentFeedbackMutation>(
+    graphql`
+    mutation rubricEditorChangePresetCommentStudentFeedbackMutation($input: ChangePresetCommentDetailsInput!) {
+      changePresetCommentDetails(input: $input) {
+        presetComment {
+          id
+          studentFeedback
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing rubric preset student feedback',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    }
+  );
+  const handleChange = (newVal: string) => {
+    mutate({
+      variables: {
+        input: {
+          presetCommentId: presetComment.id,
+          updateStudentFeedback: true,
+          studentFeedback: newVal,
+        },
+      },
+    });
+  };
+  return (
+    <DebouncedFormControl
+      placeholder="Give a default message to students -- if blank, will use the grader hint"
+      defaultValue={presetComment.studentFeedback || ''}
       onChange={handleChange}
       disabled={loading}
     />

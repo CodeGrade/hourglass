@@ -1,4 +1,9 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
 import {
@@ -9,24 +14,30 @@ import {
 import {
   Rubric, RubricAll, RubricAny, RubricOne, RubricPresets,
 } from '@professor/exams/types';
-import { examWithAnswers } from '@professor/exams/new/editor';
-import { graphql, useQuery } from 'relay-hooks';
+// import { examWithAnswers } from '@professor/exams/new/editor';
+import { graphql, useQuery, useMutation } from 'relay-hooks';
 
 import { RenderError } from '@hourglass/common/boundary';
 import convertRubric from '@professor/exams/rubrics';
-import { ButtonGroup, Card, Col, Form, Row, ToggleButton } from 'react-bootstrap';
-import { SelectOption, SelectOptions } from '@hourglass/common/helpers';
-import { rubricEditorQuery } from './__generated__/rubricEditorQuery.graphql';
+import {
+  ButtonGroup,
+  Card,
+  Col,
+  Form,
+  Row,
+  ToggleButton,
+} from 'react-bootstrap';
+import { SelectOption } from '@hourglass/common/helpers';
 import Select from 'react-select';
-import { useMutation } from 'relay-hooks';
-import { rubricEditorChangeRubricTypeMutation } from './__generated__/rubricEditorChangeRubricTypeMutation.graphql';
 import { AlertContext } from '@hourglass/common/alerts';
-import CustomEditor from '../editor/components/CustomEditor';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import { useDebounce, useDebouncedCallback } from 'use-debounce/lib';
-import { rubricEditorChangeRubricDetailsDescriptionMutation } from './__generated__/rubricEditorChangeRubricDetailsDescriptionMutation.graphql';
 import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/NumericInput';
-import { rubricEditorChangeRubricDetailsPointsMutation } from './__generated__/rubricEditorChangeRubricDetailsPointsMutation.graphql';
 import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
+import { rubricEditorChangeRubricDetailsDescriptionMutation } from './__generated__/rubricEditorChangeRubricDetailsDescriptionMutation.graphql';
+import { rubricEditorChangeRubricTypeMutation } from './__generated__/rubricEditorChangeRubricTypeMutation.graphql';
+import { rubricEditorChangeRubricDetailsPointsMutation } from './__generated__/rubricEditorChangeRubricDetailsPointsMutation.graphql';
+import { rubricEditorQuery } from './__generated__/rubricEditorQuery.graphql';
 import { rubricEditorChangeRubricPresetLabelMutation } from './__generated__/rubricEditorChangeRubricPresetLabelMutation.graphql';
 import { rubricEditorChangeRubricPresetDirectionMutation } from './__generated__/rubricEditorChangeRubricPresetDirectionMutation.graphql';
 
@@ -42,7 +53,6 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
     examVersionId,
     exam,
     versionName,
-    answers,
   } = props;
   const res = useQuery<rubricEditorQuery>(
     graphql`
@@ -92,8 +102,8 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
   }
   const { rubrics } = res.data.examVersion;
   const { examRubric, questions } = convertRubric(rubrics);
-  const examVersionWithAnswers = examWithAnswers(exam, answers.answers);
-  
+  // const examVersionWithAnswers = examWithAnswers(exam, answers.answers);
+
   return (
     <ExamContext.Provider
       value={{
@@ -120,23 +130,26 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
               />
             ) : 'TODO: NONE'}
             {questions.map((q, qnum) => (
+              // eslint-disable-next-line react/no-array-index-key
               <Row key={qnum}>
                 <Col>
-                  <p>Question {qnum+1} rubric:</p>
+                  <p>{`Question ${qnum + 1} rubric:`}</p>
                   <SingleRubricEditor
                     rubric={q.questionRubric}
                   />
                   {q.parts.map((p, pnum) => (
+                    // eslint-disable-next-line react/no-array-index-key
                     <Row key={pnum}>
                       <Col>
-                        <p>Question {qnum+1} part {pnum+1} rubric:</p>
+                        <p>{`Question ${qnum + 1} part ${pnum + 1} rubric:`}</p>
                         <SingleRubricEditor
                           rubric={p.partRubric}
                         />
                         {p.body.map((b, bnum) => (
+                          // eslint-disable-next-line react/no-array-index-key
                           <Row key={bnum}>
                             <Col>
-                              <p>Question {qnum+1} part {pnum+1} body {bnum+1} rubric:</p>
+                              <p>{`Question ${qnum + 1} part ${pnum + 1} body ${bnum + 1} rubric:`}</p>
                               <SingleRubricEditor
                                 rubric={b}
                               />
@@ -241,7 +254,6 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
   );
 };
 
-
 const RubricPresetDirectionEditor: React.FC<{
   rubricPreset: RubricPresets;
 }> = (props) => {
@@ -269,7 +281,7 @@ const RubricPresetDirectionEditor: React.FC<{
           copyButton: true,
         });
       },
-    }
+    },
   );
   const handleChange = (newDirection: RubricPresets['direction']) => {
     mutate({
@@ -281,15 +293,14 @@ const RubricPresetDirectionEditor: React.FC<{
           direction: newDirection,
         },
       },
-    })
+    });
   };
   return (
     <ChangeRubricPresetDirection
       value={rubricPreset.direction}
       onChange={handleChange}
       disabled={loading}
-    >
-    </ChangeRubricPresetDirection>
+    />
   );
 };
 
@@ -369,7 +380,7 @@ const RubricPresetLabelEditor: React.FC<{
           copyButton: true,
         });
       },
-    }
+    },
   );
   useEffect(() => {
     if (debouncedLabel === rubricPreset.label) {
@@ -384,15 +395,14 @@ const RubricPresetLabelEditor: React.FC<{
           label: debouncedLabel,
         },
       },
-    })
+    });
   }, [debouncedLabel]);
   return (
     <Form.Control
       disabled={loading}
       value={currentLabel}
       onChange={(e) => setCurrentLabel(e.target.value)}
-    >
-    </Form.Control>
+    />
   );
 };
 
@@ -466,10 +476,10 @@ const RubricTypeEditor: React.FC<{
       disabled={loading}
       value={rubric.type}
       onChange={onChange}
-      disableAllWhenPreset={ // only disable 'all'
-        'choices' in rubric && // if we have any saved choices...
-        'presets' in rubric.choices && // that are presets,
-        rubric.choices.presets.length > 0 // and presets are present
+      disableAllWhenPreset={
+        // only disable 'all' if we have any saved choices that are presests,
+        // and presets are present
+        'choices' in rubric && 'presets' in rubric.choices && rubric.choices.presets.length > 0
       }
     />
   );
@@ -485,13 +495,18 @@ export const ChangeRubricType: React.FC<{
   disableAllWhenPreset: boolean;
 }> = (props) => {
   const options: RubricSelectOption[] = Object.values(defaultOptions);
-  const { value, onChange, disabled = false } = props;
+  const {
+    value,
+    onChange,
+    disableAllWhenPreset,
+    disabled = false,
+  } = props;
   const changeRubricType = useCallback((newtype: RubricSelectOption) => {
     onChange(newtype.value);
   }, [value, onChange]);
-  const disableAllWhenPreset = useCallback((option: RubricSelectOption) => {
-    return option.value === 'all' && props.disableAllWhenPreset;
-  }, [props.disableAllWhenPreset]);
+  const disableAllOptionWhenPreset = useCallback((option: RubricSelectOption) => (
+    option.value === 'all' && disableAllWhenPreset
+  ), [disableAllWhenPreset]);
   return (
     <Form.Group as={Row}>
       <Form.Label column sm="2"><h5 className="my-0">Rubric type</h5></Form.Label>
@@ -502,7 +517,7 @@ export const ChangeRubricType: React.FC<{
           className="z-1000-select"
           options={options}
           value={defaultOptions[value || 'none']}
-          isOptionDisabled={disableAllWhenPreset}
+          isOptionDisabled={disableAllOptionWhenPreset}
           onChange={changeRubricType}
         />
       </Col>
@@ -539,7 +554,7 @@ const RubricDescriptionEditor: React.FC<{
           copyButton: true,
         });
       },
-    }
+    },
   );
   const onChange = (newDescription: HTMLVal) => {
     mutate({
@@ -551,7 +566,7 @@ const RubricDescriptionEditor: React.FC<{
           description: newDescription.value,
         },
       },
-    })
+    });
   };
   return (
     <EditHTMLVal
@@ -635,8 +650,8 @@ const RubricPointsEditor: React.FC<{
           copyButton: true,
         });
       },
-    }
-  )
+    },
+  );
   const handleChange: ChangeHandler = (newVal: string | number, focused: boolean) => {
     if (focused) {
       const normalized = normalizeNumber(newVal.toString(), pointsVal);

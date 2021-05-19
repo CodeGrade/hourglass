@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { AnswersState, AnswerState, ExamFile } from '@student/exams/show/types';
+import { AnswersState, ExamFile } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import {
   ExamContext,

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navbar } from 'react-bootstrap';
+// eslint-disable-next-line no-restricted-imports
 import NavbarLogo from '../../../images/hourglass.svg';
 
 const NotLoggedIn: React.FC = () => (

@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { graphql, useQuery, useMutation } from 'relay-hooks';
 import { AlertContext } from '@hourglass/common/alerts';
 import NotLoggedIn from './NotLoggedIn';
+// eslint-disable-next-line no-restricted-imports
 import NavbarLogo from '../../../images/hourglass.svg';
 
 import { navbarQuery } from './__generated__/navbarQuery.graphql';

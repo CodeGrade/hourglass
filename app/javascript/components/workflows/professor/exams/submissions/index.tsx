@@ -11,8 +11,6 @@ import { BsListCheck } from 'react-icons/bs';
 import { useQuery, useMutation } from 'relay-hooks';
 import {
   AnswersState,
-  ContentsState,
-  ExamVersion,
 } from '@student/exams/show/types';
 import Spoiler from '@hourglass/common/Spoiler';
 import ExamViewer from '@proctor/registrations/show';
@@ -225,7 +223,7 @@ const ExamSubmission: React.FC = () => {
   if (!res.data) {
     return <p>Loading...</p>;
   }
-  const myRegistration = res.data.me.id == res.data.registration.user.id;
+  const myRegistration = res.data.me.id === res.data.registration.user.id;
   // TODO: better error message if the request fails because it is someone else's registration
   if (myRegistration) {
     if (!res.data.registration.published) {
@@ -240,15 +238,14 @@ const ExamSubmission: React.FC = () => {
     return (
       <ExamSubmissionStudent />
     );
-  } else {
-    return (
-      <ExamSubmissionStaff />
-    );
   }
+  return (
+    <ExamSubmissionStaff />
+  );
 };
 
 function round(value: number, places: number): number {
-  const multiplier = Math.pow(10, places);
+  const multiplier = 10 ** places;
   return Math.round(value * multiplier) / multiplier;
 }
 
@@ -295,7 +292,7 @@ const ExamSubmissionStudent: React.FC = () => {
       <h1>
         {`Submission by ${userInfo}`}
       </h1>
-      <h2>Grade: {round(currentScorePercentage, 2).toFixed(2)}%</h2>
+      <h2>{`Grade: ${round(currentScorePercentage, 2).toFixed(2)}%`}</h2>
       <ExamViewerStudent
         version={registration.examVersion}
         currentGrading={currentGrading as CurrentGrading}
@@ -304,7 +301,7 @@ const ExamSubmissionStudent: React.FC = () => {
       />
     </DocumentTitle>
   );
-}
+};
 
 const ExamSubmissionStaff: React.FC = () => {
   const { registrationId } = useParams<{ registrationId: string }>();

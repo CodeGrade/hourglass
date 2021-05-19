@@ -334,7 +334,7 @@ module UploadsHelper
           'racket', Rails.root.join('lib/assets/render-racket.rkt').to_s,
           '-e', output_path,
           '-o', "#{filename}ext",
-          f,
+          filename,
           timeout: 30
         )
         if status.success? && !timed_out
@@ -346,7 +346,7 @@ module UploadsHelper
           Audit.log "Successfully processed #{filename} to #{output_path}"
           return true
         else
-          FileUtils.rm "#{ffilename}ext", force: true
+          FileUtils.rm "#{filename}ext", force: true
           Audit.log <<~ERROR
             ================================
             Problem processing #{filename}:

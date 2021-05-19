@@ -25,6 +25,7 @@ class Rubric < ApplicationRecord
   validate :all_rubric_does_not_have_comments
 
   delegate :exam, to: :exam_version
+  delegate :course, to: :exam_version
 
   accepts_nested_attributes_for :subsections, :rubric_preset
 

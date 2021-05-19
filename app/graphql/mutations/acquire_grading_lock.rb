@@ -23,7 +23,8 @@ module Mutations
         raise GraphQL::ExecutionError, 'That part is already being graded.' if lock&.grader
 
         lock.grader = context[:current_user]
-        lock.save!
+        saved = lock.save
+        raise GraphQL::ExecutionError, lock.errors.full_messages.to_sentence unless saved
       end
       { acquired: true }
     end

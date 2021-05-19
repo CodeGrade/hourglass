@@ -27,7 +27,8 @@ module Mutations
       preset_comment.points = kwargs[:points] if kwargs[:update_points]
       preset_comment.grader_hint = kwargs[:grader_hint] if kwargs[:update_grader_hint]
       preset_comment.student_feedback = kwargs[:student_feedback] if kwargs[:update_student_feedback]
-      preset_comment.save!
+      saved = preset_comment.save
+      raise GraphQL::ExecutionError, preset_comment.errors.full_messages.to_sentence unless saved
 
       { preset_comment: preset_comment }
     end

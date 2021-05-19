@@ -61,7 +61,8 @@ module Mutations
       raise GraphQL::ExecutionError, err if student_reg.started?
 
       student_reg.exam_version = version
-      student_reg.save!
+      saved = student_reg.save
+      raise GraphQL::ExecutionError, student_reg.errors.full_messages.to_sentence unless saved
     end
 
     def assign_version!(exam, version, students)

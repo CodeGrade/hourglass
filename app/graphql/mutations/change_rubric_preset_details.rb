@@ -19,7 +19,8 @@ module Mutations
     def resolve(rubric_preset:, update_label:, update_direction:, label: nil, direction: nil)
       rubric_preset.label = label if update_label
       rubric_preset.direction = direction if update_direction
-      rubric_preset.save!
+      saved = rubric_preset.save
+      raise GraphQL::ExecutionError, rubric_preset.errors.full_messages.to_sentence unless saved
 
       { rubric_preset: rubric_preset }
     end

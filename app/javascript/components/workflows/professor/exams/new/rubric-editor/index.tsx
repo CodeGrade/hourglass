@@ -451,7 +451,7 @@ function useCreateRubricMutation(): MutationReturn<rubricEditorCreateRubricMutat
           message: err.message,
           copyButton: true,
         });
-      }
+      },
     },
   );
   return results;
@@ -473,7 +473,10 @@ const CreateRubricItemDropdown: React.FC<{
   } = props;
   const [sectionMutate, { loading: sectionLoading }] = useCreateRubricMutation();
   const { alert } = useContext(AlertContext);
-  const [presetCommentMutate, { loading: presetCommentLoading }] = useMutation<rubricEditorCreateRubricPresetMutation>(
+  const [
+    presetCommentMutate,
+    { loading: presetCommentLoading },
+  ] = useMutation<rubricEditorCreateRubricPresetMutation>(
     graphql`
     mutation rubricEditorCreateRubricPresetMutation($input: CreateRubricPresetInput!) {
       createRubricPreset(input: $input) {
@@ -506,8 +509,8 @@ const CreateRubricItemDropdown: React.FC<{
           copyButton: true,
         });
       },
-    }
-  )
+    },
+  );
   const loading = sectionLoading || presetCommentLoading;
   return (
     <Row className="text-center">
@@ -573,7 +576,7 @@ const CreateRubricSectionButton: React.FC<{
   return (
     <Row className="text-center">
       <Col>
-       <Button
+        <Button
           variant="secondary"
           disabled={loading}
           onClick={() => {

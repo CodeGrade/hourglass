@@ -22,7 +22,7 @@ module Mutations
         saved = rubric_preset.save
         raise GraphQL::ExecutionError, rubric_preset.errors.full_messages.to_sentence unless saved
 
-        preset_comment = PresetComment.new(rubric_preset: rubric_preset, grader_hint: '', points: 0)
+        preset_comment = PresetComment.new(rubric_preset: rubric_preset, grader_hint: '', points: 0, order: 0)
         saved = preset_comment.save
         raise GraphQL::ExecutionError, preset_comment.errors.full_messages.to_sentence unless saved
 

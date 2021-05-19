@@ -1,5 +1,4 @@
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { admin_version$data } from './__generated__/admin_version.graphql';
 import {
   ExamRubric,
   Rubric,
@@ -8,8 +7,8 @@ import {
   RubricAll,
   RubricOne,
   RubricAny,
-} from './types';
-import { showExamViewer$data } from '@hourglass/workflows/proctor/registrations/show/__generated__/showExamViewer.graphql';
+} from '@professor/exams/types';
+import { showExamViewer$data } from '@proctor/registrations/show/__generated__/showExamViewer.graphql';
 
 const nullNumComp = (n1, n2) => {
   if (n1 === n2) return 0;
@@ -42,6 +41,7 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
     direction,
     presets: presetComments.map((c) => {
       const {
+        // eslint-disable-next-line no-shadow
         id,
         // eslint-disable-next-line no-shadow
         label,

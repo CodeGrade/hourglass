@@ -6,7 +6,7 @@ import React, {
 } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+// import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
   Button,
   Form,
@@ -34,10 +34,6 @@ import {
   PartInfoWithAnswers,
   AllThatApplyInfoWithAnswer,
   MatchingInfoWithAnswer,
-  Rubric,
-  ExamRubric,
-  Preset,
-  RubricPresets,
 } from '@professor/exams/types';
 import {
   reduxForm,
@@ -309,10 +305,10 @@ function transformMatching(
   };
 }
 
-function stripInUsePreset(preset: Preset): Preset {
-  const { inUse: _, ...presetClean } = preset;
-  return presetClean;
-}
+// function stripInUsePreset(preset: Preset): Preset {
+//   const { inUse: _, ...presetClean } = preset;
+//   return presetClean;
+// }
 
 function transformForSubmit(values: FormValues): Version {
   const { all } = values;

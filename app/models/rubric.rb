@@ -23,11 +23,19 @@ class Rubric < ApplicationRecord
   validate :points_if_preset
   validate :not_both_presets_and_subsections
   validate :all_rubric_does_not_have_comments
+  validate :has_order_if_not_root
 
   delegate :exam, to: :exam_version
   delegate :course, to: :exam_version
 
   accepts_nested_attributes_for :subsections, :rubric_preset
+
+  # Ensure that non-root rubrics have a non-nil `order` field
+  def has_order_if_not_root
+    return if parent_section.nil?
+
+    errors.add(:order, 'must exist for non-root rubrics') if order.nil?
+  end
 
   # Ensure that preset comments exist, or subsections exist, but not both
   def not_both_presets_and_subsections

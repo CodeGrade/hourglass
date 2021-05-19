@@ -11,7 +11,6 @@ module Mutations
     argument :question_id, ID, required: false, loads: Types::QuestionType
     argument :part_id, ID, required: false, loads: Types::PartType
     argument :body_item_id, ID, required: false, loads: Types::BodyItemType
-    argument :order, Integer, required: false
 
     field :exam_version, Types::ExamVersionType, null: false
 
@@ -22,7 +21,8 @@ module Mutations
     end
 
     def resolve(type:, **args)
-      rubric = Rubric.new(type: type.capitalize, **args)
+      order = args[:parent_section]&.subsections&.count || 0
+      rubric = Rubric.new(type: type.capitalize, order: order, **args)
       saved = rubric.save
       raise GraphQL::ExecutionError, rubric.errors.full_messages.to_sentence unless saved
 

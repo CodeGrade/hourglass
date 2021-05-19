@@ -273,10 +273,10 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
         <Form.Group as={Row}>
           {('choices' in rubric && 'direction' in rubric.choices && rubric.choices.presets.length > 0) && (
             <>
-              <Col sm="12" md="4">
+              <Col sm="12" md>
                 <Row>
                   <Form.Label column sm="2" md="auto">Label</Form.Label>
-                  <Col>
+                  <Col md>
                     <RubricPresetLabelEditor
                       rubricPreset={rubric.choices}
                     />
@@ -285,7 +285,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
               </Col>
               <Col sm="12" md="auto">
                 <Row>
-                  <Form.Label column sm="2" md="auto">Direction</Form.Label>
+                  <Form.Label column sm="3" md="auto">Direction</Form.Label>
                   <Col>
                     <RubricPresetDirectionEditor
                       rubricPreset={rubric.choices}
@@ -299,7 +299,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
             <Col sm="12" md="3">
               <Row>
                 <Form.Label column sm="2" md="auto">Points</Form.Label>
-                <Col>
+                <Col md>
                   <RubricPointsEditor
                     rubric={rubric}
                   />

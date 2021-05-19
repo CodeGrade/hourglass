@@ -48,6 +48,7 @@ import { rubricEditorChangePresetCommentLabelMutation } from './__generated__/ru
 import { rubricEditorChangePresetCommentGraderHintMutation } from './__generated__/rubricEditorChangePresetCommentGraderHintMutation.graphql';
 import { rubricEditorChangePresetCommentStudentFeedbackMutation } from './__generated__/rubricEditorChangePresetCommentStudentFeedbackMutation.graphql';
 import { rubricEditorCreatePresetCommentMutation } from './__generated__/rubricEditorCreatePresetCommentMutation.graphql';
+import Loading from '@hourglass/common/loading';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -787,15 +788,16 @@ export const ChangeRubricType: React.FC<{
     <Form.Group as={Row}>
       <Form.Label column sm="2"><h5 className="my-0">Rubric type</h5></Form.Label>
       <Col sm="10">
-        <Select
-          isDisabled={disabled}
-          classNamePrefix="select"
-          className="z-1000-select"
-          options={options}
-          value={defaultOptions[value || 'none']}
-          isOptionDisabled={disableAllOptionWhenPreset}
-          onChange={changeRubricType}
-        />
+        <Loading loading={disabled} noText>
+          <Select
+            classNamePrefix="select"
+            className="z-1000-select"
+            options={options}
+            value={defaultOptions[value || 'none']}
+            isOptionDisabled={disableAllOptionWhenPreset}
+            onChange={changeRubricType}
+          />
+        </Loading>
       </Col>
     </Form.Group>
   );

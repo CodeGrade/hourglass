@@ -54,6 +54,8 @@ import Loading from '@hourglass/common/loading';
 import { rubricEditorCreateRubricMutation } from './__generated__/rubricEditorCreateRubricMutation.graphql';
 import { MutationParameters } from 'relay-runtime';
 import { rubricEditorCreateRubricPresetMutation } from './__generated__/rubricEditorCreateRubricPresetMutation.graphql';
+import MoveItem from '../editor/components/MoveItem';
+import { rubricEditorDestroyPresetCommentMutation } from './__generated__/rubricEditorDestroyPresetCommentMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -260,7 +262,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
           </Form.Group>
         )}
         <Form.Group as={Row}>
-          {('choices' in rubric && 'direction' in rubric.choices) && (
+          {('choices' in rubric && 'direction' in rubric.choices && rubric.choices.presets.length > 0) && (
             <>
               <Form.Label column sm="1">Label</Form.Label>
               <Col sm="4">
@@ -299,7 +301,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
             />
           ))
         )}
-        {('choices' in rubric && 'presets' in rubric.choices) && (
+        {('choices' in rubric && 'presets' in rubric.choices && rubric.choices.presets.length > 0) && (
           <Form.Group as={Row}>
             <Col>
               <Form.Label>
@@ -711,11 +713,55 @@ const RubricPresetDirectionEditor: React.FC<{
 
 const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
   const { preset } = props;
+  const [mutate] = useMutation<rubricEditorDestroyPresetCommentMutation>(
+    graphql`
+    mutation rubricEditorDestroyPresetCommentMutation($input: DestroyPresetCommentInput!) {
+      destroyPresetComment(input: $input) {
+        rubric {
+          id
+          rubricPreset {
+            id
+            direction
+            label
+            mercy
+            presetComments {
+              id
+              label
+              order
+              points
+              graderHint
+              studentFeedback
+            }
+          }
+        }
+      }
+    }
+    `,
+  );
   return (
     <Card
       className="mb-3 alert-warning p-0 w-100"
       border="warning"
     >
+      <MoveItem
+        visible
+        variant="secondary"
+        enableUp
+        enableDown
+        enableDelete
+        onUp={console.log}
+        onDown={console.log}
+        onDelete={() => {
+          mutate({
+            variables: {
+              input: {
+                presetCommentId: preset.id,
+              }
+            }
+          })
+        }}
+        disabledDeleteMessage="not disabled"
+      />
       <Card.Body>
         <Form.Group as={Row}>
           <Form.Label column sm="2">Label</Form.Label>

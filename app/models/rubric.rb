@@ -25,6 +25,7 @@ class Rubric < ApplicationRecord
   validate :not_both_presets_and_subsections
   validate :all_rubric_does_not_have_comments
   validate :has_order_if_not_root
+  validate :parent_has_no_presets
 
   delegate :exam, to: :exam_version
   delegate :course, to: :exam_version
@@ -36,6 +37,13 @@ class Rubric < ApplicationRecord
     return if parent_section.nil?
 
     errors.add(:order, 'must exist for non-root rubrics') if order.nil?
+  end
+
+  # Ensure that the parent rubric does not have a rubric preset
+  def parent_has_no_presets
+    return if parent_section.nil?
+
+    errors.add(:parent_section, 'cannot already have rubric presets') if parent_section.rubric_preset.present?
   end
 
   # Ensure that preset comments exist, or subsections exist, but not both

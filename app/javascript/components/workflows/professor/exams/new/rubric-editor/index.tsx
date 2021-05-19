@@ -12,6 +12,7 @@ import {
   HTMLVal,
 } from '@student/exams/show/types';
 import {
+  Preset,
   Rubric, RubricAll, RubricAny, RubricOne, RubricPresets,
 } from '@professor/exams/types';
 // import { examWithAnswers } from '@professor/exams/new/editor';
@@ -249,6 +250,13 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
             />
           ))
         )}
+        {('choices' in rubric && 'presets' in rubric.choices) && (
+          <Form.Group as={Row}>
+            {rubric.choices.presets.map((p) => (
+              <RubricPresetEditor key={p.id} preset={p} />
+            ))}
+          </Form.Group>
+        )}
       </Card.Body>
     </Card>
   );
@@ -296,11 +304,63 @@ const RubricPresetDirectionEditor: React.FC<{
     });
   };
   return (
-    <ChangeRubricPresetDirection
-      value={rubricPreset.direction}
-      onChange={handleChange}
-      disabled={loading}
-    />
+    <>
+      <ChangeRubricPresetDirection
+        value={rubricPreset.direction}
+        onChange={handleChange}
+        disabled={loading}
+      />
+    </>
+  );
+};
+
+const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
+  const { preset } = props;
+  const {
+    graderHint,
+    studentFeedback,
+    label,
+  } = preset;
+  return (
+    <Card
+      className="mb-3 alert-warning p-0"
+      border="warning"
+    >
+      <Card.Body>
+        <Form.Group as={Row}>
+          <Form.Label column sm="2">Label</Form.Label>
+          <Col sm="4">
+            <input defaultValue={label} className="bg-white border rounded w-100" />
+          </Col>
+          <Form.Label column sm="2">Points</Form.Label>
+          <Col sm="4">
+            <PresetPointsEditor preset={preset} />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row}>
+          <Form.Label column sm="2">Grader hint</Form.Label>
+          <Col sm="10">
+            <input
+              className="bg-white border rounded w-100"
+              name="graderHint"
+              placeholder="Give a description to graders to use"
+              defaultValue={graderHint}
+            />
+          </Col>
+        </Form.Group>
+        <Form.Group as={Row}>
+          <Form.Label column sm="2">Student feedback</Form.Label>
+          <Col sm="10">
+            <input
+              className="bg-white border rounded w-100"
+              name="studentFeedback"
+              defaultValue={studentFeedback}
+              placeholder="Give a default message to students -- if blank, will use the grader hint"
+            />
+          </Col>
+        </Form.Group>
+      </Card.Body>
+    </Card>
   );
 };
 
@@ -620,6 +680,30 @@ const EditHTMLVal: React.FC<{
       onChange={handleChange}
       refreshProps={refreshProps}
       className={className}
+    />
+  );
+};
+
+const PresetPointsEditor: React.FC<{
+  preset: Preset
+}> = (props) => {
+  const { preset } = props;
+  const [pointsVal, setPointsVal] = useState(preset.points.toString());
+  // TODO: mutation
+  const loading = false;
+  const handleChange: ChangeHandler = (newVal : string | number, _focused: boolean) => {
+    setPointsVal(String(newVal));
+  };
+  useEffect(() => {
+    setPointsVal(preset.points.toString());
+  }, [preset.points]);
+  return (
+    <NumericInput
+      disabled={loading}
+      value={pointsVal}
+      step={0.5}
+      variant="warning"
+      onChange={handleChange}
     />
   );
 };

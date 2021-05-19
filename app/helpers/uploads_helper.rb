@@ -150,8 +150,9 @@ module UploadsHelper
           direction: preset['direction'],
           mercy: preset['mercy'],
         )
-        preset['presets']&.map do |p|
+        preset['presets']&.each_with_index&.map do |p, pindex|
           pc = PresetComment.new(
+            order: pindex,
             label: p['label'],
             grader_hint: p['graderHint'],
             student_feedback: p['studentFeedback'],

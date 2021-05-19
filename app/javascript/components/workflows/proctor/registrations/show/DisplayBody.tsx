@@ -88,7 +88,7 @@ const ShowRubricPreset: React.FC<{ preset: RubricPresetJson, points: number}> = 
       {Object.keys(values).map((rId) => {
         const presetComment = values[rId];
         return presetComment.values.map((pc) => (
-          <ShowComment key={pc.railsId} comment={pc} />
+          <ShowComment key={pc.id} comment={pc} />
         ));
       })}
     </div>

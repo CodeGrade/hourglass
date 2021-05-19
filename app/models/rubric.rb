@@ -62,9 +62,20 @@ class Rubric < ApplicationRecord
 
       qpb = "(#{question.index}, #{part.index}, #{body_item.index})"
       errors.add(:order, "must be nil if this is the root of #{qpb}")
-    elsif order.nil?
-      qpb = "(#{question.index}, #{part.index}, #{body_item.index})"
-      errors.add(:order, "cannot be nil if this is a subrubric within #{qpb}")
+    else
+      errors.add(:question, "must match parent section's question") if question != parent_section.question
+
+      errors.add(:part, "must match parent section's part") if part != parent_section.part
+
+      errors.add(:body_item, "must match parent section's body item") if body_item != parent_section.body_item
+
+      if order.nil?
+        # if this is a root rubric, don't need order
+        return if question.nil? || part.nil? || body_item.nil?
+
+        qpb = "(#{question&.index || "nil"}, #{part&.index || "nil"}, #{body_item&.index || "nil"})"
+        errors.add(:order, "cannot be nil if this is a subrubric within #{qpb}")
+      end
     end
   end
 

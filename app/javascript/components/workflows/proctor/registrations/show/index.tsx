@@ -50,14 +50,29 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
         type
         value
       }
+      dbQuestions {
+        id
+        rubrics {
+          id
+        }
+        parts {
+          id
+          rubrics {
+            id
+          }
+          bodyItems {
+            id
+            rubrics {
+              id
+            }
+          }
+        }
+      }
       files
       rubrics {
         id
         type
         parentSectionId
-        qnum
-        pnum
-        bnum
         order
         points
         description {
@@ -86,7 +101,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     `,
     version,
   );
-  const rubric = convertRubric(res.rubrics);
+  const rubric = convertRubric(res.rubrics, res.dbQuestions);
   const {
     instructions,
     dbReferences: references,

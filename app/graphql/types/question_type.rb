@@ -34,5 +34,9 @@ module Types
     def references
       AssociationLoader.for(Question, :references).load(object)
     end
+
+    field :rubrics, [Types::RubricType], null: false do
+      guard Guards::ALL_STAFF
+    end
   end
 end

@@ -11,5 +11,9 @@ module Types
     field :answer, GraphQL::Types::JSON, null: true do
       guard Guards::ALL_STAFF
     end
+
+    field :rubrics, [Types::RubricType], null: false do
+      guard Guards::ALL_STAFF
+    end
   end
 end

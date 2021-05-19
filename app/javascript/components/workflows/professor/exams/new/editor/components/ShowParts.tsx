@@ -10,8 +10,6 @@ import { useRefresher } from '@hourglass/common/helpers';
 import { PartInfoWithAnswers } from '@professor/exams/types';
 import Part from '@professor/exams/new/editor/components/Part';
 import { AlertContext } from '@hourglass/common/alerts';
-import CREATE_RUBRIC_MUTATION from '@professor/exams/new/editor/components/manageRubrics';
-import { manageRubricsCreateRubricMutation } from './__generated__/manageRubricsCreateRubricMutation.graphql';
 
 const ShowParts: React.FC<{
   qnum: number;
@@ -24,19 +22,19 @@ const ShowParts: React.FC<{
   } = props;
   const { alert } = useContext(AlertContext);
   const [refresher, refresh] = useRefresher();
-  const [createRubric, { loading }] = useMutation<manageRubricsCreateRubricMutation>(
-    CREATE_RUBRIC_MUTATION,
-    {
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error creating rubric for new question.',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
-  );
+  // const [createRubric, { loading }] = useMutation<manageRubricsCreateRubricMutation>(
+  //   CREATE_RUBRIC_MUTATION,
+  //   {
+  //     onError: (err) => {
+  //       alert({
+  //         variant: 'danger',
+  //         title: 'Error creating rubric for new question.',
+  //         message: err.message,
+  //         copyButton: true,
+  //       });
+  //     },
+  //   },
+  // );
   return (
     <>
       <Row>
@@ -75,38 +73,38 @@ const ShowParts: React.FC<{
         <Col>
           <Button
             variant="success"
-            disabled={loading}
+            // disabled={loading}
             onClick={(): void => {
-              createRubric({
-                variables: {
-                  input: {
-                    examVersionId,
-                    type: 'none',
-                    qnum,
-                    pnum: fields.length,
-                  },
-                },
-              }).then((result) => {
-                const { rubric } = result.createRubric;
-                const p: PartInfoWithAnswers = {
-                  references: [],
-                  name: {
-                    type: 'HTML',
-                    value: '',
-                  },
-                  description: {
-                    type: 'HTML',
-                    value: '',
-                  },
-                  points: 0,
-                  bodyItems: [],
-                  partRubric: {
-                    type: 'none',
-                    railsId: rubric.railsId,
-                  },
-                };
-                fields.push(p);
-              });
+              // createRubric({
+              //   variables: {
+              //     input: {
+              //       examVersionId,
+              //       type: 'none',
+              //       qnum,
+              //       pnum: fields.length,
+              //     },
+              //   },
+              // }).then((result) => {
+              //   const { rubric } = result.createRubric;
+              //   const p: PartInfoWithAnswers = {
+              //     references: [],
+              //     name: {
+              //       type: 'HTML',
+              //       value: '',
+              //     },
+              //     description: {
+              //       type: 'HTML',
+              //       value: '',
+              //     },
+              //     points: 0,
+              //     bodyItems: [],
+              //     partRubric: {
+              //       type: 'none',
+              //       railsId: rubric.railsId,
+              //     },
+              //   };
+              //   fields.push(p);
+              // });
             }}
           >
             Add part

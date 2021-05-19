@@ -757,13 +757,28 @@ function AnswersRow<T, V>(
     graphql`
     fragment gradingRubric on ExamVersion {
       id
+      dbQuestions {
+        id
+        rubrics {
+          id
+        }
+        parts {
+          id
+          rubrics {
+            id
+          }
+          bodyItems {
+            id
+            rubrics {
+              id
+            }
+          }
+        }
+      }
       rubrics {
         id
         type
         parentSectionId
-        qnum
-        pnum
-        bnum
         order
         points
         description {
@@ -793,7 +808,7 @@ function AnswersRow<T, V>(
     examVersionKey,
   );
   const [studentWidth, setStudentWidth] = useState(6);
-  const rubrics = convertRubric(res.rubrics);
+  const rubrics = convertRubric(res.rubrics, res.dbQuestions);
   const { examRubric } = rubrics;
   const qnumRubric = rubrics.questions[qnum]?.questionRubric;
   const pnumRubric = rubrics.questions[qnum]?.parts[pnum]?.partRubric;
@@ -850,7 +865,7 @@ function AnswersRow<T, V>(
               examRubric={examRubric}
               qnumRubric={qnumRubric}
               pnumRubric={pnumRubric}
-              bnumRubric={bnumRubric}
+              bnumRubric={bnumRubric.rubric}
               showCompletenessAgainst={comments.map((c) => c.presetComment?.id)}
               registrationId={registrationId}
               qnum={qnum}

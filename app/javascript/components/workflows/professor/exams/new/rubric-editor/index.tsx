@@ -16,7 +16,7 @@ import {
   Rubric, RubricAll, RubricAny, RubricOne, RubricPresets,
 } from '@professor/exams/types';
 // import { examWithAnswers } from '@professor/exams/new/editor';
-import { graphql, useQuery, useMutation } from 'relay-hooks';
+import { graphql, useQuery, useMutation, MutationConfigWithoutVariables, MutateWithVariables, MutationState } from 'relay-hooks';
 
 import { RenderError } from '@hourglass/common/boundary';
 import convertRubric from '@professor/exams/rubrics';
@@ -26,6 +26,8 @@ import {
   ButtonProps,
   Card,
   Col,
+  Dropdown,
+  DropdownButton,
   Form,
   Row,
   ToggleButton,
@@ -49,6 +51,8 @@ import { rubricEditorChangePresetCommentGraderHintMutation } from './__generated
 import { rubricEditorChangePresetCommentStudentFeedbackMutation } from './__generated__/rubricEditorChangePresetCommentStudentFeedbackMutation.graphql';
 import { rubricEditorCreatePresetCommentMutation } from './__generated__/rubricEditorCreatePresetCommentMutation.graphql';
 import Loading from '@hourglass/common/loading';
+import { rubricEditorCreateRubricMutation } from './__generated__/rubricEditorCreateRubricMutation.graphql';
+import { MutationParameters } from 'relay-runtime';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -67,13 +71,28 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
     graphql`
     query rubricEditorQuery($examVersionId: ID!) {
       examVersion(id: $examVersionId) {
+        dbQuestions {
+          id
+          rubrics {
+            id
+          }
+          parts {
+            id
+            rubrics {
+              id
+            }
+            bodyItems {
+              id
+              rubrics {
+                id
+              }
+            }
+          }
+        }
         rubrics {
           id
           type
           parentSectionId
-          qnum
-          pnum
-          bnum
           order
           points
           description {
@@ -109,9 +128,8 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
   if (!res.data) {
     return <p>Loading...</p>;
   }
-  const { rubrics } = res.data.examVersion;
-  const { examRubric, questions } = convertRubric(rubrics);
-  // const examVersionWithAnswers = examWithAnswers(exam, answers.answers);
+  const { rubrics, dbQuestions } = res.data.examVersion;
+  const { examRubric, questions } = convertRubric(rubrics, dbQuestions);
 
   return (
     <ExamContext.Provider
@@ -136,6 +154,7 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
             {examRubric ? (
               <SingleRubricEditor
                 rubric={examRubric}
+                examVersionId={examVersionId}
               />
             ) : 'TODO: NONE'}
             {questions.map((q, qnum) => (
@@ -145,6 +164,8 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
                   <p>{`Question ${qnum + 1} rubric:`}</p>
                   <SingleRubricEditor
                     rubric={q.questionRubric}
+                    examVersionId={examVersionId}
+                    questionId={q.id}
                   />
                   {q.parts.map((p, pnum) => (
                     // eslint-disable-next-line react/no-array-index-key
@@ -153,6 +174,9 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
                         <p>{`Question ${qnum + 1} part ${pnum + 1} rubric:`}</p>
                         <SingleRubricEditor
                           rubric={p.partRubric}
+                          examVersionId={examVersionId}
+                          questionId={q.id}
+                          partId={p.id}
                         />
                         {p.body.map((b, bnum) => (
                           // eslint-disable-next-line react/no-array-index-key
@@ -160,7 +184,11 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
                             <Col>
                               <p>{`Question ${qnum + 1} part ${pnum + 1} body ${bnum + 1} rubric:`}</p>
                               <SingleRubricEditor
-                                rubric={b}
+                                rubric={b.rubric}
+                                examVersionId={examVersionId}
+                                questionId={q.id}
+                                partId={p.id}
+                                bodyItemId={b.id}
                               />
                             </Col>
                           </Row>
@@ -200,11 +228,19 @@ const defaultOptions: Record<Rubric['type'], SelectOption<Rubric['type']>> = {
 
 interface SingleRubricEditorProps {
   rubric?: Rubric;
+  examVersionId: string;
+  questionId?: string;
+  partId?: string;
+  bodyItemId?: string;
 }
 
 const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
   const {
     rubric,
+    examVersionId,
+    questionId,
+    partId,
+    bodyItemId,
   } = props;
   return (
     <Card
@@ -255,6 +291,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
             <SingleRubricEditor
               key={subRubric.id}
               rubric={subRubric}
+              examVersionId={examVersionId}
             />
           ))
         )}
@@ -274,16 +311,240 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
               {rubric.choices.presets.map((p) => (
                 <RubricPresetEditor key={p.id} preset={p} />
               ))}
-              <div className="text-center">
-                <CreatePresetCommentButton
-                  rubricPresetId={rubric.choices.id}
-                />
-              </div>
             </Col>
           </Form.Group>
         )}
+        {rubric.type !== 'none' && (
+          <RubricEntriesEditor
+            rubric={rubric}
+            examVersionId={examVersionId}
+            questionId={questionId}
+            partId={partId}
+            bodyItemId={bodyItemId}
+          />
+        )}
       </Card.Body>
     </Card>
+  );
+};
+
+const RubricEntriesEditor: React.FC<{
+  rubric: RubricAny | RubricAll | RubricOne;
+  examVersionId: string;
+  questionId: string;
+  partId: string;
+  bodyItemId: string;
+}> = (props) => {
+  const {
+    rubric,
+    examVersionId,
+    questionId,
+    partId,
+    bodyItemId,
+  } = props;
+  const {
+    choices,
+  } = rubric;
+  const addNewRubricSection = (
+    <CreateRubricSectionButton
+      examVersionId={examVersionId}
+      parentSectionId={rubric.id}
+      questionId={questionId}
+      partId={partId}
+      bodyItemId={bodyItemId}
+    />
+  );
+  const addNewRubricItemDropdown = (
+    <CreateRubricItemDropdown
+      examVersionId={examVersionId}
+      parentSectionId={rubric.id}
+      questionId={questionId}
+      partId={partId}
+      bodyItemId={bodyItemId}
+    />
+  );
+  if (choices instanceof Array) {
+    if (choices.length > 0) {
+      return addNewRubricSection;
+    } else {
+      if (rubric.type === 'all') {
+        return addNewRubricSection;
+      } else {
+        return addNewRubricItemDropdown;
+      }
+    }
+  } else {
+    if (choices.presets.length > 0) {
+      return (
+        <div className="text-center">
+          <CreatePresetCommentButton
+            rubricPresetId={choices.id}
+          />
+        </div>
+      );
+    } else {
+      // This should not be reached, but we will make it the same as the false/false case above
+      // for completeness
+      if (rubric.type === 'all') {
+        return addNewRubricSection;
+      } else {
+        return addNewRubricItemDropdown;
+      }
+    }
+  }
+};
+
+type MutationReturn<T extends MutationParameters> = [MutateWithVariables<T>, MutationState<T>];
+
+function useCreateRubricMutation(): MutationReturn<rubricEditorCreateRubricMutation>  {
+  const { alert } = useContext(AlertContext);
+  const results = useMutation<rubricEditorCreateRubricMutation>(
+    graphql`
+    mutation rubricEditorCreateRubricMutation($input: CreateRubricInput!) {
+      createRubric(input: $input) {
+        examVersion {
+          id
+          rubrics {
+            id
+            type
+            parentSectionId
+            qnum
+            pnum
+            bnum
+            order
+            points
+            description {
+              type
+              value
+            }
+            rubricPreset {
+              id
+              direction
+              label
+              mercy
+              presetComments {
+                id
+                label
+                order
+                points
+                graderHint
+                studentFeedback
+              }
+            }
+            subsections {
+              id
+            }
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating rubric section',
+          message: err.message,
+          copyButton: true,
+        });
+      }
+    },
+  );
+  return results;
+}
+
+const CreateRubricItemDropdown: React.FC<{
+  examVersionId: string;
+  parentSectionId: string;
+  questionId: string;
+  partId: string;
+  bodyItemId: string;
+}> = (props) => {
+  const {
+    examVersionId,
+    parentSectionId,
+    questionId,
+    partId,
+    bodyItemId,
+  } = props;
+  const [sectionMutate, { loading: sectionLoading }] = useCreateRubricMutation();
+  const presetCommentLoading = false; // TODO
+  const loading = sectionLoading || presetCommentLoading;
+  return (
+    <Row className="text-center">
+      <Col>
+        <DropdownButton
+          title="Add new rubric item..."
+          variant="secondary"
+          disabled={loading}
+        >
+          <Dropdown.Item
+            onClick={() => {
+              sectionMutate({
+                variables: {
+                  input: {
+                    examVersionId,
+                    type: 'none',
+                    parentSectionId,
+                    questionId,
+                    partId,
+                    bodyItemId,
+                  },
+                },
+              });
+            }}
+          >
+            Rubric section
+          </Dropdown.Item>
+          <Dropdown.Item>
+            Preset comment
+          </Dropdown.Item>
+        </DropdownButton>
+      </Col>
+    </Row>
+  );
+};
+
+const CreateRubricSectionButton: React.FC<{
+  examVersionId: string;
+  parentSectionId: string;
+  questionId: string;
+  partId: string;
+  bodyItemId: string;
+}> = (props) => {
+  const {
+    examVersionId,
+    parentSectionId,
+    questionId,
+    partId,
+    bodyItemId,
+  } = props;
+  const [mutate, { loading }] = useCreateRubricMutation();
+  return (
+    <Row className="text-center">
+      <Col>
+       <Button
+          variant="secondary"
+          disabled={loading}
+          onClick={() => {
+            mutate({
+              variables: {
+                input: {
+                  examVersionId,
+                  type: 'none',
+                  parentSectionId,
+                  questionId,
+                  partId,
+                  bodyItemId,
+                },
+              },
+            });
+          }}
+        >
+          Add new rubric section
+        </Button>
+      </Col>
+    </Row>
   );
 };
 

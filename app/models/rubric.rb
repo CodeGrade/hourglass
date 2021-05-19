@@ -19,6 +19,7 @@ class Rubric < ApplicationRecord
 
   has_one :rubric_preset, dependent: :destroy
 
+  validate :no_detached_parts
   validate :sensible_coordinates
   validate :points_if_preset
   validate :not_both_presets_and_subsections
@@ -53,38 +54,40 @@ class Rubric < ApplicationRecord
     errors.add(:rubric_preset, 'cannot be used with All-type rubrics')
   end
 
+  # rubocop:disable Metrics/PerceivedComplexity
   def sensible_coordinates
-    if question.nil?
-      if part.nil?
-        if body_item.nil?
-          # Nothing: this is a valid coordinate triple
-        else
-          errors.add(:body_item, 'must be nil if question and part are nil')
-        end
-      else
-        errors.add(:part, 'must be nil if question is nil')
-      end
-    end
+    return if parent_section.nil? && order.nil?
 
     if parent_section.nil?
-      return if order.nil?
-
       qpb = "(#{question.index}, #{part.index}, #{body_item.index})"
       errors.add(:order, "must be nil if this is the root of #{qpb}")
     else
       errors.add(:question, "must match parent section's question") if question != parent_section.question
-
       errors.add(:part, "must match parent section's part") if part != parent_section.part
-
       errors.add(:body_item, "must match parent section's body item") if body_item != parent_section.body_item
 
       if order.nil?
         # if this is a root rubric, don't need order
         return if question.nil? || part.nil? || body_item.nil?
 
-        qpb = "(#{question&.index || "nil"}, #{part&.index || "nil"}, #{body_item&.index || "nil"})"
+        qpb = "(#{question&.index || 'nil'}, #{part&.index || 'nil'}, #{body_item&.index || 'nil'})"
         errors.add(:order, "cannot be nil if this is a subrubric within #{qpb}")
       end
+    end
+  end
+  # rubocop:enable Metrics/PerceivedComplexity
+
+  def no_detached_parts
+    return if question.present?
+
+    if part.nil?
+      if body_item.nil?
+        # Nothing: this is a valid coordinate triple
+      else
+        errors.add(:body_item, 'must be nil if question and part are nil')
+      end
+    else
+      errors.add(:part, 'must be nil if question is nil')
     end
   end
 

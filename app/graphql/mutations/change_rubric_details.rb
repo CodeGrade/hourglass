@@ -3,10 +3,12 @@
 module Mutations
   class ChangeRubricDetails < BaseMutation
     argument :rubric_id, ID, required: true, loads: Types::RubricType
+
     argument :points, Float, required: false
-    argument :update_points, Boolean, required: true
+    argument :update_points, Boolean, required: false, default_value: false
+
     argument :description, String, required: false
-    argument :update_description, Boolean, required: true
+    argument :update_description, Boolean, required: false, default_value: false
 
     field :rubric, Types::RubricType, null: false
 

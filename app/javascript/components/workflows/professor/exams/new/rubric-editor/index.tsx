@@ -22,9 +22,11 @@ import { RenderError } from '@hourglass/common/boundary';
 import convertRubric from '@professor/exams/rubrics';
 import {
   ButtonGroup,
+  ButtonProps,
   Card,
   Col,
   Form,
+  FormControlProps,
   Row,
   ToggleButton,
 } from 'react-bootstrap';
@@ -41,6 +43,9 @@ import { rubricEditorChangeRubricDetailsPointsMutation } from './__generated__/r
 import { rubricEditorQuery } from './__generated__/rubricEditorQuery.graphql';
 import { rubricEditorChangeRubricPresetLabelMutation } from './__generated__/rubricEditorChangeRubricPresetLabelMutation.graphql';
 import { rubricEditorChangeRubricPresetDirectionMutation } from './__generated__/rubricEditorChangeRubricPresetDirectionMutation.graphql';
+import { rubricEditorChangePresetCommentPointsMutation } from './__generated__/rubricEditorChangePresetCommentPointsMutation.graphql';
+import { rubricEditorChangePresetCommentLabelMutation } from './__generated__/rubricEditorChangePresetCommentLabelMutation.graphql';
+import { rubricEditorChangePresetCommentGraderHintMutation } from './__generated__/rubricEditorChangePresetCommentGraderHintMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -308,7 +313,6 @@ const RubricPresetDirectionEditor: React.FC<{
       variables: {
         input: {
           rubricPresetId: rubricPreset.id,
-          updateLabel: false,
           updateDirection: true,
           direction: newDirection,
         },
@@ -328,11 +332,6 @@ const RubricPresetDirectionEditor: React.FC<{
 
 const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
   const { preset } = props;
-  const {
-    graderHint,
-    studentFeedback,
-    label,
-  } = preset;
   return (
     <Card
       className="mb-3 alert-warning p-0 w-100"
@@ -342,37 +341,136 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
         <Form.Group as={Row}>
           <Form.Label column sm="2">Label</Form.Label>
           <Col sm="4">
-            <input defaultValue={label} className="bg-white border rounded w-100" />
+            <PresetCommentLabelEditor
+              presetComment={preset}
+            />
           </Col>
           <Form.Label column sm="2">Points</Form.Label>
           <Col sm="4">
-            <PresetPointsEditor preset={preset} />
+            <PresetPointsEditor presetComment={preset} />
           </Col>
         </Form.Group>
         <Form.Group as={Row}>
           <Form.Label column sm="2">Grader hint</Form.Label>
           <Col sm="10">
-            <input
-              className="bg-white border rounded w-100"
-              name="graderHint"
-              placeholder="Give a description to graders to use"
-              defaultValue={graderHint}
+            <PresetCommentGraderHintEditor
+              presetComment={preset}
             />
           </Col>
         </Form.Group>
         <Form.Group as={Row}>
           <Form.Label column sm="2">Student feedback</Form.Label>
           <Col sm="10">
-            <input
-              className="bg-white border rounded w-100"
+            TODO
+            {/* <Form.Control
               name="studentFeedback"
               defaultValue={studentFeedback}
               placeholder="Give a default message to students -- if blank, will use the grader hint"
-            />
+            /> */}
           </Col>
         </Form.Group>
       </Card.Body>
     </Card>
+  );
+};
+
+const PresetCommentLabelEditor: React.FC<{
+  presetComment: Preset;
+}> = (props) => {
+  const {
+    presetComment,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorChangePresetCommentLabelMutation>(
+    graphql`
+    mutation rubricEditorChangePresetCommentLabelMutation($input: ChangePresetCommentDetailsInput!) {
+      changePresetCommentDetails(input: $input) {
+        presetComment {
+          id
+          label
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing preset comment label',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const handleChange = (newVal: string) => {
+    mutate({
+      variables: {
+        input: {
+          presetCommentId: presetComment.id,
+          updateLabel: true,
+          label: newVal,
+        },
+      },
+    });
+  };
+  return (
+    <DebouncedFormControl
+      disabled={loading}
+      onChange={handleChange}
+      defaultValue={presetComment.label || ''}
+      placeholder="(optional) Give a terse description of this preset comment"
+    />
+  );
+};
+
+const PresetCommentGraderHintEditor: React.FC<{
+  presetComment: Preset;
+}> = (props) => {
+  const {
+    presetComment,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorChangePresetCommentGraderHintMutation>(
+    graphql`
+    mutation rubricEditorChangePresetCommentGraderHintMutation($input: ChangePresetCommentDetailsInput!) {
+      changePresetCommentDetails(input: $input) {
+        presetComment {
+          id
+          graderHint
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing rubric preset grader hint',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    }
+  );
+  const handleChange = (newVal: string) => {
+    mutate({
+      variables: {
+        input: {
+          presetCommentId: presetComment.id,
+          updateGraderHint: true,
+          graderHint: newVal,
+        },
+      },
+    });
+  };
+  return (
+    <DebouncedFormControl
+      placeholder="Give a description to graders to use"
+      defaultValue={presetComment.graderHint}
+      onChange={handleChange}
+      disabled={loading}
+    />
   );
 };
 
@@ -429,8 +527,6 @@ const RubricPresetLabelEditor: React.FC<{
   const {
     rubricPreset,
   } = props;
-  const [currentLabel, setCurrentLabel] = useState(rubricPreset.label);
-  const [debouncedLabel] = useDebounce(currentLabel, 1000);
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangeRubricPresetLabelMutation>(
     graphql`
@@ -454,26 +550,23 @@ const RubricPresetLabelEditor: React.FC<{
       },
     },
   );
-  useEffect(() => {
-    if (debouncedLabel === rubricPreset.label) {
-      return;
-    }
+  const handleChange = (newVal: string) => {
     mutate({
       variables: {
         input: {
           rubricPresetId: rubricPreset.id,
-          updateDirection: false,
           updateLabel: true,
-          label: debouncedLabel,
+          label: newVal,
         },
       },
     });
-  }, [debouncedLabel]);
+  };
   return (
-    <Form.Control
+    <DebouncedFormControl
       disabled={loading}
-      value={currentLabel}
-      onChange={(e) => setCurrentLabel(e.target.value)}
+      defaultValue={rubricPreset.label}
+      onChange={handleChange}
+      placeholder="(optional) Give a short description of this rubric section"
     />
   );
 };
@@ -633,7 +726,6 @@ const RubricDescriptionEditor: React.FC<{
       variables: {
         input: {
           rubricId: rubric.id,
-          updatePoints: false,
           updateDescription: true,
           description: newDescription.value,
         },
@@ -697,25 +789,50 @@ const EditHTMLVal: React.FC<{
 };
 
 const PresetPointsEditor: React.FC<{
-  preset: Preset
+  presetComment: Preset;
 }> = (props) => {
-  const { preset } = props;
-  const [pointsVal, setPointsVal] = useState(preset.points.toString());
-  // TODO: mutation
-  const loading = false;
-  const handleChange: ChangeHandler = (newVal : string | number, _focused: boolean) => {
-    setPointsVal(String(newVal));
+  const { presetComment } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorChangePresetCommentPointsMutation>(
+    graphql`
+    mutation rubricEditorChangePresetCommentPointsMutation($input: ChangePresetCommentDetailsInput!) {
+      changePresetCommentDetails(input: $input) {
+        presetComment {
+          id
+          points
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing preset comment points',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const handleChange = (newVal: number) => {
+    mutate({
+      variables: {
+        input: {
+          presetCommentId: presetComment.id,
+          updatePoints: true,
+          points: newVal,
+        },
+      },
+    });
   };
-  useEffect(() => {
-    setPointsVal(preset.points.toString());
-  }, [preset.points]);
   return (
-    <NumericInput
+    <NormalizedNumericInput
+      defaultValue={presetComment.points.toString()}
       disabled={loading}
-      value={pointsVal}
       step={0.5}
       variant="warning"
-      onChange={handleChange}
+      onCommit={handleChange}
     />
   );
 };
@@ -724,7 +841,6 @@ const RubricPointsEditor: React.FC<{
   rubric: RubricOne | RubricAny;
 }> = (props) => {
   const { rubric } = props;
-  const [pointsVal, setPointsVal] = useState(rubric.points.toString());
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangeRubricDetailsPointsMutation>(
     graphql`
@@ -748,32 +864,99 @@ const RubricPointsEditor: React.FC<{
       },
     },
   );
+  const handleChange = (newVal: number) => {
+    mutate({
+      variables: {
+        input: {
+          rubricId: rubric.id,
+          updatePoints: true,
+          points: newVal,
+        },
+      },
+    });
+  };
+  return (
+    <NormalizedNumericInput
+      defaultValue={rubric.points.toString()}
+      disabled={loading}
+      step={0.5}
+      variant="warning"
+      onCommit={handleChange}
+    />
+  );
+};
+
+const DebouncedFormControl: React.FC<{
+  defaultValue: string;
+  debounceMillis?: number;
+  onChange: (newVal: string) => void;
+  disabled?: boolean;
+  className?: string;
+  placeholder?: string;
+}> = (props) => {
+  const {
+    defaultValue,
+    debounceMillis = 1000,
+    onChange,
+    disabled,
+    className,
+    placeholder,
+  } = props;
+  const [text, setText] = useState(defaultValue);
+  const [debouncedText] = useDebounce(text, debounceMillis);
+  useEffect(() => {
+    if (debouncedText == defaultValue) {
+      return;
+    }
+    onChange(debouncedText);
+  }, [debouncedText]);
+  useEffect(() => {
+    setText(defaultValue);
+  }, [defaultValue]);
+  return (
+    <Form.Control
+      disabled={disabled}
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      className={className}
+      placeholder={placeholder}
+    />
+  );
+};
+
+const NormalizedNumericInput: React.FC<{
+  defaultValue?: string;
+  disabled?: boolean;
+  onCommit: (newVal: number) => void;
+  step?: number;
+  variant?: ButtonProps['variant'];
+}> = (props) => {
+  const {
+    defaultValue = '',
+    disabled = false,
+    onCommit,
+    step,
+    variant,
+  } = props;
+  const [pointsVal, setPointsVal] = useState(defaultValue);
   const handleChange: ChangeHandler = (newVal: string | number, focused: boolean) => {
     if (focused) {
       const normalized = normalizeNumber(newVal.toString(), pointsVal);
       setPointsVal(normalized);
     } else {
-      mutate({
-        variables: {
-          input: {
-            rubricId: rubric.id,
-            updatePoints: true,
-            updateDescription: false,
-            points: newVal as number,
-          },
-        },
-      });
+      if (newVal === defaultValue) return;
+      onCommit(newVal as number);
     }
   };
   useEffect(() => {
-    setPointsVal(rubric.points.toString());
-  }, [rubric.points]);
+    setPointsVal(defaultValue);
+  }, [defaultValue]);
   return (
     <NumericInput
-      disabled={loading}
+      disabled={disabled}
       value={pointsVal}
-      step={0.5}
-      variant="warning"
+      step={step}
+      variant={variant}
       onChange={handleChange}
     />
   );

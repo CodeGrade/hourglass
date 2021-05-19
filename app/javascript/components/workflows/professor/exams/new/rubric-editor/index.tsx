@@ -56,6 +56,7 @@ import { MutationParameters } from 'relay-runtime';
 import { rubricEditorCreateRubricPresetMutation } from './__generated__/rubricEditorCreateRubricPresetMutation.graphql';
 import MoveItem from '../editor/components/MoveItem';
 import { rubricEditorDestroyPresetCommentMutation } from './__generated__/rubricEditorDestroyPresetCommentMutation.graphql';
+import { FaTrashAlt } from 'react-icons/fa';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -711,9 +712,34 @@ const RubricPresetDirectionEditor: React.FC<{
   );
 };
 
+const DestroyButton: React.FC<{
+  disabled?: boolean;
+  className?: string;
+  onClick: () => void;
+}> = (props) => {
+  const {
+    disabled = false,
+    className = 'position-absolute t-0 r-0',
+    onClick,
+  } = props;
+  return (
+    <span className={className}>
+      <Button
+        variant="danger"
+        disabled={disabled}
+        onClick={onClick}
+        className={!disabled ? '' : 'cursor-not-allowed pointer-events-auto'}
+        title="Delete"
+      >
+        <FaTrashAlt />
+      </Button>
+    </span>
+  );
+};
+
 const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
   const { preset } = props;
-  const [mutate] = useMutation<rubricEditorDestroyPresetCommentMutation>(
+  const [mutate, { loading }] = useMutation<rubricEditorDestroyPresetCommentMutation>(
     graphql`
     mutation rubricEditorDestroyPresetCommentMutation($input: DestroyPresetCommentInput!) {
       destroyPresetComment(input: $input) {
@@ -743,27 +769,20 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
       className="mb-3 alert-warning p-0 w-100"
       border="warning"
     >
-      <MoveItem
-        visible
-        variant="secondary"
-        enableUp
-        enableDown
-        enableDelete
-        onUp={console.log}
-        onDown={console.log}
-        onDelete={() => {
-          mutate({
-            variables: {
-              input: {
-                presetCommentId: preset.id,
-              }
-            }
-          })
-        }}
-        disabledDeleteMessage="not disabled"
-      />
       <Card.Body>
-        <Form.Group as={Row}>
+        <DestroyButton
+          disabled={loading}
+          onClick={() => {
+            mutate({
+              variables: {
+                input: {
+                  presetCommentId: preset.id,
+                },
+              },
+            });
+          }}
+        />
+        <Form.Group as={Row} className="mr-4">
           <Form.Label column sm="2">Label</Form.Label>
           <Col sm="4">
             <PresetCommentLabelEditor
@@ -771,7 +790,7 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
             />
           </Col>
           <Form.Label column sm="2">Points</Form.Label>
-          <Col sm="4">
+          <Col>
             <PresetPointsEditor presetComment={preset} />
           </Col>
         </Form.Group>

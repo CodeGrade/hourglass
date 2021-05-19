@@ -251,11 +251,23 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
           ))
         )}
         {('choices' in rubric && 'presets' in rubric.choices) && (
-          <Form.Group as={Row}>
-            {rubric.choices.presets.map((p) => (
-              <RubricPresetEditor key={p.id} preset={p} />
-            ))}
-          </Form.Group>
+          <Col>
+            <Form.Group as={Row}>
+              <Form.Label>
+                Presets
+                <span className="mx-2">
+                  (most point values should be
+                  <b className="mx-1">
+                    {rubric.choices.direction === 'credit' ? 'positive' : 'negative'}
+                  </b>
+                  in this set of presets)
+                </span>
+              </Form.Label>
+              {rubric.choices.presets.map((p) => (
+                <RubricPresetEditor key={p.id} preset={p} />
+              ))}
+            </Form.Group>
+          </Col>
         )}
       </Card.Body>
     </Card>
@@ -323,7 +335,7 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
   } = preset;
   return (
     <Card
-      className="mb-3 alert-warning p-0"
+      className="mb-3 alert-warning p-0 w-100"
       border="warning"
     >
       <Card.Body>

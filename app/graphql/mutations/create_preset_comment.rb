@@ -10,20 +10,20 @@ module Mutations
     argument :points, Float, required: true
     argument :order, Integer, required: false
 
-    field :preset_comment, Types::PresetCommentType, null: false
+    field :rubric_preset, Types::RubricPresetType, null: false
 
     def authorized?(rubric_preset:, **_args)
       return true if rubric_preset.exam.user_is_professor?(context[:current_user])
-      
+
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
     def resolve(**args)
       preset_comment = PresetComment.new(args)
       saved = preset_comment.save
-      raise GraphQL::ExecutionError, preset_comment.errors.full_messages,to_sentence unless saved
+      raise GraphQL::ExecutionError, preset_comment.errors.full_messages, to_sentence unless saved
 
-      { preset_comment: preset_comment }
+      { rubric_preset: preset_comment.rubric_preset }
     end
   end
 end

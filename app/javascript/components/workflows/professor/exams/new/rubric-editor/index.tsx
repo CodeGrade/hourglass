@@ -238,6 +238,7 @@ interface SingleRubricEditorProps {
   partId?: string;
   bodyItemId?: string;
   showDestroy?: boolean;
+  disabled?: boolean;
 }
 
 const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
@@ -248,6 +249,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
     partId,
     bodyItemId,
     showDestroy = false,
+    disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorDestroyRubricMutation>(
@@ -325,7 +327,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
       <Card.Body>
         {showDestroy && (
           <DestroyButton
-            disabled={loading}
+            disabled={loading || disabled}
             onClick={() => {
               mutate({
                 variables: {
@@ -342,6 +344,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
           <Col sm="10">
             <RubricTypeEditor
               rubric={rubric}
+              disabled={loading || disabled}
             />
           </Col>
         </Form.Group>
@@ -349,6 +352,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
           <Form.Group>
             <RubricDescriptionEditor
               rubric={rubric}
+              disabled={loading || disabled}
             />
           </Form.Group>
         )}
@@ -361,6 +365,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
                   <Col md>
                     <RubricPresetLabelEditor
                       rubricPreset={rubric.choices}
+                      disabled={loading || disabled}
                     />
                   </Col>
                 </Row>
@@ -371,6 +376,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
                   <Col>
                     <RubricPresetDirectionEditor
                       rubricPreset={rubric.choices}
+                      disabled={loading || disabled}
                     />
                   </Col>
                 </Row>
@@ -384,6 +390,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
                 <Col md>
                   <RubricPointsEditor
                     rubric={rubric}
+                    disabled={loading || disabled}
                   />
                 </Col>
               </Row>
@@ -400,6 +407,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
               partId={partId}
               bodyItemId={bodyItemId}
               showDestroy
+              disabled={loading || disabled}
             />
           ))
         )}
@@ -417,7 +425,11 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
                 </span>
               </Form.Label>
               {rubric.choices.presets.map((p) => (
-                <RubricPresetEditor key={p.id} preset={p} />
+                <RubricPresetEditor
+                  key={p.id}
+                  preset={p}
+                  disabled={loading || disabled}
+                />
               ))}
             </Col>
           </Form.Group>
@@ -429,6 +441,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
             questionId={questionId}
             partId={partId}
             bodyItemId={bodyItemId}
+            disabled={loading || disabled}
           />
         )}
       </Card.Body>
@@ -442,6 +455,7 @@ const RubricEntriesEditor: React.FC<{
   questionId: string;
   partId: string;
   bodyItemId: string;
+  disabled?: boolean;
 }> = (props) => {
   const {
     rubric,
@@ -449,6 +463,7 @@ const RubricEntriesEditor: React.FC<{
     questionId,
     partId,
     bodyItemId,
+    disabled = false,
   } = props;
   const {
     choices,
@@ -460,6 +475,7 @@ const RubricEntriesEditor: React.FC<{
       questionId={questionId}
       partId={partId}
       bodyItemId={bodyItemId}
+      disabled={disabled}
     />
   );
   const addNewRubricItemDropdown = (
@@ -469,6 +485,7 @@ const RubricEntriesEditor: React.FC<{
       questionId={questionId}
       partId={partId}
       bodyItemId={bodyItemId}
+      disabled={disabled}
     />
   );
   if (choices instanceof Array) {
@@ -567,6 +584,7 @@ const CreateRubricItemDropdown: React.FC<{
   questionId: string;
   partId: string;
   bodyItemId: string;
+  disabled?: boolean;
 }> = (props) => {
   const {
     examVersionId,
@@ -574,6 +592,7 @@ const CreateRubricItemDropdown: React.FC<{
     questionId,
     partId,
     bodyItemId,
+    disabled = false,
   } = props;
   const [sectionMutate, { loading: sectionLoading }] = useCreateRubricMutation();
   const { alert } = useContext(AlertContext);
@@ -622,7 +641,7 @@ const CreateRubricItemDropdown: React.FC<{
         <DropdownButton
           title="Add new rubric item..."
           variant="secondary"
-          disabled={loading}
+          disabled={loading || disabled}
         >
           <Dropdown.Item
             onClick={() => {
@@ -668,6 +687,7 @@ const CreateRubricSectionButton: React.FC<{
   questionId: string;
   partId: string;
   bodyItemId: string;
+  disabled?: boolean;
 }> = (props) => {
   const {
     examVersionId,
@@ -675,6 +695,7 @@ const CreateRubricSectionButton: React.FC<{
     questionId,
     partId,
     bodyItemId,
+    disabled = false,
   } = props;
   const [mutate, { loading }] = useCreateRubricMutation();
   return (
@@ -682,7 +703,7 @@ const CreateRubricSectionButton: React.FC<{
       <Col>
         <Button
           variant="secondary"
-          disabled={loading}
+          disabled={loading || disabled}
           onClick={() => {
             mutate({
               variables: {
@@ -764,9 +785,11 @@ const CreatePresetCommentButton: React.FC<{
 
 const RubricPresetDirectionEditor: React.FC<{
   rubricPreset: RubricPresets;
+  disabled?: boolean;
 }> = (props) => {
   const {
     rubricPreset,
+    disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangeRubricPresetDirectionMutation>(
@@ -807,7 +830,7 @@ const RubricPresetDirectionEditor: React.FC<{
       <ChangeRubricPresetDirection
         value={rubricPreset.direction}
         onChange={handleChange}
-        disabled={loading}
+        disabled={loading || disabled}
       />
     </>
   );
@@ -838,8 +861,15 @@ const DestroyButton: React.FC<{
   );
 };
 
-const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
-  const { preset } = props;
+
+const RubricPresetEditor: React.FC<{
+  preset: Preset;
+  disabled?: boolean;
+}> = (props) => {
+  const {
+    preset,
+    disabled = false,
+  } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorDestroyPresetCommentMutation>(
     graphql`
@@ -883,7 +913,7 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
     >
       <Card.Body>
         <DestroyButton
-          disabled={loading}
+          disabled={loading || disabled}
           onClick={() => {
             mutate({
               variables: {
@@ -898,14 +928,14 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
           <Form.Label column sm="2">Label</Form.Label>
           <Col sm="4">
             <PresetCommentLabelEditor
-              disabled={loading}
+              disabled={loading || disabled}
               presetComment={preset}
             />
           </Col>
           <Form.Label column sm="2">Points</Form.Label>
           <Col>
             <PresetPointsEditor
-              disabled={loading}
+              disabled={loading || disabled}
               presetComment={preset}
             />
           </Col>
@@ -914,7 +944,7 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
           <Form.Label column sm="2">Grader hint</Form.Label>
           <Col sm="10">
             <PresetCommentGraderHintEditor
-              disabled={loading}
+              disabled={loading || disabled}
               presetComment={preset}
             />
           </Col>
@@ -923,7 +953,7 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
           <Form.Label column sm="2">Student feedback</Form.Label>
           <Col sm="10">
             <PresetCommentStudentFeedbackEditor
-              disabled={loading}
+              disabled={loading || disabled}
               presetComment={preset}
             />
           </Col>
@@ -1138,9 +1168,11 @@ const ChangeRubricPresetDirection: React.FC<ChangeRubricPresetDirectionProps> = 
 
 const RubricPresetLabelEditor: React.FC<{
   rubricPreset: RubricPresets;
+  disabled?: boolean;
 }> = (props) => {
   const {
     rubricPreset,
+    disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangeRubricPresetLabelMutation>(
@@ -1178,7 +1210,7 @@ const RubricPresetLabelEditor: React.FC<{
   };
   return (
     <DebouncedFormControl
-      disabled={loading}
+      disabled={loading || disabled}
       defaultValue={rubricPreset.label}
       onChange={handleChange}
       placeholder="(optional) Give a short description of this rubric section"
@@ -1189,8 +1221,12 @@ const RubricPresetLabelEditor: React.FC<{
 // given a rubric, hook up GraphQL mutation for type changes
 const RubricTypeEditor: React.FC<{
   rubric: Rubric;
+  disabled?: boolean;
 }> = (props) => {
-  const { rubric } = props;
+  const {
+    rubric,
+    disabled = false,
+  } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangeRubricTypeMutation>(
     graphql`
@@ -1253,7 +1289,7 @@ const RubricTypeEditor: React.FC<{
   };
   return (
     <ChangeRubricType
-      disabled={loading}
+      disabled={loading || disabled}
       value={rubric.type}
       onChange={onChange}
       disableAllWhenPreset={
@@ -1303,8 +1339,12 @@ export const ChangeRubricType: React.FC<{
 
 const RubricDescriptionEditor: React.FC<{
   rubric: RubricAll | RubricOne | RubricAny;
+  disabled?: boolean;
 }> = (props) => {
-  const { rubric } = props;
+  const {
+    rubric,
+    disabled = false,
+  } = props;
   const { description = { type: 'HTML', value: '' } } = rubric;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangeRubricDetailsDescriptionMutation>(
@@ -1346,7 +1386,7 @@ const RubricDescriptionEditor: React.FC<{
   return (
     <EditHTMLVal
       className="bg-white border rounded"
-      disabled={loading}
+      disabled={loading || disabled}
       value={description}
       onChange={onChange}
       placeholder={`Give use-${rubric.type} rubric instructions here`}
@@ -1454,8 +1494,12 @@ const PresetPointsEditor: React.FC<{
 
 const RubricPointsEditor: React.FC<{
   rubric: RubricOne | RubricAny;
+  disabled?: boolean;
 }> = (props) => {
-  const { rubric } = props;
+  const {
+    rubric,
+    disabled = false,
+  } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangeRubricDetailsPointsMutation>(
     graphql`
@@ -1493,7 +1537,7 @@ const RubricPointsEditor: React.FC<{
   return (
     <NormalizedNumericInput
       defaultValue={rubric.points.toString()}
-      disabled={loading}
+      disabled={loading || disabled}
       step={0.5}
       variant="warning"
       onCommit={handleChange}

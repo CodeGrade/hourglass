@@ -61,7 +61,10 @@ export default function RearrangableList<T extends { id: string }>(
           moveItem={moveItem}
           index={index}
         >
-          {children(idToDbItemMap[id])}
+          {idToDbItemMap[id]
+          // if an item was deleted, it will take 2 render cycles for `order` to catch up
+            ? children(idToDbItemMap[id])
+            : null}
         </RearrangeableItem>
       ))}
     </>

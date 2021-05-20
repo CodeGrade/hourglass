@@ -399,18 +399,22 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
           )}
         </Form.Group>
         {('choices' in rubric && rubric.choices instanceof Array) && (
-          rubric.choices.map((subRubric) => (
-            <SingleRubricEditor
-              key={subRubric.id}
-              rubric={subRubric}
-              examVersionId={examVersionId}
-              questionId={questionId}
-              partId={partId}
-              bodyItemId={bodyItemId}
-              showDestroy
-              disabled={loading || disabled}
-            />
-          ))
+          <RearrangableList
+            dbArray={rubric.choices}
+            identifier="SECTION-INDEX"
+          >
+            {(subRubric) => (
+              <SingleRubricEditor
+                rubric={subRubric}
+                examVersionId={examVersionId}
+                questionId={questionId}
+                partId={partId}
+                bodyItemId={bodyItemId}
+                showDestroy
+                disabled={loading || disabled}
+              />
+            )}
+          </RearrangableList>
         )}
         {('choices' in rubric && 'presets' in rubric.choices && rubric.choices.presets.length > 0) && (
           <Form.Group as={Row}>
@@ -425,6 +429,13 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
                   in this set of presets)
                 </span>
               </Form.Label>
+              {/* {rubric.choices.presets.map((preset) => (
+                <RubricPresetEditor
+                  key={preset.id}
+                  preset={preset}
+                  disabled={loading || disabled}
+                />
+              ))} */}
               <ReordorablePresetCommentEditor
                 disabled={loading || disabled}
                 presets={rubric.choices.presets}

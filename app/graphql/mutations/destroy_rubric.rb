@@ -13,13 +13,23 @@ module Mutations
     end
 
     def resolve(rubric:)
-      exam_version = rubric.exam_version
-      throw_if_root_rubric(rubric)
+      Rubric.transaction do
+        exam_version = rubric.exam_version
+        throw_if_root_rubric(rubric)
+        parent_section = rubric.parent_section
+        order = rubric.order
 
-      destroyed = rubric.destroy
-      raise GraphQL::ExecutionError, rubric.errors.full_messages.to_sentence unless destroyed
+        destroyed = rubric.destroy
+        raise GraphQL::ExecutionError, rubric.errors.full_messages.to_sentence unless destroyed
 
-      { exam_version: exam_version }
+        if parent_section
+          parent_section.subsections.where(order: order..).order(:order).each do |section|
+            section.update(order: section.order - 1)
+          end
+        end
+
+        { exam_version: exam_version }
+      end
     end
 
     def throw_if_root_rubric(rubric)

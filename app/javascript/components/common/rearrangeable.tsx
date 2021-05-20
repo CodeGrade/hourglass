@@ -30,6 +30,7 @@ function arrSplice<T>(arr: readonly T[], from: number, to: number): T[] {
 interface RearrangeableListProps<T extends { id: string }> {
   dbArray: readonly T[];
   identifier: string;
+  onRearrange: (from: number, to: number) => void;
   children: (item: T) => ReactNode;
 }
 
@@ -39,6 +40,7 @@ export default function RearrangableList<T extends { id: string }>(
   const {
     dbArray,
     identifier,
+    onRearrange,
     children,
   } = props;
   const [order, setOrder] = useState<string[]>(() => []);
@@ -60,6 +62,7 @@ export default function RearrangableList<T extends { id: string }>(
           identifier={identifier}
           moveItem={moveItem}
           index={index}
+          onRearrange={onRearrange}
         >
           {idToDbItemMap[id]
           // if an item was deleted, it will take 2 render cycles for `order` to catch up
@@ -71,10 +74,17 @@ export default function RearrangableList<T extends { id: string }>(
   );
 }
 
+interface DropItem {
+  startIndex: number;
+  index: number;
+  type: string;
+}
+
 const RearrangeableItem: React.FC<{
   identifier: string;
   moveItem: (dragIndex: number, hoverIndex: number) => void;
   index: number;
+  onRearrange: (from: number, to: number) => void;
 }> = (props) => {
   // Borrowed from:
   // https://react-dnd.github.io/react-dnd/examples/sortable/simple
@@ -82,6 +92,7 @@ const RearrangeableItem: React.FC<{
     identifier,
     moveItem,
     index,
+    onRearrange,
     children,
   } = props;
   const ref = useRef<HTMLDivElement>(null);
@@ -90,7 +101,7 @@ const RearrangeableItem: React.FC<{
     collect: (monitor) => ({
       handlerId: monitor.getHandlerId(),
     }),
-    hover(item: { index: number; type: string; }, monitor: DropTargetMonitor) {
+    hover(item: DropItem, monitor: DropTargetMonitor) {
       if (!ref.current) {
         return;
       }
@@ -140,10 +151,13 @@ const RearrangeableItem: React.FC<{
     },
   });
   const [{ isDragging }, drag] = useDrag({
-    item: { type: identifier, index },
+    item: { type: identifier, index, startIndex: index },
     collect: (monitor: DragSourceMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
+    end: (item: DropItem, _monitor) => {
+      onRearrange(item.startIndex, item.index);
+    },
   });
   const opacity = isDragging ? 0 : 1;
   drag(drop(ref));

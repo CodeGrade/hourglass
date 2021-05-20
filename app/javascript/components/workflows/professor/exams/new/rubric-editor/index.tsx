@@ -402,6 +402,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
           <RearrangableList
             dbArray={rubric.choices}
             identifier="SECTION-INDEX"
+            onRearrange={console.log}
           >
             {(subRubric) => (
               <SingleRubricEditor
@@ -470,6 +471,7 @@ const ReordorablePresetCommentEditor: React.FC<{
     <RearrangableList
       dbArray={presets}
       identifier="PRESET-INDEX"
+      onRearrange={console.log}
     >
       {(preset) => (
         <RubricPresetEditor

@@ -15,8 +15,14 @@ class Part < ApplicationRecord
 
   accepts_nested_attributes_for :body_items, :rubrics, :references
 
+  def root_rubric
+    rubrics.find_by(
+      body_item: nil,
+      parent_section: nil,
+    )
+  end
+
   def as_json(format:)
-    root_rubric = rubrics.find_by(body_item: nil, order: nil)
     rubric_as_json =
       if root_rubric.nil? || root_rubric.is_a?(None)
         nil

@@ -130,16 +130,19 @@ class ExamVersion < ApplicationRecord
     as_json(format: :graphql)
   end
 
+  def root_rubric
+    rubrics.find_by(
+      question: nil,
+      part: nil,
+      body_item: nil,
+      parent_section: nil,
+    )
+  end
+
   # NOTE: format should be either :export or :graphql
   # Use :export when reproducing the exam-upload schema
   # USe :graphql when passing JSON data to the front-end
   def as_json(format:)
-    root_rubric = rubrics.find_by(
-      question: nil,
-      part: nil,
-      body_item: nil,
-      order: nil,
-    )
     rubric_as_json =
       if root_rubric.nil? || root_rubric.is_a?(None)
         nil

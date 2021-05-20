@@ -924,7 +924,7 @@ const RubricPresetEditor: React.FC<{
             });
           }}
         />
-        <Form.Group as={Row} className="mr-4">
+        <Form.Group as={Row}>
           <Form.Label column sm="2">Label</Form.Label>
           <Col sm="4">
             <PresetCommentLabelEditor
@@ -933,7 +933,7 @@ const RubricPresetEditor: React.FC<{
             />
           </Col>
           <Form.Label column sm="2">Points</Form.Label>
-          <Col>
+          <Col className="pr-5">
             <PresetPointsEditor
               disabled={loading || disabled}
               presetComment={preset}

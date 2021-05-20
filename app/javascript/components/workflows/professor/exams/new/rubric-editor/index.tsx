@@ -15,8 +15,13 @@ import {
   Preset,
   Rubric, RubricAll, RubricAny, RubricOne, RubricPresets,
 } from '@professor/exams/types';
-// import { examWithAnswers } from '@professor/exams/new/editor';
-import { graphql, useQuery, useMutation, MutationConfigWithoutVariables, MutateWithVariables, MutationState } from 'relay-hooks';
+import {
+  graphql,
+  useQuery,
+  useMutation,
+  MutateWithVariables,
+  MutationState,
+} from 'relay-hooks';
 
 import { RenderError } from '@hourglass/common/boundary';
 import convertRubric from '@professor/exams/rubrics';
@@ -39,6 +44,10 @@ import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import { useDebounce, useDebouncedCallback } from 'use-debounce/lib';
 import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/NumericInput';
 import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
+import Loading from '@hourglass/common/loading';
+import { MutationParameters } from 'relay-runtime';
+import { FaTrashAlt } from 'react-icons/fa';
+import RearrangableList from '@hourglass/common/rearrangeable';
 import { rubricEditorChangeRubricDetailsDescriptionMutation } from './__generated__/rubricEditorChangeRubricDetailsDescriptionMutation.graphql';
 import { rubricEditorChangeRubricTypeMutation } from './__generated__/rubricEditorChangeRubricTypeMutation.graphql';
 import { rubricEditorChangeRubricDetailsPointsMutation } from './__generated__/rubricEditorChangeRubricDetailsPointsMutation.graphql';
@@ -50,15 +59,10 @@ import { rubricEditorChangePresetCommentLabelMutation } from './__generated__/ru
 import { rubricEditorChangePresetCommentGraderHintMutation } from './__generated__/rubricEditorChangePresetCommentGraderHintMutation.graphql';
 import { rubricEditorChangePresetCommentStudentFeedbackMutation } from './__generated__/rubricEditorChangePresetCommentStudentFeedbackMutation.graphql';
 import { rubricEditorCreatePresetCommentMutation } from './__generated__/rubricEditorCreatePresetCommentMutation.graphql';
-import Loading from '@hourglass/common/loading';
 import { rubricEditorCreateRubricMutation } from './__generated__/rubricEditorCreateRubricMutation.graphql';
-import { MutationParameters } from 'relay-runtime';
 import { rubricEditorCreateRubricPresetMutation } from './__generated__/rubricEditorCreateRubricPresetMutation.graphql';
-import MoveItem from '../editor/components/MoveItem';
 import { rubricEditorDestroyPresetCommentMutation } from './__generated__/rubricEditorDestroyPresetCommentMutation.graphql';
-import { FaTrashAlt } from 'react-icons/fa';
 import { rubricEditorDestroyRubricMutation } from './__generated__/rubricEditorDestroyRubricMutation.graphql';
-import RearrangableList from '@hourglass/common/rearrangeable';
 import { rubricEditorReorderPresetCommentMutation } from './__generated__/rubricEditorReorderPresetCommentMutation.graphql';
 import { rubricEditorReorderRubricsMutation } from './__generated__/rubricEditorReorderRubricsMutation.graphql';
 
@@ -408,7 +412,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
             questionId={questionId}
             partId={partId}
             bodyItemId={bodyItemId}
-         />
+          />
         )}
         {('choices' in rubric && 'presets' in rubric.choices && rubric.choices.presets.length > 0) && (
           <Form.Group as={Row}>
@@ -592,7 +596,6 @@ const ReordorablePresetCommentEditor: React.FC<{
   );
 };
 
-
 const RubricEntriesEditor: React.FC<{
   rubric: RubricAny | RubricAll | RubricOne;
   examVersionId: string;
@@ -635,37 +638,32 @@ const RubricEntriesEditor: React.FC<{
   if (choices instanceof Array) {
     if (choices.length > 0) {
       return addNewRubricSection;
-    } else {
-      if (rubric.type === 'all') {
-        return addNewRubricSection;
-      } else {
-        return addNewRubricItemDropdown;
-      }
     }
-  } else {
-    if (choices.presets.length > 0) {
-      return (
-        <div className="text-center">
-          <CreatePresetCommentButton
-            rubricPresetId={choices.id}
-          />
-        </div>
-      );
-    } else {
-      // This should not be reached, but we will make it the same as the false/false case above
-      // for completeness
-      if (rubric.type === 'all') {
-        return addNewRubricSection;
-      } else {
-        return addNewRubricItemDropdown;
-      }
+    if (rubric.type === 'all') {
+      return addNewRubricSection;
     }
+    return addNewRubricItemDropdown;
   }
+  if (choices.presets.length > 0) {
+    return (
+      <div className="text-center">
+        <CreatePresetCommentButton
+          rubricPresetId={choices.id}
+        />
+      </div>
+    );
+  }
+  // This should not be reached, but we will make it the same as the false/false case above
+  // for completeness
+  if (rubric.type === 'all') {
+    return addNewRubricSection;
+  }
+  return addNewRubricItemDropdown;
 };
 
 type MutationReturn<T extends MutationParameters> = [MutateWithVariables<T>, MutationState<T>];
 
-function useCreateRubricMutation(): MutationReturn<rubricEditorCreateRubricMutation>  {
+function useCreateRubricMutation(): MutationReturn<rubricEditorCreateRubricMutation> {
   const { alert } = useContext(AlertContext);
   const results = useMutation<rubricEditorCreateRubricMutation>(
     graphql`

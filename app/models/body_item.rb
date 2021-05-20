@@ -44,8 +44,11 @@ class BodyItem < ApplicationRecord
     end
   end
 
+  def root_rubric
+    rubrics.find_by(parent_section: nil)
+  end
+
   def rubric_as_json(format:)
-    root_rubric = rubrics.find_by(order: nil)
     if root_rubric.nil? || root_rubric.is_a?(None)
       nil
     else

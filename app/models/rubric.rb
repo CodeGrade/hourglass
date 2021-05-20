@@ -108,6 +108,30 @@ class Rubric < ApplicationRecord
     move_association(Rubric, subsections, :order, index_from, index_to)
   end
 
+  # Returns all the rubrics in the tree of subsections rooted at this node
+  def all_subsections
+    inv_parent_id_map = Rubric.where(
+      exam_version_id: exam_version_id,
+      question_id: question_id,
+      part_id: part_id,
+      body_item: body_item_id
+    ).where.not(parent_section_id: nil).pluck(:id, :parent_section_id).to_h
+    
+    inv_parent_id_map[id] = true
+    changed = true
+    while changed do
+      changed = false
+      inv_parent_id_map.each do |id, parent_id|
+        if parent_id != true && inv_parent_id_map[parent_id] == true
+          inv_parent_id_map[id] = true 
+          changed = true
+        end
+      end
+    end
+    keepers = inv_parent_id_map.keep_if { |k, v| v == true }.keys
+    Rubric.where(id: keepers)
+  end
+
   def points_if_preset
     # NOTE: for new_records, the class is still Rubric, not All
     return if type == 'All'

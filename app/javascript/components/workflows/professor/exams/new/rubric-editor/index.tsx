@@ -865,7 +865,7 @@ const DestroyButton: React.FC<{
 }> = (props) => {
   const {
     disabled = false,
-    className = 'position-absolute t-0 r-0',
+    className = 'position-absolute t-0 r-0 z-1000',
     onClick,
   } = props;
   return (

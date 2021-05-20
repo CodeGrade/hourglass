@@ -58,6 +58,7 @@ import MoveItem from '../editor/components/MoveItem';
 import { rubricEditorDestroyPresetCommentMutation } from './__generated__/rubricEditorDestroyPresetCommentMutation.graphql';
 import { FaTrashAlt } from 'react-icons/fa';
 import { rubricEditorDestroyRubricMutation } from './__generated__/rubricEditorDestroyRubricMutation.graphql';
+import RearrangableList from '@hourglass/common/rearrangeable';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -424,13 +425,10 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
                   in this set of presets)
                 </span>
               </Form.Label>
-              {rubric.choices.presets.map((p) => (
-                <RubricPresetEditor
-                  key={p.id}
-                  preset={p}
-                  disabled={loading || disabled}
-                />
-              ))}
+              <ReordorablePresetCommentEditor
+                disabled={loading || disabled}
+                presets={rubric.choices.presets}
+              />
             </Col>
           </Form.Group>
         )}
@@ -448,6 +446,30 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
     </Card>
   );
 };
+
+const ReordorablePresetCommentEditor: React.FC<{
+  presets: Preset[];
+  disabled?: boolean;
+}> = (props) => {
+  const {
+    presets,
+    disabled = false,
+  } = props;
+  return (
+    <RearrangableList
+      dbArray={presets}
+      identifier="PRESET-INDEX"
+    >
+      {(preset) => (
+        <RubricPresetEditor
+          preset={preset}
+          disabled={disabled}
+        />
+      )}
+    </RearrangableList>
+  );
+};
+
 
 const RubricEntriesEditor: React.FC<{
   rubric: RubricAny | RubricAll | RubricOne;
@@ -860,7 +882,6 @@ const DestroyButton: React.FC<{
     </span>
   );
 };
-
 
 const RubricPresetEditor: React.FC<{
   preset: Preset;

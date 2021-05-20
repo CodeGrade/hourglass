@@ -41,6 +41,7 @@ module Types
     field :create_rubric, mutation: Mutations::CreateRubric
     field :change_rubric_type, mutation: Mutations::ChangeRubricTypeType
     field :change_rubric_details, mutation: Mutations::ChangeRubricDetails
+    field :destroy_rubric, mutation: Mutations::DestroyRubric
 
     field :create_rubric_preset, mutation: Mutations::CreateRubricPreset
     field :change_rubric_preset_details, mutation: Mutations::ChangeRubricPresetDetails

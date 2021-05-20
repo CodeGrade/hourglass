@@ -15,12 +15,19 @@ module Mutations
     def resolve(preset_comment:)
       Rubric.transaction do
         rubric_preset = preset_comment.rubric_preset
+        order = preset_comment.order
         rubric = rubric_preset.rubric
         destroyed = preset_comment.destroy
         raise GraphQL::ExecutionError, preset_comment.errors.full_messages.to_sentence unless destroyed
 
         rubric_preset.reload
-        rubric_preset.destroy if rubric_preset.preset_comments.empty?
+        if rubric_preset.preset_comments.empty?
+          rubric_preset.destroy
+        else
+          rubric_preset.preset_comments.where(order: order..).order(:order).each do |comment|
+            comment.update(order: comment.order - 1)
+          end
+        end
 
         { rubric: rubric }
       end

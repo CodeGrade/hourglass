@@ -57,6 +57,7 @@ import { rubricEditorCreateRubricPresetMutation } from './__generated__/rubricEd
 import MoveItem from '../editor/components/MoveItem';
 import { rubricEditorDestroyPresetCommentMutation } from './__generated__/rubricEditorDestroyPresetCommentMutation.graphql';
 import { FaTrashAlt } from 'react-icons/fa';
+import { rubricEditorDestroyRubricMutation } from './__generated__/rubricEditorDestroyRubricMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -236,6 +237,7 @@ interface SingleRubricEditorProps {
   questionId?: string;
   partId?: string;
   bodyItemId?: string;
+  showDestroy?: boolean;
 }
 
 const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
@@ -245,16 +247,96 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
     questionId,
     partId,
     bodyItemId,
+    showDestroy = false,
   } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorDestroyRubricMutation>(
+    graphql`
+    mutation rubricEditorDestroyRubricMutation($input: DestroyRubricInput!) {
+      destroyRubric(input: $input) {
+        examVersion {
+          id
+          dbQuestions {
+            id
+            rubrics {
+              id
+            }
+            parts {
+              id
+              rubrics {
+                id
+              }
+              bodyItems {
+                id
+                rubrics {
+                  id
+                }
+              }
+            }
+          }
+          rubrics {
+            id
+            type
+            parentSectionId
+            order
+            points
+            description {
+              type
+              value
+            }
+            rubricPreset {
+              id
+              direction
+              label
+              mercy
+              presetComments {
+                id
+                label
+                order
+                points
+                graderHint
+                studentFeedback
+              }
+            }
+            subsections {
+              id
+            }
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error destroying rubric section',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
   return (
     <Card
       className="mb-3 alert-dark rubric p-0"
       border="secondary"
     >
       <Card.Body>
-        {/* <DestroyButton
-        TODO
-        /> */}
+        {showDestroy && (
+          <DestroyButton
+            disabled={loading}
+            onClick={() => {
+              mutate({
+                variables: {
+                  input: {
+                    rubricId: rubric.id,
+                  },
+                },
+              });
+            }}
+          />
+        )}
         <Form.Group as={Row} className="mr-4">
           <Form.Label column sm="2"><h5 className="my-0">Rubric type</h5></Form.Label>
           <Col sm="10">
@@ -317,6 +399,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
               questionId={questionId}
               partId={partId}
               bodyItemId={bodyItemId}
+              showDestroy
             />
           ))
         )}
@@ -757,6 +840,7 @@ const DestroyButton: React.FC<{
 
 const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
   const { preset } = props;
+  const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorDestroyPresetCommentMutation>(
     graphql`
     mutation rubricEditorDestroyPresetCommentMutation($input: DestroyPresetCommentInput!) {
@@ -781,6 +865,16 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
       }
     }
     `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error destroying rubric preset',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
   );
   return (
     <Card
@@ -804,18 +898,23 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
           <Form.Label column sm="2">Label</Form.Label>
           <Col sm="4">
             <PresetCommentLabelEditor
+              disabled={loading}
               presetComment={preset}
             />
           </Col>
           <Form.Label column sm="2">Points</Form.Label>
           <Col>
-            <PresetPointsEditor presetComment={preset} />
+            <PresetPointsEditor
+              disabled={loading}
+              presetComment={preset}
+            />
           </Col>
         </Form.Group>
         <Form.Group as={Row}>
           <Form.Label column sm="2">Grader hint</Form.Label>
           <Col sm="10">
             <PresetCommentGraderHintEditor
+              disabled={loading}
               presetComment={preset}
             />
           </Col>
@@ -824,6 +923,7 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
           <Form.Label column sm="2">Student feedback</Form.Label>
           <Col sm="10">
             <PresetCommentStudentFeedbackEditor
+              disabled={loading}
               presetComment={preset}
             />
           </Col>
@@ -835,9 +935,11 @@ const RubricPresetEditor: React.FC<{ preset: Preset }> = (props) => {
 
 const PresetCommentLabelEditor: React.FC<{
   presetComment: Preset;
+  disabled?: boolean;
 }> = (props) => {
   const {
     presetComment,
+    disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangePresetCommentLabelMutation>(
@@ -875,7 +977,7 @@ const PresetCommentLabelEditor: React.FC<{
   };
   return (
     <DebouncedFormControl
-      disabled={loading}
+      disabled={loading || disabled}
       onChange={handleChange}
       defaultValue={presetComment.label || ''}
       placeholder="(optional) Give a terse description of this preset comment"
@@ -885,9 +987,11 @@ const PresetCommentLabelEditor: React.FC<{
 
 const PresetCommentGraderHintEditor: React.FC<{
   presetComment: Preset;
+  disabled?: boolean;
 }> = (props) => {
   const {
     presetComment,
+    disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangePresetCommentGraderHintMutation>(
@@ -928,16 +1032,18 @@ const PresetCommentGraderHintEditor: React.FC<{
       placeholder="Give a description to graders to use"
       defaultValue={presetComment.graderHint || ''}
       onChange={handleChange}
-      disabled={loading}
+      disabled={loading || disabled}
     />
   );
 };
 
 const PresetCommentStudentFeedbackEditor: React.FC<{
   presetComment: Preset;
+  disabled?: boolean;
 }> = (props) => {
   const {
     presetComment,
+    disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangePresetCommentStudentFeedbackMutation>(
@@ -978,7 +1084,7 @@ const PresetCommentStudentFeedbackEditor: React.FC<{
       placeholder="Give a default message to students -- if blank, will use the grader hint"
       defaultValue={presetComment.studentFeedback || ''}
       onChange={handleChange}
-      disabled={loading}
+      disabled={loading || disabled}
     />
   );
 };
@@ -1295,8 +1401,12 @@ const EditHTMLVal: React.FC<{
 
 const PresetPointsEditor: React.FC<{
   presetComment: Preset;
+  disabled?: boolean;
 }> = (props) => {
-  const { presetComment } = props;
+  const {
+    presetComment,
+    disabled = false,
+  } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorChangePresetCommentPointsMutation>(
     graphql`
@@ -1334,7 +1444,7 @@ const PresetPointsEditor: React.FC<{
   return (
     <NormalizedNumericInput
       defaultValue={presetComment.points.toString()}
-      disabled={loading}
+      disabled={loading || disabled}
       step={0.5}
       variant="warning"
       onCommit={handleChange}

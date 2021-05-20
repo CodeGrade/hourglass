@@ -6,7 +6,6 @@ import {
   DropdownButton,
 } from 'react-bootstrap';
 import { WrappedFieldArrayProps } from 'redux-form';
-import { useMutation } from 'relay-hooks';
 import { BodyItemWithAnswer } from '@professor/exams/types';
 import { useRefresher } from '@hourglass/common/helpers';
 import BodyItem from '@professor/exams/new/editor/components/BodyItem';

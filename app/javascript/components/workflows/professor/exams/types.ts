@@ -184,7 +184,7 @@ export type Preset = {
 }
 
 export type RubricPresets = {
-  id?: string;
+  id: string;
   label?: string;
   direction: 'credit' | 'deduction';
   mercy?: number;

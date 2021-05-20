@@ -3,7 +3,7 @@
 # A collection of preset comments for an individual subsection of a rubric
 class RubricPreset < ApplicationRecord
   belongs_to :rubric
-  has_many :preset_comments, dependent: :destroy
+  has_many :preset_comments, -> { order(:order) }, dependent: :destroy, inverse_of: :rubric_preset
 
   delegate :exam_version, to: :rubric
   delegate :exam, to: :exam_version

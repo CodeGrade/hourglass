@@ -48,6 +48,7 @@ module Types
 
     field :create_preset_comment, mutation: Mutations::CreatePresetComment
     field :change_preset_comment_details, mutation: Mutations::ChangePresetCommentDetails
+    field :reorder_preset_comments, mutation: Mutations::ReorderPresetComments
     field :destroy_preset_comment, mutation: Mutations::DestroyPresetComment
   end
 end

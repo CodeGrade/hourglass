@@ -156,6 +156,7 @@ const RearrangeableItem: React.FC<{
       isDragging: monitor.isDragging(),
     }),
     end: (item: DropItem, _monitor) => {
+      if (item.startIndex === item.index) return;
       onRearrange(item.startIndex, item.index);
     },
   });

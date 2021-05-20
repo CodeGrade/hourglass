@@ -60,6 +60,7 @@ import { FaTrashAlt } from 'react-icons/fa';
 import { rubricEditorDestroyRubricMutation } from './__generated__/rubricEditorDestroyRubricMutation.graphql';
 import RearrangableList from '@hourglass/common/rearrangeable';
 import { rubricEditorReorderPresetCommentMutation } from './__generated__/rubricEditorReorderPresetCommentMutation.graphql';
+import { rubricEditorReorderRubricsMutation } from './__generated__/rubricEditorReorderRubricsMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -400,23 +401,14 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
           )}
         </Form.Group>
         {('choices' in rubric && rubric.choices instanceof Array) && (
-          <RearrangableList
-            dbArray={rubric.choices}
-            identifier="SECTION-INDEX"
-            onRearrange={console.log}
-          >
-            {(subRubric) => (
-              <SingleRubricEditor
-                rubric={subRubric}
-                examVersionId={examVersionId}
-                questionId={questionId}
-                partId={partId}
-                bodyItemId={bodyItemId}
-                showDestroy
-                disabled={loading || disabled}
-              />
-            )}
-          </RearrangableList>
+          <ReordorableRubricEditor
+            rubricId={rubric.id}
+            subsections={rubric.choices}
+            examVersionId={examVersionId}
+            questionId={questionId}
+            partId={partId}
+            bodyItemId={bodyItemId}
+         />
         )}
         {('choices' in rubric && 'presets' in rubric.choices && rubric.choices.presets.length > 0) && (
           <Form.Group as={Row}>
@@ -457,6 +449,81 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
         )}
       </Card.Body>
     </Card>
+  );
+};
+
+const ReordorableRubricEditor: React.FC<{
+  rubricId: string;
+  subsections: Rubric[];
+  examVersionId: string;
+  questionId?: string;
+  partId?: string;
+  bodyItemId?: string;
+  disabled?: boolean;
+}> = (props) => {
+  const {
+    rubricId,
+    subsections,
+    examVersionId,
+    questionId,
+    partId,
+    bodyItemId,
+    disabled = false,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorReorderRubricsMutation>(
+    graphql`
+    mutation rubricEditorReorderRubricsMutation($input: ReorderRubricsInput!) {
+      reorderRubrics(input: $input) {
+        rubric {
+          id
+          subsections {
+            id
+            order
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error reordering rubric subsection',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  return (
+    <RearrangableList
+      dbArray={subsections}
+      identifier={`SECTION-INDEX-${rubricId}`}
+      onRearrange={(from, to) => {
+        mutate({
+          variables: {
+            input: {
+              parentSectionId: rubricId,
+              fromIndex: from,
+              toIndex: to,
+            },
+          },
+        });
+      }}
+    >
+      {(subRubric) => (
+        <SingleRubricEditor
+          rubric={subRubric}
+          examVersionId={examVersionId}
+          questionId={questionId}
+          partId={partId}
+          bodyItemId={bodyItemId}
+          showDestroy
+          disabled={loading || disabled}
+        />
+      )}
+    </RearrangableList>
   );
 };
 
@@ -502,7 +569,7 @@ const ReordorablePresetCommentEditor: React.FC<{
   return (
     <RearrangableList
       dbArray={presets}
-      identifier="PRESET-INDEX"
+      identifier={`PRESET-INDEX-${rubricPreset.id}`}
       onRearrange={(from, to) => {
         mutate({
           variables: {

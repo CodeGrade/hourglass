@@ -102,14 +102,15 @@ function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric 
       if (description !== null) { ans.description = description; }
       return ans;
     }
-    default:
-      const qnum = rubricsByID[rawRubric.id].qnum;
-      const pnum = rubricsByID[rawRubric.id].pnum;
-      const bnum = rubricsByID[rawRubric.id].bnum;
+    default: {
+      const { qnum } = rubricsByID[rawRubric.id];
+      const { pnum } = rubricsByID[rawRubric.id];
+      const { bnum } = rubricsByID[rawRubric.id];
       throw new ExhaustiveSwitchError(
         type,
         `showing rubric for q${qnum}-p${pnum}-b${bnum}`,
       );
+    }
   }
 }
 
@@ -124,7 +125,11 @@ function convertRubric(rawRubrics : readonly RawRubric[], qTree: ExamRubricTree)
     },
   };
   const rubricsByID: RawRubricMap = { };
-  rawRubrics.forEach((r) => { rubricsByID[r.id] = {...r, qnum: null, pnum: null, bnum: null}; });
+  rawRubrics.forEach((r) => {
+    rubricsByID[r.id] = {
+      ...r, qnum: null, pnum: null, bnum: null,
+    };
+  });
   // const qpbById = {};
   qTree.forEach((q, qnum) => {
     q.rubrics.forEach(({ id }) => {
@@ -152,9 +157,9 @@ function convertRubric(rawRubrics : readonly RawRubric[], qTree: ExamRubricTree)
   });
   rawRubrics.forEach((r) => {
     if (r.parentSectionId !== null) return; // only process roots
-    const qnum = rubricsByID[r.id].qnum;
-    const pnum = rubricsByID[r.id].pnum;
-    const bnum = rubricsByID[r.id].bnum;
+    const { qnum } = rubricsByID[r.id];
+    const { pnum } = rubricsByID[r.id];
+    const { bnum } = rubricsByID[r.id];
     if (qnum === null) {
       rubric.examRubric = expandRubric(r, rubricsByID);
     } else {

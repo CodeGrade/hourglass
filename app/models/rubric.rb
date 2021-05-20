@@ -12,6 +12,7 @@ class Rubric < ApplicationRecord
              optional: true
 
   has_many :subsections,
+           -> { order(:order) },
            class_name: 'Rubric',
            foreign_key: 'parent_section_id',
            inverse_of: 'parent_section',

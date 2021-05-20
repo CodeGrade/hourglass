@@ -59,6 +59,7 @@ import { rubricEditorDestroyPresetCommentMutation } from './__generated__/rubric
 import { FaTrashAlt } from 'react-icons/fa';
 import { rubricEditorDestroyRubricMutation } from './__generated__/rubricEditorDestroyRubricMutation.graphql';
 import RearrangableList from '@hourglass/common/rearrangeable';
+import { rubricEditorReorderPresetCommentMutation } from './__generated__/rubricEditorReorderPresetCommentMutation.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -439,7 +440,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
               ))} */}
               <ReordorablePresetCommentEditor
                 disabled={loading || disabled}
-                presets={rubric.choices.presets}
+                rubricPreset={rubric.choices}
               />
             </Col>
           </Form.Group>
@@ -460,23 +461,64 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
 };
 
 const ReordorablePresetCommentEditor: React.FC<{
-  presets: Preset[];
+  rubricPreset: RubricPresets;
   disabled?: boolean;
 }> = (props) => {
   const {
-    presets,
+    rubricPreset,
     disabled = false,
   } = props;
+  const { presets } = rubricPreset;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<rubricEditorReorderPresetCommentMutation>(
+    graphql`
+    mutation rubricEditorReorderPresetCommentMutation($input: ReorderPresetCommentsInput!) {
+      reorderPresetComments(input: $input) {
+        rubricPreset {
+          id
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error reordering preset comment',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
   return (
     <RearrangableList
       dbArray={presets}
       identifier="PRESET-INDEX"
-      onRearrange={console.log}
+      onRearrange={(from, to) => {
+        mutate({
+          variables: {
+            input: {
+              rubricPresetId: rubricPreset.id,
+              fromIndex: from,
+              toIndex: to,
+            },
+          },
+        });
+      }}
     >
       {(preset) => (
         <RubricPresetEditor
           preset={preset}
-          disabled={disabled}
+          disabled={disabled || loading}
         />
       )}
     </RearrangableList>

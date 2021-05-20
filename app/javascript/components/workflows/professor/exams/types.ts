@@ -175,7 +175,7 @@ export interface BodyRubric {
 type GradingComment = string;
 
 export type Preset = {
-  id?: string;
+  id: string;
   label?: string;
   graderHint: GradingComment;
   studentFeedback?: GradingComment;

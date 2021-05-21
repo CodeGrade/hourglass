@@ -216,40 +216,16 @@ const RubricEditor: React.FC = () => {
                   />
                 )}
               </RearrangableList>
-              <Button
-                variant="primary"
-              >
-                Add question
-              </Button>
-              {/* {q.parts.map((p, pnum) => (
-                        // eslint-disable-next-line react/no-array-index-key
-                        <Row key={pnum}>
-                          <Col>
-                            <p>{`Question ${qnum + 1} part ${pnum + 1} rubric:`}</p>
-                            <SingleRubricKeyEditor
-                              rubricKey={p.rootRubric}
-                              examVersionId={examVersionId}
-                              questionId={q.id}
-                              partId={p.id}
-                            />
-                            {p.bodyItems.map((b, bnum) => (
-                              // eslint-disable-next-line react/no-array-index-key
-                              <Row key={bnum}>
-                                <Col>
-                           <p>{`Question ${qnum + 1} part ${pnum + 1} body ${bnum + 1} rubric:`}</p>
-                                  <SingleRubricKeyEditor
-                                    rubricKey={b.rootRubric}
-                                    examVersionId={examVersionId}
-                                    questionId={q.id}
-                                    partId={p.id}
-                                    bodyItemId={b.id}
-                                  />
-                                </Col>
-                              </Row>
-                            ))}
-                          </Col>
-                        </Row>
-                      ))} */}
+              <Row className="text-center">
+                <Col>
+                  <Button
+                    variant="primary"
+                    onClick={console.log}
+                  >
+                    Add question
+                  </Button>
+                </Col>
+              </Row>
             </Col>
           </Row>
         </ExamFilesContext.Provider>
@@ -400,6 +376,16 @@ const QuestionEditor: React.FC<{
             </Row>
           )}
         </RearrangableList>
+        <Row className="text-center">
+          <Col>
+            <Button
+              variant="success"
+              onClick={console.log}
+            >
+              Add part
+            </Button>
+          </Col>
+        </Row>
       </Card.Body>
     </Card>
   );

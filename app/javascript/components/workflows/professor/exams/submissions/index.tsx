@@ -253,7 +253,7 @@ const ExamSubmissionStudent: React.FC = () => {
   const { registrationId } = useParams<{ registrationId: string }>();
   const res = useQuery<submissionsStudentQuery>(
     graphql`
-    query submissionsStudentQuery($registrationId: ID!) {
+    query submissionsStudentQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
         currentAnswers
         currentGrading
@@ -269,7 +269,7 @@ const ExamSubmissionStudent: React.FC = () => {
       }
     }
     `,
-    { registrationId },
+    { registrationId, withRubric: false },
   );
   if (res.error) {
     return <RenderError error={res.error} />;
@@ -307,7 +307,7 @@ const ExamSubmissionStaff: React.FC = () => {
   const { registrationId } = useParams<{ registrationId: string }>();
   const res = useQuery<submissionsStaffQuery>(
     graphql`
-    query submissionsStaffQuery($registrationId: ID!) {
+    query submissionsStaffQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
         currentAnswers
         currentGrading
@@ -323,7 +323,7 @@ const ExamSubmissionStaff: React.FC = () => {
       }
     }
     `,
-    { registrationId },
+    { registrationId, withRubric: true },
   );
   const [title, setTitle] = useState<string>(undefined);
   if (res.error) {

@@ -257,7 +257,7 @@ const StudentDNDForm: React.FC<
   }, [history]);
   const [mutate, { loading }] = useMutation<studentDndUpdateMutation>(
     graphql`
-    mutation studentDndUpdateMutation($input: UpdateStudentSeatingInput!) {
+    mutation studentDndUpdateMutation($input: UpdateStudentSeatingInput!, $withRubric: Boolean!) {
       updateStudentSeating(input: $input) {
         exam {
           ...admin_checklist
@@ -304,6 +304,7 @@ const StudentDNDForm: React.FC<
               unassignedStudentIds: all.unassigned.map((s) => s.id),
               studentRoomUpdates: rooms,
             },
+            withRubric: true,
           },
         });
       })}

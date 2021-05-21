@@ -9,6 +9,7 @@ import { DisplayQuestionsStudent$key } from './__generated__/DisplayQuestionsStu
 interface DisplayQuestionsProps {
   refreshCodeMirrorsDeps: React.DependencyList;
   currentGrading?: CurrentGrading;
+  registrationId?: string;
   fullyExpandCode: boolean;
   overviewMode: boolean;
   version: DisplayQuestionsStudent$key;
@@ -18,6 +19,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
     currentGrading = [],
+    registrationId,
     fullyExpandCode,
     overviewMode,
     version,
@@ -31,6 +33,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           type
           value
         }
+        rootRubric @include(if: $withRubric) { ...ShowRubricKey } 
         description {
           type
           value
@@ -74,10 +77,10 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           qnum={i}
           currentGrading={currentGrading[i]}
           refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
-          registrationId={null}
+          registrationId={registrationId}
           fullyExpandCode={fullyExpandCode}
           overviewMode={overviewMode}
-          showRubric={false}
+          rubricKey={q.rootRubric}
         />
       ))}
     </>

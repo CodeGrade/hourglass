@@ -41,7 +41,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
       id
       answers
       ...DisplayQuestions
-      rootRubric { ...ShowRubricKey }
+      rootRubric @include(if: $withRubric) { ...ShowRubricKey } 
       dbReferences {
         type
         path

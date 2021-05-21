@@ -5,7 +5,7 @@ module Mutations
     argument :body_item_id, ID, required: true, loads: Types::BodyItemType
     argument :from_index, Integer, required: true
     argument :to_index, Integer, required: true
-    argument :is_matching_prompts, boolean, required: false
+    argument :is_matching_prompts, Boolean, required: false
 
     field :body_item, Types::BodyItemType, null: false
 

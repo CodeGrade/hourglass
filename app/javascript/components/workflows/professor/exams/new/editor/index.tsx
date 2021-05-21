@@ -12,6 +12,7 @@ import {
   FileRef,
   YesNoInfo,
   BodyItemInfo,
+  CodeState,
 } from '@student/exams/show/types';
 import {
   Preset,
@@ -83,6 +84,7 @@ import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
 import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.graphql';
 import EditBodyItemDetails from './BodyItem';
 import { ReactQuillProps } from 'react-quill';
+import Code from './questions/Code';
 
 const DragHandle: React.FC<{
   handleRef: React.Ref<HTMLElement>,
@@ -595,20 +597,76 @@ const BodyItemEditor: React.FC<{
     graphql`
     fragment editorBodyItemEditor on BodyItem {
       id
-      ...BodyItemDetailsEditor
+      info
+      answer
     }
     `,
     bodyItemKey,
   );
+  const info = bodyItem.info as BodyItemInfo;
+  const {
+    id,
+    answer,
+  } = bodyItem;
+  let editor;
+  let showRubric = true;
+  switch (info.type) {
+    case 'HTML':
+      showRubric = false;
+      editor = (
+        <EditHTMLVal
+          className="text-instructions bg-white"
+          // disabled={loading || disabled}
+          theme="snow"
+          value={info}
+          onChange={console.log}
+          debounceDelay={1000}
+          placeholder="Provide instructions here..."
+        />
+      );
+      break;
+    case 'Code':
+      editor = (
+        <Code
+          id={id}
+          info={info}
+          answer={answer as CodeState}
+        />
+      );
+      break;
+    default:
+      return <p>todo</p>;
+    // case 'AllThatApply':
+    //   return <AllThatApply qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'CodeTag':
+    //   return <CodeTag qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'YesNo':
+    //   return <YesNo qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'MultipleChoice':
+    //   return <MultipleChoice qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'Text':
+    //   return <Text qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // case 'Matching':
+    //   return <Matching qnum={qnum} pnum={pnum} bnum={bnum} />;
+    // default:
+    //   throw new ExhaustiveSwitchError(info);
+  }
   return (
     <Card
       className="border border-secondary alert-secondary mb-3"
     >
       {handleRef && <DragHandle handleRef={handleRef} variant="secondary" />}
       <Card.Body className="ml-4">
-        <EditBodyItemDetails
-          bodyItemKey={bodyItem}
-        />
+        <Row>
+          <Col sm={showRubric ? 6 : 12}>
+            {editor}
+          </Col>
+          {showRubric && (
+            <Col sm="6">
+              TODO: rubric
+            </Col>
+          )}
+        </Row>
       </Card.Body>
     </Card>
   );

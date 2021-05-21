@@ -9,13 +9,11 @@ class Rubric < ApplicationRecord
   
   has_many :ancestor_links, # This rubric's ancestors are ones with it as a descendant
            class_name: 'RubricTreePath',
-           foreign_key: 'descendant_id',
-           dependent: :destroy
+           foreign_key: 'descendant_id'
   has_many :ancestors, through: :ancestor_links
-  has_many :descendant_links, # This rubric's descendants are ones with it as an ancesor
+  has_many :descendant_links, # This rubric's descendants are ones with it as an ancestor
            class_name: 'RubricTreePath',
-           foreign_key: 'ancestor_id',
-           dependent: :destroy
+           foreign_key: 'ancestor_id'
   has_many :descendants, through: :descendant_links
   has_many :subsection_links, -> { where(path_length: 1) },
            class_name: 'RubricTreePath',
@@ -35,18 +33,22 @@ class Rubric < ApplicationRecord
   }
 
   before_create do
-    self_link = RubricTreePath.new(ancestor: self, descendant: self)
+    self_link = RubricTreePath.new(ancestor: self, descendant: self, path_length: 0)
     association(:descendant_links).add_to_target(self_link)
     association(:ancestor_links).add_to_target(self_link)
   end
   before_destroy do
-    subsections.destroy_all
+    ancestor_links.destroy_all
+
+    descs = descendants.pluck(:id)
+
+    descendant_links.destroy_all
+    Rubric.where(id: descs).destroy_all
   end
 
   has_one :rubric_preset, dependent: :destroy
 
   validate :no_detached_parts
-  validate :sensible_coordinates
   validate :points_if_preset
   validate :not_both_presets_and_subsections
   validate :all_rubric_does_not_have_comments
@@ -87,29 +89,6 @@ class Rubric < ApplicationRecord
 
     errors.add(:rubric_preset, 'cannot be used with All-type rubrics')
   end
-
-  # rubocop:disable Metrics/PerceivedComplexity
-  def sensible_coordinates
-    return if parent_section.nil? && order.nil?
-
-    if parent_section.nil?
-      qpb = "(#{question.index}, #{part.index}, #{body_item.index})"
-      errors.add(:order, "must be nil if this is the root of #{qpb}")
-    else
-      errors.add(:question, "must match parent section's question") if question != parent_section.question
-      errors.add(:part, "must match parent section's part") if part != parent_section.part
-      errors.add(:body_item, "must match parent section's body item") if body_item != parent_section.body_item
-
-      if order.nil?
-        # if this is a root rubric, don't need order
-        return if question.nil? || part.nil? || body_item.nil?
-
-        qpb = "(#{question&.index || 'nil'}, #{part&.index || 'nil'}, #{body_item&.index || 'nil'})"
-        errors.add(:order, "cannot be nil if this is a subrubric within #{qpb}")
-      end
-    end
-  end
-  # rubocop:enable Metrics/PerceivedComplexity
 
   def no_detached_parts
     return if question.present?

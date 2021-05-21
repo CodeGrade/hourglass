@@ -38,13 +38,18 @@ module Mutations
         raise GraphQL::ExecutionError, rubric.errors.full_messages.to_sentence unless saved
 
         parent_section.ancestor_links.each do |link|
-          new_link = RubricTreePath.new(
+          next if link.ancestor_id == parent_section.id
+          new_link = RubricTreePath.find_or_initialize_by(
             ancestor_id: link.ancestor_id,
-            descendant: rubric,
-            path_length: link.path_length + 1
+            descendant: rubric
           )
-          saved = new_link.save
-          raise GraphQL::ExecutionError, saved.errors.full_messages.to_sentence unless saved
+          if new_link.new_record?
+            new_link.path_length = link.path_length + 1
+            saved = new_link.save
+            raise GraphQL::ExecutionError, saved.errors.full_messages.to_sentence unless saved
+          else
+            puts "Already found link #{new_link.inspect}"
+          end
         end
 
         exam_version = rubric.exam_version

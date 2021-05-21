@@ -40,7 +40,7 @@ import {
   Row,
   ToggleButton,
 } from 'react-bootstrap';
-import { SelectOption } from '@hourglass/common/helpers';
+import { alphabetIdx, SelectOption } from '@hourglass/common/helpers';
 import Select from 'react-select';
 import { AlertContext } from '@hourglass/common/alerts';
 import CustomEditor from '@hourglass/workflows/professor/exams/new/old-editor/components/CustomEditor';
@@ -329,68 +329,61 @@ const QuestionEditor: React.FC<{
             </Col>
           </Row>
         </Card.Title>
-        <Card.Subtitle>
-          <Row>
-            <Col sm="6">
-              <Form.Group as={Row}>
-                <Form.Label column sm="2">Description:</Form.Label>
-                <Col sm="10">
-                  <EditHTMLVal
-                    className="bg-white border rounded"
-                    // disabled={loading || disabled}
-                    value={question.description || {
-                      type: 'HTML',
-                      value: '',
-                    }}
-                    onChange={console.log}
-                    placeholder="Give a longer description of the question"
-                    debounceDelay={1000}
-                  />
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row}>
-                {/* <Field name="separateSubparts" component={QuestionSepSubParts} /> */}
-                <Form.Label column sm="2">Separate subparts?</Form.Label>
-                <Col sm="4">
-                  <YesNo
-                    className="bg-white rounded"
-                    value={!!question.separateSubparts}
-                    info={SEP_SUB_YESNO}
-                    onChange={console.log}
-                  />
-                </Col>
-                <Form.Label column sm="2">Extra credit?</Form.Label>
-                <Col sm="4">
-                  <YesNo
-                    className="bg-white rounded"
-                    value={!!question.extraCredit}
-                    info={SEP_SUB_YESNO}
-                    onChange={console.log}
-                  />
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row}>
-                <EditReference
-                  value={question.references as FileRef[]}
-                  onChange={console.log}
-                  label="this question"
-                />
-              </Form.Group>
-            </Col>
-            <Col sm="6">
-              <Row>
-                <Col>
-                  <p>{`Question ${question.index + 1} rubric:`}</p>
-                  <SingleRubricKeyEditor
-                    rubricKey={question.rootRubric}
-                  />
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </Card.Subtitle>
       </div>
       <Card.Body>
+        <Row>
+          <Col sm="6">
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">Description:</Form.Label>
+              <Col sm="10">
+                <EditHTMLVal
+                  className="bg-white border rounded"
+                  // disabled={loading || disabled}
+                  value={question.description || {
+                    type: 'HTML',
+                    value: '',
+                  }}
+                  onChange={console.log}
+                  placeholder="Give a longer description of the question"
+                  debounceDelay={1000}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              {/* <Field name="separateSubparts" component={QuestionSepSubParts} /> */}
+              <Form.Label column sm="2">Separate subparts?</Form.Label>
+              <Col sm="4">
+                <YesNo
+                  className="bg-white rounded"
+                  value={!!question.separateSubparts}
+                  info={SEP_SUB_YESNO}
+                  onChange={console.log}
+                />
+              </Col>
+              <Form.Label column sm="2">Extra credit?</Form.Label>
+              <Col sm="4">
+                <YesNo
+                  className="bg-white rounded"
+                  value={!!question.extraCredit}
+                  info={SEP_SUB_YESNO}
+                  onChange={console.log}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <EditReference
+                value={question.references as FileRef[]}
+                onChange={console.log}
+                label="this question"
+              />
+            </Form.Group>
+          </Col>
+          <Col sm="6">
+            <SingleRubricKeyEditor
+              rubricKey={question.rootRubric}
+            />
+          </Col>
+        </Row>
         <RearrangableList
           dbArray={question.parts}
           identifier={`PART-${question.id}`}
@@ -455,9 +448,10 @@ const PartEditor: React.FC<{
     >
       <div className="alert alert-success">
         <Card.Title>
+          {handleRef && <DragHandle handleRef={handleRef} variant="success" />}
           <Row>
-            <Col sm="auto">
-              {handleRef && <span ref={handleRef} className="cursor-move"><Icon I={MdDragHandle} /></span>}
+            <Col sm="auto" className={handleRef ? 'ml-4' : ''}>
+              <Form.Label column>{`Part ${alphabetIdx(part.index)}:`}</Form.Label>
             </Col>
             <Col>
               <EditHTMLVal
@@ -474,68 +468,61 @@ const PartEditor: React.FC<{
             </Col>
           </Row>
         </Card.Title>
-        <Card.Subtitle>
-          <Row>
-            <Col sm="6">
-              <Form.Group as={Row}>
-                <Form.Label column sm="2">Description:</Form.Label>
-                <Col sm="10">
-                  <EditHTMLVal
-                    className="bg-white border rounded"
-                    // disabled={loading || disabled}
-                    value={part.description || {
-                      type: 'HTML',
-                      value: '',
-                    }}
-                    onChange={console.log}
-                    placeholder="Give a longer description of the part"
-                    debounceDelay={1000}
-                  />
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row}>
-                <Form.Label column sm="2">Points</Form.Label>
-                <Col sm="4">
-                  <NormalizedNumericInput
-                    defaultValue={part.points.toString()}
-                    // disabled={loading || disabled}
-                    step={0.5}
-                    variant="warning"
-                    onCommit={console.log}
-                  />
-                </Col>
-                <Form.Label column sm="2">Extra credit?</Form.Label>
-                <Col sm="4">
-                  <YesNo
-                    className="bg-white rounded"
-                    value={!!part.extraCredit}
-                    info={SEP_SUB_YESNO}
-                    onChange={console.log}
-                  />
-                </Col>
-              </Form.Group>
-              <Form.Group as={Row}>
-                <EditReference
-                  value={part.references as FileRef[]}
-                  onChange={console.log}
-                  label="this question part"
-                />
-              </Form.Group>
-            </Col>
-            <Col sm="6">
-              <Row>
-                <Col>
-                  <p>{`Part ${part.index + 1} rubric:`}</p>
-                  <SingleRubricKeyEditor
-                    rubricKey={part.rootRubric}
-                  />
-                </Col>
-              </Row>
-            </Col>
-          </Row>
-        </Card.Subtitle>
       </div>
       <Card.Body>
+        <Row>
+          <Col sm="6">
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">Description:</Form.Label>
+              <Col sm="10">
+                <EditHTMLVal
+                  className="bg-white border rounded"
+                  // disabled={loading || disabled}
+                  value={part.description || {
+                    type: 'HTML',
+                    value: '',
+                  }}
+                  onChange={console.log}
+                  placeholder="Give a longer description of the part"
+                  debounceDelay={1000}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">Points</Form.Label>
+              <Col sm="4">
+                <NormalizedNumericInput
+                  defaultValue={part.points.toString()}
+                  // disabled={loading || disabled}
+                  step={0.5}
+                  variant="warning"
+                  onCommit={console.log}
+                />
+              </Col>
+              <Form.Label column sm="2">Extra credit?</Form.Label>
+              <Col sm="4">
+                <YesNo
+                  className="bg-white rounded"
+                  value={!!part.extraCredit}
+                  info={SEP_SUB_YESNO}
+                  onChange={console.log}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <EditReference
+                value={part.references as FileRef[]}
+                onChange={console.log}
+                label="this question part"
+              />
+            </Form.Group>
+          </Col>
+          <Col sm="6">
+            <SingleRubricKeyEditor
+              rubricKey={part.rootRubric}
+            />
+          </Col>
+        </Row>
         <RearrangableList
           dbArray={part.bodyItems}
           identifier={`BODYITEM-${part.id}`}
@@ -626,7 +613,7 @@ const BodyItemEditor: React.FC<{
   );
   return (
     <>
-      {handleRef && <span ref={handleRef} className="cursor-move"><Icon I={MdDragHandle} /></span>}
+      {handleRef && <DragHandle handleRef={handleRef} variant="warning" />}
       <Row>
         <Col>
           {`TODO: edit body item ${bodyItem.id}`}
@@ -811,7 +798,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
       border="secondary"
     >
       <Card.Body>
-        {handleRef && <DragHandle handleRef={handleRef} variant="info" />}
+        {handleRef && <DragHandle handleRef={handleRef} variant="secondary" />}
         {showDestroy && (
           <DestroyButton
             disabled={loading || disabled}
@@ -907,13 +894,6 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
                   in this set of presets)
                 </span>
               </Form.Label>
-              {/* {rubric.choices.presets.map((preset) => (
-                <RubricPresetEditor
-                  key={preset.id}
-                  preset={preset}
-                  disabled={loading || disabled}
-                />
-              ))} */}
               <ReordorablePresetCommentEditor
                 disabled={loading || disabled}
                 rubricPreset={rubric.choices}

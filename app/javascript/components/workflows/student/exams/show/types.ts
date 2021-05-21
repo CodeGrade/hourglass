@@ -1,7 +1,7 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
-import { rubricEditorQueryResponse } from '@hourglass/workflows/professor/exams/new/editor/__generated__/rubricEditorQuery.graphql';
+import { editorQueryResponse } from '@professor/exams/new/editor/__generated__/editorQuery.graphql';
 import { Policy } from '@material-ui/icons';
 
 export type ExamTakerAction =
@@ -489,7 +489,7 @@ export interface AnomalyListener {
   capture?: boolean;
 }
 
-export type Policy = rubricEditorQueryResponse['examVersion']['policies'][number];
+export type Policy = editorQueryResponse['examVersion']['policies'][number];
 
 export function policyPermits(policy: readonly Policy[], query: Policy): boolean {
   return policy.find((p) => p === query) !== undefined;

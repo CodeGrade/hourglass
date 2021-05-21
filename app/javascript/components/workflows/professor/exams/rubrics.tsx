@@ -8,7 +8,7 @@ import {
   RubricAny,
 } from '@professor/exams/types';
 import { showExamViewer$data } from '@proctor/registrations/show/__generated__/showExamViewer.graphql';
-import { rubricEditorSingle$data } from './new/editor/__generated__/rubricEditorSingle.graphql';
+import { editorSingle$data } from './new/editor/__generated__/editorSingle.graphql';
 
 type RawRubric = showExamViewer$data['rubrics'][number];
 type RawRubricMap = Record<RawRubric['id'], RawRubric & { qnum?: number; pnum?: number; bnum?: number; }>;
@@ -101,7 +101,7 @@ function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric 
   }
 }
 
-type RawRootRubric = Omit<rubricEditorSingle$data, ' $refType'>;
+type RawRootRubric = Omit<editorSingle$data, ' $refType'>;
 
 export function expandRootRubric(rawRubric : RawRootRubric): Rubric {
   const rubricsById: RawRubricMap = {};

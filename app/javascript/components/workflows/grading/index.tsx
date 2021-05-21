@@ -47,7 +47,6 @@ import {
   ExamFile,
   AnswersState,
   BodyItemInfo,
-  PartInfo,
 } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
@@ -1448,23 +1447,9 @@ const ShowOnePart: React.FC<{
             path
           }
           parts {
-            name {
-              type
-              value
-            }
-            description {
-              type
-              value
-            }
-            points
-            references {
-              type
-              path
-            }
-            bodyItems {
-              id
-              info
-            }
+            id
+            name { value }
+            ...PartShow
           }
         }
         answers
@@ -1513,7 +1498,7 @@ const ShowOnePart: React.FC<{
               <Col sm={{ span: 6, offset: 3 }}>
                 <Part
                   refreshCodeMirrorsDeps={refreshProps}
-                  part={questions[qnum].parts[pnum] as PartInfo}
+                  partKey={questions[qnum].parts[pnum]}
                   qnum={qnum}
                   pnum={pnum}
                   anonymous={singlePart}
@@ -1536,7 +1521,7 @@ const GradeOnePart: React.FC = () => {
   }>();
   const res = useQuery<gradingQuery>(
     graphql`
-    query gradingQuery($registrationId: ID!) {
+    query gradingQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
         ...grading_one
         ...grading_showOne
@@ -1550,7 +1535,7 @@ const GradeOnePart: React.FC = () => {
       }
     }
     `,
-    { registrationId },
+    { registrationId, withRubric: true },
   );
 
   if (res.error) {

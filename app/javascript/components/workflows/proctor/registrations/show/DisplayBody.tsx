@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { graphql, useFragment } from 'relay-hooks';
 import { ExamViewerContext } from '@hourglass/common/context';
 import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
@@ -15,7 +16,7 @@ import {
 import { ExhaustiveSwitchError, pluralize } from '@hourglass/common/helpers';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import Prompted from '@proctor/registrations/show/questions/Prompted';
-import ShowRubric from '@proctor/registrations/show/ShowRubric';
+import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import {
   CurrentGrading,
   RubricJson,
@@ -32,9 +33,11 @@ import { variantForPoints, iconForPoints } from '@hourglass/workflows/grading';
 import Icon from '@student/exams/show/components/Icon';
 import ErrorBoundary from '@hourglass/common/boundary';
 
+import { DisplayBody$key } from './__generated__/DisplayBody.graphql';
+
 export interface BodyProps {
+  bodyKey: DisplayBody$key;
   refreshCodeMirrorsDeps: React.DependencyList;
-  body: BodyItem;
   qnum: number;
   pnum: number;
   bnum: number;
@@ -157,7 +160,7 @@ const ShowCurrentGrading: React.FC<{
 const DisplayBody: React.FC<BodyProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
-    body,
+    bodyKey,
     qnum,
     pnum,
     bnum,
@@ -165,14 +168,24 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     fullyExpandCode,
     overviewMode,
   } = props;
+  const res = useFragment<DisplayBody$key>(
+    graphql`
+    fragment DisplayBody on BodyItem {
+      id
+      info
+      rootRubric @include(if: $withRubric) { ...ShowRubricKey }
+    }
+    `,
+    bodyKey,
+  );
+  const body = res as BodyItem;
+  const bRubric = res.rootRubric;
   const {
     answers,
-    rubric,
   } = useContext(ExamViewerContext);
   const [open, setOpen] = useState(false);
   const answer = answers.answers[qnum]?.[pnum]?.[bnum];
   const value = isNoAns(answer) ? undefined : answer;
-  const bRubric = rubric?.questions[qnum]?.parts[pnum]?.body[bnum]?.rubric;
 
   switch (body.info.type) {
     case 'HTML':
@@ -213,7 +226,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
             refreshProps={refreshCodeMirrorsDeps}
             fullyExpandCode={fullyExpandCode}
           />
-          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -222,7 +235,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayAllThatApply info={body.info} value={value as AllThatApplyState} />
-          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -230,7 +243,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayCodeTag info={body.info} value={value as CodeTagState} />
-          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -238,7 +251,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayYesNo info={body.info} value={value as YesNoState} />
-          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -246,7 +259,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayMultipleChoice info={body.info} value={value as MultipleChoiceState} />
-          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -254,7 +267,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayText info={body.info} value={value as TextState} />
-          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
@@ -262,7 +275,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
       return (
         <Prompted prompt={body.info.prompt}>
           <DisplayMatching info={body.info} value={value as MatchingState} />
-          {bRubric && overviewMode && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );

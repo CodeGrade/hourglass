@@ -166,7 +166,7 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
             </Col>
             <Col><b>Prompt</b></Col>
           </Row>
-          <FieldArray name="options" component={EditOption} />
+          <FieldArray name="options" component={EditOption} props={{ }} />
         </Col>
       </Form.Group>
     </>

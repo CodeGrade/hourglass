@@ -356,7 +356,7 @@ const ExamRoomsForm: React.FC<
           </Button>
         </span>
       </h2>
-      <FieldArray name="rooms" component={ShowRooms} />
+      <FieldArray name="rooms" component={ShowRooms} props={{ }} />
     </form>
   );
 };

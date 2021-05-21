@@ -202,6 +202,7 @@ const Rooms: React.FC<WrappedFieldArrayProps<FormRoom> & RoomsProps> = (props) =
               <FieldArray
                 name="proctors"
                 component={Students}
+                props={{ }}
               />
             </FormSection>
           </Form.Group>
@@ -339,11 +340,11 @@ const StaffSeatingForm: React.FC<
         </h2>
         <Form.Group>
           <h3>Unassigned Staff</h3>
-          <FieldArray name="unassigned" component={Students} />
+          <FieldArray name="unassigned" component={Students} props={{ }} />
         </Form.Group>
         <Form.Group>
           <h3>Proctors Without Rooms</h3>
-          <FieldArray name="proctors" component={Students} />
+          <FieldArray name="proctors" component={Students} props={{ }} />
         </Form.Group>
         <Form.Group>
           <FieldArray

@@ -286,7 +286,8 @@ const Code: React.FC<{
   return (
     <>
       <Prompted
-        prompt={info.prompt}
+        value={info.prompt}
+        onChange={console.log}
       />
       <Form.Group as={Row}>
         <Form.Label column sm={2}>Starter</Form.Label>

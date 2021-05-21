@@ -3,7 +3,7 @@ import { Form, Row, Col } from 'react-bootstrap';
 import CustomEditor from '@hourglass/workflows/professor/exams/new/old-editor/components/CustomEditor';
 import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
 
-const EditPrompt: React.FC<{
+const Prompted: React.FC<{
   value: HTMLVal;
   onChange: (newVal: HTMLVal) => void;
 }> = (props) => {
@@ -33,20 +33,6 @@ const EditPrompt: React.FC<{
         </Col>
       </Form.Group>
     </>
-  );
-};
-
-const Prompted: React.FC<{
-  prompt: HTMLVal;
-}> = (props) => {
-  const {
-    prompt,
-  } = props;
-  return (
-    <EditPrompt
-      value={prompt}
-      onChange={console.log}
-    />
   );
 };
 

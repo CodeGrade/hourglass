@@ -1,22 +1,24 @@
 import React, { useMemo, useContext } from 'react';
-import { PartInfo } from '@student/exams/show/types';
+import { BodyItem } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import DisplayBody from '@proctor/registrations/show/DisplayBody';
 import '@student/exams/show/components/Part.css';
-import { PartFilesContext, ExamViewerContext } from '@hourglass/common/context';
+import { PartFilesContext } from '@hourglass/common/context';
 import { PartName } from '@student/exams/show/components/Part';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import ShowRubric from '@proctor/registrations/show/ShowRubric';
+import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@hourglass/workflows/professor/exams/types';
 import { pluralize } from '@hourglass/common/helpers';
-import { graphql, useMutation } from 'relay-hooks';
+import { graphql, useFragment, useMutation } from 'relay-hooks';
 import { AlertContext } from '@hourglass/common/alerts';
 import { PartRequestGradingLockMutation } from './__generated__/PartRequestGradingLockMutation.graphql';
 
+import { PartShow$key } from './__generated__/PartShow.graphql';
+
 interface PartProps {
   refreshCodeMirrorsDeps: React.DependencyList;
-  part: PartInfo;
+  partKey: PartShow$key;
   qnum: number;
   pnum: number;
   currentGrading?: CurrentGrading[number][number];
@@ -103,7 +105,7 @@ export const ClaimGradingButton: React.FC<{
 const Part: React.FC<PartProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
-    part,
+    partKey,
     qnum,
     pnum,
     currentGrading,
@@ -112,16 +114,43 @@ const Part: React.FC<PartProps> = (props) => {
     fullyExpandCode = false,
     overviewMode,
   } = props;
+  const res = useFragment<PartShow$key>(
+    graphql`
+    fragment PartShow on Part {
+      id
+      name {
+        type
+        value
+      }
+      description {
+        type
+        value
+      }
+      points
+      extraCredit
+      rootRubric @include(if: $withRubric) { ...ShowRubricKey } 
+      references {
+        type
+        path
+      }
+      bodyItems {
+        id
+        info
+        ...DisplayBody
+      }
+    }
+    `,
+    partKey,
+  );
   const {
     name,
     references,
     description,
     points,
-    extraCredit = false,
+    extraCredit,
     bodyItems,
-  } = part;
-  const { rubric } = useContext(ExamViewerContext);
-  const pRubric = rubric?.questions[qnum]?.parts[pnum]?.partRubric;
+    rootRubric,
+  } = res;
   const strPoints = pluralize(points, 'point', 'points');
   let subtitle;
   if (currentGrading?.score !== undefined) {
@@ -164,13 +193,13 @@ const Part: React.FC<PartProps> = (props) => {
             fullyExpandCode={fullyExpandCode}
           />
         )}
-        {pRubric && overviewMode && <ShowRubric rubric={pRubric} forWhat="part" />}
+        {rootRubric && overviewMode && <ShowRubricKey rubricKey={rootRubric} forWhat="part" />}
         {bodyItems.map((b, i) => (
           // Body numbers are STATIC.
           // eslint-disable-next-line react/no-array-index-key
-          <div className={`p-2 bodyitem ${b.info.type}`} key={i}>
+          <div className={`p-2 bodyitem ${(b as BodyItem).info.type}`} key={i}>
             <DisplayBody
-              body={b}
+              bodyKey={b}
               qnum={qnum}
               pnum={pnum}
               bnum={i}

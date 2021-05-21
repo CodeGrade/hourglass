@@ -1,5 +1,4 @@
 import React from 'react';
-import { QuestionInfo } from '@student/exams/show/types';
 import ShowQuestion from '@proctor/registrations/show/ShowQuestion';
 import { CurrentGrading } from '@professor/exams/types';
 import { graphql, useFragment } from 'relay-hooks';
@@ -24,45 +23,12 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
     overviewMode,
     version,
   } = props;
-  const res = useFragment(
+  const res = useFragment<DisplayQuestions$key>(
     graphql`
     fragment DisplayQuestions on ExamVersion {
       dbQuestions {
         id
-        name {
-          type
-          value
-        }
-        description {
-          type
-          value
-        }
-        separateSubparts
-        references {
-          type
-          path
-        }
-        rootRubric @include(if: $withRubric) { ...ShowRubricKey } 
-        parts {
-          id
-          name {
-            type
-            value
-          }
-          description {
-            type
-            value
-          }
-          points
-          references {
-            type
-            path
-          }
-          bodyItems {
-            id
-            info
-          }
-        }
+        ...ShowQuestion
       }
     }
     `,
@@ -73,14 +39,13 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
       {res.dbQuestions.map((q, i) => (
         <ShowQuestion
           key={q.id}
-          question={q as QuestionInfo}
+          questionKey={q}
           qnum={i}
           currentGrading={currentGrading[i]}
           refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
           registrationId={registrationId}
           fullyExpandCode={fullyExpandCode}
           overviewMode={overviewMode}
-          rubricKey={q.rootRubric}
         />
       ))}
     </>

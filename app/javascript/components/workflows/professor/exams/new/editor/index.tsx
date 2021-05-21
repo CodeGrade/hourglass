@@ -552,6 +552,57 @@ const PartEditor: React.FC<{
             </Row>
           )}
         </RearrangableList>
+        <Row className="text-center">
+          <Col>
+            <DropdownButton
+              // disabled={loading}
+              variant="secondary"
+              title="Add new item..."
+            >
+              <Dropdown.Item
+                onClick={console.log}
+              >
+                Text instructions
+              </Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item
+                onClick={console.log}
+              >
+                All that apply
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={console.log}
+              >
+                Code
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={console.log}
+              >
+                Code tag
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={console.log}
+              >
+                Matching
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={console.log}
+              >
+                Multiple choice
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={console.log}
+              >
+                Free-response
+              </Dropdown.Item>
+              <Dropdown.Item
+                onClick={console.log}
+              >
+                Yes/No or True/False
+              </Dropdown.Item>
+            </DropdownButton>
+          </Col>
+        </Row>
       </Card.Body>
     </Card>
   );
@@ -574,9 +625,14 @@ const BodyItemEditor: React.FC<{
     bodyItemKey,
   );
   return (
-    <span ref={handleRef}>
-      {`TODO: edit bodyitem ${bodyItem.id}`}
-    </span>
+    <>
+      {handleRef && <span ref={handleRef} className="cursor-move"><Icon I={MdDragHandle} /></span>}
+      <Row>
+        <Col>
+          {`TODO: edit body item ${bodyItem.id}`}
+        </Col>
+      </Row>
+    </>
   );
 };
 

@@ -51,5 +51,7 @@ module Types
     field :change_preset_comment_details, mutation: Mutations::ChangePresetCommentDetails
     field :reorder_preset_comments, mutation: Mutations::ReorderPresetComments
     field :destroy_preset_comment, mutation: Mutations::DestroyPresetComment
+
+    field :move_body_item_answer, mutation: Mutations::MoveBodyItemAnswer
   end
 end

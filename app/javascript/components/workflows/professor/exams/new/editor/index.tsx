@@ -599,6 +599,7 @@ const BodyItemEditor: React.FC<{
       id
       info
       answer
+      rootRubric { ...editorSingle }
     }
     `,
     bodyItemKey,
@@ -663,7 +664,9 @@ const BodyItemEditor: React.FC<{
           </Col>
           {showRubric && (
             <Col sm="6">
-              TODO: rubric
+              <SingleRubricKeyEditor
+                rubricKey={bodyItem.rootRubric}
+              />
             </Col>
           )}
         </Row>

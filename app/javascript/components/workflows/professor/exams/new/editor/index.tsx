@@ -52,7 +52,7 @@ import { MutationParameters } from 'relay-runtime';
 import { FaTrashAlt } from 'react-icons/fa';
 import RearrangableList from '@hourglass/common/rearrangeable';
 import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
-import { MdDragHandle } from 'react-icons/md';
+import { GrDrag } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
 import YesNo from '@student/exams/show/components/questions/YesNo';
 import Policies from './Policies';
@@ -79,6 +79,21 @@ import { editorReorderRubricsMutation } from './__generated__/editorReorderRubri
 import { editorSingle$key } from './__generated__/editorSingle.graphql';
 import { editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
 import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
+
+const DragHandle: React.FC<{
+  handleRef: React.Ref<HTMLElement>,
+  variant?: ButtonProps['variant'],
+}> = (props) => {
+  const {
+    handleRef,
+    variant = 'secondary',
+  } = props;
+  return (
+    <span className={`position-absolute t-0 l-0 z-1000 btn btn-sm btn-${variant} cursor-grab`} ref={handleRef}>
+      <Icon I={GrDrag} />
+    </span>
+  );
+};
 
 const RubricEditor: React.FC = () => {
   const { versionId: examVersionId } = useParams<{ versionId: string }>();
@@ -293,9 +308,10 @@ const QuestionEditor: React.FC<{
     >
       <div className="alert alert-primary">
         <Card.Title>
+          {handleRef && <DragHandle variant="primary" handleRef={handleRef} />}
           <Row>
-            <Col sm="auto">
-              {handleRef && <span ref={handleRef} className="cursor-move"><Icon I={MdDragHandle} /></span>}
+            <Col sm="auto" className={handleRef ? 'ml-4' : ''}>
+              <Form.Label column>{`Question ${question.index + 1}:`}</Form.Label>
             </Col>
             <Col>
               <EditHTMLVal
@@ -580,6 +596,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
       border="secondary"
     >
       <Card.Body>
+        {handleRef && <DragHandle handleRef={handleRef} variant="info" />}
         {showDestroy && (
           <DestroyButton
             disabled={loading || disabled}
@@ -594,10 +611,9 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
             }}
           />
         )}
-        <Form.Group as={Row} className="mr-4">
+        <Form.Group as={Row} className={`${(handleRef && showDestroy) ? 'ml-4' : ''} ${showDestroy ? 'mr-4' : ''}`}>
           <Form.Label column sm="2">
             <h5 className="my-0">
-              {handleRef && <span ref={handleRef} className="cursor-move"><Icon I={MdDragHandle} /></span>}
               Rubric type
             </h5>
           </Form.Label>
@@ -1268,6 +1284,7 @@ const RubricPresetEditor: React.FC<{
       border="warning"
     >
       <Card.Body>
+        {handleRef && <DragHandle handleRef={handleRef} variant="warning" />}
         <DestroyButton
           disabled={loading || disabled}
           onClick={() => {
@@ -1280,9 +1297,8 @@ const RubricPresetEditor: React.FC<{
             });
           }}
         />
-        <Form.Group as={Row}>
+        <Form.Group as={Row} className={handleRef ? 'ml-4' : ''}>
           <Form.Label column sm="2">
-            {handleRef && <span ref={handleRef} className="cursor-move"><Icon I={MdDragHandle} /></span>}
             Label
           </Form.Label>
           <Col sm="4">
@@ -1299,7 +1315,7 @@ const RubricPresetEditor: React.FC<{
             />
           </Col>
         </Form.Group>
-        <Form.Group as={Row}>
+        <Form.Group as={Row} className={handleRef ? 'ml-4' : ''}>
           <Form.Label column sm="2">Grader hint</Form.Label>
           <Col sm="10">
             <PresetCommentGraderHintEditor
@@ -1308,7 +1324,7 @@ const RubricPresetEditor: React.FC<{
             />
           </Col>
         </Form.Group>
-        <Form.Group as={Row}>
+        <Form.Group as={Row} className={handleRef ? 'ml-4' : ''}>
           <Form.Label column sm="2">Student feedback</Form.Label>
           <Col sm="10">
             <PresetCommentStudentFeedbackEditor

@@ -79,6 +79,7 @@ import { editorReorderRubricsMutation } from './__generated__/editorReorderRubri
 import { editorSingle$key } from './__generated__/editorSingle.graphql';
 import { editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
 import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
+import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.graphql';
 
 const DragHandle: React.FC<{
   handleRef: React.Ref<HTMLElement>,
@@ -439,6 +440,10 @@ const PartEditor: React.FC<{
       extraCredit
       points
       rootRubric { ...editorSingle }
+      bodyItems {
+        id
+        ...editorBodyItemEditor
+      }
     }
     `,
     partKey,
@@ -531,9 +536,47 @@ const PartEditor: React.FC<{
         </Card.Subtitle>
       </div>
       <Card.Body>
-        TODO: body items here
+        <RearrangableList
+          dbArray={part.bodyItems}
+          identifier={`BODYITEM-${part.id}`}
+          onRearrange={console.log}
+        >
+          {(bodyItem, bodyItemHandleRef) => (
+            <Row key={bodyItem.id}>
+              <Col>
+                <BodyItemEditor
+                  bodyItemKey={bodyItem}
+                  handleRef={bodyItemHandleRef}
+                />
+              </Col>
+            </Row>
+          )}
+        </RearrangableList>
       </Card.Body>
     </Card>
+  );
+};
+
+const BodyItemEditor: React.FC<{
+  bodyItemKey: editorBodyItemEditor$key;
+  handleRef: React.Ref<HTMLElement>;
+}> = (props) => {
+  const {
+    bodyItemKey,
+    handleRef,
+  } = props;
+  const bodyItem = useFragment(
+    graphql`
+    fragment editorBodyItemEditor on BodyItem {
+      id
+    }
+    `,
+    bodyItemKey,
+  );
+  return (
+    <span ref={handleRef}>
+      {`TODO: edit bodyitem ${bodyItem.id}`}
+    </span>
   );
 };
 

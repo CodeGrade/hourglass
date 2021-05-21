@@ -1,189 +1,110 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import {
   Form,
   Row,
   Col,
   Button,
 } from 'react-bootstrap';
-import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
+import Prompted from '@hourglass/workflows/professor/exams/new/editor/body-items/Prompted';
 import Icon from '@student/exams/show/components/Icon';
-import MoveItem from '@hourglass/workflows/professor/exams/new/old-editor/components/MoveItem';
-import {
-  FieldArray,
-  Field,
-  WrappedFieldProps,
-  FieldArrayFieldsProps,
-} from 'redux-form';
 import { FaCircle } from 'react-icons/fa';
-import { HTMLVal } from '@student/exams/show/types';
-import EditHTMLs, { EditHTMLField } from '@hourglass/workflows/professor/exams/new/old-editor/components/editHTMLs';
-import { useRefresher } from '@hourglass/common/helpers';
+import { HTMLVal, MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
+import RearrangableList from '@hourglass/common/rearrangeable';
+import { DragHandle, EditHTMLVal } from '..';
+
+interface DraggableMCOption {
+  id: string;
+  option: HTMLVal;
+  selected: boolean;
+}
 
 const OneOption: React.FC<{
-  selected: boolean;
-  onSelect: () => void;
-  memberName: string;
-  optionNum: number;
-  enableDown: boolean;
-  moveDown: () => void;
-  moveUp: () => void;
-  remove: () => void;
-  refreshProps?: React.DependencyList;
+  option: DraggableMCOption;
+  handleRef: React.Ref<HTMLElement>;
 }> = (props) => {
   const {
-    selected,
-    onSelect,
-    memberName,
-    optionNum,
-    enableDown,
-    moveDown,
-    moveUp,
-    remove,
-    refreshProps = [],
+    option,
+    handleRef,
   } = props;
-  const [moversVisible, setMoversVisible] = useState(false);
-  const showMovers = (): void => setMoversVisible(true);
-  const hideMovers = (): void => setMoversVisible(false);
   return (
-    <Row
-      className="p-2"
-      onMouseOver={showMovers}
-      onFocus={showMovers}
-      onBlur={hideMovers}
-      onMouseOut={hideMovers}
-    >
+    <Row className="p-2">
+      <Col sm="auto">
+        {handleRef && <DragHandle handleRef={handleRef} variant="info" />}
+      </Col>
       <Col className="flex-grow-01">
-        <MoveItem
-          visible={moversVisible}
-          variant="dark"
-          enableUp={optionNum > 0}
-          enableDown={enableDown}
-          enableDelete
-          disabledDeleteMessage=""
-          onUp={moveUp}
-          onDown={moveDown}
-          onDelete={remove}
-        />
         <Button
-          variant={selected ? 'dark' : 'outline-dark'}
-          onClick={onSelect}
+          variant={option.selected ? 'dark' : 'outline-dark'}
+          onClick={console.log}
         >
-          <Icon I={FaCircle} className={selected ? '' : 'invisible'} />
+          <Icon I={FaCircle} className={option.selected ? '' : 'invisible'} />
         </Button>
       </Col>
       <Col className="pr-0">
-        <Field
-          name={memberName}
-          component={EditHTMLField}
-          theme="bubble"
-          refreshProps={refreshProps}
+        <EditHTMLVal
+          className="bg-white border rounded"
+          // disabled={loading || disabled}
+          value={option.option || {
+            type: 'HTML',
+            value: '',
+          }}
+          onChange={console.log}
+          debounceDelay={1000}
         />
       </Col>
     </Row>
   );
 };
 
-export const renderOptionsMultipleChoice = ({
-  selected,
-  onChange,
-  moveDown,
-  moveUp,
-  remove,
-  refresh,
-  refreshProps,
-}: {
-  selected: number;
-  onChange: (idx: number) => void;
-  moveDown: () => void;
-  moveUp: () => void;
-  remove: () => void;
-  refresh?: () => void;
-  refreshProps?: React.DependencyList;
-}) => (
-  member: string,
-  index: number,
-  fields: FieldArrayFieldsProps<HTMLVal>,
-): JSX.Element => (
-  <OneOption
-    // eslint-disable-next-line react/no-array-index-key
-    key={index}
-    selected={selected === index}
-    onSelect={() => onChange(index)}
-    optionNum={index}
-    memberName={member}
-    enableDown={index + 1 < fields.length}
-    moveDown={(): void => {
-      fields.move(index, index + 1);
-      if (index === selected) moveDown();
-      if (index + 1 === selected) moveUp();
-      if (refresh) refresh();
-    }}
-    moveUp={(): void => {
-      fields.move(index, index - 1);
-      if (index === selected) moveUp();
-      if (index - 1 === selected) moveDown();
-      if (refresh) refresh();
-    }}
-    remove={(): void => {
-      fields.remove(index);
-      if (index === selected) remove();
-      if (refresh) refresh();
-    }}
-    refreshProps={refreshProps}
-  />
-);
-
-const EditAns: React.FC<WrappedFieldProps> = (props) => {
+const EditAns: React.FC<{
+  options: DraggableMCOption[];
+  bodyItemId: string;
+}> = (props) => {
   const {
-    input,
+    options,
+    bodyItemId,
   } = props;
-  const {
-    value,
-    onChange,
-  } = input;
-  const moveDown = () => onChange(value + 1);
-  const moveUp = () => onChange(value - 1);
-  const remove = () => onChange(0);
-  const [refresher, refresh] = useRefresher();
-  const refreshProps: React.DependencyList = [refresher];
-  const renderOptions = useCallback(renderOptionsMultipleChoice({
-    selected: value,
-    onChange,
-    moveDown,
-    moveUp,
-    remove,
-    refresh,
-    refreshProps,
-  }), [onChange, value]);
   return (
-    <FieldArray
-      name="options"
-      component={EditHTMLs}
-      renderOptions={renderOptions}
-    />
+    <>
+      <RearrangableList
+        dbArray={options}
+        identifier={`MC-${bodyItemId}`}
+        onRearrange={console.log}
+      >
+        {(option, handleRef) => (
+          <OneOption
+            option={option}
+            handleRef={handleRef}
+          />
+        )}
+      </RearrangableList>
+    </>
   );
 };
 
 interface MultipleChoiceProps {
-  qnum: number;
-  pnum: number;
-  bnum: number;
+  info: MultipleChoiceInfo;
+  id: string;
+  answer: MultipleChoiceState;
 }
 
 const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
   const {
-    qnum,
-    pnum,
-    bnum,
+    info,
+    id,
+    answer,
   } = props;
+  const zipped: DraggableMCOption[] = info.options.map((option, index) => ({
+    option,
+    id: index.toString(),
+    selected: index === answer,
+  }));
   return (
     <>
       <Prompted
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
+        value={info.prompt}
+        onChange={console.log}
       />
-      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
+      <Form.Group as={Row}>
         <Form.Label column sm={2}>Answers</Form.Label>
         <Col sm={10}>
           <Row className="p-2">
@@ -192,7 +113,10 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
             </Col>
             <Col><b>Prompt</b></Col>
           </Row>
-          <Field name="answer" component={EditAns} />
+          <EditAns
+            bodyItemId={id}
+            options={zipped}
+          />
         </Col>
       </Form.Group>
     </>

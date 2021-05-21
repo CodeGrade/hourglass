@@ -14,6 +14,7 @@ import {
   BodyItemInfo,
   CodeState,
   AllThatApplyState,
+  MultipleChoiceState,
 } from '@student/exams/show/types';
 import {
   Preset,
@@ -647,18 +648,29 @@ const BodyItemEditor: React.FC<{
         />
       );
       break;
+    case 'MultipleChoice':
+      editor = (
+        <MultipleChoice
+          id={id}
+          info={info}
+          answer={answer as MultipleChoiceState}
+        />
+      );
+      break;
     default:
       return <p>todo: {info.type}</p>;
     // case 'CodeTag':
-    //   return <CodeTag qnum={qnum} pnum={pnum} bnum={bnum} />;
+    //   editor = <CodeTag qnum={qnum} pnum={pnum} bnum={bnum} />;
+    //   break;
     // case 'YesNo':
-    //   return <YesNo qnum={qnum} pnum={pnum} bnum={bnum} />;
-    // case 'MultipleChoice':
-    //   return <MultipleChoice qnum={qnum} pnum={pnum} bnum={bnum} />;
+    //   editor = <YesNo qnum={qnum} pnum={pnum} bnum={bnum} />;
+    //   break;
     // case 'Text':
-    //   return <Text qnum={qnum} pnum={pnum} bnum={bnum} />;
+    //   editor = <Text qnum={qnum} pnum={pnum} bnum={bnum} />;
+    //   break;
     // case 'Matching':
-    //   return <Matching qnum={qnum} pnum={pnum} bnum={bnum} />;
+    //   editor = <Matching qnum={qnum} pnum={pnum} bnum={bnum} />;
+    //   break;
     // default:
     //   throw new ExhaustiveSwitchError(info);
   }

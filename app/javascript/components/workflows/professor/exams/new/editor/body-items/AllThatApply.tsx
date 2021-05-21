@@ -30,14 +30,14 @@ const EditAnswer: React.FC<{
   );
 };
 
-type OptionWithAnswer = {
+type DraggableATAOption = {
   id: string;
   option: HTMLVal;
   answer: boolean;
 }
 
 const OneOption: React.FC<{
-  option: OptionWithAnswer;
+  option: DraggableATAOption;
   handleRef: React.Ref<HTMLElement>;
 }> = (props) => {
   const {
@@ -72,16 +72,18 @@ const OneOption: React.FC<{
 };
 
 const EditOptions: React.FC<{
-  options: OptionWithAnswer[];
+  options: DraggableATAOption[];
+  bodyItemId: string;
 }> = (props) => {
   const {
     options,
+    bodyItemId,
   } = props;
   return (
     <>
       <RearrangableList
         dbArray={options}
-        identifier="TODO"
+        identifier={`ATA-${bodyItemId}`}
         onRearrange={console.log}
       >
         {(option, handleRef) => (
@@ -115,7 +117,7 @@ const AllThatApply: React.FC<{
     id,
     answer,
   } = props;
-  const zipped: OptionWithAnswer[] = info.options.map((option, index) => ({
+  const zipped: DraggableATAOption[] = info.options.map((option, index) => ({
     option,
     answer: answer[index],
     id: index.toString(),
@@ -137,6 +139,7 @@ const AllThatApply: React.FC<{
           </Row>
           <EditOptions
             options={zipped}
+            bodyItemId={id}
           />
         </Col>
       </Form.Group>

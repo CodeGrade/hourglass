@@ -6,7 +6,7 @@ import { isCovered, isFullscreen, openFullscreen } from './helpers';
  * @throws Error if lockdown fails
  */
 export default async function lock(policies: readonly Policy[]): Promise<void> {
-  if (policyPermits(policies, Policy.tolerateWindowed)) return;
+  if (policyPermits(policies, 'TOLERATE_WINDOWED')) return;
 
   try {
     await navigator.clipboard.writeText('');

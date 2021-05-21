@@ -2,27 +2,27 @@ import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import { Policy } from '@student/exams/show/types';
 import Select from 'react-select';
-import { ExhaustiveSwitchError, SelectOption, SelectOptions } from '@hourglass/common/helpers';
+import { SelectOption, SelectOptions } from '@hourglass/common/helpers';
 
 export interface PoliciesProps {
-  value: Policy[];
+  value: readonly Policy[];
   onChange: (newPolicies: Policy[]) => void;
 }
 
-export const policyToString = (p: Policy): string => {
-  switch (p) {
-    case Policy.ignoreLockdown: return 'Ignore lockdown';
-    case Policy.tolerateWindowed: return 'Tolerate windowed mode';
-    case Policy.mockLockdown: return 'Warn upon lockdown violation';
-    default: throw new ExhaustiveSwitchError(p);
-  }
+export const policyToString: Record<Policy, string> = {
+  IGNORE_LOCKDOWN: 'Ignore lockdown',
+  TOLERATE_WINDOWED: 'Tolerate windowed mode',
+  MOCK_LOCKDOWN: 'Warn upon lockdown violation',
 };
+
+const allPolicies: Policy[] = Object.keys(policyToString) as Policy[];
+
 type PolicyOption = SelectOption<Policy>;
 type PolicyOptions = SelectOptions<Policy>;
 
-const policyValues: PolicyOptions = Object.keys(Policy).map((policy) => ({
-  value: Policy[policy],
-  label: policyToString(Policy[policy]),
+const policyValues: PolicyOptions = allPolicies.map((policy) => ({
+  value: policy,
+  label: policyToString[policy],
 }));
 
 const Policies: React.FC<PoliciesProps> = (props) => {

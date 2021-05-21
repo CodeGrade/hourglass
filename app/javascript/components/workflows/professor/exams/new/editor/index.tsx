@@ -49,7 +49,6 @@ import { useParams, useHistory } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import store from '@professor/exams/new/editor/store';
 import Name from '@professor/exams/new/editor/components/Name';
-import Policies from '@professor/exams/new/editor/components/Policies';
 import Instructions from '@professor/exams/new/editor/components/Instructions';
 import EditReference from '@professor/exams/new/editor/components/Reference';
 import FileUploader from '@professor/exams/new/editor/components/FileUploader';
@@ -220,7 +219,7 @@ function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
 }
 
 const WrappedName = wrapInput(Name);
-const WrappedPolicies = wrapInput(Policies);
+// const WrappedPolicies = wrapInput(Policies);
 const WrappedInstructions = wrapInput(Instructions);
 
 export const formSelector = formValueSelector('version-editor');
@@ -500,7 +499,7 @@ const ExamEditor: React.FC<
     <Form onSubmit={doSubmit}>
       <FormSection name="all">
         <Field name="name" component={WrappedName} />
-        <Field name="policies" component={WrappedPolicies} />
+        {/* <Field name="policies" component={WrappedPolicies} /> */}
         <FormSection name="exam">
           <FormContextProviderConnected>
             <div className="alert alert-info">

@@ -254,7 +254,7 @@ const StaffSeatingForm: React.FC<
   }, [history]);
   const [mutate, { loading }] = useMutation<assignStaffUpdateMutation>(
     graphql`
-    mutation assignStaffUpdateMutation($input: UpdateStaffSeatingInput!) {
+    mutation assignStaffUpdateMutation($input: UpdateStaffSeatingInput!, $withRubric: Boolean!) {
       updateStaffSeating(input: $input) {
         exam {
           ...admin_checklist
@@ -302,6 +302,7 @@ const StaffSeatingForm: React.FC<
               proctorsWithoutRoomIds: (all.proctors ?? []).map((s) => s.id),
               proctorRegistrationUpdates: rooms,
             },
+            withRubric: true,
           },
         });
       })}

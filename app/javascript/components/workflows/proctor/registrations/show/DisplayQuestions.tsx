@@ -42,7 +42,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           type
           path
         }
-        rootRubric { ...ShowRubricKey }
+        rootRubric @include(if: $withRubric) { ...ShowRubricKey } 
         parts {
           id
           name {
@@ -80,7 +80,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           registrationId={registrationId}
           fullyExpandCode={fullyExpandCode}
           overviewMode={overviewMode}
-          showRubric
+          rubricKey={q.rootRubric}
         />
       ))}
     </>

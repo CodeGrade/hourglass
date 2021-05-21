@@ -1023,7 +1023,7 @@ const ExamAdmin: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
   const res = useQuery<adminExamQuery>(
     graphql`
-    query adminExamQuery($examId: ID!) {
+    query adminExamQuery($examId: ID!, $withRubric: Boolean!) {
       exam(id: $examId) {
         id
         name
@@ -1036,7 +1036,7 @@ const ExamAdmin: React.FC = () => {
       }
     }
     `,
-    { examId },
+    { examId, withRubric: true },
   );
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;

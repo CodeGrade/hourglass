@@ -1,13 +1,14 @@
-import React, { useMemo, useContext } from 'react';
+import React, { useMemo } from 'react';
 import { QuestionInfo } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import Part, { ClaimGradingButton } from '@proctor/registrations/show/Part';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
-import { QuestionFilesContext, ExamViewerContext } from '@hourglass/common/context';
+import { QuestionFilesContext } from '@hourglass/common/context';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
-import ShowRubric from '@proctor/registrations/show/ShowRubric';
+import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@professor/exams/types';
 import { pluralize } from '@hourglass/common/helpers';
+import { ShowRubricKey$key } from './__generated__/ShowRubricKey.graphql';
 
 interface ShowQuestionProps {
   refreshCodeMirrorsDeps: React.DependencyList;
@@ -17,7 +18,7 @@ interface ShowQuestionProps {
   registrationId?: string;
   fullyExpandCode: boolean;
   overviewMode: boolean;
-  showRubric: boolean;
+  rubricKey: ShowRubricKey$key;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
@@ -29,7 +30,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     registrationId,
     fullyExpandCode,
     overviewMode,
-    // showRubric,
+    rubricKey,
   } = props;
   const {
     name,
@@ -37,8 +38,6 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     description,
     parts,
   } = question;
-  const { rubric } = useContext(ExamViewerContext);
-  const qRubric = rubric?.questions[qnum]?.questionRubric;
   const singlePart = parts.length === 1 && !parts[0].name?.value?.trim();
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = pluralize(points, 'point', 'points');
@@ -90,7 +89,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             fullyExpandCode={fullyExpandCode}
           />
         )}
-        {qRubric && overviewMode && <ShowRubric rubric={qRubric} forWhat="question" />}
+        {rubricKey && overviewMode && <ShowRubricKey rubricKey={rubricKey} forWhat="question" />}
         {parts.map((p, i) => (
           <Part
             // Part numbers are STATIC.

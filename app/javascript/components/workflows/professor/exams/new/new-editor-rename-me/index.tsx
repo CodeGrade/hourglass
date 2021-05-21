@@ -7,8 +7,6 @@ import React, {
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
 import {
-  ExamVersion,
-  AnswersState,
   HTMLVal,
   ExamFile,
   FileRef,
@@ -171,11 +169,6 @@ const RubricEditor: React.FC = () => {
                     />
                   </div>
                   <Form.Group as={Row}>
-                    {/* <Field
-                    name="reference"
-                    component={EditReference}
-                    label="the entire exam"
-                  /> */}
                     <EditReference
                       value={examVersion.dbReferences as FileRef[]}
                       onChange={console.log}

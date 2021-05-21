@@ -55,7 +55,7 @@ import ErrorBoundary, { RenderError } from '@hourglass/common/boundary';
 import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import { policyToString } from '@professor/exams/new/rubric-editor/Policies';
+import { policyToString } from '@hourglass/workflows/professor/exams/new/new-editor-rename-me/Policies';
 import {
   graphql,
   useFragment,

@@ -114,21 +114,21 @@ class Rubric < ApplicationRecord
       exam_version_id: exam_version_id,
       question_id: question_id,
       part_id: part_id,
-      body_item: body_item_id
+      body_item: body_item_id,
     ).where.not(parent_section_id: nil).pluck(:id, :parent_section_id).to_h
-    
+
     inv_parent_id_map[id] = true
     changed = true
-    while changed do
+    while changed
       changed = false
       inv_parent_id_map.each do |id, parent_id|
         if parent_id != true && inv_parent_id_map[parent_id] == true
-          inv_parent_id_map[id] = true 
+          inv_parent_id_map[id] = true
           changed = true
         end
       end
     end
-    keepers = inv_parent_id_map.keep_if { |k, v| v == true }.keys
+    keepers = inv_parent_id_map.keep_if { |_k, v| v == true }.keys
     Rubric.where(id: keepers)
   end
 

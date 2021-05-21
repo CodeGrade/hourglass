@@ -90,17 +90,9 @@ module Types
       }
     end
 
-    field :parent_section_id, ID, null: true
-    def parent_section_id
-      return nil if object.parent_section_id.nil?
-
-      HourglassSchema.id_from_object_id(object.parent_section_id, Types::RubricType, context)
-    end
     field :parent_section, Types::RubricType, null: true
     def parent_section
-      return nil if object.parent_section_id.nil?
-
-      RecordLoader.for(Rubric).load(object.parent_section_id)
+      AssociationLoader.for(Rubric, :parent_section).load(object)
     end
 
     field :exam_version, Types::ExamVersionType, null: false
@@ -113,6 +105,9 @@ module Types
       AssociationLoader.for(Rubric, :subsections).load(object)
     end
     field :all_subsections, [Types::RubricType], null: false
+    def all_subsections
+      AssociationLoader.for(Rubric, :descendants).load(object)
+    end
 
     field :rubric_preset, Types::RubricPresetType, null: true
     def rubric_preset

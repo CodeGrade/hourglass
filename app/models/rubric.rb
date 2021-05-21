@@ -6,17 +6,42 @@ class Rubric < ApplicationRecord
   belongs_to :question, optional: true, inverse_of: :rubrics
   belongs_to :part, optional: true, inverse_of: :rubrics
   belongs_to :body_item, optional: true, inverse_of: :rubrics
-  belongs_to :parent_section,
-             class_name: 'Rubric',
-             inverse_of: 'subsections',
-             optional: true
-
-  has_many :subsections,
-           -> { order(:order) },
-           class_name: 'Rubric',
-           foreign_key: 'parent_section_id',
-           inverse_of: 'parent_section',
+  
+  has_many :ancestor_links, # This rubric's ancestors are ones with it as a descendant
+           class_name: 'RubricTreePath',
+           foreign_key: 'descendant_id',
            dependent: :destroy
+  has_many :ancestors, through: :ancestor_links
+  has_many :descendant_links, # This rubric's descendants are ones with it as an ancesor
+           class_name: 'RubricTreePath',
+           foreign_key: 'ancestor_id',
+           dependent: :destroy
+  has_many :descendants, through: :descendant_links
+  has_many :subsection_links, -> { where(path_length: 1) },
+           class_name: 'RubricTreePath',
+           foreign_key: 'ancestor_id'
+  has_many :subsections, 
+           through: :subsection_links,
+           source: 'descendant'
+  has_one :parent_section_link, -> { where(path_length: 1) },
+          class_name: 'RubricTreePath',
+          foreign_key: 'descendant_id'
+  has_one :parent_section,
+          through: :parent_section_link,
+          source: 'ancestor'
+  
+  scope :root_rubrics, -> {
+    joins(:ancestor_links).group('id').having('count(rubrics.id) = 1')
+  }
+
+  before_create do
+    self_link = RubricTreePath.new(ancestor: self, descendant: self)
+    association(:descendant_links).add_to_target(self_link)
+    association(:ancestor_links).add_to_target(self_link)
+  end
+  before_destroy do
+    subsections.destroy_all
+  end
 
   has_one :rubric_preset, dependent: :destroy
 
@@ -31,7 +56,7 @@ class Rubric < ApplicationRecord
   delegate :exam, to: :exam_version
   delegate :course, to: :exam_version
 
-  accepts_nested_attributes_for :subsections, :rubric_preset
+  accepts_nested_attributes_for :rubric_preset
 
   # Ensure that non-root rubrics have a non-nil `order` field
   def has_order_if_not_root
@@ -106,30 +131,6 @@ class Rubric < ApplicationRecord
 
   def move_subsections(index_from, index_to)
     move_association(Rubric, subsections, :order, index_from, index_to)
-  end
-
-  # Returns all the rubrics in the tree of subsections rooted at this node
-  def all_subsections
-    inv_parent_id_map = Rubric.where(
-      exam_version_id: exam_version_id,
-      question_id: question_id,
-      part_id: part_id,
-      body_item: body_item_id,
-    ).where.not(parent_section_id: nil).pluck(:id, :parent_section_id).to_h
-
-    inv_parent_id_map[id] = true
-    changed = true
-    while changed
-      changed = false
-      inv_parent_id_map.each do |id, parent_id|
-        if parent_id != true && inv_parent_id_map[parent_id] == true
-          inv_parent_id_map[id] = true
-          changed = true
-        end
-      end
-    end
-    keepers = inv_parent_id_map.keep_if { |_k, v| v == true }.keys
-    Rubric.where(id: keepers)
   end
 
   def points_if_preset

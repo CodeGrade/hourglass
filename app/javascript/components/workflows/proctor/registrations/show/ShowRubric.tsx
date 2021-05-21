@@ -276,7 +276,6 @@ export const ShowRubricKey: React.FC<{
     fragment ShowRubricKey on Rubric {
       id
       type
-      parentSectionId
       order
       points
       description {
@@ -301,7 +300,6 @@ export const ShowRubricKey: React.FC<{
       allSubsections {
         id
         type
-        parentSectionId
         order
         points
         description {

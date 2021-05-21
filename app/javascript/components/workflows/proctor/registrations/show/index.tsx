@@ -72,7 +72,6 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
       rubrics {
         id
         type
-        parentSectionId
         order
         points
         description {

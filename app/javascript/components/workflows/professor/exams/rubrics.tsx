@@ -1,6 +1,5 @@
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
-  ExamRubric,
   Rubric,
   RubricPresets,
   Preset,
@@ -9,19 +8,7 @@ import {
   RubricAny,
 } from '@professor/exams/types';
 import { showExamViewer$data } from '@proctor/registrations/show/__generated__/showExamViewer.graphql';
-
-const nullNumComp = (n1, n2) => {
-  if (n1 === n2) return 0;
-  if (n1 === null) return -1;
-  if (n2 === null) return 1;
-  return n1 - n2;
-};
-const nullStrComp = (s1, s2) => {
-  if (s1 === s2) return 0;
-  if (s1 === null) return -1;
-  if (s2 === null) return 1;
-  return (s1 < s2 ? -1 : 1);
-};
+import { rubricEditorSingle$data } from './new/rubric-editor/__generated__/rubricEditorSingle.graphql';
 
 type RawRubric = showExamViewer$data['rubrics'][number];
 type RawRubricMap = Record<RawRubric['id'], RawRubric & { qnum?: number; pnum?: number; bnum?: number; }>;
@@ -114,95 +101,13 @@ function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric 
   }
 }
 
-type ExamRubricTree = showExamViewer$data['dbQuestions'];
+type RawRootRubric = Omit<rubricEditorSingle$data, ' $refType'>;
 
-function convertRubric(rawRubrics : readonly RawRubric[], qTree: ExamRubricTree): ExamRubric {
-  const rubric: ExamRubric = {
-    questions: [],
-    examRubric: {
-      type: 'none',
-      id: 'not-set',
-    },
-  };
-  const rubricsByID: RawRubricMap = { };
-  rawRubrics.forEach((r) => {
-    rubricsByID[r.id] = {
-      ...r, qnum: null, pnum: null, bnum: null,
-    };
-  });
-  // const qpbById = {};
-  qTree.forEach((q, qnum) => {
-    q.rubrics.forEach(({ id }) => {
-      rubricsByID[id].qnum = qnum;
-    });
-    // qpbById[q.id] = qnum;
-    q.parts.forEach((p, pnum) => {
-      // qpbById[p.id] = pnum;
-      p.rubrics.forEach(({ id }) => {
-        rubricsByID[id].pnum = pnum;
-      });
-      p.bodyItems.forEach((b, bnum) => {
-        // qpbById[b.id] = bnum;
-        b.rubrics.forEach(({ id }) => {
-          rubricsByID[id].bnum = bnum;
-        });
-      });
-    });
-  });
-  const rubricCopy = [...rawRubrics];
-  rubricCopy.sort((r1, r2) => {
-    const compParent = nullStrComp(r1.parentSectionId, r2.parentSectionId);
-    if (compParent !== 0) return compParent;
-    return nullNumComp(r1.order, r2.order);
-  });
-  rawRubrics.forEach((r) => {
-    if (r.parentSectionId !== null) return; // only process roots
-    const { qnum } = rubricsByID[r.id];
-    const { pnum } = rubricsByID[r.id];
-    const { bnum } = rubricsByID[r.id];
-    if (qnum === null) {
-      rubric.examRubric = expandRubric(r, rubricsByID);
-    } else {
-      if (rubric.questions[qnum] === undefined) {
-        rubric.questions[qnum] = {
-          id: qTree[qnum].id,
-          parts: [],
-          questionRubric: {
-            type: 'none',
-            id: 'not-set',
-          },
-        };
-      }
-      const byQ = rubric.questions[qnum];
-      if (pnum === null) {
-        byQ.questionRubric = expandRubric(r, rubricsByID);
-      } else {
-        if (byQ.parts[pnum] === undefined) {
-          byQ.parts[pnum] = {
-            id: qTree[qnum].parts[pnum].id,
-            body: [],
-            partRubric: {
-              type: 'none',
-              id: 'not-set',
-            },
-          };
-        }
-        const byP = byQ.parts[pnum];
-        if (bnum === null) {
-          byP.partRubric = expandRubric(r, rubricsByID);
-        } else if (r.parentSectionId === null) {
-          byP.body[bnum] = {
-            id: qTree[qnum].parts[pnum].bodyItems[bnum].id,
-            rubric: expandRubric(r, rubricsByID),
-          };
-        }
-      }
-    }
-  });
-  return rubric;
+export function expandRootRubric(rawRubric : RawRootRubric): Rubric {
+  const rubricsById: RawRubricMap = {};
+  rawRubric.allSubsections.forEach((r) => { rubricsById[r.id] = r; });
+  return expandRubric(rawRubric, rubricsById);
 }
-
-export default convertRubric;
 
 export function deepDiff(v1 : unknown, v2 : unknown): unknown {
   if (v1 === v2) return undefined;

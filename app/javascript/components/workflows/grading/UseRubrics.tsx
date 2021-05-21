@@ -25,9 +25,11 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import { BsArrowUpRight, BsArrowDownRight } from 'react-icons/bs';
 import { AlertContext } from '@hourglass/common/alerts';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
-import { useMutation } from 'relay-hooks';
+import { graphql, useFragment, useMutation } from 'relay-hooks';
+import { expandRootRubric } from '@professor/exams/rubrics';
 import { createCommentMutation } from './__generated__/createCommentMutation.graphql';
 import { grading_one$data } from './__generated__/grading_one.graphql';
+import { UseRubricsKey$key } from './__generated__/UseRubricsKey.graphql';
 
 type GradingComment = grading_one$data['gradingComments']['edges'][number]['node'];
 type PresetCommentId = GradingComment['presetComment']['id']
@@ -512,6 +514,100 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
   );
 };
 
+function nonEmptyRubric(r ?: Rubric): boolean {
+  return r !== null && r !== undefined && r.type !== 'none';
+}
+
+const ShowRubricKey: React.FC<ShowRubricProps<UseRubricsKey$key> & {
+  caption: string,
+}> = (props) => {
+  const {
+    caption,
+    rubric: rubricKey,
+    showCompletenessAgainst,
+    qnum,
+    pnum,
+    bnum,
+    registrationId,
+  } = props;
+  const rawRubric = useFragment<UseRubricsKey$key>(
+    graphql`
+    fragment UseRubricsKey on Rubric {
+      id
+      type
+      parentSectionId
+      order
+      points
+      description {
+        type
+        value
+      }
+      rubricPreset {
+        id
+        direction
+        label
+        mercy
+        presetComments {
+          id
+          label
+          order
+          points
+          graderHint
+          studentFeedback
+        }
+      }
+      subsections { id }
+      allSubsections {
+        id
+        type
+        parentSectionId
+        order
+        points
+        description {
+          type
+          value
+        }
+        rubricPreset {
+          id
+          direction
+          label
+          mercy
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+        subsections { id }
+      }
+    }
+    `,
+    rubricKey,
+  );
+  const rubric = expandRootRubric(rawRubric);
+  if (nonEmptyRubric(rubric)) {
+    return (
+      <>
+        <h5>{caption}</h5>
+        <div className="rubric">
+          <ShowRubric
+            rubric={rubric}
+            showCompletenessAgainst={showCompletenessAgainst}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
+            registrationId={registrationId}
+          />
+        </div>
+      </>
+    );
+  }
+  return null;
+};
+
 const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
   const {
     rubric,
@@ -580,15 +676,11 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
   );
 };
 
-function nonEmptyRubric(r ?: Rubric): boolean {
-  return r !== null && r !== undefined && r.type !== 'none';
-}
-
 export const ShowRubrics: React.FC<{
-  examRubric: Rubric;
-  qnumRubric: Rubric;
-  pnumRubric: Rubric;
-  bnumRubric: Rubric;
+  examRubricKey: UseRubricsKey$key;
+  qnumRubricKey: UseRubricsKey$key;
+  pnumRubricKey: UseRubricsKey$key;
+  bnumRubricKey: UseRubricsKey$key;
   showCompletenessAgainst?: PresetCommentId[];
   qnum: number;
   pnum: number;
@@ -596,10 +688,10 @@ export const ShowRubrics: React.FC<{
   registrationId: string;
 }> = (props) => {
   const {
-    examRubric,
-    qnumRubric,
-    pnumRubric,
-    bnumRubric,
+    examRubricKey,
+    qnumRubricKey,
+    pnumRubricKey,
+    bnumRubricKey,
     showCompletenessAgainst,
     qnum,
     pnum,
@@ -608,66 +700,42 @@ export const ShowRubrics: React.FC<{
   } = props;
   return (
     <>
-      {nonEmptyRubric(examRubric) && (
-        <>
-          <h5>Exam-wide rubric</h5>
-          <div className="rubric">
-            <ShowRubric
-              rubric={examRubric}
-              showCompletenessAgainst={showCompletenessAgainst}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={bnum}
-              registrationId={registrationId}
-            />
-          </div>
-        </>
-      )}
-      {nonEmptyRubric(qnumRubric) && (
-        <>
-          <h5>Question rubric</h5>
-          <div className="rubric">
-            <ShowRubric
-              rubric={qnumRubric}
-              showCompletenessAgainst={showCompletenessAgainst}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={bnum}
-              registrationId={registrationId}
-            />
-          </div>
-        </>
-      )}
-      {nonEmptyRubric(pnumRubric) && (
-        <>
-          <h5>Part rubric</h5>
-          <div className="rubric">
-            <ShowRubric
-              rubric={pnumRubric}
-              showCompletenessAgainst={showCompletenessAgainst}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={bnum}
-              registrationId={registrationId}
-            />
-          </div>
-        </>
-      )}
-      {nonEmptyRubric(bnumRubric) && (
-        <>
-          <h5>Item rubric</h5>
-          <div className="rubric">
-            <ShowRubric
-              rubric={bnumRubric}
-              showCompletenessAgainst={showCompletenessAgainst}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={bnum}
-              registrationId={registrationId}
-            />
-          </div>
-        </>
-      )}
+      <ShowRubricKey
+        caption="Exam-wide rubric"
+        rubric={examRubricKey}
+        showCompletenessAgainst={showCompletenessAgainst}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
+      <ShowRubricKey
+        caption="Question rubric"
+        rubric={qnumRubricKey}
+        showCompletenessAgainst={showCompletenessAgainst}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
+      <ShowRubricKey
+        caption="Part rubric"
+        rubric={pnumRubricKey}
+        showCompletenessAgainst={showCompletenessAgainst}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
+      <ShowRubricKey
+        caption="Item rubric"
+        rubric={bnumRubricKey}
+        showCompletenessAgainst={showCompletenessAgainst}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
     </>
   );
 };

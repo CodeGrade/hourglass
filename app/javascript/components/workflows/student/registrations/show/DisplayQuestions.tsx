@@ -69,9 +69,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
     <>
       {res.dbQuestions.map((q, i) => (
         <ShowQuestion
-          // Question numbers are STATIC.
-          // eslint-disable-next-line react/no-array-index-key
-          key={i}
+          key={q.id}
           question={q as QuestionInfo}
           qnum={i}
           currentGrading={currentGrading[i]}
@@ -79,6 +77,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           registrationId={null}
           fullyExpandCode={fullyExpandCode}
           overviewMode={overviewMode}
+          showRubric={false}
         />
       ))}
     </>

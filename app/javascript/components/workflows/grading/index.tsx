@@ -67,7 +67,6 @@ import {
 } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
-import convertRubric from '@professor/exams/rubrics';
 import {
   useParams,
   Switch,
@@ -757,50 +756,17 @@ function AnswersRow<T, V>(
     graphql`
     fragment gradingRubric on ExamVersion {
       id
+      rootRubric { ...UseRubricsKey }
       dbQuestions {
         id
-        rubrics {
-          id
-        }
+        rootRubric { ...UseRubricsKey }
         parts {
           id
-          rubrics {
-            id
-          }
+          rootRubric { ...UseRubricsKey }
           bodyItems {
             id
-            rubrics {
-              id
-            }
+            rootRubric { ...UseRubricsKey }
           }
-        }
-      }
-      rubrics {
-        id
-        type
-        parentSectionId
-        order
-        points
-        description {
-          type
-          value
-        }
-        rubricPreset {
-          id
-          direction
-          label
-          mercy
-          presetComments {
-            id
-            label
-            order
-            points
-            graderHint
-            studentFeedback
-          }
-        }
-        subsections {
-          id
         }
       }
     }
@@ -808,11 +774,10 @@ function AnswersRow<T, V>(
     examVersionKey,
   );
   const [studentWidth, setStudentWidth] = useState(6);
-  const rubrics = convertRubric(res.rubrics, res.dbQuestions);
-  const { examRubric } = rubrics;
-  const qnumRubric = rubrics.questions[qnum]?.questionRubric;
-  const pnumRubric = rubrics.questions[qnum]?.parts[pnum]?.partRubric;
-  const bnumRubric = rubrics.questions[qnum]?.parts[pnum]?.body[bnum];
+  const { rootRubric: examRubricKey } = res;
+  const qnumRubricKey = res.dbQuestions[qnum]?.rootRubric;
+  const pnumRubricKey = res.dbQuestions[qnum]?.parts[pnum]?.rootRubric;
+  const bnumRubricKey = res.dbQuestions[qnum]?.parts[pnum]?.bodyItems[bnum]?.rootRubric;
   return (
     <Card>
       <Card.Body>
@@ -862,10 +827,10 @@ function AnswersRow<T, V>(
           </Col>
           <Col md={6}>
             <ShowRubrics
-              examRubric={examRubric}
-              qnumRubric={qnumRubric}
-              pnumRubric={pnumRubric}
-              bnumRubric={bnumRubric.rubric}
+              examRubricKey={examRubricKey}
+              qnumRubricKey={qnumRubricKey}
+              pnumRubricKey={pnumRubricKey}
+              bnumRubricKey={bnumRubricKey}
               showCompletenessAgainst={comments.map((c) => c.presetComment?.id)}
               registrationId={registrationId}
               qnum={qnum}

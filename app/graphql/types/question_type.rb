@@ -38,5 +38,12 @@ module Types
     field :rubrics, [Types::RubricType], null: false do
       guard Guards::ALL_STAFF
     end
+    def rubrics
+      AssociationLoader.for(Question, :rubrics, merge: -> { where(part_id: nil, body_item_id: nil) }).load(object)
+    end
+
+    field :root_rubric, Types::RubricType, null: false do
+      guard Guards::ALL_STAFF
+    end
   end
 end

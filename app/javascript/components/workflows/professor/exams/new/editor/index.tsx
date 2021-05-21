@@ -13,6 +13,7 @@ import {
   YesNoInfo,
   BodyItemInfo,
   CodeState,
+  AllThatApplyState,
 } from '@student/exams/show/types';
 import {
   Preset,
@@ -85,8 +86,9 @@ import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.g
 import EditBodyItemDetails from './BodyItem';
 import { ReactQuillProps } from 'react-quill';
 import Code from './questions/Code';
+import AllThatApply from './questions/AllThatApply';
 
-const DragHandle: React.FC<{
+export const DragHandle: React.FC<{
   handleRef: React.Ref<HTMLElement>,
   variant?: ButtonProps['variant'],
 }> = (props) => {
@@ -635,10 +637,17 @@ const BodyItemEditor: React.FC<{
         />
       );
       break;
+    case 'AllThatApply':
+      editor = (
+        <AllThatApply
+          id={id}
+          info={info}
+          answer={answer as AllThatApplyState}
+        />
+      );
+      break;
     default:
-      return <p>todo</p>;
-    // case 'AllThatApply':
-    //   return <AllThatApply qnum={qnum} pnum={pnum} bnum={bnum} />;
+      return <p>todo: {info.type}</p>;
     // case 'CodeTag':
     //   return <CodeTag qnum={qnum} pnum={pnum} bnum={bnum} />;
     // case 'YesNo':

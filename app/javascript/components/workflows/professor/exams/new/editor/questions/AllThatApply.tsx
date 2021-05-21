@@ -1,37 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Form,
   Row,
   Col,
   Button,
 } from 'react-bootstrap';
-import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
-import MoveItem from '@hourglass/workflows/professor/exams/new/old-editor/components/MoveItem';
-import {
-  Field,
-  FieldArray,
-  FieldArrayFieldsProps,
-  WrappedFieldArrayProps,
-  WrappedFieldProps,
-  FormSection,
-} from 'redux-form';
-import { EditHTMLField } from '@hourglass/workflows/professor/exams/new/old-editor/components/editHTMLs';
-import { AllThatApplyOptionWithAnswer } from '@professor/exams/types';
 import Icon from '@student/exams/show/components/Icon';
 import { FaCheck } from 'react-icons/fa';
+import { AllThatApplyInfo, AllThatApplyState, HTMLVal } from '@hourglass/workflows/student/exams/show/types';
+import RearrangableList from '@hourglass/common/rearrangeable';
+import Prompted from './Prompted';
+import { DragHandle, EditHTMLVal } from '..';
 
-interface AllThatApplyProps {
-  qnum: number;
-  pnum: number;
-  bnum: number;
-}
-
-const EditAnswer: React.FC<WrappedFieldProps> = (props) => {
-  const { input } = props;
+const EditAnswer: React.FC<{
+  value: boolean;
+  onChange: (newVal: boolean) => void;
+}> = (props) => {
   const {
     value,
     onChange,
-  } = input;
+  } = props;
   return (
     <Button
       variant={value ? 'dark' : 'outline-dark'}
@@ -42,99 +30,72 @@ const EditAnswer: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
+type OptionWithAnswer = {
+  id: string;
+  option: HTMLVal;
+  answer: boolean;
+}
+
 const OneOption: React.FC<{
-  memberName: string;
-  optionNum: number;
-  enableDown: boolean;
-  moveDown: () => void;
-  moveUp: () => void;
-  remove: () => void;
+  option: OptionWithAnswer;
+  handleRef: React.Ref<HTMLElement>;
 }> = (props) => {
   const {
-    memberName,
-    optionNum,
-    enableDown,
-    moveDown,
-    moveUp,
-    remove,
+    option,
+    handleRef,
   } = props;
-  const [moversVisible, setMoversVisible] = useState(false);
-  const showMovers = (): void => setMoversVisible(true);
-  const hideMovers = (): void => setMoversVisible(false);
   return (
-    <FormSection name={memberName}>
-      <Row
-        className="p-2"
-        onMouseOver={showMovers}
-        onFocus={showMovers}
-        onBlur={hideMovers}
-        onMouseOut={hideMovers}
-      >
-        <Col className="flex-grow-01">
-          <MoveItem
-            visible={moversVisible}
-            variant="dark"
-            enableUp={optionNum > 0}
-            enableDown={enableDown}
-            enableDelete
-            disabledDeleteMessage=""
-            onUp={moveUp}
-            onDown={moveDown}
-            onDelete={remove}
-          />
-          <Field name="answer" component={EditAnswer} />
-        </Col>
-        <Col className="pr-0">
-          <Field name="html" component={EditHTMLField} theme="bubble" />
-        </Col>
-      </Row>
-    </FormSection>
+    <Row className="p-2">
+      <Col sm="auto">
+        {handleRef && <DragHandle handleRef={handleRef} variant="info" />}
+      </Col>
+      <Col className="flex-grow-01">
+        <EditAnswer
+          value={option.answer}
+          onChange={console.log}
+        />
+      </Col>
+      <Col className="pr-0">
+        <EditHTMLVal
+          className="bg-white border rounded"
+          // disabled={loading || disabled}
+          value={option.option || {
+            type: 'HTML',
+            value: '',
+          }}
+          onChange={console.log}
+          debounceDelay={1000}
+        />
+      </Col>
+    </Row>
   );
 };
 
-export const renderOptionsATA = (
-  member: string,
-  index: number,
-  fields: FieldArrayFieldsProps<AllThatApplyOptionWithAnswer>,
-): JSX.Element => (
-  <OneOption
-    // eslint-disable-next-line react/no-array-index-key
-    key={index}
-    optionNum={index}
-    memberName={member}
-    enableDown={index + 1 < fields.length}
-    moveDown={(): void => {
-      fields.move(index, index + 1);
-    }}
-    moveUp={(): void => {
-      fields.move(index, index - 1);
-    }}
-    remove={(): void => {
-      fields.remove(index);
-    }}
-  />
-);
-
-const EditOption: React.FC<WrappedFieldArrayProps<AllThatApplyOptionWithAnswer>> = (props) => {
+const EditOptions: React.FC<{
+  options: OptionWithAnswer[];
+}> = (props) => {
   const {
-    fields,
+    options,
   } = props;
   return (
     <>
-      {fields.map(renderOptionsATA)}
+      <RearrangableList
+        dbArray={options}
+        identifier="TODO"
+        onRearrange={console.log}
+      >
+        {(option, handleRef) => (
+          <OneOption
+            option={option}
+            handleRef={handleRef}
+          />
+        )}
+      </RearrangableList>
       <Row className="p-2">
         <Col className="text-center p-0">
           <Button
             variant="dark"
-            onClick={(): void => {
-              fields.push({
-                html: {
-                  type: 'HTML',
-                  value: '',
-                },
-                answer: false,
-              });
-            }}
+            onClick={console.log}
           >
             Add new option
           </Button>
@@ -144,20 +105,28 @@ const EditOption: React.FC<WrappedFieldArrayProps<AllThatApplyOptionWithAnswer>>
   );
 };
 
-const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
+const AllThatApply: React.FC<{
+  info: AllThatApplyInfo;
+  id: string;
+  answer: AllThatApplyState;
+}> = (props) => {
   const {
-    qnum,
-    pnum,
-    bnum,
+    info,
+    id,
+    answer,
   } = props;
+  const zipped: OptionWithAnswer[] = info.options.map((option, index) => ({
+    option,
+    answer: answer[index],
+    id: index.toString(),
+  }));
   return (
     <>
       <Prompted
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
+        value={info.prompt}
+        onChange={console.log}
       />
-      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-answer`}>
+      <Form.Group as={Row}>
         <Form.Label column sm={2}>Answers</Form.Label>
         <Col sm={10}>
           <Row className="p-2">
@@ -166,7 +135,9 @@ const AllThatApply: React.FC<AllThatApplyProps> = (props) => {
             </Col>
             <Col><b>Prompt</b></Col>
           </Row>
-          <FieldArray name="options" component={EditOption} props={{ }} />
+          <EditOptions
+            options={zipped}
+          />
         </Col>
       </Form.Group>
     </>

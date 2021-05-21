@@ -7,7 +7,7 @@ import {
   ExamFilesContext,
 } from '@hourglass/common/context';
 import { createMap } from '@student/exams/show/files';
-import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
+import DisplayQuestions from '@student/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
 import { CurrentGrading } from '@professor/exams/types';

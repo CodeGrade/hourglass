@@ -36,7 +36,7 @@ const ExamViewerStudent: React.FC<ExamViewerProps> = (props) => {
     graphql`
     fragment showExamViewerStudent on ExamVersion {
       id
-      ...DisplayQuestionsStudent
+      ...DisplayQuestions
       dbReferences {
         type
         path

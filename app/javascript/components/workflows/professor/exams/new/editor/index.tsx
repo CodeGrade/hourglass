@@ -77,6 +77,7 @@ import Instructions from './Instructions';
 import EditReference from './Reference';
 import { editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
 import YesNo from '@hourglass/workflows/student/exams/show/components/questions/YesNo';
+import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
 
 const RubricEditor: React.FC = () => {
   const { versionId: examVersionId } = useParams<{ versionId: string }>();
@@ -276,6 +277,10 @@ const QuestionEditor: React.FC<{
       separateSubparts
       extraCredit
       rootRubric { ...editorSingle }
+      parts {
+        id
+        ...editorPartEditor
+      }
     }
     `,
     questionKey,
@@ -366,15 +371,36 @@ const QuestionEditor: React.FC<{
             </Row>
           </Col>
         </Row>
-        {/* {question.parts.map((part) => (
+        {question.parts.map((part) => (
           <Row key={part.id}>
             <Col>
-              part here
+              <PartEditor partKey={part} />
             </Col>
           </Row>
-        ))} */}
+        ))}
       </Card.Body>
     </Card>
+  );
+};
+
+const PartEditor: React.FC<{
+  partKey: editorPartEditor$key;
+}> = (props) => {
+  const {
+    partKey,
+  } = props;
+  const part = useFragment(
+    graphql`
+    fragment editorPartEditor on Part {
+      id
+    }
+    `,
+    partKey,
+  );
+  return (
+    <>
+      {`TODO: render ${part.id}`}
+    </>
   );
 };
 

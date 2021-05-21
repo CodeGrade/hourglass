@@ -11,6 +11,7 @@ import {
   ExamFile,
   FileRef,
   YesNoInfo,
+  BodyItemInfo,
 } from '@student/exams/show/types';
 import {
   Preset,
@@ -80,6 +81,8 @@ import { editorSingle$key } from './__generated__/editorSingle.graphql';
 import { editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
 import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
 import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.graphql';
+import EditBodyItemDetails from './BodyItem';
+import { ReactQuillProps } from 'react-quill';
 
 const DragHandle: React.FC<{
   handleRef: React.Ref<HTMLElement>,
@@ -198,7 +201,6 @@ const RubricEditor: React.FC = () => {
                   </Form.Group>
                 </Col>
                 <Col sm={6}>
-                  <p>Exam-wide rubric:</p>
                   <SingleRubricKeyEditor
                     rubricKey={rootRubric}
                   />
@@ -593,19 +595,22 @@ const BodyItemEditor: React.FC<{
     graphql`
     fragment editorBodyItemEditor on BodyItem {
       id
+      ...BodyItemDetailsEditor
     }
     `,
     bodyItemKey,
   );
   return (
-    <>
-      {handleRef && <DragHandle handleRef={handleRef} variant="warning" />}
-      <Row>
-        <Col>
-          {`TODO: edit body item ${bodyItem.id}`}
-        </Col>
-      </Row>
-    </>
+    <Card
+      className="border border-secondary alert-secondary mb-3"
+    >
+      {handleRef && <DragHandle handleRef={handleRef} variant="secondary" />}
+      <Card.Body className="ml-4">
+        <EditBodyItemDetails
+          bodyItemKey={bodyItem}
+        />
+      </Card.Body>
+    </Card>
   );
 };
 
@@ -1951,7 +1956,7 @@ const RubricDescriptionEditor: React.FC<{
   );
 };
 
-const EditHTMLVal: React.FC<{
+export const EditHTMLVal: React.FC<{
   disabled?: boolean;
   value: HTMLVal;
   onChange: (newVal: HTMLVal) => void;
@@ -1959,6 +1964,7 @@ const EditHTMLVal: React.FC<{
   debounceDelay?: number;
   refreshProps?: React.DependencyList;
   className?: string;
+  theme?: ReactQuillProps['theme'];
 }> = (props) => {
   const {
     disabled = false,
@@ -1968,6 +1974,7 @@ const EditHTMLVal: React.FC<{
     debounceDelay = 0,
     refreshProps = [],
     className,
+    theme = 'bubble',
   } = props;
   const debouncedOnChange = useDebouncedCallback(
     onChange,
@@ -1986,7 +1993,7 @@ const EditHTMLVal: React.FC<{
       disabled={disabled}
       value={value.value}
       placeholder={placeholder}
-      theme="bubble"
+      theme={theme}
       onChange={handleChange}
       refreshProps={[...refreshProps, value.value]}
       className={className}

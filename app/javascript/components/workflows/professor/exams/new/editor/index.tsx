@@ -328,73 +328,84 @@ const QuestionEditor: React.FC<{
             </Col>
           </Row>
         </Card.Title>
+        <Card.Subtitle>
+          <Row>
+            <Col sm="6">
+              <Form.Group as={Row}>
+                <Form.Label column sm="2">Description:</Form.Label>
+                <Col sm="10">
+                  <EditHTMLVal
+                    className="bg-white border rounded"
+                    // disabled={loading || disabled}
+                    value={question.description || {
+                      type: 'HTML',
+                      value: '',
+                    }}
+                    onChange={console.log}
+                    placeholder="Give a longer description of the question"
+                    debounceDelay={1000}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                {/* <Field name="separateSubparts" component={QuestionSepSubParts} /> */}
+                <Form.Label column sm="2">Separate subparts?</Form.Label>
+                <Col sm="4">
+                  <YesNo
+                    className="bg-white rounded"
+                    value={!!question.separateSubparts}
+                    info={SEP_SUB_YESNO}
+                    onChange={console.log}
+                  />
+                </Col>
+                <Form.Label column sm="2">Extra credit?</Form.Label>
+                <Col sm="4">
+                  <YesNo
+                    className="bg-white rounded"
+                    value={!!question.extraCredit}
+                    info={SEP_SUB_YESNO}
+                    onChange={console.log}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <EditReference
+                  value={question.references as FileRef[]}
+                  onChange={console.log}
+                  label="this question"
+                />
+              </Form.Group>
+            </Col>
+            <Col sm="6">
+              <Row>
+                <Col>
+                  <p>{`Question ${question.index + 1} rubric:`}</p>
+                  <SingleRubricKeyEditor
+                    rubricKey={question.rootRubric}
+                  />
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </Card.Subtitle>
       </div>
       <Card.Body>
-        <Row key={question.id}>
-          <Col sm="6">
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">Description:</Form.Label>
-              <Col sm="10">
-                <EditHTMLVal
-                  className="bg-white border rounded"
-                  // disabled={loading || disabled}
-                  value={question.description || {
-                    type: 'HTML',
-                    value: '',
-                  }}
-                  onChange={console.log}
-                  placeholder="Give a longer description of the question"
-                  debounceDelay={1000}
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              {/* <Field name="separateSubparts" component={QuestionSepSubParts} /> */}
-              <Form.Label column sm="2">Separate subparts?</Form.Label>
-              <Col sm="4">
-                <YesNo
-                  className="bg-white rounded"
-                  value={!!question.separateSubparts}
-                  info={SEP_SUB_YESNO}
-                  onChange={console.log}
-                />
-              </Col>
-              <Form.Label column sm="2">Extra credit?</Form.Label>
-              <Col sm="4">
-                <YesNo
-                  className="bg-white rounded"
-                  value={!!question.extraCredit}
-                  info={SEP_SUB_YESNO}
-                  onChange={console.log}
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <EditReference
-                value={question.references as FileRef[]}
-                onChange={console.log}
-                label="this question"
-              />
-            </Form.Group>
-          </Col>
-          <Col sm="6">
-            <Row>
+        <RearrangableList
+          dbArray={question.parts}
+          identifier={`PART-${question.id}`}
+          onRearrange={console.log}
+        >
+          {(part, partHandleRef) => (
+            <Row key={part.id}>
               <Col>
-                <p>{`Question ${question.index + 1} rubric:`}</p>
-                <SingleRubricKeyEditor
-                  rubricKey={question.rootRubric}
+                <PartEditor
+                  partKey={part}
+                  handleRef={partHandleRef}
                 />
               </Col>
             </Row>
-          </Col>
-        </Row>
-        {question.parts.map((part) => (
-          <Row key={part.id}>
-            <Col>
-              <PartEditor partKey={part} />
-            </Col>
-          </Row>
-        ))}
+          )}
+        </RearrangableList>
       </Card.Body>
     </Card>
   );
@@ -402,22 +413,127 @@ const QuestionEditor: React.FC<{
 
 const PartEditor: React.FC<{
   partKey: editorPartEditor$key;
+  handleRef: React.Ref<HTMLElement>;
 }> = (props) => {
   const {
     partKey,
+    handleRef,
   } = props;
   const part = useFragment(
     graphql`
     fragment editorPartEditor on Part {
       id
+      index
+      name {
+        type
+        value
+      }
+      description {
+        type
+        value
+      }
+      references {
+        type
+        path
+      }
+      extraCredit
+      points
+      rootRubric { ...editorSingle }
     }
     `,
     partKey,
   );
   return (
-    <>
-      {`TODO: render ${part.id}`}
-    </>
+    <Card
+      className="mb-3"
+      border="success"
+    >
+      <div className="alert alert-success">
+        <Card.Title>
+          <Row>
+            <Col sm="auto">
+              {handleRef && <span ref={handleRef} className="cursor-move"><Icon I={MdDragHandle} /></span>}
+            </Col>
+            <Col>
+              <EditHTMLVal
+                className="bg-white border rounded"
+                // disabled={loading || disabled}
+                value={part.name || {
+                  type: 'HTML',
+                  value: '',
+                }}
+                onChange={console.log}
+                placeholder="Give a short (optional) descriptive name for the part"
+                debounceDelay={1000}
+              />
+            </Col>
+          </Row>
+        </Card.Title>
+        <Card.Subtitle>
+          <Row>
+            <Col sm="6">
+              <Form.Group as={Row}>
+                <Form.Label column sm="2">Description:</Form.Label>
+                <Col sm="10">
+                  <EditHTMLVal
+                    className="bg-white border rounded"
+                    // disabled={loading || disabled}
+                    value={part.description || {
+                      type: 'HTML',
+                      value: '',
+                    }}
+                    onChange={console.log}
+                    placeholder="Give a longer description of the part"
+                    debounceDelay={1000}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <Form.Label column sm="2">Points</Form.Label>
+                <Col sm="4">
+                  <NormalizedNumericInput
+                    defaultValue={part.points.toString()}
+                    // disabled={loading || disabled}
+                    step={0.5}
+                    variant="warning"
+                    onCommit={console.log}
+                  />
+                </Col>
+                <Form.Label column sm="2">Extra credit?</Form.Label>
+                <Col sm="4">
+                  <YesNo
+                    className="bg-white rounded"
+                    value={!!part.extraCredit}
+                    info={SEP_SUB_YESNO}
+                    onChange={console.log}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <EditReference
+                  value={part.references as FileRef[]}
+                  onChange={console.log}
+                  label="this question part"
+                />
+              </Form.Group>
+            </Col>
+            <Col sm="6">
+              <Row>
+                <Col>
+                  <p>{`Part ${part.index + 1} rubric:`}</p>
+                  <SingleRubricKeyEditor
+                    rubricKey={part.rootRubric}
+                  />
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </Card.Subtitle>
+      </div>
+      <Card.Body>
+        TODO: body items here
+      </Card.Body>
+    </Card>
   );
 };
 

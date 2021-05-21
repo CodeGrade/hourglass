@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Rubric,
   Preset,
   RubricPresets,
   RubricAll,
   RubricAny,
   RubricOne,
+  Rubric,
 } from '@professor/exams/types';
 import { ExhaustiveSwitchError, pluralize } from '@hourglass/common/helpers';
 import {
@@ -17,9 +17,12 @@ import {
 } from 'react-bootstrap';
 import HTML from '@student/exams/show/components/HTML';
 import Icon from '@student/exams/show/components/Icon';
+import { graphql, useFragment } from 'relay-hooks';
 import { variantForPoints, iconForPoints } from '@grading/index';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { ShowPresetSummary } from '@grading/UseRubrics';
+import { expandRootRubric } from '@professor/exams/rubrics';
+import { ShowRubricKey$key } from './__generated__/ShowRubricKey.graphql';
 
 const ShowPreset: React.FC<{
   preset: Preset;
@@ -263,7 +266,76 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
   );
 };
 
-const ShowRubric: React.FC<{ rubric: Rubric, forWhat: string }> = (props) => {
+export const ShowRubricKey: React.FC<{
+  rubricKey: ShowRubricKey$key,
+  forWhat: string,
+}> = (props) => {
+  const { rubricKey, forWhat } = props;
+  const rawRubric = useFragment<ShowRubricKey$key>(
+    graphql`
+    fragment ShowRubricKey on Rubric {
+      id
+      type
+      parentSectionId
+      order
+      points
+      description {
+        type
+        value
+      }
+      rubricPreset {
+        id
+        direction
+        label
+        mercy
+        presetComments {
+          id
+          label
+          order
+          points
+          graderHint
+          studentFeedback
+        }
+      }
+      subsections { id }
+      allSubsections {
+        id
+        type
+        parentSectionId
+        order
+        points
+        description {
+          type
+          value
+        }
+        rubricPreset {
+          id
+          direction
+          label
+          mercy
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+        subsections { id }
+      }
+    }
+    `,
+    rubricKey,
+  );
+  const rubric = expandRootRubric(rawRubric);
+  return <ShowRubric rubric={rubric} forWhat={forWhat} />;
+};
+
+const ShowRubric: React.FC<{
+  rubric: Rubric,
+  forWhat: string,
+}> = (props) => {
   const { rubric, forWhat } = props;
   switch (rubric.type) {
     case 'none': return <div><i>{`No ${forWhat} rubric`}</i></div>;

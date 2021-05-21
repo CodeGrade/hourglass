@@ -4,7 +4,7 @@ module Mutations
   class DestroyRubric < BaseMutation
     argument :rubric_id, ID, required: true, loads: Types::RubricType
 
-    field :exam_version, Types::ExamVersionType, null: false
+    field :parent_section, Types::RubricType, null: false
 
     def authorized?(rubric:)
       return true if rubric.exam_version.course.user_is_professor?(context[:current_user])
@@ -22,13 +22,12 @@ module Mutations
         destroyed = rubric.destroy
         raise GraphQL::ExecutionError, rubric.errors.full_messages.to_sentence unless destroyed
 
-        if parent_section
-          parent_section.subsections.where(order: order..).order(:order).each do |section|
-            section.update(order: section.order - 1)
-          end
+        parent_section.subsections.where(order: order..).order(:order).each do |section|
+          section.update(order: section.order - 1)
         end
 
-        { exam_version: exam_version }
+        cache_authorization!(exam_version.exam, exam_version.exam.course)
+        { parent_section: parent_section }
       end
     end
 

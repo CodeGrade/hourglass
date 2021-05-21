@@ -21,10 +21,11 @@ import {
   useMutation,
   MutateWithVariables,
   MutationState,
+  useFragment,
 } from 'relay-hooks';
 
 import { RenderError } from '@hourglass/common/boundary';
-import convertRubric from '@professor/exams/rubrics';
+import { expandRootRubric } from '@professor/exams/rubrics';
 import {
   Button,
   ButtonGroup,
@@ -65,6 +66,7 @@ import { rubricEditorDestroyPresetCommentMutation } from './__generated__/rubric
 import { rubricEditorDestroyRubricMutation } from './__generated__/rubricEditorDestroyRubricMutation.graphql';
 import { rubricEditorReorderPresetCommentMutation } from './__generated__/rubricEditorReorderPresetCommentMutation.graphql';
 import { rubricEditorReorderRubricsMutation } from './__generated__/rubricEditorReorderRubricsMutation.graphql';
+import { rubricEditorSingle$key } from './__generated__/rubricEditorSingle.graphql';
 
 export interface RubricEditorProps {
   examVersionId: string;
@@ -83,50 +85,17 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
     graphql`
     query rubricEditorQuery($examVersionId: ID!) {
       examVersion(id: $examVersionId) {
+        rootRubric { ...rubricEditorSingle }
         dbQuestions {
           id
-          rubrics {
-            id
-          }
+          rootRubric { ...rubricEditorSingle }
           parts {
             id
-            rubrics {
-              id
-            }
+            rootRubric { ...rubricEditorSingle }
             bodyItems {
               id
-              rubrics {
-                id
-              }
+              rootRubric { ...rubricEditorSingle }
             }
-          }
-        }
-        rubrics {
-          id
-          type
-          parentSectionId
-          order
-          points
-          description {
-            type
-            value
-          }
-          rubricPreset {
-            id
-            direction
-            label
-            mercy
-            presetComments {
-              id
-              label
-              order
-              points
-              graderHint
-              studentFeedback
-            }
-          }
-          subsections {
-            id
           }
         }
       }
@@ -140,8 +109,7 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
   if (!res.data) {
     return <p>Loading...</p>;
   }
-  const { rubrics, dbQuestions } = res.data.examVersion;
-  const { examRubric, questions } = convertRubric(rubrics, dbQuestions);
+  const { rootRubric, dbQuestions } = res.data.examVersion;
 
   return (
     <ExamContext.Provider
@@ -163,19 +131,17 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
         <Row>
           <Col sm={12}>
             <p>Exam-wide rubric:</p>
-            {examRubric ? (
-              <SingleRubricEditor
-                rubric={examRubric}
-                examVersionId={examVersionId}
-              />
-            ) : 'TODO: NONE'}
-            {questions.map((q, qnum) => (
+            <SingleRubricKeyEditor
+              rubricKey={rootRubric}
+              examVersionId={examVersionId}
+            />
+            {dbQuestions.map((q, qnum) => (
               // eslint-disable-next-line react/no-array-index-key
               <Row key={qnum}>
                 <Col>
                   <p>{`Question ${qnum + 1} rubric:`}</p>
-                  <SingleRubricEditor
-                    rubric={q.questionRubric}
+                  <SingleRubricKeyEditor
+                    rubricKey={q.rootRubric}
                     examVersionId={examVersionId}
                     questionId={q.id}
                   />
@@ -184,19 +150,19 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
                     <Row key={pnum}>
                       <Col>
                         <p>{`Question ${qnum + 1} part ${pnum + 1} rubric:`}</p>
-                        <SingleRubricEditor
-                          rubric={p.partRubric}
+                        <SingleRubricKeyEditor
+                          rubricKey={p.rootRubric}
                           examVersionId={examVersionId}
                           questionId={q.id}
                           partId={p.id}
                         />
-                        {p.body.map((b, bnum) => (
+                        {p.bodyItems.map((b, bnum) => (
                           // eslint-disable-next-line react/no-array-index-key
                           <Row key={bnum}>
                             <Col>
                               <p>{`Question ${qnum + 1} part ${pnum + 1} body ${bnum + 1} rubric:`}</p>
-                              <SingleRubricEditor
-                                rubric={b.rubric}
+                              <SingleRubricKeyEditor
+                                rubricKey={b.rootRubric}
                                 examVersionId={examVersionId}
                                 questionId={q.id}
                                 partId={p.id}
@@ -238,8 +204,8 @@ const defaultOptions: Record<Rubric['type'], SelectOption<Rubric['type']>> = {
   },
 };
 
-interface SingleRubricEditorProps {
-  rubric?: Rubric;
+interface SingleRubricKeyEditorProps {
+  rubricKey: rubricEditorSingle$key;
   examVersionId: string;
   questionId?: string;
   partId?: string;
@@ -248,6 +214,96 @@ interface SingleRubricEditorProps {
   disabled?: boolean;
 }
 
+const SingleRubricKeyEditor: React.FC<SingleRubricKeyEditorProps> = (props) => {
+  const {
+    rubricKey,
+    examVersionId,
+    questionId,
+    partId,
+    bodyItemId,
+    showDestroy = false,
+    disabled = false,
+  } = props;
+  const rawRubric = useFragment<rubricEditorSingle$key>(
+    graphql`
+    fragment rubricEditorSingle on Rubric {
+      id
+      type
+      parentSectionId
+      order
+      points
+      description {
+        type
+        value
+      }
+      rubricPreset {
+        id
+        direction
+        label
+        mercy
+        presetComments {
+          id
+          label
+          order
+          points
+          graderHint
+          studentFeedback
+        }
+      }
+      subsections { id }
+      allSubsections {
+        id
+        type
+        parentSectionId
+        order
+        points
+        description {
+          type
+          value
+        }
+        rubricPreset {
+          id
+          direction
+          label
+          mercy
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+        subsections { id }
+      }
+    }
+    `,
+    rubricKey,
+  );
+  const rubric = expandRootRubric(rawRubric);
+  return (
+    <SingleRubricEditor
+      rubric={rubric}
+      examVersionId={examVersionId}
+      questionId={questionId}
+      partId={partId}
+      bodyItemId={bodyItemId}
+      showDestroy={showDestroy}
+      disabled={disabled}
+    />
+  );
+};
+
+interface SingleRubricEditorProps {
+  rubric: Rubric;
+  examVersionId: string;
+  questionId?: string;
+  partId?: string;
+  bodyItemId?: string;
+  showDestroy?: boolean;
+  disabled?: boolean;
+}
 const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
   const {
     rubric,
@@ -263,52 +319,44 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
     graphql`
     mutation rubricEditorDestroyRubricMutation($input: DestroyRubricInput!) {
       destroyRubric(input: $input) {
-        examVersion {
-          id
-          dbQuestions {
+        parentSection {
+          examVersion {
             id
-            rubrics {
-              id
-            }
-            parts {
-              id
-              rubrics {
-                id
-              }
-              bodyItems {
-                id
-                rubrics {
-                  id
-                }
+            rootRubric {
+              allSubsections { 
+                id 
+                subsections { id }
               }
             }
           }
-          rubrics {
+          question {
             id
-            type
-            parentSectionId
-            order
-            points
-            description {
-              type
-              value
-            }
-            rubricPreset {
+            rootRubric {
               id
-              direction
-              label
-              mercy
-              presetComments {
-                id
-                label
-                order
-                points
-                graderHint
-                studentFeedback
+              allSubsections { 
+                id 
+                subsections { id }
               }
             }
-            subsections {
+          }
+          part {
+            id
+            rootRubric {
               id
+              allSubsections { 
+                id 
+                subsections { id }
+              }
+            }
+          }
+          bodyItem {
+            id
+            rootRubric {
+              id
+              allSubsections { 
+                id 
+                subsections { id }
+              }
             }
           }
         }
@@ -669,37 +717,56 @@ function useCreateRubricMutation(): MutationReturn<rubricEditorCreateRubricMutat
     graphql`
     mutation rubricEditorCreateRubricMutation($input: CreateRubricInput!) {
       createRubric(input: $input) {
-        examVersion {
+        parentSection {
           id
-          rubrics {
-            id
+          subsections { id }
+        }
+        rubric {
+          id
+          type
+          parentSectionId
+          order
+          points
+          description {
             type
-            parentSectionId
-            qnum
-            pnum
-            bnum
-            order
-            points
-            description {
-              type
-              value
-            }
-            rubricPreset {
+            value
+          }
+          rubricPreset {
+            id
+            direction
+            label
+            mercy
+            presetComments {
               id
-              direction
               label
-              mercy
-              presetComments {
-                id
-                label
-                order
-                points
-                graderHint
-                studentFeedback
-              }
+              order
+              points
+              graderHint
+              studentFeedback
             }
-            subsections {
+          }
+          subsections {
+            id
+          }
+          question {
+            id
+            rootRubric {
               id
+              allSubsections { id }
+            }
+          }
+          part {
+            id
+            rootRubric {
+              id
+              allSubsections { id }
+            }
+          }
+          bodyItem {
+            id
+            rootRubric {
+              id
+              allSubsections { id }
             }
           }
         }

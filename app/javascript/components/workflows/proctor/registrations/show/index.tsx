@@ -11,10 +11,9 @@ import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
 import { CurrentGrading } from '@professor/exams/types';
-import ShowRubric from '@proctor/registrations/show/ShowRubric';
+import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import { useFragment } from 'relay-hooks';
 import { graphql } from 'relay-runtime';
-import convertRubric from '@professor/exams/rubrics';
 
 import { showExamViewer$key } from './__generated__/showExamViewer.graphql';
 
@@ -42,6 +41,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
       id
       answers
       ...DisplayQuestions
+      rootRubric { ...ShowRubricKey }
       dbReferences {
         type
         path
@@ -101,7 +101,6 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     `,
     version,
   );
-  const rubric = convertRubric(res.rubrics, res.dbQuestions);
   const {
     instructions,
     dbReferences: references,
@@ -117,7 +116,6 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
   }), [files]);
   const examViewerContextVal = useMemo(() => ({
     answers,
-    rubric,
   }), [answers]);
   const examFilesContextVal = useMemo(() => ({
     references,
@@ -143,7 +141,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
                 references={references}
               />
             )}
-            {rubric?.examRubric && overviewMode && <ShowRubric rubric={rubric.examRubric} forWhat="exam" />}
+            {overviewMode && <ShowRubricKey rubricKey={res.rootRubric} forWhat="exam" />}
             <div>
               <DisplayQuestions
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}

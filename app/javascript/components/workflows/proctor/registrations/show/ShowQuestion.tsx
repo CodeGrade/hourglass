@@ -11,12 +11,13 @@ import { pluralize } from '@hourglass/common/helpers';
 
 interface ShowQuestionProps {
   refreshCodeMirrorsDeps: React.DependencyList;
-  question: QuestionInfo;
+  question: Readonly<QuestionInfo>;
   qnum: number;
   currentGrading?: CurrentGrading[number];
   registrationId?: string;
   fullyExpandCode: boolean;
   overviewMode: boolean;
+  showRubric: boolean;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
@@ -28,6 +29,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     registrationId,
     fullyExpandCode,
     overviewMode,
+    // showRubric,
   } = props;
   const {
     name,

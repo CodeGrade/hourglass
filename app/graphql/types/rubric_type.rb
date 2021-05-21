@@ -103,10 +103,17 @@ module Types
       RecordLoader.for(Rubric).load(object.parent_section_id)
     end
 
+    field :exam_version, Types::ExamVersionType, null: false
+    field :question, Types::QuestionType, null: true
+    field :part, Types::PartType, null: true
+    field :body_item, Types::BodyItemType, null: true
+
     field :subsections, [Types::RubricType], null: true
     def subsections
       AssociationLoader.for(Rubric, :subsections).load(object)
     end
+    field :all_subsections, [Types::RubricType], null: false
+
     field :rubric_preset, Types::RubricPresetType, null: true
     def rubric_preset
       AssociationLoader.for(Rubric, :rubric_preset).load(object)

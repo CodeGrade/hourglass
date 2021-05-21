@@ -12,7 +12,8 @@ module Mutations
     argument :part_id, ID, required: false, loads: Types::PartType
     argument :body_item_id, ID, required: false, loads: Types::BodyItemType
 
-    field :exam_version, Types::ExamVersionType, null: false
+    field :parent_section, Types::RubricType, null: false
+    field :rubric, Types::RubricType, null: false
 
     def authorized?(exam_version:, **_args)
       return true if exam_version.course.user_is_professor?(context[:current_user])
@@ -21,12 +22,17 @@ module Mutations
     end
 
     def resolve(type:, **args)
-      order = args[:parent_section]&.subsections&.count || 0
+      parent_section = args[:parent_section]
+      raise GraphQL::ExecutionError, 'Cannot create root rubrics' if parent_section.nil?
+
+      order = parent_section.subsections&.count || 0
       rubric = Rubric.new(type: type.capitalize, order: order, **args)
       saved = rubric.save
       raise GraphQL::ExecutionError, rubric.errors.full_messages.to_sentence unless saved
 
-      { exam_version: rubric.exam_version }
+      exam_version = rubric.exam_version
+      cache_authorization!(exam_version.exam, exam_version.exam.course)
+      { parent_section: parent_section, rubric: rubric }
     end
   end
 end

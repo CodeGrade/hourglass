@@ -116,11 +116,26 @@ module Types
       guard ALL_STAFF_OR_PUBLISHED
     end
 
+    field :all_rubrics, [Types::RubricType], null: true do
+      guard Guards::ALL_STAFF
+    end
+    def all_rubrics
+      AssociationLoader
+        .for(ExamVersion, :rubrics)
+        .load(object)
+    end
+
     field :rubrics, [Types::RubricType], null: true do
       guard Guards::ALL_STAFF
     end
     def rubrics
-      AssociationLoader.for(ExamVersion, :rubrics).load(object)
+      AssociationLoader
+        .for(ExamVersion, :rubrics, merge: -> { where(question_id: nil, part_id: nil, body_item_id: nil) })
+        .load(object)
+    end
+
+    field :root_rubric, Types::RubricType, null: true do
+      guard Guards::ALL_STAFF
     end
 
     field :raw_rubrics, GraphQL::Types::JSON, null: true do

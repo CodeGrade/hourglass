@@ -94,6 +94,10 @@
   cursor: pointer;
 }
 
+.cursor-move {
+  cursor: move;
+}
+
 .transition {
   transition: 0.35s width ease-in-out;
 }

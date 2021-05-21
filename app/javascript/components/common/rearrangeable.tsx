@@ -31,7 +31,7 @@ interface RearrangeableListProps<T extends { id: string }> {
   dbArray: readonly T[];
   identifier: string;
   onRearrange: (from: number, to: number) => void;
-  children: (item: T) => ReactNode;
+  children: (item: T, handleRef: React.Ref<HTMLElement>) => ReactNode;
 }
 
 export default function RearrangableList<T extends { id: string }>(
@@ -64,10 +64,10 @@ export default function RearrangableList<T extends { id: string }>(
           index={index}
           onRearrange={onRearrange}
         >
-          {idToDbItemMap[id]
-          // if an item was deleted, it will take 2 render cycles for `order` to catch up
-            ? children(idToDbItemMap[id])
-            : null}
+          {(handleRef) => (idToDbItemMap[id]
+            // if an item was deleted, it will take 2 render cycles for `order` to catch up
+            ? children(idToDbItemMap[id], handleRef)
+            : null)}
         </RearrangeableItem>
       ))}
     </>
@@ -85,6 +85,7 @@ const RearrangeableItem: React.FC<{
   moveItem: (dragIndex: number, hoverIndex: number) => void;
   index: number;
   onRearrange: (from: number, to: number) => void;
+  children: (handleRef: React.Ref<HTMLElement>) => ReactNode;
 }> = (props) => {
   // Borrowed from:
   // https://react-dnd.github.io/react-dnd/examples/sortable/simple
@@ -96,6 +97,7 @@ const RearrangeableItem: React.FC<{
     children,
   } = props;
   const ref = useRef<HTMLDivElement>(null);
+  const handleRef = useRef<HTMLElement>(null);
   const [{ handlerId }, drop] = useDrop({
     accept: identifier,
     collect: (monitor) => ({
@@ -150,7 +152,7 @@ const RearrangeableItem: React.FC<{
       item.index = hoverIndex;
     },
   });
-  const [{ isDragging }, drag] = useDrag({
+  const [{ isDragging }, drag, preview] = useDrag({
     item: { type: identifier, index, startIndex: index },
     collect: (monitor: DragSourceMonitor) => ({
       isDragging: monitor.isDragging(),
@@ -161,10 +163,11 @@ const RearrangeableItem: React.FC<{
     },
   });
   const opacity = isDragging ? 0 : 1;
-  drag(drop(ref));
+  drag(handleRef);
+  preview(drop(ref));
   return (
-    <div ref={ref} style={{ opacity }} className="cursor-move" data-handler-id={handlerId}>
-      {children}
+    <div ref={ref} style={{ opacity }} data-handler-id={handlerId}>
+      {children(handleRef)}
     </div>
   );
 };

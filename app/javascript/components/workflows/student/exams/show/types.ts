@@ -1,6 +1,8 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
+import { rubricEditorQueryResponse } from '@hourglass/workflows/professor/exams/new/rubric-editor/__generated__/rubricEditorQuery.graphql';
+import { Policy } from '@material-ui/icons';
 
 export type ExamTakerAction =
   LoadExamAction |
@@ -487,11 +489,7 @@ export interface AnomalyListener {
   capture?: boolean;
 }
 
-export enum Policy {
-  ignoreLockdown = 'IGNORE_LOCKDOWN',
-  tolerateWindowed = 'TOLERATE_WINDOWED',
-  mockLockdown = 'MOCK_LOCKDOWN'
-}
+export type Policy = rubricEditorQueryResponse['examVersion']['policies'][number];
 
 export function policyPermits(policy: readonly Policy[], query: Policy): boolean {
   return policy.find((p) => p === query) !== undefined;

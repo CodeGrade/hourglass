@@ -10,6 +10,8 @@ import {
   ExamVersion,
   AnswersState,
   HTMLVal,
+  ExamFile,
+  FileRef,
 } from '@student/exams/show/types';
 import {
   Preset,
@@ -32,6 +34,7 @@ import {
   ButtonProps,
   Card,
   Col,
+  Container,
   Dropdown,
   DropdownButton,
   Form,
@@ -51,6 +54,7 @@ import { FaTrashAlt } from 'react-icons/fa';
 import RearrangableList from '@hourglass/common/rearrangeable';
 import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
 import { MdDragHandle } from 'react-icons/md';
+import { useParams } from 'react-router-dom';
 import { rubricEditorChangeRubricDetailsDescriptionMutation } from './__generated__/rubricEditorChangeRubricDetailsDescriptionMutation.graphql';
 import { rubricEditorChangeRubricTypeMutation } from './__generated__/rubricEditorChangeRubricTypeMutation.graphql';
 import { rubricEditorChangeRubricDetailsPointsMutation } from './__generated__/rubricEditorChangeRubricDetailsPointsMutation.graphql';
@@ -69,25 +73,29 @@ import { rubricEditorDestroyRubricMutation } from './__generated__/rubricEditorD
 import { rubricEditorReorderPresetCommentMutation } from './__generated__/rubricEditorReorderPresetCommentMutation.graphql';
 import { rubricEditorReorderRubricsMutation } from './__generated__/rubricEditorReorderRubricsMutation.graphql';
 import { rubricEditorSingle$key } from './__generated__/rubricEditorSingle.graphql';
+import Policies from './Policies';
+import FileUploader from './FileUploader';
+import Instructions from './Instructions';
+import EditReference from './Reference';
 
-export interface RubricEditorProps {
-  examVersionId: string;
-  exam: ExamVersion;
-  versionName: string;
-  answers: AnswersState;
-}
-
-const RubricEditor: React.FC<RubricEditorProps> = (props) => {
-  const {
-    examVersionId,
-    exam,
-    versionName,
-  } = props;
+const RubricEditor: React.FC = () => {
+  const { versionId: examVersionId } = useParams<{ versionId: string }>();
   const res = useQuery<rubricEditorQuery>(
     graphql`
     query rubricEditorQuery($examVersionId: ID!) {
       examVersion(id: $examVersionId) {
+        name
         rootRubric { ...rubricEditorSingle }
+        files
+        instructions {
+          type
+          value
+        }
+        dbReferences {
+          type
+          path
+        }
+        policies
         dbQuestions {
           id
           rootRubric { ...rubricEditorSingle }
@@ -106,83 +114,130 @@ const RubricEditor: React.FC<RubricEditorProps> = (props) => {
     { examVersionId },
   );
   if (res.error) {
-    return <RenderError error={res.error} />;
+    return <Container><RenderError error={res.error} /></Container>;
   }
   if (!res.data) {
-    return <p>Loading...</p>;
+    return <Container><p>Loading...</p></Container>;
   }
-  const { rootRubric, dbQuestions } = res.data.examVersion;
+  const { examVersion } = res.data;
+  const { rootRubric, dbQuestions, policies } = examVersion;
 
   return (
-    <ExamContext.Provider
-      value={{
-        files: exam.files,
-        fmap: createMap(exam.files),
-      }}
-    >
-      <ExamFilesContext.Provider
+    <Container fluid>
+      <ExamContext.Provider
         value={{
-          references: exam.references,
+          files: examVersion.files as ExamFile[],
+          fmap: createMap(examVersion.files as ExamFile[]),
         }}
       >
-        <Row>
-          <Col sm={{ span: 6, offset: 3 }}>
-            <h1>{`${versionName} Rubric`}</h1>
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12}>
-            <p>Exam-wide rubric:</p>
-            <SingleRubricKeyEditor
-              rubricKey={rootRubric}
-              examVersionId={examVersionId}
-            />
-            {dbQuestions.map((q, qnum) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <Row key={qnum}>
+        <ExamFilesContext.Provider
+          value={{
+            references: examVersion.dbReferences,
+          }}
+        >
+          <Row>
+            <Col sm={{ span: 8, offset: 2 }}>
+              <Form.Group as={Row} controlId="examTitle">
+                <Form.Label column sm="auto"><h2>Version name:</h2></Form.Label>
                 <Col>
-                  <p>{`Question ${qnum + 1} rubric:`}</p>
-                  <SingleRubricKeyEditor
-                    rubricKey={q.rootRubric}
-                    examVersionId={examVersionId}
-                    questionId={q.id}
+                  <Form.Control
+                    size="lg"
+                    type="text"
+                    placeholder="Enter a name for this version"
+                    value={examVersion.name}
+                    onChange={console.log}
                   />
-                  {q.parts.map((p, pnum) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <Row key={pnum}>
-                      <Col>
-                        <p>{`Question ${qnum + 1} part ${pnum + 1} rubric:`}</p>
-                        <SingleRubricKeyEditor
-                          rubricKey={p.rootRubric}
-                          examVersionId={examVersionId}
-                          questionId={q.id}
-                          partId={p.id}
-                        />
-                        {p.bodyItems.map((b, bnum) => (
-                          // eslint-disable-next-line react/no-array-index-key
-                          <Row key={bnum}>
-                            <Col>
-                              <p>{`Question ${qnum + 1} part ${pnum + 1} body ${bnum + 1} rubric:`}</p>
-                              <SingleRubricKeyEditor
-                                rubricKey={b.rootRubric}
-                                examVersionId={examVersionId}
-                                questionId={q.id}
-                                partId={p.id}
-                                bodyItemId={b.id}
-                              />
-                            </Col>
-                          </Row>
-                        ))}
-                      </Col>
-                    </Row>
-                  ))}
+                </Col>
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12}>
+              <Row>
+                <Col sm={6}>
+                  <div className="alert alert-info">
+                    <h4>Exam-wide information</h4>
+                    <Policies
+                      value={policies}
+                      onChange={console.log}
+                    />
+                    <FileUploader
+                      value={examVersion.files as ExamFile[]}
+                      onChange={console.log}
+                    />
+                    <Instructions
+                      value={examVersion.instructions}
+                      onChange={console.log}
+                    />
+                  </div>
+                  <Form.Group as={Row}>
+                    {/* <Field
+                    name="reference"
+                    component={EditReference}
+                    label="the entire exam"
+                  /> */}
+                    <EditReference
+                      value={examVersion.dbReferences as FileRef[]}
+                      onChange={console.log}
+                      label="the entire exam"
+                    />
+                  </Form.Group>
+                </Col>
+                <Col sm={6}>
+                  <p>Exam-wide rubric:</p>
+                  <SingleRubricKeyEditor
+                    rubricKey={rootRubric}
+                    examVersionId={examVersionId}
+                  />
                 </Col>
               </Row>
-            ))}
-          </Col>
-        </Row>
-      </ExamFilesContext.Provider>
-    </ExamContext.Provider>
+              {dbQuestions.map((q, qnum) => (
+                // eslint-disable-next-line react/no-array-index-key
+                <Row key={qnum}>
+                  <Col>
+                    <p>{`Question ${qnum + 1} rubric:`}</p>
+                    <SingleRubricKeyEditor
+                      rubricKey={q.rootRubric}
+                      examVersionId={examVersionId}
+                      questionId={q.id}
+                    />
+                    {q.parts.map((p, pnum) => (
+                      // eslint-disable-next-line react/no-array-index-key
+                      <Row key={pnum}>
+                        <Col>
+                          <p>{`Question ${qnum + 1} part ${pnum + 1} rubric:`}</p>
+                          <SingleRubricKeyEditor
+                            rubricKey={p.rootRubric}
+                            examVersionId={examVersionId}
+                            questionId={q.id}
+                            partId={p.id}
+                          />
+                          {p.bodyItems.map((b, bnum) => (
+                            // eslint-disable-next-line react/no-array-index-key
+                            <Row key={bnum}>
+                              <Col>
+                                <p>{`Question ${qnum + 1} part ${pnum + 1} body ${bnum + 1} rubric:`}</p>
+                                <SingleRubricKeyEditor
+                                  rubricKey={b.rootRubric}
+                                  examVersionId={examVersionId}
+                                  questionId={q.id}
+                                  partId={p.id}
+                                  bodyItemId={b.id}
+                                />
+                              </Col>
+                            </Row>
+                          ))}
+                        </Col>
+                      </Row>
+                    ))}
+                  </Col>
+                </Row>
+              ))}
+            </Col>
+          </Row>
+        </ExamFilesContext.Provider>
+      </ExamContext.Provider>
+    </Container>
   );
 };
 export default RubricEditor;

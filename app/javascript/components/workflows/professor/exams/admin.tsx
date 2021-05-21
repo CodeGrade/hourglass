@@ -55,7 +55,7 @@ import ErrorBoundary, { RenderError } from '@hourglass/common/boundary';
 import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import { policyToString } from '@professor/exams/new/editor/components/Policies';
+import { policyToString } from '@professor/exams/new/rubric-editor/Policies';
 import {
   graphql,
   useFragment,
@@ -797,25 +797,16 @@ const ShowVersion: React.FC<{
               Export as archive
             </Dropdown.Item>
           </DropdownButton>
-          <LinkSplitButton
+          <LinkButton
             id={`edit-${res.id}`}
             disabled={loading}
             variant="info"
-            to={`/exams/${examId}/versions/${res.id}/edit/questions`}
+            to={`/exams/${examId}/versions/${res.id}/edit`}
             className="mr-2"
             title="Edit"
           >
-            <LinkDropdownItem
-              to={`/exams/${examId}/versions/${res.id}/edit/questions`}
-            >
-              Edit Questions
-            </LinkDropdownItem>
-            <LinkDropdownItem
-              to={`/exams/${examId}/versions/${res.id}/edit/rubric`}
-            >
-              Edit Rubric
-            </LinkDropdownItem>
-          </LinkSplitButton>
+            Edit
+          </LinkButton>
           <TooltipButton
             variant="danger"
             disabled={res.anyStarted || res.anyFinalized || loading}
@@ -868,7 +859,7 @@ const PreviewVersion: React.FC<{
         <h6>
           Policies:
           <span className="ml-4">
-            {res.policies.map(policyToString).join(', ')}
+            {res.policies.map((policy) => policyToString[policy]).join(', ')}
           </span>
         </h6>
         <div className="border p-2">

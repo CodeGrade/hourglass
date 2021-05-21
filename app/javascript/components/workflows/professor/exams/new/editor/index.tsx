@@ -85,8 +85,9 @@ import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
 import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.graphql';
 import EditBodyItemDetails from './BodyItem';
 import { ReactQuillProps } from 'react-quill';
-import Code from './questions/Code';
-import AllThatApply from './questions/AllThatApply';
+import Code from './body-items/Code';
+import AllThatApply from './body-items/AllThatApply';
+import MultipleChoice from './body-items/MultipleChoice';
 
 export const DragHandle: React.FC<{
   handleRef: React.Ref<HTMLElement>,

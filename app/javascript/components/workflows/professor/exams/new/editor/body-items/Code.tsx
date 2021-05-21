@@ -8,7 +8,7 @@ import {
 } from 'react-bootstrap';
 import { MarkDescription, CodeState, CodeInfo, CodeInitialContents } from '@student/exams/show/types';
 import { Editor, marksToDescs } from '@student/exams/show/components/ExamCodeBox';
-import Prompted from '@hourglass/workflows/professor/exams/new/editor/questions/Prompted';
+import Prompted from '@hourglass/workflows/professor/exams/new/editor/body-items/Prompted';
 import { FaLock, FaBan } from 'react-icons/fa';
 import { ExamContext } from '@hourglass/common/context';
 import { firstFile } from '@student/exams/show/files';

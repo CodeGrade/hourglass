@@ -76,6 +76,7 @@ import FileUploader from './FileUploader';
 import Instructions from './Instructions';
 import EditReference from './Reference';
 import { editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
+import YesNo from '@hourglass/workflows/student/exams/show/components/questions/YesNo';
 
 const RubricEditor: React.FC = () => {
   const { versionId: examVersionId } = useParams<{ versionId: string }>();
@@ -240,6 +241,13 @@ const RubricEditor: React.FC = () => {
 };
 export default RubricEditor;
 
+const SEP_SUB_YESNO: YesNoInfo = {
+  type: 'YesNo',
+  yesLabel: 'Yes',
+  noLabel: 'No',
+  prompt: { type: 'HTML', value: '' },
+};
+
 const QuestionEditor: React.FC<{
   questionKey: editorQuestionEditor$key;
   handleRef: React.Ref<HTMLElement>;
@@ -257,6 +265,16 @@ const QuestionEditor: React.FC<{
         type
         value
       }
+      description {
+        type
+        value
+      }
+      references {
+        type
+        path
+      }
+      separateSubparts
+      extraCredit
       rootRubric { ...editorSingle }
     }
     `,
@@ -292,7 +310,50 @@ const QuestionEditor: React.FC<{
       <Card.Body>
         <Row key={question.id}>
           <Col sm="6">
-            TODO
+            <Form.Group as={Row}>
+              <Form.Label column sm="2">Description:</Form.Label>
+              <Col sm="10">
+                <EditHTMLVal
+                  className="bg-white border rounded"
+                  // disabled={loading || disabled}
+                  value={question.description || {
+                    type: 'HTML',
+                    value: '',
+                  }}
+                  onChange={console.log}
+                  placeholder="Give a longer description of the question"
+                  debounceDelay={1000}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              {/* <Field name="separateSubparts" component={QuestionSepSubParts} /> */}
+              <Form.Label column sm="2">Separate subparts?</Form.Label>
+              <Col sm="4">
+                <YesNo
+                  className="bg-white rounded"
+                  value={!!question.separateSubparts}
+                  info={SEP_SUB_YESNO}
+                  onChange={console.log}
+                />
+              </Col>
+              <Form.Label column sm="2">Extra credit?</Form.Label>
+              <Col sm="4">
+                <YesNo
+                  className="bg-white rounded"
+                  value={!!question.extraCredit}
+                  info={SEP_SUB_YESNO}
+                  onChange={console.log}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row}>
+              <EditReference
+                value={question.references as FileRef[]}
+                onChange={console.log}
+                label="this question"
+              />
+            </Form.Group>
           </Col>
           <Col sm="6">
             <Row>

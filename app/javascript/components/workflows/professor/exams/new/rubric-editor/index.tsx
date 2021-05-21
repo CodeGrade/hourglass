@@ -49,6 +49,8 @@ import Loading from '@hourglass/common/loading';
 import { MutationParameters } from 'relay-runtime';
 import { FaTrashAlt } from 'react-icons/fa';
 import RearrangableList from '@hourglass/common/rearrangeable';
+import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
+import { MdDragHandle } from 'react-icons/md';
 import { rubricEditorChangeRubricDetailsDescriptionMutation } from './__generated__/rubricEditorChangeRubricDetailsDescriptionMutation.graphql';
 import { rubricEditorChangeRubricTypeMutation } from './__generated__/rubricEditorChangeRubricTypeMutation.graphql';
 import { rubricEditorChangeRubricDetailsPointsMutation } from './__generated__/rubricEditorChangeRubricDetailsPointsMutation.graphql';
@@ -303,6 +305,7 @@ interface SingleRubricEditorProps {
   bodyItemId?: string;
   showDestroy?: boolean;
   disabled?: boolean;
+  handleRef?: React.Ref<HTMLElement>;
 }
 const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
   const {
@@ -313,6 +316,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
     bodyItemId,
     showDestroy = false,
     disabled = false,
+    handleRef,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorDestroyRubricMutation>(
@@ -395,7 +399,12 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
           />
         )}
         <Form.Group as={Row} className="mr-4">
-          <Form.Label column sm="2"><h5 className="my-0">Rubric type</h5></Form.Label>
+          <Form.Label column sm="2">
+            <h5 className="my-0">
+              {handleRef && <span ref={handleRef} className="cursor-move"><Icon I={MdDragHandle} /></span>}
+              Rubric type
+            </h5>
+          </Form.Label>
           <Col sm="10">
             <RubricTypeEditor
               rubric={rubric}
@@ -564,7 +573,7 @@ const ReordorableRubricEditor: React.FC<{
         });
       }}
     >
-      {(subRubric) => (
+      {(subRubric, handleRef) => (
         <SingleRubricEditor
           rubric={subRubric}
           examVersionId={examVersionId}
@@ -573,6 +582,7 @@ const ReordorableRubricEditor: React.FC<{
           bodyItemId={bodyItemId}
           showDestroy
           disabled={loading || disabled}
+          handleRef={handleRef}
         />
       )}
     </RearrangableList>
@@ -634,10 +644,11 @@ const ReordorablePresetCommentEditor: React.FC<{
         });
       }}
     >
-      {(preset) => (
+      {(preset, handleRef) => (
         <RubricPresetEditor
           preset={preset}
           disabled={disabled || loading}
+          handleRef={handleRef}
         />
       )}
     </RearrangableList>
@@ -1073,10 +1084,12 @@ const DestroyButton: React.FC<{
 const RubricPresetEditor: React.FC<{
   preset: Preset;
   disabled?: boolean;
+  handleRef: React.Ref<HTMLElement>;
 }> = (props) => {
   const {
     preset,
     disabled = false,
+    handleRef,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<rubricEditorDestroyPresetCommentMutation>(
@@ -1133,7 +1146,10 @@ const RubricPresetEditor: React.FC<{
           }}
         />
         <Form.Group as={Row}>
-          <Form.Label column sm="2">Label</Form.Label>
+          <Form.Label column sm="2">
+            {handleRef && <span ref={handleRef} className="cursor-move"><Icon I={MdDragHandle} /></span>}
+            Label
+          </Form.Label>
           <Col sm="4">
             <PresetCommentLabelEditor
               disabled={loading || disabled}

@@ -10,6 +10,7 @@ import {
   HTMLVal,
   ExamFile,
   FileRef,
+  YesNoInfo,
 } from '@student/exams/show/types';
 import {
   Preset,
@@ -53,6 +54,11 @@ import RearrangableList from '@hourglass/common/rearrangeable';
 import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
 import { MdDragHandle } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
+import YesNo from '@student/exams/show/components/questions/YesNo';
+import Policies from './Policies';
+import FileUploader from './FileUploader';
+import Instructions from './Instructions';
+import EditReference from './Reference';
 import { editorChangeRubricDetailsDescriptionMutation } from './__generated__/editorChangeRubricDetailsDescriptionMutation.graphql';
 import { editorChangeRubricTypeMutation } from './__generated__/editorChangeRubricTypeMutation.graphql';
 import { editorChangeRubricDetailsPointsMutation } from './__generated__/editorChangeRubricDetailsPointsMutation.graphql';
@@ -71,12 +77,7 @@ import { editorDestroyRubricMutation } from './__generated__/editorDestroyRubric
 import { editorReorderPresetCommentMutation } from './__generated__/editorReorderPresetCommentMutation.graphql';
 import { editorReorderRubricsMutation } from './__generated__/editorReorderRubricsMutation.graphql';
 import { editorSingle$key } from './__generated__/editorSingle.graphql';
-import Policies from './Policies';
-import FileUploader from './FileUploader';
-import Instructions from './Instructions';
-import EditReference from './Reference';
 import { editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
-import YesNo from '@hourglass/workflows/student/exams/show/components/questions/YesNo';
 import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
 
 const RubricEditor: React.FC = () => {
@@ -219,7 +220,7 @@ const RubricEditor: React.FC = () => {
                               // eslint-disable-next-line react/no-array-index-key
                               <Row key={bnum}>
                                 <Col>
-                            <p>{`Question ${qnum + 1} part ${pnum + 1} body ${bnum + 1} rubric:`}</p>
+                           <p>{`Question ${qnum + 1} part ${pnum + 1} body ${bnum + 1} rubric:`}</p>
                                   <SingleRubricKeyEditor
                                     rubricKey={b.rootRubric}
                                     examVersionId={examVersionId}
@@ -440,7 +441,6 @@ const SingleRubricKeyEditor: React.FC<SingleRubricKeyEditorProps> = (props) => {
     fragment editorSingle on Rubric {
       id
       type
-      parentSectionId
       order
       points
       description {
@@ -465,7 +465,6 @@ const SingleRubricKeyEditor: React.FC<SingleRubricKeyEditorProps> = (props) => {
       allSubsections {
         id
         type
-        parentSectionId
         order
         points
         description {
@@ -896,7 +895,6 @@ function useCreateRubricMutation(): MutationReturn<editorCreateRubricMutation> {
         rubric {
           id
           type
-          parentSectionId
           order
           points
           description {
@@ -1596,7 +1594,6 @@ const RubricTypeEditor: React.FC<{
         rubric {
           id
           type
-          parentSectionId
           qnum
           pnum
           bnum

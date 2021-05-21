@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Row, Col, Form,
 } from 'react-bootstrap';
-import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
+import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
 import { Field } from 'redux-form';
 
 interface TextProps {

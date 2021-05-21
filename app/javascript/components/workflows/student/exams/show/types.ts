@@ -1,7 +1,7 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
-import { rubricEditorQueryResponse } from '@hourglass/workflows/professor/exams/new/new-editor-rename-me/__generated__/rubricEditorQuery.graphql';
+import { rubricEditorQueryResponse } from '@hourglass/workflows/professor/exams/new/editor/__generated__/rubricEditorQuery.graphql';
 import { Policy } from '@material-ui/icons';
 
 export type ExamTakerAction =

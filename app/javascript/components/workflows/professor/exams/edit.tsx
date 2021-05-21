@@ -1,7 +1,7 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import Editor from '@professor/exams/new/editor';
+import Editor from '@hourglass/workflows/professor/exams/new/old-editor';
 import { useAlert } from '@hourglass/common/alerts';
 import { useQuery, graphql } from 'relay-hooks';
 import {

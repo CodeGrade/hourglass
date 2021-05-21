@@ -8,7 +8,7 @@ import {
 } from 'react-bootstrap';
 import { MarkDescription, CodeState, CodeInfo } from '@student/exams/show/types';
 import { Editor, marksToDescs } from '@student/exams/show/components/ExamCodeBox';
-import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
+import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
 import { FaLock, FaBan } from 'react-icons/fa';
 import {
   Field,
@@ -18,7 +18,7 @@ import {
 } from 'redux-form';
 import { ExamContext } from '@hourglass/common/context';
 import { firstFile } from '@student/exams/show/files';
-import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
+import { FilePickerSelectWithPreview } from '@hourglass/workflows/professor/exams/new/old-editor/components/FilePicker';
 
 export const languages = {
   scheme: 'Racket',

@@ -6,8 +6,8 @@ import {
   Col,
 } from 'react-bootstrap';
 import YesNo from '@student/exams/show/components/questions/YesNo';
-import MoveItem from '@professor/exams/new/editor/components/MoveItem';
-import ShowParts from '@professor/exams/new/editor/components/ShowParts';
+import MoveItem from '@hourglass/workflows/professor/exams/new/old-editor/components/MoveItem';
+import ShowParts from '@hourglass/workflows/professor/exams/new/old-editor/components/ShowParts';
 import {
   WrappedFieldProps,
   Field,
@@ -15,8 +15,8 @@ import {
   FormSection,
 } from 'redux-form';
 import { QuestionFilesContext } from '@hourglass/common/context';
-import { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
-import EditReference from '@professor/exams/new/editor/components/Reference';
+import { EditHTMLField } from '@hourglass/workflows/professor/exams/new/old-editor/components/editHTMLs';
+import EditReference from '@hourglass/workflows/professor/exams/new/old-editor/components/Reference';
 import { YesNoInfo } from '@student/exams/show/types';
 
 const SEP_SUB_YESNO: YesNoInfo = {

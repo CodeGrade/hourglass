@@ -8,7 +8,7 @@ import {
   RubricAny,
 } from '@professor/exams/types';
 import { showExamViewer$data } from '@proctor/registrations/show/__generated__/showExamViewer.graphql';
-import { rubricEditorSingle$data } from './new/new-editor-rename-me/__generated__/rubricEditorSingle.graphql';
+import { rubricEditorSingle$data } from './new/editor/__generated__/rubricEditorSingle.graphql';
 
 type RawRubric = showExamViewer$data['rubrics'][number];
 type RawRubricMap = Record<RawRubric['id'], RawRubric & { qnum?: number; pnum?: number; bnum?: number; }>;

@@ -131,12 +131,11 @@ class ExamVersion < ApplicationRecord
   end
 
   def root_rubric
-    rubrics.find_by(
+    rubrics.where(
       question: nil,
       part: nil,
-      body_item: nil,
-      parent_section: nil,
-    )
+      body_item: nil
+    ).root_rubrics.first
   end
 
   # NOTE: format should be either :export or :graphql
@@ -259,7 +258,7 @@ class ExamVersion < ApplicationRecord
   def detailed_grade_breakdown_for(reg)
     comments_and_rubrics = reg.grading_comments.includes(
       :creator, :question, :part, :body_item,
-      preset_comment: [{ rubric_preset: [{ rubric: [{ parent_section: [{ parent_section: :parent_section }] }] }] }]
+      preset_comment: [{ rubric_preset: [{ rubric: :parent_section }] }]
     )
     comments = multi_group_by(comments_and_rubrics, [:question_id, :part_id, :body_item_id, :preset_comment])
     checks = multi_group_by(

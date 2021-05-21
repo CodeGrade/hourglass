@@ -535,7 +535,6 @@ const ShowRubricKey: React.FC<ShowRubricProps<UseRubricsKey$key> & {
     fragment UseRubricsKey on Rubric {
       id
       type
-      parentSectionId
       order
       points
       description {
@@ -560,7 +559,6 @@ const ShowRubricKey: React.FC<ShowRubricProps<UseRubricsKey$key> & {
       allSubsections {
         id
         type
-        parentSectionId
         order
         points
         description {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_19_203405) do
+ActiveRecord::Schema.define(version: 2021_05_21_121346) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -269,9 +269,17 @@ ActiveRecord::Schema.define(version: 2021_05_19_203405) do
     t.index ["rubric_id"], name: "index_rubric_presets_on_rubric_id"
   end
 
+  create_table "rubric_tree_paths", force: :cascade do |t|
+    t.bigint "ancestor_id", null: false
+    t.bigint "descendant_id", null: false
+    t.integer "path_length", null: false
+    t.index ["ancestor_id", "descendant_id"], name: "index_rubric_tree_paths_on_ancestor_id_and_descendant_id", unique: true
+    t.index ["ancestor_id"], name: "index_rubric_tree_paths_on_ancestor_id"
+    t.index ["descendant_id"], name: "index_rubric_tree_paths_on_descendant_id"
+  end
+
   create_table "rubrics", force: :cascade do |t|
     t.bigint "exam_version_id", null: false
-    t.bigint "parent_section_id"
     t.string "type", null: false
     t.string "description"
     t.float "points"
@@ -282,16 +290,7 @@ ActiveRecord::Schema.define(version: 2021_05_19_203405) do
     t.bigint "part_id"
     t.bigint "body_item_id"
     t.index ["body_item_id"], name: "index_rubrics_on_body_item_id"
-    t.index ["exam_version_id", "parent_section_id", "order"], name: "unique_rubric_order_per_ev", unique: true, where: "((parent_section_id IS NOT NULL) AND (question_id IS NULL) AND (part_id IS NULL) AND (body_item_id IS NULL))"
-    t.index ["exam_version_id", "parent_section_id", "question_id", "order"], name: "unique_rubric_order_per_question", unique: true, where: "((parent_section_id IS NOT NULL) AND (question_id IS NOT NULL) AND (part_id IS NULL) AND (body_item_id IS NULL))"
-    t.index ["exam_version_id", "parent_section_id", "question_id", "part_id", "body_item_id", "order"], name: "unique_rubric_order_per_body_item", unique: true, where: "((parent_section_id IS NOT NULL) AND (question_id IS NOT NULL) AND (part_id IS NOT NULL) AND (body_item_id IS NOT NULL))"
-    t.index ["exam_version_id", "parent_section_id", "question_id", "part_id", "order"], name: "unique_rubric_order_per_part", unique: true, where: "((parent_section_id IS NOT NULL) AND (question_id IS NOT NULL) AND (part_id IS NOT NULL) AND (body_item_id IS NULL))"
-    t.index ["exam_version_id", "question_id", "part_id", "body_item_id"], name: "unique_rubric_root_coords_body_items", unique: true, where: "((parent_section_id IS NULL) AND (question_id IS NOT NULL) AND (part_id IS NOT NULL) AND (body_item_id IS NOT NULL))"
-    t.index ["exam_version_id", "question_id", "part_id"], name: "unique_rubric_root_coords_parts", unique: true, where: "((parent_section_id IS NULL) AND (question_id IS NOT NULL) AND (part_id IS NOT NULL) AND (body_item_id IS NULL))"
-    t.index ["exam_version_id", "question_id"], name: "unique_rubric_root_coords_questions", unique: true, where: "((parent_section_id IS NULL) AND (question_id IS NOT NULL) AND (part_id IS NULL) AND (body_item_id IS NULL))"
     t.index ["exam_version_id"], name: "index_rubrics_on_exam_version_id"
-    t.index ["exam_version_id"], name: "unique_rubric_root_coords_ev", unique: true, where: "((parent_section_id IS NULL) AND (question_id IS NULL) AND (part_id IS NULL) AND (body_item_id IS NULL))"
-    t.index ["parent_section_id"], name: "index_rubrics_on_parent_section_id"
     t.index ["part_id"], name: "index_rubrics_on_part_id"
     t.index ["question_id", "part_id", "body_item_id"], name: "index_rubrics_on_question_id_and_part_id_and_body_item_id"
     t.index ["question_id", "part_id"], name: "index_rubrics_on_question_id_and_part_id"
@@ -398,8 +397,9 @@ ActiveRecord::Schema.define(version: 2021_05_19_203405) do
   add_foreign_key "room_announcements", "rooms"
   add_foreign_key "rooms", "exams"
   add_foreign_key "rubric_presets", "rubrics"
+  add_foreign_key "rubric_tree_paths", "rubrics", column: "ancestor_id"
+  add_foreign_key "rubric_tree_paths", "rubrics", column: "descendant_id"
   add_foreign_key "rubrics", "exam_versions"
-  add_foreign_key "rubrics", "rubrics", column: "parent_section_id"
   add_foreign_key "sections", "courses"
   add_foreign_key "snapshots", "registrations"
   add_foreign_key "staff_registrations", "sections"

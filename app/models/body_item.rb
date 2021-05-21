@@ -45,7 +45,7 @@ class BodyItem < ApplicationRecord
   end
 
   def root_rubric
-    rubrics.find_by(parent_section: nil)
+    rubrics.root_rubrics.first
   end
 
   def rubric_as_json(format:)

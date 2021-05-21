@@ -17,7 +17,7 @@ module Mutations
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
-    def resolve(type:, description:, points:, **args)
+    def resolve(type:, description: nil, points: nil, **args)
       parent_section = args[:parent_section]
       exam_version = parent_section.exam_version
       raise GraphQL::ExecutionError, 'Cannot create root rubrics' if parent_section.nil?

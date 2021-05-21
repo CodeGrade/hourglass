@@ -47,7 +47,6 @@ import {
 import { Provider, connect } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import store from '@professor/exams/new/editor/store';
 import Name from '@professor/exams/new/editor/components/Name';
 import Instructions from '@professor/exams/new/editor/components/Instructions';
 import EditReference from '@professor/exams/new/editor/components/Reference';
@@ -188,12 +187,10 @@ const Editor: React.FC<ExamEditorProps> = (props) => {
     },
   }), [versionName, versionPolicies, answers.answers, exam]);
   return (
-    <Provider store={store}>
-      <ExamEditorForm
-        examVersionId={examVersionId}
-        initialValues={initialValues}
-      />
-    </Provider>
+    <ExamEditorForm
+      examVersionId={examVersionId}
+      initialValues={initialValues}
+    />
   );
 };
 export default Editor;

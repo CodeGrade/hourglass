@@ -5,9 +5,9 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
-import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
+import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
 import Icon from '@student/exams/show/components/Icon';
-import MoveItem from '@professor/exams/new/editor/components/MoveItem';
+import MoveItem from '@hourglass/workflows/professor/exams/new/old-editor/components/MoveItem';
 import {
   FieldArray,
   Field,
@@ -16,7 +16,7 @@ import {
 } from 'redux-form';
 import { FaCircle } from 'react-icons/fa';
 import { HTMLVal } from '@student/exams/show/types';
-import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
+import EditHTMLs, { EditHTMLField } from '@hourglass/workflows/professor/exams/new/old-editor/components/editHTMLs';
 import { useRefresher } from '@hourglass/common/helpers';
 
 const OneOption: React.FC<{

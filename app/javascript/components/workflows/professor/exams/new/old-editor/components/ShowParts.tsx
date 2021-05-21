@@ -1,22 +1,24 @@
 import React, { useContext } from 'react';
-import { WrappedFieldArrayProps } from 'redux-form';
 import {
   Row,
   Col,
   Button,
 } from 'react-bootstrap';
+import { WrappedFieldArrayProps } from 'redux-form';
 import { useMutation } from 'relay-hooks';
 import { useRefresher } from '@hourglass/common/helpers';
-import { QuestionInfoWithAnswers } from '@professor/exams/types';
-import Question from '@professor/exams/new/editor/components/Question';
+import { PartInfoWithAnswers } from '@professor/exams/types';
+import Part from '@hourglass/workflows/professor/exams/new/old-editor/components/Part';
 import { AlertContext } from '@hourglass/common/alerts';
 
-const ShowQuestions: React.FC<{
+const ShowParts: React.FC<{
+  qnum: number;
   examVersionId: string;
-} & WrappedFieldArrayProps<QuestionInfoWithAnswers>> = (props) => {
+} & WrappedFieldArrayProps<PartInfoWithAnswers>> = (props) => {
   const {
-    fields,
+    qnum,
     examVersionId,
+    fields,
   } = props;
   const { alert } = useContext(AlertContext);
   const [refresher, refresh] = useRefresher();
@@ -35,7 +37,7 @@ const ShowQuestions: React.FC<{
   // );
   return (
     <>
-      <Row className="py-3">
+      <Row>
         <Col>
           {fields.map((member, index) => {
             const moveUp = () => {
@@ -51,11 +53,12 @@ const ShowQuestions: React.FC<{
               fields.remove(index);
             };
             return (
-              <Question
+              <Part
                 // eslint-disable-next-line react/no-array-index-key
                 key={`${refresher}-${index}`}
                 examVersionId={examVersionId}
-                qnum={index}
+                qnum={qnum}
+                pnum={index}
                 memberName={member}
                 enableDown={index + 1 < fields.length}
                 moveDown={moveDown}
@@ -69,7 +72,7 @@ const ShowQuestions: React.FC<{
       <Row className="text-center">
         <Col>
           <Button
-            variant="primary"
+            variant="success"
             // disabled={loading}
             onClick={(): void => {
               // createRubric({
@@ -77,12 +80,13 @@ const ShowQuestions: React.FC<{
               //     input: {
               //       examVersionId,
               //       type: 'none',
-              //       qnum: fields.length,
+              //       qnum,
+              //       pnum: fields.length,
               //     },
               //   },
               // }).then((result) => {
               //   const { rubric } = result.createRubric;
-              //   const q: QuestionInfoWithAnswers = {
+              //   const p: PartInfoWithAnswers = {
               //     references: [],
               //     name: {
               //       type: 'HTML',
@@ -92,23 +96,24 @@ const ShowQuestions: React.FC<{
               //       type: 'HTML',
               //       value: '',
               //     },
-              //     parts: [],
-              //     separateSubparts: false,
-              //     questionRubric: {
+              //     points: 0,
+              //     bodyItems: [],
+              //     partRubric: {
               //       type: 'none',
               //       railsId: rubric.railsId,
               //     },
               //   };
-              //   fields.push(q);
+              //   fields.push(p);
               // });
             }}
           >
-            Add question
+            Add part
           </Button>
         </Col>
       </Row>
     </>
+
   );
 };
 
-export default ShowQuestions;
+export default ShowParts;

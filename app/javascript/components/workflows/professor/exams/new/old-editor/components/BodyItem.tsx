@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import Code from '@professor/exams/new/editor/components/questions/Code';
-import YesNo from '@professor/exams/new/editor/components/questions/YesNo';
-import CodeTag from '@professor/exams/new/editor/components/questions/CodeTag';
-import Text from '@professor/exams/new/editor/components/questions/Text';
-import Matching from '@professor/exams/new/editor/components/questions/Matching';
-import MultipleChoice from '@professor/exams/new/editor/components/questions/MultipleChoice';
-import AllThatApply from '@professor/exams/new/editor/components/questions/AllThatApply';
+import Code from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Code';
+import YesNo from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/YesNo';
+import CodeTag from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/CodeTag';
+import Text from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Text';
+import Matching from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Matching';
+import MultipleChoice from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/MultipleChoice';
+import AllThatApply from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/AllThatApply';
 import { BodyItem } from '@student/exams/show/types';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Card } from 'react-bootstrap';
 import { Field, WrappedFieldProps, FormSection } from 'redux-form';
-import MoveItem from '@professor/exams/new/editor/components/MoveItem';
+import MoveItem from '@hourglass/workflows/professor/exams/new/old-editor/components/MoveItem';
 import { EditHTMLField } from './editHTMLs';
 
 const OneItem: React.FC<WrappedFieldProps & {

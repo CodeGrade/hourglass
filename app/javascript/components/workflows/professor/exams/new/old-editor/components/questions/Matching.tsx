@@ -7,9 +7,9 @@ import {
 import {
   Select, FormControl, InputLabel, MenuItem,
 } from '@material-ui/core';
-import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
-import MoveItem from '@professor/exams/new/editor/components/MoveItem';
-import Prompted from '@professor/exams/new/editor/components/questions/Prompted';
+import CustomEditor from '@hourglass/workflows/professor/exams/new/old-editor/components/CustomEditor';
+import MoveItem from '@hourglass/workflows/professor/exams/new/old-editor/components/MoveItem';
+import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
 import { alphabetIdx, useRefresher } from '@hourglass/common/helpers';
 import {
   Field,
@@ -19,7 +19,7 @@ import {
   FormSection,
   WrappedFieldArrayProps,
 } from 'redux-form';
-import EditHTMLs, { EditHTMLField } from '@professor/exams/new/editor/components/editHTMLs';
+import EditHTMLs, { EditHTMLField } from '@hourglass/workflows/professor/exams/new/old-editor/components/editHTMLs';
 import { MatchingPromptWithAnswer } from '@professor/exams/types';
 import './Matching.css';
 

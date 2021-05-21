@@ -8,8 +8,8 @@ import {
 import { WrappedFieldArrayProps } from 'redux-form';
 import { BodyItemWithAnswer } from '@professor/exams/types';
 import { useRefresher } from '@hourglass/common/helpers';
-import BodyItem from '@professor/exams/new/editor/components/BodyItem';
-import { languages } from '@professor/exams/new/editor/components/questions/Code';
+import BodyItem from '@hourglass/workflows/professor/exams/new/old-editor/components/BodyItem';
+import { languages } from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Code';
 import { AlertContext } from '@hourglass/common/alerts';
 
 const ShowBodyItems: React.FC<{

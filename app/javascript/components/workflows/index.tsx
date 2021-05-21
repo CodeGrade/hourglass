@@ -26,7 +26,7 @@ import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
 import ExamSubmissions from '@professor/exams/submissions';
 import ExamProctoring from '@proctor/exams/index';
-import EditRubric from '@hourglass/workflows/professor/exams/new/new-editor-rename-me';
+import EditRubric from '@hourglass/workflows/professor/exams/new/editor';
 import { AllAlerts } from '@hourglass/common/alerts';
 import './index.scss';
 import ErrorBoundary from '@hourglass/common/boundary';

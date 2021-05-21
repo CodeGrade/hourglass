@@ -3,9 +3,8 @@ import {
   Form,
   Col,
 } from 'react-bootstrap';
-import { WrappedFieldProps } from 'redux-form';
 import { ExamContext } from '@hourglass/common/context';
-import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
+import { FilePickerSelectWithPreview } from '@hourglass/workflows/professor/exams/new/old-editor/components/FilePicker';
 import { FileRef } from '@student/exams/show/types';
 
 /**
@@ -24,18 +23,14 @@ function useEffectSkipFirst(effect: React.EffectCallback, deps?: React.Dependenc
 
 const EditReference: React.FC<{
   label: string;
-} & WrappedFieldProps> = (props) => {
+  value: FileRef[];
+  onChange: (newVal: FileRef[]) => void;
+}> = (props) => {
   const {
     label,
-    input,
-  } = props;
-  const {
     value,
     onChange,
-  }: {
-    value: FileRef[];
-    onChange: (newVal: FileRef[]) => void;
-  } = input;
+  } = props;
   const { files, fmap } = useContext(ExamContext);
   // We don't need the effect on the initial render, because
   // we assume the fileRefs that come from the database are valid.

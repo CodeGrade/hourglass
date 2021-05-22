@@ -15,6 +15,7 @@ import {
   CodeState,
   AllThatApplyState,
   MultipleChoiceState,
+  YesNoState,
 } from '@student/exams/show/types';
 import {
   Preset,
@@ -58,7 +59,9 @@ import RearrangableList from '@hourglass/common/rearrangeable';
 import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
 import { GrDrag } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
-import YesNo from '@student/exams/show/components/questions/YesNo';
+import YesNoControl from '@student/exams/show/components/questions/YesNo';
+import { ReactQuillProps } from 'react-quill';
+import YesNo from './body-items/YesNo';
 import Policies from './Policies';
 import FileUploader from './FileUploader';
 import Instructions from './Instructions';
@@ -84,8 +87,6 @@ import { editorSingle$key } from './__generated__/editorSingle.graphql';
 import { editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
 import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
 import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.graphql';
-import EditBodyItemDetails from './BodyItem';
-import { ReactQuillProps } from 'react-quill';
 import Code from './body-items/Code';
 import AllThatApply from './body-items/AllThatApply';
 import MultipleChoice from './body-items/MultipleChoice';
@@ -341,7 +342,7 @@ const QuestionEditor: React.FC<{
               {/* <Field name="separateSubparts" component={QuestionSepSubParts} /> */}
               <Form.Label column sm="2">Separate subparts?</Form.Label>
               <Col sm="4">
-                <YesNo
+                <YesNoControl
                   className="bg-white rounded"
                   value={!!question.separateSubparts}
                   info={SEP_SUB_YESNO}
@@ -350,7 +351,7 @@ const QuestionEditor: React.FC<{
               </Col>
               <Form.Label column sm="2">Extra credit?</Form.Label>
               <Col sm="4">
-                <YesNo
+                <YesNoControl
                   className="bg-white rounded"
                   value={!!question.extraCredit}
                   info={SEP_SUB_YESNO}
@@ -499,7 +500,7 @@ const PartEditor: React.FC<{
               </Col>
               <Form.Label column sm="2">Extra credit?</Form.Label>
               <Col sm="4">
-                <YesNo
+                <YesNoControl
                   className="bg-white rounded"
                   value={!!part.extraCredit}
                   info={SEP_SUB_YESNO}
@@ -661,13 +662,19 @@ const BodyItemEditor: React.FC<{
         />
       );
       break;
+    case 'YesNo':
+      editor = (
+        <YesNo
+          id={id}
+          info={info}
+          answer={answer as YesNoState}
+        />
+      );
+      break;
     default:
-      return <p>todo: {info.type}</p>;
+      return <p>{`todo: ${info.type}`}</p>;
     // case 'CodeTag':
     //   editor = <CodeTag qnum={qnum} pnum={pnum} bnum={bnum} />;
-    //   break;
-    // case 'YesNo':
-    //   editor = <YesNo qnum={qnum} pnum={pnum} bnum={bnum} />;
     //   break;
     // case 'Text':
     //   editor = <Text qnum={qnum} pnum={pnum} bnum={bnum} />;

@@ -17,6 +17,7 @@ import {
   MultipleChoiceState,
   YesNoState,
   TextState,
+  CodeTagState,
 } from '@student/exams/show/types';
 import {
   Preset,
@@ -87,6 +88,7 @@ import { editorSingle$key } from './__generated__/editorSingle.graphql';
 import { editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
 import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
 import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.graphql';
+import CodeTag from './body-items/CodeTag';
 import Text from './body-items/Text';
 import YesNo from './body-items/YesNo';
 import Code from './body-items/Code';
@@ -682,11 +684,17 @@ const BodyItemEditor: React.FC<{
         />
       );
       break;
+    case 'CodeTag':
+      editor = (
+        <CodeTag
+          id={id}
+          info={info}
+          answer={answer as CodeTagState}
+        />
+      );
+      break;
     default:
       return <p>{`todo: ${info.type}`}</p>;
-    // case 'CodeTag':
-    //   editor = <CodeTag qnum={qnum} pnum={pnum} bnum={bnum} />;
-    //   break;
     // case 'Matching':
     //   editor = <Matching qnum={qnum} pnum={pnum} bnum={bnum} />;
     //   break;

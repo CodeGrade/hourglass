@@ -18,6 +18,7 @@ import {
   YesNoState,
   TextState,
   CodeTagState,
+  MatchingState,
 } from '@student/exams/show/types';
 import {
   Preset,
@@ -47,7 +48,7 @@ import {
   Row,
   ToggleButton,
 } from 'react-bootstrap';
-import { alphabetIdx, SelectOption } from '@hourglass/common/helpers';
+import { alphabetIdx, ExhaustiveSwitchError, SelectOption } from '@hourglass/common/helpers';
 import Select from 'react-select';
 import { AlertContext } from '@hourglass/common/alerts';
 import CustomEditor from '@hourglass/workflows/professor/exams/new/old-editor/components/CustomEditor';
@@ -94,6 +95,7 @@ import YesNo from './body-items/YesNo';
 import Code from './body-items/Code';
 import AllThatApply from './body-items/AllThatApply';
 import MultipleChoice from './body-items/MultipleChoice';
+import Matching from './body-items/Matching';
 
 export const DragHandle: React.FC<{
   handleRef: React.Ref<HTMLElement>,
@@ -693,13 +695,17 @@ const BodyItemEditor: React.FC<{
         />
       );
       break;
+    case 'Matching':
+      editor = (
+        <Matching
+          id={id}
+          info={info}
+          answer={answer as MatchingState}
+        />
+      );
+      break;
     default:
-      return <p>{`todo: ${info.type}`}</p>;
-    // case 'Matching':
-    //   editor = <Matching qnum={qnum} pnum={pnum} bnum={bnum} />;
-    //   break;
-    // default:
-    //   throw new ExhaustiveSwitchError(info);
+      throw new ExhaustiveSwitchError(info);
   }
   return (
     <Card

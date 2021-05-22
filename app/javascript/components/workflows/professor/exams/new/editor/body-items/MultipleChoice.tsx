@@ -8,6 +8,7 @@ import {
 import Prompted from '@hourglass/workflows/professor/exams/new/editor/body-items/Prompted';
 import Icon from '@student/exams/show/components/Icon';
 import { FaCircle } from 'react-icons/fa';
+import { GrDrag } from 'react-icons/gr';
 import { HTMLVal, MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
 import RearrangableList from '@hourglass/common/rearrangeable';
 import { DragHandle, EditHTMLVal } from '..';
@@ -27,9 +28,9 @@ const OneOption: React.FC<{
     handleRef,
   } = props;
   return (
-    <Row className="p-2">
-      <Col sm="auto">
-        {handleRef && <DragHandle handleRef={handleRef} variant="info" />}
+    <Row className="p-2 align-items-center">
+      <Col sm="auto" className="p-0">
+        {handleRef && <DragHandle handleRef={handleRef} variant="info" alignmentClass="m-0" />}
       </Col>
       <Col className="flex-grow-01">
         <Button
@@ -108,6 +109,11 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
         <Form.Label column sm={2}>Answers</Form.Label>
         <Col sm={10}>
           <Row className="p-2">
+            <Col sm="auto" className="p-0">
+              <span className="btn btn-sm invisible">
+                <Icon I={GrDrag} />
+              </span>
+            </Col>
             <Col className="flex-grow-01">
               <b>Correct?</b>
             </Col>

@@ -93,13 +93,17 @@ import MultipleChoice from './body-items/MultipleChoice';
 export const DragHandle: React.FC<{
   handleRef: React.Ref<HTMLElement>,
   variant?: ButtonProps['variant'],
+  className?: string,
+  alignmentClass?: string,
 }> = (props) => {
   const {
     handleRef,
     variant = 'secondary',
+    className = 'cursor-grab',
+    alignmentClass = 'position-absolute t-0 l-0 z-1000',
   } = props;
   return (
-    <span className={`position-absolute t-0 l-0 z-1000 btn btn-sm btn-${variant} cursor-grab`} ref={handleRef}>
+    <span className={`${alignmentClass} btn btn-sm btn-${variant} ${className}`} ref={handleRef}>
       <Icon I={GrDrag} />
     </span>
   );

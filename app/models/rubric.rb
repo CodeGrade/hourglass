@@ -38,12 +38,12 @@ class Rubric < ApplicationRecord
     association(:ancestor_links).add_to_target(self_link)
   end
   before_destroy do
-    ancestor_links.destroy_all
+    # get all descendants
+    desc_ids = descendant_links.pluck(:descendant_id)
 
-    descs = descendants.pluck(:id)
-
-    descendant_links.destroy_all
-    Rubric.where(id: descs).destroy_all
+    ancestor_links.destroy_all # disconnect upward
+    descendant_links.destroy_all # disconnect downward
+    Rubric.where(id: desc_ids).destroy_all # destroy descendant rubrics
   end
 
   has_one :rubric_preset, dependent: :destroy

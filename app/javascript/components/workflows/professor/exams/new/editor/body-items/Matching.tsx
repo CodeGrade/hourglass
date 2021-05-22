@@ -7,9 +7,8 @@ import {
 import {
   Select, FormControl, InputLabel, MenuItem,
 } from '@material-ui/core';
-import CustomEditor from '@hourglass/workflows/professor/exams/new/old-editor/components/CustomEditor';
 import MoveItem from '@hourglass/workflows/professor/exams/new/old-editor/components/MoveItem';
-import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
+import Prompted from '@hourglass/workflows/professor/exams/new/editor/body-items/Prompted';
 import { alphabetIdx, useRefresher } from '@hourglass/common/helpers';
 import {
   Field,
@@ -22,12 +21,8 @@ import {
 import EditHTMLs, { EditHTMLField } from '@hourglass/workflows/professor/exams/new/old-editor/components/editHTMLs';
 import { MatchingPromptWithAnswer } from '@professor/exams/types';
 import './Matching.css';
-
-interface MatchingProps {
-  qnum: number;
-  pnum: number;
-  bnum: number;
-}
+import { MatchingInfo, MatchingState } from '@hourglass/workflows/student/exams/show/types';
+import { EditHTMLVal } from '..';
 
 const ChooseRightAnswer: React.FC<WrappedFieldProps & {
   numChoices: number;
@@ -270,32 +265,6 @@ function renderPrompt(setup: RenderPromptSetup) {
   );
 }
 
-const EditColName: React.FC<WrappedFieldProps & {
-  defaultLabel: string;
-}> = (props) => {
-  const {
-    input,
-    defaultLabel,
-  } = props;
-  const {
-    value,
-    onChange,
-  } = input;
-  const handleChange = useCallback((newVal) => onChange({
-    type: 'HTML',
-    value: newVal,
-  }), [onChange]);
-  return (
-    <CustomEditor
-      className="bg-white"
-      theme="bubble"
-      placeholder={defaultLabel}
-      value={value.value}
-      onChange={handleChange}
-    />
-  );
-};
-
 const EditPrompts: React.FC<
   RenderPromptSetup & WrappedFieldArrayProps<MatchingPromptWithAnswer>
 > = (props) => {
@@ -409,31 +378,59 @@ const RenderValues: React.FC<WrappedFieldProps> = (props) => {
   );
 };
 
-const Matching: React.FC<MatchingProps> = (props) => {
-  const { qnum, pnum, bnum } = props;
+const Matching: React.FC<{
+  info: MatchingInfo;
+  id: string;
+  answer: MatchingState;
+}> = (props) => {
+  const {
+    info,
+    id,
+    answer,
+  } = props;
   return (
     <>
       <Prompted
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
+        value={info.prompt}
+        onChange={console.log}
       />
       <Row>
         <Col sm={6}>
           <Row className="p-2">
             <Col className="text-center p-0">
-              <Field name="promptsLabel" component={EditColName} defaultLabel="Column A" />
+              <EditHTMLVal
+                className="bg-white rounded"
+                value={info.promptsLabel || {
+                  type: 'HTML',
+                  value: '',
+                }}
+                onChange={console.log}
+                debounceDelay={1000}
+                placeholder="Column A"
+              />
             </Col>
           </Row>
-          <Field name="values" component={RenderPrompts} />
+          {/* <RenderPrompts
+            prompts={info.prompts}
+          /> */}
+          {/* <Field name="values" component={RenderPrompts} /> */}
         </Col>
         <Col sm={6}>
           <Row className="p-2">
             <Col className="text-center p-0">
-              <Field name="valuesLabel" component={EditColName} defaultLabel="Column B" />
+              <EditHTMLVal
+                className="bg-white rounded"
+                value={info.valuesLabel || {
+                  type: 'HTML',
+                  value: '',
+                }}
+                onChange={console.log}
+                debounceDelay={1000}
+                placeholder="Column B"
+              />
             </Col>
           </Row>
-          <Field name="prompts" component={RenderValues} />
+          {/* <Field name="prompts" component={RenderValues} /> */}
         </Col>
       </Row>
     </>

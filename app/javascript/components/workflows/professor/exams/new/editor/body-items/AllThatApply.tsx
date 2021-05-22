@@ -7,6 +7,7 @@ import {
 } from 'react-bootstrap';
 import Icon from '@student/exams/show/components/Icon';
 import { FaCheck } from 'react-icons/fa';
+import { GrDrag } from 'react-icons/gr';
 import { AllThatApplyInfo, AllThatApplyState, HTMLVal } from '@hourglass/workflows/student/exams/show/types';
 import RearrangableList from '@hourglass/common/rearrangeable';
 import Prompted from './Prompted';
@@ -45,9 +46,9 @@ const OneOption: React.FC<{
     handleRef,
   } = props;
   return (
-    <Row className="p-2">
-      <Col sm="auto">
-        {handleRef && <DragHandle handleRef={handleRef} variant="info" />}
+    <Row className="p-2 align-items-center">
+      <Col sm="auto" className="p-0">
+        {handleRef && <DragHandle handleRef={handleRef} variant="info" alignmentClass="" />}
       </Col>
       <Col className="flex-grow-01">
         <EditAnswer
@@ -131,8 +132,11 @@ const AllThatApply: React.FC<{
       <Form.Group as={Row}>
         <Form.Label column sm={2}>Answers</Form.Label>
         <Col sm={10}>
-          <Row className="p-2">
-            <Col className="flex-grow-01">
+          <Row className="p-2 align-items-center">
+            <Col className="flex-grow-01 text-nowrap">
+              <span className="btn btn-sm invisible">
+                <Icon I={GrDrag} />
+              </span>
               <b>Correct?</b>
             </Col>
             <Col><b>Prompt</b></Col>

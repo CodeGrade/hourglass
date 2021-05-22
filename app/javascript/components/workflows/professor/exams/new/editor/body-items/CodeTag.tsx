@@ -10,7 +10,7 @@ import {
 } from 'react-bootstrap';
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
+import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import {
   ExamContext,
   ExamFilesContext,
@@ -19,7 +19,6 @@ import {
 } from '@hourglass/common/context';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { getFilesForRefs, countFiles } from '@student/exams/show/files';
-import { Fields, WrappedFieldsProps } from 'redux-form';
 
 interface CodeTagValProps {
   value?: CodeTagState;
@@ -143,19 +142,14 @@ const FileModal: React.FC<FileModalProps> = (props) => {
   );
 };
 
-const EditChoices: React.FC<WrappedFieldsProps> = (props) => {
-  const {
-    choices,
-    answer,
-  } = props;
-  const { input } = choices;
+const EditChoices: React.FC<{
+  value: CodeTagInfo['choices'],
+  onChange: (newVal: CodeTagInfo['choices']) => void,
+}> = (props) => {
   const {
     value,
     onChange,
-  }: {
-    value: CodeTagInfo['choices'];
-    onChange: (newVal: CodeTagInfo['choices']) => void;
-  } = input;
+  } = props;
   return (
     <>
       <Form.Label column sm={2}>Files source</Form.Label>
@@ -166,7 +160,7 @@ const EditChoices: React.FC<WrappedFieldsProps> = (props) => {
             active={value === 'exam'}
             onClick={(): void => {
               onChange('exam');
-              answer.input.onChange({ NO_ANS: true });
+              // answer.input.onChange({ NO_ANS: true });
             }}
           >
             Files for full exam
@@ -176,7 +170,7 @@ const EditChoices: React.FC<WrappedFieldsProps> = (props) => {
             active={value === 'question'}
             onClick={(): void => {
               onChange('question');
-              answer.input.onChange({ NO_ANS: true });
+              // answer.input.onChange({ NO_ANS: true });
             }}
           >
             Files for current question
@@ -186,7 +180,7 @@ const EditChoices: React.FC<WrappedFieldsProps> = (props) => {
             active={value === 'part'}
             onClick={(): void => {
               onChange('part');
-              answer.input.onChange({ NO_ANS: true });
+              // answer.input.onChange({ NO_ANS: true });
             }}
           >
             Files for current part
@@ -197,22 +191,21 @@ const EditChoices: React.FC<WrappedFieldsProps> = (props) => {
   );
 };
 
-const EditAnswer: React.FC<WrappedFieldsProps> = (props) => {
-  const {
-    answer,
-    choices,
-  } = props;
-  const { input } = answer;
+const EditAnswer: React.FC<{
+  value: CodeTagState,
+  choice: CodeTagInfo['choices'],
+  onChange: (newAnswer: CodeTagState) => void;
+}> = (props) => {
   const {
     value,
+    choice,
     onChange,
-  } = input;
+  } = props;
   const [showModal, setShowModal] = useState(false);
   const examReferences = useContext(ExamFilesContext);
   const questionReferences = useContext(QuestionFilesContext);
   const partReferences = useContext(PartFilesContext);
   let references: readonly FileRef[];
-  const choice: CodeTagInfo['choices'] = choices.input.value;
   switch (choice) {
     case 'exam':
       references = examReferences.references;
@@ -256,34 +249,33 @@ const EditAnswer: React.FC<WrappedFieldsProps> = (props) => {
   );
 };
 
-interface CodeTagProps {
-  qnum: number;
-  pnum: number;
-  bnum: number;
-}
-
-const CodeTag: React.FC<CodeTagProps> = (props) => {
+const CodeTag: React.FC<{
+  info: CodeTagInfo,
+  id: string,
+  answer: CodeTagState,
+}> = (props) => {
   const {
-    qnum,
-    pnum,
-    bnum,
+    info,
+    answer,
   } = props;
   return (
     <>
       <Prompted
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
+        value={info.prompt}
+        onChange={console.log}
       />
-      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-source`}>
-        <Fields names={['answer', 'choices']} component={EditChoices} />
+      <Form.Group as={Row}>
+        <EditChoices
+          value={info.choices}
+          onChange={console.log}
+        />
       </Form.Group>
-      <Form.Group
-        as={Row}
-        controlId={`${qnum}-${pnum}-${bnum}-answer`}
-        className="align-items-baseline"
-      >
-        <Fields names={['answer', 'choices']} component={EditAnswer} />
+      <Form.Group as={Row} className="align-items-baseline">
+        <EditAnswer
+          choice={info.choices}
+          value={answer}
+          onChange={console.log}
+        />
       </Form.Group>
     </>
   );

@@ -6,15 +6,18 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
-import { Fields, WrappedFieldsProps } from 'redux-form';
+import Prompted from '@professor/exams/new/editor/body-items/Prompted';
+import { YesNoInfo, YesNoState } from '@hourglass/workflows/student/exams/show/types';
 
-const EditLabels: React.FC<WrappedFieldsProps> = (props) => {
+const EditLabels: React.FC<{
+  value: 'yn' | 'tf',
+  onChange: (label: 'yn' | 'tf') => void,
+}> = (props) => {
   const {
-    yesLabel,
-    noLabel,
+    value,
+    onChange,
   } = props;
-  const isYesNo = (yesLabel.input.value === 'Yes');
+  const isYesNo = (value === 'yn');
   return (
     <>
       <Form.Label column sm={2}>Answer format</Form.Label>
@@ -23,16 +26,8 @@ const EditLabels: React.FC<WrappedFieldsProps> = (props) => {
           className="bg-white rounded"
           name="wording"
           type="radio"
-          value={isYesNo ? 'yn' : 'tf'}
-          onChange={(v: 'yn' | 'tf'): void => {
-            if (v === 'yn') {
-              yesLabel.input.onChange('Yes');
-              noLabel.input.onChange('No');
-            } else {
-              yesLabel.input.onChange('True');
-              noLabel.input.onChange('False');
-            }
-          }}
+          value={value}
+          onChange={onChange}
         >
           <ToggleButton
             variant={isYesNo ? 'primary' : 'outline-primary'}
@@ -52,16 +47,22 @@ const EditLabels: React.FC<WrappedFieldsProps> = (props) => {
   );
 };
 
-const EditAnswer: React.FC<WrappedFieldsProps> = (props) => {
+const EditAnswer: React.FC<{
+  answer?: YesNoState,
+  yesLabel: string,
+  noLabel: string,
+  onChange: (answer: YesNoState) => void,
+}> = (props) => {
   const {
     answer,
     yesLabel,
     noLabel,
+    onChange,
   } = props;
   let tbgVal;
-  if (answer.input.value === true) {
+  if (answer === true) {
     tbgVal = 'yes';
-  } else if (answer.input.value === false) {
+  } else if (answer === false) {
     tbgVal = 'no';
   }
   return (
@@ -73,19 +74,19 @@ const EditAnswer: React.FC<WrappedFieldsProps> = (props) => {
           name="tbg"
           type="radio"
           value={tbgVal}
-          onChange={(newVal: 'yes' | 'no') => answer.input.onChange(newVal === 'yes')}
+          onChange={(newVal: 'yes' | 'no') => onChange(newVal === 'yes')}
         >
           <ToggleButton
-            variant={answer.input.value ? 'primary' : 'outline-primary'}
+            variant={answer ? 'primary' : 'outline-primary'}
             value="yes"
           >
-            {yesLabel.input.value}
+            {yesLabel}
           </ToggleButton>
           <ToggleButton
-            variant={(answer.input.value === false) ? 'primary' : 'outline-primary'}
+            variant={(answer === false) ? 'primary' : 'outline-primary'}
             value="no"
           >
-            {noLabel.input.value}
+            {noLabel}
           </ToggleButton>
         </ToggleButtonGroup>
       </Col>
@@ -93,30 +94,36 @@ const EditAnswer: React.FC<WrappedFieldsProps> = (props) => {
   );
 };
 
-export interface YesNoProps {
-  qnum: number;
-  pnum: number;
-  bnum: number;
-}
-
-const YesNo: React.FC<YesNoProps> = (props) => {
+const YesNo: React.FC<{
+  info: YesNoInfo,
+  id: string,
+  answer: YesNoState,
+}> = (props) => {
   const {
-    qnum,
-    pnum,
-    bnum,
+    info,
+    answer,
   } = props;
   return (
     <>
       <Prompted
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
+        value={info.prompt}
+        onChange={console.log}
       />
-      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-wording`}>
-        <Fields names={['yesLabel', 'noLabel']} component={EditLabels} />
+      <Form.Group as={Row}>
+        <EditLabels
+          value={info.yesLabel === 'Yes' ? 'yn' : 'tf'}
+          onChange={console.log}
+        />
+        {/* <Fields names={['yesLabel', 'noLabel']} component={EditLabels} /> */}
       </Form.Group>
-      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-yesNo-answer`}>
-        <Fields names={['yesLabel', 'noLabel', 'answer']} component={EditAnswer} />
+      <Form.Group as={Row}>
+        <EditAnswer
+          answer={answer}
+          yesLabel={info.yesLabel}
+          noLabel={info.noLabel}
+          onChange={console.log}
+        />
+        {/* <Fields names={['yesLabel', 'noLabel', 'answer']} component={EditAnswer} /> */}
       </Form.Group>
     </>
   );

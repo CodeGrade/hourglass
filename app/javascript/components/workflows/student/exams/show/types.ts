@@ -3,7 +3,6 @@ import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
 import { editorQueryResponse } from '@professor/exams/new/editor/__generated__/editorQuery.graphql';
 import { Policy } from '@material-ui/icons';
-import { AllThatApplyInfoWithAnswer } from '@hourglass/workflows/professor/exams/types';
 
 export type ExamTakerAction =
   LoadExamAction |

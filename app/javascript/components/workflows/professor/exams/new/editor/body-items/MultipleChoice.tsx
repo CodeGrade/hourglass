@@ -5,7 +5,7 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
-import Prompted from '@hourglass/workflows/professor/exams/new/editor/body-items/Prompted';
+import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import Icon from '@student/exams/show/components/Icon';
 import { FaCircle } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';

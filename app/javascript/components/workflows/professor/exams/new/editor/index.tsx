@@ -16,6 +16,7 @@ import {
   AllThatApplyState,
   MultipleChoiceState,
   YesNoState,
+  TextState,
 } from '@student/exams/show/types';
 import {
   Preset,
@@ -61,7 +62,6 @@ import { GrDrag } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
 import YesNoControl from '@student/exams/show/components/questions/YesNo';
 import { ReactQuillProps } from 'react-quill';
-import YesNo from './body-items/YesNo';
 import Policies from './Policies';
 import FileUploader from './FileUploader';
 import Instructions from './Instructions';
@@ -87,6 +87,8 @@ import { editorSingle$key } from './__generated__/editorSingle.graphql';
 import { editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
 import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
 import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.graphql';
+import Text from './body-items/Text';
+import YesNo from './body-items/YesNo';
 import Code from './body-items/Code';
 import AllThatApply from './body-items/AllThatApply';
 import MultipleChoice from './body-items/MultipleChoice';
@@ -671,13 +673,19 @@ const BodyItemEditor: React.FC<{
         />
       );
       break;
+    case 'Text':
+      editor = (
+        <Text
+          id={id}
+          info={info}
+          answer={answer as TextState}
+        />
+      );
+      break;
     default:
       return <p>{`todo: ${info.type}`}</p>;
     // case 'CodeTag':
     //   editor = <CodeTag qnum={qnum} pnum={pnum} bnum={bnum} />;
-    //   break;
-    // case 'Text':
-    //   editor = <Text qnum={qnum} pnum={pnum} bnum={bnum} />;
     //   break;
     // case 'Matching':
     //   editor = <Matching qnum={qnum} pnum={pnum} bnum={bnum} />;

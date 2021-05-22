@@ -2,42 +2,33 @@ import React from 'react';
 import {
   Row, Col, Form,
 } from 'react-bootstrap';
-import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
-import { Field } from 'redux-form';
+import Prompted from '@professor/exams/new/editor/body-items/Prompted';
+import { TextInfo, TextState } from '@hourglass/workflows/student/exams/show/types';
 
-interface TextProps {
-  qnum: number;
-  pnum: number;
-  bnum: number;
-}
-
-const Text: React.FC<TextProps> = (props) => {
+const Text: React.FC<{
+  info: TextInfo,
+  id: string,
+  answer: TextState
+}> = (props) => {
   const {
-    qnum,
-    pnum,
-    bnum,
+    info,
+    answer,
   } = props;
   return (
     <>
       <Prompted
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
+        value={info.prompt}
+        onChange={console.log}
       />
-      <Form.Group as={Row} controlId={`${qnum}-${pnum}-${bnum}-prompt`}>
+      <Form.Group as={Row}>
         <Form.Label column sm={2}>Correct answer</Form.Label>
         <Col sm={10}>
-          <Field
-            name="answer"
-            component={({ input }) => (
-              <Form.Control
-                as="textarea"
-                rows={3}
-                placeholder="Sketch the intended answer here."
-                value={input.value ?? ''}
-                onChange={input.onChange}
-              />
-            )}
+          <Form.Control
+            as="textarea"
+            rows={3}
+            placeholder="Sketch the intended answer here."
+            value={answer ?? ''}
+            onChange={console.log}
           />
         </Col>
       </Form.Group>

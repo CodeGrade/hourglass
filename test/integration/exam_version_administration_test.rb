@@ -36,7 +36,6 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
     HourglassSchema.do_mutation!('UPDATE_EXAM_VERSION', user, {
       examVersionId: HourglassSchema.id_from_object(ver, Types::ExamVersionType, {}),
       name: new_name,
-      info: ver.export_exam_info.to_json,
       files: ver.files.to_json,
     })
   end

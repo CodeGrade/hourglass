@@ -7,7 +7,7 @@ import {
   Col,
 } from 'react-bootstrap';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
-import { YesNoInfo, YesNoState } from '@hourglass/workflows/student/exams/show/types';
+import { YesNoInfo, YesNoState } from '@student/exams/show/types';
 
 const EditLabels: React.FC<{
   value: 'yn' | 'tf',

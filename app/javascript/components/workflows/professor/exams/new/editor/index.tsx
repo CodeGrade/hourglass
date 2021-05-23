@@ -51,15 +51,15 @@ import {
 import { alphabetIdx, ExhaustiveSwitchError, SelectOption } from '@hourglass/common/helpers';
 import Select from 'react-select';
 import { AlertContext } from '@hourglass/common/alerts';
-import CustomEditor from '@hourglass/workflows/professor/exams/new/old-editor/components/CustomEditor';
+import CustomEditor from '@professor/exams/new/old-editor/components/CustomEditor';
 import { useDebounce, useDebouncedCallback } from 'use-debounce/lib';
 import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/NumericInput';
-import Tooltip from '@hourglass/workflows/student/exams/show/components/Tooltip';
+import Tooltip from '@student/exams/show/components/Tooltip';
 import Loading from '@hourglass/common/loading';
 import { MutationParameters } from 'relay-runtime';
 import { FaTrashAlt } from 'react-icons/fa';
 import RearrangableList from '@hourglass/common/rearrangeable';
-import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
+import Icon from '@student/exams/show/components/Icon';
 import { GrDrag } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
 import YesNoControl from '@student/exams/show/components/questions/YesNo';

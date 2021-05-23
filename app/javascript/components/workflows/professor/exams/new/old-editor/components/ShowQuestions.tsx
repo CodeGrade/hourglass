@@ -8,7 +8,7 @@ import {
 import { useMutation } from 'relay-hooks';
 import { useRefresher } from '@hourglass/common/helpers';
 import { QuestionInfoWithAnswers } from '@professor/exams/types';
-import Question from '@hourglass/workflows/professor/exams/new/old-editor/components/Question';
+import Question from '@professor/exams/new/old-editor/components/Question';
 import { AlertContext } from '@hourglass/common/alerts';
 
 const ShowQuestions: React.FC<{

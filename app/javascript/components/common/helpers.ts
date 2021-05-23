@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
+import { HTMLVal } from '@student/exams/show/types';
 
 /**
  * Error to throw in the default case of an exhaustive `switch` statement.

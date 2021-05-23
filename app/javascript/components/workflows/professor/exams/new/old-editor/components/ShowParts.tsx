@@ -8,7 +8,7 @@ import { WrappedFieldArrayProps } from 'redux-form';
 import { useMutation } from 'relay-hooks';
 import { useRefresher } from '@hourglass/common/helpers';
 import { PartInfoWithAnswers } from '@professor/exams/types';
-import Part from '@hourglass/workflows/professor/exams/new/old-editor/components/Part';
+import Part from '@professor/exams/new/old-editor/components/Part';
 import { AlertContext } from '@hourglass/common/alerts';
 
 const ShowParts: React.FC<{

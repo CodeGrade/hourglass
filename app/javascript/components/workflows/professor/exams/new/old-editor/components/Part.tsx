@@ -14,8 +14,8 @@ import {
 } from 'redux-form';
 import { PartFilesContext } from '@hourglass/common/context';
 import { NumericInput } from '@hourglass/common/NumericInput';
-import MoveItem from '@hourglass/workflows/professor/exams/new/old-editor/components/MoveItem';
-import ShowBodyItems from '@hourglass/workflows/professor/exams/new/old-editor/components/ShowBodyItems';
+import MoveItem from '@professor/exams/new/old-editor/components/MoveItem';
+import ShowBodyItems from '@professor/exams/new/old-editor/components/ShowBodyItems';
 import YesNo from '@student/exams/show/components/questions/YesNo';
 import { YesNoInfo } from '@student/exams/show/types';
 import { EditHTMLField } from './editHTMLs';

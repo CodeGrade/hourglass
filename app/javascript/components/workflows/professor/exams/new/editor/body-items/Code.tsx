@@ -6,13 +6,13 @@ import {
   Button,
   ButtonGroup,
 } from 'react-bootstrap';
-import { MarkDescription, CodeState, CodeInfo, CodeInitialContents } from '@student/exams/show/types';
+import { MarkDescription, CodeState, CodeInfo } from '@student/exams/show/types';
 import { Editor, marksToDescs } from '@student/exams/show/components/ExamCodeBox';
-import Prompted from '@hourglass/workflows/professor/exams/new/editor/body-items/Prompted';
+import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { FaLock, FaBan } from 'react-icons/fa';
 import { ExamContext } from '@hourglass/common/context';
 import { firstFile } from '@student/exams/show/files';
-import { FilePickerSelectWithPreview } from '@hourglass/workflows/professor/exams/new/editor/FilePicker';
+import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/FilePicker';
 
 export const languages = {
   scheme: 'Racket',
@@ -51,7 +51,7 @@ const EditLang: React.FC<{
   );
 };
 
- // TODO debounce me!!
+// TODO: debounce me!!
 const EditCodeAnswerValues: React.FC<{
   lang: CodeInfo['lang'];
   onChangeLang: (newLang: CodeInfo['lang']) => void;
@@ -280,7 +280,6 @@ const Code: React.FC<{
 }> = (props) => {
   const {
     info,
-    id,
     answer,
   } = props;
   return (

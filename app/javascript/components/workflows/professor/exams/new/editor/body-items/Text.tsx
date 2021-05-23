@@ -3,7 +3,7 @@ import {
   Row, Col, Form,
 } from 'react-bootstrap';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
-import { TextInfo, TextState } from '@hourglass/workflows/student/exams/show/types';
+import { TextInfo, TextState } from '@student/exams/show/types';
 
 const Text: React.FC<{
   info: TextInfo,

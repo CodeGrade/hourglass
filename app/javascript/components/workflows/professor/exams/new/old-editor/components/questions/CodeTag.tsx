@@ -10,7 +10,7 @@ import {
 } from 'react-bootstrap';
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
+import Prompted from '@professor/exams/new/old-editor/components/questions/Prompted';
 import {
   ExamContext,
   ExamFilesContext,

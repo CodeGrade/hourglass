@@ -5,7 +5,7 @@ import {
 } from 'react-bootstrap';
 import { WrappedFieldProps } from 'redux-form';
 import { ExamContext } from '@hourglass/common/context';
-import { FilePickerSelectWithPreview } from '@hourglass/workflows/professor/exams/new/old-editor/components/FilePicker';
+import { FilePickerSelectWithPreview } from '@professor/exams/new/old-editor/components/FilePicker';
 import { FileRef } from '@student/exams/show/types';
 
 /**

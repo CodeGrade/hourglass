@@ -8,7 +8,7 @@ import {
 import Icon from '@student/exams/show/components/Icon';
 import { FaCheck } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
-import { AllThatApplyInfo, AllThatApplyState, HTMLVal } from '@hourglass/workflows/student/exams/show/types';
+import { AllThatApplyInfo, AllThatApplyState, HTMLVal } from '@student/exams/show/types';
 import RearrangableList from '@hourglass/common/rearrangeable';
 import Prompted from './Prompted';
 import { DestroyButton, DragHandle, EditHTMLVal } from '..';

@@ -613,7 +613,7 @@ const VersionInfo: React.FC<{
     `,
     {
       onCompleted: ({ createExamVersion }) => {
-        history.push(`/exams/${res.id}/versions/${createExamVersion.examVersion.id}/edit/questions`);
+        history.push(`/exams/${res.id}/versions/${createExamVersion.examVersion.id}/edit`);
       },
       onError: (err) => {
         alert({
@@ -639,7 +639,7 @@ const VersionInfo: React.FC<{
               const [f] = files;
               if (!f) return;
               uploadFile<{ id: number; }>(res.examVersionUploadUrl, f).then((innerRes) => {
-                history.push(`/exams/${res.id}/versions/${innerRes.id}/edit/questions`);
+                history.push(`/exams/${res.id}/versions/${innerRes.id}/edit`);
                 alert({
                   variant: 'success',
                   autohide: true,

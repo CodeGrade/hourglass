@@ -5,7 +5,7 @@ class Exam < ApplicationRecord
   belongs_to :course
 
   has_many :rooms, dependent: :destroy
-  has_many :exam_versions, dependent: :destroy
+  has_many :exam_versions, -> { order(:created_at) }, dependent: :destroy
   has_many :proctor_registrations, dependent: :destroy
   has_many :exam_announcements, dependent: :destroy
 

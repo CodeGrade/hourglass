@@ -7,10 +7,10 @@ import {
 import {
   Select, FormControl, InputLabel, MenuItem,
 } from '@material-ui/core';
-import Prompted from '@hourglass/workflows/professor/exams/new/editor/body-items/Prompted';
+import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { alphabetIdx } from '@hourglass/common/helpers';
 import './Matching.css';
-import { HTMLVal, MatchingInfo, MatchingState } from '@hourglass/workflows/student/exams/show/types';
+import { HTMLVal, MatchingInfo, MatchingState } from '@student/exams/show/types';
 import RearrangableList from '@hourglass/common/rearrangeable';
 import { EditHTMLVal, DestroyButton, DragHandle } from '..';
 

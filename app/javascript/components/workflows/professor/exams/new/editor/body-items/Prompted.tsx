@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
-import CustomEditor from '@hourglass/workflows/professor/exams/new/old-editor/components/CustomEditor';
-import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
+import CustomEditor from '@professor/exams/new/old-editor/components/CustomEditor';
+import { HTMLVal } from '@student/exams/show/types';
 
 const Prompted: React.FC<{
   value: HTMLVal;

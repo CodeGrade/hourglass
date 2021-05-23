@@ -5,8 +5,8 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
-import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
-import MoveItem from '@hourglass/workflows/professor/exams/new/old-editor/components/MoveItem';
+import Prompted from '@professor/exams/new/old-editor/components/questions/Prompted';
+import MoveItem from '@professor/exams/new/old-editor/components/MoveItem';
 import {
   Field,
   FieldArray,
@@ -15,7 +15,7 @@ import {
   WrappedFieldProps,
   FormSection,
 } from 'redux-form';
-import { EditHTMLField } from '@hourglass/workflows/professor/exams/new/old-editor/components/editHTMLs';
+import { EditHTMLField } from '@professor/exams/new/old-editor/components/editHTMLs';
 import { AllThatApplyOptionWithAnswer } from '@professor/exams/types';
 import Icon from '@student/exams/show/components/Icon';
 import { FaCheck } from 'react-icons/fa';

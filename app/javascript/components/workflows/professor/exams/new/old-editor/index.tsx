@@ -47,11 +47,11 @@ import {
 import { Provider, connect } from 'react-redux';
 import { useParams, useHistory } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import Name from '@hourglass/workflows/professor/exams/new/old-editor/components/Name';
-import Instructions from '@hourglass/workflows/professor/exams/new/old-editor/components/Instructions';
-import EditReference from '@hourglass/workflows/professor/exams/new/old-editor/components/Reference';
-import FileUploader from '@hourglass/workflows/professor/exams/new/old-editor/components/FileUploader';
-import ShowQuestions from '@hourglass/workflows/professor/exams/new/old-editor/components/ShowQuestions';
+import Name from '@professor/exams/new/old-editor/components/Name';
+import Instructions from '@professor/exams/new/old-editor/components/Instructions';
+import EditReference from '@professor/exams/new/old-editor/components/Reference';
+import FileUploader from '@professor/exams/new/old-editor/components/FileUploader';
+import ShowQuestions from '@professor/exams/new/old-editor/components/ShowQuestions';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import { useMutation, graphql } from 'relay-hooks';
 import { editorUpdateExamVersionMutation } from './__generated__/editorUpdateExamVersionMutation.graphql';

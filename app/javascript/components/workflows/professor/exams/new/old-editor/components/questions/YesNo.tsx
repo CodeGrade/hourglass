@@ -6,7 +6,7 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import Prompted from '@hourglass/workflows/professor/exams/new/old-editor/components/questions/Prompted';
+import Prompted from '@professor/exams/new/old-editor/components/questions/Prompted';
 import { Fields, WrappedFieldsProps } from 'redux-form';
 
 const EditLabels: React.FC<WrappedFieldsProps> = (props) => {

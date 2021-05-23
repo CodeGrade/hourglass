@@ -8,7 +8,7 @@ import { PartFilesContext } from '@hourglass/common/context';
 import { PartName } from '@student/exams/show/components/Part';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
-import { CurrentGrading } from '@hourglass/workflows/professor/exams/types';
+import { CurrentGrading } from '@professor/exams/types';
 import { pluralize } from '@hourglass/common/helpers';
 import { graphql, useFragment, useMutation } from 'relay-hooks';
 import { AlertContext } from '@hourglass/common/alerts';

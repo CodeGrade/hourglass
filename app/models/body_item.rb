@@ -16,17 +16,14 @@ class BodyItem < ApplicationRecord
   accepts_nested_attributes_for :rubrics
 
   before_save do
-    r = Rubric.find_or_initialize_by(
-      exam_version: self.exam_version,
-      question: self.question,
-      part: self.part,
-      body_item: self,
-    )
-    if r.new_record?
-      r.assign_attributes(
+    if rubrics.empty?
+      rubrics << Rubric.new(
+        exam_version: exam_version,
+        question: question,
+        part: part,
+        body_item: self,
         type: 'None',
       )
-      self.rubrics << r
     end
   end
 

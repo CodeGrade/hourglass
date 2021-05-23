@@ -16,24 +16,21 @@ class Question < ApplicationRecord
   accepts_nested_attributes_for :parts, :rubrics, :references
 
   before_save do
-    r = Rubric.find_or_initialize_by(
-      exam_version: self.exam_version,
-      question: self,
-      part: nil,
-      body_item: nil,
-    )
-    if r.new_record?
-      r.assign_attributes(
+    if rubrics.empty?
+      rubrics << Rubric.new(
+        exam_version: exam_version,
+        question: self,
+        part: nil,
+        body_item: nil,
         type: 'None',
       )
-      self.rubrics << r
     end
   end
 
   def root_rubric
     rubrics.where(
       part: nil,
-      body_item: nil
+      body_item: nil,
     ).root_rubrics.first
   end
 

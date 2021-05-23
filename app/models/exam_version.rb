@@ -29,17 +29,14 @@ class ExamVersion < ApplicationRecord
   delegate :all_staff, to: :exam
 
   before_save do
-    r = Rubric.find_or_initialize_by(
-      exam_version: self,
-      question: nil,
-      part: nil,
-      body_item: nil,
-    )
-    if r.new_record?
-      r.assign_attributes(
+    if rubrics.empty?
+      rubrics << Rubric.new(
+        exam_version: self,
+        question: nil,
+        part: nil,
+        body_item: nil,
         type: 'None',
       )
-      self.rubrics << r
     end
   end
 
@@ -119,7 +116,7 @@ class ExamVersion < ApplicationRecord
     rubrics.where(
       question: nil,
       part: nil,
-      body_item: nil
+      body_item: nil,
     ).root_rubrics.first
   end
 
@@ -322,23 +319,6 @@ class ExamVersion < ApplicationRecord
         p['score']
       end
     end
-  end
-
-  def self.new_empty(exam)
-    n = exam.exam_versions.length + 1
-    new(
-      exam: exam,
-      name: "#{exam.name} Version #{n}",
-      files: [],
-      info: {
-        'policies' => [],
-        'answers' => [],
-        'contents' => {
-          'reference' => [],
-          'questions' => [],
-        },
-      },
-    )
   end
 
   def any_started?

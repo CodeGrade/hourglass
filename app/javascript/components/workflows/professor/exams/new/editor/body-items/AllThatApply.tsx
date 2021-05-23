@@ -15,15 +15,18 @@ import { DestroyButton, DragHandle, EditHTMLVal } from '..';
 
 const EditAnswer: React.FC<{
   value: boolean;
+  disabled?: boolean;
   onChange: (newVal: boolean) => void;
 }> = (props) => {
   const {
     value,
+    disabled = false,
     onChange,
   } = props;
   return (
     <Button
       variant={value ? 'dark' : 'outline-dark'}
+      disabled={disabled}
       onClick={() => onChange(!value)}
     >
       <Icon I={FaCheck} className={value ? '' : 'invisible'} />
@@ -39,12 +42,15 @@ type DraggableATAOption = {
 
 const OneOption: React.FC<{
   option: DraggableATAOption;
+  disabled?: boolean;
   handleRef: React.Ref<HTMLElement>;
 }> = (props) => {
   const {
     option,
+    disabled: parentDisabled = false,
     handleRef,
   } = props;
+  const disabled = parentDisabled;
   return (
     <Row className="p-2 align-items-center">
       <Col sm="auto" className="p-0">
@@ -53,13 +59,14 @@ const OneOption: React.FC<{
       <Col className="flex-grow-01">
         <EditAnswer
           value={option.answer}
+          disabled={disabled}
           onChange={console.log}
         />
       </Col>
       <Col>
         <EditHTMLVal
           className="bg-white border rounded"
-          // disabled={loading || disabled}
+          disabled={disabled}
           value={option.option || {
             type: 'HTML',
             value: '',
@@ -71,6 +78,7 @@ const OneOption: React.FC<{
       <Col className="px-0" sm="auto">
         <DestroyButton
           className=""
+          disabled={disabled}
           onClick={console.log}
         />
       </Col>
@@ -80,22 +88,26 @@ const OneOption: React.FC<{
 
 const EditOptions: React.FC<{
   options: DraggableATAOption[];
+  disabled?: boolean;
   bodyItemId: string;
 }> = (props) => {
   const {
     options,
+    disabled = false,
     bodyItemId,
   } = props;
   return (
     <>
       <RearrangeableList
         dbArray={options}
+        disabled={disabled}
         dropVariant="info"
         identifier={`ATA-${bodyItemId}`}
         onRearrange={console.log}
       >
         {(option, handleRef) => (
           <OneOption
+            disabled={disabled}
             option={option}
             handleRef={handleRef}
           />
@@ -105,6 +117,7 @@ const EditOptions: React.FC<{
         <Col className="text-center p-0">
           <Button
             variant="dark"
+            disabled={disabled}
             onClick={console.log}
           >
             Add new option
@@ -118,11 +131,13 @@ const EditOptions: React.FC<{
 const AllThatApply: React.FC<{
   info: AllThatApplyInfo;
   id: string;
+  disabled?: boolean;
   answer: AllThatApplyState;
 }> = (props) => {
   const {
     info,
     id,
+    disabled = false,
     answer,
   } = props;
   const zipped: DraggableATAOption[] = info.options.map((option, index) => ({
@@ -134,6 +149,7 @@ const AllThatApply: React.FC<{
     <>
       <Prompted
         value={info.prompt}
+        disabled={disabled}
         onChange={console.log}
       />
       <Form.Group as={Row}>
@@ -150,6 +166,7 @@ const AllThatApply: React.FC<{
           </Row>
           <EditOptions
             options={zipped}
+            disabled={disabled}
             bodyItemId={id}
           />
         </Col>

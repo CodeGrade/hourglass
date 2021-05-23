@@ -57,12 +57,14 @@ const EditCodeAnswerValues: React.FC<{
   onChangeLang: (newLang: CodeInfo['lang']) => void;
   value: CodeState;
   onChangeValue: (newVal: CodeState) => void;
+  disabled?: boolean;
 }> = (props) => {
   const {
     lang,
     onChangeLang,
     value,
     onChangeValue,
+    disabled: parentDisabled = false,
   } = props;
   const answerText = value?.text ?? '';
   const answerMarks = value?.marks ?? [];
@@ -80,6 +82,7 @@ const EditCodeAnswerValues: React.FC<{
   } else {
     title = 'No region selected to lock';
   }
+  const disabled = parentDisabled || !lockState.enabled;
   return (
     <div className="quill bg-white">
       <div className="ql-toolbar ql-snow">
@@ -88,7 +91,7 @@ const EditCodeAnswerValues: React.FC<{
           className="float-none"
           variant="outline-secondary"
           size="sm"
-          disabled={!lockState.enabled}
+          disabled={disabled}
           active={lockState.active}
           title={title}
           onClick={(): void => {
@@ -135,6 +138,7 @@ const EditCodeAnswerValues: React.FC<{
           variant="outline-secondary"
           size="sm"
           title="Clear all locked regions"
+          disabled={disabled}
           onClick={(): void => {
             onChangeValue({ text: answerText, marks: [] });
           }}
@@ -147,6 +151,7 @@ const EditCodeAnswerValues: React.FC<{
         markDescriptions={answerMarks}
         valueUpdate={answerMarks}
         language={lang}
+        disabled={disabled}
         onSelection={(editor, data): void => {
           const { ranges, origin } = data;
           if (origin === undefined) return;
@@ -199,12 +204,14 @@ interface LockStateInfo {
 const SetInitial: React.FC<{
   initial: CodeInfo['initial'];
   lang: CodeInfo['lang'];
+  disabled?: boolean;
   onChangeInitial: (newVal: CodeInfo['initial']) => void;
   onChangeLang: (newVal: CodeInfo['lang']) => void;
 }> = (props) => {
   const {
     initial,
     lang,
+    disabled = false,
     onChangeInitial,
     onChangeLang,
   } = props;
@@ -219,6 +226,7 @@ const SetInitial: React.FC<{
         <Button
           variant={isNone ? 'secondary' : 'outline-secondary'}
           active={isNone}
+          disabled={disabled}
           onClick={(): void => {
             onChangeInitial(null);
           }}
@@ -228,6 +236,7 @@ const SetInitial: React.FC<{
         <Button
           variant={isText ? 'secondary' : 'outline-secondary'}
           active={isText}
+          disabled={disabled}
           onClick={(): void => {
             onChangeInitial({ text: '', marks: [] });
           }}
@@ -237,6 +246,7 @@ const SetInitial: React.FC<{
         <Button
           variant={isFile ? 'secondary' : 'outline-secondary'}
           active={isFile}
+          disabled={disabled}
           onClick={(): void => {
             onChangeInitial({ file: first.relPath });
           }}
@@ -248,6 +258,7 @@ const SetInitial: React.FC<{
         <EditCodeAnswerValues
           value={initial}
           onChangeValue={onChangeInitial}
+          disabled={disabled}
           lang={lang}
           onChangeLang={onChangeLang}
         />
@@ -260,6 +271,7 @@ const SetInitial: React.FC<{
               type: 'file',
               path: initial.file,
             }]}
+            disabled={disabled}
             onChange={(arr): void => {
               const lastSelected = arr[arr.length - 1];
               if (!lastSelected) return;
@@ -276,22 +288,26 @@ const SetInitial: React.FC<{
 const Code: React.FC<{
   info: CodeInfo;
   id: string;
+  disabled?: boolean;
   answer: CodeState;
 }> = (props) => {
   const {
     info,
     answer,
+    disabled = false,
   } = props;
   return (
     <>
       <Prompted
         value={info.prompt}
+        disabled={disabled}
         onChange={console.log}
       />
       <Form.Group as={Row}>
         <Form.Label column sm={2}>Starter</Form.Label>
         <Col sm={10}>
           <SetInitial
+            disabled={disabled}
             initial={info.initial}
             onChangeInitial={console.log}
             lang={info.lang}
@@ -303,6 +319,7 @@ const Code: React.FC<{
         <Form.Label column sm={2}>Answer</Form.Label>
         <Col sm={10}>
           <EditCodeAnswerValues
+            disabled={disabled}
             lang={info.lang}
             onChangeLang={console.log}
             value={answer}

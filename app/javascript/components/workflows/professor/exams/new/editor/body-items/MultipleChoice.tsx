@@ -21,12 +21,15 @@ interface DraggableMCOption {
 
 const OneOption: React.FC<{
   option: DraggableMCOption;
+  disabled?: boolean;
   handleRef: React.Ref<HTMLElement>;
 }> = (props) => {
   const {
     option,
+    disabled: parentDisabled = false,
     handleRef,
   } = props;
+  const disabled = parentDisabled;
   return (
     <Row className="p-2 align-items-center">
       <Col sm="auto" className="p-0">
@@ -35,6 +38,7 @@ const OneOption: React.FC<{
       <Col className="flex-grow-01">
         <Button
           variant={option.selected ? 'dark' : 'outline-dark'}
+          disabled={disabled}
           onClick={console.log}
         >
           <Icon I={FaCircle} className={option.selected ? '' : 'invisible'} />
@@ -43,7 +47,7 @@ const OneOption: React.FC<{
       <Col>
         <EditHTMLVal
           className="bg-white border rounded"
-          // disabled={loading || disabled}
+          disabled={disabled}
           value={option.option || {
             type: 'HTML',
             value: '',
@@ -55,6 +59,7 @@ const OneOption: React.FC<{
       <Col className="px-0" sm="auto">
         <DestroyButton
           className=""
+          disabled={disabled}
           onClick={console.log}
         />
       </Col>
@@ -64,16 +69,19 @@ const OneOption: React.FC<{
 
 const EditAns: React.FC<{
   options: DraggableMCOption[];
+  disabled?: boolean;
   bodyItemId: string;
 }> = (props) => {
   const {
     options,
+    disabled = false,
     bodyItemId,
   } = props;
   return (
     <>
       <RearrangeableList
         dbArray={options}
+        disabled={disabled}
         dropVariant="info"
         identifier={`MC-${bodyItemId}`}
         onRearrange={console.log}
@@ -81,6 +89,7 @@ const EditAns: React.FC<{
         {(option, handleRef) => (
           <OneOption
             option={option}
+            disabled={disabled}
             handleRef={handleRef}
           />
         )}
@@ -92,6 +101,7 @@ const EditAns: React.FC<{
 interface MultipleChoiceProps {
   info: MultipleChoiceInfo;
   id: string;
+  disabled?: boolean;
   answer: MultipleChoiceState;
 }
 
@@ -99,6 +109,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
   const {
     info,
     id,
+    disabled = false,
     answer,
   } = props;
   const zipped: DraggableMCOption[] = info.options.map((option, index) => ({
@@ -110,6 +121,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
     <>
       <Prompted
         value={info.prompt}
+        disabled={disabled}
         onChange={console.log}
       />
       <Form.Group as={Row}>
@@ -127,6 +139,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
             <Col><b>Prompt</b></Col>
           </Row>
           <EditAns
+            disabled={disabled}
             bodyItemId={id}
             options={zipped}
           />

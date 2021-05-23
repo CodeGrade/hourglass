@@ -23,11 +23,13 @@ type DraggableMPrompt = {
 
 const OnePrompt: React.FC<{
   option: DraggableMPrompt,
+  disabled?: boolean;
   numChoices: number,
   handleRef: React.Ref<HTMLElement>,
 }> = (props) => {
   const {
     option,
+    disabled = false,
     numChoices,
     handleRef,
   } = props;
@@ -42,7 +44,7 @@ const OnePrompt: React.FC<{
       <Col sm>
         <EditHTMLVal
           className="bg-white border rounded"
-          // disabled={loading || disabled}
+          disabled={disabled}
           value={option.prompt || {
             type: 'HTML',
             value: '',
@@ -56,6 +58,7 @@ const OnePrompt: React.FC<{
         <FormControl variant="outlined" className="w-100">
           <InputLabel>Match</InputLabel>
           <Select
+            disabled={disabled}
             margin="dense"
             value={option.answer || -1}
             onChange={console.log}
@@ -79,6 +82,7 @@ const OnePrompt: React.FC<{
       </Col>
       <Col className="px-0" sm="auto">
         <DestroyButton
+          disabled={disabled}
           className=""
           onClick={console.log}
         />
@@ -90,23 +94,27 @@ const OnePrompt: React.FC<{
 const EditPrompts: React.FC<{
   prompts: DraggableMPrompt[];
   numChoices: number;
+  disabled?: boolean;
   bodyItemId: string;
 }> = (props) => {
   const {
     prompts,
     numChoices,
     bodyItemId,
+    disabled = false,
   } = props;
   return (
     <>
       <RearrangeableList
         dbArray={prompts}
+        disabled={disabled}
         dropVariant="info"
         identifier={`MP-${bodyItemId}`}
         onRearrange={console.log}
       >
         {(prompt, handleRef) => (
           <OnePrompt
+            disabled={disabled}
             option={prompt}
             numChoices={numChoices}
             handleRef={handleRef}
@@ -116,6 +124,7 @@ const EditPrompts: React.FC<{
       <Row className="p-2">
         <Col className="text-center p-0">
           <Button
+            disabled={disabled}
             variant="dark"
             onClick={console.log}
           >
@@ -135,10 +144,12 @@ type DraggableMValue = {
 
 const OneValue: React.FC<{
   value: DraggableMValue;
+  disabled?: boolean;
   handleRef: React.Ref<HTMLElement>;
 }> = (props) => {
   const {
     value,
+    disabled = false,
     handleRef,
   } = props;
   return (
@@ -152,7 +163,7 @@ const OneValue: React.FC<{
       <Col sm>
         <EditHTMLVal
           className="bg-white border rounded"
-          // disabled={loading || disabled}
+          disabled={disabled}
           value={value.value || {
             type: 'HTML',
             value: '',
@@ -164,6 +175,7 @@ const OneValue: React.FC<{
       </Col>
       <Col className="px-0" sm="auto">
         <DestroyButton
+          disabled={disabled}
           className=""
           onClick={console.log}
         />
@@ -174,22 +186,26 @@ const OneValue: React.FC<{
 
 const EditValues: React.FC<{
   values: DraggableMValue[];
+  disabled?: boolean;
   bodyItemId: string;
 }> = (props) => {
   const {
     values,
+    disabled = false,
     bodyItemId,
   } = props;
   return (
     <>
       <RearrangeableList
         dbArray={values}
+        disabled={disabled}
         dropVariant="info"
         identifier={`MV-${bodyItemId}`}
         onRearrange={console.log}
       >
         {(value, handleRef) => (
           <OneValue
+            disabled={disabled}
             value={value}
             handleRef={handleRef}
           />
@@ -198,6 +214,7 @@ const EditValues: React.FC<{
       <Row className="p-2">
         <Col className="text-center p-0">
           <Button
+            disabled={disabled}
             variant="dark"
             onClick={console.log}
           >
@@ -212,11 +229,13 @@ const EditValues: React.FC<{
 const Matching: React.FC<{
   info: MatchingInfo;
   id: string;
+  disabled?: boolean;
   answer: MatchingState;
 }> = (props) => {
   const {
     info,
     id,
+    disabled = false,
     answer,
   } = props;
   const zippedPrompts: DraggableMPrompt[] = info.prompts.map((prompt, index) => ({
@@ -234,6 +253,7 @@ const Matching: React.FC<{
     <>
       <Prompted
         value={info.prompt}
+        disabled={disabled}
         onChange={console.log}
       />
       <Row>
@@ -241,6 +261,7 @@ const Matching: React.FC<{
           <Row className="p-2">
             <Col className="text-center p-0">
               <EditHTMLVal
+                disabled={disabled}
                 className="bg-white rounded"
                 value={info.promptsLabel || {
                   type: 'HTML',
@@ -253,19 +274,17 @@ const Matching: React.FC<{
             </Col>
           </Row>
           <EditPrompts
+            disabled={disabled}
             prompts={zippedPrompts}
             bodyItemId={id}
             numChoices={info.values.length}
           />
-          {/* <RenderPrompts
-            prompts={info.prompts}
-          /> */}
-          {/* <Field name="values" component={RenderPrompts} /> */}
         </Col>
         <Col sm={6}>
           <Row className="p-2">
             <Col className="text-center p-0">
               <EditHTMLVal
+                disabled={disabled}
                 className="bg-white rounded"
                 value={info.valuesLabel || {
                   type: 'HTML',
@@ -278,10 +297,10 @@ const Matching: React.FC<{
             </Col>
           </Row>
           <EditValues
+            disabled={disabled}
             values={zippedValues}
             bodyItemId={id}
           />
-          {/* <Field name="prompts" component={RenderValues} /> */}
         </Col>
       </Row>
     </>

@@ -24,11 +24,13 @@ function useEffectSkipFirst(effect: React.EffectCallback, deps?: React.Dependenc
 const EditReference: React.FC<{
   label: string;
   value: FileRef[];
+  disabled?: boolean;
   onChange: (newVal: FileRef[]) => void;
 }> = (props) => {
   const {
     label,
     value,
+    disabled = false,
     onChange,
   } = props;
   const { files, fmap } = useContext(ExamContext);
@@ -49,6 +51,7 @@ const EditReference: React.FC<{
           options={files}
           selected={value}
           onChange={onChange}
+          disabled={disabled}
         />
       </Col>
     </>

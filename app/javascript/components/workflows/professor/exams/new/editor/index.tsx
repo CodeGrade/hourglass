@@ -68,6 +68,12 @@ import Policies from './Policies';
 import FileUploader from './FileUploader';
 import Instructions from './Instructions';
 import EditReference from './Reference';
+import { editorCreateQuestionMutation } from './__generated__/editorCreateQuestionMutation.graphql';
+import { editorDestroyQuestionMutation } from './__generated__/editorDestroyQuestionMutation.graphql';
+import { editorReorderQuestionsMutation } from './__generated__/editorReorderQuestionsMutation.graphql';
+import { editorCreatePartMutation } from './__generated__/editorCreatePartMutation.graphql';
+import { editorDestroyPartMutation } from './__generated__/editorDestroyPartMutation.graphql';
+import { editorReorderPartsMutation } from './__generated__/editorReorderPartsMutation.graphql';
 import { editorChangeRubricDetailsDescriptionMutation } from './__generated__/editorChangeRubricDetailsDescriptionMutation.graphql';
 import { editorChangeRubricTypeMutation } from './__generated__/editorChangeRubricTypeMutation.graphql';
 import { editorChangeRubricDetailsPointsMutation } from './__generated__/editorChangeRubricDetailsPointsMutation.graphql';
@@ -86,7 +92,7 @@ import { editorDestroyRubricMutation } from './__generated__/editorDestroyRubric
 import { editorReorderPresetCommentMutation } from './__generated__/editorReorderPresetCommentMutation.graphql';
 import { editorReorderRubricsMutation } from './__generated__/editorReorderRubricsMutation.graphql';
 import { editorSingle$key } from './__generated__/editorSingle.graphql';
-import { editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
+import { editorQuestionEditor, editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
 import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
 import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.graphql';
 import CodeTag from './body-items/CodeTag';
@@ -164,22 +170,43 @@ const ExamVersionEditor: React.FC = () => {
         }
         policies
         dbQuestions {
-          ...editorQuestionEditor
           id
-          rootRubric { ...editorSingle }
-          parts {
-            id
-            rootRubric { ...editorSingle }
-            bodyItems {
-              id
-              rootRubric { ...editorSingle }
-            }
-          }
+          ...editorQuestionEditor
+
         }
       }
     }
     `,
     { examVersionId },
+  );
+  const { alert } = useContext(AlertContext);
+  const [
+    mutateCreateQuestion,
+    { loading: loadingCreateQuestion },
+  ] = useMutation<editorCreateQuestionMutation>(
+    graphql`
+    mutation editorCreateQuestionMutation($input: CreateQuestionInput!) {
+      createQuestion(input: $input) {
+        examVersion {
+          id
+          dbQuestions {
+            id
+            ...editorQuestionEditor
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error adding new question',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
   );
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
@@ -252,26 +279,24 @@ const ExamVersionEditor: React.FC = () => {
                   />
                 </Col>
               </Row>
-              <RearrangeableList
-                dbArray={dbQuestions}
-                className="mb-3"
-                dropVariant="primary"
-                onRearrange={console.log}
-                identifier={`QUESTION-${examVersionId}`}
-              >
-                {(question, handleRef, isDragging) => (
-                  <QuestionEditor
-                    questionKey={question}
-                    handleRef={handleRef}
-                    isDragging={isDragging}
-                  />
-                )}
-              </RearrangeableList>
+              <ReorderableQuestionsEditor
+                dbQuestions={dbQuestions}
+                examVersionId={examVersionId}
+              />
               <Row className="text-center">
                 <Col>
                   <Button
                     variant="primary"
-                    onClick={console.log}
+                    onClick={() => {
+                      mutateCreateQuestion({
+                        variables: {
+                          input: {
+                            examVersionId,
+                          },
+                        },
+                      });
+                    }}
+                    disabled={loadingCreateQuestion}
                   >
                     Add question
                   </Button>
@@ -293,16 +318,85 @@ const SEP_SUB_YESNO: YesNoInfo = {
   prompt: { type: 'HTML', value: '' },
 };
 
+const ReorderableQuestionsEditor: React.FC<{
+  dbQuestions: editorQuery['response']['examVersion']['dbQuestions'],
+  examVersionId: string,
+  disabled?: boolean,
+}> = (props) => {
+  const {
+    dbQuestions,
+    examVersionId,
+    disabled = false,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<editorReorderQuestionsMutation>(
+    graphql`
+    mutation editorReorderQuestionsMutation($input: ReorderQuestionsInput!) {
+      reorderQuestions(input: $input) {
+        examVersion {
+          id
+          dbQuestions {
+            id
+            index
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error reordering questions',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  return (
+    <RearrangeableList
+      dbArray={dbQuestions}
+      className="mb-3"
+      dropVariant="primary"
+      onRearrange={(from, to) => {
+        mutate({
+          variables: {
+            input: {
+              examVersionId,
+              fromIndex: from,
+              toIndex: to,
+            },
+          },
+        });
+      }}
+      identifier={`QUESTION-${examVersionId}`}
+    >
+      {(question, handleRef, isDragging) => (
+        <QuestionEditor
+          questionKey={question}
+          handleRef={handleRef}
+          isDragging={isDragging}
+          disabled={disabled || loading}
+        />
+      )}
+    </RearrangeableList>
+  );
+};
+
 const QuestionEditor: React.FC<{
   questionKey: editorQuestionEditor$key;
   handleRef: React.Ref<HTMLElement>;
   isDragging?: boolean;
+  disabled?: boolean;
 }> = (props) => {
   const {
     questionKey,
     handleRef,
     isDragging = false,
+    disabled: parentDisabled = false,
   } = props;
+  const { alert } = useContext(AlertContext);
   const question = useFragment(
     graphql`
     fragment editorQuestionEditor on Question {
@@ -331,6 +425,62 @@ const QuestionEditor: React.FC<{
     `,
     questionKey,
   );
+  const [
+    mutateDestroyQuestion,
+    { loading: loadingDestroyQuestion },
+  ] = useMutation<editorDestroyQuestionMutation>(
+    graphql`
+    mutation editorDestroyQuestionMutation($input: DestroyQuestionInput!) {
+      destroyQuestion(input: $input) {
+        examVersion {
+          id
+          dbQuestions {
+            id
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error destroying question',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const [
+    mutateCreatePart,
+    { loading: loadingCreatePart },
+  ] = useMutation<editorCreatePartMutation>(
+    graphql`
+    mutation editorCreatePartMutation($input: CreatePartInput!) {
+      createPart(input: $input) {
+        question {
+          id
+          parts {
+            id
+            ...editorPartEditor
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error adding new part',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const disabled = loadingDestroyQuestion || loadingCreatePart || parentDisabled;
   return (
     <Card
       className={isDragging ? '' : 'mb-3'}
@@ -339,11 +489,23 @@ const QuestionEditor: React.FC<{
       <div className="alert alert-primary">
         <Card.Title>
           {handleRef && <DragHandle variant="primary" handleRef={handleRef} />}
+          <DestroyButton
+            disabled={disabled}
+            onClick={() => {
+              mutateDestroyQuestion({
+                variables: {
+                  input: {
+                    questionId: question.id,
+                  },
+                },
+              });
+            }}
+          />
           <Row>
             <Col sm="auto" className={handleRef ? 'ml-4' : ''}>
               <Form.Label column>{`Question ${question.index + 1}:`}</Form.Label>
             </Col>
-            <Col>
+            <Col className="mr-5">
               <EditHTMLVal
                 className="bg-white border rounded"
                 // disabled={loading || disabled}
@@ -351,6 +513,7 @@ const QuestionEditor: React.FC<{
                   type: 'HTML',
                   value: '',
                 }}
+                disabled={disabled}
                 onChange={console.log}
                 placeholder="Give a short (optional) descriptive name for the question"
                 debounceDelay={1000}
@@ -372,6 +535,7 @@ const QuestionEditor: React.FC<{
                     type: 'HTML',
                     value: '',
                   }}
+                  disabled={disabled}
                   onChange={console.log}
                   placeholder="Give a longer description of the question"
                   debounceDelay={1000}
@@ -384,6 +548,7 @@ const QuestionEditor: React.FC<{
               <Col sm="4">
                 <YesNoControl
                   className="bg-white rounded"
+                  disabled={disabled}
                   value={!!question.separateSubparts}
                   info={SEP_SUB_YESNO}
                   onChange={console.log}
@@ -393,6 +558,7 @@ const QuestionEditor: React.FC<{
               <Col sm="4">
                 <YesNoControl
                   className="bg-white rounded"
+                  disabled={disabled}
                   value={!!question.extraCredit}
                   info={SEP_SUB_YESNO}
                   onChange={console.log}
@@ -402,6 +568,7 @@ const QuestionEditor: React.FC<{
             <Form.Group as={Row}>
               <EditReference
                 value={question.references as FileRef[]}
+                disabled={disabled}
                 onChange={console.log}
                 label="this question"
               />
@@ -410,33 +577,30 @@ const QuestionEditor: React.FC<{
           <Col sm="6">
             <SingleRubricKeyEditor
               rubricKey={question.rootRubric}
+              disabled={disabled}
             />
           </Col>
         </Row>
-        <RearrangeableList
-          dbArray={question.parts}
-          className="mb-3"
-          dropVariant="success"
-          identifier={`PART-${question.id}`}
-          onRearrange={console.log}
-        >
-          {(part, partHandleRef, partIsDragging) => (
-            <Row key={part.id}>
-              <Col>
-                <PartEditor
-                  partKey={part}
-                  handleRef={partHandleRef}
-                  isDragging={partIsDragging}
-                />
-              </Col>
-            </Row>
-          )}
-        </RearrangeableList>
+        <ReorderablePartsEditor
+          parts={question.parts}
+          disabled={disabled}
+          questionId={question.id}
+        />
         <Row className="text-center">
           <Col>
             <Button
               variant="success"
-              onClick={console.log}
+              onClick={() => {
+                mutateCreatePart({
+                  variables: {
+                    input: {
+                      questionId: question.id,
+                      points: 0,
+                    },
+                  },
+                });
+              }}
+              disabled={disabled}
             >
               Add part
             </Button>
@@ -447,16 +611,89 @@ const QuestionEditor: React.FC<{
   );
 };
 
+const ReorderablePartsEditor: React.FC<{
+  parts: editorQuestionEditor['parts'];
+  disabled?: boolean;
+  questionId: string;
+}> = (props) => {
+  const {
+    parts,
+    disabled = false,
+    questionId,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<editorReorderPartsMutation>(
+    graphql`
+    mutation editorReorderPartsMutation($input: ReorderPartsInput!) {
+      reorderParts(input: $input) {
+        question {
+          id
+          parts {
+            id
+            index
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error reordering parts',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  return (
+    <RearrangeableList
+      dbArray={parts}
+      className="mb-3"
+      dropVariant="success"
+      disabled={disabled}
+      identifier={`PART-${questionId}`}
+      onRearrange={(from, to) => {
+        mutate({
+          variables: {
+            input: {
+              questionId,
+              fromIndex: from,
+              toIndex: to,
+            },
+          },
+        });
+      }}
+    >
+      {(part, partHandleRef, partIsDragging) => (
+        <Row key={part.id}>
+          <Col>
+            <PartEditor
+              partKey={part}
+              handleRef={partHandleRef}
+              isDragging={partIsDragging}
+              disabled={disabled || loading}
+            />
+          </Col>
+        </Row>
+      )}
+    </RearrangeableList>
+  );
+};
 const PartEditor: React.FC<{
   partKey: editorPartEditor$key;
   handleRef: React.Ref<HTMLElement>;
   isDragging?: boolean;
+  disabled?: boolean;
 }> = (props) => {
   const {
     partKey,
     handleRef,
     isDragging = false,
+    disabled = false,
   } = props;
+  const { alert } = useContext(AlertContext);
   const part = useFragment(
     graphql`
     fragment editorPartEditor on Part {
@@ -485,6 +722,30 @@ const PartEditor: React.FC<{
     `,
     partKey,
   );
+  const [mutate, { loading }] = useMutation<editorDestroyPartMutation>(
+    graphql`
+    mutation editorDestroyPartMutation($input: DestroyPartInput!) {
+      destroyPart(input: $input) {
+        question {
+          id
+          parts {
+            id
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error destroying part',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
   return (
     <Card
       className={isDragging ? '' : 'mb-3'}
@@ -493,11 +754,23 @@ const PartEditor: React.FC<{
       <div className="alert alert-success">
         <Card.Title>
           {handleRef && <DragHandle handleRef={handleRef} variant="success" />}
+          <DestroyButton
+            disabled={loading || disabled}
+            onClick={() => {
+              mutate({
+                variables: {
+                  input: {
+                    partId: part.id,
+                  },
+                },
+              });
+            }}
+          />
           <Row>
             <Col sm="auto" className={handleRef ? 'ml-4' : ''}>
               <Form.Label column>{`Part ${alphabetIdx(part.index)}:`}</Form.Label>
             </Col>
-            <Col>
+            <Col className="mr-5">
               <EditHTMLVal
                 className="bg-white border rounded"
                 // disabled={loading || disabled}
@@ -505,6 +778,7 @@ const PartEditor: React.FC<{
                   type: 'HTML',
                   value: '',
                 }}
+                disabled={disabled || loading}
                 onChange={console.log}
                 placeholder="Give a short (optional) descriptive name for the part"
                 debounceDelay={1000}
@@ -526,6 +800,7 @@ const PartEditor: React.FC<{
                     type: 'HTML',
                     value: '',
                   }}
+                  disabled={disabled || loading}
                   onChange={console.log}
                   placeholder="Give a longer description of the part"
                   debounceDelay={1000}
@@ -540,6 +815,7 @@ const PartEditor: React.FC<{
                   // disabled={loading || disabled}
                   step={0.5}
                   variant="warning"
+                  disabled={disabled || loading}
                   onCommit={console.log}
                 />
               </Col>
@@ -549,6 +825,7 @@ const PartEditor: React.FC<{
                   className="bg-white rounded"
                   value={!!part.extraCredit}
                   info={SEP_SUB_YESNO}
+                  disabled={disabled || loading}
                   onChange={console.log}
                 />
               </Col>
@@ -556,6 +833,7 @@ const PartEditor: React.FC<{
             <Form.Group as={Row}>
               <EditReference
                 value={part.references as FileRef[]}
+                disabled={disabled || loading}
                 onChange={console.log}
                 label="this question part"
               />
@@ -564,6 +842,7 @@ const PartEditor: React.FC<{
           <Col sm="6">
             <SingleRubricKeyEditor
               rubricKey={part.rootRubric}
+              disabled={disabled || loading}
             />
           </Col>
         </Row>

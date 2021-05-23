@@ -6,31 +6,35 @@ class Rubric < ApplicationRecord
   belongs_to :question, optional: true, inverse_of: :rubrics
   belongs_to :part, optional: true, inverse_of: :rubrics
   belongs_to :body_item, optional: true, inverse_of: :rubrics
-  
+
   has_many :ancestor_links, # This rubric's ancestors are ones with it as a descendant
            class_name: 'RubricTreePath',
-           foreign_key: 'descendant_id'
+           foreign_key: 'descendant_id',
+           inverse_of: :descendant,
+           dependent: nil # will manually clean up links
   has_many :ancestors, through: :ancestor_links
   has_many :descendant_links, # This rubric's descendants are ones with it as an ancestor
            class_name: 'RubricTreePath',
-           foreign_key: 'ancestor_id'
+           foreign_key: 'ancestor_id',
+           inverse_of: :ancestor,
+           dependent: nil # will manually clean up links
   has_many :descendants, through: :descendant_links
   has_many :subsection_links, -> { where(path_length: 1) },
            class_name: 'RubricTreePath',
-           foreign_key: 'ancestor_id'
-  has_many :subsections, 
+           foreign_key: 'ancestor_id',
+           inverse_of: :ancestor
+  has_many :subsections, -> { order(:order) },
            through: :subsection_links,
            source: 'descendant'
   has_one :parent_section_link, -> { where(path_length: 1) },
           class_name: 'RubricTreePath',
-          foreign_key: 'descendant_id'
+          foreign_key: 'descendant_id',
+          inverse_of: :descendant
   has_one :parent_section,
           through: :parent_section_link,
           source: 'ancestor'
-  
-  scope :root_rubrics, -> {
-    joins(:ancestor_links).group('id').having('count(rubrics.id) = 1')
-  }
+
+  scope :root_rubrics, -> { joins(:ancestor_links).group('id').having('count(rubrics.id) = 1') }
 
   before_create do
     self_link = RubricTreePath.new(ancestor: self, descendant: self, path_length: 0)
@@ -188,7 +192,7 @@ class Rubric < ApplicationRecord
       when 'none'
         update(points: 0, description: nil)
         rubric_preset&.destroy!
-        # Note(Ben): I'm not sure why this isn't the same thing as subsections.destroy_all, 
+        # Note(Ben): I'm not sure why this isn't the same thing as subsections.destroy_all,
         # but it isn't: the two-step approach below works, though.
         subsection_ids = subsection_links.pluck(:descendant_id)
         Rubric.where(id: subsection_ids).destroy_all

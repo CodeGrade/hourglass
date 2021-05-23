@@ -6,7 +6,7 @@ module Mutations
     argument :from_index, Integer, required: true
     argument :to_index, Integer, required: true
 
-    field :rubric, Types::RubricType, null: false
+    field :parent_section, Types::RubricType, null: false
 
     def authorized?(parent_section:, **_kwargs)
       return true if parent_section.course.user_is_professor?(context[:current_user])
@@ -17,7 +17,7 @@ module Mutations
     def resolve(parent_section:, from_index:, to_index:)
       parent_section.move_subsections(from_index, to_index)
 
-      { rubric: parent_section }
+      { parent_section: parent_section }
     end
   end
 end

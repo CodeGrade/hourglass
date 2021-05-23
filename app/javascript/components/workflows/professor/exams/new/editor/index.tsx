@@ -1288,6 +1288,13 @@ function useCreateRubricMutation(): MutationReturn<editorCreateRubricMutation> {
           subsections {
             id
           }
+          examVersion {
+            id
+            rootRubric {
+              id
+              allSubsections { id }
+            }
+          }
           question {
             id
             rootRubric {

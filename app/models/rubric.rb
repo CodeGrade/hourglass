@@ -188,7 +188,10 @@ class Rubric < ApplicationRecord
       when 'none'
         update(points: 0, description: nil)
         rubric_preset&.destroy!
-        subsections.destroy_all
+        # Note(Ben): I'm not sure why this isn't the same thing as subsections.destroy_all, 
+        # but it isn't: the two-step approach below works, though.
+        subsection_ids = subsection_links.pluck(:descendant_id)
+        Rubric.where(id: subsection_ids).destroy_all
         becomes(None)
       when 'all'
         update(points: nil)

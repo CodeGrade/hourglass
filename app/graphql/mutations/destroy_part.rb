@@ -20,13 +20,12 @@ module Mutations
         raise GraphQL::ExecutionError, part.errors.full_messages.to_sentence unless destroyed
 
         question.reload
-        question.parts.where(index: index..).order(:index).each do |q|
-          q.update(index: q.index - 1)
+        question.parts.where(index: index..).order(:index).each do |p|
+          p.update(index: p.index - 1)
         end
 
         { question: question }
       end
     end
-
   end
 end

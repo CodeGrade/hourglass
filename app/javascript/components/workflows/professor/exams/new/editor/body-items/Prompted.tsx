@@ -5,10 +5,12 @@ import { HTMLVal } from '@student/exams/show/types';
 
 const Prompted: React.FC<{
   value: HTMLVal;
+  disabled?: boolean;
   onChange: (newVal: HTMLVal) => void;
 }> = (props) => {
   const {
     value,
+    disabled = false,
     onChange,
   } = props;
   const handleChange = useCallback((newVal: string, _delta, source, _editor): void => {
@@ -25,6 +27,7 @@ const Prompted: React.FC<{
         <Form.Label column sm={2}>Prompt</Form.Label>
         <Col sm={10}>
           <CustomEditor
+            disabled={disabled}
             className="bg-white"
             value={value.value}
             placeholder="Provide any instructions for this specific item..."

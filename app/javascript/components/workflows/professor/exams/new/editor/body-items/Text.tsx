@@ -8,16 +8,19 @@ import { TextInfo, TextState } from '@student/exams/show/types';
 const Text: React.FC<{
   info: TextInfo,
   id: string,
+  disabled?: boolean;
   answer: TextState
 }> = (props) => {
   const {
     info,
     answer,
+    disabled = false,
   } = props;
   return (
     <>
       <Prompted
         value={info.prompt}
+        disabled={disabled}
         onChange={console.log}
       />
       <Form.Group as={Row}>
@@ -26,6 +29,7 @@ const Text: React.FC<{
           <Form.Control
             as="textarea"
             rows={3}
+            disabled={disabled}
             placeholder="Sketch the intended answer here."
             value={answer ?? ''}
             onChange={console.log}

@@ -74,6 +74,9 @@ import { editorReorderQuestionsMutation } from './__generated__/editorReorderQue
 import { editorCreatePartMutation } from './__generated__/editorCreatePartMutation.graphql';
 import { editorDestroyPartMutation } from './__generated__/editorDestroyPartMutation.graphql';
 import { editorReorderPartsMutation } from './__generated__/editorReorderPartsMutation.graphql';
+import { editorCreateBodyItemMutation } from './__generated__/editorCreateBodyItemMutation.graphql';
+import { editorDestroyBodyItemMutation } from './__generated__/editorDestroyBodyItemMutation.graphql';
+import { editorReorderBodyItemsMutation } from './__generated__/editorReorderBodyItemsMutation.graphql';
 import { editorChangeRubricDetailsDescriptionMutation } from './__generated__/editorChangeRubricDetailsDescriptionMutation.graphql';
 import { editorChangeRubricTypeMutation } from './__generated__/editorChangeRubricTypeMutation.graphql';
 import { editorChangeRubricDetailsPointsMutation } from './__generated__/editorChangeRubricDetailsPointsMutation.graphql';
@@ -93,7 +96,7 @@ import { editorReorderPresetCommentMutation } from './__generated__/editorReorde
 import { editorReorderRubricsMutation } from './__generated__/editorReorderRubricsMutation.graphql';
 import { editorSingle$key } from './__generated__/editorSingle.graphql';
 import { editorQuestionEditor, editorQuestionEditor$key } from './__generated__/editorQuestionEditor.graphql';
-import { editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
+import { editorPartEditor, editorPartEditor$key } from './__generated__/editorPartEditor.graphql';
 import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.graphql';
 import CodeTag from './body-items/CodeTag';
 import Text from './body-items/Text';
@@ -618,7 +621,7 @@ const ReorderablePartsEditor: React.FC<{
 }> = (props) => {
   const {
     parts,
-    disabled = false,
+    disabled: parentDisabled = false,
     questionId,
   } = props;
   const { alert } = useContext(AlertContext);
@@ -647,6 +650,7 @@ const ReorderablePartsEditor: React.FC<{
       },
     },
   );
+  const disabled = parentDisabled || loading;
   return (
     <RearrangeableList
       dbArray={parts}
@@ -673,7 +677,7 @@ const ReorderablePartsEditor: React.FC<{
               partKey={part}
               handleRef={partHandleRef}
               isDragging={partIsDragging}
-              disabled={disabled || loading}
+              disabled={disabled}
             />
           </Col>
         </Row>
@@ -691,7 +695,7 @@ const PartEditor: React.FC<{
     partKey,
     handleRef,
     isDragging = false,
-    disabled = false,
+    disabled: parentDisabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const part = useFragment(
@@ -722,7 +726,10 @@ const PartEditor: React.FC<{
     `,
     partKey,
   );
-  const [mutate, { loading }] = useMutation<editorDestroyPartMutation>(
+  const [
+    mutateDestroyPart,
+    { loading: loadingDestroyPart },
+  ] = useMutation<editorDestroyPartMutation>(
     graphql`
     mutation editorDestroyPartMutation($input: DestroyPartInput!) {
       destroyPart(input: $input) {
@@ -746,6 +753,35 @@ const PartEditor: React.FC<{
       },
     },
   );
+  const [
+    mutateCreateBodyItem,
+    { loading: loadingCreateBodyItem },
+  ] = useMutation<editorCreateBodyItemMutation>(
+    graphql`
+    mutation editorCreateBodyItemMutation($input: CreateBodyItemInput!) {
+      createBodyItem(input: $input) {
+        part {
+          id
+          bodyItems {
+            id
+            ...editorBodyItemEditor
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error adding new body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const disabled = parentDisabled || loadingDestroyPart || loadingCreateBodyItem;
   return (
     <Card
       className={isDragging ? '' : 'mb-3'}
@@ -755,9 +791,9 @@ const PartEditor: React.FC<{
         <Card.Title>
           {handleRef && <DragHandle handleRef={handleRef} variant="success" />}
           <DestroyButton
-            disabled={loading || disabled}
+            disabled={disabled}
             onClick={() => {
-              mutate({
+              mutateDestroyPart({
                 variables: {
                   input: {
                     partId: part.id,
@@ -778,7 +814,7 @@ const PartEditor: React.FC<{
                   type: 'HTML',
                   value: '',
                 }}
-                disabled={disabled || loading}
+                disabled={disabled}
                 onChange={console.log}
                 placeholder="Give a short (optional) descriptive name for the part"
                 debounceDelay={1000}
@@ -800,7 +836,7 @@ const PartEditor: React.FC<{
                     type: 'HTML',
                     value: '',
                   }}
-                  disabled={disabled || loading}
+                  disabled={disabled}
                   onChange={console.log}
                   placeholder="Give a longer description of the part"
                   debounceDelay={1000}
@@ -815,7 +851,7 @@ const PartEditor: React.FC<{
                   // disabled={loading || disabled}
                   step={0.5}
                   variant="warning"
-                  disabled={disabled || loading}
+                  disabled={disabled}
                   onCommit={console.log}
                 />
               </Col>
@@ -825,7 +861,7 @@ const PartEditor: React.FC<{
                   className="bg-white rounded"
                   value={!!part.extraCredit}
                   info={SEP_SUB_YESNO}
-                  disabled={disabled || loading}
+                  disabled={disabled}
                   onChange={console.log}
                 />
               </Col>
@@ -833,7 +869,7 @@ const PartEditor: React.FC<{
             <Form.Group as={Row}>
               <EditReference
                 value={part.references as FileRef[]}
-                disabled={disabled || loading}
+                disabled={disabled}
                 onChange={console.log}
                 label="this question part"
               />
@@ -842,38 +878,35 @@ const PartEditor: React.FC<{
           <Col sm="6">
             <SingleRubricKeyEditor
               rubricKey={part.rootRubric}
-              disabled={disabled || loading}
+              disabled={disabled}
             />
           </Col>
         </Row>
-        <RearrangeableList
-          dbArray={part.bodyItems}
-          className="mb-3"
-          dropVariant="secondary"
-          identifier={`BODYITEM-${part.id}`}
-          onRearrange={console.log}
-        >
-          {(bodyItem, bodyItemHandleRef, bodyItemIsDragging) => (
-            <Row key={bodyItem.id}>
-              <Col>
-                <BodyItemEditor
-                  bodyItemKey={bodyItem}
-                  handleRef={bodyItemHandleRef}
-                  isDragging={bodyItemIsDragging}
-                />
-              </Col>
-            </Row>
-          )}
-        </RearrangeableList>
+        <ReorderableBodyItemsEditor
+          bodyItems={part.bodyItems}
+          partId={part.id}
+        />
         <Row className="text-center">
           <Col>
             <DropdownButton
-              // disabled={loading}
+              disabled={disabled}
               variant="secondary"
               title="Add new item..."
             >
               <Dropdown.Item
-                onClick={console.log}
+                onClick={() => {
+                  mutateCreateBodyItem({
+                    variables: {
+                      input: {
+                        partId: part.id,
+                        info: {
+                          type: 'HTML',
+                          value: '',
+                        },
+                      },
+                    },
+                  });
+                }}
               >
                 Text instructions
               </Dropdown.Item>
@@ -921,16 +954,91 @@ const PartEditor: React.FC<{
   );
 };
 
+const ReorderableBodyItemsEditor: React.FC<{
+  bodyItems: editorPartEditor['bodyItems'];
+  partId: string;
+  disabled?: boolean;
+}> = (props) => {
+  const {
+    bodyItems,
+    partId,
+    disabled: parentDisabled = false,
+  } = props;
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<editorReorderBodyItemsMutation>(
+    graphql`
+    mutation editorReorderBodyItemsMutation($input: ReorderBodyItemsInput!) {
+      reorderBodyItems(input: $input) {
+        part {
+          id
+          bodyItems {
+            id
+            index
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error reordering body items',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const disabled = parentDisabled || loading;
+  return (
+    <RearrangeableList
+      dbArray={bodyItems}
+      className="mb-3"
+      dropVariant="secondary"
+      disabled={disabled}
+      identifier={`BODYITEM-${partId}`}
+      onRearrange={(from, to) => {
+        mutate({
+          variables: {
+            input: {
+              partId,
+              fromIndex: from,
+              toIndex: to,
+            },
+          },
+        });
+      }}
+    >
+      {(bodyItem, bodyItemHandleRef, bodyItemIsDragging) => (
+        <Row key={bodyItem.id}>
+          <Col>
+            <BodyItemEditor
+              bodyItemKey={bodyItem}
+              disabled={disabled}
+              handleRef={bodyItemHandleRef}
+              isDragging={bodyItemIsDragging}
+            />
+          </Col>
+        </Row>
+      )}
+    </RearrangeableList>
+  );
+};
+
 const BodyItemEditor: React.FC<{
   bodyItemKey: editorBodyItemEditor$key;
   handleRef: React.Ref<HTMLElement>;
   isDragging?: boolean;
+  disabled?: boolean;
 }> = (props) => {
   const {
     bodyItemKey,
     handleRef,
     isDragging = false,
+    disabled: parentDisabled = false,
   } = props;
+  const { alert } = useContext(AlertContext);
   const bodyItem = useFragment(
     graphql`
     fragment editorBodyItemEditor on BodyItem {
@@ -947,6 +1055,34 @@ const BodyItemEditor: React.FC<{
     id,
     answer,
   } = bodyItem;
+  const [
+    mutateDestroyBodyItem,
+    { loading: loadingDestroyBodyItem },
+  ] = useMutation<editorDestroyBodyItemMutation>(
+    graphql`
+    mutation editorDestroyBodyItemMutation($input: DestroyBodyItemInput!) {
+      destroyBodyItem(input: $input) {
+        part {
+          id
+          bodyItems {
+            id
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error destroying body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const disabled = parentDisabled || loadingDestroyBodyItem;
   let editor;
   let showRubric = true;
   switch (info.type) {
@@ -955,7 +1091,7 @@ const BodyItemEditor: React.FC<{
       editor = (
         <EditHTMLVal
           className="text-instructions bg-white"
-          // disabled={loading || disabled}
+          disabled={disabled}
           theme="snow"
           value={info}
           onChange={console.log}
@@ -969,6 +1105,7 @@ const BodyItemEditor: React.FC<{
         <Code
           id={id}
           info={info}
+          disabled={disabled}
           answer={answer as CodeState}
         />
       );
@@ -978,6 +1115,7 @@ const BodyItemEditor: React.FC<{
         <AllThatApply
           id={id}
           info={info}
+          disabled={disabled}
           answer={answer as AllThatApplyState}
         />
       );
@@ -987,6 +1125,7 @@ const BodyItemEditor: React.FC<{
         <MultipleChoice
           id={id}
           info={info}
+          disabled={disabled}
           answer={answer as MultipleChoiceState}
         />
       );
@@ -996,6 +1135,7 @@ const BodyItemEditor: React.FC<{
         <YesNo
           id={id}
           info={info}
+          disabled={disabled}
           answer={answer as YesNoState}
         />
       );
@@ -1005,6 +1145,7 @@ const BodyItemEditor: React.FC<{
         <Text
           id={id}
           info={info}
+          disabled={disabled}
           answer={answer as TextState}
         />
       );
@@ -1014,6 +1155,7 @@ const BodyItemEditor: React.FC<{
         <CodeTag
           id={id}
           info={info}
+          disabled={disabled}
           answer={answer as CodeTagState}
         />
       );
@@ -1023,6 +1165,7 @@ const BodyItemEditor: React.FC<{
         <Matching
           id={id}
           info={info}
+          disabled={disabled}
           answer={answer as MatchingState}
         />
       );
@@ -1035,7 +1178,19 @@ const BodyItemEditor: React.FC<{
       className={`border border-secondary alert-secondary ${isDragging ? '' : 'mb-3'}`}
     >
       {handleRef && <DragHandle handleRef={handleRef} variant="secondary" />}
-      <Card.Body className="ml-4">
+      <DestroyButton
+        disabled={disabled}
+        onClick={() => {
+          mutateDestroyBodyItem({
+            variables: {
+              input: {
+                bodyItemId: bodyItem.id,
+              },
+            },
+          });
+        }}
+      />
+      <Card.Body className="ml-4 mr-4">
         <Row>
           <Col sm={showRubric ? 6 : 12}>
             {editor}
@@ -1043,6 +1198,7 @@ const BodyItemEditor: React.FC<{
           {showRubric && (
             <Col sm="6">
               <SingleRubricKeyEditor
+                disabled={disabled}
                 rubricKey={bodyItem.rootRubric}
               />
             </Col>

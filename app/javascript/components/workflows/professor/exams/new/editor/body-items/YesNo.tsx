@@ -11,10 +11,12 @@ import { YesNoInfo, YesNoState } from '@student/exams/show/types';
 
 const EditLabels: React.FC<{
   value: 'yn' | 'tf',
+  disabled?: boolean;
   onChange: (label: 'yn' | 'tf') => void,
 }> = (props) => {
   const {
     value,
+    disabled = false,
     onChange,
   } = props;
   const isYesNo = (value === 'yn');
@@ -30,12 +32,14 @@ const EditLabels: React.FC<{
           onChange={onChange}
         >
           <ToggleButton
+            disabled={disabled}
             variant={isYesNo ? 'primary' : 'outline-primary'}
             value="yn"
           >
             Yes/No
           </ToggleButton>
           <ToggleButton
+            disabled={disabled}
             variant={(isYesNo === false) ? 'primary' : 'outline-primary'}
             value="tf"
           >
@@ -51,12 +55,14 @@ const EditAnswer: React.FC<{
   answer?: YesNoState,
   yesLabel: string,
   noLabel: string,
+  disabled?: boolean;
   onChange: (answer: YesNoState) => void,
 }> = (props) => {
   const {
     answer,
     yesLabel,
     noLabel,
+    disabled = false,
     onChange,
   } = props;
   let tbgVal;
@@ -77,12 +83,14 @@ const EditAnswer: React.FC<{
           onChange={(newVal: 'yes' | 'no') => onChange(newVal === 'yes')}
         >
           <ToggleButton
+            disabled={disabled}
             variant={answer ? 'primary' : 'outline-primary'}
             value="yes"
           >
             {yesLabel}
           </ToggleButton>
           <ToggleButton
+            disabled={disabled}
             variant={(answer === false) ? 'primary' : 'outline-primary'}
             value="no"
           >
@@ -97,27 +105,32 @@ const EditAnswer: React.FC<{
 const YesNo: React.FC<{
   info: YesNoInfo,
   id: string,
+  disabled?: boolean;
   answer: YesNoState,
 }> = (props) => {
   const {
     info,
     answer,
+    disabled = false,
   } = props;
   return (
     <>
       <Prompted
         value={info.prompt}
+        disabled={disabled}
         onChange={console.log}
       />
       <Form.Group as={Row}>
         <EditLabels
           value={info.yesLabel === 'Yes' ? 'yn' : 'tf'}
+          disabled={disabled}
           onChange={console.log}
         />
         {/* <Fields names={['yesLabel', 'noLabel']} component={EditLabels} /> */}
       </Form.Group>
       <Form.Group as={Row}>
         <EditAnswer
+          disabled={disabled}
           answer={answer}
           yesLabel={info.yesLabel}
           noLabel={info.noLabel}

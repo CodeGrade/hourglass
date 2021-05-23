@@ -144,10 +144,12 @@ const FileModal: React.FC<FileModalProps> = (props) => {
 
 const EditChoices: React.FC<{
   value: CodeTagInfo['choices'],
+  disabled?: boolean;
   onChange: (newVal: CodeTagInfo['choices']) => void,
 }> = (props) => {
   const {
     value,
+    disabled = false,
     onChange,
   } = props;
   return (
@@ -157,6 +159,7 @@ const EditChoices: React.FC<{
         <ButtonGroup>
           <Button
             variant={value === 'exam' ? 'secondary' : 'outline-secondary'}
+            disabled={disabled}
             active={value === 'exam'}
             onClick={(): void => {
               onChange('exam');
@@ -167,6 +170,7 @@ const EditChoices: React.FC<{
           </Button>
           <Button
             variant={value === 'question' ? 'secondary' : 'outline-secondary'}
+            disabled={disabled}
             active={value === 'question'}
             onClick={(): void => {
               onChange('question');
@@ -177,6 +181,7 @@ const EditChoices: React.FC<{
           </Button>
           <Button
             variant={value === 'part' ? 'secondary' : 'outline-secondary'}
+            disabled={disabled}
             active={value === 'part'}
             onClick={(): void => {
               onChange('part');
@@ -194,11 +199,13 @@ const EditChoices: React.FC<{
 const EditAnswer: React.FC<{
   value: CodeTagState,
   choice: CodeTagInfo['choices'],
+  disabled?: boolean;
   onChange: (newAnswer: CodeTagState) => void;
 }> = (props) => {
   const {
     value,
     choice,
+    disabled = false,
     onChange,
   } = props;
   const [showModal, setShowModal] = useState(false);
@@ -229,6 +236,7 @@ const EditAnswer: React.FC<{
       </Col>
       <Col sm={4}>
         <Button
+          disabled={disabled}
           onClick={(): void => setShowModal(true)}
         >
           Choose line
@@ -252,27 +260,32 @@ const EditAnswer: React.FC<{
 const CodeTag: React.FC<{
   info: CodeTagInfo,
   id: string,
+  disabled?: boolean;
   answer: CodeTagState,
 }> = (props) => {
   const {
     info,
     answer,
+    disabled = false,
   } = props;
   return (
     <>
       <Prompted
         value={info.prompt}
+        disabled={disabled}
         onChange={console.log}
       />
       <Form.Group as={Row}>
         <EditChoices
           value={info.choices}
+          disabled={disabled}
           onChange={console.log}
         />
       </Form.Group>
       <Form.Group as={Row} className="align-items-baseline">
         <EditAnswer
           choice={info.choices}
+          disabled={disabled}
           value={answer}
           onChange={console.log}
         />

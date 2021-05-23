@@ -60,6 +60,10 @@ module Types
     field :reorder_parts, mutation: Mutations::ReorderParts
     field :destroy_part, mutation: Mutations::DestroyPart
 
-     field :move_body_item_answer, mutation: Mutations::MoveBodyItemAnswer
+    field :create_body_item, mutation: Mutations::CreateBodyItem
+    field :reorder_body_items, mutation: Mutations::ReorderBodyItems
+    field :destroy_body_item, mutation: Mutations::DestroyBodyItem
+
+    field :move_body_item_answer, mutation: Mutations::MoveBodyItemAnswer
   end
 end

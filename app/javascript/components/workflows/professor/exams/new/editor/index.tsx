@@ -58,7 +58,7 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import Loading from '@hourglass/common/loading';
 import { MutationParameters } from 'relay-runtime';
 import { FaTrashAlt } from 'react-icons/fa';
-import RearrangableList from '@hourglass/common/rearrangeable';
+import RearrangeableList from '@hourglass/common/rearrangeable';
 import Icon from '@student/exams/show/components/Icon';
 import { GrDrag } from 'react-icons/gr';
 import { useParams } from 'react-router-dom';
@@ -145,7 +145,7 @@ export const DestroyButton: React.FC<{
   );
 };
 
-const RubricEditor: React.FC = () => {
+const ExamVersionEditor: React.FC = () => {
   const { versionId: examVersionId } = useParams<{ versionId: string }>();
   const res = useQuery<editorQuery>(
     graphql`
@@ -252,18 +252,21 @@ const RubricEditor: React.FC = () => {
                   />
                 </Col>
               </Row>
-              <RearrangableList
+              <RearrangeableList
                 dbArray={dbQuestions}
+                className="mb-3"
+                dropVariant="primary"
                 onRearrange={console.log}
                 identifier={`QUESTION-${examVersionId}`}
               >
-                {(question, handleRef) => (
+                {(question, handleRef, isDragging) => (
                   <QuestionEditor
                     questionKey={question}
                     handleRef={handleRef}
+                    isDragging={isDragging}
                   />
                 )}
-              </RearrangableList>
+              </RearrangeableList>
               <Row className="text-center">
                 <Col>
                   <Button
@@ -281,7 +284,7 @@ const RubricEditor: React.FC = () => {
     </Container>
   );
 };
-export default RubricEditor;
+export default ExamVersionEditor;
 
 const SEP_SUB_YESNO: YesNoInfo = {
   type: 'YesNo',
@@ -293,10 +296,12 @@ const SEP_SUB_YESNO: YesNoInfo = {
 const QuestionEditor: React.FC<{
   questionKey: editorQuestionEditor$key;
   handleRef: React.Ref<HTMLElement>;
+  isDragging?: boolean;
 }> = (props) => {
   const {
     questionKey,
     handleRef,
+    isDragging = false,
   } = props;
   const question = useFragment(
     graphql`
@@ -328,7 +333,7 @@ const QuestionEditor: React.FC<{
   );
   return (
     <Card
-      className="mb-3"
+      className={isDragging ? '' : 'mb-3'}
       border="primary"
     >
       <div className="alert alert-primary">
@@ -408,22 +413,25 @@ const QuestionEditor: React.FC<{
             />
           </Col>
         </Row>
-        <RearrangableList
+        <RearrangeableList
           dbArray={question.parts}
+          className="mb-3"
+          dropVariant="success"
           identifier={`PART-${question.id}`}
           onRearrange={console.log}
         >
-          {(part, partHandleRef) => (
+          {(part, partHandleRef, partIsDragging) => (
             <Row key={part.id}>
               <Col>
                 <PartEditor
                   partKey={part}
                   handleRef={partHandleRef}
+                  isDragging={partIsDragging}
                 />
               </Col>
             </Row>
           )}
-        </RearrangableList>
+        </RearrangeableList>
         <Row className="text-center">
           <Col>
             <Button
@@ -442,10 +450,12 @@ const QuestionEditor: React.FC<{
 const PartEditor: React.FC<{
   partKey: editorPartEditor$key;
   handleRef: React.Ref<HTMLElement>;
+  isDragging?: boolean;
 }> = (props) => {
   const {
     partKey,
     handleRef,
+    isDragging = false,
   } = props;
   const part = useFragment(
     graphql`
@@ -477,7 +487,7 @@ const PartEditor: React.FC<{
   );
   return (
     <Card
-      className="mb-3"
+      className={isDragging ? '' : 'mb-3'}
       border="success"
     >
       <div className="alert alert-success">
@@ -557,22 +567,25 @@ const PartEditor: React.FC<{
             />
           </Col>
         </Row>
-        <RearrangableList
+        <RearrangeableList
           dbArray={part.bodyItems}
+          className="mb-3"
+          dropVariant="secondary"
           identifier={`BODYITEM-${part.id}`}
           onRearrange={console.log}
         >
-          {(bodyItem, bodyItemHandleRef) => (
+          {(bodyItem, bodyItemHandleRef, bodyItemIsDragging) => (
             <Row key={bodyItem.id}>
               <Col>
                 <BodyItemEditor
                   bodyItemKey={bodyItem}
                   handleRef={bodyItemHandleRef}
+                  isDragging={bodyItemIsDragging}
                 />
               </Col>
             </Row>
           )}
-        </RearrangableList>
+        </RearrangeableList>
         <Row className="text-center">
           <Col>
             <DropdownButton
@@ -632,10 +645,12 @@ const PartEditor: React.FC<{
 const BodyItemEditor: React.FC<{
   bodyItemKey: editorBodyItemEditor$key;
   handleRef: React.Ref<HTMLElement>;
+  isDragging?: boolean;
 }> = (props) => {
   const {
     bodyItemKey,
     handleRef,
+    isDragging = false,
   } = props;
   const bodyItem = useFragment(
     graphql`
@@ -738,7 +753,7 @@ const BodyItemEditor: React.FC<{
   }
   return (
     <Card
-      className="border border-secondary alert-secondary mb-3"
+      className={`border border-secondary alert-secondary ${isDragging ? '' : 'mb-3'}`}
     >
       {handleRef && <DragHandle handleRef={handleRef} variant="secondary" />}
       <Card.Body className="ml-4">
@@ -860,6 +875,7 @@ interface SingleRubricEditorProps {
   showDestroy?: boolean;
   disabled?: boolean;
   handleRef?: React.Ref<HTMLElement>;
+  isDragging?: boolean;
 }
 const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
   const {
@@ -867,6 +883,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
     showDestroy = false,
     disabled = false,
     handleRef,
+    isDragging = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<editorDestroyRubricMutation>(
@@ -930,7 +947,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
   );
   return (
     <Card
-      className="mb-3 alert-dark rubric p-0"
+      className={`${isDragging ? '' : 'mb-3'} alert-dark rubric p-0`}
       border="secondary"
     >
       <Card.Body>
@@ -1013,7 +1030,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
         </Form.Group>
         {('choices' in rubric && rubric.choices instanceof Array) && (
           <ReordorableRubricEditor
-            rubricId={rubric.id}
+            parentSectionId={rubric.id}
             subsections={rubric.choices}
           />
         )}
@@ -1049,12 +1066,12 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
 };
 
 const ReordorableRubricEditor: React.FC<{
-  rubricId: string;
+  parentSectionId: string;
   subsections: Rubric[];
   disabled?: boolean;
 }> = (props) => {
   const {
-    rubricId,
+    parentSectionId,
     subsections,
     disabled = false,
   } = props;
@@ -1063,7 +1080,7 @@ const ReordorableRubricEditor: React.FC<{
     graphql`
     mutation editorReorderRubricsMutation($input: ReorderRubricsInput!) {
       reorderRubrics(input: $input) {
-        rubric {
+        parentSection {
           id
           subsections {
             id
@@ -1085,14 +1102,16 @@ const ReordorableRubricEditor: React.FC<{
     },
   );
   return (
-    <RearrangableList
+    <RearrangeableList
       dbArray={subsections}
-      identifier={`SECTION-INDEX-${rubricId}`}
+      identifier={`SECTION-INDEX-${parentSectionId}`}
+      className="mb-3"
+      dropVariant="light"
       onRearrange={(from, to) => {
         mutate({
           variables: {
             input: {
-              parentSectionId: rubricId,
+              parentSectionId,
               fromIndex: from,
               toIndex: to,
             },
@@ -1100,15 +1119,16 @@ const ReordorableRubricEditor: React.FC<{
         });
       }}
     >
-      {(subRubric, handleRef) => (
+      {(subRubric, handleRef, isDragging) => (
         <SingleRubricEditor
           rubric={subRubric}
           showDestroy
           disabled={loading || disabled}
           handleRef={handleRef}
+          isDragging={isDragging}
         />
       )}
-    </RearrangableList>
+    </RearrangeableList>
   );
 };
 
@@ -1152,8 +1172,10 @@ const ReordorablePresetCommentEditor: React.FC<{
     },
   );
   return (
-    <RearrangableList
+    <RearrangeableList
       dbArray={presets}
+      className="mb-3"
+      dropVariant="light"
       identifier={`PRESET-INDEX-${rubricPreset.id}`}
       onRearrange={(from, to) => {
         mutate({
@@ -1167,14 +1189,15 @@ const ReordorablePresetCommentEditor: React.FC<{
         });
       }}
     >
-      {(preset, handleRef) => (
+      {(preset, handleRef, isDragging) => (
         <RubricPresetEditor
           preset={preset}
           disabled={disabled || loading}
+          isDragging={isDragging}
           handleRef={handleRef}
         />
       )}
-    </RearrangableList>
+    </RearrangeableList>
   );
 };
 
@@ -1541,11 +1564,13 @@ const RubricPresetDirectionEditor: React.FC<{
 const RubricPresetEditor: React.FC<{
   preset: Preset;
   disabled?: boolean;
+  isDragging?: boolean;
   handleRef: React.Ref<HTMLElement>;
 }> = (props) => {
   const {
     preset,
     disabled = false,
+    isDragging = false,
     handleRef,
   } = props;
   const { alert } = useContext(AlertContext);
@@ -1586,7 +1611,7 @@ const RubricPresetEditor: React.FC<{
   );
   return (
     <Card
-      className="mb-3 alert-warning p-0 w-100"
+      className={`${isDragging ? '' : 'mb-3'} alert-warning p-0 w-100`}
       border="warning"
     >
       <Card.Body>

@@ -9,7 +9,7 @@ import Icon from '@student/exams/show/components/Icon';
 import { FaCheck } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import { AllThatApplyInfo, AllThatApplyState, HTMLVal } from '@student/exams/show/types';
-import RearrangableList from '@hourglass/common/rearrangeable';
+import RearrangeableList from '@hourglass/common/rearrangeable';
 import Prompted from './Prompted';
 import { DestroyButton, DragHandle, EditHTMLVal } from '..';
 
@@ -88,8 +88,9 @@ const EditOptions: React.FC<{
   } = props;
   return (
     <>
-      <RearrangableList
+      <RearrangeableList
         dbArray={options}
+        dropVariant="info"
         identifier={`ATA-${bodyItemId}`}
         onRearrange={console.log}
       >
@@ -99,7 +100,7 @@ const EditOptions: React.FC<{
             handleRef={handleRef}
           />
         )}
-      </RearrangableList>
+      </RearrangeableList>
       <Row className="p-2">
         <Col className="text-center p-0">
           <Button

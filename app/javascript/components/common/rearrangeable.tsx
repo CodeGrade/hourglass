@@ -1,3 +1,4 @@
+import { AlertProps } from 'react-bootstrap';
 import React, {
   ReactNode,
   useEffect,
@@ -31,16 +32,20 @@ interface RearrangeableListProps<T extends { id: string }> {
   dbArray: readonly T[];
   identifier: string;
   onRearrange: (from: number, to: number) => void;
-  children: (item: T, handleRef: React.Ref<HTMLElement>) => ReactNode;
+  className?: string;
+  dropVariant?: AlertProps['variant'];
+  children: (item: T, handleRef: React.Ref<HTMLElement>, isDragging: boolean) => ReactNode;
 }
 
-export default function RearrangableList<T extends { id: string }>(
+export default function RearrangeableList<T extends { id: string }>(
   props: React.PropsWithChildren<RearrangeableListProps<T>>,
 ): React.ReactElement {
   const {
     dbArray,
     identifier,
     onRearrange,
+    className,
+    dropVariant,
     children,
   } = props;
   const [order, setOrder] = useState<string[]>(() => []);
@@ -62,11 +67,14 @@ export default function RearrangableList<T extends { id: string }>(
           identifier={identifier}
           moveItem={moveItem}
           index={index}
+          className={className}
+          dropVariant={dropVariant}
           onRearrange={onRearrange}
+          onCancel={() => setOrder(dbArray.map((dbItem) => dbItem.id))}
         >
-          {(handleRef) => (idToDbItemMap[id]
+          {(handleRef, isDragging) => (idToDbItemMap[id]
             // if an item was deleted, it will take 2 render cycles for `order` to catch up
-            ? children(idToDbItemMap[id], handleRef)
+            ? children(idToDbItemMap[id], handleRef, isDragging)
             : null)}
         </RearrangeableItem>
       ))}
@@ -85,7 +93,10 @@ const RearrangeableItem: React.FC<{
   moveItem: (dragIndex: number, hoverIndex: number) => void;
   index: number;
   onRearrange: (from: number, to: number) => void;
-  children: (handleRef: React.Ref<HTMLElement>) => ReactNode;
+  onCancel: () => void;
+  className?: string;
+  dropVariant?: AlertProps['variant'];
+  children: (handleRef: React.Ref<HTMLElement>, isDragging: boolean) => ReactNode;
 }> = (props) => {
   // Borrowed from:
   // https://react-dnd.github.io/react-dnd/examples/sortable/simple
@@ -94,14 +105,19 @@ const RearrangeableItem: React.FC<{
     moveItem,
     index,
     onRearrange,
+    onCancel,
     children,
+    className = '',
+    dropVariant,
   } = props;
   const ref = useRef<HTMLDivElement>(null);
   const handleRef = useRef<HTMLElement>(null);
-  const [{ handlerId }, drop] = useDrop({
+  const [{ handlerId, isOver, canDrop }, drop] = useDrop({
     accept: identifier,
     collect: (monitor) => ({
       handlerId: monitor.getHandlerId(),
+      isOver: !!monitor.isOver(),
+      canDrop: !!monitor.canDrop(),
     }),
     hover(item: DropItem, monitor: DropTargetMonitor) {
       if (!ref.current) {
@@ -157,17 +173,23 @@ const RearrangeableItem: React.FC<{
     collect: (monitor: DragSourceMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
-    end: (item: DropItem, _monitor) => {
-      if (item.startIndex === item.index) return;
+    end: (item: DropItem, monitor) => {
+      if (item.startIndex === item.index || !monitor.didDrop()) {
+        onCancel();
+        return;
+      }
       onRearrange(item.startIndex, item.index);
     },
   });
   const opacity = isDragging ? 0 : 1;
+  const variant = (isDragging && isOver && canDrop && dropVariant) ? `alert-${dropVariant}` : '';
   drag(handleRef);
   preview(drop(ref));
   return (
-    <div ref={ref} style={{ opacity }} data-handler-id={handlerId}>
-      {children(handleRef)}
+    <div ref={ref} style={{ opacity: Math.max(0.5, opacity) }} className={`${variant} ${className}`} data-handler-id={handlerId}>
+      <div style={{ opacity }}>
+        {children(handleRef, isDragging)}
+      </div>
     </div>
   );
 };

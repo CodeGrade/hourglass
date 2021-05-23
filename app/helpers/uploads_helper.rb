@@ -22,7 +22,6 @@ module UploadsHelper
         files: files || [],
         policies: str_policies,
         instructions: instructions,
-        info: {placeholder: true},
       )
 
       avail_references = {

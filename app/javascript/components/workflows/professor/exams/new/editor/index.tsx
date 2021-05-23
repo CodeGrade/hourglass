@@ -110,8 +110,37 @@ export const DragHandle: React.FC<{
     alignmentClass = 'position-absolute t-0 l-0 z-1000',
   } = props;
   return (
-    <span className={`${alignmentClass} btn btn-sm btn-${variant} ${className}`} ref={handleRef}>
+    <span
+      className={`${alignmentClass} btn btn-sm btn-${variant} ${className}`}
+      ref={handleRef}
+      title="Reorder"
+    >
       <Icon I={GrDrag} />
+    </span>
+  );
+};
+
+export const DestroyButton: React.FC<{
+  disabled?: boolean;
+  className?: string;
+  onClick: () => void;
+}> = (props) => {
+  const {
+    disabled = false,
+    className = 'position-absolute t-0 r-0 z-1000',
+    onClick,
+  } = props;
+  return (
+    <span className={className}>
+      <Button
+        variant="danger"
+        disabled={disabled}
+        onClick={onClick}
+        className={!disabled ? '' : 'cursor-not-allowed pointer-events-auto'}
+        title="Delete"
+      >
+        <FaTrashAlt />
+      </Button>
     </span>
   );
 };
@@ -1506,31 +1535,6 @@ const RubricPresetDirectionEditor: React.FC<{
         disabled={loading || disabled}
       />
     </>
-  );
-};
-
-const DestroyButton: React.FC<{
-  disabled?: boolean;
-  className?: string;
-  onClick: () => void;
-}> = (props) => {
-  const {
-    disabled = false,
-    className = 'position-absolute t-0 r-0 z-1000',
-    onClick,
-  } = props;
-  return (
-    <span className={className}>
-      <Button
-        variant="danger"
-        disabled={disabled}
-        onClick={onClick}
-        className={!disabled ? '' : 'cursor-not-allowed pointer-events-auto'}
-        title="Delete"
-      >
-        <FaTrashAlt />
-      </Button>
-    </span>
   );
 };
 

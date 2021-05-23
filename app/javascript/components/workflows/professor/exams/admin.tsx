@@ -63,8 +63,6 @@ import {
   useQuery,
 } from 'relay-hooks';
 import { uploadFile } from '@hourglass/common/types/api';
-import LinkSplitButton from '@hourglass/common/linksplitbutton';
-import LinkDropdownItem from '@hourglass/common/linkdropdownitem';
 import './dnd.scss';
 
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';

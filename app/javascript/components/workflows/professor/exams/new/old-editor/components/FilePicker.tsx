@@ -22,6 +22,7 @@ import { pluralize, SelectOption, SelectOptions } from '@hourglass/common/helper
 export interface FilePickerProps {
   options: ExamFile[];
   selected: FileRef[];
+  disabled?: boolean;
   onChange: (fileRefs: FileRef[]) => void;
   children?: React.ReactNode;
 }
@@ -89,6 +90,7 @@ const FilePickerSelect: React.FC<FilePickerProps> = (props) => {
     options,
     selected = [],
     onChange,
+    disabled = false,
   } = props;
   const selectOptions = useMemo(() => {
     const allIds = createMap(options);
@@ -147,6 +149,7 @@ const FilePickerSelect: React.FC<FilePickerProps> = (props) => {
       <Select
         options={selectOptions}
         components={COMPONENTS}
+        isDisabled={disabled}
         // Pass-along props to FilePicker
         files={options}
         selected={selected}
@@ -170,6 +173,7 @@ export const FilePickerSelectWithPreview: React.FC<FilePickerProps> = (props) =>
   const {
     options,
     selected,
+    disabled = false,
     onChange,
   } = props;
   const [open, setOpen] = useState(false);
@@ -180,12 +184,17 @@ export const FilePickerSelectWithPreview: React.FC<FilePickerProps> = (props) =>
     <>
       <InputGroup>
         <div className="flex-grow-1">
-          <FilePickerSelect options={options} selected={selected} onChange={onChange} />
+          <FilePickerSelect
+            options={options}
+            selected={selected}
+            disabled={disabled}
+            onChange={onChange}
+          />
         </div>
         <InputGroup.Append>
           <Button
             variant="info"
-            disabled={noFiles}
+            disabled={noFiles || disabled}
             onClick={(): void => setOpen((o) => !o)}
           >
             {`Preview ${pluralize(selected.length, 'file', 'files')}`}

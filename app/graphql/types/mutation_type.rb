@@ -52,6 +52,14 @@ module Types
     field :reorder_preset_comments, mutation: Mutations::ReorderPresetComments
     field :destroy_preset_comment, mutation: Mutations::DestroyPresetComment
 
-    field :move_body_item_answer, mutation: Mutations::MoveBodyItemAnswer
+    field :create_question, mutation: Mutations::CreateQuestion
+    field :reorder_questions, mutation: Mutations::ReorderQuestions
+    field :destroy_question, mutation: Mutations::DestroyQuestion
+
+    field :create_part, mutation: Mutations::CreatePart
+    field :reorder_parts, mutation: Mutations::ReorderParts
+    field :destroy_part, mutation: Mutations::DestroyPart
+
+     field :move_body_item_answer, mutation: Mutations::MoveBodyItemAnswer
   end
 end

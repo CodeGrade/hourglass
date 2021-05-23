@@ -33,6 +33,7 @@ interface RearrangeableListProps<T extends { id: string }> {
   identifier: string;
   onRearrange: (from: number, to: number) => void;
   className?: string;
+  disabled?: boolean;
   dropVariant?: AlertProps['variant'];
   children: (item: T, handleRef: React.Ref<HTMLElement>, isDragging: boolean) => ReactNode;
 }
@@ -44,6 +45,7 @@ export default function RearrangeableList<T extends { id: string }>(
     dbArray,
     identifier,
     onRearrange,
+    disabled = false,
     className,
     dropVariant,
     children,
@@ -64,6 +66,7 @@ export default function RearrangeableList<T extends { id: string }>(
       {order.map((id, index) => (
         <RearrangeableItem
           key={id}
+          disabled={disabled}
           identifier={identifier}
           moveItem={moveItem}
           index={index}
@@ -94,6 +97,7 @@ const RearrangeableItem: React.FC<{
   index: number;
   onRearrange: (from: number, to: number) => void;
   onCancel: () => void;
+  disabled?: boolean;
   className?: string;
   dropVariant?: AlertProps['variant'];
   children: (handleRef: React.Ref<HTMLElement>, isDragging: boolean) => ReactNode;
@@ -106,6 +110,7 @@ const RearrangeableItem: React.FC<{
     index,
     onRearrange,
     onCancel,
+    disabled = false,
     children,
     className = '',
     dropVariant,
@@ -121,6 +126,9 @@ const RearrangeableItem: React.FC<{
     }),
     hover(item: DropItem, monitor: DropTargetMonitor) {
       if (!ref.current) {
+        return;
+      }
+      if (disabled) {
         return;
       }
       const dragIndex = item.index;

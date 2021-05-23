@@ -11,7 +11,7 @@ import { FaCircle } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import { HTMLVal, MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
 import RearrangableList from '@hourglass/common/rearrangeable';
-import { DragHandle, EditHTMLVal } from '..';
+import { DestroyButton, DragHandle, EditHTMLVal } from '..';
 
 interface DraggableMCOption {
   id: string;
@@ -40,7 +40,7 @@ const OneOption: React.FC<{
           <Icon I={FaCircle} className={option.selected ? '' : 'invisible'} />
         </Button>
       </Col>
-      <Col className="pr-0">
+      <Col>
         <EditHTMLVal
           className="bg-white border rounded"
           // disabled={loading || disabled}
@@ -50,6 +50,12 @@ const OneOption: React.FC<{
           }}
           onChange={console.log}
           debounceDelay={1000}
+        />
+      </Col>
+      <Col className="px-0" sm="auto">
+        <DestroyButton
+          className=""
+          onClick={console.log}
         />
       </Col>
     </Row>

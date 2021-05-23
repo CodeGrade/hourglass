@@ -11,7 +11,7 @@ import { GrDrag } from 'react-icons/gr';
 import { AllThatApplyInfo, AllThatApplyState, HTMLVal } from '@hourglass/workflows/student/exams/show/types';
 import RearrangableList from '@hourglass/common/rearrangeable';
 import Prompted from './Prompted';
-import { DragHandle, EditHTMLVal } from '..';
+import { DestroyButton, DragHandle, EditHTMLVal } from '..';
 
 const EditAnswer: React.FC<{
   value: boolean;
@@ -56,7 +56,7 @@ const OneOption: React.FC<{
           onChange={console.log}
         />
       </Col>
-      <Col className="pr-0">
+      <Col>
         <EditHTMLVal
           className="bg-white border rounded"
           // disabled={loading || disabled}
@@ -66,6 +66,12 @@ const OneOption: React.FC<{
           }}
           onChange={console.log}
           debounceDelay={1000}
+        />
+      </Col>
+      <Col className="px-0" sm="auto">
+        <DestroyButton
+          className=""
+          onClick={console.log}
         />
       </Col>
     </Row>

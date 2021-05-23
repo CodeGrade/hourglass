@@ -21,7 +21,7 @@ module Mutations
       order = args[:rubric_preset]&.preset_comments&.count || 0
       preset_comment = PresetComment.new(order: order, **args)
       saved = preset_comment.save
-      raise GraphQL::ExecutionError, preset_comment.errors.full_messages, to_sentence unless saved
+      raise GraphQL::ExecutionError, preset_comment.errors.full_messages.to_sentence unless saved
 
       { rubric_preset: preset_comment.rubric_preset }
     end

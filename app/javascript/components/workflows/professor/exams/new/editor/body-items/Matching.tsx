@@ -11,7 +11,7 @@ import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { alphabetIdx } from '@hourglass/common/helpers';
 import './Matching.css';
 import { HTMLVal, MatchingInfo, MatchingState } from '@student/exams/show/types';
-import RearrangableList from '@hourglass/common/rearrangeable';
+import RearrangeableList from '@hourglass/common/rearrangeable';
 import { EditHTMLVal, DestroyButton, DragHandle } from '..';
 
 type DraggableMPrompt = {
@@ -99,8 +99,9 @@ const EditPrompts: React.FC<{
   } = props;
   return (
     <>
-      <RearrangableList
+      <RearrangeableList
         dbArray={prompts}
+        dropVariant="info"
         identifier={`MP-${bodyItemId}`}
         onRearrange={console.log}
       >
@@ -111,7 +112,7 @@ const EditPrompts: React.FC<{
             handleRef={handleRef}
           />
         )}
-      </RearrangableList>
+      </RearrangeableList>
       <Row className="p-2">
         <Col className="text-center p-0">
           <Button
@@ -181,8 +182,9 @@ const EditValues: React.FC<{
   } = props;
   return (
     <>
-      <RearrangableList
+      <RearrangeableList
         dbArray={values}
+        dropVariant="info"
         identifier={`MV-${bodyItemId}`}
         onRearrange={console.log}
       >
@@ -192,7 +194,7 @@ const EditValues: React.FC<{
             handleRef={handleRef}
           />
         )}
-      </RearrangableList>
+      </RearrangeableList>
       <Row className="p-2">
         <Col className="text-center p-0">
           <Button

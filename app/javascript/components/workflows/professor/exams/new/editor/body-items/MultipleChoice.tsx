@@ -10,7 +10,7 @@ import Icon from '@student/exams/show/components/Icon';
 import { FaCircle } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import { HTMLVal, MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
-import RearrangableList from '@hourglass/common/rearrangeable';
+import RearrangeableList from '@hourglass/common/rearrangeable';
 import { DestroyButton, DragHandle, EditHTMLVal } from '..';
 
 interface DraggableMCOption {
@@ -72,8 +72,9 @@ const EditAns: React.FC<{
   } = props;
   return (
     <>
-      <RearrangableList
+      <RearrangeableList
         dbArray={options}
+        dropVariant="info"
         identifier={`MC-${bodyItemId}`}
         onRearrange={console.log}
       >
@@ -83,7 +84,7 @@ const EditAns: React.FC<{
             handleRef={handleRef}
           />
         )}
-      </RearrangableList>
+      </RearrangeableList>
     </>
   );
 };

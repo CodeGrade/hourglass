@@ -28,7 +28,20 @@ class ExamVersion < ApplicationRecord
   delegate :proctors_and_professors, to: :exam
   delegate :all_staff, to: :exam
 
-  before_save :create_all_none_rubrics
+  before_save do
+    r = Rubric.find_or_initialize_by(
+      exam_version: self,
+      question: nil,
+      part: nil,
+      body_item: nil,
+    )
+    if r.new_record?
+      r.assign_attributes(
+        type: 'None',
+      )
+      self.rubrics << r
+    end
+  end
 
   accepts_nested_attributes_for :db_questions, :rubrics, :db_references
 
@@ -80,34 +93,6 @@ class ExamVersion < ApplicationRecord
       answers: def_answers,
       scratch: '',
     }
-  end
-
-  # Creates empty rubrics for any (q?,p?,b?) triple that does not already have a rubric in the database.
-  def create_all_none_rubrics
-    create_none_rubric(nil, nil, nil) # exam rubric
-    db_questions.each do |q|
-      create_none_rubric(q, nil, nil)
-      q.parts.each do |p|
-        create_none_rubric(q, p, nil)
-        p.body_items.each do |b|
-          create_none_rubric(q, p, b)
-        end
-      end
-    end
-  end
-
-  def create_none_rubric(question, part, body_item)
-    r = Rubric.find_or_initialize_by(
-      exam_version: self,
-      question: question,
-      part: part,
-      body_item: body_item,
-    )
-    return unless r.new_record?
-
-    r.assign_attributes(
-      type: 'None',
-    )
   end
 
   def swap_questions(index_from, index_to)

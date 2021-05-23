@@ -12,8 +12,24 @@ class Part < ApplicationRecord
 
   delegate :visible_to?, to: :question
   delegate :course, to: :question
+  delegate :exam_version, to: :question
 
   accepts_nested_attributes_for :body_items, :rubrics, :references
+
+  before_save do
+    r = Rubric.find_or_initialize_by(
+      exam_version: self.exam_version,
+      question: self.question,
+      part: self,
+      body_item: nil,
+    )
+    if r.new_record?
+      r.assign_attributes(
+        type: 'None',
+      )
+      self.rubrics << r
+    end
+  end
 
   def root_rubric
     rubrics.where(

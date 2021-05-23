@@ -6,12 +6,29 @@ class BodyItem < ApplicationRecord
 
   delegate :visible_to?, to: :part
   delegate :course, to: :part
+  delegate :exam_version, to: :part
+  delegate :question, to: :part
 
   has_many :rubrics, dependent: :destroy
   has_many :rubric_presets, through: :rubrics
   has_many :preset_comments, through: :rubric_presets
 
   accepts_nested_attributes_for :rubrics
+
+  before_save do
+    r = Rubric.find_or_initialize_by(
+      exam_version: self.exam_version,
+      question: self.question,
+      part: self.part,
+      body_item: self,
+    )
+    if r.new_record?
+      r.assign_attributes(
+        type: 'None',
+      )
+      self.rubrics << r
+    end
+  end
 
   # TODO: validate answer with JSON schema
 

@@ -155,7 +155,7 @@ const AllThatApply: React.FC<{
       <Form.Group as={Row}>
         <Form.Label column sm={2}>Answers</Form.Label>
         <Col sm={10}>
-          <Row className="p-2 align-items-center">
+          <Row className="p-2 align-items-baseline">
             <Col className="flex-grow-01 text-nowrap">
               <span className="btn btn-sm invisible">
                 <Icon I={GrDrag} />

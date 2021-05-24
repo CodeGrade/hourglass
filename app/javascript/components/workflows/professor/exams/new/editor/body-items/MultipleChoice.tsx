@@ -127,7 +127,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
       <Form.Group as={Row}>
         <Form.Label column sm={2}>Answers</Form.Label>
         <Col sm={10}>
-          <Row className="p-2">
+          <Row className="p-2 align-items-baseline">
             <Col sm="auto" className="p-0">
               <span className="btn btn-sm invisible">
                 <Icon I={GrDrag} />

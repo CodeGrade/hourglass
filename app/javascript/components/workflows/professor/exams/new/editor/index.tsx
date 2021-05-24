@@ -101,7 +101,7 @@ import { editorBodyItemEditor$key } from './__generated__/editorBodyItemEditor.g
 import CodeTag from './body-items/CodeTag';
 import Text from './body-items/Text';
 import YesNo from './body-items/YesNo';
-import Code from './body-items/Code';
+import Code, { languages } from './body-items/Code';
 import AllThatApply from './body-items/AllThatApply';
 import MultipleChoice from './body-items/MultipleChoice';
 import Matching from './body-items/Matching';
@@ -912,37 +912,155 @@ const PartEditor: React.FC<{
               </Dropdown.Item>
               <Dropdown.Divider />
               <Dropdown.Item
-                onClick={console.log}
+                onClick={() => {
+                  mutateCreateBodyItem({
+                    variables: {
+                      input: {
+                        partId: part.id,
+                        info: {
+                          type: 'AllThatApply',
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                          options: [],
+                        },
+                      },
+                    },
+                  });
+                }}
               >
                 All that apply
               </Dropdown.Item>
               <Dropdown.Item
-                onClick={console.log}
+                onClick={() => {
+                  mutateCreateBodyItem({
+                    variables: {
+                      input: {
+                        partId: part.id,
+                        info: {
+                          type: 'Code',
+                          lang: Object.keys(languages)[0],
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                          answer: {
+                            text: '',
+                            marks: [],
+                          },
+                        },
+                      },
+                    },
+                  });
+                }}
               >
                 Code
               </Dropdown.Item>
               <Dropdown.Item
-                onClick={console.log}
+                onClick={() => {
+                  mutateCreateBodyItem({
+                    variables: {
+                      input: {
+                        partId: part.id,
+                        info: {
+                          type: 'CodeTag',
+                          choices: 'exam',
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                        },
+                      },
+                    },
+                  });
+                }}
               >
                 Code tag
               </Dropdown.Item>
               <Dropdown.Item
-                onClick={console.log}
+                onClick={() => {
+                  mutateCreateBodyItem({
+                    variables: {
+                      input: {
+                        partId: part.id,
+                        info: {
+                          type: 'Matching',
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                          prompts: [],
+                          values: [],
+                        },
+                      },
+                    },
+                  });
+                }}
               >
                 Matching
               </Dropdown.Item>
               <Dropdown.Item
-                onClick={console.log}
+                onClick={() => {
+                  mutateCreateBodyItem({
+                    variables: {
+                      input: {
+                        partId: part.id,
+                        info: {
+                          type: 'MultipleChoice',
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                          options: [],
+                        },
+                      },
+                    },
+                  });
+                }}
               >
                 Multiple choice
               </Dropdown.Item>
               <Dropdown.Item
-                onClick={console.log}
+                onClick={() => {
+                  mutateCreateBodyItem({
+                    variables: {
+                      input: {
+                        partId: part.id,
+                        info: {
+                          type: 'Text',
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                          answer: '',
+                        },
+                      },
+                    },
+                  });
+                }}
               >
                 Free-response
               </Dropdown.Item>
               <Dropdown.Item
-                onClick={console.log}
+                onClick={() => {
+                  mutateCreateBodyItem({
+                    variables: {
+                      input: {
+                        partId: part.id,
+                        info: {
+                          type: 'YesNo',
+                          yesLabel: 'Yes',
+                          noLabel: 'No',
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                        },
+                      },
+                    },
+                  });
+                }}
               >
                 Yes/No or True/False
               </Dropdown.Item>

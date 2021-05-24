@@ -11,7 +11,7 @@ import { FaCircle } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import { HTMLVal, MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
 import RearrangeableList from '@hourglass/common/rearrangeable';
-import { DestroyButton, DragHandle, EditHTMLVal } from '..';
+import { DragHandle, DestroyButton, EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
 
 interface DraggableMCOption {
   id: string;

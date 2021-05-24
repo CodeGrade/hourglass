@@ -12,7 +12,7 @@ import { alphabetIdx } from '@hourglass/common/helpers';
 import './Matching.css';
 import { HTMLVal, MatchingInfo, MatchingState } from '@student/exams/show/types';
 import RearrangeableList from '@hourglass/common/rearrangeable';
-import { EditHTMLVal, DestroyButton, DragHandle } from '..';
+import { DragHandle, DestroyButton, EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
 
 type DraggableMPrompt = {
   id: string;

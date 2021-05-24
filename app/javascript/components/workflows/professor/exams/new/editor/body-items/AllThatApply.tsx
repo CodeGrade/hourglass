@@ -10,8 +10,8 @@ import { FaCheck } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import { AllThatApplyInfo, AllThatApplyState, HTMLVal } from '@student/exams/show/types';
 import RearrangeableList from '@hourglass/common/rearrangeable';
+import { DragHandle, DestroyButton, EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
 import Prompted from './Prompted';
-import { DestroyButton, DragHandle, EditHTMLVal } from '..';
 
 const EditAnswer: React.FC<{
   value: boolean;

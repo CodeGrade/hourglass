@@ -46,11 +46,13 @@ export const ReorderableBodyItemsEditor: React.FC<{
   bodyItems: PartEditor['bodyItems'];
   partId: string;
   disabled?: boolean;
+  showRubricEditors?: boolean;
 }> = (props) => {
   const {
     bodyItems,
     partId,
     disabled: parentDisabled = false,
+    showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<BodyItemReorderMutation>(
@@ -106,6 +108,7 @@ export const ReorderableBodyItemsEditor: React.FC<{
               disabled={disabled}
               handleRef={bodyItemHandleRef}
               isDragging={bodyItemIsDragging}
+              showRubricEditors={showRubricEditors}
             />
           </Col>
         </Row>
@@ -119,12 +122,14 @@ export const BodyItemEditor: React.FC<{
   handleRef: React.Ref<HTMLElement>;
   isDragging?: boolean;
   disabled?: boolean;
+  showRubricEditors?: boolean;
 }> = (props) => {
   const {
     bodyItemKey,
     handleRef,
     isDragging = false,
     disabled: parentDisabled = false,
+    showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const bodyItem = useFragment(
@@ -172,7 +177,7 @@ export const BodyItemEditor: React.FC<{
   );
   const disabled = parentDisabled || loadingDestroyBodyItem;
   let editor;
-  let showRubric = true;
+  let showRubric = showRubricEditors;
   switch (info.type) {
     case 'HTML':
       showRubric = false;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   ToggleButton,
   ToggleButtonGroup,
@@ -6,8 +6,44 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import Prompted from '@professor/exams/new/editor/body-items/Prompted';
+import {
+  graphql,
+  useMutation,
+} from 'relay-hooks';
 import { YesNoInfo, YesNoState } from '@student/exams/show/types';
+import { MutationReturn } from '@hourglass/common/helpers';
+import { AlertContext } from '@hourglass/common/alerts';
+import Prompted from '@professor/exams/new/editor/body-items/Prompted';
+import { YesNoCreateMutation } from './__generated__/YesNoCreateMutation.graphql';
+
+export function useCreateYesNoMutation(): MutationReturn<YesNoCreateMutation> {
+  const { alert } = useContext(AlertContext);
+  return useMutation<YesNoCreateMutation>(
+    graphql`
+    mutation YesNoCreateMutation($input: CreateYesNoInput!) {
+      createYesNo(input: $input) {
+        part {
+          id
+          bodyItems {
+            id
+            ...BodyItemEditor
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating new Yes/No body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+}
 
 const EditLabels: React.FC<{
   value: 'yn' | 'tf',

@@ -8,8 +8,13 @@ import {
   Button,
   ButtonGroup,
 } from 'react-bootstrap';
+import {
+  graphql,
+  useMutation,
+} from 'relay-hooks';
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
+import { getFilesForRefs, countFiles } from '@student/exams/show/files';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import {
   ExamContext,
@@ -17,9 +22,38 @@ import {
   QuestionFilesContext,
   PartFilesContext,
 } from '@hourglass/common/context';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { getFilesForRefs, countFiles } from '@student/exams/show/files';
+import { AlertContext } from '@hourglass/common/alerts';
+import { ExhaustiveSwitchError, MutationReturn } from '@hourglass/common/helpers';
+import { CodeTagCreateMutation } from './__generated__/CodeTagCreateMutation.graphql';
 
+export function useCreateCodeTagMutation(): MutationReturn<CodeTagCreateMutation> {
+  const { alert } = useContext(AlertContext);
+  return useMutation<CodeTagCreateMutation>(
+    graphql`
+    mutation CodeTagCreateMutation($input: CreateCodeTagInput!) {
+      createCodeTag(input: $input) {
+        part {
+          id
+          bodyItems {
+            id
+            ...BodyItemEditor
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating new CodeTag body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+}
 interface CodeTagValProps {
   value?: CodeTagState;
   hideFile?: boolean;

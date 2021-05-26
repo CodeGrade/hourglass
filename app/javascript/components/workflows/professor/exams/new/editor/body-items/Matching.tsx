@@ -1,18 +1,53 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Row,
   Col,
   Button,
 } from 'react-bootstrap';
 import {
+  graphql,
+  useMutation,
+} from 'relay-hooks';
+import {
   Select, FormControl, InputLabel, MenuItem,
 } from '@material-ui/core';
-import Prompted from '@professor/exams/new/editor/body-items/Prompted';
-import { alphabetIdx } from '@hourglass/common/helpers';
-import './Matching.css';
 import { HTMLVal, MatchingInfo, MatchingState } from '@student/exams/show/types';
+import { alphabetIdx, MutationReturn } from '@hourglass/common/helpers';
+import { AlertContext } from '@hourglass/common/alerts';
 import RearrangeableList from '@hourglass/common/rearrangeable';
+import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { DragHandle, DestroyButton, EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
+import './Matching.css';
+import { MatchingCreateMutation } from './__generated__/MatchingCreateMutation.graphql';
+
+export function useCreateMatchingMutation(): MutationReturn<MatchingCreateMutation> {
+  const { alert } = useContext(AlertContext);
+  return useMutation<MatchingCreateMutation>(
+    graphql`
+    mutation MatchingCreateMutation($input: CreateMatchingInput!) {
+      createMatching(input: $input) {
+        part {
+          id
+          bodyItems {
+            id
+            ...BodyItemEditor
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating new Matching body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+}
 
 type DraggableMPrompt = {
   id: string;

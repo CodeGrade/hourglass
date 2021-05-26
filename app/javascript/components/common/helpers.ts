@@ -1,4 +1,9 @@
 import { useState } from 'react';
+import {
+  MutateWithVariables,
+  MutationState,
+} from 'relay-hooks';
+import { MutationParameters } from 'relay-runtime';
 import { HTMLVal } from '@student/exams/show/types';
 
 /**
@@ -56,3 +61,7 @@ export type SelectOption<T> = {
 };
 
 export type SelectOptions<T> = SelectOption<T>[];
+
+export type MutationReturn<T extends MutationParameters> = [
+  MutateWithVariables<T>, MutationState<T>
+];

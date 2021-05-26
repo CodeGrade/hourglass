@@ -6,13 +6,21 @@ import {
   Button,
   ButtonGroup,
 } from 'react-bootstrap';
+import {
+  graphql,
+  useMutation,
+} from 'relay-hooks';
+import { FaLock, FaBan } from 'react-icons/fa';
+import { useDebouncedCallback } from 'use-debounce/lib';
+import { ExamContext } from '@hourglass/common/context';
+import { MutationReturn } from '@hourglass/common/helpers';
+import { AlertContext } from '@hourglass/common/alerts';
 import { MarkDescription, CodeState, CodeInfo } from '@student/exams/show/types';
 import { Editor, marksToDescs } from '@student/exams/show/components/ExamCodeBox';
-import Prompted from '@professor/exams/new/editor/body-items/Prompted';
-import { FaLock, FaBan } from 'react-icons/fa';
-import { ExamContext } from '@hourglass/common/context';
 import { firstFile } from '@student/exams/show/files';
+import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/FilePicker';
+import { CodeCreateMutation } from './__generated__/CodeCreateMutation.graphql';
 
 export const languages = {
   scheme: 'Racket',
@@ -28,6 +36,35 @@ export const languages = {
   'text/css': 'CSS',
   'application/xml': 'XML',
 };
+
+export function useCreateCodeMutation(): MutationReturn<CodeCreateMutation> {
+  const { alert } = useContext(AlertContext);
+  return useMutation<CodeCreateMutation>(
+    graphql`
+    mutation CodeCreateMutation($input: CreateCodeInput!) {
+      createCode(input: $input) {
+        part {
+          id
+          bodyItems {
+            id
+            ...BodyItemEditor
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating new Code body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+}
 
 const EditLang: React.FC<{
   value: CodeInfo['lang'];
@@ -51,13 +88,13 @@ const EditLang: React.FC<{
   );
 };
 
-// TODO: debounce me!!
 const EditCodeAnswerValues: React.FC<{
   lang: CodeInfo['lang'];
   onChangeLang: (newLang: CodeInfo['lang']) => void;
   value: CodeState;
   onChangeValue: (newVal: CodeState) => void;
   disabled?: boolean;
+  debounceDelay?: number;
 }> = (props) => {
   const {
     lang,
@@ -65,6 +102,7 @@ const EditCodeAnswerValues: React.FC<{
     value,
     onChangeValue,
     disabled: parentDisabled = false,
+    debounceDelay = 1000,
   } = props;
   const answerText = value?.text ?? '';
   const answerMarks = value?.marks ?? [];
@@ -72,6 +110,8 @@ const EditCodeAnswerValues: React.FC<{
     enabled: false,
     active: false,
   });
+  const debouncedOnChangeLang = useDebouncedCallback(onChangeLang, debounceDelay);
+  const debouncedOnChangeValue = useDebouncedCallback(onChangeValue, debounceDelay);
   let title: string;
   if (lockState.enabled) {
     if (lockState.active) {
@@ -82,16 +122,16 @@ const EditCodeAnswerValues: React.FC<{
   } else {
     title = 'No region selected to lock';
   }
-  const disabled = parentDisabled || !lockState.enabled;
+  const disabled = parentDisabled;
   return (
     <div className="quill bg-white">
       <div className="ql-toolbar ql-snow">
-        <EditLang onChange={onChangeLang} value={lang} />
+        <EditLang onChange={debouncedOnChangeLang} value={lang} />
         <Button
           className="float-none"
           variant="outline-secondary"
           size="sm"
-          disabled={disabled}
+          disabled={disabled || !lockState.enabled}
           active={lockState.active}
           title={title}
           onClick={(): void => {
@@ -128,7 +168,7 @@ const EditCodeAnswerValues: React.FC<{
               };
               newMarks.push(newMark);
             }
-            onChangeValue({ text: answerText, marks: newMarks });
+            debouncedOnChangeValue({ text: answerText, marks: newMarks });
           }}
         >
           <FaLock />
@@ -140,7 +180,7 @@ const EditCodeAnswerValues: React.FC<{
           title="Clear all locked regions"
           disabled={disabled}
           onClick={(): void => {
-            onChangeValue({ text: answerText, marks: [] });
+            debouncedOnChangeValue({ text: answerText, marks: [] });
           }}
         >
           <FaBan />
@@ -182,7 +222,7 @@ const EditCodeAnswerValues: React.FC<{
           }
         }}
         onChange={(newText, newMarks): void => {
-          onChangeValue({ text: newText, marks: newMarks });
+          debouncedOnChangeValue({ text: newText, marks: newMarks });
         }}
       />
     </div>
@@ -246,7 +286,8 @@ const SetInitial: React.FC<{
         <Button
           variant={isFile ? 'secondary' : 'outline-secondary'}
           active={isFile}
-          disabled={disabled}
+          disabled={disabled || first === undefined}
+          title={first === undefined ? 'No reference files were supplied for this exam' : undefined}
           onClick={(): void => {
             onChangeInitial({ file: first.relPath });
           }}

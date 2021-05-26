@@ -32,13 +32,19 @@ import EditReference from './Reference';
 import { SEP_SUB_YESNO } from './Question';
 import { ReorderableBodyItemsEditor } from './BodyItem';
 
-import { languages } from './body-items/Code';
-
 import { QuestionEditor } from './__generated__/QuestionEditor.graphql';
 import { PartEditor$key } from './__generated__/PartEditor.graphql';
 import { PartDestroyMutation } from './__generated__/PartDestroyMutation.graphql';
 import { PartReorderMutation } from './__generated__/PartReorderMutation.graphql';
-import { PartCreateBodyItemMutation } from './__generated__/PartCreateBodyItemMutation.graphql';
+
+import { languages, useCreateCodeMutation } from './body-items/Code';
+import { useCreateCodeTagMutation } from './body-items/CodeTag';
+import { useCreateTextMutation } from './body-items/Text';
+import { useCreateAllThatApplyMutation } from './body-items/AllThatApply';
+import { useCreateMatchingMutation } from './body-items/Matching';
+import { useCreateMultipleChoiceMutation } from './body-items/MultipleChoice';
+import { useCreateYesNoMutation } from './body-items/YesNo';
+import { useCreateHtmlMutation } from './body-items/Html';
 
 export const ReorderablePartsEditor: React.FC<{
   parts: QuestionEditor['parts'];
@@ -179,33 +185,24 @@ export const OnePart: React.FC<{
       },
     },
   );
-  const [
-    mutateCreateBodyItem,
-    { loading: loadingCreateBodyItem },
-  ] = useMutation<PartCreateBodyItemMutation>(
-    graphql`
-    mutation PartCreateBodyItemMutation($input: CreateBodyItemInput!) {
-      createBodyItem(input: $input) {
-        part {
-          id
-          bodyItems {
-            id
-            ...BodyItemEditor
-          }
-        }
-      }
-    }
-    `,
-    {
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error adding new body item',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
+  const [mutateCreateCode, { loading: loadingCreateCode }] = useCreateCodeMutation();
+  const [mutateCreateCodeTag, { loading: loadingCreateCodeTag }] = useCreateCodeTagMutation();
+  const [mutateCreateText, { loading: loadingCreateText }] = useCreateTextMutation();
+  const [mutateCreateATA, { loading: loadingCreateATA }] = useCreateAllThatApplyMutation();
+  const [mutateCreateMatching, { loading: loadingCreateMatching }] = useCreateMatchingMutation();
+  const [mutateCreateMC, { loading: loadingCreateMC }] = useCreateMultipleChoiceMutation();
+  const [mutateCreateYesNo, { loading: loadingCreateYesNo }] = useCreateYesNoMutation();
+  const [mutateCreateHtml, { loading: loadingCreateHtml }] = useCreateHtmlMutation();
+
+  const loadingCreateBodyItem = (
+    loadingCreateCode
+    || loadingCreateCodeTag
+    || loadingCreateText
+    || loadingCreateATA
+    || loadingCreateMatching
+    || loadingCreateMC
+    || loadingCreateYesNo
+    || loadingCreateHtml
   );
   const disabled = parentDisabled || loadingDestroyPart || loadingCreateBodyItem;
   return (
@@ -235,7 +232,6 @@ export const OnePart: React.FC<{
             <Col className="mr-5">
               <EditHTMLVal
                 className="bg-white border rounded"
-                // disabled={loading || disabled}
                 value={part.name || {
                   type: 'HTML',
                   value: '',
@@ -257,7 +253,6 @@ export const OnePart: React.FC<{
               <Col sm="10">
                 <EditHTMLVal
                   className="bg-white border rounded"
-                  // disabled={loading || disabled}
                   value={part.description || {
                     type: 'HTML',
                     value: '',
@@ -274,7 +269,6 @@ export const OnePart: React.FC<{
               <Col sm="4">
                 <NormalizedNumericInput
                   defaultValue={part.points.toString()}
-                  // disabled={loading || disabled}
                   step={0.5}
                   variant="warning"
                   disabled={disabled}
@@ -321,11 +315,11 @@ export const OnePart: React.FC<{
             >
               <Dropdown.Item
                 onClick={() => {
-                  mutateCreateBodyItem({
+                  mutateCreateHtml({
                     variables: {
                       input: {
                         partId: part.id,
-                        info: {
+                        value: {
                           type: 'HTML',
                           value: '',
                         },
@@ -339,18 +333,15 @@ export const OnePart: React.FC<{
               <Dropdown.Divider />
               <Dropdown.Item
                 onClick={() => {
-                  mutateCreateBodyItem({
+                  mutateCreateATA({
                     variables: {
                       input: {
                         partId: part.id,
-                        info: {
-                          type: 'AllThatApply',
-                          prompt: {
-                            type: 'HTML',
-                            value: '',
-                          },
-                          options: [],
+                        prompt: {
+                          type: 'HTML',
+                          value: '',
                         },
+                        options: [],
                       },
                     },
                   });
@@ -360,21 +351,18 @@ export const OnePart: React.FC<{
               </Dropdown.Item>
               <Dropdown.Item
                 onClick={() => {
-                  mutateCreateBodyItem({
+                  mutateCreateCode({
                     variables: {
                       input: {
                         partId: part.id,
-                        info: {
-                          type: 'Code',
-                          lang: Object.keys(languages)[0],
-                          prompt: {
-                            type: 'HTML',
-                            value: '',
-                          },
-                          answer: {
-                            text: '',
-                            marks: [],
-                          },
+                        lang: Object.keys(languages)[0],
+                        prompt: {
+                          type: 'HTML',
+                          value: '',
+                        },
+                        answer: {
+                          text: '',
+                          marks: [],
                         },
                       },
                     },
@@ -385,17 +373,14 @@ export const OnePart: React.FC<{
               </Dropdown.Item>
               <Dropdown.Item
                 onClick={() => {
-                  mutateCreateBodyItem({
+                  mutateCreateCodeTag({
                     variables: {
                       input: {
                         partId: part.id,
-                        info: {
-                          type: 'CodeTag',
-                          choices: 'exam',
-                          prompt: {
-                            type: 'HTML',
-                            value: '',
-                          },
+                        choices: 'exam',
+                        prompt: {
+                          type: 'HTML',
+                          value: '',
                         },
                       },
                     },
@@ -406,19 +391,16 @@ export const OnePart: React.FC<{
               </Dropdown.Item>
               <Dropdown.Item
                 onClick={() => {
-                  mutateCreateBodyItem({
+                  mutateCreateMatching({
                     variables: {
                       input: {
                         partId: part.id,
-                        info: {
-                          type: 'Matching',
-                          prompt: {
-                            type: 'HTML',
-                            value: '',
-                          },
-                          prompts: [],
-                          values: [],
+                        prompt: {
+                          type: 'HTML',
+                          value: '',
                         },
+                        prompts: [],
+                        values: [],
                       },
                     },
                   });
@@ -428,18 +410,15 @@ export const OnePart: React.FC<{
               </Dropdown.Item>
               <Dropdown.Item
                 onClick={() => {
-                  mutateCreateBodyItem({
+                  mutateCreateMC({
                     variables: {
                       input: {
                         partId: part.id,
-                        info: {
-                          type: 'MultipleChoice',
-                          prompt: {
-                            type: 'HTML',
-                            value: '',
-                          },
-                          options: [],
+                        prompt: {
+                          type: 'HTML',
+                          value: '',
                         },
+                        options: [],
                       },
                     },
                   });
@@ -449,18 +428,15 @@ export const OnePart: React.FC<{
               </Dropdown.Item>
               <Dropdown.Item
                 onClick={() => {
-                  mutateCreateBodyItem({
+                  mutateCreateText({
                     variables: {
                       input: {
                         partId: part.id,
-                        info: {
-                          type: 'Text',
-                          prompt: {
-                            type: 'HTML',
-                            value: '',
-                          },
-                          answer: '',
+                        prompt: {
+                          type: 'HTML',
+                          value: '',
                         },
+                        answer: '',
                       },
                     },
                   });
@@ -470,18 +446,14 @@ export const OnePart: React.FC<{
               </Dropdown.Item>
               <Dropdown.Item
                 onClick={() => {
-                  mutateCreateBodyItem({
+                  mutateCreateYesNo({
                     variables: {
                       input: {
                         partId: part.id,
-                        info: {
-                          type: 'YesNo',
-                          yesLabel: 'Yes',
-                          noLabel: 'No',
-                          prompt: {
-                            type: 'HTML',
-                            value: '',
-                          },
+                        labelType: 'yn',
+                        prompt: {
+                          type: 'HTML',
+                          value: '',
                         },
                       },
                     },

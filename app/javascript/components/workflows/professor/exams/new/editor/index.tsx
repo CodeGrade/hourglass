@@ -1,5 +1,5 @@
 import React, {
-  useContext,
+  useContext, useState,
 } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
@@ -20,6 +20,8 @@ import {
   Container,
   Form,
   Row,
+  ToggleButton,
+  ToggleButtonGroup,
 } from 'react-bootstrap';
 import { AlertContext } from '@hourglass/common/alerts';
 import { useParams } from 'react-router-dom';
@@ -98,6 +100,8 @@ const ExamVersionEditor: React.FC = () => {
   const { examVersion } = res.data;
   const { rootRubric, dbQuestions, policies } = examVersion;
 
+  const [showRubrics, setShowRubrics] = useState(false);
+
   return (
     <Container fluid>
       <ExamContext.Provider
@@ -125,12 +129,37 @@ const ExamVersionEditor: React.FC = () => {
                   />
                 </Col>
               </Form.Group>
+              <Form.Group as={Row} className="text-center">
+                <Form.Label column sm="auto"><h3>Show rubric editors?</h3></Form.Label>
+                <Col sm="auto">
+                  <ToggleButtonGroup
+                    className="bg-white rounded"
+                    name="wording"
+                    type="radio"
+                    value={showRubrics ? 'yes' : 'no'}
+                    onChange={(newVal) => setShowRubrics(newVal === 'yes')}
+                  >
+                    <ToggleButton
+                      variant={showRubrics ? 'primary' : 'outline-primary'}
+                      value="yes"
+                    >
+                      Yes
+                    </ToggleButton>
+                    <ToggleButton
+                      variant={!showRubrics ? 'primary' : 'outline-primary'}
+                      value="no"
+                    >
+                      No
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Col>
+              </Form.Group>
             </Col>
           </Row>
           <Row>
-            <Col sm={12}>
+            <Col sm={showRubrics ? 12 : { span: 8, offset: 2 }}>
               <Row>
-                <Col sm={6}>
+                <Col sm={showRubrics ? 6 : 12}>
                   <div className="alert alert-info">
                     <h4>Exam-wide information</h4>
                     <Policies
@@ -154,15 +183,18 @@ const ExamVersionEditor: React.FC = () => {
                     />
                   </Form.Group>
                 </Col>
-                <Col sm={6}>
-                  <SingleRubricKeyEditor
-                    rubricKey={rootRubric}
-                  />
-                </Col>
+                {showRubrics && (
+                  <Col sm={6}>
+                    <SingleRubricKeyEditor
+                      rubricKey={rootRubric}
+                    />
+                  </Col>
+                )}
               </Row>
               <ReorderableQuestionsEditor
                 dbQuestions={dbQuestions}
                 examVersionId={examVersionId}
+                showRubricEditors={showRubrics}
               />
               <Row className="text-center">
                 <Col>

@@ -42,11 +42,13 @@ export const ReorderableQuestionsEditor: React.FC<{
   dbQuestions: editorQuery['response']['examVersion']['dbQuestions'],
   examVersionId: string,
   disabled?: boolean,
+  showRubricEditors?: boolean,
 }> = (props) => {
   const {
     dbQuestions,
     examVersionId,
     disabled = false,
+    showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<QuestionReorderMutation>(
@@ -98,6 +100,7 @@ export const ReorderableQuestionsEditor: React.FC<{
           handleRef={handleRef}
           isDragging={isDragging}
           disabled={disabled || loading}
+          showRubricEditors={showRubricEditors}
         />
       )}
     </RearrangeableList>
@@ -109,12 +112,14 @@ export const OneQuestion: React.FC<{
   handleRef: React.Ref<HTMLElement>;
   isDragging?: boolean;
   disabled?: boolean;
+  showRubricEditors?: boolean;
 }> = (props) => {
   const {
     questionKey,
     handleRef,
     isDragging = false,
     disabled: parentDisabled = false,
+    showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const question = useFragment(
@@ -243,7 +248,7 @@ export const OneQuestion: React.FC<{
       </div>
       <Card.Body>
         <Row>
-          <Col sm="6">
+          <Col sm={showRubricEditors ? 6 : 12}>
             <Form.Group as={Row}>
               <Form.Label column sm="2">Description:</Form.Label>
               <Col sm="10">
@@ -292,17 +297,20 @@ export const OneQuestion: React.FC<{
               />
             </Form.Group>
           </Col>
-          <Col sm="6">
-            <SingleRubricKeyEditor
-              rubricKey={question.rootRubric}
-              disabled={disabled}
-            />
-          </Col>
+          {showRubricEditors && (
+            <Col sm="6">
+              <SingleRubricKeyEditor
+                rubricKey={question.rootRubric}
+                disabled={disabled}
+              />
+            </Col>
+          )}
         </Row>
         <ReorderablePartsEditor
           parts={question.parts}
           disabled={disabled}
           questionId={question.id}
+          showRubricEditors={showRubricEditors}
         />
         <Row className="text-center">
           <Col>

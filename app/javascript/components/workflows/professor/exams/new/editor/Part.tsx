@@ -50,11 +50,13 @@ export const ReorderablePartsEditor: React.FC<{
   parts: QuestionEditor['parts'];
   disabled?: boolean;
   questionId: string;
+  showRubricEditors?: boolean;
 }> = (props) => {
   const {
     parts,
     disabled: parentDisabled = false,
     questionId,
+    showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutate, { loading }] = useMutation<PartReorderMutation>(
@@ -110,6 +112,7 @@ export const ReorderablePartsEditor: React.FC<{
               handleRef={partHandleRef}
               isDragging={partIsDragging}
               disabled={disabled}
+              showRubricEditors={showRubricEditors}
             />
           </Col>
         </Row>
@@ -122,12 +125,14 @@ export const OnePart: React.FC<{
   handleRef: React.Ref<HTMLElement>;
   isDragging?: boolean;
   disabled?: boolean;
+  showRubricEditors?: boolean;
 }> = (props) => {
   const {
     partKey,
     handleRef,
     isDragging = false,
     disabled: parentDisabled = false,
+    showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
   const part = useFragment(
@@ -247,7 +252,7 @@ export const OnePart: React.FC<{
       </div>
       <Card.Body>
         <Row>
-          <Col sm="6">
+          <Col sm={showRubricEditors ? 6 : 12}>
             <Form.Group as={Row}>
               <Form.Label column sm="2">Description:</Form.Label>
               <Col sm="10">
@@ -295,16 +300,19 @@ export const OnePart: React.FC<{
               />
             </Form.Group>
           </Col>
-          <Col sm="6">
-            <SingleRubricKeyEditor
-              rubricKey={part.rootRubric}
-              disabled={disabled}
-            />
-          </Col>
+          {showRubricEditors && (
+            <Col sm="6">
+              <SingleRubricKeyEditor
+                rubricKey={part.rootRubric}
+                disabled={disabled}
+              />
+            </Col>
+          )}
         </Row>
         <ReorderableBodyItemsEditor
           bodyItems={part.bodyItems}
           partId={part.id}
+          showRubricEditors={showRubricEditors}
         />
         <Row className="text-center">
           <Col>

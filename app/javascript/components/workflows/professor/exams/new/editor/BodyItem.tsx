@@ -127,7 +127,6 @@ export const BodyItemEditor: React.FC<{
   const {
     bodyItemKey,
     handleRef,
-    isDragging = false,
     disabled: parentDisabled = false,
     showRubricEditors = false,
   } = props;
@@ -267,9 +266,7 @@ export const BodyItemEditor: React.FC<{
       throw new ExhaustiveSwitchError(info);
   }
   return (
-    <Card
-      className={`border border-secondary alert-secondary ${isDragging ? '' : 'mb-3'}`}
-    >
+    <Card className="border border-secondary alert-secondary">
       {handleRef && <DragHandle handleRef={handleRef} variant="secondary" />}
       <DestroyButton
         disabled={disabled}

@@ -130,7 +130,6 @@ export const OnePart: React.FC<{
   const {
     partKey,
     handleRef,
-    isDragging = false,
     disabled: parentDisabled = false,
     showRubricEditors = false,
   } = props;
@@ -211,10 +210,7 @@ export const OnePart: React.FC<{
   );
   const disabled = parentDisabled || loadingDestroyPart || loadingCreateBodyItem;
   return (
-    <Card
-      className={isDragging ? '' : 'mb-3'}
-      border="success"
-    >
+    <Card border="success">
       <div className="alert alert-success">
         <Card.Title>
           {handleRef && <DragHandle handleRef={handleRef} variant="success" />}

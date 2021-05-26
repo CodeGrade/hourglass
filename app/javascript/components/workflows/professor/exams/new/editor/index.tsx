@@ -91,6 +91,7 @@ const ExamVersionEditor: React.FC = () => {
       },
     },
   );
+  const [showRubrics, setShowRubrics] = useState(false);
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
@@ -99,8 +100,6 @@ const ExamVersionEditor: React.FC = () => {
   }
   const { examVersion } = res.data;
   const { rootRubric, dbQuestions, policies } = examVersion;
-
-  const [showRubrics, setShowRubrics] = useState(false);
 
   return (
     <Container fluid>

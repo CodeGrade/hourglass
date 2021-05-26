@@ -1,37 +1,39 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
-import CustomEditor from '@professor/exams/new/old-editor/components/CustomEditor';
+import { ReactQuillProps } from 'react-quill';
 import { HTMLVal } from '@student/exams/show/types';
+import { EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
 
 const Prompted: React.FC<{
-  value: HTMLVal;
   disabled?: boolean;
+  value: HTMLVal;
   onChange: (newVal: HTMLVal) => void;
+  debounceDelay?: number;
+  className?: string;
+  theme?: ReactQuillProps['theme'];
 }> = (props) => {
   const {
     value,
     disabled = false,
+    debounceDelay = 1000,
     onChange,
+    theme,
+    className = 'bg-white',
   } = props;
-  const handleChange = useCallback((newVal: string, _delta, source, _editor): void => {
-    if (source === 'user') {
-      onChange({
-        type: 'HTML',
-        value: newVal,
-      });
-    }
-  }, [onChange]);
+
   return (
     <>
       <Form.Group as={Row}>
         <Form.Label column sm={2}>Prompt</Form.Label>
         <Col sm={10}>
-          <CustomEditor
+          <EditHTMLVal
             disabled={disabled}
-            className="bg-white"
-            value={value.value}
+            className={className}
+            value={value}
+            debounceDelay={debounceDelay}
+            theme={theme}
             placeholder="Provide any instructions for this specific item..."
-            onChange={handleChange}
+            onChange={onChange}
           />
         </Col>
       </Form.Group>

@@ -228,7 +228,6 @@ export const OneQuestion: React.FC<{
             <Col className="mr-5">
               <EditHTMLVal
                 className="bg-white border rounded"
-                // disabled={loading || disabled}
                 value={question.name || {
                   type: 'HTML',
                   value: '',
@@ -250,7 +249,6 @@ export const OneQuestion: React.FC<{
               <Col sm="10">
                 <EditHTMLVal
                   className="bg-white border rounded"
-                  // disabled={loading || disabled}
                   value={question.description || {
                     type: 'HTML',
                     value: '',

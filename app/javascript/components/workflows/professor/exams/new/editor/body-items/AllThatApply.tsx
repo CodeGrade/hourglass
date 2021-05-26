@@ -1,17 +1,53 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Form,
   Row,
   Col,
   Button,
 } from 'react-bootstrap';
-import Icon from '@student/exams/show/components/Icon';
+import {
+  graphql,
+  useMutation,
+} from 'relay-hooks';
 import { FaCheck } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
+import Icon from '@student/exams/show/components/Icon';
 import { AllThatApplyInfo, AllThatApplyState, HTMLVal } from '@student/exams/show/types';
+import { MutationReturn } from '@hourglass/common/helpers';
+import { AlertContext } from '@hourglass/common/alerts';
 import RearrangeableList from '@hourglass/common/rearrangeable';
 import { DragHandle, DestroyButton, EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
 import Prompted from './Prompted';
+import { AllThatApplyCreateMutation } from './__generated__/AllThatApplyCreateMutation.graphql';
+
+export function useCreateAllThatApplyMutation(): MutationReturn<AllThatApplyCreateMutation> {
+  const { alert } = useContext(AlertContext);
+  return useMutation<AllThatApplyCreateMutation>(
+    graphql`
+    mutation AllThatApplyCreateMutation($input: CreateAllThatApplyInput!) {
+      createAllThatApply(input: $input) {
+        part {
+          id
+          bodyItems {
+            id
+            ...BodyItemEditor
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating new AllThatApply body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+}
 
 const EditAnswer: React.FC<{
   value: boolean;

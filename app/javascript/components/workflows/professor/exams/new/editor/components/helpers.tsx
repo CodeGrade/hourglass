@@ -3,21 +3,21 @@ import React, {
   useState,
   useCallback,
 } from 'react';
-
 import {
   Button,
   ButtonProps,
   Form,
+  FormControlProps,
 } from 'react-bootstrap';
 import { ReactQuillProps } from 'react-quill';
 import { FaTrashAlt } from 'react-icons/fa';
+import { GrDrag } from 'react-icons/gr';
+import { useDebounce, useDebouncedCallback } from 'use-debounce/lib';
+
 import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/NumericInput';
 import { HTMLVal } from '@student/exams/show/types';
 import Icon from '@student/exams/show/components/Icon';
 import CustomEditor from '@professor/exams/new/old-editor/components/CustomEditor';
-import { GrDrag } from 'react-icons/gr';
-
-import { useDebounce, useDebouncedCallback } from 'use-debounce/lib';
 
 export const DragHandle: React.FC<{
   handleRef: React.Ref<HTMLElement>,
@@ -74,6 +74,7 @@ export const DebouncedFormControl: React.FC<{
   disabled?: boolean;
   className?: string;
   placeholder?: string;
+  size?: FormControlProps['size'];
 }> = (props) => {
   const {
     defaultValue,
@@ -82,6 +83,7 @@ export const DebouncedFormControl: React.FC<{
     disabled,
     className,
     placeholder,
+    size,
   } = props;
   const [text, setText] = useState(defaultValue);
   const [debouncedText] = useDebounce(text, debounceMillis);
@@ -96,6 +98,7 @@ export const DebouncedFormControl: React.FC<{
   }, [defaultValue]);
   return (
     <Form.Control
+      size={size}
       disabled={disabled}
       value={text}
       onChange={(e) => setText(e.target.value)}

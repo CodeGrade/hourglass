@@ -1,17 +1,53 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   Form,
   Row,
   Col,
   Button,
 } from 'react-bootstrap';
-import Prompted from '@professor/exams/new/editor/body-items/Prompted';
-import Icon from '@student/exams/show/components/Icon';
+import {
+  graphql,
+  useMutation,
+} from 'relay-hooks';
 import { FaCircle } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
+import Icon from '@student/exams/show/components/Icon';
 import { HTMLVal, MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
 import RearrangeableList from '@hourglass/common/rearrangeable';
+import { MutationReturn } from '@hourglass/common/helpers';
+import { AlertContext } from '@hourglass/common/alerts';
+import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { DragHandle, DestroyButton, EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
+import { MultipleChoiceCreateMutation } from './__generated__/MultipleChoiceCreateMutation.graphql';
+
+export function useCreateMultipleChoiceMutation(): MutationReturn<MultipleChoiceCreateMutation> {
+  const { alert } = useContext(AlertContext);
+  return useMutation<MultipleChoiceCreateMutation>(
+    graphql`
+    mutation MultipleChoiceCreateMutation($input: CreateMultipleChoiceInput!) {
+      createMultipleChoice(input: $input) {
+        part {
+          id
+          bodyItems {
+            id
+            ...BodyItemEditor
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error creating new MultipleChoice body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+}
 
 interface DraggableMCOption {
   id: string;

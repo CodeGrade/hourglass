@@ -5,8 +5,6 @@ import React, {
 import {
   graphql,
   useMutation,
-  MutateWithVariables,
-  MutationState,
   useFragment,
 } from 'relay-hooks';
 import {
@@ -21,10 +19,9 @@ import {
   ToggleButton,
 } from 'react-bootstrap';
 import Select from 'react-select';
-import { MutationParameters } from 'relay-runtime';
 
 import { AlertContext } from '@hourglass/common/alerts';
-import { SelectOption } from '@hourglass/common/helpers';
+import { SelectOption, MutationReturn } from '@hourglass/common/helpers';
 import RearrangeableList from '@hourglass/common/rearrangeable';
 import Loading from '@hourglass/common/loading';
 import { HTMLVal } from '@student/exams/show/types';
@@ -535,8 +532,6 @@ const RubricEntriesEditor: React.FC<{
   }
   return addNewRubricItemDropdown;
 };
-
-type MutationReturn<T extends MutationParameters> = [MutateWithVariables<T>, MutationState<T>];
 
 function useCreateRubricMutation(): MutationReturn<RubricCreateMutation> {
   const { alert } = useContext(AlertContext);

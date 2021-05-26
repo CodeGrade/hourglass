@@ -257,10 +257,9 @@ const ShowRubricPresets: React.FC<ShowRubricProps<RubricPresets>> = (props) => {
   return (
     <Row>
       <Col>
-        {presets.map((p, index) => (
+        {presets.map((p) => (
           <ShowPreset
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
+            key={p.id}
             preset={p}
             registrationId={registrationId}
             qnum={qnum}
@@ -289,10 +288,9 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   if (choices instanceof Array) {
     body = (
       <>
-        {choices.map((c, index) => (
+        {choices.map((c) => (
           <ShowRubric
-            /* eslint-disable-next-line react/no-array-index-key */
-            key={index}
+            key={c.id}
             showCompletenessAgainst={showCompletenessAgainst}
             parentRubricType="all"
             rubric={c}
@@ -372,8 +370,7 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
       <Accordion defaultActiveKey="0">
         {choices.map((r, i) => (
           <ShowRubric
-            // eslint-disable-next-line react/no-array-index-key
-            key={i}
+            key={r.id}
             rubric={r}
             qnum={qnum}
             pnum={pnum}
@@ -449,10 +446,9 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
   if (choices instanceof Array) {
     body = (
       <>
-        {choices.map((c, index) => (
+        {choices.map((c) => (
           <ShowRubric
-            /* eslint-disable-next-line react/no-array-index-key */
-            key={index}
+            key={c.id}
             rubric={c}
             qnum={qnum}
             pnum={pnum}

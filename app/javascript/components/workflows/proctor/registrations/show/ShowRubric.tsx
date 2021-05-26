@@ -74,9 +74,8 @@ const ShowRubricPresets: React.FC<{ choices: RubricPresets }> = (props) => {
   return (
     <Row>
       <Col>
-        {presets.map((p, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <ShowPreset direction={direction} preset={p} key={index} />
+        {presets.map((p) => (
+          <ShowPreset direction={direction} preset={p} key={p.id} />
         ))}
       </Col>
     </Row>
@@ -92,9 +91,8 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll, forWhat: string }> = (props) 
   if (choices instanceof Array) {
     body = (
       <>
-        {choices.map((c, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
+        {choices.map((c) => (
+          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} />
         ))}
       </>
     );
@@ -153,9 +151,8 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny, forWhat: string }> = (props) 
     summary = <span className="ml-auto">{pointsMsg}</span>;
     body = (
       <>
-        {choices.map((c, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
+        {choices.map((c) => (
+          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} />
         ))}
       </>
     );
@@ -215,9 +212,8 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
     summary = <span className="ml-auto">{pointsMsg}</span>;
     body = (
       <>
-        {choices.map((c, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
+        {choices.map((c) => (
+          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} />
         ))}
       </>
     );

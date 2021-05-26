@@ -195,9 +195,7 @@ const Part: React.FC<PartProps> = (props) => {
         )}
         {rootRubric && overviewMode && <ShowRubricKey rubricKey={rootRubric} forWhat="part" />}
         {bodyItems.map((b, i) => (
-          // Body numbers are STATIC.
-          // eslint-disable-next-line react/no-array-index-key
-          <div className={`p-2 bodyitem ${(b as BodyItem).info.type}`} key={i}>
+          <div className={`p-2 bodyitem ${(b as BodyItem).info.type}`} key={b.id}>
             <DisplayBody
               bodyKey={b}
               qnum={qnum}

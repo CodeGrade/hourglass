@@ -2,7 +2,7 @@ module Mutations
   class CreateMatching < BaseMutation
     argument :part_id, ID, required: true, loads: Types::PartType
     argument :prompts, [Types::HtmlInputType], required: true
-    argument :values, [Types::HtmlInputType], required: true
+    argument :match_values, [Types::HtmlInputType], required: true
     argument :prompt, Types::HtmlInputType, required: false
     argument :answer, [Integer], required: false
 
@@ -14,7 +14,7 @@ module Mutations
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
-    def resolve(part:, prompts:, values:, answer: nil, prompt: nil)
+    def resolve(part:, prompts:, match_values:, answer: nil, prompt: nil)
       unless answer.nil? || answer.count == prompts.count
         raise GraphQL::ExecutionError, "Must have one answer per prompt" 
       end
@@ -28,7 +28,7 @@ module Mutations
         info: {
           type: 'Matching',
           prompts: prompts,
-          values: values,
+          values: match_values,
           prompt: prompt || {
             type: 'HTML',
             value: '',

@@ -4,6 +4,8 @@ module Mutations
     argument :lang, String, required: true
     argument :prompt, Types::HtmlInputType, required: false
     argument :answer, Types::CodeAnswerInputType, required: false
+    argument :initial_file, String, required: false
+    argument :initial_code, Types::CodeAnswerInputType, required: false
 
     field :part, Types::PartType, null: false
 
@@ -13,8 +15,11 @@ module Mutations
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
-    def resolve(part:, lang:, answer: nil, prompt: nil)
+    def resolve(part:, lang:, answer: nil, prompt: nil, initial_file: nil, initial_code: nil)
       index = part.body_items.count
+      if initial_code.present? && initial_file.present?
+        raise GraphQL::ExecutionError, "Cannot specify both initial file and starter code"
+      end
       body_item = BodyItem.new(
         part: part,
         index: index, 
@@ -24,7 +29,8 @@ module Mutations
           prompt: {
             type: 'HTML',
             value: prompt || '',
-          }
+          },
+          initial: initial_code || initial_file,
         },
         answer: answer || {
           text: '',

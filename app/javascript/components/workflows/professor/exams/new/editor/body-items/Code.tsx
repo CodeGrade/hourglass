@@ -1,4 +1,8 @@
-import React, { useState, useContext } from 'react';
+import React, {
+  useState,
+  useContext,
+  useCallback,
+} from 'react';
 import {
   Form,
   Row,
@@ -12,15 +16,23 @@ import {
 } from 'relay-hooks';
 import { FaLock, FaBan } from 'react-icons/fa';
 import { useDebouncedCallback } from 'use-debounce/lib';
+import Loading from '@hourglass/common/loading';
 import { ExamContext } from '@hourglass/common/context';
 import { MutationReturn } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
-import { MarkDescription, CodeState, CodeInfo } from '@student/exams/show/types';
+import {
+  MarkDescription,
+  CodeState,
+  CodeInfo,
+  HTMLVal,
+  CodeInitial,
+} from '@student/exams/show/types';
 import { Editor, marksToDescs } from '@student/exams/show/components/ExamCodeBox';
 import { firstFile } from '@student/exams/show/files';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/FilePicker';
 import { CodeCreateMutation } from './__generated__/CodeCreateMutation.graphql';
+import { CodeChangeMutation } from './__generated__/CodeChangeMutation.graphql';
 
 export const languages = {
   scheme: 'Racket',
@@ -66,6 +78,33 @@ export function useCreateCodeMutation(): MutationReturn<CodeCreateMutation> {
   );
 }
 
+function useChangeCodeMutation(): MutationReturn<CodeChangeMutation> {
+  const { alert } = useContext(AlertContext);
+  return useMutation<CodeChangeMutation>(
+    graphql`
+    mutation CodeChangeMutation($input: ChangeCodeDetailsInput!) {
+      changeCodeDetails(input: $input) {
+        bodyItem {
+          id
+          info
+          answer
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing Code body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+}
+
 const EditLang: React.FC<{
   value: CodeInfo['lang'];
   onChange: (newLang: CodeInfo['lang']) => void;
@@ -79,7 +118,7 @@ const EditLang: React.FC<{
       as="select"
       custom
       size="sm"
-      className="col-sm-2"
+      className="col-sm-3"
       value={value}
       onChange={(e): void => onChange(e.target.value)}
     >
@@ -124,108 +163,109 @@ const EditCodeAnswerValues: React.FC<{
   }
   const disabled = parentDisabled;
   return (
-    <div className="quill bg-white">
-      <div className="ql-toolbar ql-snow">
-        <EditLang onChange={debouncedOnChangeLang} value={lang} />
-        <Button
-          className="float-none"
-          variant="outline-secondary"
-          size="sm"
-          disabled={disabled || !lockState.enabled}
-          active={lockState.active}
-          title={title}
-          onClick={(): void => {
-            const newMarks = [...answerMarks];
-            const { curRange, finalPos } = lockState;
-            if (lockState.active) {
-              const markId = answerMarks.findIndex((m) => (
-                m.from.ch === curRange.from.ch
-                && m.from.line === curRange.from.line
-                && m.to.ch === curRange.to.ch
-                && m.to.line === curRange.to.line
-              ));
-              newMarks.splice(markId, 1);
-            } else {
-              const newMark: MarkDescription = {
-                from: {
-                  ch: curRange.from.ch,
-                  line: curRange.from.line,
-                },
-                to: {
-                  ch: curRange.to.ch,
-                  line: curRange.to.line,
-                },
-                options: {
-                  inclusiveLeft: (
-                    curRange.from.line === 0
-                    && curRange.from.ch === 0
-                  ),
-                  inclusiveRight: (
-                    curRange.to.line === finalPos.line
-                    && curRange.to.ch === finalPos.ch
-                  ),
-                },
-              };
-              newMarks.push(newMark);
+    <Loading loading={disabled} noText>
+      <div className="quill bg-white">
+        <div className="ql-toolbar ql-snow">
+          <EditLang onChange={debouncedOnChangeLang} value={lang} />
+          <Button
+            className="float-none"
+            variant="outline-secondary"
+            size="sm"
+            disabled={!lockState.enabled}
+            active={lockState.active}
+            title={title}
+            onClick={(): void => {
+              const newMarks = [...answerMarks];
+              const { curRange, finalPos } = lockState;
+              if (lockState.active) {
+                const markId = answerMarks.findIndex((m) => (
+                  m.from.ch === curRange.from.ch
+                  && m.from.line === curRange.from.line
+                  && m.to.ch === curRange.to.ch
+                  && m.to.line === curRange.to.line
+                ));
+                newMarks.splice(markId, 1);
+              } else {
+                const newMark: MarkDescription = {
+                  from: {
+                    ch: curRange.from.ch,
+                    line: curRange.from.line,
+                  },
+                  to: {
+                    ch: curRange.to.ch,
+                    line: curRange.to.line,
+                  },
+                  options: {
+                    inclusiveLeft: (
+                      curRange.from.line === 0
+                      && curRange.from.ch === 0
+                    ),
+                    inclusiveRight: (
+                      curRange.to.line === finalPos.line
+                      && curRange.to.ch === finalPos.ch
+                    ),
+                  },
+                };
+                newMarks.push(newMark);
+              }
+              debouncedOnChangeValue({ text: answerText, marks: newMarks });
+            }}
+          >
+            <FaLock />
+          </Button>
+          <Button
+            className="float-none"
+            variant="outline-secondary"
+            size="sm"
+            title="Clear all locked regions"
+            onClick={(): void => {
+              debouncedOnChangeValue({ text: answerText, marks: [] });
+            }}
+          >
+            <FaBan />
+          </Button>
+        </div>
+        <Editor
+          value={answerText}
+          markDescriptions={answerMarks}
+          valueUpdate={[answerMarks]}
+          refreshProps={[answerText]}
+          language={lang}
+          onSelection={(editor, data): void => {
+            const { ranges, origin } = data;
+            if (origin === undefined) return;
+            if (ranges.length > 0) {
+              const curRange = ranges[0];
+              const selectedMarks = marksToDescs(editor.findMarks(curRange.from(), curRange.to()));
+              const lastLine = editor.lastLine();
+              const lastLineLen = editor.getLine(lastLine).length;
+              if (selectedMarks.length === 0) {
+                setLockState({
+                  enabled: !curRange.empty(),
+                  active: false,
+                  curRange: { from: curRange.from(), to: curRange.to() },
+                  finalPos: { line: lastLine, ch: lastLineLen },
+                });
+              } else {
+                const activeMark = selectedMarks[0];
+                setLockState({
+                  active: true,
+                  enabled: true,
+                  curRange: {
+                    from: activeMark.from,
+                    to: activeMark.to,
+                  },
+                  finalPos: { line: lastLine, ch: lastLineLen },
+                });
+              }
             }
-            debouncedOnChangeValue({ text: answerText, marks: newMarks });
           }}
-        >
-          <FaLock />
-        </Button>
-        <Button
-          className="float-none"
-          variant="outline-secondary"
-          size="sm"
-          title="Clear all locked regions"
-          disabled={disabled}
-          onClick={(): void => {
-            debouncedOnChangeValue({ text: answerText, marks: [] });
+          onChange={(newText, newMarks): void => {
+            debouncedOnChangeValue({ text: newText, marks: newMarks });
           }}
-        >
-          <FaBan />
-        </Button>
+        />
       </div>
-      <Editor
-        value={answerText}
-        markDescriptions={answerMarks}
-        valueUpdate={answerMarks}
-        language={lang}
-        disabled={disabled}
-        onSelection={(editor, data): void => {
-          const { ranges, origin } = data;
-          if (origin === undefined) return;
-          if (ranges.length > 0) {
-            const curRange = ranges[0];
-            const selectedMarks = marksToDescs(editor.findMarks(curRange.from(), curRange.to()));
-            const lastLine = editor.lastLine();
-            const lastLineLen = editor.getLine(lastLine).length;
-            if (selectedMarks.length === 0) {
-              setLockState({
-                enabled: !curRange.empty(),
-                active: false,
-                curRange: { from: curRange.from(), to: curRange.to() },
-                finalPos: { line: lastLine, ch: lastLineLen },
-              });
-            } else {
-              const activeMark = selectedMarks[0];
-              setLockState({
-                active: true,
-                enabled: true,
-                curRange: {
-                  from: activeMark.from,
-                  to: activeMark.to,
-                },
-                finalPos: { line: lastLine, ch: lastLineLen },
-              });
-            }
-          }
-        }}
-        onChange={(newText, newMarks): void => {
-          debouncedOnChangeValue({ text: newText, marks: newMarks });
-        }}
-      />
-    </div>
+    </Loading>
   );
 };
 
@@ -261,12 +301,11 @@ const SetInitial: React.FC<{
   const { files } = useContext(ExamContext);
   const first = firstFile(files);
   return (
-    <>
+    <Loading loading={disabled} noText>
       <ButtonGroup>
         <Button
           variant={isNone ? 'secondary' : 'outline-secondary'}
           active={isNone}
-          disabled={disabled}
           onClick={(): void => {
             onChangeInitial(null);
           }}
@@ -276,7 +315,6 @@ const SetInitial: React.FC<{
         <Button
           variant={isText ? 'secondary' : 'outline-secondary'}
           active={isText}
-          disabled={disabled}
           onClick={(): void => {
             onChangeInitial({ text: '', marks: [] });
           }}
@@ -286,7 +324,7 @@ const SetInitial: React.FC<{
         <Button
           variant={isFile ? 'secondary' : 'outline-secondary'}
           active={isFile}
-          disabled={disabled || first === undefined}
+          disabled={first === undefined}
           title={first === undefined ? 'No reference files were supplied for this exam' : undefined}
           onClick={(): void => {
             onChangeInitial({ file: first.relPath });
@@ -299,7 +337,6 @@ const SetInitial: React.FC<{
         <EditCodeAnswerValues
           value={initial}
           onChangeValue={onChangeInitial}
-          disabled={disabled}
           lang={lang}
           onChangeLang={onChangeLang}
         />
@@ -312,7 +349,6 @@ const SetInitial: React.FC<{
               type: 'file',
               path: initial.file,
             }]}
-            disabled={disabled}
             onChange={(arr): void => {
               const lastSelected = arr[arr.length - 1];
               if (!lastSelected) return;
@@ -322,7 +358,7 @@ const SetInitial: React.FC<{
           />
         </>
       )}
-    </>
+    </Loading>
   );
 };
 
@@ -333,16 +369,85 @@ const Code: React.FC<{
   answer: CodeState;
 }> = (props) => {
   const {
+    id,
     info,
     answer,
-    disabled = false,
+    disabled: parentDisabled = false,
   } = props;
+  const [mutate, { loading }] = useChangeCodeMutation();
+  const updatePrompt = useCallback((newPrompt: HTMLVal) => {
+    mutate({
+      variables: {
+        input: {
+          bodyItemId: id,
+          updatePrompt: true,
+          prompt: newPrompt,
+        },
+      },
+    });
+  }, [id]);
+  const updateInitial = useCallback((newInitial: CodeInitial) => {
+    if (newInitial === null) {
+      mutate({
+        variables: {
+          input: {
+            bodyItemId: id,
+            updateInitial: true,
+          },
+        },
+      });
+    } else if ('file' in newInitial) {
+      mutate({
+        variables: {
+          input: {
+            bodyItemId: id,
+            updateInitial: true,
+            initialFile: newInitial,
+          },
+        },
+      });
+    } else {
+      mutate({
+        variables: {
+          input: {
+            bodyItemId: id,
+            updateInitial: true,
+            initialCode: newInitial,
+          },
+        },
+      });
+    }
+  }, [id]);
+  const updateLang = useCallback((newVal: string) => {
+    mutate({
+      variables: {
+        input: {
+          bodyItemId: id,
+          updateLang: true,
+          lang: newVal,
+        },
+      },
+    });
+  }, [id]);
+  const updateAnswer = useCallback((newAnswer: CodeState) => {
+    mutate({
+      variables: {
+        input: {
+          bodyItemId: id,
+          updateAnswer: true,
+          answer: newAnswer,
+        },
+      },
+    });
+  }, [id]);
+
+  const disabled = parentDisabled || loading;
   return (
     <>
       <Prompted
         value={info.prompt}
         disabled={disabled}
-        onChange={console.log}
+        onChange={updatePrompt}
       />
       <Form.Group as={Row}>
         <Form.Label column sm={2}>Starter</Form.Label>
@@ -350,9 +455,9 @@ const Code: React.FC<{
           <SetInitial
             disabled={disabled}
             initial={info.initial}
-            onChangeInitial={console.log}
+            onChangeInitial={updateInitial}
             lang={info.lang}
-            onChangeLang={console.log}
+            onChangeLang={updateLang}
           />
         </Col>
       </Form.Group>
@@ -362,9 +467,9 @@ const Code: React.FC<{
           <EditCodeAnswerValues
             disabled={disabled}
             lang={info.lang}
-            onChangeLang={console.log}
+            onChangeLang={updateLang}
             value={answer}
-            onChangeValue={console.log}
+            onChangeValue={updateAnswer}
           />
         </Col>
       </Form.Group>

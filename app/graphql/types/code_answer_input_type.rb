@@ -50,4 +50,14 @@ module Types
       }
     end
   end
+
+  class CodeInitialFileType < Types::BaseInputObject
+    argument :file, String, required: true
+
+    def prepare
+      {
+        file: file
+      }
+    end
+  end
 end

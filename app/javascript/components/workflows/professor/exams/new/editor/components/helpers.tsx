@@ -15,6 +15,7 @@ import { GrDrag } from 'react-icons/gr';
 import { useDebounce, useDebouncedCallback } from 'use-debounce/lib';
 
 import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/NumericInput';
+import Loading from '@hourglass/common/loading';
 import { HTMLVal } from '@student/exams/show/types';
 import Icon from '@student/exams/show/components/Icon';
 import CustomEditor from '@professor/exams/new/old-editor/components/CustomEditor';
@@ -114,7 +115,6 @@ export const EditHTMLVal: React.FC<{
   onChange: (newVal: HTMLVal) => void;
   placeholder?: string;
   debounceDelay?: number;
-  refreshProps?: React.DependencyList;
   className?: string;
   theme?: ReactQuillProps['theme'];
 }> = (props) => {
@@ -124,7 +124,6 @@ export const EditHTMLVal: React.FC<{
     onChange,
     placeholder,
     debounceDelay = 0,
-    refreshProps = [],
     className,
     theme = 'bubble',
   } = props;
@@ -141,15 +140,15 @@ export const EditHTMLVal: React.FC<{
     }
   }, [onChange]);
   return (
-    <CustomEditor
-      disabled={disabled}
-      value={value.value}
-      placeholder={placeholder}
-      theme={theme}
-      onChange={handleChange}
-      refreshProps={[...refreshProps, value.value]}
-      className={className}
-    />
+    <Loading loading={disabled} noText>
+      <CustomEditor
+        value={value.value}
+        placeholder={placeholder}
+        theme={theme}
+        onChange={handleChange}
+        className={className}
+      />
+    </Loading>
   );
 };
 

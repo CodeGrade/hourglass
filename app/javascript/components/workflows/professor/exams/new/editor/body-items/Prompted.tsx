@@ -3,7 +3,6 @@ import { Form, Row, Col } from 'react-bootstrap';
 import { ReactQuillProps } from 'react-quill';
 import { HTMLVal } from '@student/exams/show/types';
 import { EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
-import Loading from '@hourglass/common/loading';
 
 const Prompted: React.FC<{
   disabled?: boolean;
@@ -27,16 +26,15 @@ const Prompted: React.FC<{
       <Form.Group as={Row}>
         <Form.Label column sm={2}>Prompt</Form.Label>
         <Col sm={10}>
-          <Loading loading={disabled} noText>
-            <EditHTMLVal
-              className={className}
-              value={value}
-              debounceDelay={debounceDelay}
-              theme={theme}
-              placeholder="Provide any instructions for this specific item..."
-              onChange={onChange}
-            />
-          </Loading>
+          <EditHTMLVal
+            disabled={disabled}
+            className={className}
+            value={value}
+            debounceDelay={debounceDelay}
+            theme={theme}
+            placeholder="Provide any instructions for this specific item..."
+            onChange={onChange}
+          />
         </Col>
       </Form.Group>
     </>

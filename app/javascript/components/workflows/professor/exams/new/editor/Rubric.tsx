@@ -262,7 +262,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
             />
           </Col>
         </Form.Group>
-        {'description' in rubric && (
+        {rubric.type !== 'none' && (
           <Form.Group>
             <RubricDescriptionEditor
               rubric={rubric}

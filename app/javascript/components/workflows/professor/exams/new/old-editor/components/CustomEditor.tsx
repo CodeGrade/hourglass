@@ -1,4 +1,8 @@
-import React, { useCallback, useMemo } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+} from 'react';
 import ReactQuill from 'react-quill';
 import QuillPasteSmart from 'quill-paste-smart';
 import './CustomEditor.scss';
@@ -12,7 +16,6 @@ export interface CustomEditorProps {
   id?: string;
   theme?: string;
   onChange?: ReactQuill.ReactQuillProps['onChange'];
-  refreshProps?: React.DependencyList;
   disabled?: boolean;
 }
 
@@ -59,7 +62,6 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
     id,
     theme,
     onChange,
-    refreshProps = [],
     disabled = false,
   } = props;
 
@@ -71,16 +73,19 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
     }
   }, [onChange]);
 
-  const key = useMemo(() => Math.random(), refreshProps);
+  const ref = useRef<ReactQuill>();
+  useEffect(() => {
+    if (!ref.current) { return; }
+    ref.current.getEditor().root.dataset.placeholder = placeholder;
+  }, [ref.current, placeholder]);
 
   return (
     <ReactQuill
+      ref={ref}
       readOnly={disabled}
       id={id}
-      key={key}
       className={className}
       theme={theme || 'snow'}
-      placeholder={placeholder}
       value={value}
       formats={formatOptions}
       modules={modules}

@@ -1365,7 +1365,7 @@ const RubricDescriptionEditor: React.FC<{
       },
     },
   );
-  const onChange = (newDescription: HTMLVal) => {
+  const onChange = useCallback((newDescription: HTMLVal) => {
     mutate({
       variables: {
         input: {
@@ -1375,7 +1375,7 @@ const RubricDescriptionEditor: React.FC<{
         },
       },
     });
-  };
+  }, [rubric.id]);
   return (
     <EditHTMLVal
       className="bg-white border rounded"
@@ -1384,7 +1384,6 @@ const RubricDescriptionEditor: React.FC<{
       onChange={onChange}
       placeholder={`Give use-${rubric.type} rubric instructions here`}
       debounceDelay={1000}
-      refreshProps={[rubric.type]}
     />
   );
 };

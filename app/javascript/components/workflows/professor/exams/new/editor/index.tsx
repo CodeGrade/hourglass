@@ -16,6 +16,7 @@ import {
 import { RenderError } from '@hourglass/common/boundary';
 import {
   Button,
+  Card,
   Col,
   Container,
   Form,
@@ -156,40 +157,46 @@ const ExamVersionEditor: React.FC = () => {
             </Col>
           </Row>
           <Row>
-            <Col sm={showRubrics ? 12 : { span: 8, offset: 2 }}>
-              <Row>
-                <Col sm={showRubrics ? 6 : 12}>
-                  <div className="alert alert-info">
-                    <h4>Exam-wide information</h4>
-                    <Policies
-                      value={policies}
-                      onChange={console.log}
-                    />
-                    <FileUploader
-                      value={examVersion.files as ExamFile[]}
-                      onChange={console.log}
-                    />
-                    <Instructions
-                      value={examVersion.instructions}
-                      onChange={console.log}
-                    />
-                  </div>
-                  <Form.Group as={Row}>
-                    <EditReference
-                      value={examVersion.dbReferences as FileRef[]}
-                      onChange={console.log}
-                      label="the entire exam"
-                    />
-                  </Form.Group>
-                </Col>
-                {showRubrics && (
-                  <Col sm={6}>
-                    <SingleRubricKeyEditor
-                      rubricKey={rootRubric}
-                    />
-                  </Col>
-                )}
-              </Row>
+            <Col sm={12} xl={showRubrics ? 12 : { span: 8, offset: 2 }}>
+              <Card border="info" className="mb-4">
+                <div className="alert alert-info">
+                  <Card.Title>
+                    Exam-wide information
+                  </Card.Title>
+                </div>
+                <Card.Body>
+                  <Row>
+                    <Col>
+                      <Policies
+                        value={policies}
+                        onChange={console.log}
+                      />
+                      <FileUploader
+                        value={examVersion.files as ExamFile[]}
+                        onChange={console.log}
+                      />
+                      <Instructions
+                        value={examVersion.instructions}
+                        onChange={console.log}
+                      />
+                      <Form.Group as={Row}>
+                        <EditReference
+                          value={examVersion.dbReferences as FileRef[]}
+                          onChange={console.log}
+                          label="the entire exam"
+                        />
+                      </Form.Group>
+                    </Col>
+                    {showRubrics && (
+                      <Col sm={12} xl={6}>
+                        <SingleRubricKeyEditor
+                          rubricKey={rootRubric}
+                        />
+                      </Col>
+                    )}
+                  </Row>
+                </Card.Body>
+              </Card>
               <ReorderableQuestionsEditor
                 dbQuestions={dbQuestions}
                 examVersionId={examVersionId}

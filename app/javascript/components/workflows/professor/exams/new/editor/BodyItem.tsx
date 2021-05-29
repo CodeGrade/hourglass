@@ -282,11 +282,11 @@ export const BodyItemEditor: React.FC<{
       />
       <Card.Body className="ml-4 mr-4">
         <Row>
-          <Col sm={showRubric ? 6 : 12}>
+          <Col sm={12} xl={showRubric ? 6 : 12}>
             {editor}
           </Col>
           {showRubric && (
-            <Col sm="6">
+            <Col sm={12} xl={6}>
               <SingleRubricKeyEditor
                 disabled={disabled}
                 rubricKey={bodyItem.rootRubric}

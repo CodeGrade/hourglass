@@ -248,7 +248,7 @@ export const OneQuestion: React.FC<{
       </div>
       <Card.Body>
         <Row>
-          <Col sm={showRubricEditors ? 6 : 12}>
+          <Col sm={12} xl={showRubricEditors ? 6 : 12}>
             <Form.Group as={Row}>
               <Form.Label column sm="2">Description:</Form.Label>
               <Col sm="10">
@@ -298,7 +298,7 @@ export const OneQuestion: React.FC<{
             </Form.Group>
           </Col>
           {showRubricEditors && (
-            <Col sm="6">
+            <Col sm={12} xl={6}>
               <SingleRubricKeyEditor
                 rubricKey={question.rootRubric}
                 disabled={disabled}

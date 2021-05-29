@@ -26,6 +26,7 @@ import {
   MatchingState,
 } from '@student/exams/show/types';
 
+import Html from './body-items/Html';
 import CodeTag from './body-items/CodeTag';
 import Text from './body-items/Text';
 import YesNo from './body-items/YesNo';
@@ -35,7 +36,7 @@ import MultipleChoice from './body-items/MultipleChoice';
 import Matching from './body-items/Matching';
 
 import { SingleRubricKeyEditor } from './Rubric';
-import { DragHandle, DestroyButton, EditHTMLVal } from './components/helpers';
+import { DragHandle, DestroyButton } from './components/helpers';
 
 import { PartEditor } from './__generated__/PartEditor.graphql';
 import { BodyItemEditor$key } from './__generated__/BodyItemEditor.graphql';
@@ -181,14 +182,10 @@ export const BodyItemEditor: React.FC<{
     case 'HTML':
       showRubric = false;
       editor = (
-        <EditHTMLVal
-          className="text-instructions bg-white"
+        <Html
+          id={id}
+          info={info}
           disabled={disabled}
-          theme="snow"
-          value={info}
-          onChange={console.log}
-          debounceDelay={1000}
-          placeholder="Provide instructions here..."
         />
       );
       break;

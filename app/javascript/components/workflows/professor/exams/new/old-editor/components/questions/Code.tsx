@@ -18,7 +18,7 @@ import {
 } from 'redux-form';
 import { ExamContext } from '@hourglass/common/context';
 import { firstFile } from '@student/exams/show/files';
-import { FilePickerSelectWithPreview } from '@professor/exams/new/old-editor/components/FilePicker';
+import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
 
 export const languages = {
   scheme: 'Racket',

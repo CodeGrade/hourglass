@@ -18,7 +18,7 @@ import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/
 import Loading from '@hourglass/common/loading';
 import { HTMLVal } from '@student/exams/show/types';
 import Icon from '@student/exams/show/components/Icon';
-import CustomEditor from '@professor/exams/new/old-editor/components/CustomEditor';
+import CustomEditor from './CustomEditor';
 
 export const DragHandle: React.FC<{
   handleRef: React.Ref<HTMLElement>,

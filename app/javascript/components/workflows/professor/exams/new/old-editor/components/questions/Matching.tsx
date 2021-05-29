@@ -7,7 +7,7 @@ import {
 import {
   Select, FormControl, InputLabel, MenuItem,
 } from '@material-ui/core';
-import CustomEditor from '@professor/exams/new/old-editor/components/CustomEditor';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import MoveItem from '@professor/exams/new/old-editor/components/MoveItem';
 import Prompted from '@professor/exams/new/old-editor/components/questions/Prompted';
 import { alphabetIdx, useRefresher } from '@hourglass/common/helpers';

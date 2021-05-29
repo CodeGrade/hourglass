@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import {
   Row, Col,
 } from 'react-bootstrap';
-import CustomEditor from '@professor/exams/new/old-editor/components/CustomEditor';
+import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import { HTMLVal } from '@student/exams/show/types';
 
 interface TextProps {

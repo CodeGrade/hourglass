@@ -20,12 +20,28 @@ import React, { useEffect, useState } from 'react';
 import { UnControlled as UnControlledCodeMirror, IUnControlledCodeMirror } from 'react-codemirror2';
 import { MarkDescription } from '@student/exams/show/types';
 
-function applyMarks(cm: CM.Editor, marks: MarkDescription[]): CM.TextMarker[] {
-  return marks.map((mark) => cm.markText(mark.from, mark.to, {
+export function applyMarks(cm: CM.Editor, marks: MarkDescription[]): void {
+  marks.map((mark) => cm.markText(mark.from, mark.to, {
     ...mark.options,
     readOnly: true,
     className: 'readOnly',
   }));
+}
+
+export function removeMarks(cm: CM.Editor, marks: MarkDescription[]): void {
+  marks.forEach((mark) => {
+    cm.findMarks(mark.from, mark.to).forEach((m) => {
+      if (m.className === 'readOnly') {
+        const where = m.find();
+        if (where.from.ch === mark.from.ch
+          && where.from.line === mark.from.line
+          && where.to.ch === mark.to.ch
+          && where.to.line === mark.to.line) {
+          m.clear();
+        }
+      }
+    });
+  });
 }
 
 export function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
@@ -65,6 +81,7 @@ export interface EditorProps {
   refreshProps?: React.DependencyList;
   disabled?: boolean;
   autosize?: boolean;
+  instanceRef?: React.RefCallback<CM.Editor>;
 }
 
 const languageSpecificKeys = {
@@ -92,13 +109,11 @@ export const Editor: React.FC<EditorProps> = (props) => {
     refreshProps = [],
     disabled = false,
     autosize = false,
+    instanceRef,
   } = props;
 
   // keep track of codemirror instance
   const [instance, setInstance] = useState<CM.Editor>(undefined);
-
-  // doSave applied marks to clear them if we change files
-  const [appliedMarks, setAppliedMarks] = useState([]);
 
   // whether to enable saving state to redux
   // this boolean is purposefully local to this specific render:
@@ -113,9 +128,13 @@ export const Editor: React.FC<EditorProps> = (props) => {
     if (instance) {
       doSave = false;
       const curCursor = instance.getCursor();
-      appliedMarks.forEach((m) => m.clear());
-      instance.setValue(value);
-      setAppliedMarks(applyMarks(instance, markDescriptions));
+      instance.getAllMarks().forEach((m) => {
+        if (m.className === 'readOnly') {
+          m.clear();
+        }
+      });
+      if (instance.getValue() !== value) { instance.setValue(value); }
+      applyMarks(instance, markDescriptions);
       instance.setCursor(curCursor.line, curCursor.ch, {
         scroll: false,
       });
@@ -183,6 +202,9 @@ export const Editor: React.FC<EditorProps> = (props) => {
       options={myOptions}
       editorDidMount={(editor): void => {
         setInstance(editor);
+        if (instanceRef) {
+          instanceRef(editor);
+        }
       }}
     />
   );

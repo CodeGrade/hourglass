@@ -1,5 +1,15 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { FileRef, CodeTagState, CodeTagInfo } from '@student/exams/show/types';
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useCallback,
+} from 'react';
+import {
+  FileRef,
+  CodeTagState,
+  CodeTagInfo,
+  HTMLVal,
+} from '@student/exams/show/types';
 import {
   Form,
   Row,
@@ -24,7 +34,9 @@ import {
 } from '@hourglass/common/context';
 import { AlertContext } from '@hourglass/common/alerts';
 import { ExhaustiveSwitchError, MutationReturn } from '@hourglass/common/helpers';
+
 import { CodeTagCreateMutation } from './__generated__/CodeTagCreateMutation.graphql';
+import { CodeTagChangeMutation } from './__generated__/CodeTagChangeMutation.graphql';
 
 export function useCreateCodeTagMutation(): MutationReturn<CodeTagCreateMutation> {
   const { alert } = useContext(AlertContext);
@@ -47,6 +59,33 @@ export function useCreateCodeTagMutation(): MutationReturn<CodeTagCreateMutation
         alert({
           variant: 'danger',
           title: 'Error creating new CodeTag body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+}
+
+function useChangeCodeTagMutation(): MutationReturn<CodeTagChangeMutation> {
+  const { alert } = useContext(AlertContext);
+  return useMutation<CodeTagChangeMutation>(
+    graphql`
+    mutation CodeTagChangeMutation($input: ChangeCodeTagDetailsInput!) {
+      changeCodeTagDetails(input: $input) {
+        bodyItem {
+          id
+          info
+          answer
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing CodeTag body item',
           message: err.message,
           copyButton: true,
         });
@@ -298,22 +337,58 @@ const CodeTag: React.FC<{
   answer: CodeTagState,
 }> = (props) => {
   const {
+    id,
     info,
     answer,
-    disabled = false,
+    disabled: parentDisabled = false,
   } = props;
+  const [mutate, { loading }] = useChangeCodeTagMutation();
+  const updatePrompt = useCallback((newPrompt: HTMLVal) => {
+    mutate({
+      variables: {
+        input: {
+          bodyItemId: id,
+          updatePrompt: true,
+          prompt: newPrompt,
+        },
+      },
+    });
+  }, [id]);
+  const updateChoices = useCallback((newChoices: CodeTagInfo['choices']) => {
+    mutate({
+      variables: {
+        input: {
+          bodyItemId: id,
+          updateChoices: true,
+          choices: newChoices,
+        },
+      },
+    });
+  }, [id]);
+  const updateAnswer = useCallback((newAnswer: CodeTagState) => {
+    mutate({
+      variables: {
+        input: {
+          bodyItemId: id,
+          updateAnswer: true,
+          answer: newAnswer,
+        },
+      },
+    });
+  }, [id]);
+  const disabled = parentDisabled || loading;
   return (
     <>
       <Prompted
         value={info.prompt}
         disabled={disabled}
-        onChange={console.log}
+        onChange={updatePrompt}
       />
       <Form.Group as={Row}>
         <EditChoices
           value={info.choices}
           disabled={disabled}
-          onChange={console.log}
+          onChange={updateChoices}
         />
       </Form.Group>
       <Form.Group as={Row} className="align-items-baseline">
@@ -321,7 +396,7 @@ const CodeTag: React.FC<{
           choice={info.choices}
           disabled={disabled}
           value={answer}
-          onChange={console.log}
+          onChange={updateAnswer}
         />
       </Form.Group>
     </>

@@ -79,6 +79,15 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
     ref.current.getEditor().root.dataset.placeholder = placeholder;
   }, [ref.current, placeholder]);
 
+  // When the component first mounts, setting the initial value
+  // adds one item to the undo stack, but the initial value
+  // should not be undoable.
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.getEditor().getModule('history').clear();
+    }
+  }, []);
+
   return (
     <ReactQuill
       ref={ref}

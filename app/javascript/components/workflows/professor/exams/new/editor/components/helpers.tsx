@@ -7,7 +7,6 @@ import {
   Button,
   ButtonProps,
   Form,
-  FormControlProps,
 } from 'react-bootstrap';
 import { ReactQuillProps } from 'react-quill';
 import { FaTrashAlt } from 'react-icons/fa';
@@ -75,9 +74,13 @@ export const DebouncedFormControl: React.FC<{
   disabled?: boolean;
   className?: string;
   placeholder?: string;
-  size?: FormControlProps['size'];
+  as?: Parameters<typeof Form.Control>[0]['as'];
+  rows?: Parameters<typeof Form.Control>[0]['rows'];
+  size?: Parameters<typeof Form.Control>[0]['size'];
 }> = (props) => {
   const {
+    as,
+    rows,
     defaultValue,
     debounceMillis = 1000,
     onChange,
@@ -99,6 +102,8 @@ export const DebouncedFormControl: React.FC<{
   }, [defaultValue]);
   return (
     <Form.Control
+      as={as}
+      rows={rows}
       size={size}
       disabled={disabled}
       value={text}

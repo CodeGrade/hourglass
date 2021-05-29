@@ -10,20 +10,18 @@ import {
   WrappedFieldProps,
 } from 'redux-form';
 import { HTMLVal } from '@student/exams/show/types';
-import CustomEditor, { CustomEditorProps } from './CustomEditor';
+import CustomEditor, { CustomEditorProps } from '@professor/exams/new/editor/components/CustomEditor';
 
 export const EditHTMLField: React.FC<WrappedFieldProps & {
   theme?: CustomEditorProps['theme'];
   className?: string;
   placeholder?: CustomEditorProps['placeholder'];
-  refreshProps?: React.DependencyList;
 }> = (props) => {
   const {
     input,
     className = 'bg-white',
     theme,
     placeholder,
-    refreshProps,
   } = props;
   const {
     value,
@@ -44,7 +42,6 @@ export const EditHTMLField: React.FC<WrappedFieldProps & {
       value={value.value}
       placeholder={placeholder}
       onChange={handleChange}
-      refreshProps={refreshProps}
     />
   );
 };

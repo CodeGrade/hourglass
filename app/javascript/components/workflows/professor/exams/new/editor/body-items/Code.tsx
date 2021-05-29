@@ -1,3 +1,4 @@
+import CM from 'codemirror';
 import React, {
   useState,
   useContext,
@@ -27,7 +28,12 @@ import {
   HTMLVal,
   CodeInitial,
 } from '@student/exams/show/types';
-import { Editor, marksToDescs } from '@student/exams/show/components/ExamCodeBox';
+import {
+  Editor,
+  applyMarks,
+  marksToDescs,
+  removeMarks,
+} from '@student/exams/show/components/ExamCodeBox';
 import { firstFile } from '@student/exams/show/files';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/FilePicker';
@@ -141,10 +147,11 @@ const EditCodeAnswerValues: React.FC<{
     value,
     onChangeValue,
     disabled: parentDisabled = false,
-    debounceDelay = 1000,
+    debounceDelay = 10000,
   } = props;
   const answerText = value?.text ?? '';
   const answerMarks = value?.marks ?? [];
+  const [instance, setInstance] = useState<CM.Editor>(undefined);
   const [lockState, setLockState] = useState<LockStateInfo>({
     enabled: false,
     active: false,
@@ -184,7 +191,7 @@ const EditCodeAnswerValues: React.FC<{
                   && m.to.ch === curRange.to.ch
                   && m.to.line === curRange.to.line
                 ));
-                newMarks.splice(markId, 1);
+                removeMarks(instance, newMarks.splice(markId, 1));
               } else {
                 const newMark: MarkDescription = {
                   from: {
@@ -207,6 +214,7 @@ const EditCodeAnswerValues: React.FC<{
                   },
                 };
                 newMarks.push(newMark);
+                applyMarks(instance, [newMark]);
               }
               debouncedOnChangeValue({ text: answerText, marks: newMarks });
             }}
@@ -227,6 +235,7 @@ const EditCodeAnswerValues: React.FC<{
         </div>
         <Editor
           value={answerText}
+          instanceRef={setInstance}
           markDescriptions={answerMarks}
           valueUpdate={[answerMarks]}
           refreshProps={[answerText]}

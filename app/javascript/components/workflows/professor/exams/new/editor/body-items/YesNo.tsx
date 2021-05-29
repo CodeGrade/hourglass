@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useCallback, useContext } from 'react';
 import {
   ToggleButton,
   ToggleButtonGroup,
@@ -10,11 +10,12 @@ import {
   graphql,
   useMutation,
 } from 'relay-hooks';
-import { YesNoInfo, YesNoState } from '@student/exams/show/types';
+import { HTMLVal, YesNoInfo, YesNoState } from '@student/exams/show/types';
 import { MutationReturn } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { YesNoCreateMutation } from './__generated__/YesNoCreateMutation.graphql';
+import { YesNoChangeMutation } from './__generated__/YesNoChangeMutation.graphql';
 
 export function useCreateYesNoMutation(): MutationReturn<YesNoCreateMutation> {
   const { alert } = useContext(AlertContext);
@@ -37,6 +38,33 @@ export function useCreateYesNoMutation(): MutationReturn<YesNoCreateMutation> {
         alert({
           variant: 'danger',
           title: 'Error creating new Yes/No body item',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+}
+
+function useChangeYesNoMutation(): MutationReturn<YesNoChangeMutation> {
+  const { alert } = useContext(AlertContext);
+  return useMutation<YesNoChangeMutation>(
+    graphql`
+    mutation YesNoChangeMutation($input: ChangeYesNoDetailsInput!) {
+      changeYesNoDetails(input: $input) {
+        bodyItem {
+          id
+          info
+          answer
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error changing YesNo body item',
           message: err.message,
           copyButton: true,
         });
@@ -145,22 +173,58 @@ const YesNo: React.FC<{
   answer: YesNoState,
 }> = (props) => {
   const {
+    id,
     info,
     answer,
-    disabled = false,
+    disabled: parentDisabled = false,
   } = props;
+  const [mutate, { loading }] = useChangeYesNoMutation();
+  const updatePrompt = useCallback((newPrompt: HTMLVal) => {
+    mutate({
+      variables: {
+        input: {
+          bodyItemId: id,
+          updatePrompt: true,
+          prompt: newPrompt,
+        },
+      },
+    });
+  }, [id]);
+  const updateLabelType = useCallback((newLabel: 'yn' | 'tf') => {
+    mutate({
+      variables: {
+        input: {
+          bodyItemId: id,
+          updateLabelType: true,
+          labelType: newLabel,
+        },
+      },
+    });
+  }, [id]);
+  const updateAnswer = useCallback((newAnswer: YesNoState) => {
+    mutate({
+      variables: {
+        input: {
+          bodyItemId: id,
+          updateAnswer: true,
+          answer: newAnswer,
+        },
+      },
+    });
+  }, [id]);
+  const disabled = parentDisabled || loading;
   return (
     <>
       <Prompted
         value={info.prompt}
         disabled={disabled}
-        onChange={console.log}
+        onChange={updatePrompt}
       />
       <Form.Group as={Row}>
         <EditLabels
           value={info.yesLabel === 'Yes' ? 'yn' : 'tf'}
           disabled={disabled}
-          onChange={console.log}
+          onChange={updateLabelType}
         />
         {/* <Fields names={['yesLabel', 'noLabel']} component={EditLabels} /> */}
       </Form.Group>
@@ -170,7 +234,7 @@ const YesNo: React.FC<{
           answer={answer}
           yesLabel={info.yesLabel}
           noLabel={info.noLabel}
-          onChange={console.log}
+          onChange={updateAnswer}
         />
         {/* <Fields names={['yesLabel', 'noLabel', 'answer']} component={EditAnswer} /> */}
       </Form.Group>

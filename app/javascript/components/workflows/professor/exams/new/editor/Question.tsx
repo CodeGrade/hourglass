@@ -14,7 +14,7 @@ import {
   Row,
 } from 'react-bootstrap';
 
-import RearrangeableList from '@hourglass/common/rearrangeable';
+import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import { AlertContext } from '@hourglass/common/alerts';
 
 import { YesNoInfo, FileRef } from '@student/exams/show/types';

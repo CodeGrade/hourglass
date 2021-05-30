@@ -22,7 +22,7 @@ import Select from 'react-select';
 
 import { AlertContext } from '@hourglass/common/alerts';
 import { SelectOption, MutationReturn } from '@hourglass/common/helpers';
-import RearrangeableList from '@hourglass/common/rearrangeable';
+import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import Loading from '@hourglass/common/loading';
 import { HTMLVal } from '@student/exams/show/types';
 import Tooltip from '@student/exams/show/components/Tooltip';

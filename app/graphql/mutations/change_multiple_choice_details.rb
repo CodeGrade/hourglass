@@ -26,11 +26,18 @@ module Mutations
       end
       if kwargs[:update_options]
         raise GraphQL::ExecutionError, 'Updated options must not be nil' unless kwargs[:options]
+        newAns = (kwargs[:update_answer] && kwargs[:answer]) || body_item.answer
+        if newAns < 0 || newAns >= kwargs[:options].count
+          msg = `Answer must be in range [0, #{kwargs[:options].count}), but got #{newAns}`
+          raise GraphQL::ExecutionError, msg
+        end
         body_item.info['options'] = kwargs[:options]
       end
       if kwargs[:update_answer]
-        if kwargs[:answer] < 0 || kwargs[:answer] >= body_item.info['options'].count
-          msg = "Answer must be in range [0, #{body_item.info['options'].count})"
+        raise GraphQL::ExecutionError, 'Updated answer must not be nil' unless kwargs[:answer]
+        newOpts = (kwargs[:update_options] && kwargs[:options]) || body_item.info['options']
+        if kwargs[:answer] < 0 || kwargs[:answer] >= newOpts.count
+          msg = "Answer must be in range [0, #{newOpts.count}), but got #{newAns}"
           raise GraphQL::ExecutionError, msg
         end
         body_item.answer = kwargs[:answer] 

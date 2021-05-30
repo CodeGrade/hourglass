@@ -11,7 +11,7 @@ import {
   Col,
   Row,
 } from 'react-bootstrap';
-import RearrangeableList from '@hourglass/common/rearrangeable';
+import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import { AlertContext } from '@hourglass/common/alerts';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 

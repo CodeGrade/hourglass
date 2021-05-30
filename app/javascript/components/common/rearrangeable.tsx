@@ -61,7 +61,7 @@ export interface RearrangeableListProps<T extends { id: string }> {
   children: (item: T, handleRef: React.Ref<HTMLElement>, isDragging: boolean) => ReactNode;
 }
 
-export default function RearrangeableList<T extends { id: string }>(
+export function RearrangeableList<T extends { id: string }>(
   props: React.PropsWithChildren<RearrangeableListProps<T>>,
 ): React.ReactElement {
   const {

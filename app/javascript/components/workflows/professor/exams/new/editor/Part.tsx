@@ -14,7 +14,7 @@ import {
   Form,
   Row,
 } from 'react-bootstrap';
-import RearrangeableList from '@hourglass/common/rearrangeable';
+import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import { AlertContext } from '@hourglass/common/alerts';
 import { alphabetIdx } from '@hourglass/common/helpers';
 

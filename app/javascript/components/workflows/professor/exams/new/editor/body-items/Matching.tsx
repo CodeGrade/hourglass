@@ -14,7 +14,7 @@ import {
 import { HTMLVal, MatchingInfo, MatchingState } from '@student/exams/show/types';
 import { alphabetIdx, MutationReturn } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
-import RearrangeableList from '@hourglass/common/rearrangeable';
+import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { DragHandle, DestroyButton, EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
 import './Matching.css';

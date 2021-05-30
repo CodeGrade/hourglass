@@ -18,10 +18,11 @@ import { FaCircle } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import Icon from '@student/exams/show/components/Icon';
 import { HTMLVal, MultipleChoiceInfo, MultipleChoiceState } from '@student/exams/show/types';
-import RearrangeableList, {
+import {
   arrSplice,
   IdArray,
   idForIndex,
+  RearrangeableList,
   RearrangeableListProps,
 } from '@hourglass/common/rearrangeable';
 import { MutationReturn } from '@hourglass/common/helpers';

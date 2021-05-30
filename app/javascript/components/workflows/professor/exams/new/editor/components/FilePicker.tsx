@@ -21,7 +21,7 @@ import { pluralize, SelectOption, SelectOptions } from '@hourglass/common/helper
 
 export interface FilePickerProps {
   options: ExamFile[];
-  selected: FileRef[];
+  selected: readonly FileRef[];
   disabled?: boolean;
   onChange: (fileRefs: FileRef[]) => void;
   children?: React.ReactNode;

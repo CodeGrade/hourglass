@@ -20,6 +20,7 @@ module Types
     field :destroy_exam_version, mutation: Mutations::DestroyExamVersion
     field :update_exam_version, mutation: Mutations::UpdateExamVersion
     field :create_exam_version, mutation: Mutations::CreateExamVersion
+    field :change_exam_version_details, mutation: Mutations::ChangeExamVersionDetails
     field :sync_course_to_bottlenose, mutation: Mutations::SyncCourseToBottlenose
     field :sync_exam_to_bottlenose, mutation: Mutations::SyncExamToBottlenose
     field :update_student_seating, mutation: Mutations::UpdateStudentSeating
@@ -54,10 +55,12 @@ module Types
     
     field :create_question, mutation: Mutations::CreateQuestion
     field :reorder_questions, mutation: Mutations::ReorderQuestions
+    field :change_question_details, mutation: Mutations::ChangeQuestionDetails
     field :destroy_question, mutation: Mutations::DestroyQuestion
     
     field :create_part, mutation: Mutations::CreatePart
     field :reorder_parts, mutation: Mutations::ReorderParts
+    field :change_part_details, mutation: Mutations::ChangePartDetails
     field :destroy_part, mutation: Mutations::DestroyPart
     
     field :reorder_body_items, mutation: Mutations::ReorderBodyItems

@@ -1,34 +1,34 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import {
   Row, Col,
 } from 'react-bootstrap';
-import CustomEditor from '@professor/exams/new/editor/components/CustomEditor';
 import { HTMLVal } from '@student/exams/show/types';
+import { EditHTMLVal } from './components/helpers';
 
 interface TextProps {
   value: HTMLVal;
+  disabled?: boolean;
   onChange: (newVal: HTMLVal) => void;
 }
 
 const Instructions: React.FC<TextProps> = (props) => {
   const {
     value,
+    disabled = false,
     onChange,
   } = props;
-  const handleChange = useCallback((newVal, _delta, source, _editor): void => {
-    if (source === 'user') {
-      onChange(newVal);
-    }
-  }, [onChange]);
   return (
     <Row className="py-3">
       <Col>
         <p>Exam instructions</p>
-        <CustomEditor
+        <EditHTMLVal
           className="bg-white"
-          value={value.value}
+          value={value}
+          disabled={disabled}
+          theme="snow"
           placeholder="Give exam-wide instructions here"
-          onChange={handleChange}
+          onChange={onChange}
+          debounceDelay={1000}
         />
       </Col>
     </Row>

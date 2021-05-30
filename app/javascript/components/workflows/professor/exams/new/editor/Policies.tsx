@@ -6,6 +6,7 @@ import { SelectOption, SelectOptions } from '@hourglass/common/helpers';
 
 export interface PoliciesProps {
   value: readonly Policy[];
+  disabled?: boolean;
   onChange: (newPolicies: Policy[]) => void;
 }
 
@@ -28,6 +29,7 @@ const policyValues: PolicyOptions = allPolicies.map((policy) => ({
 const Policies: React.FC<PoliciesProps> = (props) => {
   const {
     value,
+    disabled = false,
     onChange,
   } = props;
   const curPolicyValues = value.map((p) => policyValues.find((pv) => pv.value === p));
@@ -38,6 +40,7 @@ const Policies: React.FC<PoliciesProps> = (props) => {
         <Select
           className="basic-multi-select z-1000"
           isMulti
+          isDisabled={disabled}
           placeholder="Choose security policies..."
           options={policyValues}
           value={curPolicyValues}

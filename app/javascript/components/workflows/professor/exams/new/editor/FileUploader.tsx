@@ -16,10 +16,12 @@ import { handleZip } from '@hourglass/common/archive';
 
 const FileUploader: React.FC<{
   value: ExamFile[];
+  disabled?: boolean;
   onChange: (files: ExamFile[]) => void;
 }> = (props) => {
   const {
     value,
+    disabled = false,
     onChange,
   } = props;
   const noFiles = value === undefined || value.length === 0;
@@ -35,6 +37,7 @@ const FileUploader: React.FC<{
         <InputGroup>
           <Form.File
             ref={fileInput}
+            disabled={disabled}
             onChange={(e): void => {
               const { target } = e;
               const { files: uploaded } = target;
@@ -51,7 +54,7 @@ const FileUploader: React.FC<{
           <InputGroup.Append>
             <Button
               variant="danger"
-              disabled={noFiles}
+              disabled={disabled || noFiles}
               onClick={(): void => {
                 setOpen(false);
                 setUploadedFileName(undefined);
@@ -65,7 +68,7 @@ const FileUploader: React.FC<{
             </Button>
             <Button
               variant="info"
-              disabled={noFiles}
+              disabled={disabled || noFiles}
               onClick={(): void => setOpen((o) => !o)}
             >
               Preview files

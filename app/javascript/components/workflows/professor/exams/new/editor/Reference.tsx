@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   Form,
   Col,
@@ -6,24 +6,25 @@ import {
 import { ExamContext } from '@hourglass/common/context';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
 import { FileRef } from '@student/exams/show/types';
+import { QuestionEditor } from './__generated__/QuestionEditor.graphql';
 
 /**
  * Like useEffect, but does not trigger on the initial render.
  */
-function useEffectSkipFirst(effect: React.EffectCallback, deps?: React.DependencyList) {
-  const ranOnce = useRef(false);
-  useEffect(() => {
-    if (!ranOnce.current) {
-      ranOnce.current = true;
-      return () => undefined;
-    }
-    return effect();
-  }, deps);
-}
+// function useEffectSkipFirst(effect: React.EffectCallback, deps?: React.DependencyList) {
+//   const ranOnce = useRef(false);
+//   useEffect(() => {
+//     if (!ranOnce.current) {
+//       ranOnce.current = true;
+//       return () => undefined;
+//     }
+//     return effect();
+//   }, deps);
+// }
 
 const EditReference: React.FC<{
   label: string;
-  value: FileRef[];
+  value: QuestionEditor['references'];
   disabled?: boolean;
   onChange: (newVal: FileRef[]) => void;
 }> = (props) => {
@@ -36,7 +37,7 @@ const EditReference: React.FC<{
   const { files, fmap } = useContext(ExamContext);
   // We don't need the effect on the initial render, because
   // we assume the fileRefs that come from the database are valid.
-  useEffectSkipFirst(() => {
+  useEffect(() => {
     // Filter out references that no longer exist.
     const filtered = value.filter((fileRef) => (fileRef.path in fmap));
     onChange(filtered);

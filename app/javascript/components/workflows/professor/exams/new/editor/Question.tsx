@@ -1,4 +1,5 @@
 import React, {
+  useCallback,
   useContext,
 } from 'react';
 import {
@@ -17,7 +18,7 @@ import {
 import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import { AlertContext } from '@hourglass/common/alerts';
 
-import { YesNoInfo, FileRef } from '@student/exams/show/types';
+import { HTMLVal, YesNoInfo } from '@student/exams/show/types';
 import YesNoControl from '@student/exams/show/components/questions/YesNo';
 
 import { DragHandle, DestroyButton, EditHTMLVal } from './components/helpers';
@@ -28,6 +29,7 @@ import { ReorderablePartsEditor } from './Part';
 import { editorQuery } from './__generated__/editorQuery.graphql';
 import { QuestionEditor$key } from './__generated__/QuestionEditor.graphql';
 import { QuestionDestroyMutation } from './__generated__/QuestionDestroyMutation.graphql';
+import { QuestionChangeMutation } from './__generated__/QuestionChangeMutation.graphql';
 import { QuestionReorderMutation } from './__generated__/QuestionReorderMutation.graphql';
 import { QuestionCreatePartMutation } from './__generated__/QuestionCreatePartMutation.graphql';
 
@@ -135,10 +137,11 @@ export const OneQuestion: React.FC<{
         type
         value
       }
-      references {
+      references { 
+        id
         type
         path
-      }
+       }
       separateSubparts
       extraCredit
       rootRubric { ...RubricSingle }
@@ -178,6 +181,40 @@ export const OneQuestion: React.FC<{
     },
   );
   const [
+    mutateUpdateQuestion,
+    { loading: loadingUpdateQuestion },
+  ] = useMutation<QuestionChangeMutation>(
+    graphql`
+    mutation QuestionChangeMutation($input: ChangeQuestionDetailsInput!) {
+      changeQuestionDetails(input: $input) {
+        question {
+          id
+          name {
+            type
+            value
+          }
+          description {
+            type
+            value
+          }
+          extraCredit
+          separateSubparts
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error updating question',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const [
     mutateCreatePart,
     { loading: loadingCreatePart },
   ] = useMutation<QuestionCreatePartMutation>(
@@ -205,7 +242,56 @@ export const OneQuestion: React.FC<{
       },
     },
   );
-  const disabled = loadingDestroyQuestion || loadingCreatePart || parentDisabled;
+  const updateName = useCallback((newVal: HTMLVal) => {
+    mutateUpdateQuestion({
+      variables: {
+        input: {
+          questionId: question.id,
+          updateName: true,
+          name: newVal,
+        },
+      },
+    });
+  }, [question.id]);
+  const updateDescription = useCallback((newVal: HTMLVal) => {
+    mutateUpdateQuestion({
+      variables: {
+        input: {
+          questionId: question.id,
+          updateDescription: true,
+          description: newVal,
+        },
+      },
+    });
+  }, [question.id]);
+  const updateExtraCredit = useCallback((newVal: boolean) => {
+    mutateUpdateQuestion({
+      variables: {
+        input: {
+          questionId: question.id,
+          updateExtraCredit: true,
+          extraCredit: newVal,
+        },
+      },
+    });
+  }, [question.id]);
+  const updateSeparateSubparts = useCallback((newVal: boolean) => {
+    mutateUpdateQuestion({
+      variables: {
+        input: {
+          questionId: question.id,
+          updateSeparateSubparts: true,
+          separateSubparts: newVal,
+        },
+      },
+    });
+  }, [question.id]);
+  const disabled = (
+    loadingDestroyQuestion
+    || loadingUpdateQuestion
+    || loadingCreatePart
+    || parentDisabled
+  );
   return (
     <Card
       className={isDragging ? '' : 'mb-3'}
@@ -238,7 +324,7 @@ export const OneQuestion: React.FC<{
                   value: '',
                 }}
                 disabled={disabled}
-                onChange={console.log}
+                onChange={updateName}
                 placeholder="Give a short (optional) descriptive name for the question"
                 debounceDelay={1000}
               />
@@ -259,7 +345,7 @@ export const OneQuestion: React.FC<{
                     value: '',
                   }}
                   disabled={disabled}
-                  onChange={console.log}
+                  onChange={updateDescription}
                   placeholder="Give a longer description of the question"
                   debounceDelay={1000}
                 />
@@ -274,7 +360,7 @@ export const OneQuestion: React.FC<{
                   disabled={disabled}
                   value={!!question.separateSubparts}
                   info={SEP_SUB_YESNO}
-                  onChange={console.log}
+                  onChange={updateSeparateSubparts}
                 />
               </Col>
               <Form.Label column sm="2">Extra credit?</Form.Label>
@@ -284,13 +370,13 @@ export const OneQuestion: React.FC<{
                   disabled={disabled}
                   value={!!question.extraCredit}
                   info={SEP_SUB_YESNO}
-                  onChange={console.log}
+                  onChange={updateExtraCredit}
                 />
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
               <EditReference
-                value={question.references as FileRef[]}
+                value={question.references}
                 disabled={disabled}
                 onChange={console.log}
                 label="this question"

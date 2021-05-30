@@ -351,9 +351,7 @@ export interface MatchingInfo {
   values: HTMLVal[];
 }
 
-export interface MatchingState {
-  [index: number]: number;
-}
+export type MatchingState = number[];
 
 export type BodyItemInfo =
   HTMLVal | AllThatApplyInfo | CodeInfo | YesNoInfo |

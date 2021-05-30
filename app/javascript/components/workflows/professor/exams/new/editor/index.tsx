@@ -1,12 +1,11 @@
 import React, {
-  useContext, useState,
+  useContext,
+  useState,
+  useCallback,
 } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
-import {
-  ExamFile,
-  FileRef,
-} from '@student/exams/show/types';
+import { ExamFile, HTMLVal, Policy } from '@student/exams/show/types';
 import {
   graphql,
   useQuery,
@@ -33,7 +32,9 @@ import EditReference from './Reference';
 import { SingleRubricKeyEditor } from './Rubric';
 import { ReorderableQuestionsEditor } from './Question';
 import { editorCreateQuestionMutation } from './__generated__/editorCreateQuestionMutation.graphql';
+import { editorChangeMutation } from './__generated__/editorChangeMutation.graphql';
 import { editorQuery } from './__generated__/editorQuery.graphql';
+import { DebouncedFormControl } from './components/helpers';
 
 const ExamVersionEditor: React.FC = () => {
   const { versionId: examVersionId } = useParams<{ versionId: string }>();
@@ -49,6 +50,7 @@ const ExamVersionEditor: React.FC = () => {
           value
         }
         dbReferences {
+          id
           type
           path
         }
@@ -64,6 +66,82 @@ const ExamVersionEditor: React.FC = () => {
     { examVersionId },
   );
   const { alert } = useContext(AlertContext);
+  const [
+    mutateUpdateExamVersion,
+    { loading: loadingUpdateExamVersion },
+  ] = useMutation<editorChangeMutation>(
+    graphql`
+    mutation editorChangeMutation($input: ChangeExamVersionDetailsInput!) {
+      changeExamVersionDetails(input: $input) {
+        examVersion {
+          id
+          name
+          instructions {
+            type
+            value
+          }
+          policies
+          files
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error updating exam version',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const updateName = useCallback((newVal: string) => {
+    mutateUpdateExamVersion({
+      variables: {
+        input: {
+          examVersionId,
+          updateName: true,
+          name: newVal,
+        },
+      },
+    });
+  }, [examVersionId]);
+  const updateInstructions = useCallback((newVal: HTMLVal) => {
+    mutateUpdateExamVersion({
+      variables: {
+        input: {
+          examVersionId,
+          updateInstructions: true,
+          instructions: newVal,
+        },
+      },
+    });
+  }, [examVersionId]);
+  const updatePolicies = useCallback((newVal: Policy[]) => {
+    mutateUpdateExamVersion({
+      variables: {
+        input: {
+          examVersionId,
+          updatePolicies: true,
+          policies: newVal,
+        },
+      },
+    });
+  }, [examVersionId]);
+  const updateFiles = useCallback((newVal: ExamFile[]) => {
+    mutateUpdateExamVersion({
+      variables: {
+        input: {
+          examVersionId,
+          updateFiles: true,
+          files: newVal,
+        },
+      },
+    });
+  }, [examVersionId]);
+
   const [
     mutateCreateQuestion,
     { loading: loadingCreateQuestion },
@@ -102,14 +180,14 @@ const ExamVersionEditor: React.FC = () => {
   const { examVersion } = res.data;
   const { rootRubric, dbQuestions, policies } = examVersion;
 
+  const contextVal = {
+    files: examVersion.files as ExamFile[],
+    fmap: createMap(examVersion.files as ExamFile[]),
+  };
+  const disabled = loadingCreateQuestion || loadingUpdateExamVersion;
   return (
     <Container fluid>
-      <ExamContext.Provider
-        value={{
-          files: examVersion.files as ExamFile[],
-          fmap: createMap(examVersion.files as ExamFile[]),
-        }}
-      >
+      <ExamContext.Provider value={contextVal}>
         <ExamFilesContext.Provider
           value={{
             references: examVersion.dbReferences,
@@ -120,12 +198,12 @@ const ExamVersionEditor: React.FC = () => {
               <Form.Group as={Row} controlId="examTitle">
                 <Form.Label column sm="auto"><h2>Version name:</h2></Form.Label>
                 <Col>
-                  <Form.Control
+                  <DebouncedFormControl
                     size="lg"
-                    type="text"
                     placeholder="Enter a name for this version"
-                    value={examVersion.name}
-                    onChange={console.log}
+                    defaultValue={examVersion.name}
+                    onChange={updateName}
+                    disabled={disabled}
                   />
                 </Col>
               </Form.Group>
@@ -140,12 +218,14 @@ const ExamVersionEditor: React.FC = () => {
                     onChange={(newVal) => setShowRubrics(newVal === 'yes')}
                   >
                     <ToggleButton
+                      disabled={disabled}
                       variant={showRubrics ? 'primary' : 'outline-primary'}
                       value="yes"
                     >
                       Yes
                     </ToggleButton>
                     <ToggleButton
+                      disabled={disabled}
                       variant={!showRubrics ? 'primary' : 'outline-primary'}
                       value="no"
                     >
@@ -169,19 +249,23 @@ const ExamVersionEditor: React.FC = () => {
                     <Col>
                       <Policies
                         value={policies}
-                        onChange={console.log}
+                        disabled={disabled}
+                        onChange={updatePolicies}
                       />
                       <FileUploader
                         value={examVersion.files as ExamFile[]}
-                        onChange={console.log}
+                        disabled={disabled}
+                        onChange={updateFiles}
                       />
                       <Instructions
                         value={examVersion.instructions}
-                        onChange={console.log}
+                        disabled={disabled}
+                        onChange={updateInstructions}
                       />
                       <Form.Group as={Row}>
                         <EditReference
-                          value={examVersion.dbReferences as FileRef[]}
+                          value={examVersion.dbReferences}
+                          disabled={disabled}
                           onChange={console.log}
                           label="the entire exam"
                         />
@@ -215,7 +299,7 @@ const ExamVersionEditor: React.FC = () => {
                         },
                       });
                     }}
-                    disabled={loadingCreateQuestion}
+                    disabled={disabled}
                   >
                     Add question
                   </Button>

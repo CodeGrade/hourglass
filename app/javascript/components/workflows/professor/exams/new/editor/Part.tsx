@@ -1,4 +1,5 @@
 import React, {
+  useCallback,
   useContext,
 } from 'react';
 import {
@@ -18,8 +19,8 @@ import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import { AlertContext } from '@hourglass/common/alerts';
 import { alphabetIdx } from '@hourglass/common/helpers';
 
-import { FileRef } from '@student/exams/show/types';
 import YesNoControl from '@student/exams/show/components/questions/YesNo';
+import { HTMLVal } from '@student/exams/show/types';
 
 import { SingleRubricKeyEditor } from './Rubric';
 import {
@@ -35,6 +36,7 @@ import { ReorderableBodyItemsEditor } from './BodyItem';
 import { QuestionEditor } from './__generated__/QuestionEditor.graphql';
 import { PartEditor$key } from './__generated__/PartEditor.graphql';
 import { PartDestroyMutation } from './__generated__/PartDestroyMutation.graphql';
+import { PartChangeMutation } from './__generated__/PartChangeMutation.graphql';
 import { PartReorderMutation } from './__generated__/PartReorderMutation.graphql';
 
 import { languages, useCreateCodeMutation } from './body-items/Code';
@@ -148,6 +150,7 @@ export const OnePart: React.FC<{
         value
       }
       references {
+        id
         type
         path
       }
@@ -189,6 +192,84 @@ export const OnePart: React.FC<{
       },
     },
   );
+  const [
+    mutateUpdatePart,
+    { loading: loadingUpdatePart },
+  ] = useMutation<PartChangeMutation>(
+    graphql`
+    mutation PartChangeMutation($input: ChangePartDetailsInput!) {
+      changePartDetails(input: $input) {
+        part {
+          id
+          name {
+            type
+            value
+          }
+          description {
+            type
+            value
+          }
+          extraCredit
+          points
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error updating part',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const updateName = useCallback((newVal: HTMLVal) => {
+    mutateUpdatePart({
+      variables: {
+        input: {
+          partId: part.id,
+          updateName: true,
+          name: newVal,
+        },
+      },
+    });
+  }, [part.id]);
+  const updateDescription = useCallback((newVal: HTMLVal) => {
+    mutateUpdatePart({
+      variables: {
+        input: {
+          partId: part.id,
+          updateDescription: true,
+          description: newVal,
+        },
+      },
+    });
+  }, [part.id]);
+  const updatePoints = useCallback((newVal: number) => {
+    mutateUpdatePart({
+      variables: {
+        input: {
+          partId: part.id,
+          updatePoints: true,
+          points: newVal,
+        },
+      },
+    });
+  }, [part.id]);
+  const updateSeparateSubparts = useCallback((newVal: boolean) => {
+    mutateUpdatePart({
+      variables: {
+        input: {
+          partId: part.id,
+          updateExtraCredit: true,
+          extraCredit: newVal,
+        },
+      },
+    });
+  }, [part.id]);
   const [mutateCreateCode, { loading: loadingCreateCode }] = useCreateCodeMutation();
   const [mutateCreateCodeTag, { loading: loadingCreateCodeTag }] = useCreateCodeTagMutation();
   const [mutateCreateText, { loading: loadingCreateText }] = useCreateTextMutation();
@@ -208,7 +289,12 @@ export const OnePart: React.FC<{
     || loadingCreateYesNo
     || loadingCreateHtml
   );
-  const disabled = parentDisabled || loadingDestroyPart || loadingCreateBodyItem;
+  const disabled = (
+    parentDisabled
+    || loadingDestroyPart
+    || loadingUpdatePart
+    || loadingCreateBodyItem
+  );
   return (
     <Card border="success">
       <div className="alert alert-success">
@@ -238,7 +324,7 @@ export const OnePart: React.FC<{
                   value: '',
                 }}
                 disabled={disabled}
-                onChange={console.log}
+                onChange={updateName}
                 placeholder="Give a short (optional) descriptive name for the part"
                 debounceDelay={1000}
               />
@@ -259,7 +345,7 @@ export const OnePart: React.FC<{
                     value: '',
                   }}
                   disabled={disabled}
-                  onChange={console.log}
+                  onChange={updateDescription}
                   placeholder="Give a longer description of the part"
                   debounceDelay={1000}
                 />
@@ -273,7 +359,7 @@ export const OnePart: React.FC<{
                   step={0.5}
                   variant="warning"
                   disabled={disabled}
-                  onCommit={console.log}
+                  onCommit={updatePoints}
                 />
               </Col>
               <Form.Label column sm="2">Extra credit?</Form.Label>
@@ -283,13 +369,13 @@ export const OnePart: React.FC<{
                   value={!!part.extraCredit}
                   info={SEP_SUB_YESNO}
                   disabled={disabled}
-                  onChange={console.log}
+                  onChange={updateSeparateSubparts}
                 />
               </Col>
             </Form.Group>
             <Form.Group as={Row}>
               <EditReference
-                value={part.references as FileRef[]}
+                value={part.references}
                 disabled={disabled}
                 onChange={console.log}
                 label="this question part"

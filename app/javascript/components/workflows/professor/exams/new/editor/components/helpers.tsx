@@ -136,7 +136,7 @@ export const EditHTMLVal: React.FC<{
     onChange,
     debounceDelay,
   );
-  const handleChange = useCallback((newVal, _delta, source, _editor): void => {
+  const handleChange = useCallback((newVal: string, _delta, source, _editor): void => {
     if (source === 'user') {
       debouncedOnChange({
         type: 'HTML',

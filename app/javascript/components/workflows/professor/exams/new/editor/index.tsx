@@ -23,7 +23,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
 } from 'react-bootstrap';
-import { AlertContext } from '@hourglass/common/alerts';
+import { AlertContext, useAlert } from '@hourglass/common/alerts';
 import { useParams } from 'react-router-dom';
 import Policies from './Policies';
 import FileUploader from './FileUploader';
@@ -43,6 +43,8 @@ const ExamVersionEditor: React.FC = () => {
     query editorQuery($examVersionId: ID!) {
       examVersion(id: $examVersionId) {
         name
+        anyStarted
+        anyFinalized
         rootRubric { ...RubricSingle }
         files
         instructions {
@@ -169,6 +171,15 @@ const ExamVersionEditor: React.FC = () => {
         });
       },
     },
+  );
+  useAlert(
+    {
+      variant: 'warning',
+      title: 'Students have already started taking this version',
+      message: 'Changing the questions will likely result in nonsensical answers, and changing the structure of this version will result in undefined behavior. Be careful!',
+    },
+    res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized,
+    [res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized],
   );
   const [showRubrics, setShowRubrics] = useState(false);
   if (res.error) {

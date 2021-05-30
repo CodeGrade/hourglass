@@ -13,22 +13,45 @@ import {
   XYCoord,
 } from 'react-dnd';
 
-function arrSplice<T>(arr: readonly T[], from: number, to: number): T[] {
-  const firstIndex = Math.min(from, to);
-  const secondIndex = Math.max(from, to);
-  const distance = secondIndex - firstIndex + 1;
-  const spliced = [...arr];
-  const cycle = spliced.splice(firstIndex, distance);
-  if (from < to) {
-    cycle.push(cycle.shift());
-  } else {
-    cycle.unshift(cycle.pop());
+export function arrSplice<T>(arr: readonly T[], from: number, to: number): T[] {
+  const ret = [...arr];
+
+  if (from < 0 || to < 0 || from >= arr.length || to >= arr.length) {
+    return ret;
   }
-  spliced.splice(firstIndex, 0, ...cycle);
-  return spliced;
+
+  ret.splice(to, 0, ...ret.splice(from, 1));
+  return ret;
 }
 
-interface RearrangeableListProps<T extends { id: string }> {
+// This type allows clients of RearrangeableList to manage ids, in case they're not
+// managed by React or the database itself
+export type IdArray = {
+  ids: string[];
+  base: string;
+  current: number;
+}
+
+// Gensyms the next id from the current id array
+// Updates the id array counter to the next value
+function nextId(ids : IdArray): string {
+  // eslint-disable-next-line no-param-reassign
+  ids.current += 1;
+  return `${ids.base}_${ids.current}`;
+}
+
+// Looksup the appropriate id for the current index, or generates one
+// Updates the id array with the appropriate id
+export function idForIndex(ids: IdArray, index: number): string {
+  if (ids.ids[index]) {
+    return ids.ids[index];
+  }
+  // eslint-disable-next-line no-param-reassign
+  ids.ids[index] = nextId(ids);
+  return ids.ids[index];
+}
+
+export interface RearrangeableListProps<T extends { id: string }> {
   dbArray: readonly T[];
   identifier: string;
   onRearrange: (from: number, to: number) => void;

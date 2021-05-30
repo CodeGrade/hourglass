@@ -36,7 +36,7 @@ import {
 } from '@student/exams/show/components/ExamCodeBox';
 import { firstFile } from '@student/exams/show/files';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
-import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/FilePicker';
+import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
 import { CodeCreateMutation } from './__generated__/CodeCreateMutation.graphql';
 import { CodeChangeMutation } from './__generated__/CodeChangeMutation.graphql';
 

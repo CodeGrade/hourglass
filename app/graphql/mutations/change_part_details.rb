@@ -1,0 +1,44 @@
+module Mutations
+  class ChangePartDetails < BaseMutation
+    argument :part_id, ID, required: true, loads: Types::PartType
+
+    argument :name, Types::HtmlInputType, required: false
+    argument :update_name, Boolean, required: false, default_value: false
+
+    argument :description, Types::HtmlInputType, required: false
+    argument :update_description, Boolean, required: false, default_value: false
+    
+    argument :extra_credit, Boolean, required: false
+    argument :update_extra_credit, Boolean, required: false, default_value: false
+
+    argument :points, Float, required: false
+    argument :update_points, Boolean, required: false, default_value: false
+
+    field :part, Types::PartType, null: false
+
+    def authorized?(part:, **_args)
+      return true if part.course.user_is_professor?(context[:current_user])
+
+      raise GraphQL::ExecutionError, 'You do not have permission.'
+    end
+
+    def resolve(part:, **kwargs)
+      part.name = kwargs[:name][:value] if kwargs[:update_name]
+      part.description = kwargs[:description]['value'] if kwargs[:update_description]
+      if kwargs[:update_extra_credit]
+        raise GraphQL::ExecutionError, 'Updated extra_credit must not be nil' unless kwargs.key?(:extra_credit)
+        part.extra_credit = kwargs[:extra_credit]
+      end
+      if kwargs[:update_points]
+        raise GraphQL::ExecutionError, 'Updated points must not be nil' unless kwargs.key?(:points)
+        part.points = kwargs[:points]
+      end
+
+      saved = part.save
+      raise GraphQL::ExecutionError, part.errors.full_messages.to_sentence unless saved
+
+      { part: part }
+    end
+
+  end
+end

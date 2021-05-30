@@ -11,4 +11,9 @@ module Types
     field :path, String, null: false
     field :type, ReferenceTypeType, null: false
   end
+
+  class ReferenceInputType < Types::BaseInputObject
+    argument :path, String, required: true
+    argument :type, ReferenceTypeType, required: true
+  end
 end

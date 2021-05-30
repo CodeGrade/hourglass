@@ -158,8 +158,8 @@ const EditAns: React.FC<{
   bodyItemId: string;
   onRearrange: RearrangeableListProps<DraggableMCOption>['onRearrange'];
   setAnswer: (index: number) => void;
-  setPrompt: (index: number, prompt: HTMLVal) => void;
-  deleteItem: (index: number) => void;
+  setOption: (index: number, prompt: HTMLVal) => void;
+  deleteOption: (index: number) => void;
 }> = (props) => {
   const {
     options,
@@ -167,8 +167,8 @@ const EditAns: React.FC<{
     bodyItemId,
     onRearrange,
     setAnswer,
-    setPrompt,
-    deleteItem,
+    setOption,
+    deleteOption,
   } = props;
   return (
     <>
@@ -185,8 +185,8 @@ const EditAns: React.FC<{
             disabled={disabled}
             handleRef={handleRef}
             setAnswer={setAnswer}
-            setPrompt={setPrompt}
-            deleteItem={deleteItem}
+            setPrompt={setOption}
+            deleteItem={deleteOption}
           />
         )}
       </RearrangeableList>
@@ -255,7 +255,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
       },
     });
   }, [id, curAnswer, info.options]);
-  const updateOptionPrompt = useCallback((index: number, prompt: HTMLVal) => {
+  const updateOption = useCallback((index: number, prompt: HTMLVal) => {
     const newOptions = [...info.options];
     newOptions[index] = prompt;
     mutate({
@@ -351,8 +351,8 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
             options={zipped}
             setAnswer={updateAnswer}
             onRearrange={rearrangeOptions}
-            setPrompt={updateOptionPrompt}
-            deleteItem={deleteOption}
+            setOption={updateOption}
+            deleteOption={deleteOption}
           />
           <Row className="p-2">
             <Col className="text-center p-0">

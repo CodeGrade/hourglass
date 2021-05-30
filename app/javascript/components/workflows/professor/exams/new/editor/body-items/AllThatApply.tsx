@@ -312,7 +312,7 @@ const AllThatApply: React.FC<{
         },
       },
     });
-  }, [id, answer, info.options]);
+  }, [id, curAnswer, info.options]);
   const addOption = useCallback(() => {
     const newOptions: HTMLVal[] = [
       ...info.options,
@@ -331,7 +331,7 @@ const AllThatApply: React.FC<{
         },
       },
     });
-  }, [id, info.options]);
+  }, [id, info.options, curAnswer]);
   const updateAnswer = useCallback((index: number, selected: boolean) => {
     const newAnswer = [...curAnswer];
     newAnswer[index] = selected;
@@ -345,7 +345,7 @@ const AllThatApply: React.FC<{
         },
       },
     });
-  }, [id, info.options]);
+  }, [id, curAnswer]);
   const disabled = parentDisabled || loading;
   const zipped: DraggableATAOption[] = info.options.map((option, index) => ({
     option,

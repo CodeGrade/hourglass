@@ -11,6 +11,13 @@ module Types
     field :answer, GraphQL::Types::JSON, null: true do
       guard Guards::ALL_STAFF
     end
+    def answer
+      if object.info['type'] == "Matching"
+        object.answer.map{|i| i || -1}
+      else
+        object.answer
+      end
+    end
 
     field :rubrics, [Types::RubricType], null: false do
       guard Guards::ALL_STAFF

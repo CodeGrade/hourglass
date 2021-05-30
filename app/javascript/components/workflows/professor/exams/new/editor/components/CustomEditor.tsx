@@ -76,7 +76,12 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
   const ref = useRef<ReactQuill>();
   useEffect(() => {
     if (!ref.current) { return; }
-    ref.current.getEditor().root.dataset.placeholder = placeholder;
+    const rootDataset = ref.current.getEditor().root.dataset;
+    if (placeholder) {
+      rootDataset.placeholder = placeholder;
+    } else {
+      delete rootDataset.dataset;
+    }
   }, [ref.current, placeholder]);
 
   // When the component first mounts, setting the initial value

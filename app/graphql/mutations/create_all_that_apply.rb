@@ -14,6 +14,9 @@ module Mutations
     end
 
     def resolve(part:, options:, answer: nil, prompt: nil)
+      if answer && options && answer.count != options.count
+        raise GraphQL::ExecutionError, 'Must have same number of options as answers'
+      end
       index = part.body_items.count
       body_item = BodyItem.new(
         part: part,

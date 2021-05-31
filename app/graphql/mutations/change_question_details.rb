@@ -14,6 +14,9 @@ module Mutations
     argument :separate_subparts, Boolean, required: false
     argument :update_separate_subparts, Boolean, required: false, default_value: false
 
+    argument :references, [Types::ReferenceInputType], required: false
+    argument :update_references, Boolean, required: false, default_value: false
+
     field :question, Types::QuestionType, null: false
 
     def authorized?(question:, **_args)
@@ -23,21 +26,37 @@ module Mutations
     end
 
     def resolve(question:, **kwargs)
-      question.name = kwargs[:name][:value] if kwargs[:update_name]
-      question.description = kwargs[:description]['value'] if kwargs[:update_description]
-      if kwargs[:update_extra_credit]
-        raise GraphQL::ExecutionError, 'Updated extra_credit must not be nil' unless kwargs.key?(:extra_credit)
-        question.extra_credit = kwargs[:extra_credit]
-      end
-      if kwargs[:update_separate_subparts]
-        raise GraphQL::ExecutionError, 'Updated separate_subparts must not be nil' unless kwargs.key?(:separate_subparts)
-        question.separate_subparts = kwargs[:separate_subparts]
-      end
+      Question.transaction do
+        question.name = kwargs[:name][:value] if kwargs[:update_name]
+        question.description = kwargs[:description]['value'] if kwargs[:update_description]
+        if kwargs[:update_extra_credit]
+          raise GraphQL::ExecutionError, 'Updated extra_credit must not be nil' unless kwargs.key?(:extra_credit)
+          question.extra_credit = kwargs[:extra_credit]
+        end
+        if kwargs[:update_separate_subparts]
+          raise GraphQL::ExecutionError, 'Updated separate_subparts must not be nil' unless kwargs.key?(:separate_subparts)
+          question.separate_subparts = kwargs[:separate_subparts]
+        end
+        if kwargs[:update_references]
+          raise GraphQL::ExecutionError, 'Updated references must not be nil' unless kwargs[:references]
+          question.references.destroy_all
+          kwargs[:references].each_with_index do |r, index|
+            question.references << Reference.new(
+              exam_version: question.exam_version,
+              question: question,
+              part: nil,
+              type: r[:type],
+              path: r[:path],
+              index: index,
+            )
+          end
+        end
 
-      saved = question.save
-      raise GraphQL::ExecutionError, question.errors.full_messages.to_sentence unless saved
-
-      { question: question }
+        saved = question.save
+        raise GraphQL::ExecutionError, question.errors.full_messages.to_sentence unless saved
+        
+        { question: question }
+      end
     end
   end
 end

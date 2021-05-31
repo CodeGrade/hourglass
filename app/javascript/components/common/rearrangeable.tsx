@@ -1,6 +1,7 @@
 import { AlertProps } from 'react-bootstrap';
 import React, {
   ReactNode,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -77,13 +78,14 @@ export function RearrangeableList<T extends { id: string }>(
   useEffect(() => {
     setOrder(dbArray.map((dbItem) => dbItem.id));
   }, [dbArray]);
+  const cancel = useCallback(() => setOrder(dbArray.map((dbItem) => dbItem.id)), [dbArray]);
   const idToDbItemMap: Record<string, T> = {};
   dbArray.forEach((dbItem) => {
     idToDbItemMap[dbItem.id] = dbItem;
   });
-  const moveItem = (dragIndex: number, hoverIndex: number) => {
+  const moveItem = useCallback((dragIndex: number, hoverIndex: number) => {
     setOrder(arrSplice(order, dragIndex, hoverIndex));
-  };
+  }, [order]);
   return (
     <>
       {order.map((id, index) => (
@@ -96,7 +98,7 @@ export function RearrangeableList<T extends { id: string }>(
           className={className}
           dropVariant={dropVariant}
           onRearrange={onRearrange}
-          onCancel={() => setOrder(dbArray.map((dbItem) => dbItem.id))}
+          onCancel={cancel}
         >
           {(handleRef, isDragging) => (idToDbItemMap[id]
             // if an item was deleted, it will take 2 render cycles for `order` to catch up

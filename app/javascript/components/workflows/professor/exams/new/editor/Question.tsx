@@ -17,8 +17,9 @@ import {
 
 import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import { AlertContext } from '@hourglass/common/alerts';
+import { QuestionFilesContext } from '@hourglass/common/context';
 
-import { HTMLVal, YesNoInfo } from '@student/exams/show/types';
+import { HTMLVal, YesNoInfo, FileRef } from '@student/exams/show/types';
 import YesNoControl from '@student/exams/show/components/questions/YesNo';
 
 import { DragHandle, DestroyButton, EditHTMLVal } from './components/helpers';
@@ -78,22 +79,23 @@ export const ReorderableQuestionsEditor: React.FC<{
       },
     },
   );
+  const moveQuestion = useCallback((from, to) => {
+    mutate({
+      variables: {
+        input: {
+          examVersionId,
+          fromIndex: from,
+          toIndex: to,
+        },
+      },
+    });
+  }, [examVersionId]);
   return (
     <RearrangeableList
       dbArray={dbQuestions}
       className="mb-3"
       dropVariant="primary"
-      onRearrange={(from, to) => {
-        mutate({
-          variables: {
-            input: {
-              examVersionId,
-              fromIndex: from,
-              toIndex: to,
-            },
-          },
-        });
-      }}
+      onRearrange={moveQuestion}
       identifier={`QUESTION-${examVersionId}`}
     >
       {(question, handleRef, isDragging) => (
@@ -197,6 +199,11 @@ export const OneQuestion: React.FC<{
             type
             value
           }
+          references {
+            id
+            type
+            path
+          }
           extraCredit
           separateSubparts
         }
@@ -286,6 +293,17 @@ export const OneQuestion: React.FC<{
       },
     });
   }, [question.id]);
+  const updateReferences = useCallback((newVal: FileRef[]) => {
+    mutateUpdateQuestion({
+      variables: {
+        input: {
+          questionId: question.id,
+          updateReferences: true,
+          references: newVal,
+        },
+      },
+    });
+  }, [question.id]);
   const disabled = (
     loadingDestroyQuestion
     || loadingUpdateQuestion
@@ -293,132 +311,134 @@ export const OneQuestion: React.FC<{
     || parentDisabled
   );
   return (
-    <Card
-      className={isDragging ? '' : 'mb-3'}
-      border="primary"
-    >
-      <div className="alert alert-primary">
-        <Card.Title>
-          {handleRef && <DragHandle variant="primary" handleRef={handleRef} />}
-          <DestroyButton
-            disabled={disabled}
-            onClick={() => {
-              mutateDestroyQuestion({
-                variables: {
-                  input: {
-                    questionId: question.id,
-                  },
-                },
-              });
-            }}
-          />
-          <Row>
-            <Col sm="auto" className={handleRef ? 'ml-4' : ''}>
-              <Form.Label column>{`Question ${question.index + 1}:`}</Form.Label>
-            </Col>
-            <Col className="mr-5">
-              <EditHTMLVal
-                className="bg-white border rounded"
-                value={question.name || {
-                  type: 'HTML',
-                  value: '',
-                }}
-                disabled={disabled}
-                onChange={updateName}
-                placeholder="Give a short (optional) descriptive name for the question"
-                debounceDelay={1000}
-              />
-            </Col>
-          </Row>
-        </Card.Title>
-      </div>
-      <Card.Body>
-        <Row>
-          <Col sm={12} xl={showRubricEditors ? 6 : 12}>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">Description:</Form.Label>
-              <Col sm="10">
-                <EditHTMLVal
-                  className="bg-white border rounded"
-                  value={question.description || {
-                    type: 'HTML',
-                    value: '',
-                  }}
-                  disabled={disabled}
-                  onChange={updateDescription}
-                  placeholder="Give a longer description of the question"
-                  debounceDelay={1000}
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              {/* <Field name="separateSubparts" component={QuestionSepSubParts} /> */}
-              <Form.Label column sm="2">Separate subparts?</Form.Label>
-              <Col sm="4">
-                <YesNoControl
-                  className="bg-white rounded"
-                  disabled={disabled}
-                  value={!!question.separateSubparts}
-                  info={SEP_SUB_YESNO}
-                  onChange={updateSeparateSubparts}
-                />
-              </Col>
-              <Form.Label column sm="2">Extra credit?</Form.Label>
-              <Col sm="4">
-                <YesNoControl
-                  className="bg-white rounded"
-                  disabled={disabled}
-                  value={!!question.extraCredit}
-                  info={SEP_SUB_YESNO}
-                  onChange={updateExtraCredit}
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <EditReference
-                value={question.references}
-                disabled={disabled}
-                onChange={console.log}
-                label="this question"
-              />
-            </Form.Group>
-          </Col>
-          {showRubricEditors && (
-            <Col sm={12} xl={6}>
-              <SingleRubricKeyEditor
-                rubricKey={question.rootRubric}
-                disabled={disabled}
-              />
-            </Col>
-          )}
-        </Row>
-        <ReorderablePartsEditor
-          parts={question.parts}
-          disabled={disabled}
-          questionId={question.id}
-          showRubricEditors={showRubricEditors}
-        />
-        <Row className="text-center">
-          <Col>
-            <Button
-              variant="success"
+    <QuestionFilesContext.Provider value={{ references: question.references }}>
+      <Card
+        className={isDragging ? '' : 'mb-3'}
+        border="primary"
+      >
+        <div className="alert alert-primary">
+          <Card.Title>
+            {handleRef && <DragHandle variant="primary" handleRef={handleRef} />}
+            <DestroyButton
+              disabled={disabled}
               onClick={() => {
-                mutateCreatePart({
+                mutateDestroyQuestion({
                   variables: {
                     input: {
                       questionId: question.id,
-                      points: 0,
                     },
                   },
                 });
               }}
-              disabled={disabled}
-            >
-              Add part
-            </Button>
-          </Col>
-        </Row>
-      </Card.Body>
-    </Card>
+            />
+            <Row>
+              <Col sm="auto" className={handleRef ? 'ml-4' : ''}>
+                <Form.Label column>{`Question ${question.index + 1}:`}</Form.Label>
+              </Col>
+              <Col className="mr-5">
+                <EditHTMLVal
+                  className="bg-white border rounded"
+                  value={question.name || {
+                    type: 'HTML',
+                    value: '',
+                  }}
+                  disabled={disabled}
+                  onChange={updateName}
+                  placeholder="Give a short (optional) descriptive name for the question"
+                  debounceDelay={1000}
+                />
+              </Col>
+            </Row>
+          </Card.Title>
+        </div>
+        <Card.Body>
+          <Row>
+            <Col sm={12} xl={showRubricEditors ? 6 : 12}>
+              <Form.Group as={Row}>
+                <Form.Label column sm="2">Description:</Form.Label>
+                <Col sm="10">
+                  <EditHTMLVal
+                    className="bg-white border rounded"
+                    value={question.description || {
+                      type: 'HTML',
+                      value: '',
+                    }}
+                    disabled={disabled}
+                    onChange={updateDescription}
+                    placeholder="Give a longer description of the question"
+                    debounceDelay={1000}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                {/* <Field name="separateSubparts" component={QuestionSepSubParts} /> */}
+                <Form.Label column sm="2">Separate subparts?</Form.Label>
+                <Col sm="4">
+                  <YesNoControl
+                    className="bg-white rounded"
+                    disabled={disabled}
+                    value={!!question.separateSubparts}
+                    info={SEP_SUB_YESNO}
+                    onChange={updateSeparateSubparts}
+                  />
+                </Col>
+                <Form.Label column sm="2">Extra credit?</Form.Label>
+                <Col sm="4">
+                  <YesNoControl
+                    className="bg-white rounded"
+                    disabled={disabled}
+                    value={!!question.extraCredit}
+                    info={SEP_SUB_YESNO}
+                    onChange={updateExtraCredit}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <EditReference
+                  value={question.references}
+                  disabled={disabled}
+                  onChange={updateReferences}
+                  label="this question"
+                />
+              </Form.Group>
+            </Col>
+            {showRubricEditors && (
+              <Col sm={12} xl={6}>
+                <SingleRubricKeyEditor
+                  rubricKey={question.rootRubric}
+                  disabled={disabled}
+                />
+              </Col>
+            )}
+          </Row>
+          <ReorderablePartsEditor
+            parts={question.parts}
+            disabled={disabled}
+            questionId={question.id}
+            showRubricEditors={showRubricEditors}
+          />
+          <Row className="text-center">
+            <Col>
+              <Button
+                variant="success"
+                onClick={() => {
+                  mutateCreatePart({
+                    variables: {
+                      input: {
+                        questionId: question.id,
+                        points: 0,
+                      },
+                    },
+                  });
+                }}
+                disabled={disabled}
+              >
+                Add part
+              </Button>
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
+    </QuestionFilesContext.Provider>
   );
 };

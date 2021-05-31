@@ -13,6 +13,7 @@ module Types
   end
 
   class ReferenceInputType < Types::BaseInputObject
+    argument :id, ID, required: false, loads: Types::ReferenceType
     argument :path, String, required: true
     argument :type, ReferenceTypeType, required: true
   end

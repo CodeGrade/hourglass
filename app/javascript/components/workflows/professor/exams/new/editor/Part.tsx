@@ -17,10 +17,11 @@ import {
 } from 'react-bootstrap';
 import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import { AlertContext } from '@hourglass/common/alerts';
+import { PartFilesContext } from '@hourglass/common/context';
 import { alphabetIdx } from '@hourglass/common/helpers';
 
 import YesNoControl from '@student/exams/show/components/questions/YesNo';
-import { HTMLVal } from '@student/exams/show/types';
+import { FileRef, HTMLVal } from '@student/exams/show/types';
 
 import { SingleRubricKeyEditor } from './Rubric';
 import {
@@ -209,6 +210,11 @@ export const OnePart: React.FC<{
             type
             value
           }
+          references {
+            id
+            type
+            path
+          }
           extraCredit
           points
         }
@@ -270,6 +276,17 @@ export const OnePart: React.FC<{
       },
     });
   }, [part.id]);
+  const updateReferences = useCallback((newVal: FileRef[]) => {
+    mutateUpdatePart({
+      variables: {
+        input: {
+          partId: part.id,
+          updateReferences: true,
+          references: newVal,
+        },
+      },
+    });
+  }, [part.id]);
   const [mutateCreateCode, { loading: loadingCreateCode }] = useCreateCodeMutation();
   const [mutateCreateCodeTag, { loading: loadingCreateCodeTag }] = useCreateCodeTagMutation();
   const [mutateCreateText, { loading: loadingCreateText }] = useCreateTextMutation();
@@ -296,266 +313,268 @@ export const OnePart: React.FC<{
     || loadingCreateBodyItem
   );
   return (
-    <Card border="success">
-      <div className="alert alert-success">
-        <Card.Title>
-          {handleRef && <DragHandle handleRef={handleRef} variant="success" />}
-          <DestroyButton
-            disabled={disabled}
-            onClick={() => {
-              mutateDestroyPart({
-                variables: {
-                  input: {
-                    partId: part.id,
+    <PartFilesContext.Provider value={{ references: part.references }}>
+      <Card border="success">
+        <div className="alert alert-success">
+          <Card.Title>
+            {handleRef && <DragHandle handleRef={handleRef} variant="success" />}
+            <DestroyButton
+              disabled={disabled}
+              onClick={() => {
+                mutateDestroyPart({
+                  variables: {
+                    input: {
+                      partId: part.id,
+                    },
                   },
-                },
-              });
-            }}
-          />
-          <Row>
-            <Col sm="auto" className={handleRef ? 'ml-4' : ''}>
-              <Form.Label column>{`Part ${alphabetIdx(part.index)}:`}</Form.Label>
-            </Col>
-            <Col className="mr-5">
-              <EditHTMLVal
-                className="bg-white border rounded"
-                value={part.name || {
-                  type: 'HTML',
-                  value: '',
-                }}
-                disabled={disabled}
-                onChange={updateName}
-                placeholder="Give a short (optional) descriptive name for the part"
-                debounceDelay={1000}
-              />
-            </Col>
-          </Row>
-        </Card.Title>
-      </div>
-      <Card.Body>
-        <Row>
-          <Col sm={12} xl={showRubricEditors ? 6 : 12}>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">Description:</Form.Label>
-              <Col sm="10">
+                });
+              }}
+            />
+            <Row>
+              <Col sm="auto" className={handleRef ? 'ml-4' : ''}>
+                <Form.Label column>{`Part ${alphabetIdx(part.index)}:`}</Form.Label>
+              </Col>
+              <Col className="mr-5">
                 <EditHTMLVal
                   className="bg-white border rounded"
-                  value={part.description || {
+                  value={part.name || {
                     type: 'HTML',
                     value: '',
                   }}
                   disabled={disabled}
-                  onChange={updateDescription}
-                  placeholder="Give a longer description of the part"
+                  onChange={updateName}
+                  placeholder="Give a short (optional) descriptive name for the part"
                   debounceDelay={1000}
                 />
               </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <Form.Label column sm="2">Points</Form.Label>
-              <Col sm="4">
-                <NormalizedNumericInput
-                  defaultValue={part.points.toString()}
-                  step={0.5}
-                  variant="warning"
+            </Row>
+          </Card.Title>
+        </div>
+        <Card.Body>
+          <Row>
+            <Col sm={12} xl={showRubricEditors ? 6 : 12}>
+              <Form.Group as={Row}>
+                <Form.Label column sm="2">Description:</Form.Label>
+                <Col sm="10">
+                  <EditHTMLVal
+                    className="bg-white border rounded"
+                    value={part.description || {
+                      type: 'HTML',
+                      value: '',
+                    }}
+                    disabled={disabled}
+                    onChange={updateDescription}
+                    placeholder="Give a longer description of the part"
+                    debounceDelay={1000}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <Form.Label column sm="2">Points</Form.Label>
+                <Col sm="4">
+                  <NormalizedNumericInput
+                    defaultValue={part.points.toString()}
+                    step={0.5}
+                    variant="warning"
+                    disabled={disabled}
+                    onCommit={updatePoints}
+                  />
+                </Col>
+                <Form.Label column sm="2">Extra credit?</Form.Label>
+                <Col sm="4">
+                  <YesNoControl
+                    className="bg-white rounded"
+                    value={!!part.extraCredit}
+                    info={SEP_SUB_YESNO}
+                    disabled={disabled}
+                    onChange={updateSeparateSubparts}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row}>
+                <EditReference
+                  value={part.references}
                   disabled={disabled}
-                  onCommit={updatePoints}
+                  onChange={updateReferences}
+                  label="this question part"
                 />
-              </Col>
-              <Form.Label column sm="2">Extra credit?</Form.Label>
-              <Col sm="4">
-                <YesNoControl
-                  className="bg-white rounded"
-                  value={!!part.extraCredit}
-                  info={SEP_SUB_YESNO}
-                  disabled={disabled}
-                  onChange={updateSeparateSubparts}
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row}>
-              <EditReference
-                value={part.references}
-                disabled={disabled}
-                onChange={console.log}
-                label="this question part"
-              />
-            </Form.Group>
-          </Col>
-          {showRubricEditors && (
-            <Col sm={12} xl={6}>
-              <SingleRubricKeyEditor
-                rubricKey={part.rootRubric}
-                disabled={disabled}
-              />
+              </Form.Group>
             </Col>
-          )}
-        </Row>
-        <ReorderableBodyItemsEditor
-          bodyItems={part.bodyItems}
-          partId={part.id}
-          showRubricEditors={showRubricEditors}
-        />
-        <Row className="text-center">
-          <Col>
-            <DropdownButton
-              disabled={disabled}
-              variant="secondary"
-              title="Add new item..."
-            >
-              <Dropdown.Item
-                onClick={() => {
-                  mutateCreateHtml({
-                    variables: {
-                      input: {
-                        partId: part.id,
-                        value: {
-                          type: 'HTML',
-                          value: '',
+            {showRubricEditors && (
+              <Col sm={12} xl={6}>
+                <SingleRubricKeyEditor
+                  rubricKey={part.rootRubric}
+                  disabled={disabled}
+                />
+              </Col>
+            )}
+          </Row>
+          <ReorderableBodyItemsEditor
+            bodyItems={part.bodyItems}
+            partId={part.id}
+            showRubricEditors={showRubricEditors}
+          />
+          <Row className="text-center">
+            <Col>
+              <DropdownButton
+                disabled={disabled}
+                variant="secondary"
+                title="Add new item..."
+              >
+                <Dropdown.Item
+                  onClick={() => {
+                    mutateCreateHtml({
+                      variables: {
+                        input: {
+                          partId: part.id,
+                          value: {
+                            type: 'HTML',
+                            value: '',
+                          },
                         },
                       },
-                    },
-                  });
-                }}
-              >
-                Text instructions
-              </Dropdown.Item>
-              <Dropdown.Divider />
-              <Dropdown.Item
-                onClick={() => {
-                  mutateCreateATA({
-                    variables: {
-                      input: {
-                        partId: part.id,
-                        prompt: {
-                          type: 'HTML',
-                          value: '',
-                        },
-                        options: [],
-                      },
-                    },
-                  });
-                }}
-              >
-                All that apply
-              </Dropdown.Item>
-              <Dropdown.Item
-                onClick={() => {
-                  mutateCreateCode({
-                    variables: {
-                      input: {
-                        partId: part.id,
-                        lang: Object.keys(languages)[0],
-                        prompt: {
-                          type: 'HTML',
-                          value: '',
-                        },
-                        answer: {
-                          text: '',
-                          marks: [],
+                    });
+                  }}
+                >
+                  Text instructions
+                </Dropdown.Item>
+                <Dropdown.Divider />
+                <Dropdown.Item
+                  onClick={() => {
+                    mutateCreateATA({
+                      variables: {
+                        input: {
+                          partId: part.id,
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                          options: [],
                         },
                       },
-                    },
-                  });
-                }}
-              >
-                Code
-              </Dropdown.Item>
-              <Dropdown.Item
-                onClick={() => {
-                  mutateCreateCodeTag({
-                    variables: {
-                      input: {
-                        partId: part.id,
-                        choices: 'exam',
-                        prompt: {
-                          type: 'HTML',
-                          value: '',
+                    });
+                  }}
+                >
+                  All that apply
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => {
+                    mutateCreateCode({
+                      variables: {
+                        input: {
+                          partId: part.id,
+                          lang: Object.keys(languages)[0],
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                          answer: {
+                            text: '',
+                            marks: [],
+                          },
                         },
                       },
-                    },
-                  });
-                }}
-              >
-                Code tag
-              </Dropdown.Item>
-              <Dropdown.Item
-                onClick={() => {
-                  mutateCreateMatching({
-                    variables: {
-                      input: {
-                        partId: part.id,
-                        prompt: {
-                          type: 'HTML',
-                          value: '',
-                        },
-                        prompts: [],
-                        matchValues: [],
-                      },
-                    },
-                  });
-                }}
-              >
-                Matching
-              </Dropdown.Item>
-              <Dropdown.Item
-                onClick={() => {
-                  mutateCreateMC({
-                    variables: {
-                      input: {
-                        partId: part.id,
-                        prompt: {
-                          type: 'HTML',
-                          value: '',
-                        },
-                        options: [],
-                      },
-                    },
-                  });
-                }}
-              >
-                Multiple choice
-              </Dropdown.Item>
-              <Dropdown.Item
-                onClick={() => {
-                  mutateCreateText({
-                    variables: {
-                      input: {
-                        partId: part.id,
-                        prompt: {
-                          type: 'HTML',
-                          value: '',
-                        },
-                        answer: '',
-                      },
-                    },
-                  });
-                }}
-              >
-                Free-response
-              </Dropdown.Item>
-              <Dropdown.Item
-                onClick={() => {
-                  mutateCreateYesNo({
-                    variables: {
-                      input: {
-                        partId: part.id,
-                        labelType: 'yn',
-                        prompt: {
-                          type: 'HTML',
-                          value: '',
+                    });
+                  }}
+                >
+                  Code
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => {
+                    mutateCreateCodeTag({
+                      variables: {
+                        input: {
+                          partId: part.id,
+                          choices: 'exam',
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
                         },
                       },
-                    },
-                  });
-                }}
-              >
-                Yes/No or True/False
-              </Dropdown.Item>
-            </DropdownButton>
-          </Col>
-        </Row>
-      </Card.Body>
-    </Card>
+                    });
+                  }}
+                >
+                  Code tag
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => {
+                    mutateCreateMatching({
+                      variables: {
+                        input: {
+                          partId: part.id,
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                          prompts: [],
+                          matchValues: [],
+                        },
+                      },
+                    });
+                  }}
+                >
+                  Matching
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => {
+                    mutateCreateMC({
+                      variables: {
+                        input: {
+                          partId: part.id,
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                          options: [],
+                        },
+                      },
+                    });
+                  }}
+                >
+                  Multiple choice
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => {
+                    mutateCreateText({
+                      variables: {
+                        input: {
+                          partId: part.id,
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                          answer: '',
+                        },
+                      },
+                    });
+                  }}
+                >
+                  Free-response
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => {
+                    mutateCreateYesNo({
+                      variables: {
+                        input: {
+                          partId: part.id,
+                          labelType: 'yn',
+                          prompt: {
+                            type: 'HTML',
+                            value: '',
+                          },
+                        },
+                      },
+                    });
+                  }}
+                >
+                  Yes/No or True/False
+                </Dropdown.Item>
+              </DropdownButton>
+            </Col>
+          </Row>
+        </Card.Body>
+      </Card>
+    </PartFilesContext.Provider>
   );
 };

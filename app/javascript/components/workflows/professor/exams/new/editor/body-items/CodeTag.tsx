@@ -33,7 +33,7 @@ import {
   PartFilesContext,
 } from '@hourglass/common/context';
 import { AlertContext } from '@hourglass/common/alerts';
-import { ExhaustiveSwitchError, MutationReturn } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, MutationReturn, useRefresher } from '@hourglass/common/helpers';
 
 import { CodeTagCreateMutation } from './__generated__/CodeTagCreateMutation.graphql';
 import { CodeTagChangeMutation } from './__generated__/CodeTagChangeMutation.graphql';
@@ -152,8 +152,7 @@ const FileModal: React.FC<FileModalProps> = (props) => {
   const filteredFiles = getFilesForRefs(fmap, references);
   // Modal has its own state so the user can manipulate it before saving.
   const [selected, setSelected] = useState(startValue);
-  const [refresher, setRefresher] = useState(false);
-  const refreshCodeMirror = (): void => setRefresher((b) => !b);
+  const [refresher, refreshCodeMirror] = useRefresher();
   useEffect(() => {
     // Reset my starting state when outer state changes.
     setSelected(startValue);
@@ -182,6 +181,10 @@ const FileModal: React.FC<FileModalProps> = (props) => {
           references={references}
           selection={selected}
           onChangeFile={(newFile): void => {
+            // This might occur when there's only one file visible,
+            // and so ControlledFileViewer triggers an onChangeFile
+            // as a preemptive measure.
+            if (newFile === selected.selectedFile) { return; }
             setSelected({
               selectedFile: newFile,
               lineNumber: undefined,

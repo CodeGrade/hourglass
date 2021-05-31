@@ -94,6 +94,11 @@ module Types
     field :db_references, [Types::ReferenceType], null: false do
       guard ALL_STAFF_OR_PUBLISHED
     end
+    def db_references
+      AssociationLoader
+        .for(ExamVersion, :db_references, merge: -> { where(question_id: nil, part_id: nil) })
+        .load(object)
+    end
 
     field :answers, GraphQL::Types::JSON, null: false do
       guard Guards::ALL_STAFF

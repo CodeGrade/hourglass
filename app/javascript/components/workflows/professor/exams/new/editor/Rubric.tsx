@@ -330,7 +330,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
                   in this set of presets)
                 </span>
               </Form.Label>
-              <ReordorablePresetCommentEditor
+              <ReorderablePresetCommentEditor
                 disabled={loading || disabled}
                 rubricPreset={rubric.choices}
               />
@@ -415,7 +415,7 @@ const ReordorableRubricEditor: React.FC<{
   );
 };
 
-const ReordorablePresetCommentEditor: React.FC<{
+const ReorderablePresetCommentEditor: React.FC<{
   rubricPreset: RubricPresets;
   disabled?: boolean;
 }> = (props) => {
@@ -827,7 +827,7 @@ const RubricPresetDirectionEditor: React.FC<{
       },
     },
   );
-  const handleChange = (newDirection: RubricPresets['direction']) => {
+  const handleChange = useCallback((newDirection: RubricPresets['direction']) => {
     mutate({
       variables: {
         input: {
@@ -837,7 +837,7 @@ const RubricPresetDirectionEditor: React.FC<{
         },
       },
     });
-  };
+  }, [rubricPreset.id]);
   return (
     <>
       <ChangeRubricPresetDirection
@@ -988,7 +988,7 @@ const PresetCommentLabelEditor: React.FC<{
       },
     },
   );
-  const handleChange = (newVal: string) => {
+  const handleChange = useCallback((newVal: string) => {
     mutate({
       variables: {
         input: {
@@ -998,7 +998,7 @@ const PresetCommentLabelEditor: React.FC<{
         },
       },
     });
-  };
+  }, [presetComment.id]);
   return (
     <DebouncedFormControl
       disabled={loading || disabled}
@@ -1040,7 +1040,7 @@ const PresetCommentGraderHintEditor: React.FC<{
       },
     },
   );
-  const handleChange = (newVal: string) => {
+  const handleChange = useCallback((newVal: string) => {
     mutate({
       variables: {
         input: {
@@ -1050,7 +1050,7 @@ const PresetCommentGraderHintEditor: React.FC<{
         },
       },
     });
-  };
+  }, [presetComment.id]);
   return (
     <DebouncedFormControl
       placeholder="Give a description to graders to use"
@@ -1092,7 +1092,7 @@ const PresetCommentStudentFeedbackEditor: React.FC<{
       },
     },
   );
-  const handleChange = (newVal: string) => {
+  const handleChange = useCallback((newVal: string) => {
     mutate({
       variables: {
         input: {
@@ -1102,7 +1102,7 @@ const PresetCommentStudentFeedbackEditor: React.FC<{
         },
       },
     });
-  };
+  }, [presetComment.id]);
   return (
     <DebouncedFormControl
       placeholder="Give a default message to students -- if blank, will use the grader hint"
@@ -1191,7 +1191,7 @@ const RubricPresetLabelEditor: React.FC<{
       },
     },
   );
-  const handleChange = (newVal: string) => {
+  const handleChange = useCallback((newVal: string) => {
     mutate({
       variables: {
         input: {
@@ -1201,7 +1201,7 @@ const RubricPresetLabelEditor: React.FC<{
         },
       },
     });
-  };
+  }, [rubricPreset.id]);
   return (
     <DebouncedFormControl
       disabled={loading || disabled}
@@ -1270,7 +1270,7 @@ const RubricTypeEditor: React.FC<{
       },
     },
   );
-  const onChange = (newType: Rubric['type']) => {
+  const onChange = useCallback((newType: Rubric['type']) => {
     mutate({
       variables: {
         input: {
@@ -1279,7 +1279,7 @@ const RubricTypeEditor: React.FC<{
         },
       },
     });
-  };
+  }, [rubric.id]);
   return (
     <ChangeRubricType
       disabled={loading || disabled}

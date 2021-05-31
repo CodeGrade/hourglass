@@ -1,6 +1,7 @@
 import React, {
   useCallback,
   useContext,
+  useMemo,
 } from 'react';
 import {
   graphql,
@@ -310,8 +311,11 @@ export const OneQuestion: React.FC<{
     || loadingCreatePart
     || parentDisabled
   );
+  const questionReference = useMemo(() => ({
+    references: question.references,
+  }), [question.references]);
   return (
-    <QuestionFilesContext.Provider value={{ references: question.references }}>
+    <QuestionFilesContext.Provider value={questionReference}>
       <Card
         className={isDragging ? '' : 'mb-3'}
         border="primary"
@@ -413,7 +417,7 @@ export const OneQuestion: React.FC<{
           </Row>
           <ReorderablePartsEditor
             parts={question.parts}
-            disabled={disabled}
+            disabled={loadingCreatePart || parentDisabled}
             questionId={question.id}
             showRubricEditors={showRubricEditors}
           />

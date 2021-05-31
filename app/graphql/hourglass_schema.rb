@@ -183,6 +183,7 @@ class HourglassSchema < GraphQL::Schema
       context: {
         current_user: user,
         access_cache: {},
+        skip_eager_fields: false,
       },
       variables: {
         input: input,

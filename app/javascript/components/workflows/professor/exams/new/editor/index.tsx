@@ -2,6 +2,7 @@ import React, {
   useContext,
   useState,
   useCallback,
+  useMemo,
 } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
@@ -244,6 +245,11 @@ const ExamVersionEditor: React.FC = () => {
     [res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized],
   );
   const [showRubrics, setShowRubrics] = useState(false);
+  const files = (res?.data?.examVersion?.files as ExamFile[]) ?? [];
+  const contextVal = useMemo(() => ({
+    files,
+    fmap: createMap(files),
+  }), [files]);
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
@@ -253,10 +259,6 @@ const ExamVersionEditor: React.FC = () => {
   const { examVersion } = res.data;
   const { rootRubric, dbQuestions, policies } = examVersion;
 
-  const contextVal = {
-    files: examVersion.files as ExamFile[],
-    fmap: createMap(examVersion.files as ExamFile[]),
-  };
   const disabled = (
     loadingCreateQuestion
     || loadingUpdateExamVersion

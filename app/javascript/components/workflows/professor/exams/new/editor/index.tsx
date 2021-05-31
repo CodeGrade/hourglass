@@ -5,7 +5,12 @@ import React, {
 } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
-import { ExamFile, HTMLVal, Policy } from '@student/exams/show/types';
+import {
+  ExamFile,
+  FileRef,
+  HTMLVal,
+  Policy,
+} from '@student/exams/show/types';
 import {
   graphql,
   useQuery,
@@ -33,6 +38,7 @@ import { SingleRubricKeyEditor } from './Rubric';
 import { ReorderableQuestionsEditor } from './Question';
 import { editorCreateQuestionMutation } from './__generated__/editorCreateQuestionMutation.graphql';
 import { editorChangeMutation } from './__generated__/editorChangeMutation.graphql';
+import { editorChangeFilesMutation } from './__generated__/editorChangeFilesMutation.graphql';
 import { editorQuery } from './__generated__/editorQuery.graphql';
 import { DebouncedFormControl } from './components/helpers';
 
@@ -82,7 +88,43 @@ const ExamVersionEditor: React.FC = () => {
             type
             value
           }
+          dbReferences {
+            id
+            type
+            path
+          }
           policies
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error updating exam version',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  // This mutation is separated, because files might be inordinately big
+  // compared to the other necessary data
+  const [
+    mutateUpdateExamVersionFiles,
+    { loading: loadingUpdateExamVersionFiles },
+  ] = useMutation<editorChangeFilesMutation>(
+    graphql`
+    mutation editorChangeFilesMutation($input: ChangeExamVersionDetailsInput!) {
+      changeExamVersionDetails(input: $input) {
+        examVersion {
+          id
+          dbReferences {
+            id
+            type
+            path
+          }
           files
         }
       }
@@ -133,12 +175,23 @@ const ExamVersionEditor: React.FC = () => {
     });
   }, [examVersionId]);
   const updateFiles = useCallback((newVal: ExamFile[]) => {
-    mutateUpdateExamVersion({
+    mutateUpdateExamVersionFiles({
       variables: {
         input: {
           examVersionId,
           updateFiles: true,
           files: newVal,
+        },
+      },
+    });
+  }, [examVersionId]);
+  const updateReferences = useCallback((newVal: FileRef[]) => {
+    mutateUpdateExamVersion({
+      variables: {
+        input: {
+          examVersionId,
+          updateReferences: true,
+          references: newVal,
         },
       },
     });
@@ -172,6 +225,15 @@ const ExamVersionEditor: React.FC = () => {
       },
     },
   );
+  const createQuestion = useCallback(() => {
+    mutateCreateQuestion({
+      variables: {
+        input: {
+          examVersionId,
+        },
+      },
+    });
+  }, [examVersionId]);
   useAlert(
     {
       variant: 'warning',
@@ -195,7 +257,11 @@ const ExamVersionEditor: React.FC = () => {
     files: examVersion.files as ExamFile[],
     fmap: createMap(examVersion.files as ExamFile[]),
   };
-  const disabled = loadingCreateQuestion || loadingUpdateExamVersion;
+  const disabled = (
+    loadingCreateQuestion
+    || loadingUpdateExamVersion
+    || loadingUpdateExamVersionFiles
+  );
   return (
     <Container fluid>
       <ExamContext.Provider value={contextVal}>
@@ -277,7 +343,7 @@ const ExamVersionEditor: React.FC = () => {
                         <EditReference
                           value={examVersion.dbReferences}
                           disabled={disabled}
-                          onChange={console.log}
+                          onChange={updateReferences}
                           label="the entire exam"
                         />
                       </Form.Group>
@@ -301,16 +367,8 @@ const ExamVersionEditor: React.FC = () => {
                 <Col>
                   <Button
                     variant="primary"
-                    onClick={() => {
-                      mutateCreateQuestion({
-                        variables: {
-                          input: {
-                            examVersionId,
-                          },
-                        },
-                      });
-                    }}
-                    disabled={disabled}
+                    onClick={createQuestion}
+                    disabled={loadingCreateQuestion}
                   >
                     Add question
                   </Button>

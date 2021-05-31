@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import {
   Form,
   Col,
@@ -6,25 +6,10 @@ import {
 import { ExamContext } from '@hourglass/common/context';
 import { FilePickerSelectWithPreview } from '@professor/exams/new/editor/components/FilePicker';
 import { FileRef } from '@student/exams/show/types';
-import { QuestionEditor } from './__generated__/QuestionEditor.graphql';
-
-/**
- * Like useEffect, but does not trigger on the initial render.
- */
-// function useEffectSkipFirst(effect: React.EffectCallback, deps?: React.DependencyList) {
-//   const ranOnce = useRef(false);
-//   useEffect(() => {
-//     if (!ranOnce.current) {
-//       ranOnce.current = true;
-//       return () => undefined;
-//     }
-//     return effect();
-//   }, deps);
-// }
 
 const EditReference: React.FC<{
   label: string;
-  value: QuestionEditor['references'];
+  value: readonly FileRef[];
   disabled?: boolean;
   onChange: (newVal: FileRef[]) => void;
 }> = (props) => {
@@ -35,13 +20,7 @@ const EditReference: React.FC<{
     onChange,
   } = props;
   const { files, fmap } = useContext(ExamContext);
-  // We don't need the effect on the initial render, because
-  // we assume the fileRefs that come from the database are valid.
-  useEffect(() => {
-    // Filter out references that no longer exist.
-    const filtered = value.filter((fileRef) => (fileRef.path in fmap));
-    onChange(filtered);
-  }, [fmap]);
+
   return (
     <>
       <Form.Label column sm={2}>
@@ -51,7 +30,11 @@ const EditReference: React.FC<{
         <FilePickerSelectWithPreview
           options={files}
           selected={value}
-          onChange={onChange}
+          onChange={(newRefs) => {
+            // Filter out references that no longer exist.
+            const filtered = newRefs.filter((fileRef) => (fileRef.path in fmap));
+            onChange(filtered);
+          }}
           disabled={disabled}
         />
       </Col>

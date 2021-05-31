@@ -1,6 +1,7 @@
 import React, {
   useCallback,
   useContext,
+  useMemo,
 } from 'react';
 import {
   graphql,
@@ -312,8 +313,11 @@ export const OnePart: React.FC<{
     || loadingUpdatePart
     || loadingCreateBodyItem
   );
+  const partReferences = useMemo(() => ({
+    references: part.references,
+  }), [part.references]);
   return (
-    <PartFilesContext.Provider value={{ references: part.references }}>
+    <PartFilesContext.Provider value={partReferences}>
       <Card border="success">
         <div className="alert alert-success">
           <Card.Title>

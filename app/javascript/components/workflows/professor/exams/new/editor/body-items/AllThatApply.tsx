@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import {
@@ -347,12 +348,14 @@ const AllThatApply: React.FC<{
     });
   }, [id, curAnswer]);
   const disabled = parentDisabled || loading;
-  const zipped: DraggableATAOption[] = info.options.map((option, index) => ({
-    option,
-    id: idForIndex(itemsToIds, index),
-    index,
-    answer: curAnswer[index],
-  }));
+  const zipped: DraggableATAOption[] = useMemo(() => (
+    info.options.map((option, index) => ({
+      option,
+      id: idForIndex(itemsToIds, index),
+      index,
+      answer: curAnswer[index],
+    }))
+  ), [info.options, curAnswer]);
   return (
     <>
       <Prompted

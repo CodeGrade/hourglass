@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import {
@@ -318,12 +319,14 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
     });
   }, [id]);
   const disabled = parentDisabled || loading;
-  const zipped: DraggableMCOption[] = info.options.map((option, index) => ({
-    option,
-    id: idForIndex(itemsToIds, index),
-    index,
-    selected: index === curAnswer,
-  }));
+  const zipped: DraggableMCOption[] = useMemo(() => (
+    info.options.map((option, index) => ({
+      option,
+      id: idForIndex(itemsToIds, index),
+      index,
+      selected: index === curAnswer,
+    }))
+  ), [info.options, curAnswer]);
   return (
     <>
       <Prompted

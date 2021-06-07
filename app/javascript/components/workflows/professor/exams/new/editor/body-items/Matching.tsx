@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import {
@@ -477,7 +478,7 @@ const Matching: React.FC<{
       },
     });
   }, [id, curAnswer, info.prompts]);
-  const updateAnswer = (index: number, newAns: number) => {
+  const updateAnswer = useCallback((index: number, newAns: number) => {
     const newAnswer = [...curAnswer];
     newAnswer[index] = newAns === -1 ? null : newAns;
     setCurAnswer(newAnswer);
@@ -490,7 +491,7 @@ const Matching: React.FC<{
         },
       },
     });
-  };
+  }, [id, curAnswer]);
 
   // VALUES MANIPULATION
   const rearrangeValues = useCallback((from: number, to: number) => {
@@ -571,21 +572,25 @@ const Matching: React.FC<{
         },
       },
     });
-  }, [id, curAnswer, info.prompts]);
+  }, [id, curAnswer, info.values]);
 
   const disabled = parentDisabled || loading;
 
-  const zippedPrompts: DraggableMPrompt[] = info.prompts.map((prompt, index) => ({
-    prompt,
-    index,
-    id: idForIndex(promptsToIds, index),
-    answer: curAnswer[index],
-  }));
-  const zippedValues: DraggableMValue[] = info.values.map((value, index) => ({
-    value,
-    index,
-    id: idForIndex(valuesToIds, index),
-  }));
+  const zippedPrompts: DraggableMPrompt[] = useMemo(() => (
+    info.prompts.map((prompt, index) => ({
+      prompt,
+      index,
+      id: idForIndex(promptsToIds, index),
+      answer: curAnswer[index],
+    }))
+  ), [info.prompts, curAnswer]);
+  const zippedValues: DraggableMValue[] = useMemo(() => (
+    info.values.map((value, index) => ({
+      value,
+      index,
+      id: idForIndex(valuesToIds, index),
+    }))
+  ), [info.values]);
   return (
     <>
       <Prompted

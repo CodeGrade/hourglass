@@ -3,21 +3,26 @@
 require 'test_helper'
 
 class AccommodationTest < ActiveSupport::TestCase
+  def setup
+    @version = create(:exam_version)
+    @reg = create(:registration, exam_version: @version)
+  end
+
   test 'factory builds valid accommodation' do
-    assert build(:accommodation).valid?
+    assert build(:accommodation, registration: @reg).valid?
   end
 
   test 'percent_time_expansion is a non-negative integer' do
-    assert_not build(:accommodation, percent_time_expansion: -1).valid?
-    assert_not build(:accommodation, percent_time_expansion: -1.5).valid?
-    assert_not build(:accommodation, percent_time_expansion: 0.2).valid?
-    assert_not build(:accommodation, percent_time_expansion: 1.5).valid?
+    assert_not build(:accommodation, registration: @reg, percent_time_expansion: -1).valid?
+    assert_not build(:accommodation, registration: @reg, percent_time_expansion: -1.5).valid?
+    assert_not build(:accommodation, registration: @reg, percent_time_expansion: 0.2).valid?
+    assert_not build(:accommodation, registration: @reg, percent_time_expansion: 1.5).valid?
 
-    assert build(:accommodation, percent_time_expansion: 0).valid?
-    assert build(:accommodation, percent_time_expansion: 1).valid?
-    assert build(:accommodation, percent_time_expansion: 50).valid?
-    assert build(:accommodation, percent_time_expansion: 100).valid?
-    assert build(:accommodation, percent_time_expansion: 125).valid?
+    assert build(:accommodation, registration: @reg, percent_time_expansion: 0).valid?
+    assert build(:accommodation, registration: @reg, percent_time_expansion: 1).valid?
+    assert build(:accommodation, registration: @reg, percent_time_expansion: 50).valid?
+    assert build(:accommodation, registration: @reg, percent_time_expansion: 100).valid?
+    assert build(:accommodation, registration: @reg, percent_time_expansion: 125).valid?
   end
 
   test 'factor calculation' do
@@ -96,7 +101,7 @@ class AccommodationTest < ActiveSupport::TestCase
   end
 
   test 'more time remaining for a late start with accommodation' do
-    reg = build(:registration, :late_start)
+    reg = create(:registration, :late_start)
     exam = reg.exam
     acc = build(:accommodation, registration: reg, percent_time_expansion: 50)
     acc.save

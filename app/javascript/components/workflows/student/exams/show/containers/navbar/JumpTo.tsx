@@ -12,7 +12,7 @@ import {
 
 const mapStateToProps: MSTP<{
   pagination: PaginationState;
-  questions: QuestionInfo[];
+  questions: readonly QuestionInfo[];
 }> = (state) => ({
   pagination: state.pagination,
   questions: state.contents.exam.questions,

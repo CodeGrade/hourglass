@@ -1,30 +1,17 @@
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
-import { admin_version$data } from './__generated__/admin_version.graphql';
 import {
-  ExamRubric,
   Rubric,
   RubricPresets,
   Preset,
   RubricAll,
   RubricOne,
   RubricAny,
-} from './types';
+} from '@professor/exams/types';
+import { showExamViewer$data } from '@proctor/registrations/show/__generated__/showExamViewer.graphql';
+import { RubricSingle$data } from './new/editor/__generated__/RubricSingle.graphql';
 
-const nullNumComp = (n1, n2) => {
-  if (n1 === n2) return 0;
-  if (n1 === null) return -1;
-  if (n2 === null) return 1;
-  return n1 - n2;
-};
-const nullStrComp = (s1, s2) => {
-  if (s1 === s2) return 0;
-  if (s1 === null) return -1;
-  if (s2 === null) return 1;
-  return (s1 < s2 ? -1 : 1);
-};
-
-type RawRubric = admin_version$data['rubrics'][number];
-type RawRubricMap = Record<RawRubric['id'], RawRubric>;
+type RawRubric = showExamViewer$data['rubrics'][number];
+type RawRubricMap = Record<RawRubric['id'], RawRubric & { qnum?: number; pnum?: number; bnum?: number; }>;
 type RawPreset = RawRubric['rubricPreset'];
 
 function expandPreset(rawPreset: RawPreset): RubricPresets {
@@ -34,12 +21,15 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
     label,
     mercy,
     presetComments,
+    id,
   } = rawPreset;
   const ans : RubricPresets = {
+    id,
     direction,
     presets: presetComments.map((c) => {
       const {
-        railsId,
+        // eslint-disable-next-line no-shadow
+        id,
         // eslint-disable-next-line no-shadow
         label,
         graderHint,
@@ -48,7 +38,7 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
       } = c;
       // eslint-disable-next-line no-shadow
       const ans: Preset = {
-        railsId,
+        id,
         graderHint,
         points,
       };
@@ -65,18 +55,18 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
 function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric {
   const {
     type,
-    railsId,
+    id,
     description,
     subsections,
     rubricPreset,
     points,
   } = rawRubric;
   switch (type) {
-    case 'none': return { type, railsId };
+    case 'none': return { type, id };
     case 'all': {
       const ans : RubricAll = {
         type,
-        railsId,
+        id,
         choices: (
           expandPreset(rubricPreset)
            ?? subsections.map((s) => expandRubric(rubricsByID[s.id], rubricsByID))
@@ -90,7 +80,7 @@ function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric 
       const ans : RubricAny | RubricOne = {
         type,
         points,
-        railsId,
+        id,
         choices: (
           expandPreset(rubricPreset)
            ?? subsections.map((s) => expandRubric(rubricsByID[s.id], rubricsByID))
@@ -99,64 +89,25 @@ function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric 
       if (description !== null) { ans.description = description; }
       return ans;
     }
-    default:
+    default: {
+      const { qnum } = rubricsByID[rawRubric.id];
+      const { pnum } = rubricsByID[rawRubric.id];
+      const { bnum } = rubricsByID[rawRubric.id];
       throw new ExhaustiveSwitchError(
         type,
-        `showing rubric for q${rawRubric.qnum}-p${rawRubric.pnum}-b${rawRubric.bnum}`,
+        `showing rubric for q${qnum}-p${pnum}-b${bnum}`,
       );
+    }
   }
 }
 
-function convertRubric(rawRubrics : readonly RawRubric[]): ExamRubric {
-  const rubric : ExamRubric = {
-    questions: [],
-  };
-  const rubricCopy = [...rawRubrics];
-  const rubricsByID : RawRubricMap = { };
-  rawRubrics.forEach((r) => { rubricsByID[r.id] = r; });
-  rubricCopy.sort((r1 : RawRubric, r2 : RawRubric) => {
-    const compParent = nullStrComp(r1.parentSectionId, r2.parentSectionId);
-    if (compParent !== 0) return compParent; // Roots first
-    const compQ = nullNumComp(r1.qnum, r2.qnum);
-    if (compQ !== 0) return compQ; // Then by question,
-    const compP = nullNumComp(r1.pnum, r2.pnum);
-    if (compP !== 0) return compP; // by part,
-    const compB = nullNumComp(r1.bnum, r2.bnum);
-    if (compB !== 0) return compB; // by body,
-    return nullNumComp(r1.order, r2.order); // and finally ordered within body
-  });
-  rawRubrics.forEach((r) => {
-    if (r.parentSectionId !== null) return; // only process roots
-    if (r.qnum === null) {
-      rubric.examRubric = expandRubric(r, rubricsByID);
-    } else {
-      if (rubric.questions[r.qnum] === undefined) {
-        rubric.questions[r.qnum] = {
-          parts: [],
-        };
-      }
-      const byQ = rubric.questions[r.qnum];
-      if (r.pnum === null) {
-        byQ.questionRubric = expandRubric(r, rubricsByID);
-      } else {
-        if (byQ.parts[r.pnum] === undefined) {
-          byQ.parts[r.pnum] = {
-            body: [],
-          };
-        }
-        const byP = byQ.parts[r.pnum];
-        if (r.bnum === null) {
-          byP.partRubric = expandRubric(r, rubricsByID);
-        } else if (r.parentSectionId === null) {
-          byP.body[r.bnum] = expandRubric(r, rubricsByID);
-        }
-      }
-    }
-  });
-  return rubric;
-}
+type RawRootRubric = Omit<RubricSingle$data, ' $refType'>;
 
-export default convertRubric;
+export function expandRootRubric(rawRubric : RawRootRubric): Rubric {
+  const rubricsById: RawRubricMap = {};
+  rawRubric.allSubsections.forEach((r) => { rubricsById[r.id] = r; });
+  return expandRubric(rawRubric, rubricsById);
+}
 
 export function deepDiff(v1 : unknown, v2 : unknown): unknown {
   if (v1 === v2) return undefined;

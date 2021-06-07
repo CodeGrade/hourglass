@@ -25,11 +25,34 @@ module ActionDispatch
   end
 end
 
+module Enumerable
+  def sorted?
+    each_cons(2).all? { |a, b| (a <=> b) <= 0 }
+  end
+
+  def sorted_by?
+    each_cons(2).all? { |a, b| ((yield a) <=> (yield b)) <= 0 }
+  end
+end
+
 module ActiveSupport
   class TestCase
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
     require 'factory_bot_rails'
     include FactoryBot::Syntax::Methods
+
+    def compact_blank(val)
+      return nil if val.blank? && (val != false)
+
+      case val
+      when Hash
+        val.transform_values { |v| compact_blank(v) }.reject { |_, v| v.blank? && (v != false) }
+      when Array
+        val.map { |v| compact_blank(v) }
+      else
+        val
+      end
+    end
   end
 end

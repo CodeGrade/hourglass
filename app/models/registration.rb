@@ -9,7 +9,7 @@ class Registration < ApplicationRecord
   has_many :anomalies, dependent: :destroy
   has_many :snapshots, dependent: :destroy
   has_many :messages, dependent: :destroy
-  has_many :questions, dependent: :destroy
+  has_many :student_questions, dependent: :destroy
   has_one :accommodation, dependent: :destroy
   has_many :grading_locks, dependent: :destroy
   has_many :grading_checks, dependent: :destroy
@@ -164,10 +164,6 @@ class Registration < ApplicationRecord
 
   def current_score_percentage
     (current_score / exam_version.total_points.to_f) * 100.0
-  end
-
-  def my_questions
-    questions
   end
 
   def private_messages

@@ -11,11 +11,10 @@ import { BsListCheck } from 'react-icons/bs';
 import { useQuery, useMutation } from 'relay-hooks';
 import {
   AnswersState,
-  ContentsState,
-  ExamVersion,
 } from '@student/exams/show/types';
 import Spoiler from '@hourglass/common/Spoiler';
 import ExamViewer from '@proctor/registrations/show';
+import ExamViewerStudent from '@student/registrations/show';
 import { FinalizeDialog, finalizeItemMutation } from '@proctor/exams';
 import { AlertContext } from '@hourglass/common/alerts';
 import { examsFinalizeItemMutation } from '@proctor/exams/__generated__/examsFinalizeItemMutation.graphql';
@@ -25,7 +24,9 @@ import DocumentTitle from '@hourglass/common/documentTitle';
 import { CurrentGrading } from '@professor/exams/types';
 
 import { submissionsAllQuery, submissionsAllQueryResponse } from './__generated__/submissionsAllQuery.graphql';
-import { submissionsOneQuery } from './__generated__/submissionsOneQuery.graphql';
+import { submissionsRootQuery } from './__generated__/submissionsRootQuery.graphql';
+import { submissionsStaffQuery } from './__generated__/submissionsStaffQuery.graphql';
+import { submissionsStudentQuery } from './__generated__/submissionsStudentQuery.graphql';
 
 type Registration = submissionsAllQueryResponse['exam']['registrations'][number];
 const ExamSubmissions: React.FC = () => {
@@ -198,9 +199,115 @@ const ExamSubmissions: React.FC = () => {
 
 const ExamSubmission: React.FC = () => {
   const { registrationId } = useParams<{ registrationId: string }>();
-  const res = useQuery<submissionsOneQuery>(
+  const res = useQuery<submissionsRootQuery>(
     graphql`
-    query submissionsOneQuery($registrationId: ID!) {
+    query submissionsRootQuery($registrationId: ID!) {
+      me {
+        id
+      }
+      registration(id: $registrationId) {
+        published
+        exam { name }
+        user {
+          id
+          displayName
+        }
+      }
+    }
+    `,
+    { registrationId },
+  );
+  if (res.error) {
+    return <RenderError error={res.error} />;
+  }
+  if (!res.data) {
+    return <p>Loading...</p>;
+  }
+  const myRegistration = res.data.me.id === res.data.registration.user.id;
+  // TODO: better error message if the request fails because it is someone else's registration
+  if (myRegistration) {
+    if (!res.data.registration.published) {
+      const title = `${res.data.registration.exam.name} -- Submission for ${res.data.registration.user.displayName}`;
+      return (
+        <DocumentTitle title={title}>
+          <h1>{`Submission for ${res.data.registration.exam.name}`}</h1>
+          <p>Your submission is not yet graded, and cannot be viewed at this time.</p>
+        </DocumentTitle>
+      );
+    }
+    return (
+      <ExamSubmissionStudent />
+    );
+  }
+  return (
+    <ExamSubmissionStaff />
+  );
+};
+
+function round(value: number, places: number): number {
+  const multiplier = 10 ** places;
+  return Math.round(value * multiplier) / multiplier;
+}
+
+const ExamSubmissionStudent: React.FC = () => {
+  const { registrationId } = useParams<{ registrationId: string }>();
+  const res = useQuery<submissionsStudentQuery>(
+    graphql`
+    query submissionsStudentQuery($registrationId: ID!, $withRubric: Boolean!) {
+      registration(id: $registrationId) {
+        currentAnswers
+        currentGrading
+        currentScorePercentage
+        user {
+          nuid
+          displayName
+        }
+        exam { name }
+        examVersion {
+          ...showExamViewerStudent
+        }
+      }
+    }
+    `,
+    { registrationId, withRubric: false },
+  );
+  if (res.error) {
+    return <RenderError error={res.error} />;
+  }
+  if (!res.data) {
+    return <p>Loading...</p>;
+  }
+  const { registration } = res.data;
+  const {
+    exam,
+    user,
+    currentAnswers,
+    currentGrading,
+    currentScorePercentage,
+  } = registration;
+  const title = `${exam.name} -- Submission for ${user.displayName}`;
+  const userInfo = `${user.displayName} (${user.nuid})`;
+  return (
+    <DocumentTitle title={title}>
+      <h1>
+        {`Submission by ${userInfo}`}
+      </h1>
+      <h2>{`Grade: ${round(currentScorePercentage, 2).toFixed(2)}%`}</h2>
+      <ExamViewerStudent
+        version={registration.examVersion}
+        currentGrading={currentGrading as CurrentGrading}
+        currentAnswers={currentAnswers as AnswersState}
+        overviewMode={false}
+      />
+    </DocumentTitle>
+  );
+};
+
+const ExamSubmissionStaff: React.FC = () => {
+  const { registrationId } = useParams<{ registrationId: string }>();
+  const res = useQuery<submissionsStaffQuery>(
+    graphql`
+    query submissionsStaffQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
         currentAnswers
         currentGrading
@@ -210,12 +317,13 @@ const ExamSubmission: React.FC = () => {
           displayName
         }
         exam { name }
-        reviewExam
-        canIGrade
+        examVersion {
+          ...showExamViewer
+        }
       }
     }
     `,
-    { registrationId },
+    { registrationId, withRubric: true },
   );
   const [title, setTitle] = useState<string>(undefined);
   if (res.error) {
@@ -226,13 +334,11 @@ const ExamSubmission: React.FC = () => {
   }
   const { registration } = res.data;
   const {
-    reviewExam,
     currentAnswers,
     currentGrading,
     published,
     user,
     exam,
-    canIGrade,
   } = registration;
   const userInfo = `${user.displayName} (${user.nuid})`;
   const titleInfo = published ? userInfo : '<redacted>';
@@ -245,10 +351,6 @@ const ExamSubmission: React.FC = () => {
       </DocumentTitle>
     );
   }
-  const parsedContents: ContentsState = {
-    exam: reviewExam as ExamVersion,
-    answers: currentAnswers as AnswersState,
-  };
   return (
     <DocumentTitle title={title}>
       <h1>
@@ -263,10 +365,11 @@ const ExamSubmission: React.FC = () => {
         ))}
       </h1>
       <ExamViewer
-        contents={parsedContents}
+        version={registration.examVersion}
         currentGrading={currentGrading as CurrentGrading}
-        showRequestGrading={canIGrade ? registrationId : null}
-        showStarterCode={false}
+        currentAnswers={currentAnswers as AnswersState}
+        registrationId={registrationId}
+        overviewMode={false}
       />
     </DocumentTitle>
   );

@@ -4,7 +4,6 @@ import {
   RubricOne,
   RubricAll,
   RubricAny,
-  isRubricPresets,
   RubricPresets,
   Preset,
 } from '@professor/exams/types';
@@ -26,9 +25,11 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import { BsArrowUpRight, BsArrowDownRight } from 'react-icons/bs';
 import { AlertContext } from '@hourglass/common/alerts';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
-import { useMutation } from 'relay-hooks';
+import { graphql, useFragment, useMutation } from 'relay-hooks';
+import { expandRootRubric } from '@professor/exams/rubrics';
 import { createCommentMutation } from './__generated__/createCommentMutation.graphql';
 import { grading_one$data } from './__generated__/grading_one.graphql';
+import { UseRubricsKey$key } from './__generated__/UseRubricsKey.graphql';
 
 type GradingComment = grading_one$data['gradingComments']['edges'][number]['node'];
 type PresetCommentId = GradingComment['presetComment']['id']
@@ -256,10 +257,9 @@ const ShowRubricPresets: React.FC<ShowRubricProps<RubricPresets>> = (props) => {
   return (
     <Row>
       <Col>
-        {presets.map((p, index) => (
+        {presets.map((p) => (
           <ShowPreset
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
+            key={p.id}
             preset={p}
             registrationId={registrationId}
             qnum={qnum}
@@ -285,7 +285,24 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   const { description, choices } = rubric;
   let summary;
   let body;
-  if (isRubricPresets(choices)) {
+  if (choices instanceof Array) {
+    body = (
+      <>
+        {choices.map((c) => (
+          <ShowRubric
+            key={c.id}
+            showCompletenessAgainst={showCompletenessAgainst}
+            parentRubricType="all"
+            rubric={c}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
+            registrationId={registrationId}
+          />
+        ))}
+      </>
+    );
+  } else {
     const { direction, label, mercy } = choices;
     summary = (
       <span className="ml-auto">
@@ -304,24 +321,6 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
         bnum={bnum}
         registrationId={registrationId}
       />
-    );
-  } else {
-    body = (
-      <>
-        {choices.map((c, index) => (
-          <ShowRubric
-            /* eslint-disable-next-line react/no-array-index-key */
-            key={index}
-            showCompletenessAgainst={showCompletenessAgainst}
-            parentRubricType="all"
-            rubric={c}
-            qnum={qnum}
-            pnum={pnum}
-            bnum={bnum}
-            registrationId={registrationId}
-          />
-        ))}
-      </>
     );
   }
   const showAnyway = (collapseKey === undefined ? 'show' : '');
@@ -365,7 +364,26 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
   let summary;
   let body;
-  if (isRubricPresets(choices)) {
+  if (choices instanceof Array) {
+    summary = <>{pointsMsg}</>;
+    body = (
+      <Accordion defaultActiveKey="0">
+        {choices.map((r, i) => (
+          <ShowRubric
+            key={r.id}
+            rubric={r}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
+            registrationId={registrationId}
+            showCompletenessAgainst={showCompletenessAgainst}
+            parentRubricType="one"
+            collapseKey={`${i}`}
+          />
+        ))}
+      </Accordion>
+    );
+  } else {
     const { direction, label, mercy } = choices;
     summary = (
       <ShowPresetSummary
@@ -383,26 +401,6 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
         bnum={bnum}
         registrationId={registrationId}
       />
-    );
-  } else {
-    summary = <>{pointsMsg}</>;
-    body = (
-      <Accordion defaultActiveKey="0">
-        {choices.map((r, i) => (
-          <ShowRubric
-            // eslint-disable-next-line react/no-array-index-key
-            key={i}
-            rubric={r}
-            qnum={qnum}
-            pnum={pnum}
-            bnum={bnum}
-            registrationId={registrationId}
-            showCompletenessAgainst={showCompletenessAgainst}
-            parentRubricType="one"
-            collapseKey={`${i}`}
-          />
-        ))}
-      </Accordion>
     );
   }
   const heading = (
@@ -445,7 +443,24 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
   const { description, choices, points } = rubric;
   let summary;
   let body;
-  if (isRubricPresets(choices)) {
+  if (choices instanceof Array) {
+    body = (
+      <>
+        {choices.map((c) => (
+          <ShowRubric
+            key={c.id}
+            rubric={c}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
+            registrationId={registrationId}
+            parentRubricType="any"
+            showCompletenessAgainst={showCompletenessAgainst}
+          />
+        ))}
+      </>
+    );
+  } else {
     const { direction, label, mercy } = choices;
     const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
     summary = (
@@ -466,24 +481,6 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
         bnum={bnum}
         registrationId={registrationId}
       />
-    );
-  } else {
-    body = (
-      <>
-        {choices.map((c, index) => (
-          <ShowRubric
-            /* eslint-disable-next-line react/no-array-index-key */
-            key={index}
-            rubric={c}
-            qnum={qnum}
-            pnum={pnum}
-            bnum={bnum}
-            registrationId={registrationId}
-            parentRubricType="any"
-            showCompletenessAgainst={showCompletenessAgainst}
-          />
-        ))}
-      </>
     );
   }
   const heading = (
@@ -511,6 +508,98 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
       </Accordion.Collapse>
     </>
   );
+};
+
+function nonEmptyRubric(r ?: Rubric): boolean {
+  return r !== null && r !== undefined && r.type !== 'none';
+}
+
+const ShowRubricKey: React.FC<ShowRubricProps<UseRubricsKey$key> & {
+  caption: string,
+}> = (props) => {
+  const {
+    caption,
+    rubric: rubricKey,
+    showCompletenessAgainst,
+    qnum,
+    pnum,
+    bnum,
+    registrationId,
+  } = props;
+  const rawRubric = useFragment<UseRubricsKey$key>(
+    graphql`
+    fragment UseRubricsKey on Rubric {
+      id
+      type
+      order
+      points
+      description {
+        type
+        value
+      }
+      rubricPreset {
+        id
+        direction
+        label
+        mercy
+        presetComments {
+          id
+          label
+          order
+          points
+          graderHint
+          studentFeedback
+        }
+      }
+      subsections { id }
+      allSubsections {
+        id
+        type
+        order
+        points
+        description {
+          type
+          value
+        }
+        rubricPreset {
+          id
+          direction
+          label
+          mercy
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+        subsections { id }
+      }
+    }
+    `,
+    rubricKey,
+  );
+  const rubric = expandRootRubric(rawRubric);
+  if (nonEmptyRubric(rubric)) {
+    return (
+      <>
+        <h5>{caption}</h5>
+        <div className="rubric">
+          <ShowRubric
+            rubric={rubric}
+            showCompletenessAgainst={showCompletenessAgainst}
+            qnum={qnum}
+            pnum={pnum}
+            bnum={bnum}
+            registrationId={registrationId}
+          />
+        </div>
+      </>
+    );
+  }
+  return null;
 };
 
 const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
@@ -581,15 +670,11 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
   );
 };
 
-function nonEmptyRubric(r ?: Rubric): boolean {
-  return r !== null && r !== undefined && r.type !== 'none';
-}
-
 export const ShowRubrics: React.FC<{
-  examRubric: Rubric;
-  qnumRubric: Rubric;
-  pnumRubric: Rubric;
-  bnumRubric: Rubric;
+  examRubricKey: UseRubricsKey$key;
+  qnumRubricKey: UseRubricsKey$key;
+  pnumRubricKey: UseRubricsKey$key;
+  bnumRubricKey: UseRubricsKey$key;
   showCompletenessAgainst?: PresetCommentId[];
   qnum: number;
   pnum: number;
@@ -597,10 +682,10 @@ export const ShowRubrics: React.FC<{
   registrationId: string;
 }> = (props) => {
   const {
-    examRubric,
-    qnumRubric,
-    pnumRubric,
-    bnumRubric,
+    examRubricKey,
+    qnumRubricKey,
+    pnumRubricKey,
+    bnumRubricKey,
     showCompletenessAgainst,
     qnum,
     pnum,
@@ -609,66 +694,42 @@ export const ShowRubrics: React.FC<{
   } = props;
   return (
     <>
-      {nonEmptyRubric(examRubric) && (
-        <>
-          <h5>Exam-wide rubric</h5>
-          <div className="rubric">
-            <ShowRubric
-              rubric={examRubric}
-              showCompletenessAgainst={showCompletenessAgainst}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={bnum}
-              registrationId={registrationId}
-            />
-          </div>
-        </>
-      )}
-      {nonEmptyRubric(qnumRubric) && (
-        <>
-          <h5>Question rubric</h5>
-          <div className="rubric">
-            <ShowRubric
-              rubric={qnumRubric}
-              showCompletenessAgainst={showCompletenessAgainst}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={bnum}
-              registrationId={registrationId}
-            />
-          </div>
-        </>
-      )}
-      {nonEmptyRubric(pnumRubric) && (
-        <>
-          <h5>Part rubric</h5>
-          <div className="rubric">
-            <ShowRubric
-              rubric={pnumRubric}
-              showCompletenessAgainst={showCompletenessAgainst}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={bnum}
-              registrationId={registrationId}
-            />
-          </div>
-        </>
-      )}
-      {nonEmptyRubric(bnumRubric) && (
-        <>
-          <h5>Item rubric</h5>
-          <div className="rubric">
-            <ShowRubric
-              rubric={bnumRubric}
-              showCompletenessAgainst={showCompletenessAgainst}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={bnum}
-              registrationId={registrationId}
-            />
-          </div>
-        </>
-      )}
+      <ShowRubricKey
+        caption="Exam-wide rubric"
+        rubric={examRubricKey}
+        showCompletenessAgainst={showCompletenessAgainst}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
+      <ShowRubricKey
+        caption="Question rubric"
+        rubric={qnumRubricKey}
+        showCompletenessAgainst={showCompletenessAgainst}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
+      <ShowRubricKey
+        caption="Part rubric"
+        rubric={pnumRubricKey}
+        showCompletenessAgainst={showCompletenessAgainst}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
+      <ShowRubricKey
+        caption="Item rubric"
+        rubric={bnumRubricKey}
+        showCompletenessAgainst={showCompletenessAgainst}
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        registrationId={registrationId}
+      />
     </>
   );
 };

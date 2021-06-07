@@ -5,7 +5,6 @@ module Mutations
   class UpdateExamVersion < BaseMutation
     argument :exam_version_id, ID, required: true, loads: Types::ExamVersionType
     argument :name, String, required: true
-    argument :info, String, required: true
     argument :files, String, required: true
 
     field :exam_version, Types::ExamVersionType, null: false

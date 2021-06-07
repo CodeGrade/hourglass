@@ -13,15 +13,16 @@ class PresetComment < ApplicationRecord
     !grading_comments.empty?
   end
 
-  def as_json(preset_comments_in_use = nil)
+  def as_json(preset_comments_in_use = nil, format:)
     {
-      railsId: id,
       label: label,
       graderHint: grader_hint,
       studentFeedback: student_feedback,
       points: points,
       inUse:
-        if preset_comments_in_use.nil?
+        if format == :export
+          nil
+        elsif preset_comments_in_use.nil?
           in_use?
         else
           preset_comments_in_use.member? id

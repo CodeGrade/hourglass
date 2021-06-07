@@ -27,28 +27,17 @@ require 'find'
 class Upload
   include UploadsHelper
 
-  attr_reader :files, :info
+  attr_reader :files, :info, :rubrics
 
   def initialize(upload)
     @upload = upload
     @upload_data = @upload.read
     @files = []
-    @info = {}
     @dir = Pathname.new(ArchiveUtils.mktmpdir)
+  end
+
+  def build_exam_version(default_name, destination = nil)
     extract_contents!
-    parse_info!
-    purge!
-  end
-
-  private
-
-  def purge!
-    FileUtils.remove_entry_secure @dir
-  end
-
-  EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload.json').to_s
-
-  def parse_info!
     file =
       if @dir.children.length == 1
         @dir.children.first
@@ -56,20 +45,24 @@ class Upload
         @dir.join('exam.yaml')
       end
     properties = YAML.safe_load(File.read(file)).deep_stringify_keys
-    if properties.key? 'files'
-      JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties['info'])
-      JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, properties['files'])
-      @info = properties['info']
-      @files = properties['files']
-    else
-      begin
-        JSON::Validator.validate!(EXAM_UPLOAD_SCHEMA, properties)
-        @info = FormatConverter.parse_info(properties).deep_stringify_keys
-      rescue JSON::Schema::ValidationError
-        JSON::Validator.validate!(ExamVersion::EXAM_SAVE_SCHEMA, properties)
-        @info = properties
-      end
-    end
+    files = properties.delete('files')
+    properties = properties['info'] if properties['info']
+    raise 'Specify files either in YAML or a directory, not both' if files.present? && @files.present?
+
+    JSON::Validator.validate!(ExamVersion::EXAM_UPLOAD_SCHEMA, properties)
+    JSON::Validator.validate!(ExamVersion::FILES_SCHEMA, files) if files
+    @files = files if files
+
+    answer = FormatConverter.build_exam_version(properties, default_name, @files, destination)
+    purge!
+
+    answer
+  end
+
+  private
+
+  def purge!
+    FileUtils.remove_entry_secure @dir
   end
 
   def rec_path(base_path, path)

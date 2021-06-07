@@ -12,14 +12,12 @@ module Api
       def import
         uploaded_file = params.require(:upload)
         n = @exam.exam_versions.length + 1
+        default_name = "#{@exam.name} Version #{n}"
         upload = Upload.new(uploaded_file)
-        @version = ExamVersion.create(
-          exam: @exam,
-          name: "#{@exam.name} Version #{n}",
-          files: upload.files,
-          info: upload.info,
-        )
+        @version = upload.build_exam_version(default_name)
+        @version.exam = @exam
         @version.save!
+
         render json: {
           id: HourglassSchema.id_from_object(@version, Types::ExamVersionType, {}),
         }, status: :created
@@ -31,7 +29,7 @@ module Api
 
       def export_file
         fname = "#{@version.name.gsub(/ /, '-')}.json"
-        send_data @version.export_json, type: :json, disposition: 'attachment', filename: fname
+        send_data @version.export_json(include_files: true), type: :json, disposition: 'attachment', filename: fname
       end
 
       def export_archive

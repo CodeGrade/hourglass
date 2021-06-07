@@ -9,7 +9,7 @@ FactoryBot.define do
     registration
     grader { staff_registration.user }
 
-    qnum { 0 }
-    pnum { 0 }
+    question { registration.exam_version.db_questions.find_by(index: 0) }
+    part { question.parts.find_by(index: 0) }
   end
 end

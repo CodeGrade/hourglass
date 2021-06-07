@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
+import {
+  MutateWithVariables,
+  MutationState,
+} from 'relay-hooks';
+import { MutationParameters } from 'relay-runtime';
+import { HTMLVal } from '@student/exams/show/types';
 
 /**
  * Error to throw in the default case of an exhaustive `switch` statement.
@@ -56,3 +61,7 @@ export type SelectOption<T> = {
 };
 
 export type SelectOptions<T> = SelectOption<T>[];
+
+export type MutationReturn<T extends MutationParameters> = [
+  MutateWithVariables<T>, MutationState<T>
+];

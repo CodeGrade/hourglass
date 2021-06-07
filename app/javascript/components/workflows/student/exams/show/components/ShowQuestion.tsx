@@ -24,7 +24,7 @@ interface ShowQuestionProps {
 }
 
 export const QuestionName: React.FC<{ qnum: number; name?: HTMLVal }> = ({ qnum, name }) => {
-  if (name === undefined || name.value === '') {
+  if (name?.value === undefined || name.value === '') {
     return <div className="d-inline-block">{`Question ${qnum + 1}`}</div>;
   }
   return (
@@ -49,7 +49,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   } = props;
   const {
     name,
-    reference,
+    references,
     description,
     parts,
     separateSubparts,
@@ -63,8 +63,8 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const strPoints = points > 1 || points === 0 ? 'points' : 'point';
   const subtitle = `(${points} ${strPoints})`;
   const questionFilesContextVal = useMemo(() => ({
-    references: reference,
-  }), [reference]);
+    references,
+  }), [references]);
   return (
     <QuestionFilesContext.Provider value={questionFilesContextVal}>
       <div className={classes}>
@@ -81,7 +81,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           )}
         </h1>
         <HTML value={description} />
-        {reference.length !== 0 && <FileViewer references={reference} />}
+        {references && references.length !== 0 && <FileViewer references={references} />}
         <BottomScrollspy
           question={qnum}
           separateSubparts={separateSubparts}

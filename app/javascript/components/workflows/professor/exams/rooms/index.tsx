@@ -278,7 +278,7 @@ const ExamRoomsForm: React.FC<
   }, [history]);
   const [mutate, { loading }] = useMutation<roomsUpdateMutation>(
     graphql`
-    mutation roomsUpdateMutation($input: UpdateExamRoomsInput!) {
+    mutation roomsUpdateMutation($input: UpdateExamRoomsInput!, $withRubric: Boolean!) {
       updateExamRooms(input: $input) {
         exam {
           ...admin_checklist
@@ -322,6 +322,7 @@ const ExamRoomsForm: React.FC<
               newRooms,
               deletedRoomIds,
             },
+            withRubric: true,
           },
         });
       })}
@@ -355,7 +356,7 @@ const ExamRoomsForm: React.FC<
           </Button>
         </span>
       </h2>
-      <FieldArray name="rooms" component={ShowRooms} />
+      <FieldArray name="rooms" component={ShowRooms} props={{ }} />
     </form>
   );
 };

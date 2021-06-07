@@ -10,9 +10,8 @@ class None < Rubric
     0
   end
 
-  def as_json(_preset_comments_in_use)
+  def as_json(_preset_comments_in_use, format:)
     {
-      railsId: id,
       type: 'none',
       inUse: false,
     }

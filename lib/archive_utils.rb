@@ -127,7 +127,7 @@ class ArchiveUtils
   private_class_method def self.write_entry(zip, disk_item, zip_path)
     if File.directory? disk_item
       zip.mkdir zip_path
-      (Dir.entries(disk_item) - %w[. ..]).each do |entry|
+      (Dir.entries(disk_item) - ['.', '..']).each do |entry|
         write_entry(zip, File.join(disk_item, entry), File.join(zip_path, entry))
       end
     else
@@ -147,12 +147,13 @@ class ArchiveUtils
       zip: true,
     }
     # Unsupported file types, taken from https://en.wikipedia.org/wiki/List_of_archive_formats
-    %w[rar ar cpio shar lbr iso mar sbx bz2 lz lzma lzo sfark sz
-       xz z 7z s7z ace afa alz apk arc arj b1 b6z ba bh cab
-       car cfs cpt dar dd dgc dmg ear gca ha hki ice jar kgb
-       lzh lha pak partimg paq6 paq7 paq8 pea pim pit qda rk sda
-       sea sen sfx shk sit sitx sqx uc uc0 uc2 ucn ur2 ue2 uca
-       uha war wim xar xp3 yz1 zipx zoo zpaq zz ecc par par2 rev].each do |ext|
+    ['rar', 'ar', 'cpio', 'shar', 'lbr', 'iso', 'mar', 'sbx', 'bz2', 'lz', 'lzma', 'lzo',
+     'sfark', 'sz', 'xz', 'z', '7z', 's7z', 'ace', 'afa', 'alz', 'apk', 'arc', 'arj', 'b1',
+     'b6z', 'ba', 'bh', 'cab', 'car', 'cfs', 'cpt', 'dar', 'dd', 'dgc', 'dmg', 'ear', 'gca',
+     'ha', 'hki', 'ice', 'jar', 'kgb', 'lzh', 'lha', 'pak', 'partimg', 'paq6', 'paq7', 'paq8',
+     'pea', 'pim', 'pit', 'qda', 'rk', 'sda', 'sea', 'sen', 'sfx', 'shk', 'sit', 'sitx', 'sqx',
+     'uc', 'uc0', 'uc2', 'ucn', 'ur2', 'ue2', 'uca', 'uha', 'war', 'wim', 'xar', 'xp3', 'yz1',
+     'zipx', 'zoo', 'zpaq', 'zz', 'ecc', 'par', 'par2', 'rev'].each do |ext|
       known[ext] = false
     end
     known

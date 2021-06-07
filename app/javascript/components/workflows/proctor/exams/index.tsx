@@ -159,7 +159,7 @@ interface ExamAnnouncement {
 
 interface Response {
   sent: DirectMessage[];
-  questions: Question[];
+  studentQuestions: Question[];
   version: VersionAnnouncement[];
   room: RoomAnnouncement[];
   exam: ExamAnnouncement[];
@@ -1119,7 +1119,7 @@ const newMessageSubscriptionSpec = graphql`
 const newQuestionSubscriptionSpec = graphql`
   subscription examsNewQuestionSubscription($examId: ID!) {
     questionWasAsked(examId: $examId) {
-      question {
+      studentQuestion {
         id
         createdAt
         registration {
@@ -1130,7 +1130,7 @@ const newQuestionSubscriptionSpec = graphql`
         }
         body
       }
-      questionsEdge {
+      studentQuestionsEdge {
         node {
           id
         }
@@ -1161,7 +1161,7 @@ const Loaded: React.FC<{
   } = props;
   const {
     sent,
-    questions,
+    studentQuestions: questions,
     version,
     room,
     exam,
@@ -1191,7 +1191,7 @@ const Loaded: React.FC<{
       type: 'RANGE_ADD',
       parentID: examId,
       connectionInfo: [{
-        key: 'Exam_questions',
+        key: 'Exam_studentQuestions',
         rangeBehavior: 'prepend',
       }],
       edgeName: 'questionsEdge',
@@ -1416,7 +1416,7 @@ const ExamMessages: React.FC<{
             }
           }
         }
-        questions(first: 100000) @connection(key: "Exam_questions", filters: []) {
+        studentQuestions(first: 100000) @connection(key: "Exam_studentQuestions", filters: []) {
           edges {
             node {
               id
@@ -1477,7 +1477,7 @@ const ExamMessages: React.FC<{
       registration: msg.registration,
       time: DateTime.fromISO(msg.createdAt),
     })),
-    questions: res.questions.edges.map(({ node: question }) => ({
+    studentQuestions: res.studentQuestions.edges.map(({ node: question }) => ({
       type: MessageType.Question,
       id: question.id,
       body: question.body,
@@ -1506,7 +1506,7 @@ const ExamMessages: React.FC<{
     })),
   }), [
     res.messages,
-    res.questions,
+    res.studentQuestions,
     res.versionAnnouncements,
     res.examAnnouncements,
     res.roomAnnouncements,

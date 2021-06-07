@@ -1,6 +1,8 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
+import { editorQueryResponse } from '@professor/exams/new/editor/__generated__/editorQuery.graphql';
+import { Policy } from '@material-ui/icons';
 
 export type ExamTakerAction =
   LoadExamAction |
@@ -349,14 +351,17 @@ export interface MatchingInfo {
   values: HTMLVal[];
 }
 
-export interface MatchingState {
-  [index: number]: number;
-}
+export type MatchingState = number[];
 
-export type BodyItem =
+export type BodyItemInfo =
   HTMLVal | AllThatApplyInfo | CodeInfo | YesNoInfo |
   CodeTagInfo | MultipleChoiceInfo |
   TextInfo | MatchingInfo;
+
+export interface BodyItem {
+  id: string;
+  info: BodyItemInfo;
+}
 
 export type AnswerState =
   AllThatApplyState | CodeState | YesNoState |
@@ -369,20 +374,20 @@ export interface NoAnswerState {
 
 export interface PartInfo {
   name?: HTMLVal;
-  description: HTMLVal;
+  description?: HTMLVal;
   points: number;
   extraCredit?: boolean;
-  reference: FileRef[];
-  body: BodyItem[];
+  references?: readonly FileRef[];
+  bodyItems: readonly BodyItem[];
 }
 
 export interface QuestionInfo {
   name?: HTMLVal;
-  description: HTMLVal;
+  description?: HTMLVal;
   extraCredit?: boolean;
   separateSubparts: boolean;
-  parts: PartInfo[];
-  reference: FileRef[];
+  parts: readonly PartInfo[];
+  references?: readonly FileRef[];
 }
 
 export interface RailsTimeInfo {
@@ -405,8 +410,8 @@ export interface TimeInfo {
 }
 
 export interface ExamVersion {
-  questions: QuestionInfo[];
-  reference?: FileRef[];
+  questions: readonly QuestionInfo[];
+  references?: readonly FileRef[];
   instructions?: HTMLVal;
   files: ExamFile[];
 }
@@ -482,11 +487,7 @@ export interface AnomalyListener {
   capture?: boolean;
 }
 
-export enum Policy {
-  ignoreLockdown = 'IGNORE_LOCKDOWN',
-  tolerateWindowed = 'TOLERATE_WINDOWED',
-  mockLockdown = 'MOCK_LOCKDOWN'
-}
+export type Policy = editorQueryResponse['examVersion']['policies'][number];
 
 export function policyPermits(policy: readonly Policy[], query: Policy): boolean {
   return policy.find((p) => p === query) !== undefined;

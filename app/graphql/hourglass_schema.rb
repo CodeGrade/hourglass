@@ -136,8 +136,8 @@ class HourglassSchema < GraphQL::Schema
       Types::ProctorRegistrationType
     when ProfessorCourseRegistration
       Types::ProfessorCourseRegistrationType
-    when Question
-      Types::QuestionType
+    when StudentQuestion
+      Types::StudentQuestionType
     when Registration
       Types::RegistrationType
     when RoomAnnouncement
@@ -158,6 +158,14 @@ class HourglassSchema < GraphQL::Schema
       Types::RubricPresetType
     when PresetComment
       Types::PresetCommentType
+    when Question
+      Types::QuestionType
+    when Part
+      Types::PartType
+    when BodyItem
+      Types::BodyItemType
+    when Reference
+      Types::ReferenceType
     else
       raise("Unexpected object of type '#{type}': #{obj}")
     end
@@ -175,6 +183,7 @@ class HourglassSchema < GraphQL::Schema
       context: {
         current_user: user,
         access_cache: {},
+        skip_eager_fields: false,
       },
       variables: {
         input: input,

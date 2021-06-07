@@ -48,22 +48,6 @@ module Types
       RecordLoader.for(ExamVersion).load(object.exam_version_id)
     end
 
-
-    field :review_exam, GraphQL::Types::JSON, null: true 
-    def review_exam
-      if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
-        ev = object.exam_version
-        {
-          questions: ev.questions,
-          reference: ev.reference,
-          instructions: ev.instructions,
-          files: ev.files,
-        }
-      else
-        nil
-      end
-    end
-
     field :course_title, String, null: false
     def course_title
       object.exam.course.title
@@ -75,11 +59,6 @@ module Types
     field :accommodated_start_time, GraphQL::Types::ISO8601DateTime, null: false
     def accommodated_start_time
       object.accommodated_start_time
-    end
-
-    field :can_i_grade, Boolean, null: false
-    def can_i_grade
-      Guards::ALL_STAFF.call(self, nil, context)
     end
 
     field :current_answers, GraphQL::Types::JSON, null: true
@@ -95,6 +74,15 @@ module Types
     def current_grading
       if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
         object.current_grading
+      else
+        nil
+      end
+    end
+
+    field :current_score_percentage, Float, null: true
+    def current_score_percentage
+      if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
+        object.current_score_percentage
       else
         nil
       end
@@ -158,9 +146,9 @@ module Types
       object.snapshots.last&.created_at
     end
 
-    field :questions, Types::QuestionType.connection_type, null: false
-    def questions
-      object.questions.order(created_at: :desc)
+    field :student_questions, Types::StudentQuestionType.connection_type, null: false
+    def student_questions
+      object.student_questions.order(created_at: :desc)
     end
 
     field :messages, Types::MessageType.connection_type, null: false

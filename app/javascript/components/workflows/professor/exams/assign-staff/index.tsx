@@ -202,6 +202,7 @@ const Rooms: React.FC<WrappedFieldArrayProps<FormRoom> & RoomsProps> = (props) =
               <FieldArray
                 name="proctors"
                 component={Students}
+                props={{ }}
               />
             </FormSection>
           </Form.Group>
@@ -254,7 +255,7 @@ const StaffSeatingForm: React.FC<
   }, [history]);
   const [mutate, { loading }] = useMutation<assignStaffUpdateMutation>(
     graphql`
-    mutation assignStaffUpdateMutation($input: UpdateStaffSeatingInput!) {
+    mutation assignStaffUpdateMutation($input: UpdateStaffSeatingInput!, $withRubric: Boolean!) {
       updateStaffSeating(input: $input) {
         exam {
           ...admin_checklist
@@ -302,6 +303,7 @@ const StaffSeatingForm: React.FC<
               proctorsWithoutRoomIds: (all.proctors ?? []).map((s) => s.id),
               proctorRegistrationUpdates: rooms,
             },
+            withRubric: true,
           },
         });
       })}
@@ -338,11 +340,11 @@ const StaffSeatingForm: React.FC<
         </h2>
         <Form.Group>
           <h3>Unassigned Staff</h3>
-          <FieldArray name="unassigned" component={Students} />
+          <FieldArray name="unassigned" component={Students} props={{ }} />
         </Form.Group>
         <Form.Group>
           <h3>Proctors Without Rooms</h3>
-          <FieldArray name="proctors" component={Students} />
+          <FieldArray name="proctors" component={Students} props={{ }} />
         </Form.Group>
         <Form.Group>
           <FieldArray

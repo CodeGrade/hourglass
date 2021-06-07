@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_22_000727) do
+ActiveRecord::Schema.define(version: 2021_05_23_182059) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,6 +33,15 @@ ActiveRecord::Schema.define(version: 2020_10_22_000727) do
     t.index ["registration_id"], name: "index_anomalies_on_registration_id"
   end
 
+  create_table "body_items", force: :cascade do |t|
+    t.jsonb "info", null: false
+    t.jsonb "answer"
+    t.bigint "part_id", null: false
+    t.integer "index", null: false
+    t.index ["index", "part_id"], name: "unique_body_item_per_part", unique: true
+    t.index ["part_id"], name: "index_body_items_on_part_id"
+  end
+
   create_table "courses", force: :cascade do |t|
     t.string "title", null: false
     t.datetime "last_sync"
@@ -53,10 +62,11 @@ ActiveRecord::Schema.define(version: 2020_10_22_000727) do
   create_table "exam_versions", force: :cascade do |t|
     t.string "name", null: false
     t.jsonb "files", null: false
-    t.jsonb "info", null: false
     t.bigint "exam_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "instructions", default: "", null: false
+    t.string "policies", default: "", null: false
     t.index ["exam_id"], name: "index_exam_versions_on_exam_id"
   end
 
@@ -75,14 +85,19 @@ ActiveRecord::Schema.define(version: 2020_10_22_000727) do
   create_table "grading_checks", force: :cascade do |t|
     t.bigint "creator_id", null: false
     t.bigint "registration_id", null: false
-    t.integer "qnum", null: false
-    t.integer "pnum", null: false
-    t.integer "bnum", null: false
     t.float "points"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "question_id", null: false
+    t.bigint "part_id", null: false
+    t.bigint "body_item_id", null: false
+    t.index ["body_item_id"], name: "index_grading_checks_on_body_item_id"
     t.index ["creator_id"], name: "index_grading_checks_on_creator_id"
-    t.index ["registration_id", "qnum", "pnum", "bnum"], name: "unique_check_per_item", unique: true
+    t.index ["part_id"], name: "index_grading_checks_on_part_id"
+    t.index ["question_id", "part_id", "body_item_id"], name: "index_grading_checks_on_coords"
+    t.index ["question_id", "part_id"], name: "index_grading_checks_on_question_id_and_part_id"
+    t.index ["question_id"], name: "index_grading_checks_on_question_id"
+    t.index ["registration_id", "question_id", "part_id", "body_item_id"], name: "unique_check_per_item", unique: true
     t.index ["registration_id"], name: "index_grading_checks_on_registration_id"
   end
 
@@ -91,28 +106,36 @@ ActiveRecord::Schema.define(version: 2020_10_22_000727) do
     t.text "message", null: false
     t.bigint "registration_id", null: false
     t.bigint "preset_comment_id"
-    t.integer "qnum", null: false
-    t.integer "pnum", null: false
-    t.integer "bnum", null: false
     t.float "points", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "question_id", null: false
+    t.bigint "part_id", null: false
+    t.bigint "body_item_id", null: false
+    t.index ["body_item_id"], name: "index_grading_comments_on_body_item_id"
     t.index ["creator_id"], name: "index_grading_comments_on_creator_id"
+    t.index ["part_id"], name: "index_grading_comments_on_part_id"
     t.index ["preset_comment_id"], name: "index_grading_comments_on_preset_comment_id"
+    t.index ["question_id", "part_id", "body_item_id"], name: "index_grading_comments_on_coords"
+    t.index ["question_id", "part_id"], name: "index_grading_comments_on_question_id_and_part_id"
+    t.index ["question_id"], name: "index_grading_comments_on_question_id"
     t.index ["registration_id"], name: "index_grading_comments_on_registration_id"
   end
 
   create_table "grading_locks", force: :cascade do |t|
     t.bigint "registration_id", null: false
     t.bigint "grader_id"
-    t.integer "qnum", null: false
-    t.integer "pnum", null: false
     t.bigint "completed_by_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "question_id", null: false
+    t.bigint "part_id", null: false
     t.index ["completed_by_id"], name: "index_grading_locks_on_completed_by_id"
     t.index ["grader_id"], name: "index_grading_locks_on_grader_id"
-    t.index ["registration_id", "qnum", "pnum"], name: "index_grading_locks_on_registration_id_and_qnum_and_pnum", unique: true
+    t.index ["part_id"], name: "index_grading_locks_on_part_id"
+    t.index ["question_id", "part_id"], name: "index_grading_locks_on_question_id_and_part_id"
+    t.index ["question_id"], name: "index_grading_locks_on_question_id"
+    t.index ["registration_id", "question_id", "part_id"], name: "index_grading_locks_on_registration_id_and_qnum_and_pnum", unique: true
     t.index ["registration_id"], name: "index_grading_locks_on_registration_id"
   end
 
@@ -126,13 +149,24 @@ ActiveRecord::Schema.define(version: 2020_10_22_000727) do
     t.index ["sender_id"], name: "index_messages_on_sender_id"
   end
 
+  create_table "parts", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.float "points", null: false
+    t.boolean "extra_credit", default: false, null: false
+    t.bigint "question_id", null: false
+    t.integer "index", null: false
+    t.index ["index", "question_id"], name: "unique_part_index_per_question", unique: true
+    t.index ["question_id"], name: "index_parts_on_question_id"
+  end
+
   create_table "preset_comments", force: :cascade do |t|
     t.bigint "rubric_preset_id", null: false
     t.string "label"
     t.string "grader_hint", null: false
     t.string "student_feedback"
     t.float "points", null: false
-    t.integer "order"
+    t.integer "order", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["rubric_preset_id"], name: "index_preset_comments_on_rubric_preset_id"
@@ -163,11 +197,29 @@ ActiveRecord::Schema.define(version: 2020_10_22_000727) do
   end
 
   create_table "questions", force: :cascade do |t|
-    t.bigint "registration_id", null: false
-    t.text "body", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["registration_id"], name: "index_questions_on_registration_id"
+    t.string "name"
+    t.string "description"
+    t.boolean "extra_credit", default: false, null: false
+    t.boolean "separate_subparts", default: false, null: false
+    t.bigint "exam_version_id", null: false
+    t.integer "index", null: false
+    t.index ["exam_version_id"], name: "index_questions_on_exam_version_id"
+    t.index ["index", "exam_version_id"], name: "unique_question_index_per_exam", unique: true
+  end
+
+  create_table "references", force: :cascade do |t|
+    t.string "path", null: false
+    t.string "type", null: false
+    t.bigint "exam_version_id", null: false
+    t.bigint "question_id"
+    t.bigint "part_id"
+    t.integer "index", null: false
+    t.index ["exam_version_id"], name: "index_references_on_exam_version_id"
+    t.index ["index", "exam_version_id", "question_id", "part_id"], name: "unique_reference_index_per_part", unique: true
+    t.index ["index", "exam_version_id", "question_id"], name: "unique_reference_index_per_question", unique: true, where: "(part_id IS NULL)"
+    t.index ["index", "exam_version_id"], name: "unique_reference_index_per_exam", unique: true, where: "((question_id IS NULL) AND (part_id IS NULL))"
+    t.index ["part_id"], name: "index_references_on_part_id"
+    t.index ["question_id"], name: "index_references_on_question_id"
   end
 
   create_table "registrations", force: :cascade do |t|
@@ -216,22 +268,32 @@ ActiveRecord::Schema.define(version: 2020_10_22_000727) do
     t.index ["rubric_id"], name: "index_rubric_presets_on_rubric_id"
   end
 
+  create_table "rubric_tree_paths", force: :cascade do |t|
+    t.bigint "ancestor_id", null: false
+    t.bigint "descendant_id", null: false
+    t.integer "path_length", null: false
+    t.index ["ancestor_id", "descendant_id"], name: "index_rubric_tree_paths_on_ancestor_id_and_descendant_id", unique: true
+    t.index ["ancestor_id"], name: "index_rubric_tree_paths_on_ancestor_id"
+    t.index ["descendant_id"], name: "index_rubric_tree_paths_on_descendant_id"
+  end
+
   create_table "rubrics", force: :cascade do |t|
     t.bigint "exam_version_id", null: false
-    t.bigint "parent_section_id"
     t.string "type", null: false
     t.string "description"
     t.float "points"
-    t.integer "qnum"
-    t.integer "pnum"
-    t.integer "bnum"
     t.integer "order"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["exam_version_id", "qnum", "pnum", "bnum", "order"], name: "unique_rubric_order_per_coords", unique: true, where: "(parent_section_id IS NOT NULL)"
-    t.index ["exam_version_id", "qnum", "pnum", "bnum"], name: "unique_rubric_root_coords", unique: true, where: "(parent_section_id IS NULL)"
+    t.bigint "question_id"
+    t.bigint "part_id"
+    t.bigint "body_item_id"
+    t.index ["body_item_id"], name: "index_rubrics_on_body_item_id"
     t.index ["exam_version_id"], name: "index_rubrics_on_exam_version_id"
-    t.index ["parent_section_id"], name: "index_rubrics_on_parent_section_id"
+    t.index ["part_id"], name: "index_rubrics_on_part_id"
+    t.index ["question_id", "part_id", "body_item_id"], name: "index_rubrics_on_question_id_and_part_id_and_body_item_id"
+    t.index ["question_id", "part_id"], name: "index_rubrics_on_question_id_and_part_id"
+    t.index ["question_id"], name: "index_rubrics_on_question_id"
   end
 
   create_table "sections", force: :cascade do |t|
@@ -262,6 +324,14 @@ ActiveRecord::Schema.define(version: 2020_10_22_000727) do
     t.index ["section_id"], name: "index_staff_registrations_on_section_id"
     t.index ["user_id", "section_id"], name: "index_staff_registrations_on_user_id_and_section_id", unique: true
     t.index ["user_id"], name: "index_staff_registrations_on_user_id"
+  end
+
+  create_table "student_questions", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_id"], name: "index_student_questions_on_registration_id"
   end
 
   create_table "student_registrations", force: :cascade do |t|
@@ -320,19 +390,20 @@ ActiveRecord::Schema.define(version: 2020_10_22_000727) do
   add_foreign_key "proctor_registrations", "users"
   add_foreign_key "professor_course_registrations", "courses"
   add_foreign_key "professor_course_registrations", "users"
-  add_foreign_key "questions", "registrations"
   add_foreign_key "registrations", "exam_versions"
   add_foreign_key "registrations", "rooms"
   add_foreign_key "registrations", "users"
   add_foreign_key "room_announcements", "rooms"
   add_foreign_key "rooms", "exams"
   add_foreign_key "rubric_presets", "rubrics"
+  add_foreign_key "rubric_tree_paths", "rubrics", column: "ancestor_id"
+  add_foreign_key "rubric_tree_paths", "rubrics", column: "descendant_id"
   add_foreign_key "rubrics", "exam_versions"
-  add_foreign_key "rubrics", "rubrics", column: "parent_section_id"
   add_foreign_key "sections", "courses"
   add_foreign_key "snapshots", "registrations"
   add_foreign_key "staff_registrations", "sections"
   add_foreign_key "staff_registrations", "users"
+  add_foreign_key "student_questions", "registrations"
   add_foreign_key "student_registrations", "sections"
   add_foreign_key "student_registrations", "users"
   add_foreign_key "version_announcements", "exam_versions"

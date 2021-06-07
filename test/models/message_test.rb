@@ -4,7 +4,8 @@ require 'test_helper'
 
 class MessageTest < ActiveSupport::TestCase
   test 'factory creates valid messages' do
-    msg = build(:message)
+    reg = create(:registration)
+    msg = build(:message, registration: reg)
     assert msg.valid?
     assert msg.save
     assert msg.sender.sent_messages.include? msg
@@ -18,8 +19,7 @@ class MessageTest < ActiveSupport::TestCase
   end
 
   test 'students cannot send messages to other students' do
-    exam = build(:exam)
-    ev = build(:exam_version, exam: exam)
+    ev = create(:exam_version)
     reg = build(:registration, exam_version: ev)
     reg2 = build(:registration, exam_version: ev)
     msg = build(

@@ -37,7 +37,7 @@ export function firstFile(files: ExamFile[]): ExamFile {
   return undefined;
 }
 
-export function getFilesForRefs(map: FileMap, refs: FileRef[]): ExamFile[] {
+export function getFilesForRefs(map: FileMap, refs: readonly FileRef[]): ExamFile[] {
   return refs ? refs.map((r) => map[r.path]).filter((a) => a) : [];
 }
 

@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { graphql, useFragment } from 'relay-hooks';
 import { ExamViewerContext } from '@hourglass/common/context';
 import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
@@ -15,7 +16,7 @@ import {
 import { ExhaustiveSwitchError, pluralize } from '@hourglass/common/helpers';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import Prompted from '@proctor/registrations/show/questions/Prompted';
-import ShowRubric from '@proctor/registrations/show/ShowRubric';
+import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import {
   CurrentGrading,
   RubricJson,
@@ -32,15 +33,17 @@ import { variantForPoints, iconForPoints } from '@hourglass/workflows/grading';
 import Icon from '@student/exams/show/components/Icon';
 import ErrorBoundary from '@hourglass/common/boundary';
 
+import { DisplayBody$key } from './__generated__/DisplayBody.graphql';
+
 export interface BodyProps {
+  bodyKey: DisplayBody$key;
   refreshCodeMirrorsDeps: React.DependencyList;
-  body: BodyItem;
   qnum: number;
   pnum: number;
   bnum: number;
   currentGrading?: CurrentGrading[number][number]['body'][number];
   fullyExpandCode: boolean;
-  showStarterCode: boolean;
+  overviewMode: boolean;
 }
 
 const ShowComment: React.FC<{ comment: CommentJson }> = (props) => {
@@ -88,7 +91,7 @@ const ShowRubricPreset: React.FC<{ preset: RubricPresetJson, points: number}> = 
       {Object.keys(values).map((rId) => {
         const presetComment = values[rId];
         return presetComment.values.map((pc) => (
-          <ShowComment key={pc.railsId} comment={pc} />
+          <ShowComment key={pc.id} comment={pc} />
         ));
       })}
     </div>
@@ -157,29 +160,39 @@ const ShowCurrentGrading: React.FC<{
 const DisplayBody: React.FC<BodyProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
-    body,
+    bodyKey,
     qnum,
     pnum,
     bnum,
     currentGrading,
     fullyExpandCode,
-    showStarterCode,
+    overviewMode,
   } = props;
+  const res = useFragment<DisplayBody$key>(
+    graphql`
+    fragment DisplayBody on BodyItem {
+      id
+      info
+      rootRubric @include(if: $withRubric) { ...ShowRubricKey }
+    }
+    `,
+    bodyKey,
+  );
+  const body = res as BodyItem;
+  const bRubric = res.rootRubric;
   const {
     answers,
-    rubric,
   } = useContext(ExamViewerContext);
   const [open, setOpen] = useState(false);
   const answer = answers.answers[qnum]?.[pnum]?.[bnum];
   const value = isNoAns(answer) ? undefined : answer;
-  const bRubric = rubric?.questions[qnum]?.parts[pnum]?.body[bnum];
 
-  switch (body.type) {
+  switch (body.info.type) {
     case 'HTML':
-      return <HTML value={body} />;
+      return <HTML value={body.info} />;
     case 'Code': {
       let initial = null;
-      if (showStarterCode && body.initial) {
+      if (overviewMode && body.info.initial) {
         initial = (
           <Card bg="secondary" border="info" className="mt-2 mb-3">
             <Card.Header
@@ -194,7 +207,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
             <Collapse in={open}>
               <Card.Body>
                 <DisplayCode
-                  info={body}
+                  info={body.info}
                   value={null}
                   refreshProps={[...refreshCodeMirrorsDeps, open]}
                   fullyExpandCode={fullyExpandCode}
@@ -205,69 +218,69 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
         );
       }
       return (
-        <Prompted prompt={body.prompt}>
+        <Prompted prompt={body.info.prompt}>
           {initial}
           <DisplayCode
-            info={body}
+            info={body.info}
             value={value as CodeState}
             refreshProps={refreshCodeMirrorsDeps}
             fullyExpandCode={fullyExpandCode}
           />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     }
     case 'AllThatApply':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayAllThatApply info={body} value={value as AllThatApplyState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+        <Prompted prompt={body.info.prompt}>
+          <DisplayAllThatApply info={body.info} value={value as AllThatApplyState} />
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     case 'CodeTag':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayCodeTag info={body} value={value as CodeTagState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+        <Prompted prompt={body.info.prompt}>
+          <DisplayCodeTag info={body.info} value={value as CodeTagState} />
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     case 'YesNo':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayYesNo info={body} value={value as YesNoState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+        <Prompted prompt={body.info.prompt}>
+          <DisplayYesNo info={body.info} value={value as YesNoState} />
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     case 'MultipleChoice':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayMultipleChoice info={body} value={value as MultipleChoiceState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+        <Prompted prompt={body.info.prompt}>
+          <DisplayMultipleChoice info={body.info} value={value as MultipleChoiceState} />
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     case 'Text':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayText info={body} value={value as TextState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+        <Prompted prompt={body.info.prompt}>
+          <DisplayText info={body.info} value={value as TextState} />
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     case 'Matching':
       return (
-        <Prompted prompt={body.prompt}>
-          <DisplayMatching info={body} value={value as MatchingState} />
-          {bRubric && <ShowRubric rubric={bRubric} forWhat="item" />}
+        <Prompted prompt={body.info.prompt}>
+          <DisplayMatching info={body.info} value={value as MatchingState} />
+          {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}
           {currentGrading && <ShowCurrentGrading currentGrading={currentGrading} />}
         </Prompted>
       );
     default:
-      throw new ExhaustiveSwitchError(body);
+      throw new ExhaustiveSwitchError(body.info);
   }
 };
 

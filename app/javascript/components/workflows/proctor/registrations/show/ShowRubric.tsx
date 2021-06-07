@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import {
-  Rubric,
   Preset,
-  isRubricPresets,
   RubricPresets,
   RubricAll,
   RubricAny,
   RubricOne,
+  Rubric,
 } from '@professor/exams/types';
 import { ExhaustiveSwitchError, pluralize } from '@hourglass/common/helpers';
 import {
@@ -18,9 +17,12 @@ import {
 } from 'react-bootstrap';
 import HTML from '@student/exams/show/components/HTML';
 import Icon from '@student/exams/show/components/Icon';
+import { graphql, useFragment } from 'relay-hooks';
 import { variantForPoints, iconForPoints } from '@grading/index';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { ShowPresetSummary } from '@grading/UseRubrics';
+import { expandRootRubric } from '@professor/exams/rubrics';
+import { ShowRubricKey$key } from './__generated__/ShowRubricKey.graphql';
 
 const ShowPreset: React.FC<{
   preset: Preset;
@@ -72,9 +74,8 @@ const ShowRubricPresets: React.FC<{ choices: RubricPresets }> = (props) => {
   return (
     <Row>
       <Col>
-        {presets.map((p, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <ShowPreset direction={direction} preset={p} key={index} />
+        {presets.map((p) => (
+          <ShowPreset direction={direction} preset={p} key={p.id} />
         ))}
       </Col>
     </Row>
@@ -87,7 +88,15 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll, forWhat: string }> = (props) 
   const [open, setOpen] = useState(false);
   let summary;
   let body;
-  if (isRubricPresets(choices)) {
+  if (choices instanceof Array) {
+    body = (
+      <>
+        {choices.map((c) => (
+          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} />
+        ))}
+      </>
+    );
+  } else {
     const { direction, label, mercy } = choices;
     summary = (
       <span className="ml-auto">
@@ -99,15 +108,6 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll, forWhat: string }> = (props) 
       </span>
     );
     body = <ShowRubricPresets choices={choices} />;
-  } else {
-    body = (
-      <>
-        {choices.map((c, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
-        ))}
-      </>
-    );
   }
   const heading = (
     <h5 className="d-flex align-items-center">
@@ -147,7 +147,16 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny, forWhat: string }> = (props) 
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
   let summary;
   let body;
-  if (isRubricPresets(choices)) {
+  if (choices instanceof Array) {
+    summary = <span className="ml-auto">{pointsMsg}</span>;
+    body = (
+      <>
+        {choices.map((c) => (
+          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} />
+        ))}
+      </>
+    );
+  } else {
     const { direction, label, mercy } = choices;
     summary = (
       <span className="ml-auto">
@@ -160,16 +169,6 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny, forWhat: string }> = (props) 
       </span>
     );
     body = <ShowRubricPresets choices={choices} />;
-  } else {
-    summary = <span className="ml-auto">{pointsMsg}</span>;
-    body = (
-      <>
-        {choices.map((c, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
-        ))}
-      </>
-    );
   }
   const heading = (
     <h5 className="d-flex align-items-center">
@@ -209,7 +208,16 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
   let summary;
   let body;
-  if (isRubricPresets(choices)) {
+  if (choices instanceof Array) {
+    summary = <span className="ml-auto">{pointsMsg}</span>;
+    body = (
+      <>
+        {choices.map((c) => (
+          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} />
+        ))}
+      </>
+    );
+  } else {
     const { direction, label, mercy } = choices;
     summary = (
       <span className="ml-auto">
@@ -222,16 +230,6 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
       </span>
     );
     body = <ShowRubricPresets choices={choices} />;
-  } else {
-    summary = <span className="ml-auto">{pointsMsg}</span>;
-    body = (
-      <>
-        {choices.map((c, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <ShowRubric key={index} rubric={c} forWhat={forWhat} />
-        ))}
-      </>
-    );
   }
   const heading = (
     <h5 className="d-flex align-items-center">
@@ -264,7 +262,74 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
   );
 };
 
-const ShowRubric: React.FC<{ rubric: Rubric, forWhat: string }> = (props) => {
+export const ShowRubricKey: React.FC<{
+  rubricKey: ShowRubricKey$key,
+  forWhat: string,
+}> = (props) => {
+  const { rubricKey, forWhat } = props;
+  const rawRubric = useFragment<ShowRubricKey$key>(
+    graphql`
+    fragment ShowRubricKey on Rubric {
+      id
+      type
+      order
+      points
+      description {
+        type
+        value
+      }
+      rubricPreset {
+        id
+        direction
+        label
+        mercy
+        presetComments {
+          id
+          label
+          order
+          points
+          graderHint
+          studentFeedback
+        }
+      }
+      subsections { id }
+      allSubsections {
+        id
+        type
+        order
+        points
+        description {
+          type
+          value
+        }
+        rubricPreset {
+          id
+          direction
+          label
+          mercy
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+        subsections { id }
+      }
+    }
+    `,
+    rubricKey,
+  );
+  const rubric = expandRootRubric(rawRubric);
+  return <ShowRubric rubric={rubric} forWhat={forWhat} />;
+};
+
+const ShowRubric: React.FC<{
+  rubric: Rubric,
+  forWhat: string,
+}> = (props) => {
   const { rubric, forWhat } = props;
   switch (rubric.type) {
     case 'none': return <div><i>{`No ${forWhat} rubric`}</i></div>;

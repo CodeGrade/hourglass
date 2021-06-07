@@ -75,11 +75,11 @@ module Types
       AssociationLoader.for(Exam, :exam_announcements, merge: -> { order(created_at: :desc) }).load(object)
     end
 
-    field :questions, Types::QuestionType.connection_type, null: false do
+    field :student_questions, Types::StudentQuestionType.connection_type, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
-    def questions
-      AssociationLoader.for(Exam, :questions, merge: -> { order(created_at: :desc) }).load(object)
+    def student_questions
+      AssociationLoader.for(Exam, :student_questions, merge: -> { order(created_at: :desc) }).load(object)
     end
 
     field :accommodations, Types::AccommodationType.connection_type, null: false do

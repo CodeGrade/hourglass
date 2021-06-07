@@ -14,7 +14,12 @@ module Mutations
     end
 
     def resolve(exam:)
-      version = ExamVersion.new_empty(exam)
+      n = exam.exam_versions.length + 1
+      version = ExamVersion.new(
+        exam: exam,
+        name: "#{exam.name} Version #{n}",
+        files: []
+      )
       saved = version.save
       raise GraphQL::ExecutionError, version.errors.full_messages.to_sentence unless saved
 

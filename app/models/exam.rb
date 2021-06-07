@@ -5,14 +5,14 @@ class Exam < ApplicationRecord
   belongs_to :course
 
   has_many :rooms, dependent: :destroy
-  has_many :exam_versions, dependent: :destroy
+  has_many :exam_versions, -> { order(:created_at) }, dependent: :destroy, inverse_of: :exam
   has_many :proctor_registrations, dependent: :destroy
   has_many :exam_announcements, dependent: :destroy
 
-  has_many :registrations, through: :exam_versions
+  has_many :registrations, -> { unscope(:order) }, through: :exam_versions
   has_many :grading_locks, through: :registrations
   has_many :messages, through: :registrations
-  has_many :questions, through: :registrations
+  has_many :student_questions, through: :registrations
   has_many :accommodations, through: :registrations
   has_many :version_announcements, through: :exam_versions
   has_many :room_announcements, through: :rooms
@@ -222,11 +222,11 @@ class Exam < ApplicationRecord
       existing = existing.group_by(&:registration_id)
       registrations.final.each do |registration|
         existing_for_reg = existing[registration.id] || []
-        existing_pairs = existing_for_reg.map { |gl| { qnum: gl.qnum, pnum: gl.pnum } }
+        existing_pairs = existing_for_reg.map { |gl| { question: gl.question, part: gl.part } }
         existing_pairs = existing_pairs.to_set
         missing = pairs_by_version[registration.exam_version_id].reject { |qp| existing_pairs.member? qp }
         missing.each do |qp|
-          GradingLock.create(registration: registration, qnum: qp[:qnum], pnum: qp[:pnum])
+          GradingLock.create(registration: registration, question: qp[:question], part: qp[:part])
         end
       end
     end

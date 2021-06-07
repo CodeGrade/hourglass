@@ -125,6 +125,7 @@ interface FileTreeProps {
   selectedFile: string;
   onChangeFile: (id: string) => void;
   fmap: FileMap;
+  disabled?: boolean;
 }
 
 const FileTree: React.FC<FileTreeProps> = (props) => {
@@ -133,11 +134,13 @@ const FileTree: React.FC<FileTreeProps> = (props) => {
     onChangeFile,
     selectedFile,
     fmap,
+    disabled = false,
   } = props;
   const allIds = Object.keys(fmap);
   return (
     <TreeView
       selected={selectedFile}
+      disableSelection={disabled}
       onNodeSelect={(e, id): void => {
         const dir = fmap[id].filedir === 'dir';
         if (!dir) onChangeFile(id);
@@ -152,7 +155,7 @@ const FileTree: React.FC<FileTreeProps> = (props) => {
 };
 
 interface FileViewerProps {
-  references: FileRef[];
+  references: readonly FileRef[];
   alwaysShowTreeView?: boolean;
   refreshProps?: React.DependencyList;
   fullyExpandCode?: boolean;
@@ -196,7 +199,7 @@ export const FileViewer: React.FC<FileViewerProps> = (props) => {
 };
 
 interface ControlledFileViewerProps {
-  references: FileRef[];
+  references: readonly FileRef[];
   alwaysShowTreeView?: boolean;
   selection?: CodeTagState;
   onChangeLine: (lineNumber: number) => void;

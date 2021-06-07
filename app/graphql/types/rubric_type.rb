@@ -17,11 +17,6 @@ module Types
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 
-    field :rails_id, Integer, null: false
-    def rails_id
-      object.id
-    end
-
     field :label, String, null: true
     field :grader_hint, String, null: false
     field :student_feedback, String, null: true
@@ -42,11 +37,6 @@ module Types
   class RubricPresetType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id
-
-    field :rails_id, Integer, null: false
-    def rails_id
-      object.id
-    end
 
     field :label, String, null: true
     field :direction, Types::RubricDirectionType, null: false
@@ -77,14 +67,18 @@ module Types
       object.type.downcase
     end
 
-    field :rails_id, Integer, null: false
-    def rails_id
-      object.id
-    end
-
     field :qnum, Integer, null: true
+    def qnum
+      object.question&.index
+    end
     field :pnum, Integer, null: true
+    def pnum
+      object.part&.index
+    end
     field :bnum, Integer, null: true
+    def bnum
+      object.body_item&.index
+    end
     field :order, Integer, null: true
 
     field :points, Float, null: true
@@ -95,23 +89,26 @@ module Types
         value: object.description,
       }
     end
-    field :parent_section_id, ID, null: true
-    def parent_section_id
-      return nil if object.parent_section_id.nil?
 
-      HourglassSchema.id_from_object_id(object.parent_section_id, Types::RubricType, context)
-    end
     field :parent_section, Types::RubricType, null: true
     def parent_section
-      return nil if object.parent_section_id.nil?
-
-      RecordLoader.for(Rubric).load(object.parent_section_id)
+      AssociationLoader.for(Rubric, :parent_section).load(object)
     end
+
+    field :exam_version, Types::ExamVersionType, null: false
+    field :question, Types::QuestionType, null: true
+    field :part, Types::PartType, null: true
+    field :body_item, Types::BodyItemType, null: true
 
     field :subsections, [Types::RubricType], null: true
     def subsections
       AssociationLoader.for(Rubric, :subsections).load(object)
     end
+    field :all_subsections, [Types::RubricType], null: false
+    def all_subsections
+      AssociationLoader.for(Rubric, :descendants).load(object)
+    end
+
     field :rubric_preset, Types::RubricPresetType, null: true
     def rubric_preset
       AssociationLoader.for(Rubric, :rubric_preset).load(object)

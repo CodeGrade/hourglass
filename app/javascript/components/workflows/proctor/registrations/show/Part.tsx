@@ -1,29 +1,31 @@
 import React, { useMemo, useContext } from 'react';
-import { PartInfo } from '@student/exams/show/types';
+import { BodyItem } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import DisplayBody from '@proctor/registrations/show/DisplayBody';
 import '@student/exams/show/components/Part.css';
-import { PartFilesContext, ExamViewerContext } from '@hourglass/common/context';
+import { PartFilesContext } from '@hourglass/common/context';
 import { PartName } from '@student/exams/show/components/Part';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import ShowRubric from '@proctor/registrations/show/ShowRubric';
-import { CurrentGrading } from '@hourglass/workflows/professor/exams/types';
+import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
+import { CurrentGrading } from '@professor/exams/types';
 import { pluralize } from '@hourglass/common/helpers';
-import { graphql, useMutation } from 'relay-hooks';
+import { graphql, useFragment, useMutation } from 'relay-hooks';
 import { AlertContext } from '@hourglass/common/alerts';
 import { PartRequestGradingLockMutation } from './__generated__/PartRequestGradingLockMutation.graphql';
 
+import { PartShow$key } from './__generated__/PartShow.graphql';
+
 interface PartProps {
   refreshCodeMirrorsDeps: React.DependencyList;
-  part: PartInfo;
+  partKey: PartShow$key;
   qnum: number;
   pnum: number;
   currentGrading?: CurrentGrading[number][number];
   anonymous?: boolean;
   showRequestGrading?: string;
   fullyExpandCode?: boolean;
-  showStarterCode: boolean;
+  overviewMode: boolean;
 }
 const REQUEST_GRADE_MUTATION = graphql`
 mutation PartRequestGradingLockMutation($input: RequestGradingLockInput!) {
@@ -43,7 +45,7 @@ export const ClaimGradingButton: React.FC<{
   pnum: number;
   graded?: boolean;
   disabled?: boolean;
-  disalbedMessage?: string;
+  disabledMessage?: string;
 }> = (props) => {
   const {
     registrationId,
@@ -51,7 +53,7 @@ export const ClaimGradingButton: React.FC<{
     pnum,
     graded,
     disabled = false,
-    disalbedMessage,
+    disabledMessage,
   } = props;
   const { alert } = useContext(AlertContext);
   const [mutateRequestGrade, {
@@ -80,7 +82,7 @@ export const ClaimGradingButton: React.FC<{
     <TooltipButton
       variant="info"
       disabled={disabled || requestLoading}
-      disabledMessage={disalbedMessage}
+      disabledMessage={disabledMessage}
       cursorClass=""
       className=""
       onClick={() => {
@@ -103,25 +105,52 @@ export const ClaimGradingButton: React.FC<{
 const Part: React.FC<PartProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
-    part,
+    partKey,
     qnum,
     pnum,
     currentGrading,
     anonymous,
     showRequestGrading = false,
     fullyExpandCode = false,
-    showStarterCode,
+    overviewMode,
   } = props;
+  const res = useFragment<PartShow$key>(
+    graphql`
+    fragment PartShow on Part {
+      id
+      name {
+        type
+        value
+      }
+      description {
+        type
+        value
+      }
+      points
+      extraCredit
+      rootRubric @include(if: $withRubric) { ...ShowRubricKey } 
+      references {
+        type
+        path
+      }
+      bodyItems {
+        id
+        info
+        ...DisplayBody
+      }
+    }
+    `,
+    partKey,
+  );
   const {
     name,
-    reference,
+    references,
     description,
     points,
-    extraCredit = false,
-    body,
-  } = part;
-  const { rubric } = useContext(ExamViewerContext);
-  const pRubric = rubric?.questions[qnum]?.parts[pnum]?.partRubric;
+    extraCredit,
+    bodyItems,
+    rootRubric,
+  } = res;
   const strPoints = pluralize(points, 'point', 'points');
   let subtitle;
   if (currentGrading?.score !== undefined) {
@@ -129,7 +158,7 @@ const Part: React.FC<PartProps> = (props) => {
   } else {
     subtitle = `(${strPoints}${extraCredit ? ', extra credit' : ''})`;
   }
-  const contextVal = useMemo(() => ({ references: reference }), [reference]);
+  const contextVal = useMemo(() => ({ references }), [references]);
 
   return (
     <PartFilesContext.Provider value={contextVal}>
@@ -150,34 +179,32 @@ const Part: React.FC<PartProps> = (props) => {
                   pnum={pnum}
                   graded={currentGrading?.graded}
                   disabled={currentGrading?.inProgress}
-                  disalbedMessage="This part is currently being graded"
+                  disabledMessage="This part is currently being graded"
                 />
               </span>
             )}
           </span>
         </h3>
         {description?.value && <HTML value={description} />}
-        {reference.length !== 0 && (
+        {references.length !== 0 && (
           <FileViewer
-            references={reference}
+            references={references}
             refreshProps={refreshCodeMirrorsDeps}
             fullyExpandCode={fullyExpandCode}
           />
         )}
-        {pRubric && <ShowRubric rubric={pRubric} forWhat="part" />}
-        {body.map((b, i) => (
-          // Body numbers are STATIC.
-          // eslint-disable-next-line react/no-array-index-key
-          <div className={`p-2 bodyitem ${b.type}`} key={i}>
+        {rootRubric && overviewMode && <ShowRubricKey rubricKey={rootRubric} forWhat="part" />}
+        {bodyItems.map((b, i) => (
+          <div className={`p-2 bodyitem ${(b as BodyItem).info.type}`} key={b.id}>
             <DisplayBody
-              body={b}
+              bodyKey={b}
               qnum={qnum}
               pnum={pnum}
               bnum={i}
               currentGrading={currentGrading?.body[i]}
               refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
               fullyExpandCode={fullyExpandCode}
-              showStarterCode={showStarterCode}
+              overviewMode={overviewMode}
             />
           </div>
         ))}

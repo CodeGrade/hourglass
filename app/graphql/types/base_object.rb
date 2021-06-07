@@ -26,13 +26,13 @@ module Types
 
       VISIBILITY = lambda { |obj, _args, ctx|
         cached = ctx[:access_cache]
-                 .dig(obj.class.name, obj.object_id, :visible, ctx[:current_user].id)
+                 .dig(obj.class.name, obj.object.id, :visible, ctx[:current_user].id)
         return cached unless cached.nil?
 
         ans = obj.object.visible_to?(ctx[:current_user], Guards.exam_role(ctx[:current_user], ctx), Guards.course_role(ctx[:current_user], ctx))
         Guards.cache(
           ctx[:access_cache],
-          [obj.class.name, obj.object_id, :visible, ctx[:current_user].id],
+          [obj.class.name, obj.object.id, :visible, ctx[:current_user].id],
           ans,
         )
         ans

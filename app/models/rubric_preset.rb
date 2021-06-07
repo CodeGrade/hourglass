@@ -3,10 +3,12 @@
 # A collection of preset comments for an individual subsection of a rubric
 class RubricPreset < ApplicationRecord
   belongs_to :rubric
-  has_many :preset_comments, dependent: :destroy
+  has_many :preset_comments, -> { order(:order) }, dependent: :destroy, inverse_of: :rubric_preset
 
   delegate :exam_version, to: :rubric
   delegate :exam, to: :exam_version
+
+  accepts_nested_attributes_for :preset_comments
 
   def total_points
     preset_comments.sum(&:points)
@@ -31,15 +33,24 @@ class RubricPreset < ApplicationRecord
     end
   end
 
-  def as_json(preset_comments_in_use = nil)
-    presets_as_json = preset_comments.sort_by(&:order).map { |p| p.as_json(preset_comments_in_use) }
+  def as_json(preset_comments_in_use = nil, format:)
+    presets_as_json = preset_comments.sort_by(&:order).map do |p|
+      p.as_json(preset_comments_in_use, format: format)
+    end
     {
-      railsId: id,
       label: label,
       direction: direction,
       mercy: mercy,
       presets: presets_as_json,
-      inUse: presets_as_json.any? { |p| p['inUse'] },
+      inUse: format == :export ? nil : presets_as_json.any? { |p| p['inUse'] },
     }.compact
+  end
+
+  def swap_preset_comments(index_from, index_to)
+    swap_association(PresetComment, preset_comments, :order, index_from, index_to)
+  end
+
+  def move_preset_comments(index_from, index_to)
+    move_association(PresetComment, preset_comments, :order, index_from, index_to)
   end
 end

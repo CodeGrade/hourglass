@@ -21,8 +21,7 @@ gem 'webpacker', '~> 5.1'
 
 gem 'react-rails'
 
-# TODO: switch to release newer than 4.7.3
-gem 'devise', git: 'https://github.com/heartcombo/devise', branch: 'master'
+gem 'devise', '~> 4.8.0'
 gem 'omniauth-bottlenose', git: 'https://github.com/CodeGrade/omniauth-bottlenose'
 gem 'omniauth-oauth2', '~> 1.7.0'
 gem 'omniauth-rails_csrf_protection'

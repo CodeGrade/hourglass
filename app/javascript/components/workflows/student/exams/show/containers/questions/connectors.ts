@@ -7,12 +7,12 @@ import {
   SnapshotStatus,
   MSTP,
   MDTP,
-  BodyItem,
+  BodyItemInfo,
 } from '@student/exams/show/types';
 import withLocked from '@student/exams/show/components/Locked';
 
 interface OwnProps {
-  info: BodyItem;
+  info: BodyItemInfo;
   qnum: number;
   pnum: number;
   bnum: number;

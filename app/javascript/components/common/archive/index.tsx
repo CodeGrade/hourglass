@@ -29,7 +29,7 @@ export async function handleDir(root: JSZip): Promise<ExamFile[]> {
         current = examDir.nodes;
       }
     });
-    promises.push(new Promise((resolve) => {
+    promises.push(new Promise<void>((resolve) => {
       file.async('text').then((contents) => {
         const { text, marks } = extractMarks(contents);
         const examFile: ExamSingleFile = {

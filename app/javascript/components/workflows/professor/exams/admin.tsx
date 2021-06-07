@@ -38,14 +38,6 @@ import {
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
-import {
-  ContentsState,
-  QuestionInfo,
-  FileRef,
-  HTMLVal,
-  ExamFile,
-  AnswerState,
-} from '@student/exams/show/types';
 import LinkButton from '@hourglass/common/linkbutton';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { AlertContext } from '@hourglass/common/alerts';
@@ -63,7 +55,7 @@ import ErrorBoundary, { RenderError } from '@hourglass/common/boundary';
 import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import { policyToString } from '@professor/exams/new/editor/components/Policies';
+import { policyToString } from '@professor/exams/new/editor/Policies';
 import {
   graphql,
   useFragment,
@@ -71,8 +63,6 @@ import {
   useQuery,
 } from 'relay-hooks';
 import { uploadFile } from '@hourglass/common/types/api';
-import { ExamRubric } from '@professor/exams/types';
-import convertRubric from '@professor/exams/rubrics';
 import './dnd.scss';
 
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
@@ -82,7 +72,8 @@ import { adminUpdateExamMutation } from './__generated__/adminUpdateExamMutation
 import { adminPublishGradesMutation } from './__generated__/adminPublishGradesMutation.graphql';
 import { ChecklistItemStatus, admin_checklist$key } from './__generated__/admin_checklist.graphql';
 import { admin_versionInfo$key } from './__generated__/admin_versionInfo.graphql';
-import { admin_version$key, LockdownPolicy } from './__generated__/admin_version.graphql';
+import { admin_version$key } from './__generated__/admin_version.graphql';
+import { admin_preview_version$key } from './__generated__/admin_preview_version.graphql';
 import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMutation.graphql';
 import { adminDestroyVersionMutation } from './__generated__/adminDestroyVersionMutation.graphql';
 
@@ -716,50 +707,11 @@ const ShowVersion: React.FC<{
     fragment admin_version on ExamVersion {
       id
       name
-      policies
       anyStarted
       anyFinalized
       fileExportUrl
       archiveExportUrl
-      questions
-      reference
-      instructions
-      files
-      answers
-      rubrics {
-        id
-        railsId
-        type
-        parentSectionId
-        qnum
-        pnum
-        bnum
-        order
-        points
-        description { 
-          type
-          value
-        }
-        rubricPreset {
-          id
-          railsId
-          direction
-          label
-          mercy
-          presetComments {
-            id
-            railsId
-            label
-            order
-            points
-            graderHint
-            studentFeedback
-          }
-        }
-        subsections {
-          id
-        }
-      }
+      ...admin_preview_version
     }
     `,
     version,
@@ -803,19 +755,6 @@ const ShowVersion: React.FC<{
       ],
     },
   );
-  const parsedContents: ContentsState = {
-    exam: {
-      questions: res.questions as QuestionInfo[],
-      reference: res.reference as FileRef[],
-      instructions: res.instructions as HTMLVal,
-      files: res.files as ExamFile[],
-    },
-    answers: {
-      answers: res.answers as AnswerState[][][],
-      scratch: '',
-    },
-  };
-  const rubrics = convertRubric(res.rubrics);
   let disabledDeleteMessage = '';
   if (res.anyFinalized) {
     disabledDeleteMessage = 'Students have already finished taking this exam version';
@@ -857,10 +796,12 @@ const ShowVersion: React.FC<{
             </Dropdown.Item>
           </DropdownButton>
           <LinkButton
+            id={`edit-${res.id}`}
             disabled={loading}
             variant="info"
             to={`/exams/${examId}/versions/${res.id}/edit`}
             className="mr-2"
+            title="Edit"
           >
             Edit
           </LinkButton>
@@ -886,9 +827,7 @@ const ShowVersion: React.FC<{
       <ErrorBoundary>
         <PreviewVersion
           open={preview}
-          contents={parsedContents}
-          rubric={rubrics}
-          policies={res.policies}
+          version={res}
         />
       </ErrorBoundary>
     </>
@@ -897,31 +836,35 @@ const ShowVersion: React.FC<{
 
 const PreviewVersion: React.FC<{
   open: boolean;
-  contents: ContentsState;
-  rubric?: ExamRubric;
-  policies: readonly LockdownPolicy[];
+  version: admin_preview_version$key;
 }> = (props) => {
   const {
     open,
-    contents,
-    rubric,
-    policies,
+    version,
   } = props;
+  const res = useFragment(
+    graphql`
+    fragment admin_preview_version on ExamVersion {
+      policies
+      ...showExamViewer
+    }
+    `,
+    version,
+  );
   return (
     <Collapse in={open}>
       <div>
         <h6>
           Policies:
           <span className="ml-4">
-            {policies.map(policyToString).join(', ')}
+            {res.policies.map((policy) => policyToString[policy]).join(', ')}
           </span>
         </h6>
         <div className="border p-2">
           <ExamViewer
-            contents={contents}
-            showStarterCode
+            version={res}
+            overviewMode
             refreshCodeMirrorsDeps={[open]}
-            rubric={rubric}
           />
         </div>
       </div>
@@ -1069,7 +1012,7 @@ const ExamAdmin: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
   const res = useQuery<adminExamQuery>(
     graphql`
-    query adminExamQuery($examId: ID!) {
+    query adminExamQuery($examId: ID!, $withRubric: Boolean!) {
       exam(id: $examId) {
         id
         name
@@ -1082,7 +1025,7 @@ const ExamAdmin: React.FC = () => {
       }
     }
     `,
-    { examId },
+    { examId, withRubric: true },
   );
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;

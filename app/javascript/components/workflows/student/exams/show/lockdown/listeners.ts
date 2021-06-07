@@ -106,8 +106,8 @@ export function installListeners(
   policies: readonly Policy[],
   detected: AnomalyDetected,
 ): AnomalyListener[] {
-  if (policyPermits(policies, Policy.ignoreLockdown)) return [];
-  const skipCleanup = policyPermits(policies, Policy.mockLockdown);
+  if (policyPermits(policies, 'IGNORE_LOCKDOWN')) return [];
+  const skipCleanup = policyPermits(policies, 'MOCK_LOCKDOWN');
   const handlers = listeners.map(({
     event,
     handler,

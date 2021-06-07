@@ -191,6 +191,7 @@ const Versions: React.FC<WrappedFieldArrayProps<Version> & VersionsProps> = (pro
               <FieldArray
                 name="students"
                 component={Students}
+                props={{ }}
               />
             </FormSection>
           </Form.Group>
@@ -243,7 +244,7 @@ const StudentDNDForm: React.FC<
   }, [history]);
   const [mutate, { loading }] = useMutation<allocateVersionsMutation>(
     graphql`
-    mutation allocateVersionsMutation($input: UpdateVersionRegistrationsInput!) {
+    mutation allocateVersionsMutation($input: UpdateVersionRegistrationsInput!, $withRubric: Boolean!) {
       updateVersionRegistrations(input: $input) {
         exam {
           ...admin_checklist
@@ -287,6 +288,7 @@ const StudentDNDForm: React.FC<
               unassigned: all.unassigned.map((s) => s.id),
               versions,
             },
+            withRubric: true,
           },
         });
       })}
@@ -323,7 +325,7 @@ const StudentDNDForm: React.FC<
         </h2>
         <Form.Group>
           <h3>Unassigned Students</h3>
-          <FieldArray name="unassigned" component={Students} />
+          <FieldArray name="unassigned" component={Students} props={{ }} />
         </Form.Group>
         <Form.Group>
           <FieldArray

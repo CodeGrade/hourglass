@@ -4,6 +4,7 @@ import React, {
   useRef,
   useContext,
   useEffect,
+  useLayoutEffect,
 } from 'react';
 import {
   Form,
@@ -35,7 +36,6 @@ import { VscGoToFile } from 'react-icons/vsc';
 import Icon from '@student/exams/show/components/Icon';
 import {
   HTMLVal,
-  BodyItem,
   AnswerState,
   TextState,
   CodeState,
@@ -46,7 +46,7 @@ import {
   YesNoState,
   ExamFile,
   AnswersState,
-  QuestionInfo,
+  BodyItemInfo,
 } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
@@ -58,10 +58,14 @@ import GradeYesNo from '@grading/questions/GradeYesNo';
 import GradeMatching from '@grading/questions/GradeMatching';
 import GradeMultipleChoice from '@grading/questions/GradeMultipleChoice';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
-import { ExhaustiveSwitchError, alphabetIdx, useRefresher } from '@hourglass/common/helpers';
+import {
+  ExhaustiveSwitchError,
+  alphabetIdx,
+  useRefresher,
+  pluralize,
+} from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
-import convertRubric from '@professor/exams/rubrics';
 import {
   useParams,
   Switch,
@@ -94,7 +98,7 @@ import TooltipButton from '@student/exams/show/components/TooltipButton';
 import FourOhFour from '@hourglass/workflows/FourOhFour';
 import Spoiler from '@hourglass/common/Spoiler';
 import { NumericInput } from '@hourglass/common/NumericInput';
-import { assertType, CurrentGrading, isExamRubric } from '@professor/exams/types';
+import { CurrentGrading } from '@professor/exams/types';
 import { ShowRubrics } from '@grading/UseRubrics';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
 import { DateTime } from 'luxon';
@@ -217,80 +221,119 @@ const Feedback: React.FC<{
     error,
   } = props;
   const [pointStr, setPointStr] = useState<number | string>(points);
+  const [isFocused, setFocused] = useState(true);
   useEffect(() => {
     setPointStr(String(points));
   }, [points]);
   const alertRef = useRef<HTMLDivElement>();
+  useLayoutEffect(() => {
+    if (isFocused) { alertRef.current.focus(); }
+  }, [isFocused]);
   const variant = variantForPoints(points);
+  const VariantIcon = iconForPoints(points);
   return (
     <Alert
       ref={alertRef}
       variant={variant}
+      tabIndex={-1}
       onBlur={(e) => {
+        if (alertRef.current === e.relatedTarget) {
+          if (onBlur) onBlur(e);
+          return; // don't setFocused and collapse this editor yet.
+        }
         if (isNode(e.relatedTarget) && alertRef.current.contains(e.relatedTarget)) return;
         if (onBlur) onBlur(e);
+        setFocused(false);
       }}
     >
-      <Row>
-        <Form.Group as={Col} lg="auto">
-          <Form.Label>Points</Form.Label>
-          <NumericInput
-            disabled={disabled}
-            step={0.5}
-            value={pointStr}
-            onChange={(val, focused) => {
-              setPointStr(val);
-              // Don't propagate changes when the value is in an interim state
-              // When NumericInput loses focus, it'll send a corrected numeric value.
-              if (!focused && onChangePoints && val !== '' && Number.isFinite(Number(val))) {
-                onChangePoints(Number(val));
-              }
-            }}
-          />
-        </Form.Group>
-        <Form.Group className="ml-auto mr-3">
-          <Form.Label>Status</Form.Label>
-          <div>
-            {couldReset && (
-              <Button
-                className="mr-2"
-                variant="outline-warning"
-                size="sm"
-                onClick={onReset}
-                title="Reset to suggested preset values"
-              >
-                <Icon I={FaUndo} />
-              </Button>
-            )}
-            <span>
-              <ShowStatusIcon error={error} status={status} />
-            </span>
-            <Button
+      {isFocused ? (
+        <Row>
+          <Form.Group as={Col} sm={2} className="mb-0">
+            <Form.Label>Points</Form.Label>
+            <NumericInput
               disabled={disabled}
-              className="ml-2"
-              variant="outline-danger"
+              step={0.5}
+              value={pointStr}
+              onChange={(val, focused) => {
+                setPointStr(val);
+                // Don't propagate changes when the value is in an interim state
+                // When NumericInput loses focus, it'll send a corrected numeric value.
+                if (!focused && onChangePoints && val !== '' && Number.isFinite(Number(val))) {
+                  onChangePoints(Number(val));
+                }
+              }}
+            />
+          </Form.Group>
+          <Form.Group as={Col} className="pl-0 mb-0">
+            <Form.Label>Comment</Form.Label>
+            <Form.Control
+              as="textarea"
+              disabled={disabled}
+              value={message}
+              onChange={(e) => {
+                if (onChangeMessage) onChangeMessage(e.target.value);
+              }}
+            />
+          </Form.Group>
+          <Form.Group className="ml-auto mr-3 mb-0">
+            <Form.Label>Status</Form.Label>
+            <div>
+              {couldReset && (
+                <Button
+                  className="mr-2"
+                  variant="outline-warning"
+                  size="sm"
+                  onClick={onReset}
+                  title="Reset to suggested preset values"
+                >
+                  <Icon I={FaUndo} />
+                </Button>
+              )}
+              <span>
+                <ShowStatusIcon error={error} status={status} />
+              </span>
+              <Button
+                disabled={disabled}
+                className="ml-2"
+                variant="outline-danger"
+                size="sm"
+                onClick={onRemove}
+                title="Delete this comment"
+              >
+                <Icon I={FaTrash} />
+              </Button>
+            </div>
+          </Form.Group>
+        </Row>
+      ) : (
+        <Row>
+          <Form.Group as={Col} sm={2} className="mb-0">
+            <Button
+              disabled
+              variant={variant}
               size="sm"
-              onClick={onRemove}
-              title="Delete this comment"
+              className="align-self-center w-100"
             >
-              <Icon I={FaTrash} />
+              <Icon I={VariantIcon} className="mr-2" />
+              {pluralize(points, 'point', 'points')}
             </Button>
+          </Form.Group>
+          <Form.Group as={Col} className="pl-0 mb-0">{message}</Form.Group>
+          <div className="mr-3 mb-0 float-right">
+            <span><ShowStatusIcon error={error} status={status} /></span>
+            <TooltipButton
+              disabled={false}
+              variant="outline-info"
+              size="sm"
+              enabledMessage="Click to edit this comment"
+              onClick={() => setFocused(true)}
+              className="ml-2"
+            >
+              <Icon I={BsPencilSquare} />
+            </TooltipButton>
           </div>
-        </Form.Group>
-      </Row>
-      <Row>
-        <Form.Group as={Col}>
-          <Form.Label>Comment</Form.Label>
-          <Form.Control
-            as="textarea"
-            disabled={disabled}
-            value={message}
-            onChange={(e) => {
-              if (onChangeMessage) onChangeMessage(e.target.value);
-            }}
-          />
-        </Form.Group>
-      </Row>
+        </Row>
+      )}
     </Alert>
   );
 };
@@ -712,38 +755,17 @@ function AnswersRow<T, V>(
     graphql`
     fragment gradingRubric on ExamVersion {
       id
-      rubrics {
+      rootRubric { ...UseRubricsKey }
+      dbQuestions {
         id
-        railsId
-        type
-        parentSectionId
-        qnum
-        pnum
-        bnum
-        order
-        points
-        description { 
-          type
-          value
-        }
-        rubricPreset {
+        rootRubric { ...UseRubricsKey }
+        parts {
           id
-          railsId
-          direction
-          label
-          mercy
-          presetComments {
+          rootRubric { ...UseRubricsKey }
+          bodyItems {
             id
-            railsId
-            label
-            order
-            points
-            graderHint
-            studentFeedback
+            rootRubric { ...UseRubricsKey }
           }
-        }
-        subsections {
-          id
         }
       }
     }
@@ -751,11 +773,10 @@ function AnswersRow<T, V>(
     examVersionKey,
   );
   const [studentWidth, setStudentWidth] = useState(6);
-  const rubrics = assertType(isExamRubric, convertRubric(res.rubrics));
-  const { examRubric } = rubrics;
-  const qnumRubric = rubrics.questions[qnum]?.questionRubric;
-  const pnumRubric = rubrics.questions[qnum]?.parts[pnum]?.partRubric;
-  const bnumRubric = rubrics.questions[qnum]?.parts[pnum]?.body[bnum];
+  const { rootRubric: examRubricKey } = res;
+  const qnumRubricKey = res.dbQuestions[qnum]?.rootRubric;
+  const pnumRubricKey = res.dbQuestions[qnum]?.parts[pnum]?.rootRubric;
+  const bnumRubricKey = res.dbQuestions[qnum]?.parts[pnum]?.bodyItems[bnum]?.rootRubric;
   return (
     <Card>
       <Card.Body>
@@ -805,10 +826,10 @@ function AnswersRow<T, V>(
           </Col>
           <Col md={6}>
             <ShowRubrics
-              examRubric={examRubric}
-              qnumRubric={qnumRubric}
-              pnumRubric={pnumRubric}
-              bnumRubric={bnumRubric}
+              examRubricKey={examRubricKey}
+              qnumRubricKey={qnumRubricKey}
+              pnumRubricKey={pnumRubricKey}
+              bnumRubricKey={bnumRubricKey}
               showCompletenessAgainst={comments.map((c) => c.presetComment?.id)}
               registrationId={registrationId}
               qnum={qnum}
@@ -825,7 +846,7 @@ function AnswersRow<T, V>(
 const GradeBodyItem: React.FC<{
   expectedAnswer: AnswerState;
   studentAnswer: AnswerState;
-  info: BodyItem;
+  info: BodyItemInfo;
   qnum: number;
   pnum: number;
   bnum: number;
@@ -1074,7 +1095,38 @@ const Grade: React.FC<{
       examVersion {
         id
         ...gradingRubric
-        questions
+        dbQuestions {
+          name {
+            type
+            value
+          }
+          description {
+            type
+            value
+          }
+          extraCredit
+          references {
+            type
+            path
+          }
+          parts {
+            name {
+              type
+              value
+            }
+            description {
+              type
+              value
+            }
+            references {
+              type
+              path
+            }
+            bodyItems {
+              info
+            }
+          }
+        }
         answers
         files
       }
@@ -1087,8 +1139,7 @@ const Grade: React.FC<{
   const { examId, registrationId } = useParams<{ examId: string; registrationId: string }>();
   const { examVersion } = res;
   const currentAnswers = res.currentAnswers as AnswersState;
-  const { answers } = examVersion;
-  const questions = examVersion.questions as QuestionInfo[];
+  const { answers, dbQuestions } = examVersion;
   const files = examVersion.files as ExamFile[];
   const contextVal = useMemo(() => ({
     files,
@@ -1161,11 +1212,11 @@ const Grade: React.FC<{
     },
   );
   const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
-  const singlePart = questions[qnum].parts.length === 1
-    && !questions[qnum].parts[0].name?.value?.trim();
+  const singlePart = dbQuestions[qnum].parts.length === 1
+    && !dbQuestions[qnum].parts[0].name?.value?.trim();
   const allComments = res.gradingComments.edges.map(({ node }) => node);
-  const anyUncommentedItems = questions[qnum].parts[pnum].body.some((b, bnum) => (
-    (b.type !== 'HTML')
+  const anyUncommentedItems = dbQuestions[qnum].parts[pnum].bodyItems.some((b, bnum) => (
+    ((b.info as BodyItemInfo).type !== 'HTML')
       && (allComments.filter((c) => (c.qnum === qnum && c.pnum === pnum && c.bnum === bnum))
         .length === 0)
   ));
@@ -1176,17 +1227,17 @@ const Grade: React.FC<{
           <Row>
             <Col sm={{ span: 6, offset: 3 }}>
               <h2>
-                <QuestionName qnum={qnum} name={questions[qnum].name} />
-                {questions[qnum].extraCredit ? <span className="ml-4">(Extra credit)</span> : null}
+                <QuestionName qnum={qnum} name={dbQuestions[qnum].name} />
+                {dbQuestions[qnum].extraCredit ? <span className="ml-4">(Extra credit)</span> : null}
               </h2>
             </Col>
           </Row>
-          <PromptRow prompt={questions[qnum].description} />
-          {questions[qnum].reference.length !== 0 && (
+          <PromptRow prompt={dbQuestions[qnum].description} />
+          {dbQuestions[qnum].references.length !== 0 && (
             <Row>
               <Col sm={{ span: 9, offset: 3 }}>
                 <FileViewer
-                  references={questions[qnum].reference}
+                  references={dbQuestions[qnum].references}
                   refreshProps={refreshProps}
                 />
               </Col>
@@ -1199,23 +1250,23 @@ const Grade: React.FC<{
                   <PartName
                     anonymous={singlePart}
                     pnum={pnum}
-                    name={questions[qnum].parts[pnum].name}
+                    name={dbQuestions[qnum].parts[pnum].name}
                   />
                 </h3>
               </Col>
             </Row>
-            <PromptRow prompt={questions[qnum].parts[pnum].description} />
-            {questions[qnum].parts[pnum].reference.length !== 0 && (
+            <PromptRow prompt={dbQuestions[qnum].parts[pnum].description} />
+            {dbQuestions[qnum].parts[pnum].references.length !== 0 && (
               <Row>
                 <Col sm={{ span: 9, offset: 3 }}>
                   <FileViewer
-                    references={questions[qnum].parts[pnum].reference}
+                    references={dbQuestions[qnum].parts[pnum].references}
                     refreshProps={refreshProps}
                   />
                 </Col>
               </Row>
             )}
-            {questions[qnum].parts[pnum].body.map((b, bnum) => {
+            {dbQuestions[qnum].parts[pnum].bodyItems.map((b, bnum) => {
               const studentAns = currentAnswers.answers[qnum][pnum][bnum];
               const studentAnswer = isNoAns(studentAns) ? undefined : studentAns;
 
@@ -1233,7 +1284,7 @@ const Grade: React.FC<{
                 <GradeBodyItem
                   // eslint-disable-next-line react/no-array-index-key
                   key={bnum}
-                  info={b}
+                  info={b.info as BodyItemInfo}
                   studentAnswer={studentAnswer}
                   expectedAnswer={expectedAnswer}
                   qnum={qnum}
@@ -1381,7 +1432,26 @@ const ShowOnePart: React.FC<{
       examVersion {
         id
         ...gradingRubric
-        questions
+        dbQuestions {
+          name {
+            type
+            value
+          }
+          description {
+            type
+            value
+          }
+          extraCredit
+          references {
+            type
+            path
+          }
+          parts {
+            id
+            name { value }
+            ...PartShow
+          }
+        }
         answers
         files
       }
@@ -1392,7 +1462,7 @@ const ShowOnePart: React.FC<{
   const { examVersion } = res;
   const currentAnswers = res.currentAnswers as AnswersState;
   const currentGrading = res.currentGrading as CurrentGrading;
-  const questions = examVersion.questions as QuestionInfo[];
+  const questions = examVersion.dbQuestions;
   const files = examVersion.files as ExamFile[];
   const contextVal = useMemo(() => ({
     files,
@@ -1413,11 +1483,11 @@ const ShowOnePart: React.FC<{
             </Col>
           </Row>
           <PromptRow prompt={questions[qnum].description} />
-          {questions[qnum].reference.length !== 0 && (
+          {questions[qnum].references.length !== 0 && (
             <Row>
               <Col sm={{ span: 9, offset: 3 }}>
                 <FileViewer
-                  references={questions[qnum].reference}
+                  references={questions[qnum].references}
                   refreshProps={refreshProps}
                 />
               </Col>
@@ -1428,13 +1498,13 @@ const ShowOnePart: React.FC<{
               <Col sm={{ span: 6, offset: 3 }}>
                 <Part
                   refreshCodeMirrorsDeps={refreshProps}
-                  part={questions[qnum].parts[pnum]}
+                  partKey={questions[qnum].parts[pnum]}
                   qnum={qnum}
                   pnum={pnum}
                   anonymous={singlePart}
                   currentGrading={currentGrading[qnum][pnum]}
                   showRequestGrading={res.id}
-                  showStarterCode={false}
+                  overviewMode={false}
                 />
               </Col>
             </Row>
@@ -1451,7 +1521,7 @@ const GradeOnePart: React.FC = () => {
   }>();
   const res = useQuery<gradingQuery>(
     graphql`
-    query gradingQuery($registrationId: ID!) {
+    query gradingQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
         ...grading_one
         ...grading_showOne
@@ -1465,7 +1535,7 @@ const GradeOnePart: React.FC = () => {
       }
     }
     `,
-    { registrationId },
+    { registrationId, withRubric: true },
   );
 
   if (res.error) {

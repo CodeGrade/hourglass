@@ -1,0 +1,12 @@
+---
+policies: []
+contents:
+  instructions: ""
+  questions:
+    - description: "Placeholder"
+      separateSubparts: false
+      parts:
+        - description: "Placeholder"
+          points: 1
+          body:
+            - "Placeholder"

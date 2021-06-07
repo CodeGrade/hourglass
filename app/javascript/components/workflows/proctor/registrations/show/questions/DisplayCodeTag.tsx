@@ -15,7 +15,7 @@ import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { getFilesForRefs, countFiles } from '@student/exams/show/files';
 
 interface FileModalProps {
-  references: FileRef[];
+  references: readonly FileRef[];
   value: CodeTagState;
   show: boolean;
   onClose: () => void;
@@ -86,7 +86,7 @@ const DisplayCodeTag: React.FC<CodeTagProps> = (props) => {
   const examReferences = useContext(ExamFilesContext);
   const questionReferences = useContext(QuestionFilesContext);
   const partReferences = useContext(PartFilesContext);
-  let references: FileRef[];
+  let references: readonly FileRef[];
   switch (choices) {
     case 'exam':
       references = examReferences.references;

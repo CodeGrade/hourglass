@@ -42,7 +42,7 @@ export default function useAnomalyListeners(
 ): (() => void) {
   const lst = useRef([]);
   const anomalyDetected: AnomalyDetected = (
-    policyPermits(policies, Policy.mockLockdown)
+    policyPermits(policies, 'MOCK_LOCKDOWN')
       ? showAlert
       : anom(examTakeUrl)
   );

@@ -4,6 +4,20 @@ FactoryBot.define do
   factory :exam_version do
     cs2500_v1
 
+    before(:create) do |ev, context|
+      context.upload.build_exam_version(context.name, ev)
+    end
+
+    trait :blank do
+      name { 'Blank exam' }
+      transient do
+        upload { create(:upload, :blank) }
+      end
+      before(:create) do |ev, _context|
+        ev.db_questions.delete_all
+      end
+    end
+
     trait :cs2500_v1 do
       name { 'CS2500 Midterm Version 1' }
       transient do
@@ -55,7 +69,5 @@ FactoryBot.define do
     end
 
     exam
-    files { upload.files }
-    info { upload.info }
   end
 end

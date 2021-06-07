@@ -4,49 +4,24 @@
       "IGNORE_LOCKDOWN",
       "TOLERATE_WINDOWED"
     ],
-    "rubrics": {
-      "examRubric": { "type": "none" },
-      "questions": [],
-    },
-    "answers": [
-      [
-        [
-          {
-            "NO_ANS": true
-          }
-        ]
-      ]
-    ],
     "contents": {
-      "instructions": {
-        "type": "HTML",
-        "value": "Exam instructions here..."
-      },
+      "instructions": "Exam instructions here...",
       "reference": [],
       "questions": [
         {
           "reference": [],
-          "description": {
-            "type": "HTML",
-            "value": "Something to answer."
-          },
+          "description": "Something to answer.",
+          "separateSubparts": false,
           "parts": [
             {
               "reference": [],
+              "description": "A part.",
+              "points": 1.0,
               "body": [
-                {
-                  "type": "HTML",
-                  "value": "Some instructions here for the first part."
-                }
-              ],
-              "description": {
-                "type": "HTML",
-                "value": "A part."
-              },
-              "points": 1
+                "Some instructions here for the first part."
+              ]
             }
-          ],
-          "separateSubparts": false
+          ]
         }
       ]
     }

@@ -12,8 +12,17 @@ module Types
       RecordLoader.for(PresetComment).load(object.preset_comment_id)
     end
     field :qnum, Integer, null: false
+    def qnum
+      object.question.index
+    end
     field :pnum, Integer, null: false
+    def pnum
+      object.part.index
+    end
     field :bnum, Integer, null: false
+    def bnum
+      object.body_item.index
+    end
     field :message, String, null: false
     field :points, Float, null: false
     field :creator, Types::UserType, null: false

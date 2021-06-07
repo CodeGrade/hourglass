@@ -14,8 +14,21 @@
 
 .CodeMirror-scroll {
   max-width: 100%;
-  overflow: auto;
+  // overflow: auto;
 }
+
+.CodeMirror-vscrollbar { visibility: hidden !important; }
+
+// /* Hide scrollbar for Chrome, Safari and Opera */
+// .CodeMirror-scroll::-webkit-scrollbar {
+//   display: none;
+// }
+
+// /* Hide scrollbar for IE, Edge and Firefox */
+// .CodeMirror-scroll {
+//   -ms-overflow-style: none;  /* IE and Edge */
+//   scrollbar-width: none;  /* Firefox */
+// } 
 
 .CodeMirror .readOnly {
   background: #8d6d001a;

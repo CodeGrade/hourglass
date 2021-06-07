@@ -1,654 +1,386 @@
 import React, {
   useContext,
-  useEffect,
-  useMemo,
+  useState,
   useCallback,
+  useMemo,
 } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import {
-  Button,
-  Form,
-  Row,
-} from 'react-bootstrap';
-import {
-  ExamVersion,
-  AnswersState,
-  Policy,
   ExamFile,
   FileRef,
-  QuestionInfo,
-  PartInfo,
-  BodyItem,
-  AllThatApplyState,
-  AllThatApplyInfo,
-  AnswerState,
-  MatchingInfo,
-  MatchingState,
+  HTMLVal,
+  Policy,
 } from '@student/exams/show/types';
 import {
-  BodyItemWithAnswer,
-  ExamVersionWithAnswers,
-  QuestionInfoWithAnswers,
-  PartInfoWithAnswers,
-  AllThatApplyInfoWithAnswer,
-  MatchingInfoWithAnswer,
-  Rubric,
-  ExamRubric,
-  Preset,
-  RubricPresets,
-} from '@professor/exams/types';
+  graphql,
+  useQuery,
+  useMutation,
+} from 'relay-hooks';
+
+import { RenderError } from '@hourglass/common/boundary';
 import {
-  reduxForm,
-  InjectedFormProps,
-  FormSection,
-  Field,
-  WrappedFieldProps,
-  formValueSelector,
-  FieldArray,
-} from 'redux-form';
-import { Provider, connect } from 'react-redux';
-import { useParams, useHistory } from 'react-router-dom';
-import { AlertContext } from '@hourglass/common/alerts';
-import store from '@professor/exams/new/editor/store';
-import Name from '@professor/exams/new/editor/components/Name';
-import Policies from '@professor/exams/new/editor/components/Policies';
-import Instructions from '@professor/exams/new/editor/components/Instructions';
-import EditReference from '@professor/exams/new/editor/components/Reference';
-import FileUploader from '@professor/exams/new/editor/components/FileUploader';
-import ShowQuestions from '@professor/exams/new/editor/components/ShowQuestions';
-import RubricEditor from '@professor/exams/new/editor/RubricEditor';
-import { isNoAns } from '@student/exams/show/containers/questions/connectors';
-import { useMutation, graphql } from 'relay-hooks';
-import { editorUpdateExamVersionMutation } from './__generated__/editorUpdateExamVersionMutation.graphql';
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Row,
+  ToggleButton,
+  ToggleButtonGroup,
+} from 'react-bootstrap';
+import { AlertContext, useAlert } from '@hourglass/common/alerts';
+import { useParams } from 'react-router-dom';
+import Policies from './Policies';
+import FileUploader from './FileUploader';
+import Instructions from './Instructions';
+import EditReference from './Reference';
+import { SingleRubricKeyEditor } from './Rubric';
+import { ReorderableQuestionsEditor } from './Question';
+import { editorCreateQuestionMutation } from './__generated__/editorCreateQuestionMutation.graphql';
+import { editorChangeMutation } from './__generated__/editorChangeMutation.graphql';
+import { editorChangeFilesMutation } from './__generated__/editorChangeFilesMutation.graphql';
+import { editorQuery } from './__generated__/editorQuery.graphql';
+import { DebouncedFormControl } from './components/helpers';
 
-export interface Version {
-  name: string;
-  info: {
-    policies: readonly Policy[];
-    answers: AnswersState['answers'];
-    contents: {
-      instructions: ExamVersion['instructions'];
-      questions: ExamVersion['questions'];
-      reference: ExamVersion['reference'];
-    };
-    rubrics: ExamRubric;
-  };
-  files: ExamVersion['files'];
-}
-
-function transformATAReverse(
-  ata: AllThatApplyInfo,
-  answer: AllThatApplyState,
-  rubric: Rubric,
-): AllThatApplyInfoWithAnswer {
-  const {
-    options,
-    ...rest
-  } = ata;
-  const newOptions = options.map((o, idx) => ({
-    html: o,
-    answer: answer[idx],
-  }));
-  return {
-    ...rest,
-    rubric,
-    options: newOptions,
-  };
-}
-
-function transformMatchingReverse(
-  matching: MatchingInfo,
-  answer: MatchingState,
-  rubric: Rubric,
-): MatchingInfoWithAnswer {
-  const {
-    prompts,
-    ...rest
-  } = matching;
-  const newPrompts = prompts.map((o, idx) => ({
-    html: o,
-    answer: answer[idx],
-  }));
-  return {
-    ...rest,
-    rubric,
-    prompts: newPrompts,
-  };
-}
-
-function examWithAnswersAndRubrics(
-  exam: ExamVersion,
-  answers: AnswersState['answers'],
-  rubric: ExamRubric,
-): ExamVersionWithAnswers {
-  const {
-    questions,
-    ...restOfE
-  } = exam;
-  const newQuestions: QuestionInfoWithAnswers[] = [];
-  questions.forEach((q, qnum) => {
-    const {
-      parts,
-      ...restOfQ
-    } = q;
-    const qRubric = rubric?.questions[qnum];
-    const newParts: PartInfoWithAnswers[] = [];
-    parts.forEach((p, pnum) => {
-      const {
-        body,
-        ...restOfP
-      } = p;
-      const pRubric = qRubric?.parts[pnum];
-      const newBody: BodyItemWithAnswer[] = [];
-      body.forEach((b, bnum) => {
-        const bRubric = pRubric?.body[bnum];
-        const ans = answers[qnum][pnum][bnum];
-        let newItem: BodyItemWithAnswer;
-        switch (b.type) {
-          case 'AllThatApply': {
-            newItem = transformATAReverse(b, ans as AllThatApplyState, bRubric);
-            break;
-          }
-          case 'Matching': {
-            newItem = transformMatchingReverse(b, ans as MatchingState, bRubric);
-            break;
-          }
-          default:
-            newItem = {
-              ...b,
-              rubric: bRubric,
-              answer: isNoAns(ans) ? undefined : ans,
-            } as BodyItemWithAnswer;
+const ExamVersionEditor: React.FC = () => {
+  const { versionId: examVersionId } = useParams<{ versionId: string }>();
+  const res = useQuery<editorQuery>(
+    graphql`
+    query editorQuery($examVersionId: ID!) {
+      examVersion(id: $examVersionId) {
+        name
+        anyStarted
+        anyFinalized
+        rootRubric { ...RubricSingle }
+        files
+        instructions {
+          type
+          value
         }
-        newBody.push(newItem);
-      });
-      newParts.push({
-        ...restOfP,
-        partRubric: pRubric?.partRubric,
-        body: newBody,
-      });
-    });
-    newQuestions.push({
-      ...restOfQ,
-      parts: newParts,
-      questionRubric: qRubric?.questionRubric,
-    });
-  });
-  return {
-    ...restOfE,
-    examRubric: rubric.examRubric,
-    questions: newQuestions,
-  };
-}
-
-export interface ExamEditorProps {
-  examVersionId: string;
-  exam: ExamVersion;
-  versionName: string;
-  versionPolicies: readonly Policy[];
-  answers: AnswersState;
-  rubrics: ExamRubric;
-}
-
-const Editor: React.FC<ExamEditorProps> = (props) => {
-  const {
-    examVersionId,
-    exam,
-    versionName,
-    versionPolicies,
-    answers,
-    rubrics,
-  } = props;
-  const initialValues = useMemo(() => ({
-    all: {
-      name: versionName,
-      policies: versionPolicies,
-      exam: examWithAnswersAndRubrics(exam, answers.answers, rubrics),
-    },
-  }), [versionName, versionPolicies, answers.answers, exam, rubrics]);
-  return (
-    <Provider store={store}>
-      <ExamEditorForm
-        examVersionId={examVersionId}
-        initialValues={initialValues}
-      />
-    </Provider>
-  );
-};
-export default Editor;
-
-interface FormValues {
-  all: {
-    name: string;
-    policies: readonly Policy[];
-    exam: ExamVersionWithAnswers;
-  };
-}
-
-type WrappedInput<T> = React.ComponentType<{ value: T; onChange: (a: T) => void; }>;
-
-function wrapInput<T>(Wrappee : WrappedInput<T>): React.FC<WrappedFieldProps> {
-  return (props) => {
-    const { input } = props;
-    return (
-      // eslint-disable-next-line react/jsx-props-no-spreading
-      <Wrappee {...props} value={input.value} onChange={input.onChange} />
-    );
-  };
-}
-
-const WrappedName = wrapInput(Name);
-const WrappedPolicies = wrapInput(Policies);
-const WrappedInstructions = wrapInput(Instructions);
-
-export const formSelector = formValueSelector('version-editor');
-
-const FormContextProvider: React.FC<{
-  files: ExamFile[];
-  examRef: FileRef[];
-}> = (props) => {
-  const {
-    files,
-    examRef,
-    children,
-  } = props;
-  const examContextVal = useMemo(() => ({
-    files,
-    fmap: createMap(files),
-  }), [files]);
-  const examFilesContextVal = useMemo(() => ({
-    references: examRef,
-  }), [examRef]);
-  return (
-    <ExamContext.Provider value={examContextVal}>
-      <ExamFilesContext.Provider value={examFilesContextVal}>
-        {children}
-      </ExamFilesContext.Provider>
-    </ExamContext.Provider>
-  );
-};
-
-const FormContextProviderConnected = connect((state) => ({
-  files: formSelector(state, 'all.exam.files'),
-  examRef: formSelector(state, 'all.exam.reference'),
-}))(FormContextProvider);
-
-function transformATA(
-  ata: AllThatApplyInfoWithAnswer,
-): {
-  info: AllThatApplyInfo;
-  answer: AllThatApplyState;
-} {
-  const {
-    options,
-    rubric,
-    ...rest
-  } = ata;
-  const answer = [];
-  const newOptions = [];
-  options.forEach((o) => {
-    answer.push(o.answer);
-    newOptions.push(o.html);
-  });
-  return {
-    info: {
-      ...rest,
-      options: newOptions,
-    },
-    answer,
-  };
-}
-
-function transformMatching(
-  matching: MatchingInfoWithAnswer,
-): {
-  info: MatchingInfo;
-  answer: MatchingState;
-} {
-  const {
-    prompts,
-    rubric,
-    ...rest
-  } = matching;
-  const answer = [];
-  const newPrompts = [];
-  prompts.forEach((o) => {
-    answer.push(o.answer);
-    newPrompts.push(o.html);
-  });
-  return {
-    info: {
-      ...rest,
-      prompts: newPrompts,
-    },
-    answer,
-  };
-}
-
-function stripInUsePreset(preset: Preset): Preset {
-  const { inUse: _, ...presetClean } = preset;
-  return presetClean;
-}
-
-function stripInUsePresets(rubric: RubricPresets): RubricPresets {
-  const { inUse: _, presets, ...rest } = rubric;
-  return {
-    ...rest,
-    presets: presets.map(stripInUsePreset),
-  };
-}
-
-function stripInUse(rubric: Rubric): Rubric {
-  if (rubric === undefined) return rubric;
-  switch (rubric.type) {
-    case 'none': {
-      const { inUse: _, ...rest } = rubric;
-      return rest;
-    }
-    case 'all':
-    case 'any':
-    case 'one': {
-      const { inUse: _, choices, ...rest } = rubric;
-      return {
-        ...rest,
-        choices: (choices instanceof Array
-          ? choices.map(stripInUse)
-          : stripInUsePresets(choices)
-        ),
-      };
-    }
-    default:
-      throw new ExhaustiveSwitchError(rubric);
-  }
-}
-
-function transformForSubmit(values: FormValues): Version {
-  const { all } = values;
-  const questions: QuestionInfo[] = [];
-  const answers: AnswersState['answers'] = [];
-  const rubrics: ExamRubric = {
-    examRubric: stripInUse(all.exam.examRubric),
-    questions: [],
-  };
-  all.exam.questions.forEach((q, qnum) => {
-    answers[qnum] = [];
-    const {
-      parts,
-      questionRubric,
-      ...restOfQ
-    } = q;
-    rubrics.questions[qnum] = {
-      questionRubric: stripInUse(questionRubric),
-      parts: [],
-    };
-    const newParts: PartInfo[] = [];
-    parts.forEach((p, pnum) => {
-      answers[qnum][pnum] = [];
-      const {
-        body,
-        partRubric,
-        ...restOfP
-      } = p;
-      rubrics.questions[qnum].parts[pnum] = {
-        partRubric: stripInUse(partRubric),
-        body: [],
-      };
-      const newBody: BodyItem[] = [];
-      body.forEach((b, bnum) => {
-        let itemAnswer: AnswerState;
-        let bodyItem: BodyItem;
-        const bodyRubric = stripInUse(b.rubric || { type: 'none' });
-        rubrics.questions[qnum].parts[pnum].body[bnum] = bodyRubric;
-        switch (b.type) {
-          case 'AllThatApply': {
-            const res = transformATA(b);
-            itemAnswer = res.answer;
-            bodyItem = res.info;
-            break;
-          }
-          case 'Matching': {
-            const res = transformMatching(b);
-            itemAnswer = res.answer;
-            bodyItem = res.info;
-            break;
-          }
-          default: {
-            const {
-              answer,
-              rubric,
-              ...restOfB
-            } = b;
-            itemAnswer = answer;
-            bodyItem = restOfB;
-          }
-        }
-        answers[qnum][pnum][bnum] = itemAnswer ?? { NO_ANS: true };
-        newBody.push(bodyItem);
-      });
-      newParts.push({
-        ...restOfP,
-        body: newBody,
-      });
-    });
-    questions.push({
-      ...restOfQ,
-      parts: newParts,
-    });
-  });
-
-  return {
-    name: all.name,
-    info: {
-      policies: all.policies,
-      answers,
-      contents: {
-        instructions: all.exam.instructions,
-        questions,
-        reference: all.exam.reference ?? [],
-      },
-      rubrics,
-    },
-    files: all.exam.files,
-  };
-}
-
-const UPDATE_EXAM_VERSION = graphql`
-mutation editorUpdateExamVersionMutation($input: UpdateExamVersionInput!) {
-  updateExamVersion(input: $input) {
-    examVersion {
-      id
-      rubrics {
-        id
-        railsId
-        type
-        rubricPreset {
+        dbReferences {
           id
-          railsId
-          direction
-          label
-          mercy
-          presetComments {
-            id
-            railsId
-            label
-            order
-            points
-            graderHint
-            studentFeedback
-          }
+          type
+          path
         }
-        subsections {
+        policies
+        dbQuestions {
           id
+          ...QuestionEditor
+
         }
       }
     }
-  }
-}
-`;
-
-interface ExamEditorExtraProps {
-  examVersionId: string;
-}
-
-const ExamEditor: React.FC<
-  InjectedFormProps<FormValues, ExamEditorExtraProps> & ExamEditorExtraProps
-> = (props) => {
-  const {
-    examVersionId,
-    pristine,
-    reset,
-    handleSubmit,
-  } = props;
+    `,
+    { examVersionId },
+  );
   const { alert } = useContext(AlertContext);
-  const history = useHistory();
-  const { examId } = useParams<{ examId: string }>();
-  const [update, { loading: saveLoading }] = useMutation<editorUpdateExamVersionMutation>(
-    UPDATE_EXAM_VERSION,
+  const [
+    mutateUpdateExamVersion,
+    { loading: loadingUpdateExamVersion },
+  ] = useMutation<editorChangeMutation>(
+    graphql`
+    mutation editorChangeMutation($input: ChangeExamVersionDetailsInput!) {
+      changeExamVersionDetails(input: $input) {
+        examVersion {
+          id
+          name
+          instructions {
+            type
+            value
+          }
+          dbReferences {
+            id
+            type
+            path
+          }
+          policies
+        }
+      }
+    }
+    `,
     {
-      onCompleted: () => {
-        history.push(`/exams/${examId}/admin`);
-        alert({
-          variant: 'success',
-          autohide: true,
-          message: 'Exam version updated successfully.',
-        });
-      },
       onError: (err) => {
         alert({
           variant: 'danger',
-          title: 'Exam version not updated.',
-          message: <pre>{err.message}</pre>,
+          title: 'Error updating exam version',
+          message: err.message,
           copyButton: true,
         });
       },
     },
   );
-  const [autosave, { loading: autosaveLoading }] = useMutation<editorUpdateExamVersionMutation>(
-    UPDATE_EXAM_VERSION,
+  // This mutation is separated, because files might be inordinately big
+  // compared to the other necessary data
+  const [
+    mutateUpdateExamVersionFiles,
+    { loading: loadingUpdateExamVersionFiles },
+  ] = useMutation<editorChangeFilesMutation>(
+    graphql`
+    mutation editorChangeFilesMutation($input: ChangeExamVersionDetailsInput!) {
+      changeExamVersionDetails(input: $input) {
+        examVersion {
+          id
+          dbReferences {
+            id
+            type
+            path
+          }
+          files
+        }
+      }
+    }
+    `,
     {
-      onCompleted: () => {
-        alert({
-          variant: 'success',
-          title: 'Autosaved',
-          message: 'Exam version saved automatically.',
-          autohide: true,
-        });
-      },
       onError: (err) => {
         alert({
           variant: 'danger',
-          title: 'Error doing autosave',
-          message: <pre>{err.message}</pre>,
-          autohide: true,
+          title: 'Error updating exam version',
+          message: err.message,
           copyButton: true,
         });
       },
     },
   );
-  const loading = saveLoading || autosaveLoading;
-  useEffect(() => {
-    const timer = setInterval(() => {
-      handleSubmit((values) => {
-        const {
-          name,
-          info,
-          files,
-        } = transformForSubmit(values);
-        autosave({
-          variables: {
-            input: {
-              examVersionId,
-              name,
-              info: JSON.stringify(info),
-              files: JSON.stringify(files),
-            },
-          },
-        });
-      })();
-    }, 20000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, [handleSubmit, autosave]);
-  const doSubmit = useCallback((e): void => {
-    e.preventDefault();
-    handleSubmit((values) => {
-      const {
-        name,
-        info,
-        files,
-      } = transformForSubmit(values);
-      update({
-        variables: {
-          input: {
-            examVersionId,
-            name,
-            info: JSON.stringify(info),
-            files: JSON.stringify(files),
-          },
+  const updateName = useCallback((newVal: string) => {
+    mutateUpdateExamVersion({
+      variables: {
+        input: {
+          examVersionId,
+          updateName: true,
+          name: newVal,
         },
-      });
-    })();
-  }, [handleSubmit, update]);
+      },
+    });
+  }, [examVersionId]);
+  const updateInstructions = useCallback((newVal: HTMLVal) => {
+    mutateUpdateExamVersion({
+      variables: {
+        input: {
+          examVersionId,
+          updateInstructions: true,
+          instructions: newVal,
+        },
+      },
+    });
+  }, [examVersionId]);
+  const updatePolicies = useCallback((newVal: Policy[]) => {
+    mutateUpdateExamVersion({
+      variables: {
+        input: {
+          examVersionId,
+          updatePolicies: true,
+          policies: newVal,
+        },
+      },
+    });
+  }, [examVersionId]);
+  const updateFiles = useCallback((newVal: ExamFile[]) => {
+    mutateUpdateExamVersionFiles({
+      variables: {
+        input: {
+          examVersionId,
+          updateFiles: true,
+          files: newVal,
+        },
+      },
+    });
+  }, [examVersionId]);
+  const updateReferences = useCallback((newVal: FileRef[]) => {
+    mutateUpdateExamVersion({
+      variables: {
+        input: {
+          examVersionId,
+          updateReferences: true,
+          references: newVal,
+        },
+      },
+    });
+  }, [examVersionId]);
+
+  const [
+    mutateCreateQuestion,
+    { loading: loadingCreateQuestion },
+  ] = useMutation<editorCreateQuestionMutation>(
+    graphql`
+    mutation editorCreateQuestionMutation($input: CreateQuestionInput!) {
+      createQuestion(input: $input) {
+        examVersion {
+          id
+          dbQuestions {
+            id
+            ...QuestionEditor
+          }
+        }
+      }
+    }
+    `,
+    {
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error adding new question',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const createQuestion = useCallback(() => {
+    mutateCreateQuestion({
+      variables: {
+        input: {
+          examVersionId,
+        },
+      },
+    });
+  }, [examVersionId]);
+  useAlert(
+    {
+      variant: 'warning',
+      title: 'Students have already started taking this version',
+      message: 'Changing the questions will likely result in nonsensical answers, and changing the structure of this version will result in undefined behavior. Be careful!',
+    },
+    res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized,
+    [res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized],
+  );
+  const [showRubrics, setShowRubrics] = useState(false);
+  const files = (res?.data?.examVersion?.files as ExamFile[]) ?? [];
+  const contextVal = useMemo(() => ({
+    files,
+    fmap: createMap(files),
+  }), [files]);
+  const references = res?.data?.examVersion?.dbReferences ?? [];
+  const examReference = useMemo(() => ({
+    references,
+  }), [files]);
+  if (res.error) {
+    return <Container><RenderError error={res.error} /></Container>;
+  }
+  if (!res.data) {
+    return <Container><p>Loading...</p></Container>;
+  }
+  const { examVersion } = res.data;
+  const { rootRubric, dbQuestions, policies } = examVersion;
+
+  const disabled = (
+    loadingCreateQuestion
+    || loadingUpdateExamVersion
+    || loadingUpdateExamVersionFiles
+  );
   return (
-    <Form onSubmit={doSubmit}>
-      <FormSection name="all">
-        <Field name="name" component={WrappedName} />
-        <Field name="policies" component={WrappedPolicies} />
-        <FormSection name="exam">
-          <FormContextProviderConnected>
-            <div className="alert alert-info">
-              <h4>Exam-wide information</h4>
-              <Field name="files" component={FileUploader} />
-              <Field name="instructions" component={WrappedInstructions} />
-            </div>
-            <Form.Group as={Row}>
-              <Field
-                name="reference"
-                component={EditReference}
-                label="the entire exam"
+    <Container fluid>
+      <ExamContext.Provider value={contextVal}>
+        <ExamFilesContext.Provider value={examReference}>
+          <Row>
+            <Col sm={{ span: 8, offset: 2 }}>
+              <Form.Group as={Row} controlId="examTitle">
+                <Form.Label column sm="auto"><h2>Version name:</h2></Form.Label>
+                <Col>
+                  <DebouncedFormControl
+                    size="lg"
+                    placeholder="Enter a name for this version"
+                    defaultValue={examVersion.name}
+                    onChange={updateName}
+                    disabled={disabled}
+                  />
+                </Col>
+              </Form.Group>
+              <Form.Group as={Row} className="text-center">
+                <Form.Label column sm="auto"><h3>Show rubric editors?</h3></Form.Label>
+                <Col sm="auto">
+                  <ToggleButtonGroup
+                    className="bg-white rounded"
+                    name="wording"
+                    type="radio"
+                    value={showRubrics ? 'yes' : 'no'}
+                    onChange={(newVal) => setShowRubrics(newVal === 'yes')}
+                  >
+                    <ToggleButton
+                      disabled={disabled}
+                      variant={showRubrics ? 'primary' : 'outline-primary'}
+                      value="yes"
+                    >
+                      Yes
+                    </ToggleButton>
+                    <ToggleButton
+                      disabled={disabled}
+                      variant={!showRubrics ? 'primary' : 'outline-primary'}
+                      value="no"
+                    >
+                      No
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                </Col>
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12} xl={showRubrics ? 12 : { span: 8, offset: 2 }}>
+              <Card border="info" className="mb-4">
+                <div className="alert alert-info">
+                  <Card.Title>
+                    Exam-wide information
+                  </Card.Title>
+                </div>
+                <Card.Body>
+                  <Row>
+                    <Col>
+                      <Policies
+                        value={policies}
+                        disabled={disabled}
+                        onChange={updatePolicies}
+                      />
+                      <FileUploader
+                        value={examVersion.files as ExamFile[]}
+                        disabled={disabled}
+                        onChange={updateFiles}
+                      />
+                      <Instructions
+                        value={examVersion.instructions}
+                        disabled={disabled}
+                        onChange={updateInstructions}
+                      />
+                      <Form.Group as={Row}>
+                        <EditReference
+                          value={examVersion.dbReferences}
+                          disabled={disabled}
+                          onChange={updateReferences}
+                          label="the entire exam"
+                        />
+                      </Form.Group>
+                    </Col>
+                    {showRubrics && (
+                      <Col sm={12} xl={6}>
+                        <SingleRubricKeyEditor
+                          rubricKey={rootRubric}
+                        />
+                      </Col>
+                    )}
+                  </Row>
+                </Card.Body>
+              </Card>
+              <ReorderableQuestionsEditor
+                dbQuestions={dbQuestions}
+                examVersionId={examVersionId}
+                showRubricEditors={showRubrics}
               />
-            </Form.Group>
-            <Field
-              name="examRubric"
-              fieldName="examRubric"
-              component={RubricEditor}
-              enableDelete={false}
-              disabledDeleteMessage="Cannot delete root rubric"
-            />
-            <FieldArray
-              name="questions"
-              component={ShowQuestions}
-              examVersionId={examVersionId}
-            />
-          </FormContextProviderConnected>
-        </FormSection>
-        <Row className="my-2 float-right">
-          <Button
-            disabled={loading}
-            variant="danger"
-            className={pristine ? 'd-none' : 'mr-2'}
-            onClick={reset}
-          >
-            Reset
-          </Button>
-          <Button
-            disabled={loading}
-            variant="success"
-            type="submit"
-          >
-            Submit
-          </Button>
-        </Row>
-      </FormSection>
-    </Form>
+              <Row className="text-center">
+                <Col>
+                  <Button
+                    variant="primary"
+                    onClick={createQuestion}
+                    disabled={loadingCreateQuestion}
+                  >
+                    Add question
+                  </Button>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
+        </ExamFilesContext.Provider>
+      </ExamContext.Provider>
+    </Container>
   );
 };
-
-const ExamEditorForm = reduxForm<FormValues, ExamEditorExtraProps>({
-  form: 'version-editor',
-  asyncBlurFields: [],
-  asyncChangeFields: [],
-})(ExamEditor);
+export default ExamVersionEditor;

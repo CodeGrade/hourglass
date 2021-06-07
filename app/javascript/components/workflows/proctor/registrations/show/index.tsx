@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { ContentsState } from '@student/exams/show/types';
+import { AnswersState, AnswerState, ExamFile } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import {
   ExamContext,
@@ -7,51 +7,118 @@ import {
   ExamFilesContext,
 } from '@hourglass/common/context';
 import { createMap } from '@student/exams/show/files';
-import DisplayQuestions from '@proctor/registrations/show/DisplayQuestions';
+import DisplayQuestions from '@student/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
-import { ExamRubric, CurrentGrading } from '@professor/exams/types';
-import ShowRubric from '@proctor/registrations/show/ShowRubric';
+import { CurrentGrading } from '@professor/exams/types';
+import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
+import { useFragment } from 'relay-hooks';
+import { graphql } from 'relay-runtime';
+
+import { showExamViewer$key } from './__generated__/showExamViewer.graphql';
 
 interface ExamViewerProps {
-  contents: ContentsState;
+  version: showExamViewer$key;
   currentGrading?: CurrentGrading;
+  currentAnswers?: AnswersState;
   refreshCodeMirrorsDeps?: React.DependencyList;
-  rubric?: ExamRubric;
-  showRequestGrading?: string;
-  showStarterCode: boolean;
+  registrationId?: string;
+  overviewMode: boolean;
 }
 
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {
   const {
-    contents,
+    version,
     currentGrading,
+    currentAnswers,
     refreshCodeMirrorsDeps,
-    rubric,
-    showRequestGrading,
-    showStarterCode,
+    registrationId,
+    overviewMode,
   } = props;
-  const {
-    exam,
-    answers,
-  } = contents;
+  const res = useFragment(
+    graphql`
+    fragment showExamViewer on ExamVersion {
+      id
+      answers
+      ...DisplayQuestions
+      rootRubric @include(if: $withRubric) { ...ShowRubricKey } 
+      dbReferences {
+        type
+        path
+      }
+      instructions {
+        type
+        value
+      }
+      dbQuestions {
+        id
+        rubrics {
+          id
+        }
+        parts {
+          id
+          rubrics {
+            id
+          }
+          bodyItems {
+            id
+            rubrics {
+              id
+            }
+          }
+        }
+      }
+      files
+      rubrics {
+        id
+        type
+        order
+        points
+        description {
+          type
+          value
+        }
+        rubricPreset {
+          id
+          direction
+          label
+          mercy
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+        subsections {
+          id
+        }
+      }
+    }
+    `,
+    version,
+  );
   const {
     instructions,
+    dbReferences: references,
     files,
-    reference,
-    questions,
-  } = exam;
+  } = res;
+  const answers = overviewMode ? {
+    answers: res.answers as AnswerState[][][],
+    scratch: '',
+  } : currentAnswers;
   const examContextVal = useMemo(() => ({
-    files,
-    fmap: createMap(files),
+    files: files as ExamFile[],
+    fmap: createMap(files as ExamFile[]),
   }), [files]);
   const examViewerContextVal = useMemo(() => ({
     answers,
-    rubric,
   }), [answers]);
   const examFilesContextVal = useMemo(() => ({
-    references: reference,
-  }), [reference]);
+    references,
+  }), [references]);
   return (
     <ExamContext.Provider value={examContextVal}>
       <ExamViewerContext.Provider value={examViewerContextVal}>
@@ -67,21 +134,21 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
               </div>
             )}
             {instructions && <HTML value={instructions} />}
-            {reference.length !== 0 && (
+            {references.length !== 0 && (
               <FileViewer
                 refreshProps={refreshCodeMirrorsDeps}
-                references={reference}
+                references={references}
               />
             )}
-            {rubric?.examRubric && <ShowRubric rubric={rubric.examRubric} forWhat="exam" />}
+            {overviewMode && <ShowRubricKey rubricKey={res.rootRubric} forWhat="exam" />}
             <div>
               <DisplayQuestions
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
-                questions={questions}
+                version={res}
                 currentGrading={currentGrading}
-                showRequestGrading={showRequestGrading}
+                registrationId={registrationId}
                 fullyExpandCode
-                showStarterCode={showStarterCode}
+                overviewMode={overviewMode}
               />
             </div>
           </div>

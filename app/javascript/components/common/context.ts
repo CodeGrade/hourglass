@@ -20,7 +20,7 @@ interface ExamViewerContext {
 export const ExamViewerContext = createContext<ExamViewerContext>({} as ExamViewerContext);
 
 interface FilesContext {
-  references: FileRef[];
+  references: readonly FileRef[];
 }
 
 export const ExamFilesContext = createContext<FilesContext>({

@@ -40,6 +40,10 @@ class Course < ApplicationRecord
     User.where(id: staff_ids + professor_ids + student_ids)
   end
 
+  def empty?
+    all_users.empty?
+  end
+
   def has_staff?
     staff_registrations.exists?
   end

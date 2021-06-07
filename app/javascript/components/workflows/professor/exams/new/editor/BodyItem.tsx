@@ -1,4 +1,5 @@
 import React, {
+  useCallback,
   useContext,
 } from 'react';
 import {
@@ -81,6 +82,17 @@ export const ReorderableBodyItemsEditor: React.FC<{
       },
     },
   );
+  const rearrangeItems = useCallback((from, to) => {
+    mutate({
+      variables: {
+        input: {
+          partId,
+          fromIndex: from,
+          toIndex: to,
+        },
+      },
+    });
+  }, [partId, mutate]);
   const disabled = parentDisabled || loading;
   return (
     <RearrangeableList
@@ -89,17 +101,7 @@ export const ReorderableBodyItemsEditor: React.FC<{
       dropVariant="secondary"
       disabled={disabled}
       identifier={`BODYITEM-${partId}`}
-      onRearrange={(from, to) => {
-        mutate({
-          variables: {
-            input: {
-              partId,
-              fromIndex: from,
-              toIndex: to,
-            },
-          },
-        });
-      }}
+      onRearrange={rearrangeItems}
     >
       {(bodyItem, bodyItemHandleRef, bodyItemIsDragging) => (
         <Row key={bodyItem.id}>
@@ -175,6 +177,15 @@ export const BodyItemEditor: React.FC<{
       },
     },
   );
+  const destroyItem = useCallback(() => {
+    mutateDestroyBodyItem({
+      variables: {
+        input: {
+          bodyItemId: bodyItem.id,
+        },
+      },
+    });
+  }, [mutateDestroyBodyItem, bodyItem.id]);
   const disabled = parentDisabled || loadingDestroyBodyItem;
   let editor;
   let showRubric = showRubricEditors;
@@ -267,15 +278,7 @@ export const BodyItemEditor: React.FC<{
       {handleRef && <DragHandle handleRef={handleRef} variant="secondary" />}
       <DestroyButton
         disabled={disabled}
-        onClick={() => {
-          mutateDestroyBodyItem({
-            variables: {
-              input: {
-                bodyItemId: bodyItem.id,
-              },
-            },
-          });
-        }}
+        onClick={destroyItem}
       />
       <Card.Body className="ml-4 mr-4">
         <Row>

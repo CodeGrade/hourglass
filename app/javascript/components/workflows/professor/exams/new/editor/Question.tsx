@@ -90,7 +90,7 @@ export const ReorderableQuestionsEditor: React.FC<{
         },
       },
     });
-  }, [examVersionId]);
+  }, [examVersionId, mutate]);
   return (
     <RearrangeableList
       dbArray={dbQuestions}

@@ -88,6 +88,17 @@ export const ReorderablePartsEditor: React.FC<{
       },
     },
   );
+  const rearrangeParts = useCallback((from, to) => {
+    mutate({
+      variables: {
+        input: {
+          questionId,
+          fromIndex: from,
+          toIndex: to,
+        },
+      },
+    });
+  }, [questionId, mutate]);
   const disabled = parentDisabled || loading;
   return (
     <RearrangeableList
@@ -96,17 +107,7 @@ export const ReorderablePartsEditor: React.FC<{
       dropVariant="success"
       disabled={disabled}
       identifier={`PART-${questionId}`}
-      onRearrange={(from, to) => {
-        mutate({
-          variables: {
-            input: {
-              questionId,
-              fromIndex: from,
-              toIndex: to,
-            },
-          },
-        });
-      }}
+      onRearrange={rearrangeParts}
     >
       {(part, partHandleRef, partIsDragging) => (
         <Row key={part.id}>

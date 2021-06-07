@@ -250,6 +250,10 @@ const ExamVersionEditor: React.FC = () => {
     files,
     fmap: createMap(files),
   }), [files]);
+  const references = res?.data?.examVersion?.dbReferences ?? [];
+  const examReference = useMemo(() => ({
+    references,
+  }), [files]);
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
@@ -267,11 +271,7 @@ const ExamVersionEditor: React.FC = () => {
   return (
     <Container fluid>
       <ExamContext.Provider value={contextVal}>
-        <ExamFilesContext.Provider
-          value={{
-            references: examVersion.dbReferences,
-          }}
-        >
+        <ExamFilesContext.Provider value={examReference}>
           <Row>
             <Col sm={{ span: 8, offset: 2 }}>
               <Form.Group as={Row} controlId="examTitle">

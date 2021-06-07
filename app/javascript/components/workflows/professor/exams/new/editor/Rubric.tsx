@@ -384,23 +384,24 @@ const ReordorableRubricEditor: React.FC<{
       },
     },
   );
+  const rearrangeSections = useCallback((from, to) => {
+    mutate({
+      variables: {
+        input: {
+          parentSectionId,
+          fromIndex: from,
+          toIndex: to,
+        },
+      },
+    });
+  }, [mutate, parentSectionId]);
   return (
     <RearrangeableList
       dbArray={subsections}
       identifier={`SECTION-INDEX-${parentSectionId}`}
       className="mb-3"
       dropVariant="light"
-      onRearrange={(from, to) => {
-        mutate({
-          variables: {
-            input: {
-              parentSectionId,
-              fromIndex: from,
-              toIndex: to,
-            },
-          },
-        });
-      }}
+      onRearrange={rearrangeSections}
     >
       {(subRubric, handleRef, isDragging) => (
         <SingleRubricEditor
@@ -454,23 +455,24 @@ const ReorderablePresetCommentEditor: React.FC<{
       },
     },
   );
+  const rearrangePresets = useCallback((from, to) => {
+    mutate({
+      variables: {
+        input: {
+          rubricPresetId: rubricPreset.id,
+          fromIndex: from,
+          toIndex: to,
+        },
+      },
+    });
+  }, [mutate, rubricPreset.id]);
   return (
     <RearrangeableList
       dbArray={presets}
       className="mb-3"
       dropVariant="light"
       identifier={`PRESET-INDEX-${rubricPreset.id}`}
-      onRearrange={(from, to) => {
-        mutate({
-          variables: {
-            input: {
-              rubricPresetId: rubricPreset.id,
-              fromIndex: from,
-              toIndex: to,
-            },
-          },
-        });
-      }}
+      onRearrange={rearrangePresets}
     >
       {(preset, handleRef, isDragging) => (
         <RubricPresetEditor

@@ -28,7 +28,7 @@ module Mutations
     def resolve(part:, **kwargs)
       Part.transaction do
         part.name = kwargs[:name][:value] if kwargs[:update_name]
-        part.description = kwargs[:description]['value'] if kwargs[:update_description]
+        part.description = kwargs.dig(:description, :value) if kwargs[:update_description]
         if kwargs[:update_extra_credit]
           raise GraphQL::ExecutionError, 'Updated extra_credit must not be nil' unless kwargs.key?(:extra_credit)
           part.extra_credit = kwargs[:extra_credit]

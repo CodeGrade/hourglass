@@ -5,7 +5,8 @@ import {
   Route,
   Link,
 } from 'react-router-dom';
-import { Container, Button } from 'react-bootstrap';
+import { DateTime, LocaleOptions } from 'luxon';
+import { Container, Button, Table } from 'react-bootstrap';
 import { graphql } from 'react-relay';
 import { BsListCheck } from 'react-icons/bs';
 import { useQuery, useMutation } from 'relay-hooks';
@@ -44,6 +45,8 @@ const ExamSubmissions: React.FC = () => {
           started
           over
           final
+          startTime
+          endTime
         }
       }
     }
@@ -113,71 +116,123 @@ const ExamSubmissions: React.FC = () => {
     else groups.notStarted.push(r);
   });
   const startedButNotFinished = groups.over.length > 0 || groups.started.length > 0;
+  const timeOpts : LocaleOptions & Intl.DateTimeFormatOptions = {
+    weekday: 'short', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+  };
   return (
     <DocumentTitle title={`${res.data.exam.name} -- All submissions`}>
       <h4>Completed submissions</h4>
       {groups.final.length === 0 ? (
         <i>No completed submissions yet</i>
       ) : (
-        <ul>
-          {groups.final.map((reg) => (
-            <li key={reg.id}>
-              <Link to={`/exams/${examId}/submissions/${reg.id}`}>
-                {reg.user.displayName}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-      {startedButNotFinished && (
-        <div>
-          <FinalizeDialog
-            loading={loading}
-            buttonText="Finalize all students' submissions who have run out of time"
-            subjectName="all students who have run out of time"
-            subjectValue={examId}
-            showModal={showModal}
-            closeModal={closeModal}
-            finalize={finalize}
-          />
-          <Button
-            variant="danger"
-            onClick={openModal}
-          >
-            <Icon I={BsListCheck} />
-            Finalize
-          </Button>
-        </div>
+        <Table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Started</th>
+              <th>Ended</th>
+            </tr>
+          </thead>
+          <tbody>
+            {groups.final.map((reg) => (
+              <tr key={reg.id}>
+                <td>
+                  <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+                    {reg.user.displayName}
+                  </Link>
+                </td>
+                <td>{reg.startTime && DateTime.fromISO(reg.startTime).toLocaleString(timeOpts)}</td>
+                <td>{reg.endTime && DateTime.fromISO(reg.endTime).toLocaleString(timeOpts)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       )}
       {groups.over.length === 0 ? (
         null
       ) : (
         <>
-          <h4>Out-of-time submissions</h4>
-          <ul>
-            {groups.over.map((reg) => (
-              <li key={reg.id}>
-                <Link to={`/exams/${examId}/submissions/${reg.id}`}>
-                  {reg.user.displayName}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <h4>
+            Out-of-time submissions
+            {startedButNotFinished && (
+              <div className="d-inline-block ml-4">
+                <FinalizeDialog
+                  loading={loading}
+                  buttonText="Finalize all students' submissions who have run out of time"
+                  subjectName="all students who have run out of time"
+                  subjectValue={examId}
+                  showModal={showModal}
+                  closeModal={closeModal}
+                  finalize={finalize}
+                />
+                <Button
+                  variant="danger"
+                  onClick={openModal}
+                >
+                  <Icon I={BsListCheck} />
+                  Finalize
+                </Button>
+              </div>
+            )}
+          </h4>
+          <Table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Started</th>
+                <th>Ended</th>
+              </tr>
+            </thead>
+            <tbody>
+              {groups.over.map((reg) => (
+                <tr key={reg.id}>
+                  <td>
+                    <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+                      {reg.user.displayName}
+                    </Link>
+                  </td>
+                  <td>
+                    {reg.startTime && DateTime.fromISO(reg.startTime).toLocaleString(timeOpts)}
+                  </td>
+                  <td>
+                    {reg.endTime && DateTime.fromISO(reg.endTime).toLocaleString(timeOpts)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
         </>
       )}
       <h4>Started submissions</h4>
       {groups.started.length === 0 ? (
         <i>No one is currently taking the exam</i>
       ) : (
-        <ul>
-          {groups.started.map((reg) => (
-            <li key={reg.id}>
-              <Link to={`/exams/${examId}/submissions/${reg.id}`}>
-                {reg.user.displayName}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <Table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Started</th>
+              <th>Ended</th>
+            </tr>
+          </thead>
+          <tbody>
+            {groups.started.map((reg) => (
+              <tr key={reg.id}>
+                <td>
+                  <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+                    {reg.user.displayName}
+                  </Link>
+                </td>
+                <td>
+                  {reg.startTime && DateTime.fromISO(reg.startTime).toLocaleString(timeOpts)}
+                </td>
+                <td>
+                  {reg.endTime && DateTime.fromISO(reg.endTime).toLocaleString(timeOpts)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       )}
       <h4>Not-yet-started submissions</h4>
       {groups.notStarted.length === 0 ? (
@@ -255,7 +310,10 @@ const ExamSubmissionStudent: React.FC = () => {
     graphql`
     query submissionsStudentQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
-        currentAnswers
+        currentAnswers {
+          scratch
+          answers
+        }
         currentGrading
         currentScorePercentage
         user {
@@ -309,7 +367,10 @@ const ExamSubmissionStaff: React.FC = () => {
     graphql`
     query submissionsStaffQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
-        currentAnswers
+        currentAnswers {
+          scratch
+          answers
+        }
         currentGrading
         published
         user {

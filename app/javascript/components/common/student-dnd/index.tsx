@@ -230,26 +230,38 @@ const StudentDNDForm: React.FC<
     change,
   } = props;
   const addSectionToRoom = (section: Section, roomId: string): void => {
-    change('all', ({ unassigned, rooms }) => ({
-      unassigned: unassigned.filter((unassignedStudent: Student) => (
-        !section.students.find((student) => student.id === unassignedStudent.id)
-      )),
-      rooms: rooms.map((room: Room) => {
-        const filtered = room.students.filter((roomStudent) => (
-          !section.students.find((student) => student.id === roomStudent.id)
-        ));
-        if (room.id === roomId) {
+    change('all', ({ unassigned, rooms } : {unassigned: Student[], rooms: Room[]}) => {
+      const allRegisteredStudents = {};
+      unassigned.forEach((unassignedStudent) => {
+        allRegisteredStudents[unassignedStudent.id] = true;
+      });
+      rooms.forEach((room) => {
+        room.students.forEach((student) => { allRegisteredStudents[student.id] = true; });
+      });
+      return {
+        unassigned: unassigned.filter((unassignedStudent: Student) => (
+          !section.students.find((student) => student.id === unassignedStudent.id)
+        )),
+        rooms: rooms.map((room: Room) => {
+          const studentsAlreadyInRoomButNotInSection = room.students.filter((roomStudent) => (
+            !section.students.find((student) => student.id === roomStudent.id)
+          ));
+          if (room.id === roomId) {
+            const registeredStudentsInSection = section.students.filter(
+              (student) => allRegisteredStudents[student.id],
+            );
+            return {
+              ...room,
+              students: studentsAlreadyInRoomButNotInSection.concat(registeredStudentsInSection),
+            };
+          }
           return {
             ...room,
-            students: filtered.concat(section.students),
+            students: studentsAlreadyInRoomButNotInSection,
           };
-        }
-        return {
-          ...room,
-          students: filtered,
-        };
-      }),
-    }));
+        }),
+      };
+    });
   };
   const history = useHistory();
   const { alert } = useContext(AlertContext);

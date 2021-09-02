@@ -56,8 +56,7 @@ module Mutations
     def remove_rooms(exam, proctors)
       registrations = exam.proctor_registrations.includes(:user).index_by(&:user_id)
       proctors.each do |user|
-        proctor_reg = registrations[user.id]
-        next unless proctor_reg
+        proctor_reg = registrations[user.id] || ProctorRegistration.new(user: user, exam: exam)
 
         proctor_reg.room_id = nil
         saved = proctor_reg.save

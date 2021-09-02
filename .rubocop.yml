@@ -59,3 +59,5 @@ Rails/EnvironmentVariableAccess:
   AllowReads: true
 Style/WordArray:
   EnforcedStyle: brackets
+Rails/EagerEvaluationLogMessage:
+  Enabled: false

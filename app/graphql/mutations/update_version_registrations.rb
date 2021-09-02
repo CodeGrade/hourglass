@@ -31,6 +31,9 @@ module Mutations
         delete_unassigned! exam, lookup_ids(unassigned)
         @cur_regs = exam.registrations.index_by(&:user_id)
         assign_versions! exam, versions
+        # NOTE: Because exam.registrations is defined :through .exam_versions, we need this .reload
+        # to ensure that its ActiveRecord assocations are updated properly
+        exam.reload 
         cache_authorization!(exam, exam.course)
         {
           exam: exam,

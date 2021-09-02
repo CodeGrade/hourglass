@@ -364,10 +364,7 @@ const ExamSubmissionStaff: React.FC = () => {
     graphql`
     query submissionsStaffQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
-        currentAnswers {
-          scratch
-          answers
-        }
+        currentAnswers
         currentGrading
         published
         user {

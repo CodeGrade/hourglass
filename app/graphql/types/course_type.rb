@@ -9,6 +9,8 @@ module Types
 
     field :title, String, null: false
 
+    field :term, Types::TermType, null: false
+
     field :exams, [Types::ExamType], null: false do
       guard ->(obj, _, ctx) {
         (Guards.course_role(ctx[:current_user], ctx) >= Exam.roles[:staff]) ||

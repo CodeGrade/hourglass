@@ -148,6 +148,8 @@ class HourglassSchema < GraphQL::Schema
       Types::SectionType
     when StaffRegistration
       Types::StaffRegistrationType
+    when Term
+      Types::TermType
     when User
       Types::UserType
     when VersionAnnouncement

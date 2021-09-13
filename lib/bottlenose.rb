@@ -11,6 +11,7 @@ module Bottlenose
       terms = bottlenose_get('/api/courses')
       terms.each do |term|
         active_courses = term['courses']
+        term_info = term['term']
         active_courses.each do |active_course|
           next unless active_course['prof']
 
@@ -18,6 +19,12 @@ module Bottlenose
           hg_course.title = active_course['name']
           hg_course.last_sync = DateTime.now
           hg_course.active = true
+          hg_term = Term.find_or_create_by(
+            year: term_info['year'],
+            semester: term_info['semester'],
+          )
+          hg_course.term = hg_term
+
           hg_course.save!
           sync_course_regs(hg_course)
         end

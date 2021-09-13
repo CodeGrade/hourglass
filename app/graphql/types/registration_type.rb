@@ -60,6 +60,10 @@ module Types
     def accommodated_start_time
       object.accommodated_start_time
     end
+    field :term_name, String, null: false
+    def term_name
+      object.exam.course.term.name
+    end
 
     field :current_answers, GraphQL::Types::JSON, null: true
     def current_answers

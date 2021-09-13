@@ -107,6 +107,7 @@ const ShowRegistrations: React.FC<{
         name
       }
       courseTitle
+      termName
     }
     `,
     registrations,
@@ -130,7 +131,7 @@ const ShowRegistrations: React.FC<{
           const regs = regsByCourse[courseTitle];
           return (
             <li key={regs[0].id}>
-              <h2>{courseTitle}</h2>
+              <h2>{`${courseTitle} - ${regs[0].termName}`}</h2>
               <ul>
                 {regs.map((reg) => (
                   <li key={reg.id}>

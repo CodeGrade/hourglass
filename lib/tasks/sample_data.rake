@@ -19,7 +19,8 @@ def make_sample_data
 end
 
 def make_cs2500
-  cs2500 = create(:course, title: 'CS 2500')
+  fall2021 = create(:term, year: 2021, semester: Term.semesters['fall'])
+  cs2500 = create(:course, title: 'CS 2500', term: fall2021)
   cs2500lec = create(:section, :lecture, course: cs2500)
   cs2500lab = create(:section, :lab, course: cs2500)
   cs2500midterm = create(:exam, name: 'CS2500 Midterm', course: cs2500, duration: 5.minutes)
@@ -63,7 +64,8 @@ def make_cs2500
 end
 
 def make_cs3500
-  cs3500 = create(:course, title: 'CS 3500')
+  spring2022 = create(:term, year: 2022, semester: Term.semesters['spring'])
+  cs3500 = create(:course, title: 'CS 3500', term: spring2022)
   cs3500lec = create(:section, :lecture, course: cs3500)
   cs3500lab = create(:section, :lab, course: cs3500)
   cs3500final = create(:exam, name: 'CS3500 Final', course: cs3500, duration: 15.minutes)

@@ -3,6 +3,7 @@ class CreateTerms < ActiveRecord::Migration[6.0]
     create_table :terms do |t|
       t.integer :semester, default: 0, null: false
       t.integer :year, default: 0, null: false
+      t.boolean :archived, default: false, null: false
 
       t.timestamps
       t.index ["semester", "year"], name: "index_terms_on_semester_and_year", unique: true

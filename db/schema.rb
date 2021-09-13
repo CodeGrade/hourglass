@@ -349,6 +349,7 @@ ActiveRecord::Schema.define(version: 2021_09_11_223649) do
   create_table "terms", force: :cascade do |t|
     t.integer "semester", default: 0, null: false
     t.integer "year", default: 0, null: false
+    t.boolean "archived", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["semester", "year"], name: "index_terms_on_semester_and_year", unique: true

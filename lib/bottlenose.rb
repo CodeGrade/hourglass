@@ -22,6 +22,7 @@ module Bottlenose
           hg_term = Term.find_or_create_by(
             year: term_info['year'],
             semester: term_info['semester'],
+            archived: term_info['archived'],
           )
           hg_course.term = hg_term
 

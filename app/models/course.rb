@@ -2,6 +2,8 @@
 
 # A course taken by students that gives exams.
 class Course < ApplicationRecord
+  belongs_to :term
+
   has_many :exams, dependent: :destroy
   has_many :sections, dependent: :destroy
 

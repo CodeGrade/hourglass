@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_23_182059) do
+ActiveRecord::Schema.define(version: 2021_09_11_223649) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(version: 2021_05_23_182059) do
     t.integer "bottlenose_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "term_id", null: false
   end
 
   create_table "exam_announcements", force: :cascade do |t|
@@ -343,6 +344,14 @@ ActiveRecord::Schema.define(version: 2021_05_23_182059) do
     t.index ["section_id"], name: "index_student_registrations_on_section_id"
     t.index ["user_id", "section_id"], name: "index_student_registrations_on_user_id_and_section_id", unique: true
     t.index ["user_id"], name: "index_student_registrations_on_user_id"
+  end
+
+  create_table "terms", force: :cascade do |t|
+    t.integer "semester", default: 0, null: false
+    t.integer "year", default: 0, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["semester", "year"], name: "index_terms_on_semester_and_year", unique: true
   end
 
   create_table "users", force: :cascade do |t|

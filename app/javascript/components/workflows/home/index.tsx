@@ -247,6 +247,10 @@ const ShowProfRegs: React.FC<{
       course {
         id
         title
+        term {
+          id
+          name
+        }
       }
     }
     `,
@@ -264,7 +268,7 @@ const ShowProfRegs: React.FC<{
             <Link
               to={`/courses/${course.id}`}
             >
-              {course.title}
+              {`${course.title} - ${course.term.name}`}
             </Link>
           </li>
         ))}

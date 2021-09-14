@@ -19,7 +19,7 @@ module Types
 
     field :active_terms, [TermType], null: false
     def active_terms
-      Term.active
+      Term.active.sorted
     end
 
     def cache_authorization!(exam, course)

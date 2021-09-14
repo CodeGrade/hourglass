@@ -2,7 +2,10 @@
 
 class Term < ApplicationRecord
   has_many :courses, dependent: :destroy
+  has_many :registrations, through: :courses
   enum semester: { fall: 10, spring: 30, summer_1: 40, summer: 50, summer_2: 60 }
+
+  scope :active, -> { where(archived: false) }
 
   validates :semester, inclusion: {in: Term.semesters.keys},
             uniqueness: {

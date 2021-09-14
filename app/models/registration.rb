@@ -24,6 +24,7 @@ class Registration < ApplicationRecord
   delegate :proctors_and_professors, to: :exam
   delegate :all_staff, to: :exam
   delegate :course, to: :exam
+  delegate :term, to: :course
 
   def room_version_same_exam
     return unless room

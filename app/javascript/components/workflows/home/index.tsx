@@ -107,7 +107,6 @@ const ShowRegistrations: React.FC<{
         name
       }
       courseTitle
-      termName
     }
     `,
     registrations,
@@ -125,13 +124,13 @@ const ShowRegistrations: React.FC<{
   });
   return (
     <>
-      <h1>{name}</h1>
+      <h3>{name}</h3>
       <ul>
         {Object.keys(regsByCourse).map((courseTitle) => {
           const regs = regsByCourse[courseTitle];
           return (
             <li key={regs[0].id}>
-              <h2>{`${courseTitle} - ${regs[0].termName}`}</h2>
+              <h4>{courseTitle}</h4>
               <ul>
                 {regs.map((reg) => (
                   <li key={reg.id}>
@@ -376,17 +375,20 @@ const Home: React.FC = () => {
   const res = useQuery<homeQuery>(
     graphql`
     query homeQuery {
-      me {
-        admin
+      activeTerms {
+        name
+        myRegistrations {
+          ...home_studentregs
+        }
         futureRegistrations {
           ...home_futureregs
-        }
-        currentRegistrations {
-          ...home_studentregs
         }
         priorRegistrations {
           ...home_studentregs
         }
+      }
+      me {
+        admin
         staffRegistrations {
           nodes {
             ...home_staffregs
@@ -412,38 +414,48 @@ const Home: React.FC = () => {
   if (!res.data) {
     return <p>Loading...</p>;
   }
-  const allEmpty = (
-    res.data.me.futureRegistrations.length === 0
-    && res.data.me.currentRegistrations.length === 0
-    && res.data.me.priorRegistrations.length === 0
-    && res.data.me.professorCourseRegistrations.nodes.length === 0
-    && res.data.me.proctorRegistrations.nodes.length === 0
-    && res.data.me.staffRegistrations.nodes.length === 0
-  );
+  const anyRegistrations = res.data.activeTerms.reduce((prev, cur) => {
+    const anyInTerm = cur.myRegistrations.length > 0;
+    return prev || anyInTerm;
+  }, false);
   return (
     <Container>
       <DocumentTitle title="My Exams">
-        {allEmpty && (
-          <DocumentTitle title="Hourglass">
-            <p>You have no registrations.</p>
-          </DocumentTitle>
-        )}
-        <ShowUpcomingRegistrations
-          registrations={res.data.me.futureRegistrations}
-        />
-        {res.data.me.currentRegistrations.length > 0 && (
+        {anyRegistrations && (
           <Alert variant="warning">
             <div className="text-center"><b><i>Make sure that you are using Chrome or Firefox right now!</i></b></div>
           </Alert>
         )}
-        <ShowRegistrations
-          name="Active exams"
-          registrations={res.data.me.currentRegistrations}
-        />
-        <ShowRegistrations
-          name="Prior exams"
-          registrations={res.data.me.priorRegistrations}
-        />
+        <div>
+          {res.data.activeTerms.map((term) => {
+            const allEmpty = (
+              term.futureRegistrations.length === 0
+              && term.myRegistrations.length === 0
+              && term.priorRegistrations.length === 0
+            );
+            return (
+              <div>
+                <h1>
+                  {term.name}
+                </h1>
+                {allEmpty && (
+                  <p>You have no registrations for this term.</p>
+                )}
+                <ShowUpcomingRegistrations
+                  registrations={term.futureRegistrations}
+                />
+                <ShowRegistrations
+                  name="Active exams"
+                  registrations={term.myRegistrations}
+                />
+                <ShowRegistrations
+                  name="Prior exams"
+                  registrations={term.priorRegistrations}
+                />
+              </div>
+            );
+          })}
+        </div>
         <ShowProctorRegs
           proctorRegistrations={res.data.me.proctorRegistrations.nodes}
         />

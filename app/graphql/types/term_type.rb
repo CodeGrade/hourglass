@@ -12,13 +12,13 @@ module Types
       object.registrations.where(user: context[:current_user]).current_exams
     end
 
-    field :future_registrations, [Types::FutureRegistrationType], null: false
-    def future_registrations
+    field :my_future_registrations, [Types::FutureRegistrationType], null: false
+    def my_future_registrations
       object.registrations.where(user: context[:current_user]).future_exams
     end
 
-    field :prior_registrations, [Types::RegistrationType], null: false
-    def prior_registrations
+    field :my_prior_registrations, [Types::RegistrationType], null: false
+    def my_prior_registrations
       object.registrations.where(user: context[:current_user]).past_exams
     end
   end

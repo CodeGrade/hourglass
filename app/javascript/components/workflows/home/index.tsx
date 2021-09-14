@@ -15,6 +15,7 @@ import {
   Row,
   Col,
   Alert,
+  Card,
 } from 'react-bootstrap';
 import { DateTime } from 'luxon';
 import LinkButton from '@hourglass/common/linkbutton';
@@ -437,34 +438,36 @@ const Home: React.FC = () => {
               && term.myProfessorCourseRegistrations.nodes.length === 0
             );
             return (
-              <div>
-                <h1>
-                  {term.name}
-                </h1>
-                {allEmpty && (
-                  <p>You have no registrations for this term.</p>
-                )}
-                <ShowUpcomingRegistrations
-                  registrations={term.myFutureRegistrations}
-                />
-                <ShowRegistrations
-                  name="Active exams"
-                  registrations={term.myRegistrations}
-                />
-                <ShowRegistrations
-                  name="Prior exams"
-                  registrations={term.myPriorRegistrations}
-                />
-                <ShowProctorRegs
-                  proctorRegistrations={term.myProctorRegistrations.nodes}
-                />
-                <ShowStaffRegs
-                  staffRegistrations={term.myStaffRegistrations.nodes}
-                />
-                <ShowProfRegs
-                  professorCourseRegistrations={term.myProfessorCourseRegistrations.nodes}
-                />
-              </div>
+              <Card className="my-3">
+                <Card.Body>
+                  <Card.Title>
+                    <h1>{term.name}</h1>
+                  </Card.Title>
+                  {allEmpty && (
+                    <p>You have no registrations for this term.</p>
+                  )}
+                  <ShowUpcomingRegistrations
+                    registrations={term.myFutureRegistrations}
+                  />
+                  <ShowRegistrations
+                    name="Active exams"
+                    registrations={term.myRegistrations}
+                  />
+                  <ShowRegistrations
+                    name="Prior exams"
+                    registrations={term.myPriorRegistrations}
+                  />
+                  <ShowProctorRegs
+                    proctorRegistrations={term.myProctorRegistrations.nodes}
+                  />
+                  <ShowStaffRegs
+                    staffRegistrations={term.myStaffRegistrations.nodes}
+                  />
+                  <ShowProfRegs
+                    professorCourseRegistrations={term.myProfessorCourseRegistrations.nodes}
+                  />
+                </Card.Body>
+              </Card>
             );
           })}
         </div>

@@ -2,8 +2,12 @@
 
 class Term < ApplicationRecord
   has_many :courses, dependent: :destroy
-  has_many :registrations, through: :courses
   enum semester: { fall: 10, spring: 30, summer_1: 40, summer: 50, summer_2: 60 }
+
+  has_many :registrations, through: :courses
+  has_many :staff_registrations, through: :courses
+  has_many :proctor_registrations, through: :courses
+  has_many :professor_course_registrations, through: :courses
 
   scope :active, -> { where(archived: false) }
 

@@ -11,6 +11,7 @@ class Course < ApplicationRecord
   has_many :staff_registrations, through: :sections
   has_many :student_registrations, through: :sections
   has_many :registrations, through: :exams
+  has_many :proctor_registrations, through: :exams
 
   has_many :student_ids, -> { distinct }, through: :student_registrations
   has_many :staff_ids, -> { distinct }, through: :staff_registrations

@@ -211,7 +211,7 @@ const ShowStaffRegs: React.FC<{
   });
   return (
     <>
-      <h1>Exams to Grade</h1>
+      <h3>Exams to Grade</h3>
       <ul>
         {Object.keys(courses).map((cId) => (
           <React.Fragment key={cId}>
@@ -219,7 +219,7 @@ const ShowStaffRegs: React.FC<{
               <li
                 key={exam.id}
               >
-                <h2>{exam.name}</h2>
+                <h4>{exam.name}</h4>
                 <LinkButton to={`/exams/${exam.id}/grading`} variant="success">
                   Start Grading
                 </LinkButton>
@@ -259,7 +259,7 @@ const ShowProfRegs: React.FC<{
   if (res.length === 0) return null;
   return (
     <>
-      <h1>Courses</h1>
+      <h3>Courses</h3>
       <ul>
         {res.map(({ course }) => (
           <li
@@ -268,7 +268,7 @@ const ShowProfRegs: React.FC<{
             <Link
               to={`/courses/${course.id}`}
             >
-              {`${course.title} - ${course.term.name}`}
+              {course.title}
             </Link>
           </li>
         ))}
@@ -386,24 +386,24 @@ const Home: React.FC = () => {
         myPriorRegistrations {
           ...home_studentregs
         }
-      }
-      me {
-        admin
-        staffRegistrations {
+        myStaffRegistrations {
           nodes {
             ...home_staffregs
           }
         }
-        proctorRegistrations {
+        myProctorRegistrations {
           nodes {
             ...home_proctorregs
           }
         }
-        professorCourseRegistrations {
+        myProfessorCourseRegistrations {
           nodes {
             ...home_profregs
           }
         }
+      }
+      me {
+        admin
       }
     }
     `,
@@ -432,6 +432,9 @@ const Home: React.FC = () => {
               term.myFutureRegistrations.length === 0
               && term.myRegistrations.length === 0
               && term.myPriorRegistrations.length === 0
+              && term.myStaffRegistrations.nodes.length === 0
+              && term.myProctorRegistrations.nodes.length === 0
+              && term.myProfessorCourseRegistrations.nodes.length === 0
             );
             return (
               <div>
@@ -452,19 +455,19 @@ const Home: React.FC = () => {
                   name="Prior exams"
                   registrations={term.myPriorRegistrations}
                 />
+                <ShowProctorRegs
+                  proctorRegistrations={term.myProctorRegistrations.nodes}
+                />
+                <ShowStaffRegs
+                  staffRegistrations={term.myStaffRegistrations.nodes}
+                />
+                <ShowProfRegs
+                  professorCourseRegistrations={term.myProfessorCourseRegistrations.nodes}
+                />
               </div>
             );
           })}
         </div>
-        <ShowProctorRegs
-          proctorRegistrations={res.data.me.proctorRegistrations.nodes}
-        />
-        <ShowStaffRegs
-          staffRegistrations={res.data.me.staffRegistrations.nodes}
-        />
-        <ShowProfRegs
-          professorCourseRegistrations={res.data.me.professorCourseRegistrations.nodes}
-        />
         {res.data.me.admin && (
           <Admin />
         )}

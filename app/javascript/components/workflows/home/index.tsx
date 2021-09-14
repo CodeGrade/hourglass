@@ -380,10 +380,10 @@ const Home: React.FC = () => {
         myRegistrations {
           ...home_studentregs
         }
-        futureRegistrations {
+        myFutureRegistrations {
           ...home_futureregs
         }
-        priorRegistrations {
+        myPriorRegistrations {
           ...home_studentregs
         }
       }
@@ -429,9 +429,9 @@ const Home: React.FC = () => {
         <div>
           {res.data.activeTerms.map((term) => {
             const allEmpty = (
-              term.futureRegistrations.length === 0
+              term.myFutureRegistrations.length === 0
               && term.myRegistrations.length === 0
-              && term.priorRegistrations.length === 0
+              && term.myPriorRegistrations.length === 0
             );
             return (
               <div>
@@ -442,7 +442,7 @@ const Home: React.FC = () => {
                   <p>You have no registrations for this term.</p>
                 )}
                 <ShowUpcomingRegistrations
-                  registrations={term.futureRegistrations}
+                  registrations={term.myFutureRegistrations}
                 />
                 <ShowRegistrations
                   name="Active exams"
@@ -450,7 +450,7 @@ const Home: React.FC = () => {
                 />
                 <ShowRegistrations
                   name="Prior exams"
-                  registrations={term.priorRegistrations}
+                  registrations={term.myPriorRegistrations}
                 />
               </div>
             );

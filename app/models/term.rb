@@ -10,6 +10,7 @@ class Term < ApplicationRecord
   has_many :professor_course_registrations, through: :courses
 
   scope :active, -> { where(archived: false) }
+  scope :sorted, -> { sort_by {|tt| tt.canonical_name }.reverse }
 
   validates :semester, inclusion: {in: Term.semesters.keys},
             uniqueness: {
@@ -18,7 +19,23 @@ class Term < ApplicationRecord
                 "Terms must be unique, but the semester/year pair <code>#{object.name}</code> already exists"
               end}
 
+  def canonical_name
+    season = "#{Term.semesters[semester]}_#{semester}"
+
+    arch = archived? ? "a" : "z"
+
+    "#{arch} #{effective_year} #{season} #{name}"
+  end
+
   def name
     "#{semester.humanize} #{year}"
+  end
+
+  private
+
+  def effective_year
+    # Fall is part of numerically-next *academic* year
+    add = Term.semesters[semester] < Term.semesters[:spring] ? 1 : 0
+    year + add
   end
 end

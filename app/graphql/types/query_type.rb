@@ -17,6 +17,11 @@ module Types
       context[:current_user]
     end
 
+    field :active_terms, [TermType], null: false
+    def active_terms
+      Term.active
+    end
+
     def cache_authorization!(exam, course)
       exam_role = Exam.roles[:no_reg]
       course_role = Exam.roles[:no_reg]

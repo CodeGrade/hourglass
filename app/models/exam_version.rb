@@ -386,7 +386,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def root_rubrics
-    rubrics.where(parent_section: nil)
+    rubrics.root_rubrics
   end
 
   def rubric_includes

@@ -9,7 +9,7 @@ class CreateRubricClosureTree < ActiveRecord::Migration[6.0]
     all_rubrics = Rubric.all.map { |r| [r.id, r] }.to_h
     all_rubrics.each do |r_id, r|
       RubricTreePath.create(ancestor: r, descendant: r, path_length: 0)
-      parent = r.parent_section
+      parent = all_rubrics[r.parent_section_id]
       path_length = 1
       while parent
         RubricTreePath.create(ancestor: parent, descendant: r, path_length: path_length)

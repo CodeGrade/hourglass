@@ -150,7 +150,9 @@ const Entry: React.FC = () => {
             </Modal>
             <Switch>
               <Route path="/exams/:examId" exact>
-                <ShowExam />
+                <AllAlerts>
+                  <ShowExam />
+                </AllAlerts>
               </Route>
               <Route path="/exams/:examId/proctoring">
                 <AllAlerts>

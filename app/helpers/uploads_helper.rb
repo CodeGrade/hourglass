@@ -3,7 +3,7 @@
 require 'fileutils'
 require 'audit'
 require 'open3'
-require 'headless'
+# require 'headless'
 
 module UploadsHelper
   # Converts back and forth between upload and saved exam.yaml formats
@@ -321,44 +321,45 @@ module UploadsHelper
       end
     end
 
-    create_handler :rkt do |extracted_path, filename|
-      embeds_path = extracted_path.dirname.join('embedded')
-      # Creates the path .../embedded/path/to/filename.rkt/embed#.png
-      # includes the filename in the directory structure deliberately,
-      # in case multiple racket files coexist in the same directory
-      output_path = filename.to_s.gsub(extracted_path.to_s, embeds_path.to_s)
-      Pathname.new(output_path).mkpath
-      Headless.ly(display: output_path.hash % Headless::MAX_DISPLAY_NUMBER, autopick: true) do
-        output, err, status, timed_out = ApplicationHelper.capture3(
-          { 'XDG_RUNTIME_DIR' => nil },
-          'racket', Rails.root.join('lib/assets/render-racket.rkt').to_s,
-          '-e', output_path,
-          '-o', "#{filename}ext",
-          filename,
-          timeout: 30
-        )
-        if status.success? && !timed_out
-          contents = File.read "#{filename}ext"
-          File.open(filename, 'w') do |f|
-            f.write contents.gsub(Upload.base_upload_dir.to_s, '/files')
-          end
-          FileUtils.rm "#{filename}ext"
-          Audit.log "Successfully processed #{filename} to #{output_path}"
-          return true
-        else
-          FileUtils.rm "#{filename}ext", force: true
-          Audit.log <<~ERROR
-            ================================
-            Problem processing #{filename}:
-            Status: #{status}
-            Error: #{err}
-            Output: #{output}
-            ================================
-          ERROR
-          return false
-        end
-      end
-    end
-    alias_handler :ss, :rkt
+    # TODO: setup xvfb and racket handler
+    # create_handler :rkt do |extracted_path, filename|
+    #   embeds_path = extracted_path.dirname.join('embedded')
+    #   # Creates the path .../embedded/path/to/filename.rkt/embed#.png
+    #   # includes the filename in the directory structure deliberately,
+    #   # in case multiple racket files coexist in the same directory
+    #   output_path = filename.to_s.gsub(extracted_path.to_s, embeds_path.to_s)
+    #   Pathname.new(output_path).mkpath
+    #   Headless.ly(display: output_path.hash % Headless::MAX_DISPLAY_NUMBER, autopick: true) do
+    #     output, err, status, timed_out = ApplicationHelper.capture3(
+    #       { 'XDG_RUNTIME_DIR' => nil },
+    #       'racket', Rails.root.join('lib/assets/render-racket.rkt').to_s,
+    #       '-e', output_path,
+    #       '-o', "#{filename}ext",
+    #       filename,
+    #       timeout: 30
+    #     )
+    #     if status.success? && !timed_out
+    #       contents = File.read "#{filename}ext"
+    #       File.open(filename, 'w') do |f|
+    #         f.write contents.gsub(Upload.base_upload_dir.to_s, '/files')
+    #       end
+    #       FileUtils.rm "#{filename}ext"
+    #       Audit.log "Successfully processed #{filename} to #{output_path}"
+    #       return true
+    #     else
+    #       FileUtils.rm "#{filename}ext", force: true
+    #       Audit.log <<~ERROR
+    #         ================================
+    #         Problem processing #{filename}:
+    #         Status: #{status}
+    #         Error: #{err}
+    #         Output: #{output}
+    #         ================================
+    #       ERROR
+    #       return false
+    #     end
+    #   end
+    # end
+    # alias_handler :ss, :rkt
   end
 end

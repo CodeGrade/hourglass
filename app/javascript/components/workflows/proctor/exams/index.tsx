@@ -1194,7 +1194,7 @@ const Loaded: React.FC<{
         key: 'Exam_studentQuestions',
         rangeBehavior: 'prepend',
       }],
-      edgeName: 'questionsEdge',
+      edgeName: 'studentQuestionsEdge',
     }],
   }), [examId]));
 

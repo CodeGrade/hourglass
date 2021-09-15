@@ -24,12 +24,12 @@ module Mutations
 
       range_add = GraphQL::Relay::RangeAdd.new(
         parent: registration,
-        collection: registration.questions,
+        collection: registration.student_questions,
         item: q,
         context: context,
       )
 
-      { question: q, questions_connection: range_add.connection, question_edge: range_add.edge }
+      { student_question: q, student_questions_connection: range_add.connection, student_question_edge: range_add.edge }
     end
 
     private

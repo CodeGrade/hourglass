@@ -385,9 +385,7 @@ class ExamVersion < ApplicationRecord
     end.flatten(1)
   end
 
-  def root_rubrics
-    rubrics.root_rubrics
-  end
+  delegate :root_rubrics, to: :rubrics
 
   def rubric_includes
     [

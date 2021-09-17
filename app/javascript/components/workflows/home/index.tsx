@@ -415,6 +415,15 @@ const Home: React.FC = () => {
     const anyInTerm = cur.myRegistrations.length > 0;
     return prev || anyInTerm;
   }, false);
+  if (res.data.activeTerms.length === 0) {
+    return (
+      <Container>
+        <DocumentTitle title="My Exams">
+          <h1>There are no courses with exams here yet.</h1>
+        </DocumentTitle>
+      </Container>
+    );
+  }
   return (
     <Container>
       <DocumentTitle title="My Exams">

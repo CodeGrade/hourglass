@@ -248,10 +248,6 @@ const ShowProfRegs: React.FC<{
       course {
         id
         title
-        term {
-          id
-          name
-        }
       }
     }
     `,

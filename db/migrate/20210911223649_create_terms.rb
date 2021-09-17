@@ -10,7 +10,7 @@ class CreateTerms < ActiveRecord::Migration[6.0]
     end
     empty_term = Term.create
     change_table :courses do |t|
-      t.integer :term_id
+      t.references :term, foreign_key: true
     end
     change_column_null :courses, :term_id, false, empty_term.id
   end

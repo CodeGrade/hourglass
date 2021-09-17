@@ -49,7 +49,8 @@ ActiveRecord::Schema.define(version: 2021_09_11_223649) do
     t.integer "bottlenose_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "term_id", null: false
+    t.bigint "term_id", null: false
+    t.index ["term_id"], name: "index_courses_on_term_id"
   end
 
   create_table "exam_announcements", force: :cascade do |t|
@@ -381,6 +382,7 @@ ActiveRecord::Schema.define(version: 2021_09_11_223649) do
 
   add_foreign_key "accommodations", "registrations"
   add_foreign_key "anomalies", "registrations"
+  add_foreign_key "courses", "terms"
   add_foreign_key "exam_announcements", "exams"
   add_foreign_key "exam_versions", "exams"
   add_foreign_key "exams", "courses"

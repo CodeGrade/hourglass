@@ -109,7 +109,7 @@ const ShowCourse: React.FC = () => {
         <h1>
           {res.data.course.title}
         </h1>
-        <div>
+        <div className="text-nowrap">
           <Link to={`/courses/${courseId}/sync`}>
             <Button
               variant="danger"

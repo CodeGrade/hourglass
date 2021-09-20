@@ -44,3 +44,9 @@
 .collapse.width.show {
   width: calc(var(--sidebar-expanded) - 7em);
 }
+
+
+.blue-glow {
+  /* a somewhat-transparent lightblue */
+  background: radial-gradient(closest-side, #add8e688 40%,transparent);
+}

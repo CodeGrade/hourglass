@@ -23,6 +23,8 @@ import TimeRemaining from '@student/exams/show/components/navbar/TimeRemaining';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { useFragment, graphql } from 'relay-hooks';
 import Tooltip from '@student/exams/show/components/Tooltip';
+// eslint-disable-next-line no-restricted-imports
+import NavbarLogo from '../../../../../../../images/hourglass.svg';
 
 import { navbar$key } from './__generated__/navbar.graphql';
 import { navbar_accordion$key } from './__generated__/navbar_accordion.graphql';
@@ -143,35 +145,16 @@ const ExamNavbar: React.FC<{
         ${additionalClass}
       `}
     >
-      <div className="d-flex align-items-center">
+      <div className="d-flex align-items-center mb-2">
         <Collapse
           in={expanded}
           dimension="width"
         >
-          <h1 className="flex-fill">
+          <h1 className="w-100 pb-0 mb-0">
             Hourglass
           </h1>
         </Collapse>
-        <h1 aria-hidden="true" className="width-0">&nbsp;</h1>
-        <Tooltip
-          message={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
-          placement="right"
-        >
-          <Button
-            className="ml-2"
-            onClick={(): void => {
-              if (expanded) {
-                setOpenSection('');
-                setOpenTimer('');
-                setExpanded(false);
-              } else {
-                setExpanded(true);
-              }
-            }}
-          >
-            <RenderIcon I={MdMenu} />
-          </Button>
-        </Tooltip>
+        <img src={NavbarLogo} alt="Hourglass" className="blue-glow d-inline-block float-right" style={{ height: 48, width: 66 }} />
       </div>
       <div className="m-0 p-0">
         <div className="d-flex align-items-center">
@@ -183,6 +166,44 @@ const ExamNavbar: React.FC<{
               <span className="d-flex w-100 align-items-center">
                 <h6 className="my-0">
                   {res.myRegistration.user.displayName}
+                </h6>
+                <span className="flex-fill" />
+              </span>
+            </span>
+          </Collapse>
+          <span className="mb-2">
+            <Tooltip
+              message={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
+              placement="right"
+            >
+              <Button
+                className="ml-2"
+                onClick={(): void => {
+                  if (expanded) {
+                    setOpenSection('');
+                    setOpenTimer('');
+                    setExpanded(false);
+                  } else {
+                    setExpanded(true);
+                  }
+                }}
+              >
+                <RenderIcon I={MdMenu} />
+              </Button>
+            </Tooltip>
+          </span>
+        </div>
+      </div>
+      <div className="m-0 p-0">
+        <div className="d-flex align-items-center">
+          <Collapse
+            in={expanded}
+            dimension="width"
+          >
+            <span className="flex-fill">
+              <span className="d-flex w-100 align-items-center">
+                <h6 className="my-0">
+                  Status
                 </h6>
                 <span className="flex-fill" />
                 <span className="ml-2">

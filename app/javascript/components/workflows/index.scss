@@ -201,3 +201,16 @@
     }
   }
 }
+
+.profile-photo {
+  max-width: 300px;
+  max-height: 300px;
+}
+
+.tooltip-inner {
+    max-width: none;
+}
+
+.tooltip.show {
+  opacity: 1.0; // default was 0.9
+}

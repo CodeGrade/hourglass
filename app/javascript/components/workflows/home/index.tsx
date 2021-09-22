@@ -16,6 +16,8 @@ import {
   Col,
   Alert,
   Card,
+  OverlayTrigger,
+  Tooltip,
 } from 'react-bootstrap';
 import { DateTime } from 'luxon';
 import LinkButton from '@hourglass/common/linkbutton';
@@ -278,9 +280,14 @@ export type ImpersonateVal = SelectOption<string>
 
 export const ImpersonateUser: React.FC<{
   userOptions: ImpersonateVal[] | GroupedOptionsType<ImpersonateVal>;
+  userIdToImageMap: { [key: string]: string; };
   courseId?: ImpersonateUserInput['courseId'];
 }> = (props) => {
-  const { userOptions, courseId } = props;
+  const {
+    userOptions,
+    courseId,
+    userIdToImageMap,
+  } = props;
   const { alert } = useContext(AlertContext);
   const [impersonate, { loading }] = useMutation(
     graphql`
@@ -313,6 +320,32 @@ export const ImpersonateUser: React.FC<{
             placeholder="Select a user to impersonate..."
             isDisabled={loading}
             options={userOptions}
+            formatOptionLabel={(option) => (
+              <OverlayTrigger
+                placement="right"
+                overlay={(overlayProps) => {
+                  const userHasImage = option.value in userIdToImageMap;
+                  return (
+                    <Tooltip
+                      id={`impersonation-tooltip-${option.value}`}
+                      // This is needed per react-bootstrap for the overlay to work
+                      // eslint-disable-next-line react/jsx-props-no-spreading
+                      {...overlayProps}
+                    >
+                      {userHasImage ? (
+                        <img className="profile-photo" src={userIdToImageMap[option.value]} alt={option.label} />
+                      ) : (
+                        <span>No image for that user.</span>
+                      )}
+                    </Tooltip>
+                  );
+                }}
+              >
+                <span>
+                  {option.label}
+                </span>
+              </OverlayTrigger>
+            )}
             onChange={(val: ImpersonateVal) => {
               setSelectedUser(val.value);
             }}
@@ -350,6 +383,7 @@ const Admin: React.FC = () => {
     query homeAdminQuery {
       users {
         id
+        imageUrl
         displayName
         username
       }
@@ -362,11 +396,22 @@ const Admin: React.FC = () => {
   if (!res.data) {
     return <p>Loading...</p>;
   }
+  const userIdToImageMap = {};
+  res.data.users.forEach((user) => {
+    if (user.imageUrl) {
+      userIdToImageMap[user.id] = user.imageUrl;
+    }
+  });
   const userOptions: ImpersonateVal[] = res.data.users.map((user) => ({
     label: `${user.displayName} (${user.username})`,
     value: user.id,
   }));
-  return <ImpersonateUser userOptions={userOptions} />;
+  return (
+    <ImpersonateUser
+      userOptions={userOptions}
+      userIdToImageMap={userIdToImageMap}
+    />
+  );
 };
 
 const Home: React.FC = () => {

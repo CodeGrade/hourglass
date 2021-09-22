@@ -210,7 +210,7 @@ module Types
     def completion_summary
       gls_by_qnum = object.grading_locks.group_by(&:question_id)
       object.db_questions.includes(:parts).map do |q|
-        gls_by_pnum = (gls_by_qnum[q.id] || []).group_by(&:part)
+        gls_by_pnum = (gls_by_qnum[q.id] || []).group_by(&:part_id)
         q.parts.map do |p|
           { 
             notStarted: gls_by_pnum[p.id]&.count { |gl| gl.grader_id.nil? && gl.completed_by_id.nil? } || 0,

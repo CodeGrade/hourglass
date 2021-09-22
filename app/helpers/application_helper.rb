@@ -9,6 +9,13 @@ module ApplicationHelper
       alert: 'danger' }
   end
 
+  def self.make_html(val)
+    {
+      type: 'HTML',
+      value: val,
+    }
+  end
+
   def self.mime_type(full_path)
     case File.extname(full_path).downcase
     when '.java'

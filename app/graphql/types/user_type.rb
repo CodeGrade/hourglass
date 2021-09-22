@@ -10,6 +10,9 @@ module Types
     field :nuid, Integer, null: true
     field :email, String, null: false
     field :image_url, String, null: true
+    def image_url
+      object.full_bottlenose_image_url
+    end
     field :admin, Boolean, null: false
 
     field :is_me, Boolean, null: false

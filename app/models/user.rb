@@ -71,4 +71,11 @@ class User < ApplicationRecord
   def reg_for(exam)
     registrations.find_by(room: exam.rooms)
   end
+
+  def full_bottlenose_image_url
+    return nil if image_url.nil?
+
+    bn_url = ENV.fetch('BOTTLENOSE_URL')
+    bn_url + image_url
+  end
 end

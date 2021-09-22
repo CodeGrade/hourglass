@@ -374,6 +374,7 @@ const Home: React.FC = () => {
     query homeQuery {
       activeTerms {
         name
+        id
         myRegistrations {
           ...home_studentregs
         }
@@ -443,7 +444,7 @@ const Home: React.FC = () => {
               && term.myProfessorCourseRegistrations.nodes.length === 0
             );
             return (
-              <Card className="my-3">
+              <Card className="my-3" key={`home-term-${term.id}`}>
                 <Card.Body>
                   <Card.Title>
                     <h1>{term.name}</h1>

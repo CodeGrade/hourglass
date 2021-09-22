@@ -57,14 +57,17 @@ const ShowCourse: React.FC = () => {
         students {
           id
           displayName
+          username
         }
         staff {
           id
           displayName
+          username
         }
         professors {
           id
           displayName
+          username
         }
         exams {
           ...show_courseExams
@@ -84,21 +87,21 @@ const ShowCourse: React.FC = () => {
     {
       label: 'Students',
       options: res.data.course.students.map((user) => ({
-        label: user.displayName,
+        label: `${user.displayName} (${user.username})`,
         value: user.id,
       })),
     },
     {
       label: 'Staff',
       options: res.data.course.staff.map((user) => ({
-        label: user.displayName,
+        label: `${user.displayName} (${user.username})`,
         value: user.id,
       })),
     },
     {
       label: 'Professors',
       options: res.data.course.professors.map((user) => ({
-        label: user.displayName,
+        label: `${user.displayName} (${user.username})`,
         value: user.id,
       })),
     },

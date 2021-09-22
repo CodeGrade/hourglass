@@ -351,6 +351,7 @@ const Admin: React.FC = () => {
       users {
         id
         displayName
+        username
       }
     }
     `,
@@ -362,7 +363,7 @@ const Admin: React.FC = () => {
     return <p>Loading...</p>;
   }
   const userOptions: ImpersonateVal[] = res.data.users.map((user) => ({
-    label: user.displayName,
+    label: `${user.displayName} (${user.username})`,
     value: user.id,
   }));
   return <ImpersonateUser userOptions={userOptions} />;

@@ -1669,36 +1669,6 @@ const allBlank = (stats) => {
   return stats.notStarted === 0;
 };
 
-const getCompletionStats = (version) => {
-  const completionStats: {
-    notStarted: number;
-    inProgress: number;
-    finished: number;
-  }[][] = [];
-  const { gradingLocks } = version;
-  gradingLocks.edges.forEach(({ node }) => {
-    const {
-      qnum,
-      pnum,
-      grader,
-      completedBy,
-    } = node;
-    if (completionStats[qnum] === undefined) completionStats[qnum] = [];
-    if (completionStats[qnum][pnum] === undefined) {
-      completionStats[qnum][pnum] = {
-        notStarted: 0,
-        inProgress: 0,
-        finished: 0,
-      };
-    }
-    const qpStat = completionStats[qnum][pnum];
-    if (completedBy !== null) qpStat.finished += 1;
-    else if (grader !== null && completedBy === null) qpStat.inProgress += 1;
-    else qpStat.notStarted += 1;
-  });
-  return completionStats;
-};
-
 type GradingLockInfo = gradingMyGrading['examVersions']['edges'][number]['node']['inProgress']['edges'][number]['node'];
 type QPInfo = gradingMyGrading['examVersions']['edges'][number]['node']['qpPairs'];
 
@@ -2329,26 +2299,21 @@ const GradingCompletion: React.FC<{
   const version = useFragment(
     graphql`
     fragment gradingCompletion on ExamVersion {
-      gradingLocks {
-        edges {
-          node {
-            qnum
-            pnum
-            grader { id }
-            completedBy { id }
-          }
-        }
-      }
+      completionSummary
     }
     `,
     versionKey,
   );
-  const completionStats = getCompletionStats(version);
+  const summary = version.completionSummary as {
+    notStarted: number;
+    inProgress: number;
+    finished: number;
+  }[][];
   return (
     <Table>
       <thead>
         <tr>
-          {completionStats.map((qStat, qnum) => (
+          {summary.map((qStat, qnum) => (
             <th
               // eslint-disable-next-line react/no-array-index-key
               key={`q${qnum}`}
@@ -2360,7 +2325,7 @@ const GradingCompletion: React.FC<{
           ))}
         </tr>
         <tr>
-          {completionStats.map((qStats, qnum) => (
+          {summary.map((qStats, qnum) => (
             qStats.map((_pStats, pnum) => (
               <th
                 // eslint-disable-next-line react/no-array-index-key
@@ -2375,7 +2340,7 @@ const GradingCompletion: React.FC<{
       </thead>
       <tbody>
         <tr>
-          {completionStats.map((qStats, qnum) => (
+          {summary.map((qStats, qnum) => (
             qStats.map((pStat, pnum) => {
               const { notStarted, inProgress, finished } = pStat;
               return (

@@ -42,8 +42,8 @@ class Question < ApplicationRecord
         root_rubric.as_json(format: format).deep_stringify_keys
       end
     {
-      'name' => compact_blank(name),
-      'description' => compact_blank(description),
+      'name' => ApplicationHelper.make_html(compact_blank(name)),
+      'description' => ApplicationHelper.make_html(compact_blank(description)),
       'extraCredit' => extra_credit || nil,
       'separateSubparts' => separate_subparts,
       (format == :export ? 'reference' : 'references') =>

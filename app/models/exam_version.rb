@@ -145,7 +145,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def rubric_as_json(format:)
-    rubric_tree = multi_group_by(rubrics_for_grading, [:question, :part, :body_item], true)
+    rubric_tree = multi_group_by(rubrics_for_grading, [:question_id, :part_id, :body_item_id], true)
     preset_comments_in_use = preset_comments.joins(:grading_comments).pluck(:id)
     exam_rubric = rubric_tree.delete(nil)&.dig(nil, nil)&.as_json(preset_comments_in_use, format: format)
     q_rubrics = rubric_tree.sort.map do |_qnum, rubrics_q|
@@ -187,7 +187,7 @@ class ExamVersion < ApplicationRecord
         flat_key = flatten_groups k
         flat_v = flatten_groups v
         [
-          flat_key&.dig('id'),
+          (flat_key.is_a?(Numeric) ? flat_key : flat_key&.dig('id')),
           {
             'type' => k&.class&.name&.underscore,
             'info' => flat_key,
@@ -242,7 +242,7 @@ class ExamVersion < ApplicationRecord
       :creator, :question, :part, :body_item,
       preset_comment: [{ rubric_preset: [{ rubric: :parent_section }] }]
     )
-    comments = multi_group_by(comments_and_rubrics, [:question_id, :part_id, :body_item_id, :preset_comment])
+    comments = multi_group_by(comments_and_rubrics, [:question_id, :part_id, :body_item_id, :preset_comment_id])
     checks = multi_group_by(
       reg.grading_checks.includes(:creator, :question, :part, :body_item),
       [:question_id, :part_id, :body_item_id],
@@ -271,8 +271,9 @@ class ExamVersion < ApplicationRecord
       body_item_info = part.body_items.each_with_index.map do |body_item, _bnum|
         body_checks = checks.dig(question.id, part.id, body_item.id) || []
         body_comments = comments.dig(question.id, part.id, body_item.id) || {}
+        preset_comments = PresetComment.where(id: body_comments.keys).map{|p| [p.id, p]}.to_h
 
-        grouped = body_comments.group_by { |pc, _cs| pc&.rubric_preset || RubricPreset.new(direction: 'deduction') }
+        grouped = body_comments.group_by { |pc, _cs| preset_comments[pc]&.rubric_preset || RubricPreset.new(direction: 'deduction') }
                                .transform_values(&:to_h)
         grouped = grouped.group_by { |rp, _pccs| rp&.rubric || Any.new(points: 0) }.transform_values(&:to_h)
         while grouped.keys.any? { |r, _| (r.is_a?(One) || r.is_a?(Any)) && r.points.nil? }

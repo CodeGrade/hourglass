@@ -22,9 +22,9 @@ class All < Rubric
 
   def confirm_complete(reg, comments, checks)
     if rubric_preset
-      preset_ids = rubric_preset.preset_comments.map(&:id)
-      (comments.dig(qnum, pnum, bnum)&.slice(*preset_ids)&.count.to_i +
-        checks.dig(qnum, pnum, bnum)&.count.to_i) == preset_ids.count
+      preset_ids = rubric_preset.preset_comment_ids
+      (comments.dig(question_id, part_id, body_item_id)&.slice(*preset_ids)&.count.to_i +
+        checks.dig(question_id, part_id, body_item_id)&.count.to_i) == preset_ids.count
     else
       subsections.all? { |s| s.confirm_complete(reg, comments, checks) }
     end

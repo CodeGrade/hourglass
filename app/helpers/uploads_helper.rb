@@ -165,14 +165,16 @@ module UploadsHelper
         rp
       end
 
-      def convert_rubric(owners, rubric, parent = nil, order = nil)
+      def convert_rubric(owners, rubric, ancs = [], order = nil)
         if rubric.nil?
           ret = Rubric.new(
             **owners,
             order: order,
             type: 'None',
           )
-          parent.association(:subsections).add_to_target(ret) if parent.present?
+          ancs.each_with_index do |a, depth| 
+            a.association(:descendant_links).add_to_target(RubricTreePath.new(ancestor: a, descendant: ret, path_length: depth + 1)) 
+          end
           return ret
         end
 
@@ -183,10 +185,12 @@ module UploadsHelper
           points: rubric['points'],
           order: order,
         )
-        parent.association(:subsections).add_to_target(ret) if parent.present?
+        ancs.each_with_index do |a, depth| 
+          a.association(:descendant_links).add_to_target(RubricTreePath.new(ancestor: a, descendant: ret, path_length: depth + 1)) 
+        end
         if rubric['choices'].is_a? Array
           rubric['choices'].each_with_index do |c, cindex|
-            convert_rubric(owners, c, ret, cindex)
+            convert_rubric(owners, c, [ret, *ancs], cindex)
           end
         else
           convert_presets(rubric['choices'], ret)

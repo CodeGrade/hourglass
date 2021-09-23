@@ -69,7 +69,7 @@ class User < ApplicationRecord
   end
 
   def reg_for(exam)
-    registrations.find_by(room: exam.rooms)
+    exam.registrations.find_by(user: self)
   end
 
   def full_bottlenose_image_url

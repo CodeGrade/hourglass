@@ -271,10 +271,12 @@ class ExamVersion < ApplicationRecord
       body_item_info = part.body_items.each_with_index.map do |body_item, _bnum|
         body_checks = checks.dig(question.id, part.id, body_item.id) || []
         body_comments = comments.dig(question.id, part.id, body_item.id) || {}
-        preset_comments = PresetComment.where(id: body_comments.keys).map{|p| [p.id, p]}.to_h
+        preset_comments = PresetComment.where(id: body_comments.keys).index_by(&:id)
 
-        grouped = body_comments.group_by { |pc, _cs| preset_comments[pc]&.rubric_preset || RubricPreset.new(direction: 'deduction') }
-                               .transform_values(&:to_h)
+        grouped =
+          body_comments
+          .group_by { |pc, _cs| preset_comments[pc]&.rubric_preset || RubricPreset.new(direction: 'deduction') }
+          .transform_values(&:to_h)
         grouped = grouped.group_by { |rp, _pccs| rp&.rubric || Any.new(points: 0) }.transform_values(&:to_h)
         while grouped.keys.any? { |r, _| (r.is_a?(One) || r.is_a?(Any)) && r.points.nil? }
           pointless, pointed = grouped.partition { |r, _| (r.is_a?(One) || r.is_a?(Any)) && r.points.nil? }

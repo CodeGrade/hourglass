@@ -32,6 +32,8 @@ import { home_proctorregs$key } from './__generated__/home_proctorregs.graphql';
 import { home_staffregs$key } from './__generated__/home_staffregs.graphql';
 import { homeAdminQuery } from './__generated__/homeAdminQuery.graphql';
 import { ImpersonateUserInput } from './__generated__/homeImpersonateMutation.graphql';
+import Icon from '../student/exams/show/components/Icon';
+import { MdPerson } from 'react-icons/md';
 
 const ShowUpcomingRegistrations: React.FC<{
   registrations: home_futureregs$key;
@@ -320,12 +322,12 @@ export const ImpersonateUser: React.FC<{
             placeholder="Select a user to impersonate..."
             isDisabled={loading}
             options={userOptions}
-            formatOptionLabel={(option) => (
-              <OverlayTrigger
-                placement="right"
-                overlay={(overlayProps) => {
-                  const userHasImage = option.value in userIdToImageMap;
-                  return (
+            formatOptionLabel={(option) => {
+              const userHasImage = option.value in userIdToImageMap;
+              return (
+                <OverlayTrigger
+                  placement="right"
+                  overlay={(overlayProps) => (
                     <Tooltip
                       id={`impersonation-tooltip-${option.value}`}
                       // This is needed per react-bootstrap for the overlay to work
@@ -338,14 +340,19 @@ export const ImpersonateUser: React.FC<{
                         <span>No image for that user.</span>
                       )}
                     </Tooltip>
-                  );
-                }}
-              >
-                <span>
-                  {option.label}
-                </span>
-              </OverlayTrigger>
-            )}
+                  ) }
+                >
+                  <span>
+                    {userHasImage ? (
+                      <img className="profile-photo-thumb pr-2" src={userIdToImageMap[option.value]} alt={option.label} />
+                    ) : (
+                      <Icon className="pr-2" I={MdPerson} />
+                    )}
+                    {option.label}
+                  </span>
+                </OverlayTrigger>
+              );
+            }}
             onChange={(val: ImpersonateVal) => {
               setSelectedUser(val.value);
             }}
@@ -355,7 +362,7 @@ export const ImpersonateUser: React.FC<{
       <Row>
         <Col className="d-flex">
           <Button
-            className="mx-auto"
+            className="mx-auto mt-2"
             variant="danger"
             disabled={selectedUser === undefined}
             onClick={() => {

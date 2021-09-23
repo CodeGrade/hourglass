@@ -153,12 +153,12 @@ class Rubric < ApplicationRecord
   end
 
   def grading_complete_for(reg)
-    coords = { qnum: qnum, pnum: pnum, bnum: bnum }
+    coords = { question_id: question_id, part_id: part_id, body_item_id: body_item_id }
     comments = multi_group_by(
-      reg.grading_comments.includes(:rubric_preset).where(coords),
-      [:qnum, :pnum, :bnum, :preset_comment_id],
+      reg.grading_comments.includes(:preset_comment).where(coords),
+      [:question_id, :part_id, :body_item_id, :preset_comment_id],
     )
-    checks = multi_group_by(reg.grading_checks.where(coords), [:qnum, :pnum, :bnum])
+    checks = multi_group_by(reg.grading_checks.where(coords), [:question_id, :part_id, :body_item_id])
     confirm_complete(reg, comments, checks)
   end
 

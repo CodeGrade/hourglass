@@ -20,7 +20,7 @@ class RubricPreset < ApplicationRecord
 
   def compute_grade_for(_reg, max_points, comments, checks, qpb)
     # preset_ids = preset_comments.map(&:id)
-    my_comments = comments.dig(*qpb)&.values_at(*preset_comments)&.compact || []
+    my_comments = comments.dig(*qpb)&.values_at(*preset_comment_ids)&.compact || []
     my_checks = checks.dig(*qpb) || []
     raw_score = my_comments.flatten.sum do |c|
       c.points || c.rubric_preset.points

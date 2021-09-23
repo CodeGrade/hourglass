@@ -23,6 +23,8 @@ import { DateTime } from 'luxon';
 import LinkButton from '@hourglass/common/linkbutton';
 import { SelectOption } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
+import Icon from '@student/exams/show/components/Icon';
+import { MdPerson } from 'react-icons/md';
 
 import { homeQuery } from './__generated__/homeQuery.graphql';
 import { home_futureregs$key, home_futureregs as HFR } from './__generated__/home_futureregs.graphql';
@@ -32,8 +34,6 @@ import { home_proctorregs$key } from './__generated__/home_proctorregs.graphql';
 import { home_staffregs$key } from './__generated__/home_staffregs.graphql';
 import { homeAdminQuery } from './__generated__/homeAdminQuery.graphql';
 import { ImpersonateUserInput } from './__generated__/homeImpersonateMutation.graphql';
-import Icon from '../student/exams/show/components/Icon';
-import { MdPerson } from 'react-icons/md';
 
 const ShowUpcomingRegistrations: React.FC<{
   registrations: home_futureregs$key;
@@ -340,7 +340,7 @@ export const ImpersonateUser: React.FC<{
                         <span>No image for that user.</span>
                       )}
                     </Tooltip>
-                  ) }
+                  )}
                 >
                   <span>
                     {userHasImage ? (

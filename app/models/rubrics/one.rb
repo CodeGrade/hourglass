@@ -10,6 +10,9 @@ class One < Rubric
     end
   end
 
+  # comments: Nested Map from QuestionID -> PartID -> BodyItemID -> PresetCommentID -> [PresetComment]
+  # checks: Nested Map from QuestionID -> PartID -> BodyItemID -> [GradingCheck]
+  # qpb: (QuestionID, PartID, BodyItemID)
   def compute_grade_for(reg, comments, checks, qpb)
     if rubric_preset
       preset_ids = rubric_preset.preset_comment_ids

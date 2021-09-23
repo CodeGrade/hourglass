@@ -102,7 +102,7 @@ const ShowPreset: React.FC<{
                   qnum,
                   pnum,
                   bnum,
-                  message: (studentFeedback ?? graderHint),
+                  message: (studentFeedback || graderHint),
                   points,
                 },
               },

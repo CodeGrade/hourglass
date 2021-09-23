@@ -13,7 +13,7 @@ class One < Rubric
   def compute_grade_for(reg, comments, checks, qpb)
     if rubric_preset
       preset_ids = rubric_preset.preset_comment_ids
-      if comments.dig(*qpb)&.slice(*preset_ids)&.count.to_i > 0
+      if comments.dig(*qpb)&.slice(*preset_ids)&.count.to_i.positive?
         rubric_preset.compute_grade_for(reg, out_of, comments, checks, qpb)
       else
         points
@@ -21,7 +21,6 @@ class One < Rubric
     else
       used_section = subsections.find { |s| s.send(:confirm_complete, reg, comments, checks) }
       if used_section
-        puts "Found used_section #{used_section.type} #{used_section.id}"
         used_section.compute_grade_for(reg, comments, checks, qpb)
       else
         points

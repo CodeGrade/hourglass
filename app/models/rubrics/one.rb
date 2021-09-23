@@ -34,12 +34,12 @@ class One < Rubric
   protected
 
   def confirm_complete(reg, comments, checks)
-    if rubric_preset.nil?
-      subsections.one? { |s| s.send(:confirm_complete, reg, comments, checks) }
-    else
+    if rubric_preset
       preset_ids = rubric_preset.preset_comment_ids
       (comments.dig(question_id, part_id, body_item_id)&.slice(*preset_ids)&.count.to_i +
         checks.dig(question_id, part_id, body_item_id)&.count.to_i) == 1
+    else
+      subsections.one? { |s| s.send(:confirm_complete, reg, comments, checks) }
     end
   end
 end

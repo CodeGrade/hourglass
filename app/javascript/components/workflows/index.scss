@@ -216,5 +216,5 @@
 }
 
 .tooltip.show {
-  opacity: 1.0; // default was 0.9
+  opacity: 1.0 !important; // default was 0.9
 }

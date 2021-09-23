@@ -9,11 +9,15 @@ module ApplicationHelper
       alert: 'danger' }
   end
 
-  def self.make_html(val)
-    {
-      type: 'HTML',
-      value: val,
-    }
+  def self.make_html(format, val)
+    if format == :export
+      val
+    else
+      {
+        type: 'HTML',
+        value: val,
+      }
+    end
   end
 
   def self.mime_type(full_path)

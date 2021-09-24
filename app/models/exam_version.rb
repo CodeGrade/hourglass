@@ -443,7 +443,6 @@ class ExamVersion < ApplicationRecord
       else
         {
           'name' => with_names ? Nokogiri::HTML.fragment(q.name).content : nil,
-          'extra' => q.extra_credit,
           'parts' => parts.map do |p|
             {
               'name' => with_names ? Nokogiri::HTML.fragment(p.name).content : nil,

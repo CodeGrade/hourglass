@@ -204,7 +204,6 @@ class ExamVersion < ApplicationRecord
         qnum: obj.question&.index,
         pnum: obj.part&.index,
         bnum: obj.body_item&.index,
-        description: obj.description,
       }.stringify_keys
     when RubricPreset
       {

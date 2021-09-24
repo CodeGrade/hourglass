@@ -86,21 +86,13 @@ const ShowCourse: React.FC = () => {
   if (!res.data) {
     return <Container><p>Loading...</p></Container>;
   }
-  const userIdToImageMap = {};
-  const allUsers = res.data.course.students
-    .concat(res.data.course.staff)
-    .concat(res.data.course.professors);
-  allUsers.forEach((user) => {
-    if (user.imageUrl) {
-      userIdToImageMap[user.id] = user.imageUrl;
-    }
-  });
   const userOptions: GroupedOptionsType<ImpersonateVal> = [
     {
       label: 'Students',
       options: res.data.course.students.map((user) => ({
         label: `${user.displayName} (${user.username})`,
         value: user.id,
+        imageUrl: user.imageUrl,
       })),
     },
     {
@@ -108,6 +100,7 @@ const ShowCourse: React.FC = () => {
       options: res.data.course.staff.map((user) => ({
         label: `${user.displayName} (${user.username})`,
         value: user.id,
+        imageUrl: user.imageUrl,
       })),
     },
     {
@@ -115,6 +108,7 @@ const ShowCourse: React.FC = () => {
       options: res.data.course.professors.map((user) => ({
         label: `${user.displayName} (${user.username})`,
         value: user.id,
+        imageUrl: user.imageUrl,
       })),
     },
   ];
@@ -145,7 +139,6 @@ const ShowCourse: React.FC = () => {
         <DocumentTitle title={res.data.course.title}>
           <CourseExams courseExams={res.data.course.exams} />
           <ImpersonateUser
-            userIdToImageMap={userIdToImageMap}
             userOptions={userOptions}
             courseId={res.data.course.id}
           />

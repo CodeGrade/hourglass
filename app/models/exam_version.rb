@@ -21,6 +21,14 @@ class ExamVersion < ApplicationRecord
   has_many :db_references, -> { order(:index) }, class_name: 'Reference', dependent: :destroy, inverse_of: :exam_version
   has_many :db_questions, -> { order(:index) }, class_name: 'Question', dependent: :destroy, inverse_of: :exam_version
 
+  validate :reference_errors
+
+  def reference_errors
+    db_references.each do |ref|
+      errors.add(:base, ref.errors.full_messages.to_sentence) unless ref.valid?
+    end
+  end
+
   validates :exam, presence: true
 
   delegate :course, to: :exam
@@ -362,6 +370,7 @@ class ExamVersion < ApplicationRecord
     as_json(format: :export)
   end
 
+  # TODO: reimplement in terms of walk_files
   def export_files(path, files)
     files.each do |f|
       case f['filedir']
@@ -377,6 +386,55 @@ class ExamVersion < ApplicationRecord
         raise 'Bad file'
       end
     end
+  end
+
+  def walk_files_acc(path, cur_files, and_dirs, &block)
+    cur_files.each do |f|
+      case f['filedir']
+      when 'dir'
+        dpath = path.join(f['path'])
+        yield dpath.to_s if and_dirs
+        walk_files_acc dpath, f['nodes'], and_dirs, &block
+      when 'file'
+        fpath = path.join(f['path'])
+        contents = MarksProcessor.process_marks_reverse(f['contents'], f['marks'])
+        yield fpath.to_s, contents
+      else
+        raise 'Bad file'
+      end
+    end
+  end
+
+  def walk_files(&block)
+    walk_files_acc(Pathname.new(''), files, false, &block)
+  end
+
+  def walk_files_and_dirs(&block)
+    walk_files_acc(Pathname.new(''), files, true, &block)
+  end
+
+  def collect_file_paths
+    res = []
+    walk_files do |path|
+      res << path
+    end
+    res
+  end
+
+  def collect_file_and_dir_paths
+    res = []
+    walk_files_and_dirs do |path|
+      res << path
+    end
+    res
+  end
+
+  def has_file_path?(path)
+    collect_file_paths.member? path
+  end
+
+  def has_file_or_dir_path?(path)
+    collect_file_and_dir_paths.member? path
   end
 
   def qp_pairs

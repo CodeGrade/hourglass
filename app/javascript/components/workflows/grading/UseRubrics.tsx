@@ -18,6 +18,7 @@ import {
   Col,
   ButtonGroup,
   Accordion,
+  AccordionContext,
 } from 'react-bootstrap';
 import { variantForPoints, iconForPoints } from '@grading/index';
 import '@professor/exams/rubrics.scss';
@@ -27,6 +28,8 @@ import { AlertContext } from '@hourglass/common/alerts';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
 import { graphql, useFragment, useMutation } from 'relay-hooks';
 import { expandRootRubric } from '@professor/exams/rubrics';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+
 import { createCommentMutation } from './__generated__/createCommentMutation.graphql';
 import { grading_one$data } from './__generated__/grading_one.graphql';
 import { UseRubricsKey$key } from './__generated__/UseRubricsKey.graphql';
@@ -362,13 +365,16 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
   } = props;
   const { description, choices, points } = rubric;
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
+  const currentEventKey = useContext(AccordionContext);
+  const showChevron = !!collapseKey;
+  const isOpen = collapseKey === currentEventKey;
   let summary;
   let body;
   if (choices instanceof Array) {
     summary = <>{pointsMsg}</>;
     body = (
-      <Accordion defaultActiveKey="0">
-        {choices.map((r, i) => (
+      <Accordion>
+        {choices.map((r) => (
           <ShowRubric
             key={r.id}
             rubric={r}
@@ -378,7 +384,7 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
             registrationId={registrationId}
             showCompletenessAgainst={showCompletenessAgainst}
             parentRubricType="one"
-            collapseKey={`${i}`}
+            collapseKey={r.id}
           />
         ))}
       </Accordion>
@@ -403,9 +409,20 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
       />
     );
   }
+  const showAnyway = (showChevron ? '' : 'show');
+  const padDescription = (description ? 'mb-2' : '');
+  let chevron = null;
+  if (showChevron) {
+    if (isOpen) {
+      chevron = <Icon className="mr-2" I={FaChevronUp} />;
+    } else {
+      chevron = <Icon className="mr-2" I={FaChevronDown} />;
+    }
+  }
   const heading = (
     <h5 className="d-flex align-items-center">
       <span>
+        {chevron}
         Choose exactly
         <i className="mx-1">one</i>
         entry
@@ -413,8 +430,6 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
       <span className="ml-auto">{summary}</span>
     </h5>
   );
-  const showAnyway = (collapseKey === undefined ? 'show' : '');
-  const padDescription = (description ? 'mb-2' : '');
   return (
     <>
       <Accordion.Toggle as={Card.Header} eventKey={collapseKey}>
@@ -441,6 +456,9 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
     collapseKey,
   } = props;
   const { description, choices, points } = rubric;
+  const currentEventKey = useContext(AccordionContext);
+  const showChevron = !!collapseKey;
+  const isOpen = collapseKey === currentEventKey;
   let summary;
   let body;
   if (choices instanceof Array) {
@@ -483,9 +501,20 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
       />
     );
   }
+  const showAnyway = (showChevron ? '' : 'show');
+  const padDescription = (description ? 'mb-2' : '');
+  let chevron = null;
+  if (showChevron) {
+    if (isOpen) {
+      chevron = <Icon className="mr-2" I={FaChevronUp} />;
+    } else {
+      chevron = <Icon className="mr-2" I={FaChevronDown} />;
+    }
+  }
   const heading = (
     <h5 className="d-flex align-items-center">
       <span>
+        {chevron}
         Choose something from
         <i className="mx-1">any</i>
         appropriate entries
@@ -493,8 +522,6 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
       <span className="ml-auto">{summary}</span>
     </h5>
   );
-  const showAnyway = (collapseKey === undefined ? 'show' : '');
-  const padDescription = (description ? 'mb-2' : '');
   return (
     <>
       <Accordion.Toggle as={Card.Header} eventKey={collapseKey}>

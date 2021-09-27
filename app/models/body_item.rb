@@ -15,6 +15,29 @@ class BodyItem < ApplicationRecord
 
   accepts_nested_attributes_for :rubrics
 
+  validate :valid_file_refs_code
+  validate :valid_file_refs_code_tag
+
+  def valid_file_refs_code
+    return unless info['type'] == 'Code'
+    return unless info.key? 'initial'
+    return unless info['initial'].key? 'file'
+
+    file_path = info['initial']['file']['path']
+    return if exam_version.has_file_path? file_path
+
+    errors.add(:base, "Code initial file must be a valid exam file: '#{file_path}'")
+  end
+
+  def valid_file_refs_code_tag
+    return unless info['type'] == 'CodeTag'
+
+    file_path = answer['selectedFile']
+    return if exam_version.has_file_path? file_path
+
+    errors.add(:base, "CodeTag answer file must be a valid exam file: '#{file_path}'")
+  end
+
   before_save do
     if rubrics.empty?
       rubrics << Rubric.new(
@@ -240,10 +263,7 @@ class BodyItem < ApplicationRecord
     def from_yaml_Code(type, initial: nil, prompt: nil, lang: nil, correct_answer: nil)
       unless initial.nil?
         if initial.key? 'file'
-          # TODO, was:
-          #   filename = initial['file']
-          #   file = files[filename]
-          #   raise "Invalid file for Code initial: #{filename}" if file.nil?
+          # We check file validity in the BodyItem model
         else
           processed = MarksProcessor.process_marks(ensure_utf8(initial['code'], 'text/plain'))
           initial = {

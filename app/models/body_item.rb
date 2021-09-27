@@ -23,7 +23,7 @@ class BodyItem < ApplicationRecord
     return unless info.key? 'initial'
     return unless info['initial'].key? 'file'
 
-    file_path = info['initial']['file']['path']
+    file_path = info['initial']['file']
     return if exam_version.has_file_path? file_path
 
     errors.add(:base, "Code initial file must be a valid exam file: '#{file_path}'")

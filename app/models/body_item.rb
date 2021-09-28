@@ -26,7 +26,7 @@ class BodyItem < ApplicationRecord
     file_path = info['initial']['file']
     return if exam_version.has_file_path? file_path
 
-    errors.add(:base, "Code initial file must be a valid exam file: '#{file_path}'")
+    errors.add(:base, "Code body item specifies a non-existent file as its initial value: #{file_path}")
   end
 
   def valid_file_refs_code_tag

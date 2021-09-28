@@ -36,6 +36,8 @@ class Upload
     @dir = Pathname.new(ArchiveUtils.mktmpdir)
   end
 
+  class ExamYamlMissingError < StandardError; end
+
   def build_exam_version(default_name, destination = nil)
     extract_contents!
     file =
@@ -44,6 +46,9 @@ class Upload
       else
         @dir.join('exam.yaml')
       end
+    raise ExamYamlMissingError unless file.file?
+    raise ExamYamlMissingError unless file.basename.to_s == 'exam.yaml'
+
     properties = YAML.safe_load(File.read(file)).deep_stringify_keys
     files = properties.delete('files')
     properties = properties['info'] if properties['info']

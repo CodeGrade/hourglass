@@ -25,6 +25,10 @@ module Api
         render json: {
           message: e.to_s,
         }, status: :not_acceptable
+      rescue Upload::ExamYamlMissingError
+        render json: {
+          message: 'Your upload was missing an exam.yaml file.',
+        }, status: :not_acceptable
       end
 
       def export_file

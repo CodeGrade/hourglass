@@ -388,13 +388,13 @@ class ExamVersion < ApplicationRecord
     end
   end
 
-  def walk_files_acc(path, cur_files, and_dirs, &block)
+  def walk_files_acc(path, cur_files, also_yield_dirs, &block)
     cur_files.each do |f|
       case f['filedir']
       when 'dir'
         dpath = path.join(f['path'])
-        yield dpath.to_s if and_dirs
-        walk_files_acc dpath, f['nodes'], and_dirs, &block
+        yield dpath.to_s if also_yield_dirs
+        walk_files_acc dpath, f['nodes'], also_yield_dirs, &block
       when 'file'
         fpath = path.join(f['path'])
         contents = MarksProcessor.process_marks_reverse(f['contents'], f['marks'])

@@ -35,7 +35,7 @@ class BodyItem < ApplicationRecord
     file_path = answer['selectedFile']
     return if exam_version.has_file_path? file_path
 
-    errors.add(:base, "CodeTag answer file must be a valid exam file: '#{file_path}'")
+    errors.add(:base, "Code tag body item answer refers to a non-existent file: #{file_path}")
   end
 
   before_save do

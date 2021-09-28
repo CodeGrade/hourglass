@@ -641,12 +641,12 @@ const VersionInfo: React.FC<{
                 alert({
                   variant: 'success',
                   autohide: true,
-                  message: 'Exam version successfully imported.',
+                  message: 'Exam version successfully imported',
                 });
               }).catch((err) => {
                 alert({
                   variant: 'danger',
-                  title: 'Exam version not imported.',
+                  title: 'Exam version not imported',
                   message: err.message,
                   copyButton: true,
                 });

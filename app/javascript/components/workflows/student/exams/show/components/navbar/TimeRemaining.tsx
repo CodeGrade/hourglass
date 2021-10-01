@@ -13,7 +13,7 @@ import {
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { pluralize } from '@hourglass/common/helpers';
 
-function describeRemainingTime(remaining: Duration): string {
+export function describeRemainingTime(remaining: Duration): string {
   const left = remaining.shiftTo('weeks', 'days', 'hours', 'minutes', 'seconds', 'milliseconds').normalize();
   if (left.weeks > 0) {
     return `${pluralize(left.weeks, 'week', 'weeks')}, ${pluralize(left.days, 'day', 'days')} remaining`;

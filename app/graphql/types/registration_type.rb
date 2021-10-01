@@ -19,6 +19,7 @@ module Types
     end
     field :start_time, GraphQL::Types::ISO8601DateTime, null: true
     field :end_time, GraphQL::Types::ISO8601DateTime, null: true
+    field :effective_end_time, GraphQL::Types::ISO8601DateTime, null: true
 
     field :user, Types::UserType, null: false
     def user

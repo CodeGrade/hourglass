@@ -23,6 +23,7 @@ import Icon from '@student/exams/show/components/Icon';
 import { RenderError } from '@hourglass/common/boundary';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { CurrentGrading } from '@professor/exams/types';
+import { describeRemainingTime } from '@student/exams/show/components/navbar/TimeRemaining';
 
 import { submissionsAllQuery, submissionsAllQueryResponse } from './__generated__/submissionsAllQuery.graphql';
 import { submissionsRootQuery } from './__generated__/submissionsRootQuery.graphql';
@@ -47,6 +48,7 @@ const ExamSubmissions: React.FC = () => {
           final
           startTime
           endTime
+          effectiveEndTime
         }
       }
     }
@@ -213,24 +215,38 @@ const ExamSubmissions: React.FC = () => {
               <th>Student</th>
               <th>Started</th>
               <th>Ended</th>
+              <th>End by</th>
+              <th>Time Remaining</th>
             </tr>
           </thead>
           <tbody>
-            {groups.started.map((reg) => (
-              <tr key={reg.id}>
-                <td>
-                  <Link to={`/exams/${examId}/submissions/${reg.id}`}>
-                    {reg.user.displayName}
-                  </Link>
-                </td>
-                <td>
-                  {reg.startTime && DateTime.fromISO(reg.startTime).toLocaleString(timeOpts)}
-                </td>
-                <td>
-                  {reg.endTime && DateTime.fromISO(reg.endTime).toLocaleString(timeOpts)}
-                </td>
-              </tr>
-            ))}
+            {groups.started.map((reg) => {
+              const timeDiff = DateTime.fromISO(reg.effectiveEndTime)
+                .diff(DateTime.fromISO(reg.startTime));
+              return (
+                <tr key={reg.id}>
+                  <td>
+                    <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+                      {reg.user.displayName}
+                    </Link>
+                  </td>
+                  <td>
+                    {reg.startTime && DateTime.fromISO(reg.startTime).toLocaleString(timeOpts)}
+                  </td>
+                  <td>
+                    {reg.endTime && DateTime.fromISO(reg.endTime).toLocaleString(timeOpts)}
+                  </td>
+                  <td>
+                    {reg.effectiveEndTime && (
+                      DateTime.fromISO(reg.effectiveEndTime).toLocaleString(timeOpts)
+                    )}
+                  </td>
+                  <td>
+                    {describeRemainingTime(timeDiff)}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       )}

@@ -121,7 +121,7 @@ const ExamSubmissions: React.FC = () => {
   };
   return (
     <DocumentTitle title={`${res.data.exam.name} -- All submissions`}>
-      <h4>Completed submissions</h4>
+      <h4>{`Completed submissions (${groups.final.length})`}</h4>
       {groups.final.length === 0 ? (
         <i>No completed submissions yet</i>
       ) : (
@@ -203,7 +203,7 @@ const ExamSubmissions: React.FC = () => {
           </Table>
         </>
       )}
-      <h4>Started submissions</h4>
+      <h4>{`Started submissions (${groups.started.length})`}</h4>
       {groups.started.length === 0 ? (
         <i>No one is currently taking the exam</i>
       ) : (
@@ -234,7 +234,7 @@ const ExamSubmissions: React.FC = () => {
           </tbody>
         </Table>
       )}
-      <h4>Not-yet-started submissions</h4>
+      <h4>{`Not-yet-started submissions (${groups.notStarted.length})`}</h4>
       {groups.notStarted.length === 0 ? (
         <i>Everyone has started</i>
       ) : (

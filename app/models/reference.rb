@@ -11,7 +11,10 @@ class Reference < ApplicationRecord
   def valid_path
     return if exam_version.has_file_or_dir_path? path
 
-    errors.add(:path, "does not exist in the exam: '#{path}'")
+    location = "question #{question.index}" unless question.nil?
+    location = "question #{part.question.index}, part #{part.index}" unless part.nil?
+    location = 'exam version' if question.nil? && part.nil?
+    errors.add(:path, "does not exist in the upload: '#{path}' (invalid reference for #{location})")
   end
 
   def self.inheritance_column

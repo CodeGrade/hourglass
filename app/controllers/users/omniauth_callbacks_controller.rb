@@ -18,7 +18,9 @@ module Users
     end
 
     def failure
-      redirect_to root_path
+      redirect_to root_path, flash: {
+        error: 'Unexpected error logging in with Bottlenose - please contact a professor or admin.',
+      }
     end
   end
 end

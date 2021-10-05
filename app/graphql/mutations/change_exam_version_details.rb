@@ -53,7 +53,12 @@ module Mutations
         end
 
         saved = exam_version.save
-        raise GraphQL::ExecutionError, exam_version.errors.full_messages.to_sentence unless saved
+        unless saved
+          exam_version.errors.full_messages.each do |msg|
+            context.add_error(GraphQL::ExecutionError.new(msg))
+          end
+          return nil
+        end
 
         cache_authorization!(exam_version.exam, exam_version.course)
         context[:skip_eager_fields] = true

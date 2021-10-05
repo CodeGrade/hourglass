@@ -133,10 +133,19 @@ const ExamVersionEditor: React.FC = () => {
     `,
     {
       onError: (err) => {
+        const msgs = err.message.split('\n');
+        const errorElem = (
+          <ul>
+            {msgs.map((msg, idx) => (
+              // eslint-disable-next-line react/no-array-index-key -- these only get shown once
+              <li key={idx}>{msg}</li>
+            ))}
+          </ul>
+        );
         alert({
           variant: 'danger',
-          title: 'Error updating exam version',
-          message: err.message,
+          title: 'Error uploading files for exam version',
+          message: errorElem,
           copyButton: true,
         });
       },

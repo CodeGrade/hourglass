@@ -11,6 +11,11 @@ class Reference < ApplicationRecord
   def valid_path
     return if exam_version.has_file_or_dir_path? path
 
+    if exam_version.files.blank?
+      errors.add(:base, 'Exam version has references, but no files were given.')
+      return
+    end
+
     location = "question #{question.index}" unless question.nil?
     location = "question #{part.question.index}, part #{part.index}" unless part.nil?
     location = 'exam version' if question.nil? && part.nil?

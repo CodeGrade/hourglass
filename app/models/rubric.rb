@@ -22,14 +22,16 @@ class Rubric < ApplicationRecord
   has_many :subsection_links, -> { where(path_length: 1) },
            class_name: 'RubricTreePath',
            foreign_key: 'ancestor_id',
-           inverse_of: :ancestor
+           inverse_of: :ancestor,
+           dependent: nil # will manually clean up links
   has_many :subsections, -> { order(:order) },
            through: :subsection_links,
            source: 'descendant'
   has_one :parent_section_link, -> { where(path_length: 1) },
           class_name: 'RubricTreePath',
           foreign_key: 'descendant_id',
-          inverse_of: :descendant
+          inverse_of: :descendant,
+          dependent: nil # will manually clean up links
   has_one :parent_section,
           through: :parent_section_link,
           source: 'ancestor'

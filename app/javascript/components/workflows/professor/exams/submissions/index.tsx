@@ -121,6 +121,13 @@ const ExamSubmissions: React.FC = () => {
   const timeOpts : LocaleOptions & Intl.DateTimeFormatOptions = {
     weekday: 'short', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
   };
+  const lastStudentFinishTime = groups.started.reduce((latestSoFar, cur) => {
+    const currentDateTime = DateTime.fromISO(cur.effectiveEndTime);
+    if (currentDateTime > latestSoFar) {
+      return currentDateTime;
+    }
+    return latestSoFar;
+  }, DateTime.fromMillis(0));
   return (
     <DocumentTitle title={`${res.data.exam.name} -- All submissions`}>
       <h4>{`Completed submissions (${groups.final.length})`}</h4>
@@ -206,6 +213,9 @@ const ExamSubmissions: React.FC = () => {
         </>
       )}
       <h4>{`Started submissions (${groups.started.length})`}</h4>
+      {groups.started.length > 0 && (
+        <h5>{`Last student must finish by: ${lastStudentFinishTime.toLocaleString(timeOpts)}`}</h5>
+      )}
       {groups.started.length === 0 ? (
         <i>No one is currently taking the exam</i>
       ) : (

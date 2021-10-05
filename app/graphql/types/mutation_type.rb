@@ -18,7 +18,6 @@ module Types
     
     field :ask_question, mutation: Mutations::AskQuestion
     field :destroy_exam_version, mutation: Mutations::DestroyExamVersion
-    field :update_exam_version, mutation: Mutations::UpdateExamVersion
     field :create_exam_version, mutation: Mutations::CreateExamVersion
     field :change_exam_version_details, mutation: Mutations::ChangeExamVersionDetails
     field :sync_course_to_bottlenose, mutation: Mutations::SyncCourseToBottlenose

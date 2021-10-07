@@ -20,7 +20,7 @@ jobs:
         name: hourglass
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Get nix deps
-      run: nix develop -c echo
+      run: nix -L develop -c echo
     - name: Cache nix gems
       uses: actions/cache@v2
       with:

@@ -18,7 +18,6 @@ let
     export GEM_HOME=$PWD/.nix-gems
     export GEM_PATH=$GEM_HOME
     export PATH=$GEM_HOME/bin:$PATH
-    gem install --conservative bundler solargraph
   '';
   postgres_setup = ''
     export PGDATA=$PWD/postgres_data

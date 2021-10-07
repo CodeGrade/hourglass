@@ -18,9 +18,13 @@ module Users
     end
 
     def failure
-      redirect_to root_path, flash: {
-        error: 'Unexpected error logging in with Bottlenose - please contact a professor or admin.',
-      }
+      timestamp = Time.current.to_s
+      error_msg = 'Unexpected error logging in with Bottlenose.'
+      error_msg += '<br>'
+      error_msg += 'Please contact a professor or admin, with a screenshot of this message.'
+      error_msg += '<br>'
+      error_msg += "<span class=\"small\">#{timestamp}</span>"
+      redirect_to root_path, flash: { error: error_msg }
     end
   end
 end

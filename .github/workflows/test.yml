@@ -21,6 +21,18 @@ jobs:
         authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
     - name: Get nix deps
       run: nix develop -c echo
+    - name: Cache nix gems
+      uses: actions/cache@v2
+      with:
+        path: |
+          .nix-gems/
+        key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock') }}
+    - name: Cache npm packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          node_modules/
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('yarn.lock') }}
     - name: Install ruby gems
       run: nix develop -c bundle install --jobs 4 --retry 3
     - name: Install npm packages

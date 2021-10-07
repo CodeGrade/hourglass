@@ -3,9 +3,9 @@
 require 'test_helper'
 
 class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
-  STATIC_GRAPHQL_QUERIES['UPDATE_EXAM_VERSION'] = <<-GRAPHQL
-    mutation updateExamVersion($input: UpdateExamVersionInput!) {
-      updateExamVersion(input: $input) {
+  STATIC_GRAPHQL_QUERIES['CHANGE_EXAM_VERSION_DETAILS'] = <<-GRAPHQL
+    mutation changeExamVersionDetails($input: ChangeExamVersionDetailsInput!) {
+      changeExamVersionDetails(input: $input) {
         examVersion {
           id
         }
@@ -33,10 +33,12 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   GRAPHQL
 
   def try_update(ver, new_name:, user:)
-    HourglassSchema.do_mutation!('UPDATE_EXAM_VERSION', user, {
+    HourglassSchema.do_mutation!('CHANGE_EXAM_VERSION_DETAILS', user, {
       examVersionId: HourglassSchema.id_from_object(ver, Types::ExamVersionType, {}),
       name: new_name,
+      updateName: true,
       files: ver.files.to_json,
+      updateFiles: true,
     })
   end
 

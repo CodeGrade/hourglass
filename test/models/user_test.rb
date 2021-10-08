@@ -18,4 +18,13 @@ class UserTest < ActiveSupport::TestCase
     assert_match(/has already been taken/, r2.errors.full_messages.to_sentence)
     assert_not r2.save
   end
+
+  test 'cannot create two registrations for the same Exam-User pair' do
+    r1 = create(:registration)
+    second_version = create(:exam_version, exam: r1.exam)
+    r2 = build(:registration, user: r1.user, exam_version: second_version)
+    assert_not r2.valid?
+    assert_match(/has a registration for another version/, r2.errors.full_messages.to_sentence)
+    assert_not r2.save
+  end
 end

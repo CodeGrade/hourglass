@@ -26,6 +26,17 @@ class Registration < ApplicationRecord
 
   validates :user, uniqueness: { scope: :exam_version }
 
+  validate :user_exam_uniqueness
+  def user_exam_uniqueness
+    other_reg_exists =
+      user
+      .registrations
+      .where(exam_version: exam.exam_versions)
+      .where.not(exam_version: exam_version)
+      .any?
+    errors.add(:user, 'already has a registration for another version of that exam') if other_reg_exists
+  end
+
   def room_version_same_exam
     return unless room
 

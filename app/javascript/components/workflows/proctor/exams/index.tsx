@@ -1657,6 +1657,9 @@ const SendMessage: React.FC<{
         </Col>
       </Form.Group>
       <Form.Group>
+        <span className="float-right text-secondary">
+          Enter: newline, Ctrl+enter: send
+        </span>
         <SendMessageButton
           message={message}
           loading={loading}

@@ -357,7 +357,7 @@ DEPENDENCIES
   pry-rescue
   pry-stack_explorer
   puma (~> 4.1)
-  rails (~> 6.0.2)
+  rails (~> 6.0.4.1)
   react-rails
   rubocop-rails
   rubyzip

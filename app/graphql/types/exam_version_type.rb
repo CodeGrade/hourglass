@@ -42,7 +42,7 @@ module Types
     }
 
     field :name, String, null: false do
-      guard Guards::PROCTORS_AND_PROFESSORS
+      guard Guards::ALL_STAFF
     end
 
     field :policies, [Types::LockdownPolicyType], null: false

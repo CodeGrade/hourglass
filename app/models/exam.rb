@@ -239,8 +239,8 @@ class Exam < ApplicationRecord
   end
 
   def visible_to?(check_user, role_for_exam, role_for_course)
-    if ([role_for_exam, role_for_course].max >= Exam.roles[:proctor]) ||
-       proctors_and_professors.exists?(check_user.id)
+    if ([role_for_exam, role_for_course].max >= Exam.roles[:staff]) ||
+       all_staff.exists?(check_user.id)
       return true
     end
     unless ([role_for_exam, role_for_course].max == Exam.roles[:student]) ||

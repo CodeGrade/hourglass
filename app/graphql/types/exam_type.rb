@@ -6,8 +6,7 @@ module Types
     global_id_field :id
 
     guard lambda { |obj, _, ctx|
-      (obj.object.visible_to?(ctx[:current_user], Guards.exam_role(ctx[:current_user], ctx), Guards.course_role(ctx[:current_user], ctx)) ||
-       obj.object.all_staff.exists?(ctx[:current_user].id))
+      (obj.object.visible_to?(ctx[:current_user], Guards.exam_role(ctx[:current_user], ctx), Guards.course_role(ctx[:current_user], ctx)))
     }
 
     field :name, String, null: false
@@ -24,7 +23,7 @@ module Types
     end
 
     field :exam_versions, Types::ExamVersionType.connection_type, null: false do
-      guard Guards::PROCTORS_AND_PROFESSORS
+      guard Guards::ALL_STAFF
     end
     def exam_versions
       AssociationLoader.for(Exam, :exam_versions).load(object)

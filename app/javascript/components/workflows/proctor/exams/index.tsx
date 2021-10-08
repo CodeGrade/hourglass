@@ -1546,7 +1546,8 @@ const SendMessageButton: React.FC<{
         disabled={disabled}
         disabledMessage={disabledMessage}
         variant="success"
-        onClick={() => {
+        onClick={(e) => {
+          e.currentTarget.blur();
           doSend();
         }}
       >
@@ -1623,6 +1624,7 @@ const SendMessage: React.FC<{
         <Form.Label column sm="auto">To:</Form.Label>
         <Col>
           <Select
+            isDisabled={loading}
             placeholder="Choose selection criteria..."
             value={selectedRecipient}
             onChange={(value: MessageFilterOption) => {

@@ -9,7 +9,7 @@ interface TooltipButtonProps {
   disabledMessage?: string;
   enabledMessage?: string;
   placement?: OverlayTriggerProps['placement'];
-  onClick?: () => void;
+  onClick?: ButtonProps['onClick'];
   variant?: ButtonProps['variant'];
   className?: React.HTMLAttributes<HTMLButtonElement>['className'];
   cursorClass?: string;

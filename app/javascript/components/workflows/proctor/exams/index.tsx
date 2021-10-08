@@ -1528,43 +1528,15 @@ const ExamMessages: React.FC<{
 type MessageFilterOption = SelectOption<Recipient>;
 
 const SendMessageButton: React.FC<{
-  recipient: Recipient;
   message: string;
-  onSuccess: () => void;
+  loading: boolean;
+  doSend: () => void;
 }> = (props) => {
   const {
-    recipient,
     message,
-    onSuccess,
+    loading,
+    doSend,
   } = props;
-  const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<examsSendMessageMutation>(
-    graphql`
-      mutation examsSendMessageMutation($input: SendMessageInput!) {
-        sendMessage(input: $input) {
-          clientMutationId
-        }
-      }
-    `,
-    {
-      onCompleted: () => {
-        alert({
-          variant: 'success',
-          message: 'Message sent.',
-          autohide: true,
-        });
-        onSuccess();
-      },
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error sending message',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
-  );
   const disabled = message === '' || loading;
   const disabledMessage = loading ? 'Loading...' : 'Enter a message to send';
   return (
@@ -1575,14 +1547,7 @@ const SendMessageButton: React.FC<{
         disabledMessage={disabledMessage}
         variant="success"
         onClick={() => {
-          mutate({
-            variables: {
-              input: {
-                recipientId: recipient.id,
-                message,
-              },
-            },
-          });
+          doSend();
         }}
       >
         <Icon I={MdSend} />
@@ -1613,6 +1578,44 @@ const SendMessage: React.FC<{
   const resetVals = useCallback(() => {
     setMessage('');
   }, []);
+  const { alert } = useContext(AlertContext);
+  const [mutate, { loading }] = useMutation<examsSendMessageMutation>(
+    graphql`
+      mutation examsSendMessageMutation($input: SendMessageInput!) {
+        sendMessage(input: $input) {
+          clientMutationId
+        }
+      }
+    `,
+    {
+      onCompleted: () => {
+        alert({
+          variant: 'success',
+          message: 'Message sent.',
+          autohide: true,
+        });
+        resetVals();
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error sending message',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const doSend = () => {
+    mutate({
+      variables: {
+        input: {
+          recipientId: selectedRecipient.value.id,
+          message,
+        },
+      },
+    });
+  };
   return (
     <>
       <h2>Send message</h2>
@@ -1637,18 +1640,25 @@ const SendMessage: React.FC<{
           <Form.Control
             ref={messageRef}
             value={message}
+            disabled={loading}
             onChange={(e) => {
               setMessage(e.target.value);
             }}
             as="textarea"
+            onKeyDown={(e) => {
+              // ctrl+enter
+              if ((e.keyCode === 10 || e.keyCode === 13) && e.ctrlKey) {
+                doSend();
+              }
+            }}
           />
         </Col>
       </Form.Group>
       <Form.Group>
         <SendMessageButton
-          onSuccess={resetVals}
-          recipient={selectedRecipient.value}
           message={message}
+          loading={loading}
+          doSend={doSend}
         />
       </Form.Group>
     </>

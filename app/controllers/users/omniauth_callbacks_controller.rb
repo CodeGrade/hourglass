@@ -35,7 +35,7 @@ module Users
 
       error_msg = 'Unexpected error logging in with Bottlenose.'
       error_msg += '<br>'
-      error_msg += 'Use the button below to send a message to the professor or admin with this info.'
+      error_msg += 'Use the button below to send a message to a professor or admin with this info.'
       error_msg += '<br>'
       error_msg += "<span class=\"small\">#{timestamp}</span>"
       error_msg += '<br>'

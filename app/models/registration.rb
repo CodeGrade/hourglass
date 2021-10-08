@@ -26,6 +26,8 @@ class Registration < ApplicationRecord
 
   validates :user, uniqueness: { scope: :exam_version }
 
+  # note: we are not sure whether the current reg will show up in the association,
+  # so this validation remains separate from the previous uniqueness check
   validate :user_exam_uniqueness
   def user_exam_uniqueness
     other_reg_exists =

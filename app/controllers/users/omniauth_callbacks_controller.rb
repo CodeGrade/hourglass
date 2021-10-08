@@ -27,12 +27,15 @@ module Users
       mailto_body += "Timestamp: #{timestamp}\n"
       mailto_body += "Username: #{current_user.username}\n" if current_user
       mailto_link = "mailto:professor?subject=#{ERB::Util.u(mailto_subject)}&body=#{ERB::Util.u(mailto_body)}"
-      mailto_button = '<a target="_blank" href="' + mailto_link + '" class="btn btn-info">Send email</a>'
+      mailto_button =
+        '<div class="d-flex flex-row-reverse"><a target="_blank" href="' +
+        mailto_link +
+        '" class="btn btn-primary ml-0">Send email</a></div>'
       # rubocop: enable Style/StringConcatenation
 
       error_msg = 'Unexpected error logging in with Bottlenose.'
       error_msg += '<br>'
-      error_msg += 'Please contact a professor or admin, with a screenshot of this message.'
+      error_msg += 'Use the button below to send a message to the professor or admin with this info.'
       error_msg += '<br>'
       error_msg += "<span class=\"small\">#{timestamp}</span>"
       error_msg += '<br>'

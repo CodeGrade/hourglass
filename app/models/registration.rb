@@ -24,6 +24,8 @@ class Registration < ApplicationRecord
   delegate :course, to: :exam
   delegate :term, to: :course
 
+  validates :user, uniqueness: { scope: :exam_version }
+
   def room_version_same_exam
     return unless room
 

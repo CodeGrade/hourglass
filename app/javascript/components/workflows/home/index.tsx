@@ -8,7 +8,7 @@ import {
   useMutation,
 } from 'relay-hooks';
 import { RenderError } from '@hourglass/common/boundary';
-import Select, { GroupedOptionsType } from 'react-select';
+import Select, { GroupedOptionsType, OptionProps, components } from 'react-select';
 import {
   Button,
   Container,
@@ -278,17 +278,43 @@ const ShowProfRegs: React.FC<{
   );
 };
 
-export type ImpersonateVal = SelectOption<string>
+export type ImpersonateVal = SelectOption<string, {imageUrl?: string}>
+
+const ImpersonateUserOption: React.FC<OptionProps<ImpersonateVal>> = (props) => {
+  const {
+    data,
+  } = props;
+  const value = data as ImpersonateVal;
+  return (
+    <div className="d-inline-block" style={{ maxWidth: '200px', verticalAlign: 'top' }}>
+      {(
+        // eslint-disable-next-line react/jsx-props-no-spreading
+        <components.Option {...props} className="d-inline-block p-2 rounded-lg">
+          <Card style={{ color: 'black' }}>
+            <Card.Header className="p-0" style={{ height: '200px', overflow: 'clip' }}>
+              {value.imageUrl ? (
+                <Card.Img className="profile-photo" src={value.imageUrl} alt={value.label} />
+              ) : (
+                <Icon I={MdPerson} size="100%" />
+              )}
+            </Card.Header>
+            <Card.Body>
+              {value.label}
+            </Card.Body>
+          </Card>
+        </components.Option>
+      )}
+    </div>
+  );
+};
 
 export const ImpersonateUser: React.FC<{
   userOptions: ImpersonateVal[] | GroupedOptionsType<ImpersonateVal>;
-  userIdToImageMap: { [key: string]: string; };
   courseId?: ImpersonateUserInput['courseId'];
 }> = (props) => {
   const {
     userOptions,
     courseId,
-    userIdToImageMap,
   } = props;
   const { alert } = useContext(AlertContext);
   const [impersonate, { loading }] = useMutation(
@@ -322,8 +348,9 @@ export const ImpersonateUser: React.FC<{
             placeholder="Select a user to impersonate..."
             isDisabled={loading}
             options={userOptions}
+            components={{ Option: ImpersonateUserOption }}
             formatOptionLabel={(option) => {
-              const userHasImage = option.value in userIdToImageMap;
+              const userHasImage = !!option.imageUrl;
               return (
                 <OverlayTrigger
                   placement="right"
@@ -335,7 +362,7 @@ export const ImpersonateUser: React.FC<{
                       {...overlayProps}
                     >
                       {userHasImage ? (
-                        <img className="profile-photo" src={userIdToImageMap[option.value]} alt={option.label} />
+                        <img className="profile-photo" src={option.imageUrl} alt={option.label} />
                       ) : (
                         <span>No image for that user.</span>
                       )}
@@ -343,11 +370,6 @@ export const ImpersonateUser: React.FC<{
                   )}
                 >
                   <span>
-                    {userHasImage ? (
-                      <img className="profile-photo-thumb pr-2" src={userIdToImageMap[option.value]} alt={option.label} />
-                    ) : (
-                      <Icon className="pr-2" I={MdPerson} />
-                    )}
                     {option.label}
                   </span>
                 </OverlayTrigger>
@@ -403,20 +425,14 @@ const Admin: React.FC = () => {
   if (!res.data) {
     return <p>Loading...</p>;
   }
-  const userIdToImageMap = {};
-  res.data.users.forEach((user) => {
-    if (user.imageUrl) {
-      userIdToImageMap[user.id] = user.imageUrl;
-    }
-  });
   const userOptions: ImpersonateVal[] = res.data.users.map((user) => ({
     label: `${user.displayName} (${user.username})`,
     value: user.id,
+    imageUrl: user.imageUrl,
   }));
   return (
     <ImpersonateUser
       userOptions={userOptions}
-      userIdToImageMap={userIdToImageMap}
     />
   );
 };

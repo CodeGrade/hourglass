@@ -55,12 +55,12 @@ export function pluralize(number: number, singular: string, plural: string): str
   return `${number} ${plural}`;
 }
 
-export type SelectOption<T> = {
+export type SelectOption<T, Extra = unknown> = {
   label: string;
   value: T;
-};
+} & Extra;
 
-export type SelectOptions<T> = SelectOption<T>[];
+export type SelectOptions<T, Extra = unknown> = SelectOption<T, Extra>[];
 
 export type MutationReturn<T extends MutationParameters> = [
   MutateWithVariables<T>, MutationState<T>

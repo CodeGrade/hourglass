@@ -45,7 +45,7 @@
     "prop-types": "^15.7.2",
     "quill-paste-smart": "^1.2.1",
     "react": "^16.13.0",
-    "react-bootstrap": "^1.4.3",
+    "react-bootstrap": "^1.6.4",
     "react-codemirror-runmode": "^1.0.5",
     "react-codemirror2": "^7.2.1",
     "react-datepicker": "^3.0.0",

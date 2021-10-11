@@ -1,10 +1,10 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'production'
 
-const environment = require('./environment')
+const webpackConfig = require('./base')
 
-environment.loaders.prepend('ignore', {
+webpackConfig.loaders.prepend('ignore', {
   test: /graphiql|wdyr/,
   loader: 'ignore-loader',
 });
 
-module.exports = environment.toWebpackConfig()
+module.exports = webpackConfig

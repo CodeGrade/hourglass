@@ -24,6 +24,8 @@
     "@material-ui/core": "^4.9.5",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
+    "@rails/actioncable": "latest",
+    "@rails/activestorage": "latest",
     "@rails/ujs": "^6.0.0",
     "@rails/webpacker": "^6.0.0-rc.5",
     "@types/relay-runtime": "^10.1.8",
@@ -72,13 +74,23 @@
     "relay-compiler-language-typescript": "^13.0.1",
     "relay-hooks": "^4.0.0",
     "relay-runtime": "^10.1.3",
-    "sass-loader": "^8.0.2",
+    "sass-loader": "^12.1.0",
     "style-loader": "^1.2.1",
     "ts-loader": "^7.0.5",
     "typescript": "^3.8.3",
     "use-debounce": "^6.0.1",
-    "webpack": "^4.0.0"
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.8.0"
   },
+  "version": "0.1.0",
+  "babel": {
+    "presets": [
+      "./node_modules/@rails/webpacker/package/babel/preset.js"
+    ]
+  },
+  "browserslist": [
+    "defaults"
+  ],
   "devDependencies": {
     "@types/actioncable": "^5.2.3",
     "@types/codemirror": "^0.0.107",
@@ -94,6 +106,7 @@
     "@types/redux-form": "^8.3.1",
     "@typescript-eslint/eslint-plugin": "^3.1.0",
     "@typescript-eslint/parser": "^3.1.0",
+    "@webpack-cli/serve": "^1.6.0",
     "@welldone-software/why-did-you-render": "^4.2.7",
     "concurrently": "^5.2.0",
     "eslint": "^7.2.0",
@@ -105,9 +118,9 @@
     "eslint-plugin-react-hooks": "^4.1.0",
     "graphiql": "^1.4.2",
     "relay-config": "^10.1.3",
+    "sass": "^1.42.1",
     "tplant": "^2.3.3",
     "ts-prune": "^0.6.4",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3"
+    "webpack-dev-server": "^4.3.1"
   }
 }

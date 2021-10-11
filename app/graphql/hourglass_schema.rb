@@ -174,7 +174,7 @@ class HourglassSchema < GraphQL::Schema
   end
 
   def self.write_json!
-    File.open('app/javascript/relay/data/schema.json', 'w') do |f|
+    File.open('app/packs/relay/data/schema.json', 'w') do |f|
       f.write(execute(GraphQL::Introspection::INTROSPECTION_QUERY).to_json)
     end
   end

@@ -11,12 +11,12 @@ import {
 import { ReactQuillProps } from 'react-quill';
 import { FaTrashAlt } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
-import { useDebounce, useDebouncedCallback } from 'use-debounce/lib';
+import { useDebounce, useDebouncedCallback } from 'use-debounce';
 
-import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/common/NumericInput';
-import Loading from '@hourglass/common/loading';
-import { HTMLVal } from '@student/exams/show/types';
-import Icon from '@student/exams/show/components/Icon';
+import { ChangeHandler, normalizeNumber, NumericInput } from '@hourglass/../../packs/components/common/NumericInput';
+import Loading from '@hourglass/../../packs/components/common/loading';
+import { HTMLVal } from '@hourglass/../../packs/components/workflows/student/exams/show/types';
+import Icon from '@hourglass/../../packs/components/workflows/student/exams/show/components/Icon';
 import CustomEditor from './CustomEditor';
 
 export const DragHandle: React.FC<{

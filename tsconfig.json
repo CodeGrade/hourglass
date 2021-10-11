@@ -9,7 +9,7 @@
     "target": "esnext",
     "jsx": "preserve",
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "app/javascript/components",
+    "baseUrl": "app/packs/components",
     "skipLibCheck": true,
     "paths": {
       "@hourglass/*": ["./*"],

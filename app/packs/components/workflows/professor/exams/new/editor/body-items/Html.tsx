@@ -5,7 +5,7 @@ import {
 } from 'relay-hooks';
 import { MutationReturn } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
-import { HTMLVal } from '@hourglass/workflows/student/exams/show/types';
+import { HTMLVal } from '@student/exams/show/types';
 import { EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
 
 import { HtmlCreateMutation } from './__generated__/HtmlCreateMutation.graphql';

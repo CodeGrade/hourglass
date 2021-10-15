@@ -52,7 +52,7 @@
     "react-datepicker": "^3.0.0",
     "react-dnd": "^11.1.1",
     "react-dnd-html5-backend": "^11.1.1",
-    "react-dom": "npm:@hot-loader/react-dom@16",
+    "react-dom": "npm:@hot-loader/react-dom@17",
     "react-hot-loader": "^4.12.21",
     "react-icons": "^3.10.0",
     "react-loading-overlay": "^1.0.1",

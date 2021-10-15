@@ -33,7 +33,7 @@ export function removeMarks(cm: CM.Editor, marks: MarkDescription[]): void {
     cm.findMarks(mark.from, mark.to).forEach((m) => {
       if (m.className === 'readOnly') {
         const where = m.find();
-        if (where.from.ch === mark.from.ch
+        if ('from' in where && where.from.ch === mark.from.ch
           && where.from.line === mark.from.line
           && where.to.ch === mark.to.ch
           && where.to.line === mark.to.line) {
@@ -51,7 +51,7 @@ export function removeAllMarks(cm: CM.Editor): void {
 export function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
   return marks.filter((m) => m.className === 'readOnly').map((m) => {
     const { inclusiveLeft, inclusiveRight } = m;
-    const found = m.find();
+    const found = m.find() as CM.MarkerRange;
     return {
       from: {
         ch: found.from.ch,
@@ -156,7 +156,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
     });
   }, refreshProps);
 
-  const disableCursor = disabled ? 'nocursor' : false;
+  const disableCursor: (boolean | 'nocursor') = disabled ? 'nocursor' : false;
 
   const myOptions = {
     theme: 'mdn-like',

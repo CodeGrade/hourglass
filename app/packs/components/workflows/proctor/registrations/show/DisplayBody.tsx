@@ -29,7 +29,7 @@ import {
   Card,
   Collapse,
 } from 'react-bootstrap';
-import { variantForPoints, iconForPoints } from '@hourglass/workflows/grading';
+import { variantForPoints, iconForPoints } from '@grading/index';
 import Icon from '@student/exams/show/components/Icon';
 import ErrorBoundary from '@hourglass/common/boundary';
 

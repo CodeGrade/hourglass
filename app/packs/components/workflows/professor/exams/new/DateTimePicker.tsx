@@ -29,6 +29,8 @@ function mergeDateTime(date: DateTime, time: DateTime): DateTime {
     hour: time.hour,
     minute: time.minute,
     second: time.second,
+  },
+  {
     zone: time.zone,
   });
 }
@@ -110,6 +112,8 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
                   DateTime.fromObject({
                     hour: time.hour,
                     minute: time.minute,
+                  },
+                  {
                     zone: (value ?? DateTime.local()).zone,
                   }),
                 ));

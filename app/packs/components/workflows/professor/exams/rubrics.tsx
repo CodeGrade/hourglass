@@ -28,23 +28,20 @@ function expandPreset(rawPreset: RawPreset): RubricPresets {
     direction,
     presets: presetComments.map((c) => {
       const {
-        // eslint-disable-next-line no-shadow
-        id,
-        // eslint-disable-next-line no-shadow
-        label,
+        id: commentId,
+        label: commentLabel,
         graderHint,
         studentFeedback,
         points,
       } = c;
-      // eslint-disable-next-line no-shadow
-      const ans: Preset = {
-        id,
+      const commentAns: Preset = {
+        id: commentId,
         graderHint,
         points,
       };
-      if (label !== null) { ans.label = label; }
-      if (studentFeedback !== null) { ans.studentFeedback = studentFeedback; }
-      return ans;
+      if (commentLabel !== null) { commentAns.label = commentLabel; }
+      if (studentFeedback !== null) { commentAns.studentFeedback = studentFeedback; }
+      return commentAns;
     }),
   };
   if (label !== null) { ans.label = label; }

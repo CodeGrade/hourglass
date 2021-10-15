@@ -48,7 +48,7 @@ const CodeTagVal: React.FC<CodeTagValProps> = (props) => {
               <Button disabled size="sm" variant="outline-dark">
                 {display}
               </Button>
-          )
+            )
             : <i>Unanswered</i>}
         </span>
       )}
@@ -59,7 +59,7 @@ const CodeTagVal: React.FC<CodeTagValProps> = (props) => {
             <Button disabled size="sm" variant="outline-dark">
               {value.lineNumber}
             </Button>
-        )
+          )
           : <i>Unanswered</i>}
       </span>
     </div>

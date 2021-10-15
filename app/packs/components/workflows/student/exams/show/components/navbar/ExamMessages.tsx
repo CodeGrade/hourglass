@@ -402,7 +402,7 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
     .examAnnouncements.edges.map(({ node: { createdAt } }) => DateTime.fromISO(createdAt))
     .concat(
       res.myRegistration.room?.roomAnnouncements.edges.map(
-         ({ node: { createdAt } }) => DateTime.fromISO(createdAt),
+        ({ node: { createdAt } }) => DateTime.fromISO(createdAt),
       ) ?? [],
     )
     .concat(

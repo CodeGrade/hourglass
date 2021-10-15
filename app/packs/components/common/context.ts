@@ -7,17 +7,17 @@ import {
 } from '@student/exams/show/types';
 import { ExamRubric } from '@professor/exams/types';
 
-interface ExamContext {
+interface IExamContext {
   files: ExamFile[];
   fmap: FileMap;
 }
-export const ExamContext = createContext<ExamContext>({} as ExamContext);
+export const ExamContext = createContext<IExamContext>({} as IExamContext);
 
-interface ExamViewerContext {
+interface IExamViewerContext {
   answers: AnswersState;
   rubric?: ExamRubric;
 }
-export const ExamViewerContext = createContext<ExamViewerContext>({} as ExamViewerContext);
+export const ExamViewerContext = createContext<IExamViewerContext>({} as IExamViewerContext);
 
 interface FilesContext {
   references: readonly FileRef[];

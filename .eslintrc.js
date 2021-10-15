@@ -13,6 +13,9 @@ module.exports = {
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
+    JSX: 'readonly',
+    RequestInit: 'readonly',
+    EventListener: 'readonly',
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -62,12 +65,6 @@ module.exports = {
         ],
       },
     ],
-    'no-shadow': [
-      'error',
-      {
-        allow: ['_'],
-      },
-    ],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
@@ -80,5 +77,16 @@ module.exports = {
     'react/prop-types': 'off',
     'react/require-default-props': [1, { ignoreFunctionalComponents: true }],
     'react/no-unused-prop-types': [1],
+    // note you must disable the base rule as it can report incorrect errors
+    'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
+    // note you must disable the base rule as it can report incorrect errors
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': [
+      'error',
+      {
+        allow: ['_'],
+      },
+    ],
   },
 };

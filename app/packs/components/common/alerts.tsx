@@ -83,15 +83,15 @@ const ShowAlerts: React.FC<{
   </div>
 );
 
-interface AlertContext {
+interface IAlertContext {
   alert: (alert: HGAlert) => void;
 }
 
-export const AlertContext = React.createContext<AlertContext>({} as AlertContext);
+export const AlertContext = React.createContext<IAlertContext>({} as IAlertContext);
 
 export const AllAlerts: React.FC = ({ children }) => {
   const [alerts, setAlerts] = useState<HGAlertWithID[]>([]);
-  const val = useMemo<AlertContext>(() => ({
+  const val = useMemo<IAlertContext>(() => ({
     alert: (alert) => {
       setAlerts((a) => a.concat([{
         time: DateTime.local().toMillis(),

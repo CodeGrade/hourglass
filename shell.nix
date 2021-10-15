@@ -49,7 +49,7 @@ in pkgs.mkShell {
     qt4
     curl.dev
     pcre
-    nodejs
+    nodejs-16_x
     nodePackages_latest.yarn
     start_postgres
     stop_postgres

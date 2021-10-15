@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getCSRFToken } from '@student/exams/show/helpers';
 
 export type ApiResponse<T> = Result<T> | Loading | ApiError;

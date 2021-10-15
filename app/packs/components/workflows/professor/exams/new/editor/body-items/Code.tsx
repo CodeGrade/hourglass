@@ -298,15 +298,15 @@ const EditCodeAnswerValues: React.FC<{
 };
 
 interface CMRange {
-  from: CodeMirror.Position;
-  to: CodeMirror.Position;
+  from: CM.Position;
+  to: CM.Position;
 }
 
 interface LockStateInfo {
   enabled: boolean;
   active: boolean;
   curRange?: CMRange;
-  finalPos?: CodeMirror.Position;
+  finalPos?: CM.Position;
 }
 
 const SetInitial: React.FC<{

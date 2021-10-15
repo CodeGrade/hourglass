@@ -2,7 +2,7 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
 import { editorQueryResponse } from '@professor/exams/new/editor/__generated__/editorQuery.graphql';
-import { Policy } from '@material-ui/icons';
+import CodeMirror from 'codemirror';
 
 export type ExamTakerAction =
   LoadExamAction |

@@ -40,13 +40,13 @@ import FourOhFour from './FourOhFour';
 
 type CustomHandler = (b: boolean) => void;
 
-interface BlockerContext {
+interface IBlockerContext {
   setCustomHandler: (f: () => CustomHandler) => void;
   setCancelText: (str: string) => void;
   setLeaveText: (str: string) => void;
 }
 
-const BlockerContext = React.createContext({} as BlockerContext);
+const BlockerContext = React.createContext({} as IBlockerContext);
 
 export const BlockNav: React.FC<{
   when?: boolean;

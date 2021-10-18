@@ -38,17 +38,29 @@ class Upload
 
   class ExamYamlMissingError < StandardError; end
 
+  class BadFileError < StandardError; end
+
+  class InvalidYamlError < StandardError; end
+
   def build_exam_version(default_name, destination = nil)
     extract_contents!
-    file =
-      if @dir.children.length == 1
-        @dir.children.first
-      else
-        @dir.join('exam.yaml')
-      end
-    raise ExamYamlMissingError unless file.file?
+    file = nil
+    if @dir.children.length == 1
+      file = @dir.children.first
+      raise BadFileError unless file.file?
+    else
+      file = @dir.join('exam.yaml')
+      raise ExamYamlMissingError unless file.file?
+    end
 
-    properties = YAML.safe_load(File.read(file)).deep_stringify_keys
+    begin
+      loaded_yaml = YAML.load_file(file)
+    rescue YAML::SyntaxError => e
+      raise InvalidYamlError, e.message
+    end
+    raise InvalidYamlError, 'top-level should be an object' unless loaded_yaml.is_a? Hash
+
+    properties = loaded_yaml.deep_stringify_keys
     files = properties.delete('files')
     properties = properties['info'] if properties['info']
     raise 'Specify files either in YAML or a directory, not both' if files.present? && @files.present?

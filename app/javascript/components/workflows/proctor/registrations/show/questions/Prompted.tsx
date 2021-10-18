@@ -3,7 +3,7 @@ import { HTMLVal } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 
 const Prompted: React.FC<{
-  prompt: HTMLVal;
+  prompt?: HTMLVal;
 }> = (props) => {
   const {
     children,
@@ -11,7 +11,7 @@ const Prompted: React.FC<{
   } = props;
   return (
     <div>
-      <div><HTML value={prompt} /></div>
+      {prompt && (<div><HTML value={prompt} /></div>)}
       {children}
     </div>
   );

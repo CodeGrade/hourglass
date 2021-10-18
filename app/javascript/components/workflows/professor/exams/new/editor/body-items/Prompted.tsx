@@ -6,14 +6,14 @@ import { EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
 
 const Prompted: React.FC<{
   disabled?: boolean;
-  value: HTMLVal;
+  value?: HTMLVal;
   onChange: (newVal: HTMLVal) => void;
   debounceDelay?: number;
   className?: string;
   theme?: ReactQuillProps['theme'];
 }> = (props) => {
   const {
-    value,
+    value = { type: 'HTML', value: '' },
     disabled = false,
     debounceDelay = 1000,
     onChange,

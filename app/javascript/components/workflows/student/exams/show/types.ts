@@ -262,7 +262,7 @@ export interface AnswersState {
 
 export interface CodeInfo {
   type: 'Code';
-  prompt: HTMLVal;
+  prompt?: HTMLVal;
   lang: string;
   initial?: CodeInitial;
 }
@@ -302,7 +302,7 @@ export interface HTMLVal {
 export interface AllThatApplyInfo {
   type: 'AllThatApply';
   options: HTMLVal[];
-  prompt: HTMLVal;
+  prompt?: HTMLVal;
 }
 
 export type AllThatApplyState = boolean[];
@@ -311,14 +311,14 @@ export interface YesNoInfo {
   type: 'YesNo';
   yesLabel: string;
   noLabel: string;
-  prompt: HTMLVal;
+  prompt?: HTMLVal;
 }
 
 export type YesNoState = boolean;
 
 export interface CodeTagInfo {
   type: 'CodeTag';
-  prompt: HTMLVal;
+  prompt?: HTMLVal;
   choices: 'exam' | 'question' | 'part';
 }
 
@@ -329,7 +329,7 @@ export interface CodeTagState {
 
 export interface MultipleChoiceInfo {
   type: 'MultipleChoice';
-  prompt: HTMLVal;
+  prompt?: HTMLVal;
   options: HTMLVal[];
 }
 
@@ -337,14 +337,14 @@ export type MultipleChoiceState = number;
 
 export interface TextInfo {
   type: 'Text';
-  prompt: HTMLVal;
+  prompt?: HTMLVal;
 }
 
 export type TextState = string;
 
 export interface MatchingInfo {
   type: 'Matching';
-  prompt: HTMLVal;
+  prompt?: HTMLVal;
   promptsLabel?: HTMLVal;
   prompts: HTMLVal[];
   valuesLabel?: HTMLVal;

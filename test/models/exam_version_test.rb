@@ -3,10 +3,6 @@
 require 'test_helper'
 
 class ExamVersionTest < ActiveSupport::TestCase
-  def condense_yaml(name)
-    JSON.pretty_generate(compact_blank(parse_yaml(name)))
-  end
-
   def parse_yaml(name)
     yaml_path = Rails.root.join('test', 'fixtures', 'files', name, 'exam.yaml')
     YAML.safe_load(File.read(yaml_path))
@@ -55,8 +51,8 @@ class ExamVersionTest < ActiveSupport::TestCase
 
   test 'cs3500_v2 output_json' do
     ev = create(:exam_version, :cs3500_v2)
-    json = condense_yaml 'cs3500final-v2'
-    assert_equal json, ev.export_json(include_files: true)
+    json = JSON.pretty_generate(compact_blank(parse_yaml('cs3500final-v2')))
+    assert_equal json, ev.export_json
   end
 
   test 'cs2500 is the same when exported and reimported' do

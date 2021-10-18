@@ -29,6 +29,18 @@ module Api
         render json: {
           message: 'Your upload was missing an exam.yaml file.',
         }, status: :not_acceptable
+      rescue Upload::BadFileError
+        render json: {
+          message: 'You must upload either a zip containing an exam.yaml or a single yaml/json file.',
+        }, status: :not_acceptable
+      rescue Upload::InvalidYamlError => e
+        render json: {
+          message: "Your upload had invalid yaml: #{e.message}",
+        }, status: :not_acceptable
+      rescue ActiveRecord::RecordInvalid => e
+        render json: {
+          message: "Your upload was not valid: #{e.message}",
+        }, status: :not_acceptable
       end
 
       def export_file

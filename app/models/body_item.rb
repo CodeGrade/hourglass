@@ -20,8 +20,7 @@ class BodyItem < ApplicationRecord
 
   def valid_file_refs_code
     return unless info['type'] == 'Code'
-    return unless info.key? 'initial'
-    return unless info['initial'].key? 'file'
+    return unless info['initial']&.key? 'file'
 
     file_path = info['initial']['file']
     return if exam_version.has_file_path? file_path

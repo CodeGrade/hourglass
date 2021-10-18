@@ -351,7 +351,7 @@ class ExamVersion < ApplicationRecord
     res_obj = { info: export_exam_info }
     res_obj['files'] = files if include_files
 
-    JSON.pretty_generate(compact_blank(res_obj))
+    JSON.pretty_generate(res_obj)
   end
 
   def export_all(dir)

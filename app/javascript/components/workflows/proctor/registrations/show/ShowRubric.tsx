@@ -129,9 +129,9 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll, forWhat: string }> = (props) 
     <div className="rubric">
       <Alert className="card" variant="dark">
         {heading}
+        <HTML value={description} />
         <Collapse in={open}>
           <div>
-            <HTML value={description} />
             {body}
           </div>
         </Collapse>
@@ -190,9 +190,9 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny, forWhat: string }> = (props) 
     <div className="rubric">
       <Alert className="card" variant="dark">
         {heading}
+        <HTML value={description} />
         <Collapse in={open}>
           <div>
-            <HTML value={description} />
             {body}
           </div>
         </Collapse>
@@ -251,9 +251,9 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
     <div className="rubric">
       <Alert className="card" variant="dark">
         {heading}
+        <HTML value={description} />
         <Collapse in={open}>
           <div>
-            <HTML value={description} />
             {body}
           </div>
         </Collapse>

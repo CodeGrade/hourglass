@@ -50,7 +50,7 @@ in pkgs.mkShell {
     curl.dev
     pcre
     nodejs
-    yarn
+    nodePackages_latest.yarn
     start_postgres
     stop_postgres
     nodePackages.typescript-language-server
@@ -65,6 +65,6 @@ in pkgs.mkShell {
   shellHook = ''
     ${postgres_setup}
     ${gem_setup}
-    export PATH=$PWD/node_modules/.bin:$PATH
+    export PATH=${pkgs.nodePackages_latest.yarn}/lib/node_modules/yarn/bin:$PWD/node_modules/.bin:$PATH
   '';
 }

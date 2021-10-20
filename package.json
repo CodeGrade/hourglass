@@ -91,7 +91,7 @@
     "defaults"
   ],
   "devDependencies": {
-    "@types/actioncable": "^5.2.3",
+    "@types/rails__actioncable": "^6.1.5",
     "@types/codemirror": "^5.60.5",
     "@types/luxon": "^2.0.5",
     "@types/mime": "^2.0.2",

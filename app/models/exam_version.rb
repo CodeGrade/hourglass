@@ -52,8 +52,9 @@ class ExamVersion < ApplicationRecord
 
   EXAM_UPLOAD_SCHEMA = Rails.root.join('config/schemas/exam-upload.json').to_s
   FILES_SCHEMA = Rails.root.join('config/schemas/files.json').to_s
+  FILES_SCHEMA_OBJ = File.read(FILES_SCHEMA)
   validates :files, presence: true, allow_blank: true, json: {
-    schema: -> { FILES_SCHEMA },
+    schema: FILES_SCHEMA_OBJ,
     message: ->(errors) { errors },
   }
 

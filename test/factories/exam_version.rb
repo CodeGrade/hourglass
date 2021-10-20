@@ -14,6 +14,17 @@ FactoryBot.define do
         upload { create(:upload, :blank) }
       end
       before(:create) do |ev, _context|
+        ev.db_questions.each do |q|
+          q.exam_version = nil
+          q.parts.each do |p|
+            p.question = nil
+            p.body_items.each do |b|
+              b.part = nil
+            end
+            p.body_items.delete_all
+          end
+          q.parts.delete_all
+        end
         ev.db_questions.delete_all
       end
     end

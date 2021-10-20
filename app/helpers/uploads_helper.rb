@@ -55,6 +55,7 @@ module UploadsHelper
           index: qnum,
         )
         version.association(:db_questions).add_to_target(question)
+        question.exam_version = version
         q_rubric = convert_rubric({exam_version: version, question: question}, qinfo['questionRubric'])
         question.association(:rubrics).add_to_target(q_rubric)
         avail_references["question"] = false

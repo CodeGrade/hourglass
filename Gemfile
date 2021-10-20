@@ -45,6 +45,7 @@ gem 'pretender'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
 
+gem 'json-schema', '~> 2.8'
 gem 'activerecord_json_validator', '~> 2.0'
 
 group :development, :test do

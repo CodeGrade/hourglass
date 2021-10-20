@@ -26,9 +26,9 @@ module Mutations
         info: {
           type: 'Code',
           lang: lang,
-          prompt: {
+          prompt: prompt || {
             type: 'HTML',
-            value: prompt || '',
+            value: '',
           },
           initial: initial_code || initial_file,
         },

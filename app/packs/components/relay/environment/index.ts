@@ -8,7 +8,7 @@ import {
   FetchFunction,
 } from 'relay-runtime';
 import { getCSRFToken } from '@student/exams/show/helpers';
-import ActionCable from 'actioncable';
+import { createConsumer } from '@rails/actioncable';
 import { createLegacyRelaySubscriptionHandler } from 'graphql-ruby-client/subscriptions/createRelaySubscriptionHandler';
 
 const fetchQuery: FetchFunction = async (
@@ -42,7 +42,7 @@ const fetchQuery: FetchFunction = async (
   })
 );
 
-const cable = ActionCable.createConsumer();
+const cable = createConsumer();
 
 const subscriptionHandler = createLegacyRelaySubscriptionHandler({
   cable,

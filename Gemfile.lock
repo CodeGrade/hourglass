@@ -346,14 +346,14 @@ DEPENDENCIES
   bootsnap (>= 1.4.2)
   bootstrap_form (>= 4.2.0)
   byebug
-  capybara (>= 2.15)
+  capybara (>= 3.26)
   devise (~> 4.8.0)
   factory_bot_rails
   graphql
   graphql-batch
   graphql-guard
   headless
-  listen (~> 3.2)
+  listen (~> 3.3)
   minitest-reporters
   omniauth-bottlenose!
   omniauth-oauth2 (~> 1.7.0)
@@ -371,7 +371,7 @@ DEPENDENCIES
   rubyzip
   spring
   tzinfo-data
-  web-console (>= 3.3.0)
+  web-console (>= 4.1.0)
   webdrivers
   webpacker (~> 6.0.0.rc.5)
 

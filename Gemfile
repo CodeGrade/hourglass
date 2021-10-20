@@ -60,15 +60,15 @@ end
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
-  gem 'listen', '~> 3.2'
+  gem 'listen', '~> 3.3'
   gem 'rubocop-rails'
   gem 'spring'
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
-  gem 'web-console', '>= 3.3.0'
+  gem 'web-console', '>= 4.1.0'
 end
 
 group :test do
-  gem 'capybara', '>= 2.15'
+  gem 'capybara', '>= 3.26'
   gem 'webdrivers'
 end
 

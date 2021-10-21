@@ -231,8 +231,7 @@ const ExamSubmissions: React.FC = () => {
           </thead>
           <tbody>
             {groups.started.map((reg) => {
-              const timeDiff = DateTime.fromISO(reg.effectiveEndTime)
-                .diff(DateTime.fromISO(reg.startTime));
+              const timeDiff = DateTime.fromISO(reg.effectiveEndTime).diff(DateTime.local());
               return (
                 <tr key={reg.id}>
                   <td>

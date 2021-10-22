@@ -18,7 +18,7 @@ class Any < Rubric
       (comments.dig(question_id, part_id, body_item_id)&.slice(*preset_ids)&.count.to_i +
         checks.dig(question_id, part_id, body_item_id)&.count.to_i) >= 1
     else
-      subsections.any? { |s| s.confirm_complete(reg, comments, checks) }
+      subsections.any? { |s| s.send(:confirm_complete, reg, comments, checks) }
     end
   end
 end

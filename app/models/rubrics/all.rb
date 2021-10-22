@@ -26,7 +26,7 @@ class All < Rubric
       (comments.dig(question_id, part_id, body_item_id)&.slice(*preset_ids)&.count.to_i +
         checks.dig(question_id, part_id, body_item_id)&.count.to_i) == preset_ids.count
     else
-      subsections.all? { |s| s.confirm_complete(reg, comments, checks) }
+      subsections.all? { |s| s.send(:confirm_complete, reg, comments, checks) }
     end
   end
 end

@@ -286,6 +286,9 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
     collapseKey,
   } = props;
   const { description, choices } = rubric;
+  const showChevron = !!collapseKey;
+  const currentEventKey = useContext(AccordionContext);
+  const isOpen = collapseKey === currentEventKey;
   let summary;
   let body;
   if (choices instanceof Array) {
@@ -328,9 +331,18 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   }
   const showAnyway = (collapseKey === undefined ? 'show' : '');
   const padDescription = (description ? 'mb-2' : '');
+  let chevron = null;
+  if (showChevron) {
+    if (isOpen) {
+      chevron = <Icon className="mr-2" I={FaChevronUp} />;
+    } else {
+      chevron = <Icon className="mr-2" I={FaChevronDown} />;
+    }
+  }
   const heading = (
     <h5 className="d-flex align-items-center">
       <span>
+        {chevron}
         Choose something from
         <i className="mx-1">all</i>
         entries

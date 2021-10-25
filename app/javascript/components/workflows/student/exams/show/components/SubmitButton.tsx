@@ -23,7 +23,7 @@ const SubmitButton: React.FC<SubmitButtonProps> = (props) => {
           <Modal.Title>Are you sure you want to submit?</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Once you submit, you will no be able to change your answers,
+          Once you submit, you will not be able to change your answers,
           or see your submission until it has been graded.
         </Modal.Body>
         <Modal.Footer>

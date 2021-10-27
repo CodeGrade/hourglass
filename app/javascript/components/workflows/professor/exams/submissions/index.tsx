@@ -391,6 +391,7 @@ const ExamSubmissionStaff: React.FC = () => {
       registration(id: $registrationId) {
         currentAnswers
         currentGrading
+        currentScorePercentage
         published
         user {
           nuid
@@ -416,6 +417,7 @@ const ExamSubmissionStaff: React.FC = () => {
   const {
     currentAnswers,
     currentGrading,
+    currentScorePercentage,
     published,
     user,
     exam,
@@ -444,6 +446,9 @@ const ExamSubmissionStaff: React.FC = () => {
           />
         ))}
       </h1>
+      {published && (
+        <h2>{`Grade: ${round(currentScorePercentage, 2).toFixed(2)}%`}</h2>
+      )}
       <ExamViewer
         version={registration.examVersion}
         currentGrading={currentGrading as CurrentGrading}

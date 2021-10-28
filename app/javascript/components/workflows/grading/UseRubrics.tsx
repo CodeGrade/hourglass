@@ -28,7 +28,12 @@ import { AlertContext } from '@hourglass/common/alerts';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
 import { graphql, useFragment, useMutation } from 'relay-hooks';
 import { expandRootRubric } from '@professor/exams/rubrics';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaTimes,
+  FaCheck,
+} from 'react-icons/fa';
 
 import { createCommentMutation } from './__generated__/createCommentMutation.graphql';
 import { grading_one$data } from './__generated__/grading_one.graphql';
@@ -275,6 +280,27 @@ const ShowRubricPresets: React.FC<ShowRubricProps<RubricPresets>> = (props) => {
   );
 };
 
+const statusIcons = (
+  <>
+    <Button
+      variant="outline-success"
+      className="floatLeft mt-n3 ml-n3 mr-2 status-valid"
+      disabled
+      title="Rubric is complete"
+    >
+      <Icon I={FaCheck} />
+    </Button>
+    <Button
+      variant="outline-danger"
+      className="floatLeft mt-n3 ml-n3 mr-2 status-invalid"
+      disabled
+      title="Rubric is incomplete"
+    >
+      <Icon I={FaTimes} />
+    </Button>
+  </>
+);
+
 const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   const {
     rubric,
@@ -341,6 +367,7 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   }
   const heading = (
     <h5 className="d-flex align-items-center">
+      {statusIcons}
       <span>
         {chevron}
         Choose something from
@@ -433,6 +460,7 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
   }
   const heading = (
     <h5 className="d-flex align-items-center">
+      {statusIcons}
       <span>
         {chevron}
         Choose exactly
@@ -525,6 +553,7 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
   }
   const heading = (
     <h5 className="d-flex align-items-center">
+      {statusIcons}
       <span>
         {chevron}
         Choose something from

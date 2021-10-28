@@ -16,6 +16,12 @@
       border: 0px solid transparent;
       padding: 0em;
       background-color: transparent;
+      .btn.status-invalid, .btn.status-valid {
+        align-self: flex-start;
+        color: black;
+        cursor: help;
+        display: none; 
+      }
     }
     > .collapse > .card-body,
     > .collapsing > .card-body {
@@ -24,9 +30,23 @@
     }
     &.status-valid {
       box-shadow: inset 0px 0px 2px 2px theme-color-level('success', 2);
+      > .card-header > h5 {
+        > .btn.status-valid {
+          display: initial;
+          background-color: theme-color-level('success', -5);
+          box-shadow: inset 0px 0px 2px 2px theme-color-level('success', 2);
+        }
+      }
     }
     &.status-invalid {
       box-shadow: inset 0px 0px 4px 4px theme-color-level('danger', 2);
+      > .card-header > h5 {
+        > .btn.status-invalid {
+          display: initial;
+          background-color: theme-color-level('danger', -5);
+          box-shadow: inset 0px 0px 2px 2px theme-color-level('danger', 2);
+        }
+      }
     }
   }
 

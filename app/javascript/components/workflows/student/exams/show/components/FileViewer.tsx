@@ -122,7 +122,8 @@ const FileContents: React.FC<FileContentsProps> = (props) => {
 
 interface FileTreeProps {
   files: ExamFile[];
-  selectedFile?: string;
+  // null so that the property stays controlled: undefined would get dropped from the props
+  selectedFile?: string | null;
   onChangeFile: (id: string) => void;
   fmap: FileMap;
   disabled?: boolean;
@@ -139,7 +140,7 @@ const FileTree: React.FC<FileTreeProps> = (props) => {
   const allIds = Object.keys(fmap);
   return (
     <TreeView
-      selected={selectedFile}
+      selected={selectedFile as (string | undefined)}
       disableSelection={disabled}
       onNodeSelect={(e, id): void => {
         const dir = fmap[id].filedir === 'dir';
@@ -203,7 +204,7 @@ interface ControlledFileViewerProps {
   alwaysShowTreeView?: boolean;
   selection?: CodeTagState;
   onChangeLine: (lineNumber: number) => void;
-  onChangeFile: (file: string) => void;
+  onChangeFile: (file: string | undefined) => void;
   refreshProps?: React.DependencyList;
 }
 

@@ -36,7 +36,7 @@ interface Section {
 
 interface Student {
   id: string;
-  nuid: number;
+  nuid: number | null;
   username: string;
   displayName: string;
 }
@@ -329,7 +329,7 @@ const StudentDNDForm: React.FC<
             <Button
               disabled={loading}
               variant="danger"
-              className={pristine && 'd-none'}
+              className={pristine ? 'd-none' : undefined}
               onClick={reset}
             >
               Reset

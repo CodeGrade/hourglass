@@ -4,17 +4,19 @@ import mime from '@hourglass/common/mime';
 import { extractMarks } from '@hourglass/common/archive/fileMarks';
 
 export async function handleDir(root: JSZip): Promise<ExamFile[]> {
-  const ret = [];
-  const promises = [];
+  const ret: ExamFile[] = [];
+  const promises: Promise<void>[] = [];
   root.forEach((path, file) => {
     if (file.dir) return;
     const exploded = path.split('/');
-    const fileName = exploded.pop();
-    let current = ret;
-    const pathSoFar = [];
+    // since the split condition is non-empty, the exploded array will be non-empty
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const fileName = exploded.pop()!;
+    let current: ExamFile[] = ret;
+    const pathSoFar: string[] = [];
     exploded.forEach((segment) => {
       pathSoFar.push(segment);
-      const dir = current.find((f) => f.text === `${segment}/`);
+      const dir = current.find((f): f is ExamDir => f.text === `${segment}/`);
       if (dir) {
         current = dir.nodes;
       } else {

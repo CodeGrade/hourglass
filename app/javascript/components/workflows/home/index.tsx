@@ -21,7 +21,7 @@ import {
 } from 'react-bootstrap';
 import { DateTime } from 'luxon';
 import LinkButton from '@hourglass/common/linkbutton';
-import { SelectOption } from '@hourglass/common/helpers';
+import { SelectOption, compact } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 import Icon from '@student/exams/show/components/Icon';
 import { MdPerson } from 'react-icons/md';
@@ -312,7 +312,7 @@ export const ImpersonateUser: React.FC<{
       },
     },
   );
-  const [selectedUser, setSelectedUser] = useState<string>(undefined);
+  const [selectedUser, setSelectedUser] = useState<string | undefined>(undefined);
   return (
     <>
       <Row>
@@ -488,13 +488,18 @@ const Home: React.FC = () => {
         )}
         <div>
           {res.data.activeTerms.map((term) => {
+            const myStaffRegistrations = compact(term.myStaffRegistrations.nodes ?? []);
+            const myProctorRegistrations = compact(term.myProctorRegistrations.nodes ?? []);
+            const myProfessorCourseRegistrations = compact(
+              term.myProfessorCourseRegistrations.nodes ?? [],
+            );
             const allEmpty = (
               term.myFutureRegistrations.length === 0
               && term.myRegistrations.length === 0
               && term.myPriorRegistrations.length === 0
-              && term.myStaffRegistrations.nodes.length === 0
-              && term.myProctorRegistrations.nodes.length === 0
-              && term.myProfessorCourseRegistrations.nodes.length === 0
+              && myStaffRegistrations.length === 0
+              && myProctorRegistrations.length === 0
+              && myProfessorCourseRegistrations.length === 0
             );
             return (
               <Card className="my-3" key={`home-term-${term.id}`}>
@@ -517,13 +522,13 @@ const Home: React.FC = () => {
                     registrations={term.myPriorRegistrations}
                   />
                   <ShowProctorRegs
-                    proctorRegistrations={term.myProctorRegistrations.nodes}
+                    proctorRegistrations={myProctorRegistrations}
                   />
                   <ShowStaffRegs
-                    staffRegistrations={term.myStaffRegistrations.nodes}
+                    staffRegistrations={myStaffRegistrations}
                   />
                   <ShowProfRegs
-                    professorCourseRegistrations={term.myProfessorCourseRegistrations.nodes}
+                    professorCourseRegistrations={myProfessorCourseRegistrations}
                   />
                 </Card.Body>
               </Card>

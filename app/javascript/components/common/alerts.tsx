@@ -38,7 +38,7 @@ const ShowAlert: React.FC<{
     copyButton = false,
   } = alert;
   const [show, setShow] = useState(true);
-  const bodyRef = useRef<HTMLDivElement>();
+  const bodyRef = useRef<HTMLDivElement>(null);
   return (
     <Toast
       className={`border-${variant}`}
@@ -55,8 +55,10 @@ const ShowAlert: React.FC<{
             className="p-0"
             variant={variant}
             onClick={async () => {
-              const text = bodyRef.current.innerText;
-              await navigator.clipboard.writeText(text);
+              if (bodyRef.current) {
+                const text = bodyRef.current.innerText;
+                await navigator.clipboard.writeText(text);
+              }
             }}
           >
             <Icon I={FaCopy} />

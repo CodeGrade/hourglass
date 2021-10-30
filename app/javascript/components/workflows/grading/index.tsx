@@ -63,6 +63,7 @@ import {
   alphabetIdx,
   useRefresher,
   pluralize,
+  compact,
 } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
@@ -190,7 +191,7 @@ const ShowStatusIcon: React.FC<{
   );
 };
 
-function isNode(et: EventTarget): et is Node {
+function isNode(et: EventTarget | null): et is Node {
   return et instanceof Node;
 }
 
@@ -225,9 +226,9 @@ const Feedback: React.FC<{
   useEffect(() => {
     setPointStr(String(points));
   }, [points]);
-  const alertRef = useRef<HTMLDivElement>();
+  const alertRef = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
-    if (isFocused) { alertRef.current.focus(); }
+    if (isFocused) { alertRef.current?.focus(); }
   }, [isFocused]);
   const variant = variantForPoints(points);
   const VariantIcon = iconForPoints(points);
@@ -241,7 +242,7 @@ const Feedback: React.FC<{
           if (onBlur) onBlur(e);
           return; // don't setFocused and collapse this editor yet.
         }
-        if (isNode(e.relatedTarget) && alertRef.current.contains(e.relatedTarget)) return;
+        if (isNode(e.relatedTarget) && alertRef.current?.contains(e.relatedTarget)) return;
         if (onBlur) onBlur(e);
         setFocused(false);
       }}
@@ -339,7 +340,7 @@ const Feedback: React.FC<{
 };
 
 const PromptRow: React.FC<{
-  prompt: HTMLVal;
+  prompt?: HTMLVal;
 }> = ({ prompt }) => (
   <Row>
     <Col sm={{ span: 6, offset: 3 }}>
@@ -505,7 +506,10 @@ const NewComments: React.FC<{
   );
 };
 
-type GradingComment = grading_one$data['gradingComments']['edges'][number]['node'];
+type NN<T> = Exclude<T, null>
+type O<T> = T | undefined
+
+type GradingComment = NN<NN<NN<NN<grading_one$data['gradingComments']>['edges']>[number]>['node']>;
 
 const DESTROY_COMMENT_MUTATION = graphql`
   mutation gradingDestroyCommentMutation($input: DestroyGradingCommentInput!) {
@@ -547,7 +551,7 @@ const SavedComment: React.FC<{
     presetComment,
   } = comment;
   const { alert } = useContext(AlertContext);
-  const [error, setError] = useState<string>(null);
+  const [error, setError] = useState<string | null>(null);
   const [value, setValue] = useState<CommentVal>({
     message,
     points,
@@ -568,12 +572,14 @@ const SavedComment: React.FC<{
     }));
   };
   const onReset = () => {
-    setStatus(CommentSaveStatus.DIRTY);
-    setValue((old) => ({
-      ...old,
-      message: presetComment.studentFeedback ?? presetComment.graderHint,
-      points: presetComment.points,
-    }));
+    if (presetComment) {
+      setStatus(CommentSaveStatus.DIRTY);
+      setValue((old) => ({
+        ...old,
+        message: presetComment.studentFeedback ?? presetComment.graderHint,
+        points: presetComment.points,
+      }));
+    }
   };
   const couldReset = (presetComment instanceof Object)
     && ((value.message !== presetComment.studentFeedback
@@ -652,7 +658,7 @@ const SavedComment: React.FC<{
       status={status}
       onRemove={removeComment}
       onBlur={doUpdate}
-      error={error}
+      error={error ?? undefined}
     />
   );
 };
@@ -712,13 +718,13 @@ interface AnswersRowProps<T, V> {
   ShowStudent?: React.ComponentType<{
     info: T,
     value: V,
-    refreshProps: React.DependencyList;
+    refreshProps?: React.DependencyList;
     fullyExpandCode?: boolean;
   }>;
   ShowExpected: React.ComponentType<{
     info: T,
     value: V,
-    refreshProps: React.DependencyList;
+    refreshProps?: React.DependencyList;
     fullyExpandCode?: boolean;
   }>;
   info: T;
@@ -730,7 +736,7 @@ interface AnswersRowProps<T, V> {
   bnum: number;
   comments: GradingComment[];
   registrationId: string;
-  refreshProps: React.DependencyList;
+  refreshProps?: React.DependencyList;
 }
 
 function AnswersRow<T, V>(
@@ -830,7 +836,7 @@ function AnswersRow<T, V>(
               qnumRubricKey={qnumRubricKey}
               pnumRubricKey={pnumRubricKey}
               bnumRubricKey={bnumRubricKey}
-              showCompletenessAgainst={comments.map((c) => c.presetComment?.id)}
+              showCompletenessAgainst={compact(comments.map((c) => c.presetComment?.id))}
               registrationId={registrationId}
               qnum={qnum}
               pnum={pnum}
@@ -844,14 +850,15 @@ function AnswersRow<T, V>(
 }
 
 const GradeBodyItem: React.FC<{
-  expectedAnswer: AnswerState;
-  studentAnswer: AnswerState;
+  expectedAnswer?: AnswerState;
+  studentAnswer?: AnswerState;
   info: BodyItemInfo;
   qnum: number;
   pnum: number;
   bnum: number;
   examVersionKey: gradingRubric$key;
-  check?: grading_one$data['gradingChecks'][number];
+  // eslint-disable-next-line react/no-unused-prop-types
+  check?: NN<grading_one$data['gradingChecks']>[number];
   comments: GradingComment[];
   registrationId: string;
   refreshProps: React.DependencyList;
@@ -884,8 +891,8 @@ const GradeBodyItem: React.FC<{
             bnum={bnum}
             info={info}
             ShowExpected={DisplayCode}
-            studentAnswer={studentAnswer as CodeState}
-            expectedAnswer={expectedAnswer as CodeState}
+            studentAnswer={studentAnswer as O<CodeState>}
+            expectedAnswer={expectedAnswer as O<CodeState>}
             comments={comments}
             registrationId={registrationId}
             refreshProps={refreshProps}
@@ -903,8 +910,8 @@ const GradeBodyItem: React.FC<{
             bnum={bnum}
             info={info}
             ShowExpected={DisplayCodeTag}
-            studentAnswer={studentAnswer as CodeTagState}
-            expectedAnswer={expectedAnswer as CodeTagState}
+            studentAnswer={studentAnswer as O<CodeTagState>}
+            expectedAnswer={expectedAnswer as O<CodeTagState>}
             comments={comments}
             registrationId={registrationId}
             refreshProps={refreshProps}
@@ -923,8 +930,8 @@ const GradeBodyItem: React.FC<{
             info={info}
             ShowStudent={GradeYesNo}
             ShowExpected={DisplayYesNo}
-            studentAnswer={studentAnswer as YesNoState}
-            expectedAnswer={expectedAnswer as YesNoState}
+            studentAnswer={studentAnswer as O<YesNoState>}
+            expectedAnswer={expectedAnswer as O<YesNoState>}
             comments={comments}
             registrationId={registrationId}
             refreshProps={refreshProps}
@@ -942,8 +949,8 @@ const GradeBodyItem: React.FC<{
             bnum={bnum}
             info={info}
             ShowExpected={DisplayText}
-            studentAnswer={studentAnswer as TextState}
-            expectedAnswer={expectedAnswer as TextState}
+            studentAnswer={studentAnswer as O<TextState>}
+            expectedAnswer={expectedAnswer as O<TextState>}
             comments={comments}
             registrationId={registrationId}
             refreshProps={refreshProps}
@@ -962,8 +969,8 @@ const GradeBodyItem: React.FC<{
             info={info}
             ShowStudent={GradeMatching}
             ShowExpected={DisplayMatching}
-            studentAnswer={studentAnswer as MatchingState}
-            expectedAnswer={expectedAnswer as MatchingState}
+            studentAnswer={studentAnswer as O<MatchingState>}
+            expectedAnswer={expectedAnswer as O<MatchingState>}
             comments={comments}
             registrationId={registrationId}
             refreshProps={refreshProps}
@@ -981,8 +988,8 @@ const GradeBodyItem: React.FC<{
             bnum={bnum}
             info={info}
             ShowExpected={DisplayAllThatApply}
-            studentAnswer={studentAnswer as AllThatApplyState}
-            expectedAnswer={expectedAnswer as AllThatApplyState}
+            studentAnswer={studentAnswer as O<AllThatApplyState>}
+            expectedAnswer={expectedAnswer as O<AllThatApplyState>}
             comments={comments}
             registrationId={registrationId}
             refreshProps={refreshProps}
@@ -1001,8 +1008,8 @@ const GradeBodyItem: React.FC<{
             info={info}
             ShowStudent={GradeMultipleChoice}
             ShowExpected={DisplayMultipleChoice}
-            studentAnswer={studentAnswer as MultipleChoiceState}
-            expectedAnswer={expectedAnswer as MultipleChoiceState}
+            studentAnswer={studentAnswer as O<MultipleChoiceState>}
+            expectedAnswer={expectedAnswer as O<MultipleChoiceState>}
             comments={comments}
             registrationId={registrationId}
             refreshProps={refreshProps}
@@ -1139,7 +1146,8 @@ const Grade: React.FC<{
   const { examId, registrationId } = useParams<{ examId: string; registrationId: string }>();
   const { examVersion } = res;
   const currentAnswers = res.currentAnswers as AnswersState;
-  const { answers, dbQuestions } = examVersion;
+  const { dbQuestions } = examVersion;
+  const answers = examVersion.answers as AnswerState[][][];
   const files = examVersion.files as ExamFile[];
   const contextVal = useMemo(() => ({
     files,
@@ -1156,7 +1164,8 @@ const Grade: React.FC<{
           registrationId: nextRegId,
           qnum: nextQ,
           pnum: nextP,
-        } = gradeNext;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        } = gradeNext!;
         history.replace(`/exams/${examId}/grading/${nextRegId}/${nextQ}/${nextP}`);
       },
       onError: () => {
@@ -1214,7 +1223,7 @@ const Grade: React.FC<{
   const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
   const singlePart = dbQuestions[qnum].parts.length === 1
     && !dbQuestions[qnum].parts[0].name?.value?.trim();
-  const allComments = res.gradingComments.edges.map(({ node }) => node);
+  const allComments = compact(res.gradingComments?.edges?.map((e) => e?.node) ?? []);
   const anyUncommentedItems = dbQuestions[qnum].parts[pnum].bodyItems.some((b, bnum) => (
     ((b.info as BodyItemInfo).type !== 'HTML')
       && (allComments.filter((c) => (c.qnum === qnum && c.pnum === pnum && c.bnum === bnum))
@@ -1227,12 +1236,12 @@ const Grade: React.FC<{
           <Row>
             <Col sm={{ span: 6, offset: 3 }}>
               <h2>
-                <QuestionName qnum={qnum} name={dbQuestions[qnum].name} />
+                <QuestionName qnum={qnum} name={dbQuestions[qnum].name ?? undefined} />
                 {dbQuestions[qnum].extraCredit ? <span className="ml-4">(Extra credit)</span> : null}
               </h2>
             </Col>
           </Row>
-          <PromptRow prompt={dbQuestions[qnum].description} />
+          <PromptRow prompt={dbQuestions[qnum].description ?? undefined} />
           {dbQuestions[qnum].references.length !== 0 && (
             <Row>
               <Col sm={{ span: 9, offset: 3 }}>
@@ -1250,12 +1259,12 @@ const Grade: React.FC<{
                   <PartName
                     anonymous={singlePart}
                     pnum={pnum}
-                    name={dbQuestions[qnum].parts[pnum].name}
+                    name={dbQuestions[qnum].parts[pnum].name ?? undefined}
                   />
                 </h3>
               </Col>
             </Row>
-            <PromptRow prompt={dbQuestions[qnum].parts[pnum].description} />
+            <PromptRow prompt={dbQuestions[qnum].parts[pnum].description ?? undefined} />
             {dbQuestions[qnum].parts[pnum].references.length !== 0 && (
               <Row>
                 <Col sm={{ span: 9, offset: 3 }}>
@@ -1272,7 +1281,7 @@ const Grade: React.FC<{
 
               const ans = answers[qnum][pnum][bnum];
               const expectedAnswer = isNoAns(ans) ? undefined : ans;
-              const check = res.gradingChecks.find((c) => (
+              const check = res.gradingChecks?.find((c) => (
                 c.qnum === qnum
                 && c.pnum === pnum
                 && c.bnum === bnum
@@ -1479,10 +1488,10 @@ const ShowOnePart: React.FC<{
         <div>
           <Row>
             <Col sm={{ span: 6, offset: 3 }}>
-              <h2><QuestionName qnum={qnum} name={questions[qnum].name} /></h2>
+              <h2><QuestionName qnum={qnum} name={questions[qnum].name ?? undefined} /></h2>
             </Col>
           </Row>
-          <PromptRow prompt={questions[qnum].description} />
+          <PromptRow prompt={questions[qnum].description ?? undefined} />
           {questions[qnum].references.length !== 0 && (
             <Row>
               <Col sm={{ span: 9, offset: 3 }}>
@@ -1541,7 +1550,7 @@ const GradeOnePart: React.FC = () => {
   if (res.error) {
     return <Container><RenderError error={res.error} /></Container>;
   }
-  if (!res.data) {
+  if (!res.data || !res.data.registration) {
     return <Container><p>Loading...</p></Container>;
   }
   return <GradeOnePartHelp registration={res.data.registration} qnum={qnum} pnum={pnum} />;
@@ -1550,7 +1559,7 @@ const GradeOnePart: React.FC = () => {
 const GradeOnePartHelp: React.FC<{
   qnum: string,
   pnum: string,
-  registration: gradingQuery['response']['registration'],
+  registration: NN<gradingQuery['response']['registration']>,
 }> = (props) => {
   const { registration, qnum, pnum } = props;
   const { qpPairs } = registration.examVersion;
@@ -1626,11 +1635,20 @@ const SyncExamToBottlenoseButton: React.FC = () => {
     SYNC_EXAM_TO_BOTTLENOSE_MUTATION,
     {
       onCompleted: ({ syncExamToBottlenose }) => {
-        alert({
-          variant: 'success',
-          title: 'Exam synced',
-          message: `${syncExamToBottlenose.exam.name} was synced successfully.`,
-        });
+        if (syncExamToBottlenose) {
+          alert({
+            variant: 'success',
+            title: 'Exam synced',
+            message: `${syncExamToBottlenose.exam.name} was synced successfully.`,
+          });
+        } else {
+          alert({
+            variant: 'danger',
+            title: 'Error syncing exam',
+            message: 'No data received from server',
+            copyButton: true,
+          });
+        }
       },
       onError: (err) => {
         alert({
@@ -1669,14 +1687,16 @@ const allBlank = (stats) => {
   return stats.notStarted === 0;
 };
 
-type GradingLockInfo = gradingMyGrading['examVersions']['edges'][number]['node']['inProgress']['edges'][number]['node'];
-type QPInfo = gradingMyGrading['examVersions']['edges'][number]['node']['qpPairs'];
+type GradingLockInfo = NN<NN<NN<NN<NN<NN<gradingMyGrading['examVersions']['edges']>[number]>['node']>['inProgress']['edges']>[number]>['node']>;
+type QPInfo = NN<NN<NN<gradingMyGrading['examVersions']['edges']>[number]>['node']>['qpPairs'];
 
 const groupTree = (
-  collection: {readonly edges: readonly {readonly node: GradingLockInfo}[]},
+  collection: {
+    readonly edges: readonly ({readonly node: GradingLockInfo | null} | null)[] | null
+  } | null,
 ): GradingLockInfo[][][] => {
   const tree : GradingLockInfo[][][] = [];
-  collection.edges.forEach(({ node }) => {
+  compact(collection?.edges?.map((e) => e?.node) ?? []).forEach((node) => {
     const { qnum, pnum } = node;
     tree[qnum] = tree[qnum] ?? [];
     tree[qnum][pnum] = tree[qnum][pnum] ?? [];
@@ -1950,13 +1970,13 @@ const MyGrading: React.FC<{
   return (
     <div>
       <h3>My grading so far</h3>
-      {res.examVersions.edges.map(({ node }) => {
+      {compact(res.examVersions.edges?.map((e) => e?.node) ?? []).map((node) => {
         const inProgressTree = groupTree(node.inProgress);
         const finishedTree = groupTree(node.finished);
         if (inProgressTree.length === 0 && finishedTree.length === 0) return null;
         return (
           <ul className="d-inline-block align-top">
-            {node.inProgress.edges.length > 0 && (
+            {compact(node.inProgress.edges ?? []).length > 0 && (
               <li key={`inprogress-${node.id}`}>
                 <b>{`${node.name}`}</b>
                 : In progress
@@ -1968,7 +1988,7 @@ const MyGrading: React.FC<{
                 />
               </li>
             )}
-            {node.finished.edges.length > 0 && (
+            {compact(node.finished.edges ?? []).length > 0 && (
               <li key={`finished-${node.id}`}>
                 <b>{`${node.name}`}</b>
                 : Finished
@@ -2010,8 +2030,8 @@ const BeginGradingButton: React.FC<{
     examKey,
   );
 
-  const { examVersions } = res;
-  const completionStats = examVersions.edges.map(({ node }) => node.completionSummary as {
+  const examVersions = compact(res.examVersions.edges?.map((e) => e?.node) ?? []);
+  const completionStats = examVersions.map((node) => node.completionSummary as {
     notStarted: number;
     inProgress: number;
     finished: number;
@@ -2027,7 +2047,8 @@ const BeginGradingButton: React.FC<{
           registrationId,
           qnum,
           pnum,
-        } = gradeNext;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        } = gradeNext!;
         history.push(`/exams/${examId}/grading/${registrationId}/${qnum}/${pnum}`);
       },
       onError: (err) => {
@@ -2040,12 +2061,12 @@ const BeginGradingButton: React.FC<{
       },
     },
   );
-  const filtered = examVersions.edges.filter((_ver, index) => !allBlank(completionStats[index]));
+  const filtered = examVersions.filter((_ver, index) => !allBlank(completionStats[index]));
   const filteredCompletionStats = completionStats.filter((ver) => !allBlank(ver));
   const chunkSize = 4;
   const versionsInChunks = Array.from(
     { length: Math.ceil(filtered.length / chunkSize) },
-    (v, i) => filtered.slice(i * chunkSize, i * chunkSize + chunkSize),
+    (_v, i) => filtered.slice(i * chunkSize, i * chunkSize + chunkSize),
   );
   return (
     <div>
@@ -2077,7 +2098,7 @@ const BeginGradingButton: React.FC<{
                 // eslint-disable-next-line react/no-array-index-key
                 key={chunkIndex}
               >
-                {chunk.map(({ node }, nodeIndex) => {
+                {chunk.map((node, nodeIndex) => {
                   const index = chunkIndex * chunkSize + nodeIndex;
                   return (
                     // eslint-disable-next-line react/no-array-index-key
@@ -2113,7 +2134,7 @@ const BeginGradingButton: React.FC<{
           </div>
         </Dropdown.Menu>
       </Dropdown>
-      {examVersions.edges.map(({ node }, index) => (
+      {examVersions.map((node, index) => (
         <ul key={node.id} className="d-inline-block align-top">
           <li>
             {node.name}
@@ -2284,7 +2305,7 @@ const VersionLocks: React.FC<{
         </tr>
       </thead>
       <tbody>
-        {version.gradingLocks.edges.map(({ node }) => (
+        {compact(version.gradingLocks.edges?.map((e) => e?.node) ?? []).map((node) => (
           <GradingLock key={node.id} lockKey={node} />
         ))}
       </tbody>
@@ -2444,7 +2465,7 @@ const ExamGradingAdministration: React.FC<{
   );
   return (
     <>
-      {res.examVersions.edges.map(({ node }) => (
+      {compact(res.examVersions.edges?.map((e) => e?.node) ?? []).map((node) => (
         <VersionAdministration key={node.id} versionKey={node} />
       ))}
       {res.graded && (

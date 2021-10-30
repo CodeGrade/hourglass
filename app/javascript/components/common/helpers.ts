@@ -65,3 +65,7 @@ export type SelectOptions<T> = SelectOption<T>[];
 export type MutationReturn<T extends MutationParameters> = [
   MutateWithVariables<T>, MutationState<T>
 ];
+
+export function compact<T>(ts : readonly (T | null | undefined)[]): T[] {
+  return ts.filter((t : T | null | undefined): t is T => t !== null && t !== undefined);
+}

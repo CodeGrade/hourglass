@@ -2,7 +2,7 @@ import React from 'react';
 import { HTMLVal } from '@student/exams/show/types';
 
 export interface HTMLProps {
-  value: HTMLVal;
+  value?: HTMLVal;
   className?: string;
 }
 

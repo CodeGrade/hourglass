@@ -76,8 +76,8 @@ export function useApiResponse<Server, Res = Server>(
   transformSuccess?: (server: Server) => Res,
   deps?: React.DependencyList,
 ): ApiResponse<Res> {
-  const [response, setResponse] = useState<Server>(undefined);
-  const [error, setError] = useState<ApiError>(undefined);
+  const [response, setResponse] = useState<Server | undefined>(undefined);
+  const [error, setError] = useState<ApiError | undefined>(undefined);
   useEffect(() => {
     fetch(url, {
       headers: {

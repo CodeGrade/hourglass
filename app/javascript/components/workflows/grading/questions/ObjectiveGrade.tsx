@@ -10,7 +10,7 @@ interface ObjectiveGradeProps {
 }
 const ObjectiveGrade: React.FC<ObjectiveGradeProps> = (props) => {
   const { className } = props;
-  const [value, setValue] = useState<boolean>(undefined);
+  const [value, setValue] = useState<boolean | undefined>(undefined);
   return (
     <ToggleButtonGroup
       name="correctness"

@@ -1,12 +1,12 @@
 import React from 'react';
-import { DateTime, Duration } from 'luxon';
+import { DateTime } from 'luxon';
 
 function makeReadableDate(dd: DateTime, showTime: boolean, capitalize: boolean): string {
   const today = DateTime.local().startOf('day');
   const yesterday = today.minus({ days: 1 });
   const tomorrow = today.plus({ days: 1 });
   const twodays = tomorrow.plus({ days: 1 });
-  let relDay: string;
+  let relDay: string | undefined;
   if (yesterday <= dd && dd < today) {
     relDay = (capitalize ? 'Yesterday' : 'yesterday');
   } else if (today <= dd && dd < tomorrow) {
@@ -28,7 +28,6 @@ interface ReadableDateProps {
   value: DateTime;
   relative?: boolean;
   showTime?: boolean;
-  threshold?: Duration;
   capitalize?: boolean;
 }
 
@@ -40,11 +39,11 @@ const ReadableDate: React.FC<ReadableDateProps> = (props) => {
     className,
     capitalize,
   } = props;
-  let str: string;
+  let str: string | null;
   if (relative) {
     str = value.toRelative();
   } else {
-    str = makeReadableDate(value, showTime, capitalize);
+    str = makeReadableDate(value, showTime, !!capitalize);
   }
   return (
     <span className={className}>{str}</span>

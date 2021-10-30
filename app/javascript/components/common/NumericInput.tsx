@@ -69,7 +69,9 @@ const validateNumericInput : KeyboardEventHandler<HTMLInputElement> = (e) => {
   if (e.key === '.') {
     const indexOfDot = e.currentTarget.value.indexOf('.');
     if (indexOfDot < 0) return;
-    if (e.currentTarget.selectionStart <= indexOfDot
+    if (e.currentTarget.selectionStart !== null
+        && e.currentTarget.selectionStart <= indexOfDot
+        && e.currentTarget.selectionEnd !== null
         && indexOfDot < e.currentTarget.selectionEnd) {
       return;
     }
@@ -77,7 +79,9 @@ const validateNumericInput : KeyboardEventHandler<HTMLInputElement> = (e) => {
   if (e.key === '-') {
     const indexOfMinus = e.currentTarget.value.indexOf('-');
     if (indexOfMinus < 0 && e.currentTarget.selectionStart === 0) return;
-    if (e.currentTarget.selectionStart <= indexOfMinus
+    if (e.currentTarget.selectionStart !== null
+        && e.currentTarget.selectionStart <= indexOfMinus
+        && e.currentTarget.selectionEnd !== null
         && indexOfMinus < e.currentTarget.selectionEnd) {
       return;
     }
@@ -147,7 +151,7 @@ export const NumericInput: React.FC<{
           const selEnd = e.currentTarget.selectionEnd;
           const nextVal = `${curVal.slice(0, selStart)}${data}${curVal.slice(selEnd)}`;
           const nextAsNum = Number(nextVal);
-          if (Number.isFinite(nextAsNum)) {
+          if (Number.isFinite(nextAsNum) && onChange) {
             onChange(clamp(nextAsNum, min, max), true);
           }
         }}
@@ -167,7 +171,7 @@ export const NumericInput: React.FC<{
             variant={variant}
             disabled={disabled || (max !== undefined && numValue >= max)}
             tabIndex={-1}
-            onClick={() => onChange(clamp(numValue + step, min, max), false)}
+            onClick={() => onChange && onChange(clamp(numValue + step, min, max), false)}
           >
             <Icon className="m-0 p-0" size={size === 'lg' ? '0.75em' : '0.5em'} I={FaChevronUp} />
           </Button>
@@ -177,7 +181,7 @@ export const NumericInput: React.FC<{
             variant={variant}
             disabled={disabled || (min !== undefined && numValue <= min)}
             tabIndex={-1}
-            onClick={() => onChange(clamp(numValue - step, min, max), false)}
+            onClick={() => onChange && onChange(clamp(numValue - step, min, max), false)}
           >
             <Icon size={size === 'lg' ? '0.75em' : '0.5em'} I={FaChevronDown} />
           </Button>

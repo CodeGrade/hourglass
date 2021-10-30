@@ -33,7 +33,12 @@ import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import Loading from '@hourglass/common/loading';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import { ExhaustiveSwitchError, SelectOption, SelectOptions } from '@hourglass/common/helpers';
+import {
+  ExhaustiveSwitchError,
+  SelectOption,
+  SelectOptions,
+  compact,
+} from '@hourglass/common/helpers';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
@@ -95,7 +100,7 @@ interface DirectMessage {
   };
   registration: {
     id: string;
-    room: {
+    room?: {
       id: string;
     };
     examVersion: {
@@ -115,7 +120,7 @@ interface Question {
   body: string;
   registration: {
     id: string;
-    room: {
+    room?: {
       id: string;
     };
     examVersion: {
@@ -513,11 +518,12 @@ const ShowAnomalies: React.FC<{
     }],
   }), [data.id]));
 
+  const anomalies = compact(data.anomalies.edges?.map((e) => e?.node) ?? []);
   return (
     <>
-      {data.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
-      {data.anomalies.edges.map((edge) => (
-        <ShowAnomaly key={edge.node.id} replyTo={replyTo} examId={data.id} anomalyKey={edge.node} />
+      {anomalies.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
+      {anomalies.map((node) => (
+        <ShowAnomaly key={node.id} replyTo={replyTo} examId={data.id} anomalyKey={node} />
       ))}
       {hasNext && (
         <tr>
@@ -528,7 +534,7 @@ const ShowAnomalies: React.FC<{
                 loadNext(
                   10,
                   {
-                    onComplete: (error?: Error) => {
+                    onComplete: (error: Error | null) => {
                       if (!error) return;
                       alert({
                         variant: 'danger',
@@ -616,7 +622,6 @@ export const FinalizeDialog: React.FC<{
 };
 
 const FinalizeRegs: React.FC<{
-  buttonText?: string;
   recipientOptions: RecipientOptions;
 }> = (props) => {
   const {
@@ -910,7 +915,7 @@ const ShowMessages: React.FC<{
   } = props;
   const [lastViewed, setLastViewed] = useState<DateTime>(DateTime.local());
   const resetLastViewed = useCallback(() => setLastViewed(DateTime.local()), []);
-  const [filter, setFilter] = useState<MessageFilterOption[]>(undefined);
+  const [filter, setFilter] = useState<MessageFilterOption[] | undefined>(undefined);
   let all: Array<Message> = [];
   if (!receivedOnly) {
     all = all
@@ -1469,35 +1474,35 @@ const ExamMessages: React.FC<{
     exam,
   );
   const response: Response = useMemo(() => ({
-    sent: res.messages.edges.map(({ node: msg }) => ({
+    sent: compact(res.messages.edges?.map((e) => e?.node) ?? []).map((msg) => ({
       type: MessageType.Direct,
       id: msg.id,
       body: msg.body,
       sender: msg.sender,
-      registration: msg.registration,
+      registration: { ...msg.registration, room: msg.registration.room ?? undefined },
       time: DateTime.fromISO(msg.createdAt),
     })),
-    studentQuestions: res.studentQuestions.edges.map(({ node: question }) => ({
+    studentQuestions: compact(res.studentQuestions.edges?.map((e) => e?.node) ?? []).map((q) => ({
       type: MessageType.Question,
-      id: question.id,
-      body: question.body,
-      registration: question.registration,
-      time: DateTime.fromISO(question.createdAt),
+      id: q.id,
+      body: q.body,
+      registration: { ...q.registration, room: q.registration.room ?? undefined },
+      time: DateTime.fromISO(q.createdAt),
     })),
-    version: res.versionAnnouncements.edges.map(({ node: va }) => ({
+    version: compact(res.versionAnnouncements.edges?.map((e) => e?.node) ?? []).map((va) => ({
       type: MessageType.Version,
       id: va.id,
       body: va.body,
       version: va.examVersion,
       time: DateTime.fromISO(va.createdAt),
     })),
-    exam: res.examAnnouncements.edges.map(({ node: ea }) => ({
+    exam: compact(res.examAnnouncements.edges?.map((e) => e?.node) ?? []).map((ea) => ({
       type: MessageType.Exam,
       id: ea.id,
       body: ea.body,
       time: DateTime.fromISO(ea.createdAt),
     })),
-    room: res.roomAnnouncements.edges.map(({ node: ra }) => ({
+    room: compact(res.roomAnnouncements.edges?.map((e) => e?.node) ?? []).map((ra) => ({
       type: MessageType.Room,
       id: ra.id,
       body: ra.body,
@@ -1681,7 +1686,7 @@ const SplitViewLoaded: React.FC<{
     recipients,
   } = props;
   const { alert } = useContext(AlertContext);
-  const messageRef = useRef<HTMLTextAreaElement>();
+  const messageRef = useRef<HTMLTextAreaElement>(null);
   const roomOptions: SelectOptions<Recipient> = recipients.rooms.map((r) => ({
     label: r.name,
     // This toString is needed because otherwise some CSS
@@ -1690,7 +1695,7 @@ const SplitViewLoaded: React.FC<{
     // since they're all [object Object]
     value: { ...r, toString: ((): string => r.id), type: MessageType.Room },
   }));
-  roomOptions.unshift({ label: 'No room', value: { type: MessageType.Room, id: undefined, name: 'No room' } });
+  roomOptions.unshift({ label: 'No room', value: { type: MessageType.Room, id: `No Room ${DateTime.now().toISO()}`, name: 'No room' } });
   const recipientOptions = useMemo<RecipientOptions>(() => ([
     {
       label: 'Entire exam',
@@ -1741,8 +1746,9 @@ const SplitViewLoaded: React.FC<{
         message: `Invalid registration ID: ${registrationId}`,
         copyButton: true,
       });
+    } else {
+      setSelectedRecipient(recip);
     }
-    setSelectedRecipient(recip);
     if (messageRef.current) messageRef.current.focus();
   };
   return (
@@ -1818,18 +1824,18 @@ const ProctoringSplitView: React.FC<{
       name: reg.user.displayName,
     };
     students.push(r);
-    studentsByRoom[reg.room?.id] = studentsByRoom[reg.room?.id] ?? {};
-    studentsByRoom[reg.room?.id][reg.id] = true;
+    studentsByRoom[reg.room?.id ?? ''] = studentsByRoom[reg.room?.id ?? ''] ?? {};
+    studentsByRoom[reg.room?.id ?? ''][reg.id] = true;
     studentsByVersion[reg.examVersion.id] = studentsByVersion[reg.examVersion.id] ?? {};
     studentsByVersion[reg.examVersion.id][reg.id] = true;
-    versionsByRoom[reg.room?.id] = versionsByRoom[reg.room?.id] ?? {};
-    versionsByRoom[reg.room?.id][reg.examVersion.id] = true;
+    versionsByRoom[reg.room?.id ?? ''] = versionsByRoom[reg.room?.id ?? ''] ?? {};
+    versionsByRoom[reg.room?.id ?? ''][reg.examVersion.id] = true;
     roomsByVersion[reg.examVersion.id] = roomsByVersion[reg.examVersion.id] ?? {};
-    roomsByVersion[reg.examVersion.id][reg.room?.id] = true;
+    roomsByVersion[reg.examVersion.id][reg.room?.id ?? ''] = true;
   });
   const sortByName = (a, b) => a.name.localeCompare(b.name);
   const recipients: SplitRecipients = useMemo(() => ({
-    versions: res.examVersions.edges.map(({ node: ev }) => {
+    versions: compact(res.examVersions.edges?.map((e) => e?.node) ?? []).map((ev) => {
       const r: Recipient = {
         type: MessageType.Version,
         id: ev.id,

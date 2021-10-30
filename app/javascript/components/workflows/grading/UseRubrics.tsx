@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { ReactElement, useContext } from 'react';
 import {
   Rubric,
   RubricOne,
@@ -39,13 +39,19 @@ import { createCommentMutation } from './__generated__/createCommentMutation.gra
 import { grading_one$data } from './__generated__/grading_one.graphql';
 import { UseRubricsKey$key } from './__generated__/UseRubricsKey.graphql';
 
-type GradingComment = grading_one$data['gradingComments']['edges'][number]['node'];
-type PresetCommentId = GradingComment['presetComment']['id']
+type NN<T> = Exclude<T, null>
+type O<T> = T | undefined
+
+type GradingComment = NN<NN<NN<NN<grading_one$data['gradingComments']>['edges']>[number]>['node']>;
+type PresetCommentId = NN<GradingComment['presetComment']>['id']
 
 interface ShowRubricProps<R> {
   rubric: R;
+  // eslint-disable-next-line react/no-unused-prop-types
   showCompletenessAgainst?: PresetCommentId[];
+  // eslint-disable-next-line react/no-unused-prop-types
   parentRubricType?: Rubric['type'];
+  // eslint-disable-next-line react/no-unused-prop-types
   collapseKey?: string;
   qnum: number;
   pnum: number;
@@ -127,7 +133,7 @@ const ShowPreset: React.FC<{
 };
 
 type CompletionStatus = 'complete' | 'incomplete' | 'invalid'
-function combineCompletionAll(c1 : CompletionStatus, c2: CompletionStatus): CompletionStatus {
+function combineCompletionAll(c1 : CompletionStatus, c2: O<CompletionStatus>): O<CompletionStatus> {
   // complete < incomplete < invalid
   switch (c1) {
     case 'complete': return c2;
@@ -137,7 +143,7 @@ function combineCompletionAll(c1 : CompletionStatus, c2: CompletionStatus): Comp
       throw new ExhaustiveSwitchError(c1);
   }
 }
-function combineCompletionAny(c1 : CompletionStatus, c2: CompletionStatus): CompletionStatus {
+function combineCompletionAny(c1: CompletionStatus, c2: O<CompletionStatus>): O<CompletionStatus> {
   // incomplete < complete < invalid
   switch (c1) {
     case 'incomplete': return c2;
@@ -147,7 +153,7 @@ function combineCompletionAny(c1 : CompletionStatus, c2: CompletionStatus): Comp
       throw new ExhaustiveSwitchError(c1);
   }
 }
-function completionStatus(rubric: Rubric, parentRubricType: Rubric['type'], presetIDs: PresetCommentId[]): CompletionStatus {
+function completionStatus(rubric: Rubric, parentRubricType: O<Rubric['type']>, presetIDs: O<PresetCommentId[]>): O<CompletionStatus> {
   if (rubric === undefined || rubric === null) return undefined;
   if (presetIDs === undefined || presetIDs === null) return undefined;
   switch (rubric.type) {
@@ -198,7 +204,7 @@ function completionStatus(rubric: Rubric, parentRubricType: Rubric['type'], pres
       throw new ExhaustiveSwitchError(rubric);
   }
 }
-const statusToClass = (status: CompletionStatus): string => {
+const statusToClass = (status: O<CompletionStatus>): string => {
   if (status === 'complete') {
     return 'status-valid';
   }
@@ -210,8 +216,8 @@ const statusToClass = (status: CompletionStatus): string => {
 
 export const ShowPresetSummary: React.FC<{
   direction: RubricPresets['direction'];
-  label: string;
-  mercy: number;
+  label?: string;
+  mercy?: number;
   pointsMsg?: string;
 }> = (props) => {
   const {
@@ -357,7 +363,7 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   }
   const showAnyway = (collapseKey === undefined ? 'show' : '');
   const padDescription = (description ? 'mb-2' : '');
-  let chevron = null;
+  let chevron: O<ReactElement>;
   if (showChevron) {
     if (isOpen) {
       chevron = <Icon className="mr-2" I={FaChevronUp} />;
@@ -379,11 +385,11 @@ const ShowAll: React.FC<ShowRubricProps<RubricAll>> = (props) => {
   );
   return (
     <>
-      <Accordion.Toggle as={Card.Header} eventKey={collapseKey}>
+      <Accordion.Toggle as={Card.Header} eventKey={collapseKey as string}>
         {heading}
         <HTML value={description} className={padDescription} />
       </Accordion.Toggle>
-      <Accordion.Collapse className={showAnyway} eventKey={collapseKey}>
+      <Accordion.Collapse className={showAnyway} eventKey={collapseKey as string}>
         <Card.Body>
           {body}
         </Card.Body>
@@ -450,7 +456,7 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
   }
   const showAnyway = (showChevron ? '' : 'show');
   const padDescription = (description ? 'mb-2' : '');
-  let chevron = null;
+  let chevron: O<ReactElement>;
   if (showChevron) {
     if (isOpen) {
       chevron = <Icon className="mr-2" I={FaChevronUp} />;
@@ -472,11 +478,11 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
   );
   return (
     <>
-      <Accordion.Toggle as={Card.Header} eventKey={collapseKey}>
+      <Accordion.Toggle as={Card.Header} eventKey={collapseKey as string}>
         {heading}
         <HTML value={description} className={padDescription} />
       </Accordion.Toggle>
-      <Accordion.Collapse className={showAnyway} eventKey={collapseKey}>
+      <Accordion.Collapse className={showAnyway} eventKey={collapseKey as string}>
         <Card.Body>
           {body}
         </Card.Body>
@@ -543,7 +549,7 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
   }
   const showAnyway = (showChevron ? '' : 'show');
   const padDescription = (description ? 'mb-2' : '');
-  let chevron = null;
+  let chevron: O<ReactElement>;
   if (showChevron) {
     if (isOpen) {
       chevron = <Icon className="mr-2" I={FaChevronUp} />;
@@ -565,11 +571,11 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
   );
   return (
     <>
-      <Accordion.Toggle as={Card.Header} eventKey={collapseKey}>
+      <Accordion.Toggle as={Card.Header} eventKey={collapseKey as string}>
         {heading}
         <HTML value={description} className={padDescription} />
       </Accordion.Toggle>
-      <Accordion.Collapse className={showAnyway} eventKey={collapseKey}>
+      <Accordion.Collapse className={showAnyway} eventKey={collapseKey as string}>
         <Card.Body>
           {body}
         </Card.Body>

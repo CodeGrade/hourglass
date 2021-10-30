@@ -13,7 +13,7 @@ import ReadableDate from '@hourglass/common/ReadableDate';
 import { NumericInput } from '@hourglass/common/NumericInput';
 import { BsPencilSquare } from 'react-icons/bs';
 import { AlertContext } from '@hourglass/common/alerts';
-import { SelectOption, SelectOptions } from '@hourglass/common/helpers';
+import { SelectOption, SelectOptions, compact } from '@hourglass/common/helpers';
 import { FaTrash } from 'react-icons/fa';
 import Select from 'react-select';
 import { DateTime } from 'luxon';
@@ -28,9 +28,9 @@ import { accommodationsDestroyMutation } from './__generated__/accommodationsDes
 
 const AccommodationEditor: React.FC<{
   disabled?: boolean;
-  submit: (startTime: DateTime, extraTime: number) => void;
+  submit: (startTime: DateTime | undefined, extraTime: number) => void;
   cancel: () => void;
-  newStartTime: DateTime;
+  newStartTime?: DateTime;
   percentTimeExpansion: number;
   displayName: string;
 }> = (props) => {
@@ -202,7 +202,7 @@ const SingleAccommodation: React.FC<{
       },
     },
   );
-  const submit = (newStartTime: DateTime, percentTimeExpansion: number) => {
+  const submit = (newStartTime: DateTime | undefined, percentTimeExpansion: number) => {
     update({
       variables: {
         input: {
@@ -284,7 +284,7 @@ const NewAccommodation: React.FC<{
   const {
     exam,
   } = props;
-  const [selected, setSelected] = useState<Selection>(null);
+  const [selected, setSelected] = useState<Selection | null>(null);
   const { alert } = useContext(AlertContext);
   const regsNoAccommodation = useFragment(
     graphql`
@@ -304,11 +304,11 @@ const NewAccommodation: React.FC<{
     `,
     exam,
   );
-  const sorted: SelectOptions<string> = [
-    ...regsNoAccommodation.registrationsWithoutAccommodation.edges,
-  ].sort(
-    (a, b) => a.node.user.displayName.localeCompare(b.node.user.displayName),
-  ).map(({ node }) => ({
+  const sorted: SelectOptions<string> = compact(
+    regsNoAccommodation.registrationsWithoutAccommodation.edges?.map((e) => e?.node) ?? [],
+  ).sort(
+    (a, b) => a.user.displayName.localeCompare(b.user.displayName),
+  ).map((node) => ({
     label: node.user.displayName,
     value: node.id,
   }));
@@ -335,7 +335,7 @@ const NewAccommodation: React.FC<{
           variant: 'success',
           title: 'Successfully created accommodation',
           autohide: true,
-          message: `Accommodation for '${selected.label}' created.`,
+          message: `Accommodation for '${selected?.label}' created.`,
         });
       },
       onError: (err) => {
@@ -431,9 +431,9 @@ const ManageAccommodations: React.FC<{
     exam,
   );
   const { accommodations } = res;
-  const sorted = [...accommodations.edges].sort(
-    (a, b) => a.node.registration.user.displayName.localeCompare(
-      b.node.registration.user.displayName,
+  const sorted = compact(accommodations.edges?.map((e) => e?.node) ?? []).sort(
+    (a, b) => a.registration.user.displayName.localeCompare(
+      b.registration.user.displayName,
     ),
   );
   return (
@@ -450,11 +450,11 @@ const ManageAccommodations: React.FC<{
             </tr>
           </thead>
           <tbody>
-            {sorted.map((edge) => (
+            {sorted.map((node) => (
               <SingleAccommodation
                 examId={res.id}
-                key={edge.node.id}
-                accommodationKey={edge.node}
+                key={node.id}
+                accommodationKey={node}
               />
             ))}
           </tbody>

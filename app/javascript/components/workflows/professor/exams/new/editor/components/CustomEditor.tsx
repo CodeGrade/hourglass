@@ -78,7 +78,7 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
     }
   }, [onChange]);
 
-  const ref = useRef<ReactQuill>();
+  const ref = useRef<ReactQuill>(null);
   useEffect(() => {
     if (!ref.current) { return; }
     const rootDataset = ref.current.getEditor().root.dataset;

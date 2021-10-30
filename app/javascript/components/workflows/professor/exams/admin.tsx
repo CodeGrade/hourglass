@@ -14,7 +14,7 @@ import {
   useLocation,
   Link,
 } from 'react-router-dom';
-import { pluralize, useRefresher } from '@hourglass/common/helpers';
+import { pluralize, useRefresher, compact } from '@hourglass/common/helpers';
 import { NumericInput } from '@hourglass/common/NumericInput';
 import {
   Card,
@@ -539,7 +539,7 @@ export const ExamInfoEditor: React.FC<{
               disabled={disabled}
               value={start}
               maxValue={end}
-              onChange={setStart}
+              onChange={(newVal) => setStart(newVal ?? defaultStartTime)}
             />
           </Col>
         </Form.Group>
@@ -550,7 +550,7 @@ export const ExamInfoEditor: React.FC<{
               disabled={disabled}
               value={end}
               minValue={start}
-              onChange={setEnd}
+              onChange={(newVal) => setEnd(newVal ?? defaultEndTime)}
             />
           </Col>
         </Form.Group>
@@ -634,6 +634,7 @@ const VersionInfo: React.FC<{
             hidden
             onChange={(event) => {
               const { files } = event.target;
+              if (!files) return;
               const [f] = files;
               if (!f) return;
               uploadFile<{ id: number; }>(res.examVersionUploadUrl, f).then((innerRes) => {
@@ -658,7 +659,7 @@ const VersionInfo: React.FC<{
             className="mr-2"
             variant="success"
             onClick={(): void => {
-              fileInputRef.current.click();
+              fileInputRef.current?.click();
             }}
           >
             Import Version
@@ -681,7 +682,7 @@ const VersionInfo: React.FC<{
         </div>
       </h2>
       <ul>
-        {res.examVersions.edges.map(({ node: version }) => (
+        {compact(res.examVersions.edges?.map((e) => e?.node) ?? []).map((version) => (
           <li key={version.id}>
             <ShowVersion
               examId={res.id}
@@ -863,6 +864,7 @@ const PreviewVersion: React.FC<{
         <div className="border p-2">
           <ExamViewer
             version={res}
+            currentAnswers={{ answers: [], scratch: '' }}
             overviewMode
             refreshCodeMirrorsDeps={[open]}
           />

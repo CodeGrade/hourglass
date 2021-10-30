@@ -18,12 +18,12 @@ interface OwnProps {
   bnum: number;
 }
 
-export const isNoAns = (answer: AnswerState): boolean => (
+export const isNoAns = (answer: AnswerState | undefined): boolean => (
   (answer instanceof Object) && (answer as NoAnswerState).NO_ANS
 );
 
 const mapStateToProps: MSTP<{
-  value: AnswerState;
+  value?: AnswerState;
   disabled: boolean;
   locked: boolean;
   examFinished: boolean;
@@ -34,7 +34,7 @@ const mapStateToProps: MSTP<{
   const { status, message } = snapshot;
   const locked = (status === SnapshotStatus.FAILURE);
   const examFinished = (status === SnapshotStatus.FINISHED);
-  const answer = state.contents.answers.answers[qnum][pnum][bnum];
+  const answer = state.contents.answers?.answers[qnum][pnum][bnum];
   return {
     value: isNoAns(answer) ? undefined : answer,
     disabled: locked,

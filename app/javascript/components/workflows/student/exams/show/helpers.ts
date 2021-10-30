@@ -1,5 +1,5 @@
 export function getCSRFToken(): string {
-  const elem: HTMLMetaElement = document.querySelector('[name=csrf-token]');
+  const elem: HTMLMetaElement | undefined = document.querySelector('[name=csrf-token]');
   return elem?.content ?? '';
 }
 
@@ -18,6 +18,7 @@ function pulse(elem: HTMLElement): void {
 function scrollToElem(id: string, smooth = true): void {
   setTimeout(() => {
     const elem = document.getElementById(id);
+    if (!elem) return;
     const elemTop = elem.getBoundingClientRect().top + window.pageYOffset;
     window.scrollTo({
       left: 0,

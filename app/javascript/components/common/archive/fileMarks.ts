@@ -1,5 +1,8 @@
 interface MarksInfo {
-  byLine: unknown[];
+  byLine: {
+    open: number[],
+    close: number[],
+  }[][];
   byNum: {
     [num: number]: {
       startLine: number;
@@ -37,7 +40,7 @@ export function extractMarks(text: string): FileMarksInfo {
     let idx: number;
     // eslint-disable-next-line no-cond-assign
     while ((idx = lines[lineNo].search(/~ro:\d+:[se]~/)) >= 0) {
-      const m = lines[lineNo].match(/~ro:(\d+):([se])~/);
+      const m = lines[lineNo].match(/~ro:(\d+):([se])~/) as RegExpMatchArray;
       lines[lineNo] = lines[lineNo].replace(m[0], '');
       if (m[2] === 's') {
         count += 1;
@@ -81,7 +84,7 @@ export function extractMarks(text: string): FileMarksInfo {
       },
       options: {
         inclusiveLeft: m.lockBefore,
-        inclusiveRight: m.lockAfter,
+        inclusiveRight: !!m.lockAfter,
       },
     })),
   };

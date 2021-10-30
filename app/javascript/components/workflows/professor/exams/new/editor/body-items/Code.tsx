@@ -151,7 +151,8 @@ const EditCodeAnswerValues: React.FC<{
   } = props;
   const answerText = value?.text ?? '';
   const answerMarks = value?.marks ?? [];
-  const [instance, setInstance] = useState<CM.Editor>(undefined);
+  // Safe because this will be set before being used
+  const [instance, setInstance] = useState<CM.Editor | null>(null);
   const [lockState, setLockState] = useState<LockStateInfo>({
     enabled: false,
     active: false,
@@ -184,7 +185,7 @@ const EditCodeAnswerValues: React.FC<{
             onClick={(): void => {
               const newMarks = [...answerMarks];
               const { curRange, finalPos } = lockState;
-              if (lockState.active) {
+              if (lockState.active && curRange && instance) {
                 const markId = answerMarks.findIndex((m) => (
                   m.from.ch === curRange.from.ch
                   && m.from.line === curRange.from.line
@@ -192,7 +193,7 @@ const EditCodeAnswerValues: React.FC<{
                   && m.to.line === curRange.to.line
                 ));
                 removeMarks(instance, newMarks.splice(markId, 1));
-              } else {
+              } else if (curRange && finalPos && instance) {
                 const newMark: MarkDescription = {
                   from: {
                     ch: curRange.from.ch,
@@ -294,7 +295,7 @@ const SetInitial: React.FC<{
   initial: CodeInfo['initial'];
   lang: CodeInfo['lang'];
   disabled?: boolean;
-  onChangeInitial: (newVal: CodeInfo['initial']) => void;
+  onChangeInitial: (newVal: CodeInfo['initial'] | null) => void;
   onChangeLang: (newVal: CodeInfo['lang']) => void;
 }> = (props) => {
   const {
@@ -395,7 +396,7 @@ const Code: React.FC<{
       },
     });
   }, [id]);
-  const updateInitial = useCallback((newInitial: CodeInitial) => {
+  const updateInitial = useCallback((newInitial: CodeInitial | null) => {
     if (newInitial === null) {
       mutate({
         variables: {

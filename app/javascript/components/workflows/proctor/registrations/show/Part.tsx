@@ -17,13 +17,13 @@ import { PartRequestGradingLockMutation } from './__generated__/PartRequestGradi
 import { PartShow$key } from './__generated__/PartShow.graphql';
 
 interface PartProps {
-  refreshCodeMirrorsDeps: React.DependencyList;
+  refreshCodeMirrorsDeps?: React.DependencyList;
   partKey: PartShow$key;
   qnum: number;
   pnum: number;
   currentGrading?: CurrentGrading[number][number];
   anonymous?: boolean;
-  showRequestGrading?: string;
+  showRequestGrading?: string | null;
   fullyExpandCode?: boolean;
   overviewMode: boolean;
 }
@@ -109,7 +109,7 @@ const Part: React.FC<PartProps> = (props) => {
     qnum,
     pnum,
     currentGrading,
-    anonymous,
+    anonymous = false,
     showRequestGrading = false,
     fullyExpandCode = false,
     overviewMode,
@@ -164,7 +164,7 @@ const Part: React.FC<PartProps> = (props) => {
     <PartFilesContext.Provider value={contextVal}>
       <div>
         <h3 id={`question-${qnum}-part-${pnum}`} className="d-flex align-items-baseline">
-          <PartName anonymous={anonymous} name={name} pnum={pnum} />
+          <PartName anonymous={anonymous} name={name ?? undefined} pnum={pnum} />
           <span className="ml-auto">
             {anonymous || (
               <span className="point-count">

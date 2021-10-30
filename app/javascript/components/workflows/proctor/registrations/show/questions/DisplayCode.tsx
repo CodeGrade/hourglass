@@ -5,7 +5,7 @@ import { ExamContext } from '@hourglass/common/context';
 
 interface CodeProps {
   info: CodeInfo;
-  value?: CodeState;
+  value?: CodeState | null;
   refreshProps?: React.DependencyList;
   fullyExpandCode?: boolean;
 }

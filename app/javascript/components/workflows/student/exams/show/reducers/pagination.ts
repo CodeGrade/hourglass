@@ -70,8 +70,8 @@ export default (state: PaginationState = {
         waypointsActive: action.enabled,
       };
     case 'LOAD_EXAM': {
-      const pageCoords = [];
-      const spyCoords = [];
+      const pageCoords: PaginationCoordinates[] = [];
+      const spyCoords: PaginationCoordinates[] = [];
       action.exam.questions.forEach((q, qnum) => {
         const thisQ = {
           question: qnum,

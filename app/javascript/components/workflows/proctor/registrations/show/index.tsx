@@ -20,7 +20,7 @@ import { showExamViewer$key } from './__generated__/showExamViewer.graphql';
 interface ExamViewerProps {
   version: showExamViewer$key;
   currentGrading?: CurrentGrading;
-  currentAnswers?: AnswersState;
+  currentAnswers: AnswersState;
   refreshCodeMirrorsDeps?: React.DependencyList;
   registrationId?: string;
   overviewMode: boolean;
@@ -140,7 +140,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
                 references={references}
               />
             )}
-            {overviewMode && <ShowRubricKey rubricKey={res.rootRubric} forWhat="exam" />}
+            {overviewMode && res.rootRubric && <ShowRubricKey rubricKey={res.rootRubric} forWhat="exam" />}
             <div>
               <DisplayQuestions
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}

@@ -6,7 +6,7 @@ import { graphql, useFragment } from 'relay-hooks';
 import { DisplayQuestions$key } from './__generated__/DisplayQuestions.graphql';
 
 interface DisplayQuestionsProps {
-  refreshCodeMirrorsDeps: React.DependencyList;
+  refreshCodeMirrorsDeps?: React.DependencyList;
   currentGrading?: CurrentGrading;
   registrationId?: string;
   fullyExpandCode: boolean;

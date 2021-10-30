@@ -11,7 +11,7 @@ import { pluralize } from '@hourglass/common/helpers';
 import { ShowQuestion$key } from './__generated__/ShowQuestion.graphql';
 
 interface ShowQuestionProps {
-  refreshCodeMirrorsDeps: React.DependencyList;
+  refreshCodeMirrorsDeps?: React.DependencyList;
   questionKey: ShowQuestion$key,
   qnum: number;
   currentGrading?: CurrentGrading[number];
@@ -67,9 +67,9 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const singlePart = parts.length === 1 && !parts[0].name?.value?.trim();
   const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
   const strPoints = pluralize(points, 'point', 'points');
-  let curScore = 0;
+  let curScore: number | undefined = 0;
   for (let i = 0; i < parts.length; i += 1) {
-    if (currentGrading[i]?.score !== undefined) {
+    if (currentGrading[i]?.score !== undefined && curScore !== undefined) {
       curScore += currentGrading[i].score;
     } else {
       curScore = undefined;
@@ -86,7 +86,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     <QuestionFilesContext.Provider value={contextVal}>
       <div>
         <h1 id={`question-${qnum}`} className="d-flex align-items-baseline">
-          <QuestionName name={name} qnum={qnum} />
+          <QuestionName name={name ?? undefined} qnum={qnum} />
           {singlePart && (
             <span className="ml-auto">
               <span className="point-count">
@@ -107,7 +107,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             </span>
           )}
         </h1>
-        <HTML value={description} />
+        <HTML value={description ?? undefined} />
         {references.length !== 0 && (
           <FileViewer
             references={references}

@@ -56,12 +56,12 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     examKey,
   );
   const [showWarningModal, setShowWarningModal] = useState(false);
-  const [warningModalReason, setWarningModalReason] = useState<string>(undefined);
+  const [warningModalReason, setWarningModalReason] = useState<string | undefined>(undefined);
   const warnOnAnomaly = (reason: string) => {
     setWarningModalReason(reason);
     setShowWarningModal(true);
   };
-  const policies = res.myRegistration.examVersion.policies as readonly Policy[];
+  const policies = (res.myRegistration?.examVersion.policies ?? []) as readonly Policy[];
   const cleanupBeforeSubmit = useAnomalyListeners(
     res.takeUrl,
     policies,
@@ -79,7 +79,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
   const {
     questions,
     instructions,
-    references,
+    references = [],
     files,
   } = exam;
   const examContextVal = useMemo(() => ({

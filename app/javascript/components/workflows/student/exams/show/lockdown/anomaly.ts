@@ -1,6 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { getCSRFToken } from '@student/exams/show/helpers';
-import { AnomalyDetected, Policy, policyPermits } from '@student/exams/show/types';
+import {
+  AnomalyDetected,
+  AnomalyListener,
+  Policy,
+  policyPermits,
+} from '@student/exams/show/types';
 import { installListeners, removeListeners } from './listeners';
 
 function lockOut(): void {
@@ -40,7 +45,7 @@ export default function useAnomalyListeners(
   policies: readonly Policy[],
   showAlert: (reason: string) => void,
 ): (() => void) {
-  const lst = useRef([]);
+  const lst = useRef<AnomalyListener[]>([]);
   const anomalyDetected: AnomalyDetected = (
     policyPermits(policies, 'MOCK_LOCKDOWN')
       ? showAlert

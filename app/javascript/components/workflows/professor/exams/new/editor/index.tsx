@@ -250,7 +250,7 @@ const ExamVersionEditor: React.FC = () => {
       title: 'Students have already started taking this version',
       message: 'Changing the questions will likely result in nonsensical answers, and changing the structure of this version will result in undefined behavior. Be careful!',
     },
-    res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized,
+    res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized || false,
     [res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized],
   );
   const [showRubrics, setShowRubrics] = useState(false);

@@ -18,7 +18,7 @@ const Scratch: React.FC<ScratchProps> = (props) => {
       id="scratchbox"
       value={value}
       onChange={(event): void => {
-        onChange(event.target.value);
+        if (onChange) onChange(event.target.value);
       }}
       as="textarea"
       spellCheck={false}

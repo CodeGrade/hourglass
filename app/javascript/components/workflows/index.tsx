@@ -93,7 +93,7 @@ export const BlockNav: React.FC<{
 const Entry: React.FC = () => {
   const [transitioning, setTransitioning] = useState(false);
   const [transitionMessage, setTransitionMessage] = useState('');
-  const [transitionCallback, setTransitionCallback] = useState(() => (_) => undefined);
+  const [transitionCallback, setTransitionCallback] = useState(() => (_): void => undefined);
   const [cancelText, setCancelText] = useState<string>('Stay');
   const [leaveText, setLeaveText] = useState<string>('Leave');
   const [customHandler, setCustomHandler] = useState<CustomHandler>(() => (_) => undefined);

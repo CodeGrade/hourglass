@@ -36,11 +36,20 @@ const DoSync: React.FC<{
     `,
     {
       onCompleted: ({ syncCourseToBottlenose }) => {
-        alert({
-          variant: 'success',
-          title: 'Course synced',
-          message: `${syncCourseToBottlenose.course.title} was synced successfully.`,
-        });
+        if (syncCourseToBottlenose) {
+          alert({
+            variant: 'success',
+            title: 'Course synced',
+            message: `${syncCourseToBottlenose.course.title} was synced successfully.`,
+          });
+        } else {
+          alert({
+            variant: 'danger',
+            title: 'Error syncing course',
+            message: 'No data received from server',
+            copyButton: true,
+          });
+        }
       },
       onError: (err) => {
         alert({

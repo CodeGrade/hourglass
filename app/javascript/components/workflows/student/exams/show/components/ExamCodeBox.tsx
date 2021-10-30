@@ -113,7 +113,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
   } = props;
 
   // keep track of codemirror instance
-  const [instance, setInstance] = useState<CM.Editor>(undefined);
+  const [instance, setInstance] = useState<CM.Editor | null>(null);
 
   // whether to enable saving state to redux
   // this boolean is purposefully local to this specific render:

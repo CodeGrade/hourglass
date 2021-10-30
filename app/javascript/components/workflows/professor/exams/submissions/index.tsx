@@ -122,6 +122,7 @@ const ExamSubmissions: React.FC = () => {
     weekday: 'short', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
   };
   const lastStudentFinishTime = groups.started.reduce((latestSoFar, cur) => {
+    if (!cur.effectiveEndTime) return latestSoFar;
     const currentDateTime = DateTime.fromISO(cur.effectiveEndTime);
     if (currentDateTime > latestSoFar) {
       return currentDateTime;
@@ -231,7 +232,9 @@ const ExamSubmissions: React.FC = () => {
           </thead>
           <tbody>
             {groups.started.map((reg) => {
-              const timeDiff = DateTime.fromISO(reg.effectiveEndTime).diff(DateTime.local());
+              const timeDiff = reg.effectiveEndTime ? (
+                DateTime.fromISO(reg.effectiveEndTime).diff(DateTime.local())
+              ) : undefined;
               return (
                 <tr key={reg.id}>
                   <td>
@@ -251,7 +254,7 @@ const ExamSubmissions: React.FC = () => {
                     )}
                   </td>
                   <td>
-                    {describeRemainingTime(timeDiff)}
+                    {timeDiff && describeRemainingTime(timeDiff)}
                   </td>
                 </tr>
               );
@@ -300,7 +303,7 @@ const ExamSubmission: React.FC = () => {
   if (res.error) {
     return <RenderError error={res.error} />;
   }
-  if (!res.data) {
+  if (!res.data?.registration) {
     return <p>Loading...</p>;
   }
   const myRegistration = res.data.me.id === res.data.registration.user.id;
@@ -354,7 +357,7 @@ const ExamSubmissionStudent: React.FC = () => {
   if (res.error) {
     return <RenderError error={res.error} />;
   }
-  if (!res.data) {
+  if (!res.data?.registration) {
     return <p>Loading...</p>;
   }
   const { registration } = res.data;
@@ -372,7 +375,7 @@ const ExamSubmissionStudent: React.FC = () => {
       <h1>
         {`Submission by ${userInfo}`}
       </h1>
-      <h2>{`Grade: ${round(currentScorePercentage, 2).toFixed(2)}%`}</h2>
+      <h2>{currentScorePercentage !== null && `Grade: ${round(currentScorePercentage, 2).toFixed(2)}%`}</h2>
       <ExamViewerStudent
         version={registration.examVersion}
         currentGrading={currentGrading as CurrentGrading}
@@ -406,11 +409,11 @@ const ExamSubmissionStaff: React.FC = () => {
     `,
     { registrationId, withRubric: true },
   );
-  const [title, setTitle] = useState<string>(undefined);
+  const [title, setTitle] = useState<string | undefined>(undefined);
   if (res.error) {
     return <RenderError error={res.error} />;
   }
-  if (!res.data) {
+  if (!res.data?.registration) {
     return <p>Loading...</p>;
   }
   const { registration } = res.data;
@@ -434,7 +437,7 @@ const ExamSubmissionStaff: React.FC = () => {
     );
   }
   return (
-    <DocumentTitle title={title}>
+    <DocumentTitle title={title ?? `${exam.name} -- Submission for ${titleInfo}`}>
       <h1>
         {'Submission by '}
         {(published ? userInfo : (
@@ -446,7 +449,7 @@ const ExamSubmissionStaff: React.FC = () => {
           />
         ))}
       </h1>
-      {published && (
+      {published && currentScorePercentage !== null && (
         <h2>{`Grade: ${round(currentScorePercentage, 2).toFixed(2)}%`}</h2>
       )}
       <ExamViewer

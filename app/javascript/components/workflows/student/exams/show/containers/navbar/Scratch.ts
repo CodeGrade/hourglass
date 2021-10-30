@@ -6,7 +6,7 @@ import { updateScratch } from '@student/exams/show/actions';
 const mapStateToProps: MSTP<{
   value: string;
 }> = (state) => ({
-  value: state.contents.answers.scratch ?? '',
+  value: state.contents.answers?.scratch ?? '',
 });
 
 const mapDispatchToProps: MDTP<{

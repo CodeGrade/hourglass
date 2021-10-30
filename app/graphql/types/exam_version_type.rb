@@ -123,7 +123,7 @@ module Types
       guard ALL_STAFF_OR_PUBLISHED
     end
 
-    field :all_rubrics, [Types::RubricType], null: true do
+    field :all_rubrics, [Types::RubricType], null: false do
       guard Guards::ALL_STAFF
     end
     def all_rubrics
@@ -132,7 +132,7 @@ module Types
         .load(object)
     end
 
-    field :rubrics, [Types::RubricType], null: true do
+    field :rubrics, [Types::RubricType], null: false do
       guard Guards::ALL_STAFF
     end
     def rubrics
@@ -141,11 +141,11 @@ module Types
         .load(object)
     end
 
-    field :root_rubric, Types::RubricType, null: true do
+    field :root_rubric, Types::RubricType, null: false do
       guard Guards::ALL_STAFF
     end
 
-    field :raw_rubrics, GraphQL::Types::JSON, null: true do
+    field :raw_rubrics, GraphQL::Types::JSON, null: false do
       guard Guards::PROFESSORS
     end
     def raw_rubrics

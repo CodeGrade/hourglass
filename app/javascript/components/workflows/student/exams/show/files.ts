@@ -20,7 +20,7 @@ export function createMap(files: ExamFile[]): FileMap {
   return ret;
 }
 
-export function firstFile(files: ExamFile[]): ExamFile {
+export function firstFile(files: ExamFile[]): ExamFile | undefined {
   // eslint-disable-next-line no-restricted-syntax
   for (const file of files) {
     if (file.filedir === 'file') {

@@ -19,7 +19,7 @@ interface DateTimeProps {
   value?: DateTime;
   minValue?: DateTime;
   maxValue?: DateTime;
-  onChange: (newVal: DateTime) => void;
+  onChange: (newVal: DateTime | undefined) => void;
   nullable?: boolean;
 }
 
@@ -96,7 +96,11 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
             maxDate={maxValue?.toJSDate()}
             onChange={(date, _event): void => {
               if (onChange) {
-                onChange(mergeDateTime(DateTime.fromJSDate(date), value ?? DateTime.local()));
+                if (date) {
+                  onChange(mergeDateTime(DateTime.fromJSDate(date), value ?? DateTime.local()));
+                } else {
+                  onChange(value ?? DateTime.local());
+                }
               }
             }}
           />

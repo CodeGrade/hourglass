@@ -41,7 +41,7 @@ type ItemTypes = DropStudent;
 
 interface Student {
   id: string;
-  nuid: number;
+  nuid?: number;
   username: string;
   displayName: string;
 }
@@ -238,7 +238,9 @@ const StaffSeatingForm: React.FC<
         if (room.id === roomId) {
           return {
             ...room,
-            proctors: filtered.concat(section.staff),
+            proctors: filtered.concat(
+              section.staff.map((s) => ({ ...s, nuid: s.nuid ?? undefined })),
+            ),
           };
         }
         return {
@@ -315,7 +317,7 @@ const StaffSeatingForm: React.FC<
             <Button
               disabled={loading}
               variant="danger"
-              className={pristine && 'd-none'}
+              className={pristine ? 'd-none' : undefined}
               onClick={reset}
             >
               Reset
@@ -389,12 +391,14 @@ const Editable: React.FC<StaffAssignmentProps> = (props) => {
   const contextVal = useMemo(() => ({ sections }), [sections]);
   const initialValues = useMemo(() => ({
     all: {
-      unassigned,
-      proctors: proctors.map((p) => p.user),
+      unassigned: unassigned.map((u) => ({ ...u, nuid: u.nuid ?? undefined })),
+      proctors: proctors.map((p) => ({ ...p.user, nuid: p.user.nuid ?? undefined })),
       rooms: rooms.map((r) => ({
         id: r.id,
         name: r.name,
-        proctors: r.proctorRegistrations.map((p) => p.user),
+        proctors: r.proctorRegistrations.map(
+          (p) => ({ ...p.user, nuid: p.user.nuid ?? undefined }),
+        ),
       })),
     },
   }), [unassigned, proctors, rooms]);

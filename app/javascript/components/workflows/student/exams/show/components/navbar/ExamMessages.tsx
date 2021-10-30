@@ -9,6 +9,7 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import Icon from '@student/exams/show/components/Icon';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
+import { compact } from '@hourglass/common/helpers';
 import {
   useFragment,
   graphql,
@@ -199,14 +200,17 @@ export const ShowExamMessages: React.FC<{
     `,
     examKey,
   );
+  // We won't wind up in this component unless we have a registration!
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const myReg = res.myRegistration!;
   useSubscription(useMemo(() => ({
     subscription: messageReceivedSubscriptionSpec,
     variables: {
-      registrationId: res.myRegistration.id,
+      registrationId: myReg.id,
     },
     configs: [{
       type: 'RANGE_ADD',
-      parentID: res.myRegistration.id,
+      parentID: myReg.id,
       connectionInfo: [{
         key: 'ExamMessages_messages',
         rangeBehavior: 'prepend',
@@ -234,61 +238,62 @@ export const ShowExamMessages: React.FC<{
   useSubscription(useMemo(() => ({
     subscription: versionAnnouncementReceivedSpec,
     variables: {
-      examVersionId: res.myRegistration.examVersion.id,
+      examVersionId: myReg.examVersion.id,
     },
     configs: [{
       type: 'RANGE_ADD',
-      parentID: res.myRegistration.examVersion.id,
+      parentID: myReg.examVersion.id,
       connectionInfo: [{
         key: 'ExamMessages_versionAnnouncements',
         rangeBehavior: 'prepend',
       }],
       edgeName: 'versionAnnouncementsEdge',
     }],
-  }), [res.myRegistration.examVersion.id]));
+  }), [myReg.examVersion.id]));
 
   useConditionalSubscription(
     useMemo(() => ({
       subscription: roomAnnouncementReceivedSpec,
       variables: {
-        roomId: res.myRegistration.room?.id,
+        roomId: myReg.room?.id,
       },
       configs: [{
         type: 'RANGE_ADD',
-        parentID: res.myRegistration.room?.id,
+        parentID: myReg.room?.id,
         connectionInfo: [{
           key: 'ExamMessages_roomAnnouncements',
           rangeBehavior: 'prepend',
         }],
         edgeName: 'roomAnnouncementsEdge',
       }],
-    }), [res.myRegistration.room?.id]),
-    !!res.myRegistration.room,
+    }), [myReg.room?.id]),
+    !!myReg.room,
   );
 
-  const personal: ExamMessage[] = res.myRegistration.messages.edges.map(({ node }) => ({
-    type: 'personal',
-    id: node.id,
-    body: node.body,
-    createdAt: DateTime.fromISO(node.createdAt),
+  const personal: ExamMessage[] = compact(myReg.messages.edges?.map((e) => e?.node) ?? [])
+    .map((node) => ({
+      type: 'personal',
+      id: node.id,
+      body: node.body,
+      createdAt: DateTime.fromISO(node.createdAt),
+    }));
+  const roomAnnouncements = compact(myReg.room?.roomAnnouncements.edges?.map((e) => e?.node) ?? []);
+  const room: ExamMessage[] = roomAnnouncements.map((ra) => ({
+    type: 'room',
+    id: ra.id,
+    body: ra.body,
+    createdAt: DateTime.fromISO(ra.createdAt),
   }));
-  const room: ExamMessage[] = res.myRegistration.room?.roomAnnouncements.edges.map(
-    ({ node: ra }) => ({
-      type: 'room',
-      id: ra.id,
-      body: ra.body,
-      createdAt: DateTime.fromISO(ra.createdAt),
-    }),
-  ) ?? [];
-  const version: ExamMessage[] = res.myRegistration.examVersion.versionAnnouncements.edges.map(
-    ({ node: va }) => ({
-      type: 'version',
-      id: va.id,
-      body: va.body,
-      createdAt: DateTime.fromISO(va.createdAt),
-    }),
-  );
-  const exam: ExamMessage[] = res.examAnnouncements.edges.map(({ node: ea }) => ({
+  const versionAnnouncements = compact(myReg.examVersion.versionAnnouncements
+    .edges?.map((e) => e?.node) ?? []);
+  const version: ExamMessage[] = versionAnnouncements.map((va) => ({
+    type: 'version',
+    id: va.id,
+    body: va.body,
+    createdAt: DateTime.fromISO(va.createdAt),
+  }));
+  const examAnnouncements = compact(res.examAnnouncements.edges?.map((e) => e?.node) ?? []);
+  const exam: ExamMessage[] = examAnnouncements.map((ea) => ({
     type: 'exam',
     id: ea.id,
     body: ea.body,
@@ -398,19 +403,18 @@ const ExamMessages: React.FC<ExamMessagesProps> = (props) => {
     `,
     examKey,
   );
-  const dates: DateTime[] = res
-    .examAnnouncements.edges.map(({ node: { createdAt } }) => DateTime.fromISO(createdAt))
-    .concat(
-      res.myRegistration.room?.roomAnnouncements.edges.map(
-         ({ node: { createdAt } }) => DateTime.fromISO(createdAt),
-      ) ?? [],
-    )
-    .concat(
-      res.myRegistration.examVersion.versionAnnouncements.edges.map(
-        ({ node: { createdAt } }) => DateTime.fromISO(createdAt),
-      ),
-    )
-    .concat(res.myRegistration.messages.edges.map(({ node }) => DateTime.fromISO(node.createdAt)));
+  const roomAnnouncements = compact(res.myRegistration?.room?.roomAnnouncements.edges
+    ?.map((e) => e?.node) ?? []);
+  const versionAnnouncements = compact(res.myRegistration?.examVersion.versionAnnouncements
+    .edges?.map((e) => e?.node) ?? []);
+  const personalMessages = compact(res.myRegistration?.messages.edges?.map((e) => e?.node) ?? []);
+  const examAnnouncements = compact(res.examAnnouncements.edges?.map((e) => e?.node) ?? []);
+  const dates = [
+    ...examAnnouncements.map(({ createdAt }) => DateTime.fromISO(createdAt)),
+    ...roomAnnouncements.map(({ createdAt }) => DateTime.fromISO(createdAt)),
+    ...versionAnnouncements.map(({ createdAt }) => DateTime.fromISO(createdAt)),
+    ...personalMessages.map((node) => DateTime.fromISO(node.createdAt)),
+  ];
 
   const anyUnread: boolean = dates.reduce((acc, date) => (acc || date > lastViewed), false);
   const classes = anyUnread ? 'bg-warning text-dark' : undefined;

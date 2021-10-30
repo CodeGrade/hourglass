@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { ReactElement, useContext, useState } from 'react';
 import { graphql, useFragment } from 'relay-hooks';
 import { ExamViewerContext } from '@hourglass/common/context';
 import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
@@ -37,7 +37,7 @@ import { DisplayBody$key } from './__generated__/DisplayBody.graphql';
 
 export interface BodyProps {
   bodyKey: DisplayBody$key;
-  refreshCodeMirrorsDeps: React.DependencyList;
+  refreshCodeMirrorsDeps?: React.DependencyList;
   qnum: number;
   pnum: number;
   bnum: number;
@@ -66,7 +66,7 @@ const ShowComment: React.FC<{ comment: CommentJson }> = (props) => {
   );
 };
 
-const ShowRubricPreset: React.FC<{ preset: RubricPresetJson, points: number}> = (props) => {
+const ShowRubricPreset: React.FC<{ preset: RubricPresetJson, points?: number}> = (props) => {
   const { preset, points } = props;
   const { info, values } = preset;
   const { label, direction } = info;
@@ -191,7 +191,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
     case 'HTML':
       return <HTML value={body.info} />;
     case 'Code': {
-      let initial = null;
+      let initial: ReactElement | undefined;
       if (overviewMode && body.info.initial) {
         initial = (
           <Card bg="secondary" border="info" className="mt-2 mb-3">
@@ -209,7 +209,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
                 <DisplayCode
                   info={body.info}
                   value={null}
-                  refreshProps={[...refreshCodeMirrorsDeps, open]}
+                  refreshProps={[...(refreshCodeMirrorsDeps ?? []), open]}
                   fullyExpandCode={fullyExpandCode}
                 />
               </Card.Body>

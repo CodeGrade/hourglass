@@ -15,6 +15,7 @@ import {
   WrappedFieldArrayProps,
   FormSection,
 } from 'redux-form';
+import { compact } from '@hourglass/common/helpers';
 import store from '@hourglass/common/student-dnd/store';
 import { Provider } from 'react-redux';
 import {
@@ -27,11 +28,14 @@ import { useFragment, graphql, useMutation } from 'relay-hooks';
 
 import { TabEditButton } from './admin';
 import { allocateVersions$key, allocateVersions } from './__generated__/allocateVersions.graphql';
-import { allocateVersionsMutation } from './__generated__/allocateVersionsMutation.graphql';
+import { allocateVersionsMutation, VersionAssignment } from './__generated__/allocateVersionsMutation.graphql';
+
+type NN<T> = Exclude<T, null>
+type O<T> = T | undefined
 
 type Section = allocateVersions['course']['sections'][number];
 type Student = allocateVersions['unassignedStudents'][number];
-type Version = allocateVersions['examVersions']['edges'][number]['node'];
+type Version = NN<NN<NN<allocateVersions['examVersions']['edges']>[number]>['node']>;
 
 interface FormContextType {
   sections: readonly Section[];
@@ -274,7 +278,7 @@ const StudentDNDForm: React.FC<
   return (
     <form
       onSubmit={handleSubmit(({ all }) => {
-        const versions = [];
+        const versions: VersionAssignment[] = [];
         all.versions.forEach((version) => {
           versions.push({
             versionId: version.id,
@@ -300,7 +304,7 @@ const StudentDNDForm: React.FC<
             <Button
               disabled={loading}
               variant="danger"
-              className={pristine && 'd-none'}
+              className={pristine ? 'd-none' : undefined}
               onClick={reset}
             >
               Reset
@@ -518,7 +522,7 @@ const DND: React.FC<{
       examId={res.id}
       sections={res.course.sections}
       unassigned={res.unassignedStudents}
-      versions={res.examVersions.edges.map((e) => e.node)}
+      versions={compact(res.examVersions.edges?.map((e) => e?.node) ?? [])}
     />
   );
 };

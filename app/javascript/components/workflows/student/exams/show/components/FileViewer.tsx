@@ -52,7 +52,7 @@ export const Files: React.FC<FilesProps> = (props) => {
 };
 
 interface FileContentsProps {
-  selectedFile: string;
+  selectedFile?: string;
   selectedLine?: number;
   onChangeLine?: (lineNum: number) => void;
   refreshProps?: React.DependencyList;
@@ -69,8 +69,8 @@ const FileContents: React.FC<FileContentsProps> = (props) => {
     fmap,
     fullyExpandCode = false,
   } = props;
-  const f = fmap[selectedFile];
-  let cursor: CodeMirror.Position;
+  const f = selectedFile ? fmap[selectedFile] : undefined;
+  let cursor: CodeMirror.Position | undefined;
   if (selectedLine) {
     cursor = {
       line: selectedLine - 1,
@@ -122,7 +122,7 @@ const FileContents: React.FC<FileContentsProps> = (props) => {
 
 interface FileTreeProps {
   files: ExamFile[];
-  selectedFile: string;
+  selectedFile?: string;
   onChangeFile: (id: string) => void;
   fmap: FileMap;
   disabled?: boolean;

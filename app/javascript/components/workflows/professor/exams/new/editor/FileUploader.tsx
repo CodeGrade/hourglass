@@ -25,11 +25,11 @@ const FileUploader: React.FC<{
     onChange,
   } = props;
   const noFiles = value === undefined || value.length === 0;
-  const [uploadedFileName, setUploadedFileName] = useState<string>(undefined);
+  const [uploadedFileName, setUploadedFileName] = useState<string | undefined>(undefined);
   const uploadLabel = noFiles ? 'Choose a file' : 'Saved files';
   const label = uploadedFileName ?? uploadLabel;
   const [open, setOpen] = useState(false);
-  const fileInput = useRef<HTMLInputElement>();
+  const fileInput = useRef<HTMLInputElement>(null);
   return (
     <Form.Group as={Row}>
       <Col sm={12}>
@@ -60,7 +60,9 @@ const FileUploader: React.FC<{
                 setUploadedFileName(undefined);
                 onChange([]);
                 if (fileInput.current) {
-                  fileInput.current.value = null;
+                  // Deliberately setting to null, to deal with weird browser issues
+                  // in resetting file inputs
+                  fileInput.current.value = null as unknown as string;
                 }
               }}
             >

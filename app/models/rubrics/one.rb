@@ -19,6 +19,14 @@ class One < Rubric
       if comments.dig(*qpb)&.slice(*preset_ids)&.count.to_i.positive?
         rubric_preset.compute_grade_for(reg, out_of, comments, checks, qpb)
       else
+        if Rails.env.development?
+          puts "NO USED SUBSECTION FOUND FOR reg #{reg.id} #{reg.user.display_name} and rubric #{self.id} (q #{self.question_id} #{self.question&.index}, p #{self.part_id} #{self.part&.index}, b #{self.body_item_id} #{self.body_item&.index})"
+          puts "Subsections #{subsections.map(&:id)}"
+          puts comments
+          subsections.each do |sub|
+            puts "#{sub.id} Complete? #{sub.send(:confirm_complete, reg, comments, checks)}"
+          end
+        end
         points
       end
     else
@@ -36,8 +44,8 @@ class One < Rubric
   def confirm_complete(reg, comments, checks)
     if rubric_preset
       preset_ids = rubric_preset.preset_comment_ids
-      (comments.dig(question_id, part_id, body_item_id)&.slice(*preset_ids)&.count.to_i +
-        checks.dig(question_id, part_id, body_item_id)&.count.to_i) == 1
+      (slice_hash_on_qpb(comments, is_hash: true)&.slice(*preset_ids)&.count.to_i +
+        slice_hash_on_qpb(checks, is_hash: false)&.count.to_i) == 1
     else
       subsections.one? { |s| s.send(:confirm_complete, reg, comments, checks) }
     end

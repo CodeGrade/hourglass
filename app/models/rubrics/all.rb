@@ -23,8 +23,8 @@ class All < Rubric
   def confirm_complete(reg, comments, checks)
     if rubric_preset
       preset_ids = rubric_preset.preset_comment_ids
-      (comments.dig(question_id, part_id, body_item_id)&.slice(*preset_ids)&.count.to_i +
-        checks.dig(question_id, part_id, body_item_id)&.count.to_i) == preset_ids.count
+      (slice_hash_on_qpb(comments, is_hash: true)&.slice(*preset_ids)&.count.to_i +
+        slice_hash_on_qpb(checks, is_hash: false)&.count.to_i) == preset_ids.count
     else
       subsections.all? { |s| s.send(:confirm_complete, reg, comments, checks) }
     end

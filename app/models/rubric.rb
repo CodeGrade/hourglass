@@ -155,7 +155,8 @@ class Rubric < ApplicationRecord
   end
 
   def grading_complete_for(reg)
-    coords = { question_id: question_id, part_id: part_id, body_item_id: body_item_id }
+    # Note: need to eliminate any ids that are nil, so we don't select too small a range of comments
+    coords = { question_id: question_id, part_id: part_id, body_item_id: body_item_id }.compact
     comments = multi_group_by(
       reg.grading_comments.includes(:preset_comment).where(coords),
       [:question_id, :part_id, :body_item_id, :preset_comment_id],
@@ -216,5 +217,36 @@ class Rubric < ApplicationRecord
 
   def confirm_complete(_reg, _comments, _checks)
     raise 'Individual rubric types should implement this'
+  end
+
+  # Because rubrics might have nullable questions, parts, or bodies,
+  # we have to be careful when figuring out which comments
+  # are relevant to this rubric.  Specifically, if this rubric
+  # has a null question, part, or body item, then _all_ comments
+  # in the appropriate subtree of the comment_hash are all relevant.
+  #
+  # This method can be called for grading comments (in which case
+  # comment_hash is Qid -> Pid -> Bid -> Preset_id -> Comment, and so
+  # is_hash should be true), and on grading checks (in which case
+  # comment_hash is Qid -> Pid -> Bid -> Check, and so is_hash is false).
+  def slice_hash_on_qpb(comment_hash, is_hash: )
+    relevant = comment_hash
+    if question_id
+      relevant = relevant[question_id] || {}
+    else
+      relevant = [*comment_hash.values].reduce(:merge)
+    end
+    if part_id
+      relevant = relevant[part_id] || {}
+    else
+      relevant = [*relevant.values].reduce(:merge)
+    end
+    if body_item_id
+      relevant = relevant[body_item_id] || {}
+    else
+      relevant = [*relevant.values]
+      relevant = relevant.reduce(:merge) if is_hash
+    end
+    relevant
   end
 end

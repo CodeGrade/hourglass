@@ -44,7 +44,6 @@ import { AlertContext } from '@hourglass/common/alerts';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { DateTime } from 'luxon';
-import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
 import Tooltip from '@student/exams/show/components/Tooltip';
 import EditExamRooms from '@professor/exams/rooms';
 import ManageAccommodations from '@professor/exams/accommodations';
@@ -52,7 +51,9 @@ import AssignSeating from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
 import ErrorBoundary, { RenderError } from '@hourglass/common/boundary';
-import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
+import { GrLink, GrUnlink } from 'react-icons/gr';
+import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
+import { BsPencilSquare, BsFillQuestionCircleFill, BsArrow90DegLeft } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { policyToString } from '@professor/exams/new/editor/Policies';
@@ -64,6 +65,7 @@ import {
 } from 'relay-hooks';
 import { uploadFile } from '@hourglass/common/types/api';
 import './dnd.scss';
+import './admin.scss';
 
 import { adminExamQuery } from './__generated__/adminExamQuery.graphql';
 import { admin_examInfo$key } from './__generated__/admin_examInfo.graphql';
@@ -475,6 +477,7 @@ export const ExamInfoEditor: React.FC<{
   name: string;
   startTime: DateTime;
   endTime: DateTime;
+  /** duration in seconds */
   duration: number;
 }> = (props) => {
   const {
@@ -489,6 +492,7 @@ export const ExamInfoEditor: React.FC<{
   const [name, setName] = useState<string>(defaultName);
   const [start, setStart] = useState<DateTime>(defaultStartTime);
   const [end, setEnd] = useState<DateTime>(defaultEndTime);
+  const [linked, setLinked] = useState<boolean>(true);
   const [duration, setDuration] = useState<number | string>(`${defaultDuration / 60.0}`);
 
   return (
@@ -532,29 +536,68 @@ export const ExamInfoEditor: React.FC<{
           </span>
           <div className="col flex-grow-0 pl-0" />
         </Form.Group>
-        <Form.Group as={Row} controlId="examStartTime" className="align-items-center">
-          <Form.Label column sm={2}>Start time:</Form.Label>
-          <Col>
-            <DateTimePicker
-              disabled={disabled}
-              value={start}
-              maxValue={end}
-              onChange={setStart}
-            />
+        <Form.Group as={Row} className="mb-3">
+          <Col className="pr-0" sm={2}>
+            <Form.Group as={Row} controlId="examStartTime" className="align-items-center">
+              <Form.Label column>Start time:</Form.Label>
+            </Form.Group>
+            <Form.Group as={Row} controlId="examEndTime" className="align-items-center mb-0">
+              <Form.Label column>End time:</Form.Label>
+            </Form.Group>
+          </Col>
+          <Col className="pr-0">
+            <Form.Group as={Row} controlId="examStartTime" className="align-items-center">
+              <Col>
+                <DateTimePicker
+                  disabled={disabled}
+                  value={start}
+                  maxValue={linked ? undefined : end}
+                  onChange={(newVal) => {
+                    if (linked) {
+                      setEnd(newVal.plus(end.diff(start)));
+                    }
+                    setStart(newVal);
+                    if (newVal > end) {
+                      setEnd(newVal);
+                    }
+                  }}
+                />
+              </Col>
+            </Form.Group>
+            <Form.Group as={Row} controlId="examEndTime" className="align-items-center mb-0">
+              <Col>
+                <DateTimePicker
+                  disabled={disabled}
+                  value={end}
+                  minValue={linked ? undefined : start}
+                  onChange={(newVal) => {
+                    if (linked) {
+                      setStart(newVal.minus(end.diff(start)));
+                    }
+                    setEnd(newVal);
+                    if (newVal < start) {
+                      setStart(newVal);
+                    }
+                  }}
+                />
+              </Col>
+            </Form.Group>
+          </Col>
+          <Col sm="auto" className="pl-0 pr-2 d-flex flex-column justify-content-center">
+            <Icon I={BsArrow90DegLeft} />
+            <TooltipButton
+              variant="link"
+              disabled={false}
+              className="ml-1 p-0 rotate-45"
+              enabledMessage={linked ? 'Start and end times are linked' : 'Start and end times are independent'}
+              onClick={() => setLinked(!linked)}
+            >
+              <Icon I={linked ? GrLink : GrUnlink} />
+            </TooltipButton>
+            <span style={{ transform: 'scaleY(-1)' }}><Icon I={BsArrow90DegLeft} /></span>
           </Col>
         </Form.Group>
-        <Form.Group as={Row} controlId="examEndTime" className="align-items-center">
-          <Form.Label column sm={2}>End time:</Form.Label>
-          <Col>
-            <DateTimePicker
-              disabled={disabled}
-              value={end}
-              minValue={start}
-              onChange={setEnd}
-            />
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} controlId="examDuration" className="align-items-center">
+        <Form.Group as={Row} controlId="examDuration" className="align-items-center my-0">
           <Form.Label column sm={2}>Duration (minutes):</Form.Label>
           <Col>
             <NumericInput

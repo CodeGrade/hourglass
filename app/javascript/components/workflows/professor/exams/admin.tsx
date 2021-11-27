@@ -557,8 +557,9 @@ export const ExamInfoEditor: React.FC<{
                       setEnd(newVal.plus(end.diff(start)));
                     }
                     setStart(newVal);
-                    if (newVal > end) {
-                      setEnd(newVal);
+                    const curDuration = { minutes: Number(duration) || 0 };
+                    if (newVal > end.minus(curDuration)) {
+                      setEnd(newVal.plus(curDuration));
                     }
                   }}
                 />
@@ -575,8 +576,9 @@ export const ExamInfoEditor: React.FC<{
                       setStart(newVal.minus(end.diff(start)));
                     }
                     setEnd(newVal);
-                    if (newVal < start) {
-                      setStart(newVal);
+                    const curDuration = { minutes: Number(duration) || 0 };
+                    if (newVal < start.plus(curDuration)) {
+                      setStart(newVal.minus(curDuration));
                     }
                   }}
                 />
@@ -606,7 +608,12 @@ export const ExamInfoEditor: React.FC<{
               className="overflow-visible"
               variant="primary"
               min={0}
-              onChange={setDuration}
+              onChange={(newVal) => {
+                setDuration(newVal);
+                if (start.plus({ minutes: newVal }) > end) {
+                  setEnd(start.plus({ minutes: newVal }));
+                }
+              }}
             />
           </Col>
         </Form.Group>

@@ -3,6 +3,7 @@ import React, {
   useState,
   useContext,
   useCallback,
+  useEffect,
 } from 'react';
 import {
   Form,
@@ -33,6 +34,7 @@ import {
   applyMarks,
   marksToDescs,
   removeMarks,
+  removeAllMarks,
 } from '@student/exams/show/components/ExamCodeBox';
 import { firstFile } from '@student/exams/show/files';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
@@ -147,15 +149,20 @@ const EditCodeAnswerValues: React.FC<{
     value,
     onChangeValue,
     disabled: parentDisabled = false,
-    debounceDelay = 10000,
+    debounceDelay = 1000,
   } = props;
   const answerText = value?.text ?? '';
-  const answerMarks = value?.marks ?? [];
+  const [answerMarks, setAnswerMarks] = useState<MarkDescription[]>([]);
   const [instance, setInstance] = useState<CM.Editor>(undefined);
   const [lockState, setLockState] = useState<LockStateInfo>({
     enabled: false,
     active: false,
   });
+  // Because of debouncing, value.marks doesn't get updated frequently enough
+  // so we cache it as a stateful variable
+  useEffect(() => {
+    setAnswerMarks(value.marks);
+  }, [value?.marks]);
   const debouncedOnChangeLang = useDebouncedCallback(onChangeLang, debounceDelay);
   const debouncedOnChangeValue = useDebouncedCallback(onChangeValue, debounceDelay);
   let title: string;
@@ -191,7 +198,9 @@ const EditCodeAnswerValues: React.FC<{
                   && m.to.ch === curRange.to.ch
                   && m.to.line === curRange.to.line
                 ));
-                removeMarks(instance, newMarks.splice(markId, 1));
+                if (markId !== -1) {
+                  removeMarks(instance, newMarks.splice(markId, 1));
+                }
               } else {
                 const newMark: MarkDescription = {
                   from: {
@@ -216,6 +225,7 @@ const EditCodeAnswerValues: React.FC<{
                 newMarks.push(newMark);
                 applyMarks(instance, [newMark]);
               }
+              setAnswerMarks(newMarks);
               debouncedOnChangeValue({ text: answerText, marks: newMarks });
             }}
           >
@@ -227,6 +237,14 @@ const EditCodeAnswerValues: React.FC<{
             size="sm"
             title="Clear all locked regions"
             onClick={(): void => {
+              const cursor = instance.getCursor();
+              setLockState({
+                ...lockState,
+                enabled: false,
+                active: false,
+                curRange: { from: cursor, to: cursor },
+              });
+              removeAllMarks(instance);
               debouncedOnChangeValue({ text: answerText, marks: [] });
             }}
           >

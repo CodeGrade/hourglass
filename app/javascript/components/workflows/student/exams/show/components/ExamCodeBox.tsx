@@ -44,6 +44,10 @@ export function removeMarks(cm: CM.Editor, marks: MarkDescription[]): void {
   });
 }
 
+export function removeAllMarks(cm: CM.Editor): void {
+  cm.getAllMarks().filter((m) => m.className === 'readOnly').map((m) => m.clear());
+}
+
 export function marksToDescs(marks: CM.TextMarker[]): MarkDescription[] {
   return marks.filter((m) => m.className === 'readOnly').map((m) => {
     const { inclusiveLeft, inclusiveRight } = m;
@@ -128,11 +132,7 @@ export const Editor: React.FC<EditorProps> = (props) => {
     if (instance) {
       doSave = false;
       const curCursor = instance.getCursor();
-      instance.getAllMarks().forEach((m) => {
-        if (m.className === 'readOnly') {
-          m.clear();
-        }
-      });
+      removeAllMarks(instance);
       if (instance.getValue() !== value) { instance.setValue(value); }
       applyMarks(instance, markDescriptions);
       instance.setCursor(curCursor.line, curCursor.ch, {

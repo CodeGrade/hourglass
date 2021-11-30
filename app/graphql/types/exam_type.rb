@@ -44,7 +44,7 @@ module Types
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def anomalies
-      AssociationLoader.for(Exam, :anomalies, merge: -> { includes(registration: { accommodation: { exam_version: :exam } }).unforgiven }).load(object)
+      AssociationLoader.for(Exam, :anomalies, merge: -> { includes(registration: [ :accommodation, { exam_version: :exam } ]).unforgiven }).load(object)
     end
 
     field :messages, Types::MessageType.connection_type, null: false do

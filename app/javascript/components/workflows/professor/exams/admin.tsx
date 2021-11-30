@@ -555,11 +555,11 @@ export const ExamInfoEditor: React.FC<{
                   onChange={(newVal) => {
                     if (linked) {
                       setEnd(newVal.plus(end.diff(start)));
-                    }
-                    setStart(newVal);
-                    const curDuration = { minutes: Number(duration) || 0 };
-                    if (newVal > end.minus(curDuration)) {
-                      setEnd(newVal.plus(curDuration));
+                      setStart(newVal);
+                    } else {
+                      const curDuration = { minutes: Number(duration) || 0 };
+                      const maxStartTime = end.minus(curDuration);
+                      setStart(newVal <= maxStartTime ? newVal : maxStartTime);
                     }
                   }}
                 />
@@ -574,11 +574,11 @@ export const ExamInfoEditor: React.FC<{
                   onChange={(newVal) => {
                     if (linked) {
                       setStart(newVal.minus(end.diff(start)));
-                    }
-                    setEnd(newVal);
-                    const curDuration = { minutes: Number(duration) || 0 };
-                    if (newVal < start.plus(curDuration)) {
-                      setStart(newVal.minus(curDuration));
+                      setEnd(newVal);
+                    } else {
+                      const curDuration = { minutes: Number(duration) || 0 };
+                      const minEndTime = start.plus(curDuration);
+                      setEnd(newVal >= minEndTime ? newVal : minEndTime);
                     }
                   }}
                 />

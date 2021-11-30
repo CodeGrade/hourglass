@@ -10,6 +10,7 @@ class Anomaly < ApplicationRecord
 
   delegate :user, to: :registration
   delegate :exam, to: :registration
+  delegate :exam_version, to: :registration
 
   scope :unforgiven, -> { where(forgiven: false) }
   scope :forgiven, -> { where(forgiven: true) }

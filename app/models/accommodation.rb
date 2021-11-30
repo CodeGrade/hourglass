@@ -13,6 +13,7 @@ class Accommodation < ApplicationRecord
 
   delegate :user, to: :registration
   delegate :exam, to: :registration
+  delegate :exam_version, to: :registration
   delegate :course, to: :exam
 
   def factor

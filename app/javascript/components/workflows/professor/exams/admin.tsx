@@ -608,10 +608,16 @@ export const ExamInfoEditor: React.FC<{
               className="overflow-visible"
               variant="primary"
               min={0}
+              max={linked ? undefined : end.diff(start).as('minutes')}
               onChange={(newVal) => {
-                setDuration(newVal);
-                if (start.plus({ minutes: newVal }) > end) {
-                  setEnd(start.plus({ minutes: newVal }));
+                if (linked) {
+                  setDuration(newVal);
+                  if (start.plus({ minutes: newVal }) > end) {
+                    setEnd(start.plus({ minutes: newVal }));
+                  }
+                } else {
+                  const availTime = end.diff(start).as('minutes');
+                  setDuration(Math.min(newVal, availTime));
                 }
               }}
             />

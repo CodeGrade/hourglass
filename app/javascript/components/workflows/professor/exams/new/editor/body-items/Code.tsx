@@ -245,6 +245,7 @@ const EditCodeAnswerValues: React.FC<{
                 curRange: { from: cursor, to: cursor },
               });
               removeAllMarks(instance);
+              setAnswerMarks([]);
               debouncedOnChangeValue({ text: answerText, marks: [] });
             }}
           >

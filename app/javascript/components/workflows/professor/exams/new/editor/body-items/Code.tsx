@@ -161,7 +161,7 @@ const EditCodeAnswerValues: React.FC<{
   // Because of debouncing, value.marks doesn't get updated frequently enough
   // so we cache it as a stateful variable
   useEffect(() => {
-    setAnswerMarks(value.marks);
+    if (value?.marks) { setAnswerMarks(value.marks); }
   }, [value?.marks]);
   const debouncedOnChangeLang = useDebouncedCallback(onChangeLang, debounceDelay);
   const debouncedOnChangeValue = useDebouncedCallback(onChangeValue, debounceDelay);

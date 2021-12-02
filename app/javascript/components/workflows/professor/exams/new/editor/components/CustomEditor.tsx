@@ -17,6 +17,7 @@ export interface CustomEditorProps {
   theme?: string;
   onChange?: ReactQuill.ReactQuillProps['onChange'];
   disabled?: boolean;
+  disableTab?: boolean;
 }
 
 const toolbarOptions = [
@@ -45,6 +46,14 @@ const toolbarOptions = [
 const modules = {
   toolbar: toolbarOptions,
 };
+const modulesNoTab = {
+  toolbar: toolbarOptions,
+  keyboard: {
+    bindings: {
+      tab: null,
+    },
+  },
+};
 
 const formatOptions = [
   'background', 'color', 'bold', 'italic', 'underline', 'font', 'code', 'size', 'strike', 'script',
@@ -63,6 +72,10 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
     theme,
     onChange,
     disabled = false,
+    // The snow theme has an actual toolbar, and is a multiline editor,
+    // so Tab for formatting makes sense.  For one-line editors,
+    // Tab is more useful for navigation.
+    disableTab = (theme !== 'snow'),
   } = props;
 
   const filteredOnChange = useCallback((val: string, delta, source, editor) => {
@@ -107,7 +120,7 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
       theme={theme || 'snow'}
       value={value}
       formats={formatOptions}
-      modules={modules}
+      modules={disableTab ? modulesNoTab : modules}
       onChange={filteredOnChange}
     />
   );

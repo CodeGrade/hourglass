@@ -93,6 +93,7 @@ const Html: React.FC<{
     <EditHTMLVal
       className="text-instructions bg-white"
       disabled={disabled}
+      disableTab={false}
       theme="snow"
       value={info}
       onChange={updatePrompt}

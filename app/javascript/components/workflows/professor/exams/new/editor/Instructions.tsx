@@ -25,6 +25,7 @@ const Instructions: React.FC<TextProps> = (props) => {
           className="bg-white"
           value={value}
           disabled={disabled}
+          disableTab={false}
           theme="snow"
           placeholder="Give exam-wide instructions here"
           onChange={onChange}

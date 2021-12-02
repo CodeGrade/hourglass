@@ -115,6 +115,7 @@ export const DebouncedFormControl: React.FC<{
 };
 
 export const EditHTMLVal: React.FC<{
+  disableTab?: boolean;
   disabled?: boolean;
   value: HTMLVal;
   onChange: (newVal: HTMLVal) => void;
@@ -125,6 +126,7 @@ export const EditHTMLVal: React.FC<{
 }> = (props) => {
   const {
     disabled = false,
+    disableTab = true,
     value,
     onChange,
     placeholder,
@@ -152,6 +154,7 @@ export const EditHTMLVal: React.FC<{
         theme={theme}
         onChange={handleChange}
         className={className}
+        disableTab={disableTab}
       />
     </Loading>
   );

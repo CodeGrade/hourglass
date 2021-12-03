@@ -14,7 +14,10 @@ import {
   Col,
   Form,
   Row,
+  ToggleButton,
+  ToggleButtonGroup,
 } from 'react-bootstrap';
+import { MdEdit, MdGrading } from 'react-icons/md';
 
 import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import { AlertContext } from '@hourglass/common/alerts';
@@ -22,6 +25,7 @@ import { QuestionFilesContext } from '@hourglass/common/context';
 
 import { HTMLVal, YesNoInfo, FileRef } from '@student/exams/show/types';
 import YesNoControl from '@student/exams/show/components/questions/YesNo';
+import Icon from '@student/exams/show/components/Icon';
 
 import { DragHandle, DestroyButton, EditHTMLVal } from './components/helpers';
 import { SingleRubricKeyEditor } from './Rubric';
@@ -339,7 +343,7 @@ export const OneQuestion: React.FC<{
               <Col sm="auto" className={handleRef ? 'ml-4' : ''}>
                 <Form.Label column>{`Question ${question.index + 1}:`}</Form.Label>
               </Col>
-              <Col className="mr-5">
+              <Col className="mr-2">
                 <EditHTMLVal
                   className="bg-white border rounded"
                   value={question.name || {
@@ -351,6 +355,31 @@ export const OneQuestion: React.FC<{
                   placeholder="Give a short (optional) descriptive name for the question"
                   debounceDelay={1000}
                 />
+              </Col>
+              <Col sm="auto" className="mr-5 d-flex align-items-center">
+                <ToggleButtonGroup
+                  className="bg-white rounded"
+                  name="wording"
+                  type="radio"
+                  value="no"
+                >
+                  <ToggleButton
+                    disabled={disabled}
+                    variant="primary"
+                    value="no"
+                    title="Edit exam content"
+                  >
+                    <Icon I={MdEdit} />
+                  </ToggleButton>
+                  <ToggleButton
+                    disabled={disabled}
+                    variant="outline-primary"
+                    value="yes"
+                    title="Edit rubrics"
+                  >
+                    <Icon I={MdGrading} />
+                  </ToggleButton>
+                </ToggleButtonGroup>
               </Col>
             </Row>
           </Card.Title>

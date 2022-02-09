@@ -27,12 +27,14 @@ module Hourglass
     config.load_defaults 6.1
 
     config.before_configuration do
-      ENV['BOTTLENOSE_URL'] =
-        if Rails.env.production?
-          'https://handins.ccs.neu.edu'
-        else
-          'http://127.0.0.1:3000'
-        end
+      unless ENV['BOTTLENOSE_URL']
+        ENV['BOTTLENOSE_URL'] =
+          if Rails.env.production?
+            'https://handins.ccs.neu.edu'
+          else
+            'http://127.0.0.1:3000'
+          end
+      end
     end
 
     # Add subdirectories of models

@@ -60,6 +60,7 @@ in pkgs.mkShell {
     which
     lzma
     watchman
+    redis
   ];
 
   shellHook = ''

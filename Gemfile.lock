@@ -260,6 +260,7 @@ GEM
       execjs
       railties (>= 3.2)
       tilt
+    redis (4.6.0)
     regexp_parser (2.2.1)
     responders (3.0.1)
       actionpack (>= 5.0)
@@ -357,6 +358,7 @@ DEPENDENCIES
   pry-stack_explorer
   rails (~> 6.1)
   react-rails
+  redis (~> 4.0)
   rubocop-rails
   rubyzip
   spring

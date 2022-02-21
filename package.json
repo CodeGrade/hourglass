@@ -69,7 +69,7 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-form": "^8.3.5",
     "redux-thunk": "^2.3.0",
-    "relay-compiler": "^13.1.1",
+    "relay-compiler": "^12.0.0",
     "relay-compiler-language-typescript": "^15.0.1",
     "relay-hooks": "^7.0.0",
     "relay-runtime": "^13.1.1",

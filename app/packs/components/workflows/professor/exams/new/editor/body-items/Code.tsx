@@ -17,7 +17,7 @@ import {
   useMutation,
 } from 'relay-hooks';
 import { FaLock, FaBan } from 'react-icons/fa';
-import { useDebouncedCallback } from 'use-debounce/lib';
+import { useDebouncedCallback } from 'use-debounce';
 import Loading from '@hourglass/common/loading';
 import { ExamContext } from '@hourglass/common/context';
 import { MutationReturn } from '@hourglass/common/helpers';

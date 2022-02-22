@@ -6,12 +6,9 @@ import {
   Row,
   Col,
 } from 'react-bootstrap';
-import {
-  graphql,
-  useMutation,
-} from 'relay-hooks';
+import { graphql } from 'react-relay';
 import { HTMLVal, YesNoInfo, YesNoState } from '@student/exams/show/types';
-import { MutationReturn } from '@hourglass/common/helpers';
+import { MutationReturn, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { YesNoCreateMutation } from './__generated__/YesNoCreateMutation.graphql';
@@ -19,7 +16,7 @@ import { YesNoChangeMutation } from './__generated__/YesNoChangeMutation.graphql
 
 export function useCreateYesNoMutation(): MutationReturn<YesNoCreateMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<YesNoCreateMutation>(
+  return useMutationWithDefaults<YesNoCreateMutation>(
     graphql`
     mutation YesNoCreateMutation($input: CreateYesNoInput!) {
       createYesNo(input: $input) {
@@ -48,7 +45,7 @@ export function useCreateYesNoMutation(): MutationReturn<YesNoCreateMutation> {
 
 function useChangeYesNoMutation(): MutationReturn<YesNoChangeMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<YesNoChangeMutation>(
+  return useMutationWithDefaults<YesNoChangeMutation>(
     graphql`
     mutation YesNoChangeMutation($input: ChangeYesNoDetailsInput!) {
       changeYesNoDetails(input: $input) {
@@ -178,7 +175,7 @@ const YesNo: React.FC<{
     answer,
     disabled: parentDisabled = false,
   } = props;
-  const [mutate, { loading }] = useChangeYesNoMutation();
+  const [mutate, loading] = useChangeYesNoMutation();
   const updatePrompt = useCallback((newPrompt: HTMLVal) => {
     mutate({
       variables: {

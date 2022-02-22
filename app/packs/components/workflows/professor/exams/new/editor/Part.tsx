@@ -7,7 +7,7 @@ import {
   graphql,
   useMutation,
   useFragment,
-} from 'relay-hooks';
+} from 'react-relay';
 import {
   Card,
   Col,
@@ -63,7 +63,7 @@ export const ReorderablePartsEditor: React.FC<{
     showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<PartReorderMutation>(
+  const [mutate, loading] = useMutation<PartReorderMutation>(
     graphql`
     mutation PartReorderMutation($input: ReorderPartsInput!) {
       reorderParts(input: $input) {
@@ -77,16 +77,6 @@ export const ReorderablePartsEditor: React.FC<{
       }
     }
     `,
-    {
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error reordering parts',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
   );
   const rearrangeParts = useCallback((from, to) => {
     mutate({
@@ -96,6 +86,14 @@ export const ReorderablePartsEditor: React.FC<{
           fromIndex: from,
           toIndex: to,
         },
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error reordering parts',
+          message: err.message,
+          copyButton: true,
+        });
       },
     });
   }, [questionId, mutate]);
@@ -170,7 +168,7 @@ export const OnePart: React.FC<{
   );
   const [
     mutateDestroyPart,
-    { loading: loadingDestroyPart },
+    loadingDestroyPart,
   ] = useMutation<PartDestroyMutation>(
     graphql`
     mutation PartDestroyMutation($input: DestroyPartInput!) {
@@ -184,20 +182,10 @@ export const OnePart: React.FC<{
       }
     }
     `,
-    {
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error destroying part',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
   );
   const [
     mutateUpdatePart,
-    { loading: loadingUpdatePart },
+    loadingUpdatePart,
   ] = useMutation<PartChangeMutation>(
     graphql`
     mutation PartChangeMutation($input: ChangePartDetailsInput!) {
@@ -223,16 +211,6 @@ export const OnePart: React.FC<{
       }
     }
     `,
-    {
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error updating part',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
   );
   const updateName = useCallback((newVal: HTMLVal) => {
     mutateUpdatePart({
@@ -242,6 +220,14 @@ export const OnePart: React.FC<{
           updateName: true,
           name: newVal,
         },
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error updating part',
+          message: err.message,
+          copyButton: true,
+        });
       },
     });
   }, [part.id]);
@@ -289,14 +275,14 @@ export const OnePart: React.FC<{
       },
     });
   }, [part.id]);
-  const [mutateCreateCode, { loading: loadingCreateCode }] = useCreateCodeMutation();
-  const [mutateCreateCodeTag, { loading: loadingCreateCodeTag }] = useCreateCodeTagMutation();
-  const [mutateCreateText, { loading: loadingCreateText }] = useCreateTextMutation();
-  const [mutateCreateATA, { loading: loadingCreateATA }] = useCreateAllThatApplyMutation();
-  const [mutateCreateMatching, { loading: loadingCreateMatching }] = useCreateMatchingMutation();
-  const [mutateCreateMC, { loading: loadingCreateMC }] = useCreateMultipleChoiceMutation();
-  const [mutateCreateYesNo, { loading: loadingCreateYesNo }] = useCreateYesNoMutation();
-  const [mutateCreateHtml, { loading: loadingCreateHtml }] = useCreateHtmlMutation();
+  const [mutateCreateCode, loadingCreateCode] = useCreateCodeMutation();
+  const [mutateCreateCodeTag, loadingCreateCodeTag] = useCreateCodeTagMutation();
+  const [mutateCreateText, loadingCreateText] = useCreateTextMutation();
+  const [mutateCreateATA, loadingCreateATA] = useCreateAllThatApplyMutation();
+  const [mutateCreateMatching, loadingCreateMatching] = useCreateMatchingMutation();
+  const [mutateCreateMC, loadingCreateMC] = useCreateMultipleChoiceMutation();
+  const [mutateCreateYesNo, loadingCreateYesNo] = useCreateYesNoMutation();
+  const [mutateCreateHtml, loadingCreateHtml] = useCreateHtmlMutation();
 
   const loadingCreateBodyItem = (
     loadingCreateCode
@@ -331,6 +317,14 @@ export const OnePart: React.FC<{
                     input: {
                       partId: part.id,
                     },
+                  },
+                  onError: (err) => {
+                    alert({
+                      variant: 'danger',
+                      title: 'Error destroying part',
+                      message: err.message,
+                      copyButton: true,
+                    });
                   },
                 });
               }}

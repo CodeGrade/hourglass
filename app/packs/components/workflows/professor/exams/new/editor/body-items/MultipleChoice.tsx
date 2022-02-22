@@ -11,10 +11,7 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
-import {
-  graphql,
-  useMutation,
-} from 'relay-hooks';
+import { graphql } from 'react-relay';
 import { FaCircle } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import Icon from '@student/exams/show/components/Icon';
@@ -26,7 +23,7 @@ import {
   RearrangeableList,
   RearrangeableListProps,
 } from '@hourglass/common/rearrangeable';
-import { MutationReturn } from '@hourglass/common/helpers';
+import { MutationReturn, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { DragHandle, DestroyButton, EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
@@ -36,7 +33,7 @@ import { MultipleChoiceChangeMutation } from './__generated__/MultipleChoiceChan
 
 export function useCreateMultipleChoiceMutation(): MutationReturn<MultipleChoiceCreateMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<MultipleChoiceCreateMutation>(
+  return useMutationWithDefaults<MultipleChoiceCreateMutation>(
     graphql`
     mutation MultipleChoiceCreateMutation($input: CreateMultipleChoiceInput!) {
       createMultipleChoice(input: $input) {
@@ -65,7 +62,7 @@ export function useCreateMultipleChoiceMutation(): MutationReturn<MultipleChoice
 
 function useChangeMultipleChoiceMutation(): MutationReturn<MultipleChoiceChangeMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<MultipleChoiceChangeMutation>(
+  return useMutationWithDefaults<MultipleChoiceChangeMutation>(
     graphql`
     mutation MultipleChoiceChangeMutation($input: ChangeMultipleChoiceDetailsInput!) {
       changeMultipleChoiceDetails(input: $input) {
@@ -219,7 +216,7 @@ const MultipleChoice: React.FC<MultipleChoiceProps> = (props) => {
   });
   const [curAnswer, setCurAnswer] = useState(answer);
   useEffect(() => setCurAnswer(answer), [answer]);
-  const [mutate, { loading }] = useChangeMultipleChoiceMutation();
+  const [mutate, loading] = useChangeMultipleChoiceMutation();
   const updatePrompt = useCallback((newPrompt: HTMLVal) => {
     mutate({
       variables: {

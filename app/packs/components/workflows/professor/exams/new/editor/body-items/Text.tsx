@@ -2,14 +2,11 @@ import React, { useCallback, useContext } from 'react';
 import {
   Row, Col, Form,
 } from 'react-bootstrap';
-import {
-  graphql,
-  useMutation,
-} from 'relay-hooks';
+import { graphql } from 'react-relay';
 import Prompted from '@professor/exams/new/editor/body-items/Prompted';
 import { DebouncedFormControl } from '@professor/exams/new/editor/components/helpers';
 import { HTMLVal, TextInfo, TextState } from '@student/exams/show/types';
-import { MutationReturn } from '@hourglass/common/helpers';
+import { MutationReturn, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 
 import { TextCreateMutation } from './__generated__/TextCreateMutation.graphql';
@@ -17,7 +14,7 @@ import { TextChangeMutation } from './__generated__/TextChangeMutation.graphql';
 
 export function useCreateTextMutation(): MutationReturn<TextCreateMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<TextCreateMutation>(
+  return useMutationWithDefaults<TextCreateMutation>(
     graphql`
     mutation TextCreateMutation($input: CreateTextInput!) {
       createText(input: $input) {
@@ -46,7 +43,7 @@ export function useCreateTextMutation(): MutationReturn<TextCreateMutation> {
 
 function useChangeTextMutation(): MutationReturn<TextChangeMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<TextChangeMutation>(
+  return useMutationWithDefaults<TextChangeMutation>(
     graphql`
     mutation TextChangeMutation($input: ChangeTextDetailsInput!) {
       changeTextDetails(input: $input) {
@@ -83,7 +80,7 @@ const Text: React.FC<{
     answer,
     disabled: parentDisabled = false,
   } = props;
-  const [mutate, { loading }] = useChangeTextMutation();
+  const [mutate, loading] = useChangeTextMutation();
   const updatePrompt = useCallback((newPrompt: HTMLVal) => {
     mutate({
       variables: {

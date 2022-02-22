@@ -14,12 +14,12 @@ import {
 import {
   graphql,
   useMutation,
-} from 'relay-hooks';
+} from 'react-relay';
 import { FaCheck } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import Icon from '@student/exams/show/components/Icon';
 import { AllThatApplyInfo, AllThatApplyState, HTMLVal } from '@student/exams/show/types';
-import { MutationReturn } from '@hourglass/common/helpers';
+import { useMutationWithDefaults, MutationReturn } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 import {
   arrSplice,
@@ -36,7 +36,7 @@ import { AllThatApplyChangeMutation } from './__generated__/AllThatApplyChangeMu
 
 export function useCreateAllThatApplyMutation(): MutationReturn<AllThatApplyCreateMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<AllThatApplyCreateMutation>(
+  return useMutationWithDefaults<AllThatApplyCreateMutation>(
     graphql`
     mutation AllThatApplyCreateMutation($input: CreateAllThatApplyInput!) {
       createAllThatApply(input: $input) {
@@ -65,7 +65,7 @@ export function useCreateAllThatApplyMutation(): MutationReturn<AllThatApplyCrea
 
 function useChangeAllThatApplyMutation(): MutationReturn<AllThatApplyChangeMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<AllThatApplyChangeMutation>(
+  return useMutationWithDefaults<AllThatApplyChangeMutation>(
     graphql`
     mutation AllThatApplyChangeMutation($input: ChangeAllThatApplyDetailsInput!) {
       changeAllThatApplyDetails(input: $input) {
@@ -252,7 +252,7 @@ const AllThatApply: React.FC<{
   });
   const [curAnswer, setCurAnswer] = useState(answer);
   useEffect(() => setCurAnswer(answer), [answer]);
-  const [mutate, { loading }] = useChangeAllThatApplyMutation();
+  const [mutate, loading] = useChangeAllThatApplyMutation();
   const updatePrompt = useCallback((newPrompt: HTMLVal) => {
     mutate({
       variables: {

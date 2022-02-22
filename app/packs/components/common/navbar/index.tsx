@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { Suspense, useContext } from 'react';
 import {
   Navbar,
   Form,
@@ -6,7 +6,7 @@ import {
 } from 'react-bootstrap';
 import { getCSRFToken } from '@student/exams/show/helpers';
 import { Link } from 'react-router-dom';
-import { graphql, useQuery, useMutation } from 'relay-hooks';
+import { useLazyLoadQuery, graphql, useMutation } from 'react-relay';
 import { AlertContext } from '@hourglass/common/alerts';
 import NotLoggedIn from './NotLoggedIn';
 // eslint-disable-next-line no-restricted-imports
@@ -28,9 +28,21 @@ async function logOut(): Promise<unknown> {
 
 const RN: React.FC<{
   className?: string;
+}> = ({ className }) => (
+  <Suspense
+    fallback={(
+      <NotLoggedIn />
+    )}
+  >
+    <RNQuery className={className} />
+  </Suspense>
+);
+
+const RNQuery: React.FC<{
+  className?: string;
 }> = ({ className }) => {
   const { alert } = useContext(AlertContext);
-  const res = useQuery<navbarQuery>(
+  const queryData = useLazyLoadQuery<navbarQuery>(
     graphql`
     query navbarQuery {
       impersonating
@@ -39,8 +51,9 @@ const RN: React.FC<{
       }
     }
     `,
+    {},
   );
-  const [stopImpersonating, { loading }] = useMutation(
+  const [stopImpersonating, loading] = useMutation(
     graphql`
     mutation navbarStopImpersonatingMutation {
       stopImpersonating(input: {}) {
@@ -48,22 +61,7 @@ const RN: React.FC<{
       }
     }
     `,
-    {
-      onCompleted: () => {
-        window.location.href = '/';
-      },
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error stopping impersonation',
-          message: err.message,
-        });
-      },
-    },
   );
-  if (res.error || !res.data) {
-    return <NotLoggedIn />;
-  }
   return (
     <Navbar
       bg="light"
@@ -82,12 +80,12 @@ const RN: React.FC<{
           className="mr-2"
         >
           <span>
-            {res.data.impersonating && 'Impersonating '}
-            {res.data.me.displayName}
+            {queryData.impersonating && 'Impersonating '}
+            {queryData.me.displayName}
           </span>
         </Navbar.Text>
         <Form inline>
-          {res.data.impersonating && (
+          {queryData.impersonating && (
             <Button
               disabled={loading}
               className="mr-2"
@@ -95,6 +93,16 @@ const RN: React.FC<{
               onClick={() => {
                 stopImpersonating({
                   variables: {},
+                  onCompleted: () => {
+                    window.location.href = '/';
+                  },
+                  onError: (err) => {
+                    alert({
+                      variant: 'danger',
+                      title: 'Error stopping impersonation',
+                      message: err.message,
+                    });
+                  },
                 });
               }}
             >

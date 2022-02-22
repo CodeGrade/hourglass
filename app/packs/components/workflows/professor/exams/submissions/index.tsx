@@ -1,4 +1,9 @@
-import React, { useState, useCallback, useContext } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useContext,
+  Suspense,
+} from 'react';
 import {
   useParams,
   Switch,
@@ -7,9 +12,8 @@ import {
 } from 'react-router-dom';
 import { DateTime, LocaleOptions } from 'luxon';
 import { Container, Button, Table } from 'react-bootstrap';
-import { graphql } from 'react-relay';
 import { BsListCheck } from 'react-icons/bs';
-import { useQuery, useMutation } from 'relay-hooks';
+import { graphql, useLazyLoadQuery, useMutation } from 'react-relay';
 import {
   AnswersState,
 } from '@student/exams/show/types';
@@ -20,7 +24,7 @@ import { FinalizeDialog, finalizeItemMutation } from '@proctor/exams';
 import { AlertContext } from '@hourglass/common/alerts';
 import { examsFinalizeItemMutation } from '@proctor/exams/__generated__/examsFinalizeItemMutation.graphql';
 import Icon from '@student/exams/show/components/Icon';
-import { RenderError } from '@hourglass/common/boundary';
+import ErrorBoundary from '@hourglass/common/boundary';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { CurrentGrading } from '@professor/exams/types';
 import { describeRemainingTime } from '@student/exams/show/components/navbar/TimeRemaining';
@@ -31,9 +35,22 @@ import { submissionsStaffQuery } from './__generated__/submissionsStaffQuery.gra
 import { submissionsStudentQuery } from './__generated__/submissionsStudentQuery.graphql';
 
 type Registration = submissionsAllQueryResponse['exam']['registrations'][number];
-const ExamSubmissions: React.FC = () => {
+
+const ExamSubmissions: React.FC = () => (
+  <ErrorBoundary>
+    <Suspense
+      fallback={(
+        <p>Loading...</p>
+      )}
+    >
+      <ExamSubmissionsQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const ExamSubmissionsQuery: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
-  const res = useQuery<submissionsAllQuery>(
+  const queryData = useLazyLoadQuery<submissionsAllQuery>(
     graphql`
     query submissionsAllQuery($examId: ID!) {
       exam(id: $examId) {
@@ -59,9 +76,17 @@ const ExamSubmissions: React.FC = () => {
   const openModal = useCallback(() => setShowModal(true), []);
   const closeModal = useCallback(() => setShowModal(false), []);
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<examsFinalizeItemMutation>(
+  const [mutate, loading] = useMutation<examsFinalizeItemMutation>(
     finalizeItemMutation,
-    {
+  );
+  const finalize = (subjectValue) => {
+    mutate({
+      variables: {
+        input: {
+          id: subjectValue,
+          scope: 'out_of_time',
+        },
+      },
       onCompleted: () => {
         closeModal();
         alert({
@@ -79,27 +104,11 @@ const ExamSubmissions: React.FC = () => {
           copyButton: true,
         });
       },
-    },
-  );
-  const finalize = (subjectValue) => {
-    mutate({
-      variables: {
-        input: {
-          id: subjectValue,
-          scope: 'out_of_time',
-        },
-      },
     });
   };
-  if (res.error) {
-    return <RenderError error={res.error} />;
-  }
-  if (!res.data) {
-    return <p>Loading...</p>;
-  }
   const {
     registrations,
-  } = res.data.exam;
+  } = queryData.exam;
   const groups: {
     notStarted: Registration[],
     started: Registration[],
@@ -129,7 +138,7 @@ const ExamSubmissions: React.FC = () => {
     return latestSoFar;
   }, DateTime.fromMillis(0));
   return (
-    <DocumentTitle title={`${res.data.exam.name} -- All submissions`}>
+    <DocumentTitle title={`${queryData.exam.name} -- All submissions`}>
       <h4>{`Completed submissions (${groups.final.length})`}</h4>
       {groups.final.length === 0 ? (
         <i>No completed submissions yet</i>
@@ -277,9 +286,21 @@ const ExamSubmissions: React.FC = () => {
   );
 };
 
-const ExamSubmission: React.FC = () => {
+const ExamSubmission: React.FC = () => (
+  <ErrorBoundary>
+    <Suspense
+      fallback={
+        <p>Loading...</p>
+      }
+    >
+      <ExamSubmissionQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const ExamSubmissionQuery: React.FC = () => {
   const { registrationId } = useParams<{ registrationId: string }>();
-  const res = useQuery<submissionsRootQuery>(
+  const queryData = useLazyLoadQuery<submissionsRootQuery>(
     graphql`
     query submissionsRootQuery($registrationId: ID!) {
       me {
@@ -297,20 +318,14 @@ const ExamSubmission: React.FC = () => {
     `,
     { registrationId },
   );
-  if (res.error) {
-    return <RenderError error={res.error} />;
-  }
-  if (!res.data) {
-    return <p>Loading...</p>;
-  }
-  const myRegistration = res.data.me.id === res.data.registration.user.id;
+  const myRegistration = queryData.me.id === queryData.registration.user.id;
   // TODO: better error message if the request fails because it is someone else's registration
   if (myRegistration) {
-    if (!res.data.registration.published) {
-      const title = `${res.data.registration.exam.name} -- Submission for ${res.data.registration.user.displayName}`;
+    if (!queryData.registration.published) {
+      const title = `${queryData.registration.exam.name} -- Submission for ${queryData.registration.user.displayName}`;
       return (
         <DocumentTitle title={title}>
-          <h1>{`Submission for ${res.data.registration.exam.name}`}</h1>
+          <h1>{`Submission for ${queryData.registration.exam.name}`}</h1>
           <p>Your submission is not yet graded, and cannot be viewed at this time.</p>
         </DocumentTitle>
       );
@@ -329,9 +344,21 @@ function round(value: number, places: number): number {
   return Math.round(value * multiplier) / multiplier;
 }
 
-const ExamSubmissionStudent: React.FC = () => {
+const ExamSubmissionStudent: React.FC = () => (
+  <ErrorBoundary>
+    <Suspense
+      fallback={
+        <p>Loading...</p>
+      }
+    >
+      <ExamSubmissionStudentQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const ExamSubmissionStudentQuery: React.FC = () => {
   const { registrationId } = useParams<{ registrationId: string }>();
-  const res = useQuery<submissionsStudentQuery>(
+  const queryData = useLazyLoadQuery<submissionsStudentQuery>(
     graphql`
     query submissionsStudentQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
@@ -351,13 +378,7 @@ const ExamSubmissionStudent: React.FC = () => {
     `,
     { registrationId, withRubric: false },
   );
-  if (res.error) {
-    return <RenderError error={res.error} />;
-  }
-  if (!res.data) {
-    return <p>Loading...</p>;
-  }
-  const { registration } = res.data;
+  const { registration } = queryData;
   const {
     exam,
     user,
@@ -383,9 +404,19 @@ const ExamSubmissionStudent: React.FC = () => {
   );
 };
 
-const ExamSubmissionStaff: React.FC = () => {
+const ExamSubmissionStaff: React.FC = () => (
+  <ErrorBoundary>
+    <Suspense
+      fallback={<p>Loading...</p>}
+    >
+      <ExamSubmissionStaffQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const ExamSubmissionStaffQuery: React.FC = () => {
   const { registrationId } = useParams<{ registrationId: string }>();
-  const res = useQuery<submissionsStaffQuery>(
+  const queryData = useLazyLoadQuery<submissionsStaffQuery>(
     graphql`
     query submissionsStaffQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
@@ -407,13 +438,7 @@ const ExamSubmissionStaff: React.FC = () => {
     { registrationId, withRubric: true },
   );
   const [title, setTitle] = useState<string>(undefined);
-  if (res.error) {
-    return <RenderError error={res.error} />;
-  }
-  if (!res.data) {
-    return <p>Loading...</p>;
-  }
-  const { registration } = res.data;
+  const { registration } = queryData;
   const {
     currentAnswers,
     currentGrading,

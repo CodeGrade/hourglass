@@ -1,4 +1,6 @@
 import React from 'react';
+import { Container } from 'react-bootstrap';
+import RegularNavbar from './navbar';
 
 export const RenderError: React.FC<{
   error: Error;
@@ -11,6 +13,7 @@ export const RenderError: React.FC<{
 
 interface ErrorState {
   error?: Error;
+  withNavbar?: boolean;
 }
 
 type ErrorProps = Record<string, unknown>;
@@ -29,7 +32,18 @@ export default class ErrorBoundary extends React.Component<ErrorProps, ErrorStat
 
   render(): React.ReactNode {
     const { error } = this.state;
+    const { withNavbar } = this.props;
     if (error) {
+      if (withNavbar) {
+        return (
+          <>
+            <RegularNavbar />
+            <Container>
+              <RenderError error={error} />
+            </Container>
+          </>
+        );
+      }
       return (
         <RenderError error={error} />
       );

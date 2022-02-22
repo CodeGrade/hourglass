@@ -21,7 +21,7 @@ import { openFullscreen } from '@student/exams/show/lockdown/helpers';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import ShowQuestion from '@student/exams/show/containers/ShowQuestion';
 import { BlockNav } from '@hourglass/workflows';
-import { useFragment, graphql } from 'relay-hooks';
+import { useFragment, graphql } from 'react-relay';
 
 import { ExamShowContents$key } from './__generated__/ExamShowContents.graphql';
 

@@ -12,8 +12,7 @@ import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
 import { CurrentGrading } from '@professor/exams/types';
 import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
-import { useFragment } from 'relay-hooks';
-import { graphql } from 'relay-runtime';
+import { graphql, useFragment } from 'react-relay';
 
 import { showExamViewer$key } from './__generated__/showExamViewer.graphql';
 
@@ -41,7 +40,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
       id
       answers
       ...DisplayQuestions
-      rootRubric @include(if: $withRubric) { ...ShowRubricKey } 
+      rootRubric @include(if: $withRubric) { ...ShowRubricKey }
       dbReferences {
         type
         path

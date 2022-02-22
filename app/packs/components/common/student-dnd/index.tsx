@@ -24,7 +24,7 @@ import {
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import { TabEditButton } from '@professor/exams/admin';
-import { useFragment, graphql, useMutation } from 'relay-hooks';
+import { useFragment, graphql, useMutation } from 'react-relay';
 import { studentDnd$key } from './__generated__/studentDnd.graphql';
 import { studentDndUpdateMutation } from './__generated__/studentDndUpdateMutation.graphql';
 
@@ -268,7 +268,7 @@ const StudentDNDForm: React.FC<
   const cancel = useCallback(() => {
     history.goBack();
   }, [history]);
-  const [mutate, { loading }] = useMutation<studentDndUpdateMutation>(
+  const [mutate, loading] = useMutation<studentDndUpdateMutation>(
     graphql`
     mutation studentDndUpdateMutation($input: UpdateStudentSeatingInput!, $withRubric: Boolean!) {
       updateStudentSeating(input: $input) {
@@ -278,24 +278,6 @@ const StudentDNDForm: React.FC<
       }
     }
     `,
-    {
-      onCompleted: () => {
-        history.push(`/exams/${examId}/admin/seating`);
-        alert({
-          variant: 'success',
-          autohide: true,
-          message: 'Room assignments successfully created.',
-        });
-      },
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Room assignments not created.',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
   );
   return (
     <form
@@ -318,6 +300,22 @@ const StudentDNDForm: React.FC<
               studentRoomUpdates: rooms,
             },
             withRubric: true,
+          },
+          onCompleted: () => {
+            history.push(`/exams/${examId}/admin/seating`);
+            alert({
+              variant: 'success',
+              autohide: true,
+              message: 'Room assignments successfully created.',
+            });
+          },
+          onError: (err) => {
+            alert({
+              variant: 'danger',
+              title: 'Room assignments not created.',
+              message: err.message,
+              copyButton: true,
+            });
           },
         });
       })}

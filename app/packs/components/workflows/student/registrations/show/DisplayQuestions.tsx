@@ -1,7 +1,7 @@
 import React from 'react';
 import ShowQuestion from '@proctor/registrations/show/ShowQuestion';
 import { CurrentGrading } from '@professor/exams/types';
-import { graphql, useFragment } from 'relay-hooks';
+import { graphql, useFragment } from 'react-relay';
 
 import { DisplayQuestions$key } from './__generated__/DisplayQuestions.graphql';
 

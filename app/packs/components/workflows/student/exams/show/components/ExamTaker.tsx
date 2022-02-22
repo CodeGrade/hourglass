@@ -6,7 +6,7 @@ import ExamShowContents from '@student/exams/show/containers/ExamShowContents';
 import PreStart from '@student/exams/show/containers/PreStart';
 import { Policy } from '@student/exams/show/types';
 import './ExamTaker.scss';
-import { useFragment, graphql } from 'relay-hooks';
+import { useFragment, graphql } from 'react-relay';
 
 import { ExamTaker$key } from './__generated__/ExamTaker.graphql';
 

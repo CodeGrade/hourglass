@@ -4,7 +4,7 @@ import AnomalousMessaging from '@student/exams/show/components/AnomalousMessagin
 import ErrorBoundary from '@hourglass/common/boundary';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { DateTime } from 'luxon';
-import { useFragment, graphql } from 'relay-hooks';
+import { useFragment, graphql } from 'react-relay';
 import { AllAlerts } from '@hourglass/common/alerts';
 
 import { PreStart$key } from './__generated__/PreStart.graphql';

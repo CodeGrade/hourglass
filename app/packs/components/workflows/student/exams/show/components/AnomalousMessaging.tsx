@@ -3,7 +3,7 @@ import { Card, Row, Col } from 'react-bootstrap';
 import AskQuestion from '@student/exams/show/components/navbar/AskQuestion';
 import { ShowExamMessages } from '@student/exams/show/components/navbar/ExamMessages';
 import { DateTime } from 'luxon';
-import { useFragment, graphql } from 'relay-hooks';
+import { useFragment, graphql } from 'react-relay';
 
 import { AnomalousMessaging$key } from './__generated__/AnomalousMessaging.graphql';
 

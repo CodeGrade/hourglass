@@ -2,8 +2,7 @@ import React from 'react';
 import { Container, Alert } from 'react-bootstrap';
 import RegularNavbar from '@hourglass/common/navbar';
 import { DateTime } from 'luxon';
-import { graphql } from 'react-relay';
-import { useFragment } from 'relay-hooks';
+import { graphql, useFragment } from 'react-relay';
 import ReadableDate from '@hourglass/common/ReadableDate';
 
 import { ExamSubmitted$key } from './__generated__/ExamSubmitted.graphql';

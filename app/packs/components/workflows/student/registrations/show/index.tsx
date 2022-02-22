@@ -11,8 +11,7 @@ import DisplayQuestions from '@student/registrations/show/DisplayQuestions';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
 import { CurrentGrading } from '@professor/exams/types';
-import { useFragment } from 'relay-hooks';
-import { graphql } from 'relay-runtime';
+import { useFragment, graphql } from 'react-relay';
 
 import { showExamViewerStudent$key } from './__generated__/showExamViewerStudent.graphql';
 

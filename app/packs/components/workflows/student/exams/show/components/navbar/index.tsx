@@ -21,7 +21,7 @@ import RenderIcon from '@student/exams/show/components/Icon';
 import { TimeInfo } from '@student/exams/show/types';
 import TimeRemaining from '@student/exams/show/components/navbar/TimeRemaining';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
-import { useFragment, graphql } from 'relay-hooks';
+import { useFragment, graphql } from 'react-relay';
 import Tooltip from '@student/exams/show/components/Tooltip';
 // eslint-disable-next-line no-restricted-imports
 import NavbarLogo from '../../../../../../../images/hourglass.svg';

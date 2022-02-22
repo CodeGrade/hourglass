@@ -12,15 +12,12 @@ import {
   Button,
   ButtonGroup,
 } from 'react-bootstrap';
-import {
-  graphql,
-  useMutation,
-} from 'relay-hooks';
+import { graphql } from 'react-relay';
 import { FaLock, FaBan } from 'react-icons/fa';
 import { useDebouncedCallback } from 'use-debounce';
 import Loading from '@hourglass/common/loading';
 import { ExamContext } from '@hourglass/common/context';
-import { MutationReturn } from '@hourglass/common/helpers';
+import { MutationReturn, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 import {
   MarkDescription,
@@ -59,7 +56,7 @@ export const languages = {
 
 export function useCreateCodeMutation(): MutationReturn<CodeCreateMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<CodeCreateMutation>(
+  return useMutationWithDefaults<CodeCreateMutation>(
     graphql`
     mutation CodeCreateMutation($input: CreateCodeInput!) {
       createCode(input: $input) {
@@ -88,7 +85,7 @@ export function useCreateCodeMutation(): MutationReturn<CodeCreateMutation> {
 
 function useChangeCodeMutation(): MutationReturn<CodeChangeMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<CodeChangeMutation>(
+  return useMutationWithDefaults<CodeChangeMutation>(
     graphql`
     mutation CodeChangeMutation($input: ChangeCodeDetailsInput!) {
       changeCodeDetails(input: $input) {
@@ -402,7 +399,7 @@ const Code: React.FC<{
     answer,
     disabled: parentDisabled = false,
   } = props;
-  const [mutate, { loading }] = useChangeCodeMutation();
+  const [mutate, loading] = useChangeCodeMutation();
   const updatePrompt = useCallback((newPrompt: HTMLVal) => {
     mutate({
       variables: {

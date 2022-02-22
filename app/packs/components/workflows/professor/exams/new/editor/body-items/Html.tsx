@@ -1,9 +1,6 @@
 import React, { useCallback, useContext } from 'react';
-import {
-  graphql,
-  useMutation,
-} from 'relay-hooks';
-import { MutationReturn } from '@hourglass/common/helpers';
+import { graphql } from 'react-relay';
+import { MutationReturn, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 import { HTMLVal } from '@student/exams/show/types';
 import { EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
@@ -14,7 +11,7 @@ import { HtmlChangeMutation } from './__generated__/HtmlChangeMutation.graphql';
 // eslint-disable-next-line import/prefer-default-export
 export function useCreateHtmlMutation(): MutationReturn<HtmlCreateMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<HtmlCreateMutation>(
+  return useMutationWithDefaults<HtmlCreateMutation>(
     graphql`
     mutation HtmlCreateMutation($input: CreateHtmlInput!) {
       createHtml(input: $input) {
@@ -43,7 +40,7 @@ export function useCreateHtmlMutation(): MutationReturn<HtmlCreateMutation> {
 
 function useChangeHtmlMutation(): MutationReturn<HtmlChangeMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<HtmlChangeMutation>(
+  return useMutationWithDefaults<HtmlChangeMutation>(
     graphql`
     mutation HtmlChangeMutation($input: ChangeHtmlDetailsInput!) {
       changeHtmlDetails(input: $input) {
@@ -77,7 +74,7 @@ const Html: React.FC<{
     info,
     disabled: parentDisabled = false,
   } = props;
-  const [mutate, { loading }] = useChangeHtmlMutation();
+  const [mutate, loading] = useChangeHtmlMutation();
   const updatePrompt = useCallback((newVal: HTMLVal) => {
     mutate({
       variables: {

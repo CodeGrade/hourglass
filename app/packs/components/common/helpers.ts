@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import {
-  MutateWithVariables,
-  MutationState,
-} from 'relay-hooks';
 import { MutationParameters } from 'relay-runtime';
 import { HTMLVal } from '@student/exams/show/types';
+import {
+  Disposable,
+  GraphQLTaggedNode,
+  useMutation,
+  UseMutationConfig,
+} from 'react-relay';
 
 /**
  * Error to throw in the default case of an exhaustive `switch` statement.
@@ -62,6 +64,21 @@ export type SelectOption<T> = {
 
 export type SelectOptions<T> = SelectOption<T>[];
 
+type MutateWithVariables<T extends MutationParameters> =
+  (config: UseMutationConfig<T>) => Disposable;
+
 export type MutationReturn<T extends MutationParameters> = [
-  MutateWithVariables<T>, MutationState<T>
+  MutateWithVariables<T>, boolean
 ];
+
+export function useMutationWithDefaults<TMutation extends MutationParameters>(
+  gql: GraphQLTaggedNode,
+  defaults: Partial<UseMutationConfig<TMutation>>,
+): MutationReturn<TMutation> {
+  const [mutate, loading] = useMutation<TMutation>(gql);
+  const mutateWithDefaults = (config: UseMutationConfig<TMutation>) => mutate({
+    ...defaults,
+    ...config,
+  });
+  return [mutateWithDefaults, loading];
+}

@@ -18,10 +18,7 @@ import {
   Button,
   ButtonGroup,
 } from 'react-bootstrap';
-import {
-  graphql,
-  useMutation,
-} from 'relay-hooks';
+import { graphql } from 'react-relay';
 import { ControlledFileViewer } from '@student/exams/show/components/FileViewer';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { getFilesForRefs, countFiles } from '@student/exams/show/files';
@@ -33,14 +30,19 @@ import {
   PartFilesContext,
 } from '@hourglass/common/context';
 import { AlertContext } from '@hourglass/common/alerts';
-import { ExhaustiveSwitchError, MutationReturn, useRefresher } from '@hourglass/common/helpers';
+import {
+  ExhaustiveSwitchError,
+  MutationReturn,
+  useMutationWithDefaults,
+  useRefresher,
+} from '@hourglass/common/helpers';
 
 import { CodeTagCreateMutation } from './__generated__/CodeTagCreateMutation.graphql';
 import { CodeTagChangeMutation } from './__generated__/CodeTagChangeMutation.graphql';
 
 export function useCreateCodeTagMutation(): MutationReturn<CodeTagCreateMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<CodeTagCreateMutation>(
+  return useMutationWithDefaults<CodeTagCreateMutation>(
     graphql`
     mutation CodeTagCreateMutation($input: CreateCodeTagInput!) {
       createCodeTag(input: $input) {
@@ -69,7 +71,7 @@ export function useCreateCodeTagMutation(): MutationReturn<CodeTagCreateMutation
 
 function useChangeCodeTagMutation(): MutationReturn<CodeTagChangeMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<CodeTagChangeMutation>(
+  return useMutationWithDefaults<CodeTagChangeMutation>(
     graphql`
     mutation CodeTagChangeMutation($input: ChangeCodeTagDetailsInput!) {
       changeCodeTagDetails(input: $input) {
@@ -345,7 +347,7 @@ const CodeTag: React.FC<{
     answer,
     disabled: parentDisabled = false,
   } = props;
-  const [mutate, { loading }] = useChangeCodeTagMutation();
+  const [mutate, loading] = useChangeCodeTagMutation();
   const updatePrompt = useCallback((newPrompt: HTMLVal) => {
     mutate({
       variables: {

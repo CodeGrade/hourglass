@@ -10,10 +10,7 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
-import {
-  graphql,
-  useMutation,
-} from 'relay-hooks';
+import { graphql } from 'react-relay';
 import {
   Select,
   SelectProps,
@@ -22,7 +19,7 @@ import {
   MenuItem,
 } from '@material-ui/core';
 import { HTMLVal, MatchingInfo } from '@student/exams/show/types';
-import { alphabetIdx, MutationReturn } from '@hourglass/common/helpers';
+import { alphabetIdx, MutationReturn, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 import {
   arrSplice,
@@ -39,7 +36,7 @@ import { MatchingChangeMutation } from './__generated__/MatchingChangeMutation.g
 
 export function useCreateMatchingMutation(): MutationReturn<MatchingCreateMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<MatchingCreateMutation>(
+  return useMutationWithDefaults<MatchingCreateMutation>(
     graphql`
     mutation MatchingCreateMutation($input: CreateMatchingInput!) {
       createMatching(input: $input) {
@@ -68,7 +65,7 @@ export function useCreateMatchingMutation(): MutationReturn<MatchingCreateMutati
 
 function useChangeMatchingMutation(): MutationReturn<MatchingChangeMutation> {
   const { alert } = useContext(AlertContext);
-  return useMutation<MatchingChangeMutation>(
+  return useMutationWithDefaults<MatchingChangeMutation>(
     graphql`
     mutation MatchingChangeMutation($input: ChangeMatchingDetailsInput!) {
       changeMatchingDetails(input: $input) {
@@ -371,7 +368,7 @@ const Matching: React.FC<{
   });
   const [curAnswer, setCurAnswer] = useState(answer);
   useEffect(() => setCurAnswer(answer), [answer]);
-  const [mutate, { loading }] = useChangeMatchingMutation();
+  const [mutate, loading] = useChangeMatchingMutation();
   const updateItemPrompt = useCallback((newPrompt: HTMLVal) => {
     mutate({
       variables: {

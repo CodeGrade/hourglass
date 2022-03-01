@@ -11,10 +11,7 @@ import {
   Col,
   Button,
 } from 'react-bootstrap';
-import {
-  graphql,
-  useMutation,
-} from 'react-relay';
+import { graphql } from 'react-relay';
 import { FaCheck } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import Icon from '@student/exams/show/components/Icon';

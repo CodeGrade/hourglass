@@ -24,15 +24,17 @@ interface DateTimeProps {
 }
 
 function mergeDateTime(date: DateTime, time: DateTime): DateTime {
-  return DateTime.fromObject({
-    ...date.toObject(),
-    hour: time.hour,
-    minute: time.minute,
-    second: time.second,
-  },
-  {
-    zone: time.zone,
-  });
+  return DateTime.fromObject(
+    {
+      ...date.toObject(),
+      hour: time.hour,
+      minute: time.minute,
+      second: time.second,
+    },
+    {
+      zone: time.zone,
+    },
+  );
 }
 
 const timeZones = {
@@ -109,13 +111,15 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
               if (onChange) {
                 onChange(mergeDateTime(
                   value ?? DateTime.local(),
-                  DateTime.fromObject({
-                    hour: time.hour,
-                    minute: time.minute,
-                  },
-                  {
-                    zone: (value ?? DateTime.local()).zone,
-                  }),
+                  DateTime.fromObject(
+                    {
+                      hour: time.hour,
+                      minute: time.minute,
+                    },
+                    {
+                      zone: (value ?? DateTime.local()).zone,
+                    },
+                  ),
                 ));
               }
             }}

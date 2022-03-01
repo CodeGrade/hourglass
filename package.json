@@ -110,7 +110,7 @@
     "@webpack-cli/serve": "^1.6.0",
     "@welldone-software/why-did-you-render": "^6.2.1",
     "eslint": "^8.0.1",
-    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-import-resolver-webpack": "^0.13.1",
     "eslint-plugin-import": "~2.25.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",

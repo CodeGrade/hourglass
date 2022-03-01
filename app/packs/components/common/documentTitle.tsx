@@ -10,6 +10,7 @@ const DocumentTitle: React.FC<{
   useEffect(() => {
     document.title = title;
   }, [title]);
+  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{children}</>;
 };
 

@@ -837,13 +837,11 @@ const RubricPresetDirectionEditor: React.FC<{
     });
   }, [rubricPreset.id]);
   return (
-    <>
-      <ChangeRubricPresetDirection
-        value={rubricPreset.direction}
-        onChange={handleChange}
-        disabled={loading || disabled}
-      />
-    </>
+    <ChangeRubricPresetDirection
+      value={rubricPreset.direction}
+      onChange={handleChange}
+      disabled={loading || disabled}
+    />
   );
 };
 

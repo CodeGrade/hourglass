@@ -367,21 +367,19 @@ const SetInitial: React.FC<{
         />
       )}
       {initial && 'file' in initial && (
-        <>
-          <FilePickerSelectWithPreview
-            options={files}
-            selected={[{
-              type: 'file',
-              path: initial.file,
-            }]}
-            onChange={(arr): void => {
-              const lastSelected = arr[arr.length - 1];
-              if (!lastSelected) return;
-              if (lastSelected.type === 'dir') return;
-              onChangeInitial({ file: lastSelected.path });
-            }}
-          />
-        </>
+        <FilePickerSelectWithPreview
+          options={files}
+          selected={[{
+            type: 'file',
+            path: initial.file,
+          }]}
+          onChange={(arr): void => {
+            const lastSelected = arr[arr.length - 1];
+            if (!lastSelected) return;
+            if (lastSelected.type === 'dir') return;
+            onChangeInitial({ file: lastSelected.path });
+          }}
+        />
       )}
     </Loading>
   );

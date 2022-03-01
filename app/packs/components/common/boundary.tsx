@@ -47,11 +47,9 @@ export default class ErrorBoundary extends React.Component<ErrorProps, ErrorStat
       }
       if (withContainer) {
         return (
-          <>
-            <Container>
-              <RenderError error={error} />
-            </Container>
-          </>
+          <Container>
+            <RenderError error={error} />
+          </Container>
         );
       }
       return (

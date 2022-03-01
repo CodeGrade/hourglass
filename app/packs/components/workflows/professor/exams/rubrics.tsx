@@ -119,8 +119,8 @@ export function deepDiff(v1 : unknown, v2 : unknown): unknown {
         diffs[i] = diff;
       }
       if (diffs.length === 0) return undefined;
-      return diffs;
     }
+    return diffs;
   }
   if (v1 instanceof Object && v2 instanceof Object) {
     const keys1: string[] = Object.keys(v1);

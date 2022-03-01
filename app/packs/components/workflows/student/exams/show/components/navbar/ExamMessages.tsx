@@ -13,9 +13,14 @@ import {
   useFragment,
   graphql,
   useSubscription,
-  useRelayEnvironment,
-} from 'relay-hooks';
-import { GraphQLSubscriptionConfig, requestSubscription, OperationType } from 'relay-runtime';
+} from 'react-relay';
+import {
+  graphql as rrgraphql,
+  GraphQLSubscriptionConfig,
+  requestSubscription,
+  OperationType,
+} from 'relay-runtime';
+import relayEnvironment from '@hourglass/relay/environment';
 
 import { ExamMessages_all$key } from './__generated__/ExamMessages_all.graphql';
 import { ExamMessages_navbar$key } from './__generated__/ExamMessages_navbar.graphql';
@@ -104,7 +109,7 @@ const versionAnnouncementReceivedSpec = graphql`
   }
 `;
 
-const roomAnnouncementReceivedSpec = graphql`
+const roomAnnouncementReceivedSpec = rrgraphql`
   subscription ExamMessagesNewRoomAnnouncementSubscription($roomId: ID!) {
     roomAnnouncementReceived(roomId: $roomId) {
       roomAnnouncement {
@@ -125,15 +130,13 @@ function useConditionalSubscription<TSubscriptionPayload extends OperationType>(
   config: GraphQLSubscriptionConfig<TSubscriptionPayload>,
   condition: boolean,
 ): void {
-  const environment = useRelayEnvironment();
-
   useEffect(() => {
     if (condition) {
-      const { dispose } = requestSubscription(environment, config);
+      const { dispose } = requestSubscription(relayEnvironment, config);
       return dispose;
     }
     return () => undefined;
-  }, [condition, environment, config]);
+  }, [condition, relayEnvironment, config]);
 }
 
 export const ShowExamMessages: React.FC<{

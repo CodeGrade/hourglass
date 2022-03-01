@@ -34,7 +34,7 @@ import Home from '@hourglass/workflows/home';
 import Grading from '@grading/index';
 import DocumentTitle from '@hourglass/common/documentTitle';
 
-import { RelayEnvironmentProvider } from 'relay-hooks';
+import { RelayEnvironmentProvider } from 'react-relay';
 import environment from '@hourglass/relay/environment';
 import FourOhFour from './FourOhFour';
 

@@ -14,6 +14,7 @@ export const RenderError: React.FC<{
 interface ErrorState {
   error?: Error;
   withNavbar?: boolean;
+  withContainer?: boolean;
 }
 
 type ErrorProps = Record<string, unknown>;
@@ -32,12 +33,21 @@ export default class ErrorBoundary extends React.Component<ErrorProps, ErrorStat
 
   render(): React.ReactNode {
     const { error } = this.state;
-    const { withNavbar } = this.props;
+    const { withNavbar, withContainer } = this.props;
     if (error) {
       if (withNavbar) {
         return (
           <>
             <RegularNavbar />
+            <Container>
+              <RenderError error={error} />
+            </Container>
+          </>
+        );
+      }
+      if (withContainer) {
+        return (
+          <>
             <Container>
               <RenderError error={error} />
             </Container>

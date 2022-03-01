@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { graphql, useFragment } from 'relay-hooks';
+import { graphql, useFragment } from 'react-relay';
 import { ExamViewerContext } from '@hourglass/common/context';
 import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';

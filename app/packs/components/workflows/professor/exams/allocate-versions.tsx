@@ -23,7 +23,8 @@ import {
   Route,
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import { useFragment, graphql, useMutation } from 'relay-hooks';
+import { useFragment, graphql } from 'react-relay';
+import { useMutationWithDefaults } from '@hourglass/common/helpers';
 
 import { TabEditButton } from './admin';
 import { allocateVersions$key, allocateVersions } from './__generated__/allocateVersions.graphql';
@@ -242,7 +243,7 @@ const StudentDNDForm: React.FC<
   const cancel = useCallback(() => {
     history.goBack();
   }, [history]);
-  const [mutate, { loading }] = useMutation<allocateVersionsMutation>(
+  const [mutate, loading] = useMutationWithDefaults<allocateVersionsMutation>(
     graphql`
     mutation allocateVersionsMutation($input: UpdateVersionRegistrationsInput!, $withRubric: Boolean!) {
       updateVersionRegistrations(input: $input) {

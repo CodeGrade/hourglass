@@ -17,7 +17,7 @@ import {
 } from 'react-bootstrap';
 import HTML from '@student/exams/show/components/HTML';
 import Icon from '@student/exams/show/components/Icon';
-import { graphql, useFragment } from 'relay-hooks';
+import { graphql, useFragment } from 'react-relay';
 import { variantForPoints, iconForPoints } from '@grading/index';
 import { FaChevronUp, FaChevronDown } from 'react-icons/fa';
 import { ShowPresetSummary } from '@grading/UseRubrics';

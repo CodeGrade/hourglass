@@ -16,7 +16,6 @@ import {
   useRelayEnvironment,
 } from 'react-relay';
 import {
-  graphql as rrgraphql,
   GraphQLSubscriptionConfig,
   requestSubscription,
   OperationType,
@@ -109,7 +108,7 @@ const versionAnnouncementReceivedSpec = graphql`
   }
 `;
 
-const roomAnnouncementReceivedSpec = rrgraphql`
+const roomAnnouncementReceivedSpec = graphql`
   subscription ExamMessagesNewRoomAnnouncementSubscription($roomId: ID!) {
     roomAnnouncementReceived(roomId: $roomId) {
       roomAnnouncement {

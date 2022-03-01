@@ -23,7 +23,8 @@ import {
   Route,
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import { useFragment, graphql, useMutation } from 'relay-hooks';
+import { useFragment, graphql } from 'react-relay';
+import { useMutationWithDefaults } from '@hourglass/common/helpers';
 import { TabEditButton } from '@professor/exams/admin';
 
 import { assignStaff, assignStaff$key } from './__generated__/assignStaff.graphql';
@@ -253,7 +254,7 @@ const StaffSeatingForm: React.FC<
   const cancel = useCallback(() => {
     history.goBack();
   }, [history]);
-  const [mutate, { loading }] = useMutation<assignStaffUpdateMutation>(
+  const [mutate, loading] = useMutationWithDefaults<assignStaffUpdateMutation>(
     graphql`
     mutation assignStaffUpdateMutation($input: UpdateStaffSeatingInput!, $withRubric: Boolean!) {
       updateStaffSeating(input: $input) {

@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
-import { useMutation, graphql } from 'relay-hooks';
+import { graphql } from 'react-relay';
+import { useMutationWithDefaults } from '@hourglass/common/helpers';
 import { DateTime } from 'luxon';
 import { ExamInfoEditor } from '@professor/exams/admin';
 import { newExamMutation } from './__generated__/newExamMutation.graphql';
@@ -12,7 +13,7 @@ const NewExamForm: React.FC<{
   const { courseId } = props;
   const { alert } = useContext(AlertContext);
   const history = useHistory();
-  const [mutate, { loading }] = useMutation<newExamMutation>(
+  const [mutate, loading] = useMutationWithDefaults<newExamMutation>(
     graphql`
     mutation newExamMutation($input: CreateExamInput!) {
       createExam(input: $input) {

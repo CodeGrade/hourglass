@@ -28,7 +28,8 @@ import store from '@hourglass/common/student-dnd/store';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { TabEditButton } from '@professor/exams/admin';
-import { useMutation, graphql, useFragment } from 'relay-hooks';
+import { graphql, useFragment } from 'react-relay';
+import { useMutationWithDefaults } from '@hourglass/common/helpers';
 
 import { roomsIndex, roomsIndex$key } from './__generated__/roomsIndex.graphql';
 import { roomsUpdateMutation } from './__generated__/roomsUpdateMutation.graphql';
@@ -276,7 +277,7 @@ const ExamRoomsForm: React.FC<
   const cancel = useCallback(() => {
     history.goBack();
   }, [history]);
-  const [mutate, { loading }] = useMutation<roomsUpdateMutation>(
+  const [mutate, loading] = useMutationWithDefaults<roomsUpdateMutation>(
     graphql`
     mutation roomsUpdateMutation($input: UpdateExamRoomsInput!, $withRubric: Boolean!) {
       updateExamRooms(input: $input) {

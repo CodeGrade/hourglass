@@ -5,9 +5,9 @@ import React, {
 } from 'react';
 import {
   graphql,
-  useMutation,
   useFragment,
-} from 'relay-hooks';
+} from 'react-relay';
+import { useMutationWithDefaults } from '@hourglass/common/helpers';
 import {
   Button,
   Card,
@@ -55,7 +55,7 @@ export const ReorderableQuestionsEditor: React.FC<{
     showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<QuestionReorderMutation>(
+  const [mutate, loading] = useMutationWithDefaults<QuestionReorderMutation>(
     graphql`
     mutation QuestionReorderMutation($input: ReorderQuestionsInput!) {
       reorderQuestions(input: $input) {
@@ -158,8 +158,8 @@ export const OneQuestion: React.FC<{
   );
   const [
     mutateDestroyQuestion,
-    { loading: loadingDestroyQuestion },
-  ] = useMutation<QuestionDestroyMutation>(
+    loadingDestroyQuestion,
+  ] = useMutationWithDefaults<QuestionDestroyMutation>(
     graphql`
     mutation QuestionDestroyMutation($input: DestroyQuestionInput!) {
       destroyQuestion(input: $input) {
@@ -185,8 +185,8 @@ export const OneQuestion: React.FC<{
   );
   const [
     mutateUpdateQuestion,
-    { loading: loadingUpdateQuestion },
-  ] = useMutation<QuestionChangeMutation>(
+    loadingUpdateQuestion,
+  ] = useMutationWithDefaults<QuestionChangeMutation>(
     graphql`
     mutation QuestionChangeMutation($input: ChangeQuestionDetailsInput!) {
       changeQuestionDetails(input: $input) {
@@ -224,8 +224,8 @@ export const OneQuestion: React.FC<{
   );
   const [
     mutateCreatePart,
-    { loading: loadingCreatePart },
-  ] = useMutation<QuestionCreatePartMutation>(
+    loadingCreatePart,
+  ] = useMutationWithDefaults<QuestionCreatePartMutation>(
     graphql`
     mutation QuestionCreatePartMutation($input: CreatePartInput!) {
       createPart(input: $input) {

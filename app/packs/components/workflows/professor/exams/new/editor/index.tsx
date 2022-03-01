@@ -3,6 +3,7 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  Suspense,
 } from 'react';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
@@ -14,11 +15,10 @@ import {
 } from '@student/exams/show/types';
 import {
   graphql,
-  useQuery,
-  useMutation,
-} from 'relay-hooks';
-
-import { RenderError } from '@hourglass/common/boundary';
+  useLazyLoadQuery,
+} from 'react-relay';
+import { useMutationWithDefaults } from '@hourglass/common/helpers';
+import ErrorBoundary from '@hourglass/common/boundary';
 import {
   Button,
   Card,
@@ -43,9 +43,19 @@ import { editorChangeFilesMutation } from './__generated__/editorChangeFilesMuta
 import { editorQuery } from './__generated__/editorQuery.graphql';
 import { DebouncedFormControl } from './components/helpers';
 
-const ExamVersionEditor: React.FC = () => {
+const ExamVersionEditor: React.FC = () => (
+  <ErrorBoundary withContainer>
+    <Suspense
+      fallback={<Container><p>Loading...</p></Container>}
+    >
+      <ExamVersionEditorQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const ExamVersionEditorQuery: React.FC = () => {
   const { versionId: examVersionId } = useParams<{ versionId: string }>();
-  const res = useQuery<editorQuery>(
+  const data = useLazyLoadQuery<editorQuery>(
     graphql`
     query editorQuery($examVersionId: ID!) {
       examVersion(id: $examVersionId) {
@@ -77,8 +87,8 @@ const ExamVersionEditor: React.FC = () => {
   const { alert } = useContext(AlertContext);
   const [
     mutateUpdateExamVersion,
-    { loading: loadingUpdateExamVersion },
-  ] = useMutation<editorChangeMutation>(
+    loadingUpdateExamVersion,
+  ] = useMutationWithDefaults<editorChangeMutation>(
     graphql`
     mutation editorChangeMutation($input: ChangeExamVersionDetailsInput!) {
       changeExamVersionDetails(input: $input) {
@@ -114,8 +124,8 @@ const ExamVersionEditor: React.FC = () => {
   // compared to the other necessary data
   const [
     mutateUpdateExamVersionFiles,
-    { loading: loadingUpdateExamVersionFiles },
-  ] = useMutation<editorChangeFilesMutation>(
+    loadingUpdateExamVersionFiles,
+  ] = useMutationWithDefaults<editorChangeFilesMutation>(
     graphql`
     mutation editorChangeFilesMutation($input: ChangeExamVersionDetailsInput!) {
       changeExamVersionDetails(input: $input) {
@@ -209,8 +219,8 @@ const ExamVersionEditor: React.FC = () => {
 
   const [
     mutateCreateQuestion,
-    { loading: loadingCreateQuestion },
-  ] = useMutation<editorCreateQuestionMutation>(
+    loadingCreateQuestion,
+  ] = useMutationWithDefaults<editorCreateQuestionMutation>(
     graphql`
     mutation editorCreateQuestionMutation($input: CreateQuestionInput!) {
       createQuestion(input: $input) {
@@ -250,26 +260,20 @@ const ExamVersionEditor: React.FC = () => {
       title: 'Students have already started taking this version',
       message: 'Changing the questions will likely result in nonsensical answers, and changing the structure of this version will result in undefined behavior. Be careful!',
     },
-    res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized,
-    [res.data?.examVersion?.anyStarted || res.data?.examVersion?.anyFinalized],
+    data.examVersion.anyStarted || data.examVersion.anyFinalized,
+    [data.examVersion.anyStarted || data.examVersion.anyFinalized],
   );
   const [showRubrics, setShowRubrics] = useState(false);
-  const files = (res?.data?.examVersion?.files as ExamFile[]) ?? [];
+  const files = (data.examVersion.files as ExamFile[]) ?? [];
   const contextVal = useMemo(() => ({
     files,
     fmap: createMap(files),
   }), [files]);
-  const references = res?.data?.examVersion?.dbReferences ?? [];
+  const references = data.examVersion.dbReferences ?? [];
   const examReference = useMemo(() => ({
     references,
   }), [files]);
-  if (res.error) {
-    return <Container><RenderError error={res.error} /></Container>;
-  }
-  if (!res.data) {
-    return <Container><p>Loading...</p></Container>;
-  }
-  const { examVersion } = res.data;
+  const { examVersion } = data;
   const { rootRubric, dbQuestions, policies } = examVersion;
 
   const disabled = (

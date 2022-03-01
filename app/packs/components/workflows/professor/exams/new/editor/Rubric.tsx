@@ -2,11 +2,7 @@ import React, {
   useCallback,
   useContext,
 } from 'react';
-import {
-  graphql,
-  useMutation,
-  useFragment,
-} from 'relay-hooks';
+import { graphql, useFragment } from 'react-relay';
 import {
   Button,
   ButtonGroup,
@@ -21,7 +17,7 @@ import {
 import Select from 'react-select';
 
 import { AlertContext } from '@hourglass/common/alerts';
-import { SelectOption, MutationReturn } from '@hourglass/common/helpers';
+import { SelectOption, MutationReturn, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import Loading from '@hourglass/common/loading';
 import { HTMLVal } from '@student/exams/show/types';
@@ -169,7 +165,7 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
     isDragging = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricDestroyMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricDestroyMutation>(
     graphql`
     mutation RubricDestroyMutation($input: DestroyRubricInput!) {
       destroyRubric(input: $input) {
@@ -359,7 +355,7 @@ const ReordorableRubricEditor: React.FC<{
     disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricReorderMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricReorderMutation>(
     graphql`
     mutation RubricReorderMutation($input: ReorderRubricsInput!) {
       reorderRubrics(input: $input) {
@@ -426,7 +422,7 @@ const ReorderablePresetCommentEditor: React.FC<{
   } = props;
   const { presets } = rubricPreset;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricReorderPresetCommentMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricReorderPresetCommentMutation>(
     graphql`
     mutation RubricReorderPresetCommentMutation($input: ReorderPresetCommentsInput!) {
       reorderPresetComments(input: $input) {
@@ -537,7 +533,7 @@ const RubricEntriesEditor: React.FC<{
 
 function useCreateRubricMutation(): MutationReturn<RubricCreateMutation> {
   const { alert } = useContext(AlertContext);
-  const results = useMutation<RubricCreateMutation>(
+  const results = useMutationWithDefaults<RubricCreateMutation>(
     graphql`
     mutation RubricCreateMutation($input: CreateRubricInput!) {
       createRubric(input: $input) {
@@ -625,12 +621,12 @@ const CreateRubricItemDropdown: React.FC<{
     parentSectionId,
     disabled = false,
   } = props;
-  const [sectionMutate, { loading: sectionLoading }] = useCreateRubricMutation();
+  const [sectionMutate, sectionLoading] = useCreateRubricMutation();
   const { alert } = useContext(AlertContext);
   const [
     presetCommentMutate,
-    { loading: presetCommentLoading },
-  ] = useMutation<RubricCreateRubricPresetMutation>(
+    presetCommentLoading,
+  ] = useMutationWithDefaults<RubricCreateRubricPresetMutation>(
     graphql`
     mutation RubricCreateRubricPresetMutation($input: CreateRubricPresetInput!) {
       createRubricPreset(input: $input) {
@@ -716,7 +712,7 @@ const CreateRubricSectionButton: React.FC<{
     parentSectionId,
     disabled = false,
   } = props;
-  const [mutate, { loading }] = useCreateRubricMutation();
+  const [mutate, loading] = useCreateRubricMutation();
   return (
     <Row className="text-center">
       <Col>
@@ -748,7 +744,7 @@ const CreatePresetCommentButton: React.FC<{
     rubricPresetId,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricCreatePresetCommentMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricCreatePresetCommentMutation>(
     graphql`
     mutation RubricCreatePresetCommentMutation($input: CreatePresetCommentInput!) {
       createPresetComment(input: $input) {
@@ -807,7 +803,7 @@ const RubricPresetDirectionEditor: React.FC<{
     disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricChangeRubricPresetDirectionMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricChangeRubricPresetDirectionMutation>(
     graphql`
     mutation RubricChangeRubricPresetDirectionMutation($input: ChangeRubricPresetDetailsInput!) {
       changeRubricPresetDetails(input: $input) {
@@ -864,7 +860,7 @@ const RubricPresetEditor: React.FC<{
     handleRef,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricDestroyPresetCommentMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricDestroyPresetCommentMutation>(
     graphql`
     mutation RubricDestroyPresetCommentMutation($input: DestroyPresetCommentInput!) {
       destroyPresetComment(input: $input) {
@@ -968,7 +964,7 @@ const PresetCommentLabelEditor: React.FC<{
     disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricChangePresetCommentLabelMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricChangePresetCommentLabelMutation>(
     graphql`
     mutation RubricChangePresetCommentLabelMutation($input: ChangePresetCommentDetailsInput!) {
       changePresetCommentDetails(input: $input) {
@@ -1020,7 +1016,7 @@ const PresetCommentGraderHintEditor: React.FC<{
     disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricChangePresetCommentGraderHintMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricChangePresetCommentGraderHintMutation>(
     graphql`
     mutation RubricChangePresetCommentGraderHintMutation($input: ChangePresetCommentDetailsInput!) {
       changePresetCommentDetails(input: $input) {
@@ -1072,7 +1068,9 @@ const PresetCommentStudentFeedbackEditor: React.FC<{
     disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricChangePresetCommentStudentFeedbackMutation>(
+  const [mutate, loading] = useMutationWithDefaults<
+    RubricChangePresetCommentStudentFeedbackMutation
+  >(
     graphql`
     mutation RubricChangePresetCommentStudentFeedbackMutation($input: ChangePresetCommentDetailsInput!) {
       changePresetCommentDetails(input: $input) {
@@ -1171,7 +1169,7 @@ const RubricPresetLabelEditor: React.FC<{
     disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricChangeRubricPresetLabelMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricChangeRubricPresetLabelMutation>(
     graphql`
     mutation RubricChangeRubricPresetLabelMutation($input: ChangeRubricPresetDetailsInput!) {
       changeRubricPresetDetails(input: $input) {
@@ -1224,7 +1222,7 @@ const RubricTypeEditor: React.FC<{
     disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricChangeTypeMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricChangeTypeMutation>(
     graphql`
     mutation RubricChangeTypeMutation($input: ChangeRubricTypeInput!) {
       changeRubricType(input: $input) {
@@ -1342,7 +1340,7 @@ const RubricDescriptionEditor: React.FC<{
   } = props;
   const { description = { type: 'HTML', value: '' } } = rubric;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricChangeDetailsDescriptionMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricChangeDetailsDescriptionMutation>(
     graphql`
     mutation RubricChangeDetailsDescriptionMutation($input: ChangeRubricDetailsInput!) {
       changeRubricDetails(input: $input) {
@@ -1399,7 +1397,7 @@ const PresetPointsEditor: React.FC<{
     disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricChangePresetCommentPointsMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricChangePresetCommentPointsMutation>(
     graphql`
     mutation RubricChangePresetCommentPointsMutation($input: ChangePresetCommentDetailsInput!) {
       changePresetCommentDetails(input: $input) {
@@ -1452,7 +1450,7 @@ const RubricPointsEditor: React.FC<{
     disabled = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<RubricChangeDetailsPointsMutation>(
+  const [mutate, loading] = useMutationWithDefaults<RubricChangeDetailsPointsMutation>(
     graphql`
     mutation RubricChangeDetailsPointsMutation($input: ChangeRubricDetailsInput!) {
       changeRubricDetails(input: $input) {

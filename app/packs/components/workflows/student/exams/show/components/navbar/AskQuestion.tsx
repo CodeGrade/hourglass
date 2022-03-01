@@ -15,12 +15,11 @@ import TooltipButton from '@student/exams/show/components/TooltipButton';
 import {
   useFragment,
   graphql,
-  useMutation,
-  usePagination,
-} from 'relay-hooks';
+  usePaginationFragment,
+} from 'react-relay';
 import { DateTime } from 'luxon';
 import { AlertContext } from '@hourglass/common/alerts';
-import { pluralize } from '@hourglass/common/helpers';
+import { pluralize, useMutationWithDefaults } from '@hourglass/common/helpers';
 
 import { AskQuestion$key } from './__generated__/AskQuestion.graphql';
 import { AskQuestion_single$key } from './__generated__/AskQuestion_single.graphql';
@@ -80,7 +79,7 @@ const SendQuestion: React.FC<{
     return undefined;
   }, [inTimeout]);
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<AskQuestionMutation>(
+  const [mutate, loading] = useMutationWithDefaults<AskQuestionMutation>(
     graphql`
     mutation AskQuestionMutation($input: AskQuestionInput!) {
       askQuestion(input: $input) {
@@ -175,10 +174,10 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
   const { alert } = useContext(AlertContext);
   const {
     data,
-    isLoading,
+    isLoadingNext,
     hasNext,
     loadNext,
-  } = usePagination(
+  } = usePaginationFragment(
     graphql`
     fragment AskQuestion on Exam
     @argumentDefinitions(
@@ -225,7 +224,7 @@ const AskQuestion: React.FC<AskQuestionProps> = (props) => {
           <li className="text-center">
             <Button
               onClick={() => {
-                if (!hasNext || isLoading) return;
+                if (!hasNext || isLoadingNext) return;
                 loadNext(
                   10,
                   {

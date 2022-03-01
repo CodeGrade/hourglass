@@ -2,11 +2,7 @@ import React, {
   useCallback,
   useContext,
 } from 'react';
-import {
-  graphql,
-  useMutation,
-  useFragment,
-} from 'relay-hooks';
+import { graphql, useFragment } from 'react-relay';
 import {
   Card,
   Col,
@@ -14,7 +10,7 @@ import {
 } from 'react-bootstrap';
 import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import { AlertContext } from '@hourglass/common/alerts';
-import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, useMutationWithDefaults } from '@hourglass/common/helpers';
 
 import {
   BodyItemInfo,
@@ -57,7 +53,7 @@ export const ReorderableBodyItemsEditor: React.FC<{
     showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<BodyItemReorderMutation>(
+  const [mutate, loading] = useMutationWithDefaults<BodyItemReorderMutation>(
     graphql`
     mutation BodyItemReorderMutation($input: ReorderBodyItemsInput!) {
       reorderBodyItems(input: $input) {
@@ -152,8 +148,8 @@ export const BodyItemEditor: React.FC<{
   } = bodyItem;
   const [
     mutateDestroyBodyItem,
-    { loading: loadingDestroyBodyItem },
-  ] = useMutation<BodyItemDestroyMutation>(
+    loadingDestroyBodyItem,
+  ] = useMutationWithDefaults<BodyItemDestroyMutation>(
     graphql`
     mutation BodyItemDestroyMutation($input: DestroyBodyItemInput!) {
       destroyBodyItem(input: $input) {

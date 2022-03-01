@@ -1,13 +1,13 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, Suspense } from 'react';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { Link } from 'react-router-dom';
 import {
   useFragment,
   graphql,
-  useQuery,
+  useLazyLoadQuery,
   useMutation,
-} from 'relay-hooks';
-import { RenderError } from '@hourglass/common/boundary';
+} from 'react-relay';
+import ErrorBoundary, { RenderError } from '@hourglass/common/boundary';
 import Select, { GroupedOptionsType } from 'react-select';
 import {
   Button,
@@ -384,8 +384,18 @@ export const ImpersonateUser: React.FC<{
   );
 };
 
-const Admin: React.FC = () => {
-  const res = useQuery<homeAdminQuery>(
+const Admin: React.FC = () => (
+  <ErrorBoundary>
+    <Suspense
+      fallback={<p>Loading...</p>}
+    >
+      <AdminQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const AdminQuery: React.FC = () => {
+  const res = useLazyLoadQuery<homeAdminQuery>(
     graphql`
     query homeAdminQuery {
       users {
@@ -396,20 +406,15 @@ const Admin: React.FC = () => {
       }
     }
     `,
+    {},
   );
-  if (res.error) {
-    return <RenderError error={res.error} />;
-  }
-  if (!res.data) {
-    return <p>Loading...</p>;
-  }
   const userIdToImageMap = {};
-  res.data.users.forEach((user) => {
+  res.users.forEach((user) => {
     if (user.imageUrl) {
       userIdToImageMap[user.id] = user.imageUrl;
     }
   });
-  const userOptions: ImpersonateVal[] = res.data.users.map((user) => ({
+  const userOptions: ImpersonateVal[] = res.users.map((user) => ({
     label: `${user.displayName} (${user.username})`,
     value: user.id,
   }));
@@ -421,8 +426,18 @@ const Admin: React.FC = () => {
   );
 };
 
-const Home: React.FC = () => {
-  const res = useQuery<homeQuery>(
+const Home: React.FC = () => (
+  <ErrorBoundary>
+    <Suspense
+      fallback={<p>Loading...</p>}
+    >
+      <HomeQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const HomeQuery: React.FC = () => {
+  const res = useLazyLoadQuery<homeQuery>(
     graphql`
     query homeQuery {
       activeTerms {
@@ -458,18 +473,13 @@ const Home: React.FC = () => {
       }
     }
     `,
+    {},
   );
-  if (res.error) {
-    return <RenderError error={res.error} />;
-  }
-  if (!res.data) {
-    return <p>Loading...</p>;
-  }
-  const anyRegistrations = res.data.activeTerms.reduce((prev, cur) => {
+  const anyRegistrations = res.activeTerms.reduce((prev, cur) => {
     const anyInTerm = cur.myRegistrations.length > 0;
     return prev || anyInTerm;
   }, false);
-  if (res.data.activeTerms.length === 0) {
+  if (res.activeTerms.length === 0) {
     return (
       <Container>
         <DocumentTitle title="My Exams">
@@ -487,7 +497,7 @@ const Home: React.FC = () => {
           </Alert>
         )}
         <div>
-          {res.data.activeTerms.map((term) => {
+          {res.activeTerms.map((term) => {
             const allEmpty = (
               term.myFutureRegistrations.length === 0
               && term.myRegistrations.length === 0
@@ -530,7 +540,7 @@ const Home: React.FC = () => {
             );
           })}
         </div>
-        {res.data.me.admin && (
+        {res.me.admin && (
           <Admin />
         )}
       </DocumentTitle>

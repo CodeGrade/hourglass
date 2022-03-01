@@ -7,7 +7,7 @@ import {
   RubricPresets,
   Preset,
 } from '@professor/exams/types';
-import { ExhaustiveSwitchError, pluralize } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, pluralize, useMutationWithDefaults } from '@hourglass/common/helpers';
 import HTML from '@student/exams/show/components/HTML';
 import Icon from '@student/exams/show/components/Icon';
 import {
@@ -26,7 +26,7 @@ import Tooltip from '@student/exams/show/components/Tooltip';
 import { BsArrowUpRight, BsArrowDownRight } from 'react-icons/bs';
 import { AlertContext } from '@hourglass/common/alerts';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
-import { graphql, useFragment, useMutation } from 'relay-hooks';
+import { graphql, useFragment } from 'react-relay';
 import { expandRootRubric } from '@professor/exams/rubrics';
 import {
   FaChevronDown,
@@ -74,7 +74,7 @@ const ShowPreset: React.FC<{
     studentFeedback,
   } = preset;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<createCommentMutation>(
+  const [mutate, loading] = useMutationWithDefaults<createCommentMutation>(
     CREATE_COMMENT_MUTATION,
     {
       configs: [addCommentConfig(registrationId)],

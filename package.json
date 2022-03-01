@@ -13,7 +13,6 @@
     "relay-dev": "relay-compiler --watch",
     "relay": "relay-compiler --watchman false",
     "relay-persist": "relay-compiler --watchman false --persist-output ./config/schemas/graphql-queries.json",
-    "dev": "concurrently \"yarn run webpack-dev\" \"yarn run relay-dev\"",
     "unused": "ts-prune"
   },
   "dependencies": {
@@ -110,7 +109,6 @@
     "@typescript-eslint/parser": "^5.0.0",
     "@webpack-cli/serve": "^1.6.0",
     "@welldone-software/why-did-you-render": "^6.2.1",
-    "concurrently": "^6.3.0",
     "eslint": "^8.0.1",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-import-resolver-webpack": "^0.13.1",

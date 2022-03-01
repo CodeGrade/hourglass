@@ -4,6 +4,7 @@ import React, {
   useMemo,
   useCallback,
   useRef,
+  Suspense,
 } from 'react';
 import RegularNavbar from '@hourglass/common/navbar';
 import Select from 'react-select';
@@ -33,23 +34,22 @@ import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
 import Loading from '@hourglass/common/loading';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
-import { ExhaustiveSwitchError, SelectOption, SelectOptions } from '@hourglass/common/helpers';
+import { ExhaustiveSwitchError, SelectOption, SelectOptions, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
 import './index.scss';
 import { BsListCheck } from 'react-icons/bs';
 import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
-import { graphql } from 'react-relay';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import {
+  graphql,
   useFragment,
-  useMutation,
   useSubscription,
-  usePagination,
-  useQuery,
-} from 'relay-hooks';
-import { RenderError } from '@hourglass/common/boundary';
+  useLazyLoadQuery,
+  usePaginationFragment,
+} from 'react-relay';
+import ErrorBoundary from '@hourglass/common/boundary';
 
 import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
 import { exams_recipients$key, exams_recipients$data } from './__generated__/exams_recipients.graphql';
@@ -229,7 +229,7 @@ const FinalizeButton: React.FC<{
   const openModal = useCallback(() => setShowModal(true), []);
   const closeModal = useCallback(() => setShowModal(false), []);
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<examsFinalizeItemMutation>(
+  const [mutate, loading] = useMutationWithDefaults<examsFinalizeItemMutation>(
     finalizeItemMutation,
     {
       onCompleted: () => {
@@ -293,7 +293,7 @@ const ClearButton: React.FC<{
     anomalyId,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<examsDestroyAnomalyMutation>(
+  const [mutate, loading] = useMutationWithDefaults<examsDestroyAnomalyMutation>(
     graphql`
     mutation examsDestroyAnomalyMutation($input: DestroyAnomalyInput!) {
       destroyAnomaly(input: $input) {
@@ -453,10 +453,10 @@ const ShowAnomalies: React.FC<{
   const { alert } = useContext(AlertContext);
   const {
     data,
-    isLoading,
+    isLoadingNext,
     hasNext,
     loadNext,
-  } = usePagination(
+  } = usePaginationFragment(
     graphql`
       fragment exams_anomalies on Exam
       @argumentDefinitions(
@@ -524,7 +524,7 @@ const ShowAnomalies: React.FC<{
           <td colSpan={4} className="text-center">
             <Button
               onClick={() => {
-                if (!hasNext || isLoading) return;
+                if (!hasNext || isLoadingNext) return;
                 loadNext(
                   10,
                   {
@@ -629,7 +629,7 @@ const FinalizeRegs: React.FC<{
   const [showModal, setShowModal] = useState(false);
   const openModal = useCallback(() => setShowModal(true), []);
   const closeModal = useCallback(() => setShowModal(false), []);
-  const [mutate, { loading }] = useMutation<examsFinalizeItemMutation>(
+  const [mutate, loading] = useMutationWithDefaults<examsFinalizeItemMutation>(
     finalizeItemMutation,
     {
       onCompleted: () => {
@@ -1580,7 +1580,7 @@ const SendMessage: React.FC<{
     setMessage('');
   }, []);
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<examsSendMessageMutation>(
+  const [mutate, loading] = useMutationWithDefaults<examsSendMessageMutation>(
     graphql`
       mutation examsSendMessageMutation($input: SendMessageInput!) {
         sendMessage(input: $input) {
@@ -1860,11 +1860,26 @@ const ProctoringSplitView: React.FC<{
   );
 };
 
-const ExamProctoring: React.FC = () => {
+const ExamProctoring: React.FC = () => (
+  <ErrorBoundary>
+    <Suspense
+      fallback={(
+        <Container fluid>
+          <RegularNavbar className="row" />
+          <p>Loading...</p>
+        </Container>
+      )}
+    >
+      <ExamProctoringQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const ExamProctoringQuery: React.FC = () => {
   const {
     examId,
   } = useParams<{ examId: string }>();
-  const res = useQuery<examsProctorQuery>(
+  const data = useLazyLoadQuery<examsProctorQuery>(
     graphql`
     query examsProctorQuery($examId: ID!) {
       exam(id: $examId) {
@@ -1876,31 +1891,20 @@ const ExamProctoring: React.FC = () => {
     `,
     { examId },
   );
-  if (res.error) {
-    return <RenderError error={res.error} />;
-  }
-  if (!res.data) {
-    return (
-      <Container fluid>
-        <RegularNavbar className="row" />
-        <p>Loading...</p>
-      </Container>
-    );
-  }
   return (
-    <DocumentTitle title={`${res.data.exam.name} - Proctoring`}>
+    <DocumentTitle title={`${data.exam.name} - Proctoring`}>
       <Container fluid>
         <div className="wrapper vh-100">
           <div className="inner-wrapper">
             <RegularNavbar className="row" />
             <Row>
               <Col>
-                <h1>{res.data.exam.name}</h1>
+                <h1>{data.exam.name}</h1>
               </Col>
             </Row>
             <div className="content-wrapper">
               <div className="content h-100">
-                <ProctoringSplitView exam={res.data.exam} />
+                <ProctoringSplitView exam={data.exam} />
               </div>
             </div>
           </div>

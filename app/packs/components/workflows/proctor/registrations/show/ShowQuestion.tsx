@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import HTML from '@student/exams/show/components/HTML';
 import Part, { ClaimGradingButton } from '@proctor/registrations/show/Part';
-import { graphql, useFragment } from 'relay-hooks';
+import { graphql, useFragment } from 'react-relay';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import { QuestionFilesContext } from '@hourglass/common/context';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';

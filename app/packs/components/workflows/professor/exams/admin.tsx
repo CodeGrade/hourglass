@@ -4,6 +4,7 @@ import React, {
   useContext,
   createRef,
   useCallback,
+  Suspense,
 } from 'react';
 import {
   Switch,
@@ -14,7 +15,7 @@ import {
   useLocation,
   Link,
 } from 'react-router-dom';
-import { pluralize, useRefresher } from '@hourglass/common/helpers';
+import { pluralize, useMutationWithDefaults, useRefresher } from '@hourglass/common/helpers';
 import { NumericInput } from '@hourglass/common/NumericInput';
 import {
   Card,
@@ -50,7 +51,7 @@ import ManageAccommodations from '@professor/exams/accommodations';
 import AssignSeating from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
-import ErrorBoundary, { RenderError } from '@hourglass/common/boundary';
+import ErrorBoundary from '@hourglass/common/boundary';
 import { GrLink, GrUnlink } from 'react-icons/gr';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
 import { BsPencilSquare, BsFillQuestionCircleFill, BsArrow90DegLeft } from 'react-icons/bs';
@@ -60,9 +61,8 @@ import { policyToString } from '@professor/exams/new/editor/Policies';
 import {
   graphql,
   useFragment,
-  useMutation,
-  useQuery,
-} from 'relay-hooks';
+  useLazyLoadQuery,
+} from 'react-relay';
 import { uploadFile } from '@hourglass/common/types/api';
 import './dnd.scss';
 import './admin.scss';
@@ -107,7 +107,7 @@ const ExamInformation: React.FC<{
     `,
     exam,
   );
-  const [mutate, { loading }] = useMutation<adminUpdateExamMutation>(
+  const [mutate, loading] = useMutationWithDefaults<adminUpdateExamMutation>(
     graphql`
       mutation adminUpdateExamMutation($input: UpdateExamInput!) {
         updateExam(input: $input) {
@@ -655,7 +655,7 @@ const VersionInfo: React.FC<{
   const { alert } = useContext(AlertContext);
   const history = useHistory();
   const fileInputRef = createRef<HTMLInputElement>();
-  const [createVersion, { loading }] = useMutation<adminCreateVersionMutation>(
+  const [createVersion, loading] = useMutationWithDefaults<adminCreateVersionMutation>(
     graphql`
     mutation adminCreateVersionMutation($input: CreateExamVersionInput!) {
       createExamVersion(input: $input) {
@@ -774,7 +774,7 @@ const ShowVersion: React.FC<{
   );
   const { alert } = useContext(AlertContext);
   const [preview, setPreview] = useState(false);
-  const [mutate, { loading }] = useMutation<adminDestroyVersionMutation>(
+  const [mutate, loading] = useMutationWithDefaults<adminDestroyVersionMutation>(
     graphql`
     mutation adminDestroyVersionMutation($input: DestroyExamVersionInput!) {
       destroyExamVersion(input: $input) {
@@ -940,7 +940,7 @@ const StartGradingButton: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
   const history = useHistory();
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation(
+  const [mutate, loading] = useMutationWithDefaults(
     COMMENCE_GRADING_MUTATION,
     {
       onCompleted: () => {
@@ -988,7 +988,7 @@ const PublishGradesButton: React.FC<{
     examId,
   );
   const { alert } = useContext(AlertContext);
-  const [publish, { loading }] = useMutation<adminPublishGradesMutation>(
+  const [publish, loading] = useMutationWithDefaults<adminPublishGradesMutation>(
     graphql`
       mutation adminPublishGradesMutation($input: PublishGradesInput!) {
         publishGrades(input: $input) {
@@ -1064,9 +1064,21 @@ const PublishGradesButton: React.FC<{
   );
 };
 
-const ExamAdmin: React.FC = () => {
+const ExamAdmin: React.FC = () => (
+  <Container>
+    <ErrorBoundary>
+      <Suspense
+        fallback={<p>Loading...</p>}
+      >
+        <ExamAdminQuery />
+      </Suspense>
+    </ErrorBoundary>
+  </Container>
+);
+
+const ExamAdminQuery: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
-  const res = useQuery<adminExamQuery>(
+  const data = useLazyLoadQuery<adminExamQuery>(
     graphql`
     query adminExamQuery($examId: ID!, $withRubric: Boolean!) {
       exam(id: $examId) {
@@ -1083,29 +1095,23 @@ const ExamAdmin: React.FC = () => {
     `,
     { examId, withRubric: true },
   );
-  if (res.error) {
-    return <Container><RenderError error={res.error} /></Container>;
-  }
-  if (!res.data) {
-    return <Container><p>Loading...</p></Container>;
-  }
   return (
-    <DocumentTitle title={res.data.exam.name}>
+    <DocumentTitle title={data.exam.name}>
       <Container>
-        <ExamInformation exam={res.data.exam} />
+        <ExamInformation exam={data.exam} />
         <Form.Group>
           <TabbedChecklist
-            exam={res.data.exam}
+            exam={data.exam}
             examId={examId}
           />
         </Form.Group>
         <Form.Group>
-          <Link to={`/exams/${res.data.exam.id}/proctoring`}>
+          <Link to={`/exams/${data.exam.id}/proctoring`}>
             <Button className="mr-2" variant="success">Proctor!</Button>
           </Link>
           <StartGradingButton />
-          <PublishGradesButton examId={res.data.exam} />
-          <Link to={`/exams/${res.data.exam.id}/submissions`}>
+          <PublishGradesButton examId={data.exam} />
+          <Link to={`/exams/${data.exam.id}/submissions`}>
             <Button className="ml-2" variant="primary">View submissions</Button>
           </Link>
         </Form.Group>

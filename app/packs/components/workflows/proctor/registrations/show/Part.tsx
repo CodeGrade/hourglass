@@ -9,8 +9,8 @@ import { PartName } from '@student/exams/show/components/Part';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@professor/exams/types';
-import { pluralize } from '@hourglass/common/helpers';
-import { graphql, useFragment, useMutation } from 'relay-hooks';
+import { pluralize, useMutationWithDefaults } from '@hourglass/common/helpers';
+import { graphql, useFragment } from 'react-relay';
 import { AlertContext } from '@hourglass/common/alerts';
 import { PartRequestGradingLockMutation } from './__generated__/PartRequestGradingLockMutation.graphql';
 
@@ -56,9 +56,9 @@ export const ClaimGradingButton: React.FC<{
     disabledMessage,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [mutateRequestGrade, {
-    loading: requestLoading,
-  }] = useMutation<PartRequestGradingLockMutation>(
+  const [mutateRequestGrade, requestLoading] = useMutationWithDefaults<
+    PartRequestGradingLockMutation
+  >(
     REQUEST_GRADE_MUTATION,
     {
       onCompleted: () => {

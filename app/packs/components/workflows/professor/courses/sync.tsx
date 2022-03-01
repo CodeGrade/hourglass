@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
-import { useMutation, graphql } from 'relay-hooks';
+import { graphql } from 'react-relay';
 import { Button } from 'react-bootstrap';
 import { AlertContext } from '@hourglass/common/alerts';
+import { useMutationWithDefaults } from '@hourglass/common/helpers';
 
 import { syncMutation } from './__generated__/syncMutation.graphql';
 
@@ -24,7 +25,7 @@ const DoSync: React.FC<{
 }> = (props) => {
   const { courseId } = props;
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<syncMutation>(
+  const [mutate, loading] = useMutationWithDefaults<syncMutation>(
     graphql`
     mutation syncMutation($input: SyncCourseToBottlenoseInput!) {
       syncCourseToBottlenose(input: $input) {

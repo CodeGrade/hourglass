@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useParams, Link, Route } from 'react-router-dom';
 import { Container, Button } from 'react-bootstrap';
 import NewExam from '@professor/exams/new';
 import SyncCourse from '@professor/courses/sync';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import { graphql } from 'react-relay';
-import { useFragment, useQuery } from 'relay-hooks';
-import { RenderError } from '@hourglass/common/boundary';
+import { graphql, useFragment, useLazyLoadQuery } from 'react-relay';
+import ErrorBoundary from '@hourglass/common/boundary';
 import { GroupedOptionsType } from 'react-select';
 import { ImpersonateVal, ImpersonateUser } from '@hourglass/workflows/home';
 
@@ -46,9 +45,23 @@ const CourseExams: React.FC<{
   );
 };
 
-const ShowCourse: React.FC = () => {
+const ShowCourse: React.FC = () => (
+  <Container>
+    <ErrorBoundary>
+      <Suspense
+        fallback={(
+          <p>Loading...</p>
+        )}
+      >
+        <ShowCourseQuery />
+      </Suspense>
+    </ErrorBoundary>
+  </Container>
+);
+
+const ShowCourseQuery: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
-  const res = useQuery<showCourseQuery>(
+  const data = useLazyLoadQuery<showCourseQuery>(
     graphql`
     query showCourseQuery($courseId: ID!) {
       course(id: $courseId) {
@@ -80,16 +93,10 @@ const ShowCourse: React.FC = () => {
     `,
     { courseId },
   );
-  if (res.error) {
-    return <Container><RenderError error={res.error} /></Container>;
-  }
-  if (!res.data) {
-    return <Container><p>Loading...</p></Container>;
-  }
   const userIdToImageMap = {};
-  const allUsers = res.data.course.students
-    .concat(res.data.course.staff)
-    .concat(res.data.course.professors);
+  const allUsers = data.course.students
+    .concat(data.course.staff)
+    .concat(data.course.professors);
   allUsers.forEach((user) => {
     if (user.imageUrl) {
       userIdToImageMap[user.id] = user.imageUrl;
@@ -98,21 +105,21 @@ const ShowCourse: React.FC = () => {
   const userOptions: GroupedOptionsType<ImpersonateVal> = [
     {
       label: 'Students',
-      options: res.data.course.students.map((user) => ({
+      options: data.course.students.map((user) => ({
         label: `${user.displayName} (${user.username})`,
         value: user.id,
       })),
     },
     {
       label: 'Staff',
-      options: res.data.course.staff.map((user) => ({
+      options: data.course.staff.map((user) => ({
         label: `${user.displayName} (${user.username})`,
         value: user.id,
       })),
     },
     {
       label: 'Professors',
-      options: res.data.course.professors.map((user) => ({
+      options: data.course.professors.map((user) => ({
         label: `${user.displayName} (${user.username})`,
         value: user.id,
       })),
@@ -122,7 +129,7 @@ const ShowCourse: React.FC = () => {
     <Container>
       <div className="d-flex align-items-center justify-content-between">
         <h1>
-          {res.data.course.title}
+          {data.course.title}
         </h1>
         <div className="text-nowrap">
           <Link to={`/courses/${courseId}/sync`}>
@@ -142,23 +149,23 @@ const ShowCourse: React.FC = () => {
         </div>
       </div>
       <Route path="/courses/:courseId" exact>
-        <DocumentTitle title={res.data.course.title}>
-          <CourseExams courseExams={res.data.course.exams} />
+        <DocumentTitle title={data.course.title}>
+          <CourseExams courseExams={data.course.exams} />
           <ImpersonateUser
             userIdToImageMap={userIdToImageMap}
             userOptions={userOptions}
-            courseId={res.data.course.id}
+            courseId={data.course.id}
           />
         </DocumentTitle>
       </Route>
       <Route path="/courses/:courseId/sync" exact>
-        <DocumentTitle title={`Sync - ${res.data.course.title}`}>
-          <SyncCourse courseId={res.data.course.id} />
+        <DocumentTitle title={`Sync - ${data.course.title}`}>
+          <SyncCourse courseId={data.course.id} />
         </DocumentTitle>
       </Route>
       <Route path="/courses/:courseId/new" exact>
-        <DocumentTitle title={`New Exam - ${res.data.course.title}`}>
-          <NewExam courseId={res.data.course.id} />
+        <DocumentTitle title={`New Exam - ${data.course.title}`}>
+          <NewExam courseId={data.course.id} />
         </DocumentTitle>
       </Route>
     </Container>

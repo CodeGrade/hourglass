@@ -13,11 +13,11 @@ import ReadableDate from '@hourglass/common/ReadableDate';
 import { NumericInput } from '@hourglass/common/NumericInput';
 import { BsPencilSquare } from 'react-icons/bs';
 import { AlertContext } from '@hourglass/common/alerts';
-import { SelectOption, SelectOptions } from '@hourglass/common/helpers';
+import { SelectOption, SelectOptions, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { FaTrash } from 'react-icons/fa';
 import Select from 'react-select';
 import { DateTime } from 'luxon';
-import { useMutation, graphql, useFragment } from 'relay-hooks';
+import { graphql, useFragment } from 'react-relay';
 
 import { accommodations_all$key } from './__generated__/accommodations_all.graphql';
 import { accommodations_accommodation$key } from './__generated__/accommodations_accommodation.graphql';
@@ -114,7 +114,7 @@ const SingleAccommodation: React.FC<{
   const edit = useCallback(() => setEditing(true), []);
   const stopEdit = useCallback(() => setEditing(false), []);
   const { alert } = useContext(AlertContext);
-  const [destroy, { loading: destroyLoading }] = useMutation<accommodationsDestroyMutation>(
+  const [destroy, destroyLoading] = useMutationWithDefaults<accommodationsDestroyMutation>(
     graphql`
     mutation accommodationsDestroyMutation($input: DestroyAccommodationInput!) {
       destroyAccommodation(input: $input) {
@@ -169,7 +169,7 @@ const SingleAccommodation: React.FC<{
       ],
     },
   );
-  const [update, { loading: updateLoading }] = useMutation<accommodationsUpdateMutation>(
+  const [update, updateLoading] = useMutationWithDefaults<accommodationsUpdateMutation>(
     graphql`
     mutation accommodationsUpdateMutation($input: UpdateAccommodationInput!) {
       updateAccommodation(input: $input) {
@@ -312,7 +312,7 @@ const NewAccommodation: React.FC<{
     label: node.user.displayName,
     value: node.id,
   }));
-  const [create, { loading }] = useMutation<accommodationsCreateMutation>(
+  const [create, loading] = useMutationWithDefaults<accommodationsCreateMutation>(
     graphql`
     mutation accommodationsCreateMutation($input: CreateAccommodationInput!) {
       createAccommodation(input: $input) {

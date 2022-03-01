@@ -5,9 +5,8 @@ import {
   useFragment,
   graphql,
   useLazyLoadQuery,
-  useMutation,
 } from 'react-relay';
-import ErrorBoundary, { RenderError } from '@hourglass/common/boundary';
+import ErrorBoundary from '@hourglass/common/boundary';
 import Select, { GroupedOptionsType } from 'react-select';
 import {
   Button,
@@ -21,7 +20,7 @@ import {
 } from 'react-bootstrap';
 import { DateTime } from 'luxon';
 import LinkButton from '@hourglass/common/linkbutton';
-import { SelectOption } from '@hourglass/common/helpers';
+import { SelectOption, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 import Icon from '@student/exams/show/components/Icon';
 import { MdPerson } from 'react-icons/md';
@@ -291,7 +290,7 @@ export const ImpersonateUser: React.FC<{
     userIdToImageMap,
   } = props;
   const { alert } = useContext(AlertContext);
-  const [impersonate, { loading }] = useMutation(
+  const [impersonate, loading] = useMutationWithDefaults(
     graphql`
     mutation homeImpersonateMutation($input: ImpersonateUserInput!) {
       impersonateUser(input: $input) {

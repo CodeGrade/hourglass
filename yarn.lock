@@ -1701,7 +1701,7 @@
   resolved "https://registry.yarnpkg.com/@restart/context/-/context-2.1.4.tgz#a99d87c299a34c28bd85bb489cb07bfd23149c02"
   integrity sha512-INJYZQJP7g+IoDUh/475NlGiTeMfwTXUEr3tmRneckHIxNolGOW9CTq83S8cxq0CgJwwcMzMJFchxvlwe7Rk8Q==
 
-"@restart/hooks@^0.3.1", "@restart/hooks@^0.3.26":
+"@restart/hooks@^0.3.26":
   version "0.3.27"
   resolved "https://registry.yarnpkg.com/@restart/hooks/-/hooks-0.3.27.tgz#91f356d66d4699a8cd8b3d008402708b6a9dc505"
   integrity sha512-s984xV/EapUIfkjlf8wz9weP2O9TNKR96C68FfMEy2bE69+H4cNv3RD4Mf97lW7Htt7PjZrYTjSC8f3SB9VCXw==
@@ -6278,14 +6278,6 @@ relay-config@^12.0.1:
   integrity sha512-vq7GLLsGPpb/tZr9kmfbfe5sLO1cGa67jpCp4Xtk+N98fMInCu9YIH8R/FxxUhKVPnpLQf3ecmz+s+/MjzcnTQ==
   dependencies:
     cosmiconfig "^5.0.5"
-
-relay-hooks@^7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/relay-hooks/-/relay-hooks-7.0.0.tgz#e1154f61cbfa2e916241838b41301eeab0f49e30"
-  integrity sha512-g4g9qCmVEdMluUng2RLnbjvF4YPrDPcxJnVY+T7aBoQN8WP3rcOjYcypyk3DtqpzqUDu4sQYWzuU9HOg+jX9/A==
-  dependencies:
-    "@restart/hooks" "^0.3.1"
-    fbjs "^3.0.0"
 
 relay-runtime@12.0.0, relay-runtime@^12.0.0:
   version "12.0.0"

@@ -1,4 +1,4 @@
-import { graphql } from 'relay-hooks';
+import { graphql } from 'react-relay';
 import { RangeAddConfig } from 'relay-runtime/lib/mutations/RelayDeclarativeMutationConfig';
 
 export const CREATE_COMMENT_MUTATION = graphql`

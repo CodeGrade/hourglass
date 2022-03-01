@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useLayoutEffect,
+  Suspense,
 } from 'react';
 import {
   Form,
@@ -63,6 +64,7 @@ import {
   alphabetIdx,
   useRefresher,
   pluralize,
+  useMutationWithDefaults,
 } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
@@ -74,17 +76,16 @@ import {
   Link,
 } from 'react-router-dom';
 import {
-  useQuery,
+  useLazyLoadQuery,
   useFragment,
   graphql,
-  useMutation,
-} from 'relay-hooks';
+} from 'react-relay';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
 import Part from '@proctor/registrations/show/Part';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
-import { RenderError } from '@hourglass/common/boundary';
+import ErrorBoundary from '@hourglass/common/boundary';
 import { AlertContext } from '@hourglass/common/alerts';
 import { IconType } from 'react-icons';
 import { describeTime } from '@student/exams/show/actions';
@@ -416,7 +417,7 @@ const NewComments: React.FC<{
     }));
     lastId.current += 1;
   };
-  const [mutate, { loading }] = useMutation<createCommentMutation>(
+  const [mutate, loading] = useMutationWithDefaults<createCommentMutation>(
     CREATE_COMMENT_MUTATION,
     {
       configs: [addCommentConfig(registrationId)],
@@ -437,20 +438,22 @@ const NewComments: React.FC<{
             points,
           },
         },
-      }).then(() => {
-        setCommentMap((curMap) => {
-          const newMap = { ...curMap };
-          delete newMap[id];
-          return newMap;
-        });
-      }).catch((err) => {
-        setCommentMap((curMap) => ({
-          ...curMap,
-          [id]: {
-            ...curMap[id],
-            error: err.message,
-          },
-        }));
+        onError: (err) => {
+          setCommentMap((curMap) => ({
+            ...curMap,
+            [id]: {
+              ...curMap[id],
+              error: err.message,
+            },
+          }));
+        },
+        onCompleted: () => {
+          setCommentMap((curMap) => {
+            const newMap = { ...curMap };
+            delete newMap[id];
+            return newMap;
+          });
+        },
       });
     });
     if (needingSaving.length > 0) { setNeedingSaving([]); }
@@ -579,7 +582,7 @@ const SavedComment: React.FC<{
     && ((value.message !== presetComment.studentFeedback
            && value.message !== presetComment.graderHint)
         || value.points !== presetComment.points);
-  const [mutateUpdate, { loading: updateLoading }] = useMutation<gradingUpdateCommentMutation>(
+  const [mutateUpdate, updateLoading] = useMutationWithDefaults<gradingUpdateCommentMutation>(
     UPDATE_COMMENT_MUTATION,
     {
       onCompleted: () => {
@@ -591,7 +594,7 @@ const SavedComment: React.FC<{
       },
     },
   );
-  const [mutateDestroy, { loading: destroyLoading }] = useMutation<gradingDestroyCommentMutation>(
+  const [mutateDestroy, destroyLoading] = useMutationWithDefaults<gradingDestroyCommentMutation>(
     DESTROY_COMMENT_MUTATION,
     {
       configs: [{
@@ -1148,7 +1151,7 @@ const Grade: React.FC<{
   const viewerContextVal = useMemo(() => ({
     answers: currentAnswers,
   }), [currentAnswers]);
-  const [mutateGradeNext, { loading: nextLoading }] = useMutation<gradingNextMutation>(
+  const [mutateGradeNext, nextLoading] = useMutationWithDefaults<gradingNextMutation>(
     GRADE_NEXT_MUTATION,
     {
       onCompleted: ({ gradeNext }) => {
@@ -1166,8 +1169,8 @@ const Grade: React.FC<{
   );
   const [
     mutateReleaseAndContinue,
-    { loading: releaseNextLoading },
-  ] = useMutation<gradingReleaseLockMutation>(
+    releaseNextLoading,
+  ] = useMutationWithDefaults<gradingReleaseLockMutation>(
     RELEASE_LOCK_MUTATION,
     {
       onCompleted: () => {
@@ -1194,8 +1197,8 @@ const Grade: React.FC<{
   );
   const [
     mutateReleaseAndFinish,
-    { loading: releaseFinishLoading },
-  ] = useMutation<gradingReleaseLockMutation>(
+    releaseFinishLoading,
+  ] = useMutationWithDefaults<gradingReleaseLockMutation>(
     RELEASE_LOCK_MUTATION,
     {
       onCompleted: () => {
@@ -1515,11 +1518,23 @@ const ShowOnePart: React.FC<{
   );
 };
 
-const GradeOnePart: React.FC = () => {
+const GradeOnePart: React.FC = () => (
+  <ErrorBoundary withContainer>
+    <Suspense
+      fallback={(
+        <Container><p>Loading...</p></Container>
+      )}
+    >
+      <GradeOnePartQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const GradeOnePartQuery: React.FC = () => {
   const { registrationId, qnum, pnum } = useParams<{
     registrationId: string, qnum: string, pnum: string
   }>();
-  const res = useQuery<gradingQuery>(
+  const res = useLazyLoadQuery<gradingQuery>(
     graphql`
     query gradingQuery($registrationId: ID!, $withRubric: Boolean!) {
       registration(id: $registrationId) {
@@ -1538,13 +1553,7 @@ const GradeOnePart: React.FC = () => {
     { registrationId, withRubric: true },
   );
 
-  if (res.error) {
-    return <Container><RenderError error={res.error} /></Container>;
-  }
-  if (!res.data) {
-    return <Container><p>Loading...</p></Container>;
-  }
-  return <GradeOnePartHelp registration={res.data.registration} qnum={qnum} pnum={pnum} />;
+  return <GradeOnePartHelp registration={res.registration} qnum={qnum} pnum={pnum} />;
 };
 
 const GradeOnePartHelp: React.FC<{
@@ -1622,7 +1631,7 @@ const GradeOnePartHelp: React.FC<{
 const SyncExamToBottlenoseButton: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<gradingSyncExamToBottlenoseMutation>(
+  const [mutate, loading] = useMutationWithDefaults<gradingSyncExamToBottlenoseMutation>(
     SYNC_EXAM_TO_BOTTLENOSE_MUTATION,
     {
       onCompleted: ({ syncExamToBottlenose }) => {
@@ -2019,7 +2028,7 @@ const BeginGradingButton: React.FC<{
   const { examId } = useParams<{ examId: string }>();
   const history = useHistory();
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<gradingNextMutation>(
+  const [mutate, loading] = useMutationWithDefaults<gradingNextMutation>(
     GRADE_NEXT_MUTATION,
     {
       onCompleted: ({ gradeNext }) => {
@@ -2139,9 +2148,20 @@ const BeginGradingButton: React.FC<{
   );
 };
 
-const GradingGrader: React.FC = () => {
+const GradingGrader: React.FC = () => (
+  <ErrorBoundary withContainer>
+    <Suspense
+      fallback={<Container><p>Loading...</p></Container>}
+    >
+      <GradingGraderQuery />
+    </Suspense>
+
+  </ErrorBoundary>
+);
+
+const GradingGraderQuery: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
-  const res = useQuery<gradingGraderQuery>(
+  const res = useLazyLoadQuery<gradingGraderQuery>(
     graphql`
     query gradingGraderQuery($examId: ID!) {
       exam(id: $examId) {
@@ -2152,16 +2172,10 @@ const GradingGrader: React.FC = () => {
     `,
     { examId },
   );
-  if (res.error) {
-    return <Container><RenderError error={res.error} /></Container>;
-  }
-  if (!res.data) {
-    return <Container><p>Loading...</p></Container>;
-  }
   return (
     <Container>
-      <BeginGradingButton examKey={res.data.exam} />
-      <MyGrading examKey={res.data.exam} />
+      <BeginGradingButton examKey={res.exam} />
+      <MyGrading examKey={res.exam} />
     </Container>
   );
 };
@@ -2188,7 +2202,7 @@ const GradingLock: React.FC<{
     lockKey,
   );
   const { alert } = useContext(AlertContext);
-  const [mutate, { loading }] = useMutation<gradingReleaseLockMutation>(
+  const [mutate, loading] = useMutationWithDefaults<gradingReleaseLockMutation>(
     RELEASE_LOCK_MUTATION,
     {
       onCompleted: () => {
@@ -2454,9 +2468,21 @@ const ExamGradingAdministration: React.FC<{
   );
 };
 
-const GradingAdmin: React.FC = () => {
+const GradingAdmin: React.FC = () => (
+  <Container>
+    <ErrorBoundary>
+      <Suspense
+        fallback={<p>Loading...</p>}
+      >
+        <GradingAdminQuery />
+      </Suspense>
+    </ErrorBoundary>
+  </Container>
+);
+
+const GradingAdminQuery: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
-  const res = useQuery<gradingAdminQuery>(
+  const res = useLazyLoadQuery<gradingAdminQuery>(
     graphql`
     query gradingAdminQuery($examId: ID!) {
       exam(id: $examId) {
@@ -2468,18 +2494,12 @@ const GradingAdmin: React.FC = () => {
     `,
     { examId },
   );
-  if (res.error) {
-    return <Container><RenderError error={res.error} /></Container>;
-  }
-  if (!res.data) {
-    return <Container><p>Loading...</p></Container>;
-  }
   return (
-    <Container>
-      <ExamGradingAdministration examKey={res.data.exam} />
-      <BeginGradingButton examKey={res.data.exam} />
-      <MyGrading examKey={res.data.exam} />
-    </Container>
+    <>
+      <ExamGradingAdministration examKey={res.exam} />
+      <BeginGradingButton examKey={res.exam} />
+      <MyGrading examKey={res.exam} />
+    </>
   );
 };
 

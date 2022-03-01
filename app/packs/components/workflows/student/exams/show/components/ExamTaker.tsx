@@ -66,10 +66,6 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
       </Container>
     </>
   );
-  return (
-    <>
-      {body}
-    </>
-  );
+  return body;
 };
 export default ExamTaker;

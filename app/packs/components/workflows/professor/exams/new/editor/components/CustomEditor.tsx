@@ -80,7 +80,7 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
 
   const filteredOnChange = useCallback((val: string, delta, source, editor) => {
     if (onChange) {
-      const quillBreak = new RegExp('<p><br></p>', 'g');
+      const quillBreak = /<p><br><\/p>/g;
       let filteredVal = val.replace(quillBreak, '');
       const onlyOnePar = (filteredVal.startsWith('<p>') && filteredVal.indexOf('<p>', 3) === -1)
         && (filteredVal.endsWith('</p>') && filteredVal.indexOf('</p>', 3) === filteredVal.length - 4);

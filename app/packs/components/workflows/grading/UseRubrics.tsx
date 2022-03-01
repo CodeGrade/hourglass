@@ -407,10 +407,10 @@ const ShowOne: React.FC<ShowRubricProps<RubricOne>> = (props) => {
   const currentEventKey = useContext(AccordionContext);
   const showChevron = !!collapseKey;
   const isOpen = collapseKey === currentEventKey;
-  let summary;
+  let summary: React.ReactNode;
   let body;
   if (choices instanceof Array) {
-    summary = <>{pointsMsg}</>;
+    summary = pointsMsg;
     body = (
       <Accordion>
         {choices.map((r) => (

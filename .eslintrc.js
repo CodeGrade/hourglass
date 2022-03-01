@@ -76,7 +76,7 @@ module.exports = {
     'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
     'react/prop-types': 'off',
     'react/require-default-props': [1, { ignoreFunctionalComponents: true }],
-    'react/no-unused-prop-types': [1],
+    'react/no-unused-prop-types': [0],
     // note you must disable the base rule as it can report incorrect errors
     'no-use-before-define': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
@@ -88,5 +88,8 @@ module.exports = {
         allow: ['_'],
       },
     ],
+    'react/function-component-definition': [0],
+    'default-param-last': [0],
+    'react/no-unstable-nested-components': [0],
   },
 };

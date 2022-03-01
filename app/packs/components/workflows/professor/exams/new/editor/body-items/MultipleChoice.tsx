@@ -169,26 +169,24 @@ const EditAns: React.FC<{
     deleteOption,
   } = props;
   return (
-    <>
-      <RearrangeableList
-        dbArray={options}
-        disabled={disabled}
-        dropVariant="info"
-        identifier={`MC-${bodyItemId}`}
-        onRearrange={onRearrange}
-      >
-        {(option, handleRef) => (
-          <OneOption
-            option={option}
-            disabled={disabled}
-            handleRef={handleRef}
-            setAnswer={setAnswer}
-            setPrompt={setOption}
-            deleteItem={deleteOption}
-          />
-        )}
-      </RearrangeableList>
-    </>
+    <RearrangeableList
+      dbArray={options}
+      disabled={disabled}
+      dropVariant="info"
+      identifier={`MC-${bodyItemId}`}
+      onRearrange={onRearrange}
+    >
+      {(option, handleRef) => (
+        <OneOption
+          option={option}
+          disabled={disabled}
+          handleRef={handleRef}
+          setAnswer={setAnswer}
+          setPrompt={setOption}
+          deleteItem={deleteOption}
+        />
+      )}
+    </RearrangeableList>
   );
 };
 

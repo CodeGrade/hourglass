@@ -22,22 +22,20 @@ const Prompted: React.FC<{
   } = props;
 
   return (
-    <>
-      <Form.Group as={Row}>
-        <Form.Label column sm={2}>Prompt</Form.Label>
-        <Col sm={10}>
-          <EditHTMLVal
-            disabled={disabled}
-            className={className}
-            value={value}
-            debounceDelay={debounceDelay}
-            theme={theme}
-            placeholder="Provide any instructions for this specific item..."
-            onChange={onChange}
-          />
-        </Col>
-      </Form.Group>
-    </>
+    <Form.Group as={Row}>
+      <Form.Label column sm={2}>Prompt</Form.Label>
+      <Col sm={10}>
+        <EditHTMLVal
+          disabled={disabled}
+          className={className}
+          value={value}
+          debounceDelay={debounceDelay}
+          theme={theme}
+          placeholder="Provide any instructions for this specific item..."
+          onChange={onChange}
+        />
+      </Col>
+    </Form.Group>
   );
 };
 

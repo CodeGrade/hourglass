@@ -24,7 +24,9 @@ export class ExhaustiveSwitchError extends Error {
  * @param milis duration in miliseconds
  */
 export function sleep(milis: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, milis));
+  return new Promise((resolve) => {
+    setTimeout(resolve, milis);
+  });
 }
 
 export function useRefresher(): [number, () => void] {

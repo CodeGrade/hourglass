@@ -12,7 +12,7 @@ gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
 gem 'puma'
 
-gem 'graphql'
+gem 'graphql', '~> 1.12.17'
 gem 'graphql-batch'
 gem 'graphql-guard'
 

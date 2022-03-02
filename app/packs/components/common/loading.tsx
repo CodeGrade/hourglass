@@ -2,6 +2,17 @@ import React from 'react';
 import { Spinner } from 'react-bootstrap';
 import LoadingOverlay from 'react-loading-overlay';
 
+// TODO: just implement a fade ourselves...
+import PropTypes from 'prop-types';
+
+// eslint-disable-next-line react/forbid-foreign-prop-types
+LoadingOverlay.propTypes.styles = PropTypes.shape({
+  content: PropTypes.func,
+  overlay: PropTypes.func,
+  spinner: PropTypes.func,
+  wrapper: PropTypes.func,
+});
+
 const STYLES = {
   overlay: (base) => ({
     ...base,

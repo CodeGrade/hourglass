@@ -1,0 +1,19 @@
+name: build-docker
+
+on: push
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v2.9.0
+        with:
+          push: true
+          tags: ghcr.io/codegrade/hourglass:${{ github.ref_name }}-${{ github.sha }}

@@ -49,3 +49,7 @@ __generated__/
 config/schemas/graphql-queries.json
 
 Exams/
+
+/.direnv/
+/.envrc
+/.vscode/

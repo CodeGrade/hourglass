@@ -10,7 +10,8 @@ gem 'rails', '~> 6.1'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
-gem 'puma'
+# gem 'puma', '~> 4.1'
+gem "passenger", ">= 5.3.2", require: "phusion_passenger/rack_handler"
 
 gem 'graphql', '~> 1.12.17'
 gem 'graphql-batch'

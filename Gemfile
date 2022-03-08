@@ -9,8 +9,6 @@ ruby '2.7.2'
 gem 'rails', '~> 6.1'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
-# Use Puma as the app server
-gem 'puma'
 
 gem 'graphql', '~> 1.12.17'
 gem 'graphql-batch'
@@ -49,6 +47,7 @@ gem 'json-schema', '~> 2.8'
 gem 'activerecord_json_validator', '~> 2.0'
 
 group :development, :test do
+  gem 'puma', '~> 4.1'
   gem 'byebug'
   gem 'factory_bot_rails', require: false
   gem 'minitest-reporters'
@@ -71,6 +70,10 @@ end
 group :test do
   gem 'capybara', '>= 3.26'
   gem 'webdrivers'
+end
+
+group :production do
+  gem "passenger", ">= 5.3.2", require: "phusion_passenger/rack_handler"
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

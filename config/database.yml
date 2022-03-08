@@ -84,3 +84,4 @@ production:
   database: hourglass_production
   username: hourglass
   password: <%= ENV['HOURGLASS_DATABASE_PASSWORD'] %>
+  host: <%= ENV["HOURGLASS_DATABASE_HOST"] %>

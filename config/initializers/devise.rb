@@ -300,7 +300,7 @@ Devise.setup do |config|
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
 
-  if Rails.env.development?
+  if Rails.env.development? || ENV["STRESSTESTING"]
     # From https://insights.kyan.com/devise-authentication-strategies-a1a6b4e2b891
     config.warden do |manager|
       manager.strategies.add(:debug_login, Devise::Strategies::DebugLogin)

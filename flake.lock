@@ -16,16 +16,16 @@
     },
     "nixpkgs-ruby": {
       "locked": {
-        "lastModified": 1617769200,
-        "narHash": "sha256-sSU3SfkB9H4xgHigpMmZFB2w5cA0QgOtiCr81aH/EOA=",
+        "lastModified": 1646497237,
+        "narHash": "sha256-Ccpot1h/rV8MgcngDp5OrdmLTMaUTbStZTR5/sI7zW0=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "3d7c1202df37383279bdfe8f8f9cd373d19ea467",
+        "rev": "062a0c5437b68f950b081bbfc8a699d57a4ee026",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "3d7c120",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }

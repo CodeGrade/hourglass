@@ -1,7 +1,7 @@
 {
   description = "hourglass";
 
-  inputs.nixpkgs-ruby.url = "github:nixos/nixpkgs/3d7c120";
+  inputs.nixpkgs-ruby.url = "github:nixos/nixpkgs/nixos-unstable";
 
   outputs = { self, nixpkgs, nixpkgs-ruby }: let
     pkgs = import nixpkgs {

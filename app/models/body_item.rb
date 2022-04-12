@@ -273,9 +273,10 @@ class BodyItem < ApplicationRecord
       end
       answer = nil
       if correct_answer.is_a? String
+        processed = MarksProcessor.process_marks(ensure_utf8(correct_answer, 'text/plain'))
         answer = {
-          'text' => correct_answer,
-          'marks' => [],
+          'text' => processed[:text],
+          'marks' => processed[:marks],
         }
       end
       BodyItem.new(

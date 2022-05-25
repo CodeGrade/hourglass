@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import SnapshotInfo from '@student/exams/show/containers/SnapshotInfo';
 import LockdownInfo from '@student/exams/show/containers/LockdownInfo';
 import './index.css';
@@ -28,6 +28,7 @@ import NavbarLogo from '../../../../../../../images/hourglass.svg';
 
 import { navbar$key } from './__generated__/navbar.graphql';
 import { navbar_accordion$key } from './__generated__/navbar_accordion.graphql';
+import { VerticalScrollShadow } from '../VerticalScrollShadow';
 
 interface NavAccordionProps {
   examKey: navbar_accordion$key;
@@ -55,7 +56,6 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
   const showTooltip = (expanded ? 'never' : 'onHover');
   return (
     <Accordion
-      className="overflow-visible"
       activeKey={openSection}
     >
       <NavAccordionItem
@@ -127,6 +127,7 @@ const ExamNavbar: React.FC<{
   const [expanded, setExpanded] = useState(false);
   const [openSection, setOpenSection] = useState('');
   const [openTimer, setOpenTimer] = useState('');
+  const messageRef = useRef<HTMLDivElement>(null);
   const additionalClass = expanded ? 'sidebar-expanded' : 'sidebar-small';
   const remainingTime = time.stop.diffNow();
   const durationInMillisec = time.stop.diff(time.start).as('milliseconds');
@@ -225,7 +226,7 @@ const ExamNavbar: React.FC<{
           </span>
         </div>
       </div>
-      <div className="mt-4 flex-fill overflow-visible">
+      <VerticalScrollShadow className="mt-4 flex-fill">
         <NavAccordion
           examKey={res}
           onSectionClick={(eventKey): void => {
@@ -243,7 +244,7 @@ const ExamNavbar: React.FC<{
           openSection={openSection}
           expanded={expanded}
         />
-      </div>
+      </VerticalScrollShadow>
       <div className="mb-2 mt-auto">
         <TimeRemaining
           time={time}

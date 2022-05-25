@@ -52,3 +52,6 @@ Exams/
 
 /.direnv/
 /.envrc
+config/development_local_env.yml
+config/production_local_env.yml
+config/test_local_env.yml

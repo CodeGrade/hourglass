@@ -315,7 +315,7 @@ export const ShowExamMessages: React.FC<{
 
   return (
     <>
-      <div className={dividerClass}>
+      <div className={`${dividerClass} overflow-auto`}>
         <NewMessages onClick={onMessagesOpened} />
         {later.map((msg) => (
           <div

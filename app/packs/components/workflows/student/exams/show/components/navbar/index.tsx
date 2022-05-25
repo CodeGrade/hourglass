@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import SnapshotInfo from '@student/exams/show/containers/SnapshotInfo';
 import LockdownInfo from '@student/exams/show/containers/LockdownInfo';
 import './index.css';
@@ -23,12 +23,12 @@ import TimeRemaining, { cutoffsInfo } from '@student/exams/show/components/navba
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { useFragment, graphql } from 'react-relay';
 import Tooltip from '@student/exams/show/components/Tooltip';
+import VerticalScrollShadow from '@student/exams/show/components/VerticalScrollShadow';
 // eslint-disable-next-line no-restricted-imports
 import NavbarLogo from '../../../../../../../images/hourglass.svg';
 
 import { navbar$key } from './__generated__/navbar.graphql';
 import { navbar_accordion$key } from './__generated__/navbar_accordion.graphql';
-import { VerticalScrollShadow } from '../VerticalScrollShadow';
 
 interface NavAccordionProps {
   examKey: navbar_accordion$key;
@@ -127,7 +127,6 @@ const ExamNavbar: React.FC<{
   const [expanded, setExpanded] = useState(false);
   const [openSection, setOpenSection] = useState('');
   const [openTimer, setOpenTimer] = useState('');
-  const messageRef = useRef<HTMLDivElement>(null);
   const additionalClass = expanded ? 'sidebar-expanded' : 'sidebar-small';
   const remainingTime = time.stop.diffNow();
   const durationInMillisec = time.stop.diff(time.start).as('milliseconds');

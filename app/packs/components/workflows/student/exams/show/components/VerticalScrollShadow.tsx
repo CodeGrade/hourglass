@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import './VerticalScrollShadow.scss';
 
-export const VerticalScrollShadow: React.FC<{
+const VerticalScrollShadow: React.FC<{
   className?: string,
 }> = (props) => {
   const {
@@ -13,17 +13,17 @@ export const VerticalScrollShadow: React.FC<{
   const [atTop, setAtTop] = useState(true);
   const [atBot, setAtBot] = useState(true);
   const marginMarkers = { topMarker: setAtTop, botMarker: setAtBot };
-  const observer = useMemo(() => {
-    return new IntersectionObserver((entries) => {
-      for (const entry of entries) {
+  const observer = useMemo(() => (
+    new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
         marginMarkers[entry.target.className](entry.isIntersecting);
-      }
+      });
     }, {
       root: parentRef.current,
       rootMargin: '0px',
       threshold: 1,
-    });
-  }, []);
+    })
+  ), []);
   useMemo(() => {
     observer.disconnect();
     if (parentRef.current && scrollRef.current) {
@@ -34,7 +34,7 @@ export const VerticalScrollShadow: React.FC<{
   return (
     <div className={`${className} scroll-shadowing`} ref={parentRef}>
       <div
-        className={`${atTop ? "" : "not-top"} ${atBot ? "" : "not-bot"}`}
+        className={`${atTop ? '' : 'not-top'} ${atBot ? '' : 'not-bot'}`}
         ref={scrollRef}
       >
         <span className="topMarker" />
@@ -42,5 +42,7 @@ export const VerticalScrollShadow: React.FC<{
         <span className="botMarker" />
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default VerticalScrollShadow;

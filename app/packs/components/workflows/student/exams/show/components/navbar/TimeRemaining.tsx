@@ -63,16 +63,9 @@ export interface TimeRemainingProps {
 
 type TimeRemainingWarning = 'noWarning' | 'warningActivated' | 'warningDismissed';
 
-const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
-  const {
-    time,
-    openTimer,
-    setOpenTimer,
-    expanded,
-    setExpanded,
-  } = props;
-  const [remainingTime, setRemainingTime] = useState(time.stop.diffNow());
-  const durationInMillisec = time.stop.diff(time.start).as('milliseconds');
+export function cutoffsInfo(durationInMillisec: number): {
+  t: Duration, c: string; d: number; g?: string; w?: string
+}[] {
   let cutoffs : { t: Duration, c: string; d: number; g?: string; w?: string }[];
   if (durationInMillisec < 60 * 60 * 1000) { // shorter than one hour
     cutoffs = [
@@ -142,7 +135,20 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
       },
     ];
   }
-  cutoffs = cutoffs.sort((d1, d2) => d1.t.milliseconds - d2.t.milliseconds);
+  return cutoffs.sort((d1, d2) => d1.t.milliseconds - d2.t.milliseconds);
+}
+
+const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
+  const {
+    time,
+    openTimer,
+    setOpenTimer,
+    expanded,
+    setExpanded,
+  } = props;
+  const [remainingTime, setRemainingTime] = useState(time.stop.diffNow());
+  const durationInMillisec = time.stop.diff(time.start).as('milliseconds');
+  const cutoffs = cutoffsInfo(durationInMillisec);
   const remaining = describeRemainingTime(remainingTime);
   const warningIndex = cutoffs.findIndex((cutoff) => {
     const tMinusRemaining = cutoff.t.minus(remainingTime).shiftTo('seconds').seconds;

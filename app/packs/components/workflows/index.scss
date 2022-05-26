@@ -180,6 +180,11 @@
 }
 
 @each $color, $value in $theme-colors {
+  .blue-glow.glow-pulse-#{$color} {
+    background: radial-gradient(closest-side, $value 60%,transparent);
+    animation-name: none;
+  }
+
   .glow-pulse-#{$color} {
     box-shadow: none;
     position: relative;

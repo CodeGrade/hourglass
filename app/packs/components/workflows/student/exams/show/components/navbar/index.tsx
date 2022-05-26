@@ -19,7 +19,7 @@ import ExamMessages from '@student/exams/show/components/navbar/ExamMessages';
 import AskQuestion from '@student/exams/show/components/navbar/AskQuestion';
 import RenderIcon from '@student/exams/show/components/Icon';
 import { TimeInfo } from '@student/exams/show/types';
-import TimeRemaining from '@student/exams/show/components/navbar/TimeRemaining';
+import TimeRemaining, { cutoffsInfo } from '@student/exams/show/components/navbar/TimeRemaining';
 import NavAccordionItem from '@student/exams/show/components/navbar/NavAccordionItem';
 import { useFragment, graphql } from 'react-relay';
 import Tooltip from '@student/exams/show/components/Tooltip';
@@ -128,6 +128,14 @@ const ExamNavbar: React.FC<{
   const [openSection, setOpenSection] = useState('');
   const [openTimer, setOpenTimer] = useState('');
   const additionalClass = expanded ? 'sidebar-expanded' : 'sidebar-small';
+  const remainingTime = time.stop.diffNow();
+  const durationInMillisec = time.stop.diff(time.start).as('milliseconds');
+  const cutoffs = cutoffsInfo(durationInMillisec);
+  const warningIndex = cutoffs.findIndex((cutoff) => {
+    const tMinusRemaining = cutoff.t.minus(remainingTime).shiftTo('seconds').seconds;
+    return tMinusRemaining >= 0 && tMinusRemaining < cutoff.d;
+  });
+  const warningGlow = cutoffs[warningIndex]?.g || '';
   return (
     <div
       id="sidebar"
@@ -154,7 +162,7 @@ const ExamNavbar: React.FC<{
             Hourglass
           </h1>
         </Collapse>
-        <img src={NavbarLogo} alt="Hourglass" className="blue-glow d-inline-block float-right" style={{ height: 48, width: 66 }} />
+        <img src={NavbarLogo} alt="Hourglass" className={`blue-glow ${warningGlow} d-inline-block float-right`} style={{ height: 48, width: 66 }} />
       </div>
       <div className="m-0 p-0">
         <div className="d-flex align-items-center">

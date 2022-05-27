@@ -30,6 +30,7 @@ const VerticalScrollShadow: React.FC<{
         observer.disconnect();
       };
     }
+    return undefined;
   }, [parentRef.current, scrollRef.current]);
   return (
     <div className={`${className} scroll-shadowing`} ref={parentRef}>

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './VerticalScrollShadow.scss';
 
 const VerticalScrollShadow: React.FC<{
@@ -13,22 +13,22 @@ const VerticalScrollShadow: React.FC<{
   const [atTop, setAtTop] = useState(true);
   const [atBot, setAtBot] = useState(true);
   const marginMarkers = { topMarker: setAtTop, botMarker: setAtBot };
-  const observer = useMemo(() => (
-    new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        marginMarkers[entry.target.className](entry.isIntersecting);
-      });
-    }, {
-      root: parentRef.current,
-      rootMargin: '0px',
-      threshold: 1,
-    })
-  ), []);
-  useMemo(() => {
-    observer.disconnect();
+  useEffect(() => {
     if (parentRef.current && scrollRef.current) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          marginMarkers[entry.target.className](entry.isIntersecting);
+        });
+      }, {
+        root: parentRef.current,
+        rootMargin: '0px',
+        threshold: 1,
+      });
       observer.observe(scrollRef.current.firstElementChild);
       observer.observe(scrollRef.current.lastElementChild);
+      return () => {
+        observer.disconnect();
+      };
     }
   }, [parentRef.current, scrollRef.current]);
   return (

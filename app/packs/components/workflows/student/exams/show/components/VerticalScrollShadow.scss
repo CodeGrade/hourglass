@@ -9,7 +9,9 @@
     left: 0;
     right: 0;
   }
-  > div.not-top::before {
+  > div::before {
+    opacity: 0;
+    transition: opacity 0.1s linear;
     pointer-events: none;
     position: sticky;
     content: "";
@@ -32,7 +34,13 @@
     background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
     background-attachment: local, local, scroll, scroll;
   }
-  div.not-bot::after {
+  > div.not-top::before {
+    opacity: 1;
+  }
+
+  > div::after {
+    opacity: 0;
+    transition: opacity 0.1s linear;
     pointer-events: none;
     position: sticky;
     content: "";
@@ -51,6 +59,8 @@
         rgba(0, 0, 0, 0.4),
         rgba(0, 0, 0, 0)
       ) center bottom;
-  
+  }
+  > div.not-bot::after {
+    opacity: 1;
   }
 }

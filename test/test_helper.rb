@@ -13,11 +13,19 @@ Minitest::Reporters.use! [
   # Minitest::Reporters::SpecReporter.new
 ]
 
-Selenium::WebDriver::Chrome::Service.driver_path = `which chromedriver`.chomp
 
-chromium_path = `which chromium`.chomp
-chromium_path = `which chromium-browser`.chomp if chromium_path.blank?
-Selenium::WebDriver::Chrome.path = chromium_path
+def find_executable(names)
+  names.map{ |name| [name,
+    *ENV['PATH'].split(File::PATH_SEPARATOR).map {|p| File.join(p, name)}
+   ] }.flatten.find {|f| File.executable?(f)}
+end
+
+driver_path = find_executable ['chromium.chromedriver', 'chromedriver']
+if driver_path&.start_with? "/snap"
+  Selenium::WebDriver::Chrome::Service.driver_path = driver_path
+else
+  Selenium::WebDriver::Chrome.path = find_executable ['chrome', 'chromium-browser', 'chromium']
+end
 
 module ActionDispatch
   class IntegrationTest

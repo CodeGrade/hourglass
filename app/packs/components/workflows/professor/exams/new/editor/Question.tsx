@@ -167,6 +167,7 @@ export const OneQuestion: React.FC<{
           id
           dbQuestions {
             id
+            index
           }
         }
       }

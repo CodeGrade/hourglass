@@ -157,6 +157,7 @@ export const BodyItemEditor: React.FC<{
           id
           bodyItems {
             id
+            index
           }
         }
       }

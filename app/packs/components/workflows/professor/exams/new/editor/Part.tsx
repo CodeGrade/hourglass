@@ -177,6 +177,7 @@ export const OnePart: React.FC<{
           id
           parts {
             id
+            index
           }
         }
       }

@@ -10,16 +10,13 @@ class GradingCheck < ApplicationRecord
 
   delegate :exam_version, to: :registration
 
-  validates :creator, presence: true
-  validates :registration, presence: true
-
   # negative - deduction
   # positive - bonus
   validates :points, numericality: {
     allow_nil: true,
   }
 
-  validates :body_item, presence: true, uniqueness: {
+  validates :body_item, uniqueness: {
     scope: [:registration, :question, :part],
     message: 'Grading check already exists on this body item.',
   }

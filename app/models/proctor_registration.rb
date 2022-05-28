@@ -7,8 +7,6 @@ class ProctorRegistration < ApplicationRecord
 
   belongs_to :room, optional: true
 
-  validates :user, presence: true
-  validates :exam, presence: true
   validate :room_in_exam
 
   delegate :course, to: :exam

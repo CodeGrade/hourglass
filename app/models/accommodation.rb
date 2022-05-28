@@ -5,7 +5,7 @@
 class Accommodation < ApplicationRecord
   belongs_to :registration
 
-  validates :registration, presence: true, uniqueness: { message: 'already has an accommodation' }
+  validates :registration, uniqueness: { message: 'already has an accommodation' }
   validates :percent_time_expansion, numericality: {
     only_integer: true,
     greater_than_or_equal_to: 0,

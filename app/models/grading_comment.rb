@@ -11,8 +11,6 @@ class GradingComment < ApplicationRecord
   delegate :exam_version, to: :registration
   belongs_to :preset_comment, optional: true
 
-  validates :creator, presence: true
-  validates :registration, presence: true
   validates :message, presence: true
 
   # negative - deduction

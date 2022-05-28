@@ -31,7 +31,6 @@ class Exam < ApplicationRecord
   delegate :user_is_staff?, to: :course
   delegate :user_is_professor?, to: :course
 
-  validates :course, presence: true
   validates :name, presence: true
   validates :duration, presence: true, numericality: {
     only_integer: true,
@@ -215,7 +214,7 @@ class Exam < ApplicationRecord
   end
 
   def initialize_grading_locks!(reset: false)
-    pairs_by_version = exam_versions.map { |v| [v.id, v.qp_pairs] }.to_h
+    pairs_by_version = exam_versions.to_h { |v| [v.id, v.qp_pairs] }
     GradingLock.transaction do
       existing = GradingLock.where(registration: registrations)
       existing.update(grader: nil) if reset
@@ -272,19 +271,19 @@ class Exam < ApplicationRecord
     regs = registrations if regs.nil?
     all_versions = exam_versions.map { |ev| ev.bottlenose_summary(with_names: false) }
     if compatible_versions(all_versions)
-      regs.reject { |r| r.current_answers == r.exam_version.default_answers }.map do |r|
+      regs.reject { |r| r.current_answers == r.exam_version.default_answers }.to_h do |r|
         [
           r.user.username,
           r.current_part_scores,
         ]
-      end.to_h
+      end
     else
-      regs.map do |r|
+      regs.to_h do |r|
         [
           r.user.username,
           [r.current_score],
         ]
-      end.to_h
+      end
     end
   end
 

@@ -6,8 +6,6 @@ class Anomaly < ApplicationRecord
 
   after_create :trigger_subscription
 
-  validates :registration, presence: true
-
   delegate :user, to: :registration
   delegate :exam, to: :registration
   delegate :exam_version, to: :registration

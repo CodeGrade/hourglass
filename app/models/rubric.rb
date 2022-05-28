@@ -155,7 +155,7 @@ class Rubric < ApplicationRecord
   end
 
   def grading_complete_for(reg)
-    # Note: need to eliminate any ids that are nil, so we don't select too small a range of comments
+    # NOTE: need to eliminate any ids that are nil, so we don't select too small a range of comments
     coords = { question_id: question_id, part_id: part_id, body_item_id: body_item_id }.compact
     comments = multi_group_by(
       reg.grading_comments.includes(:preset_comment).where(coords),
@@ -229,18 +229,18 @@ class Rubric < ApplicationRecord
   # comment_hash is Qid -> Pid -> Bid -> Preset_id -> Comment, and so
   # is_hash should be true), and on grading checks (in which case
   # comment_hash is Qid -> Pid -> Bid -> Check, and so is_hash is false).
-  def slice_hash_on_qpb(comment_hash, is_hash: )
+  def slice_hash_on_qpb(comment_hash, is_hash:)
     relevant = comment_hash
-    if question_id
-      relevant = relevant[question_id] || {}
-    else
-      relevant = [*comment_hash.values].reduce(:merge)
-    end
-    if part_id
-      relevant = relevant[part_id] || {}
-    else
-      relevant = [*relevant.values].reduce(:merge)
-    end
+    relevant = if question_id
+                 relevant[question_id] || {}
+               else
+                 [*comment_hash.values].reduce(:merge)
+               end
+    relevant = if part_id
+                 relevant[part_id] || {}
+               else
+                 [*relevant.values].reduce(:merge)
+               end
     if body_item_id
       relevant = relevant[body_item_id] || {}
     else

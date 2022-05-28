@@ -8,8 +8,6 @@ class GradingLock < ApplicationRecord
   belongs_to :grader, class_name: 'User', optional: true
   belongs_to :completed_by, class_name: 'User', optional: true
 
-  validates :registration, presence: true
-
   validates :part, uniqueness: {
     scope: [:registration_id, :question],
     message: 'is already being graded',

@@ -29,8 +29,6 @@ class ExamVersion < ApplicationRecord
     end
   end
 
-  validates :exam, presence: true
-
   delegate :course, to: :exam
   delegate :professors, to: :exam
   delegate :proctors_and_professors, to: :exam
@@ -192,7 +190,7 @@ class ExamVersion < ApplicationRecord
     # 1+ preset_comments.
     case obj
     when Hash
-      obj.map do |k, v|
+      obj.to_h do |k, v|
         flat_key = flatten_groups k
         flat_v = flatten_groups v
         [
@@ -203,7 +201,7 @@ class ExamVersion < ApplicationRecord
             'values' => flat_v,
           },
         ]
-      end.to_h
+      end
     when Array
       obj.map { |v| flatten_groups v }
     when Rubric
@@ -295,7 +293,7 @@ class ExamVersion < ApplicationRecord
               r
             end
           end
-          pointless = pointless.map { |k, v| [k&.parent_section, v.to_h] }.to_h
+          pointless = pointless.to_h { |k, v| [k&.parent_section, v.to_h] }
           grouped = pointed.to_h.merge! pointless
         end
         grouped = flatten_groups(grouped).deep_stringify_keys

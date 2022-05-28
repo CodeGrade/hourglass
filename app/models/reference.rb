@@ -34,7 +34,7 @@ class Reference < ApplicationRecord
     path_components = path.split('/')
     path_components.each do |pc|
       break if all_files.nil?
-      
+
       all_files = all_files['nodes'] if all_files.is_a? Hash
       all_files = all_files.find { |f| f['path'] == pc }
     end

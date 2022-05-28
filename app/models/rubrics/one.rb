@@ -19,14 +19,7 @@ class One < Rubric
       if comments.dig(*qpb)&.slice(*preset_ids)&.count.to_i.positive?
         rubric_preset.compute_grade_for(reg, out_of, comments, checks, qpb)
       else
-        if Rails.env.development?
-          puts "NO USED SUBSECTION FOUND FOR reg #{reg.id} #{reg.user.display_name} and rubric #{self.id} (q #{self.question_id} #{self.question&.index}, p #{self.part_id} #{self.part&.index}, b #{self.body_item_id} #{self.body_item&.index})"
-          puts "Subsections #{subsections.map(&:id)}"
-          puts comments
-          subsections.each do |sub|
-            puts "#{sub.id} Complete? #{sub.send(:confirm_complete, reg, comments, checks)}"
-          end
-        end
+        log_debug_info(reg, comments, checks, qpb) if Rails.env.development?
         points
       end
     else
@@ -48,6 +41,16 @@ class One < Rubric
         slice_hash_on_qpb(checks, is_hash: false)&.count.to_i) == 1
     else
       subsections.one? { |s| s.send(:confirm_complete, reg, comments, checks) }
+    end
+  end
+
+  def log_debug_info(reg, comments, checks, _qpb)
+    qpb_info = "(q#{question_id} #{question&.index}, p#{part_id} #{part&.index}, b#{body_item_id} #{body_item&.index})"
+    Rails.logger.debug "NO USED SUBSECTION FOUND FOR reg #{reg.id} #{reg.user.display_name}, rubric #{id} #{qpb_info}"
+    Rails.logger.debug "Subsections #{subsections.map(&:id)}"
+    Rails.logger.debug comments
+    subsections.each do |sub|
+      Rails.logger.debug "#{sub.id} Complete? #{sub.send(:confirm_complete, reg, comments, checks)}"
     end
   end
 end

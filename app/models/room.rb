@@ -7,7 +7,6 @@ class Room < ApplicationRecord
   has_many :proctor_registrations, dependent: :restrict_with_error
   has_many :room_announcements, dependent: :destroy
 
-  validates :exam, presence: true
   validates :name, presence: true
 
   delegate :professors, to: :exam

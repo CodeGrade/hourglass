@@ -7,6 +7,5 @@ class VersionAnnouncement < ApplicationRecord
   delegate :exam, to: :exam_version
   delegate :visible_to?, to: :exam_version
 
-  validates :exam_version, presence: true
   validates :body, presence: true
 end

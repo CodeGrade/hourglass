@@ -61,3 +61,5 @@ Style/WordArray:
   EnforcedStyle: brackets
 Rails/EagerEvaluationLogMessage:
   Enabled: false
+Rails/I18nLocaleTexts:
+  Enabled: false

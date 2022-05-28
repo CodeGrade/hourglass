@@ -13,15 +13,15 @@ Minitest::Reporters.use! [
   # Minitest::Reporters::SpecReporter.new
 ]
 
-
 def find_executable(names)
-  names.map{ |name| [name,
-    *ENV['PATH'].split(File::PATH_SEPARATOR).map {|p| File.join(p, name)}
-   ] }.flatten.find {|f| File.executable?(f)}
+  names
+    .map { |name| [name, *ENV['PATH'].split(File::PATH_SEPARATOR).map { |p| File.join(p, name) }] }
+    .flatten
+    .find { |f| File.executable?(f) }
 end
 
 driver_path = find_executable ['chromium.chromedriver', 'chromedriver']
-if driver_path&.start_with? "/snap"
+if driver_path&.start_with? '/snap'
   Selenium::WebDriver::Chrome::Service.driver_path = driver_path
 else
   Selenium::WebDriver::Chrome.path = find_executable ['chrome', 'chromium-browser', 'chromium']

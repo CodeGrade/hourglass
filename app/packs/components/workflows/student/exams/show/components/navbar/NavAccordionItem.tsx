@@ -42,8 +42,7 @@ const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
   const toggle = (
     <Tooltip
       className={tooltipClassname}
-      defaultShow={(showTooltip === 'always') || undefined}
-      showTooltip={showTooltip !== 'never'}
+      showTooltip={showTooltip}
       message={tooltipMessage}
       placement={tooltipPlacement}
     >

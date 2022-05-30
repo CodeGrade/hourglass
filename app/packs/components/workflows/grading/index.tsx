@@ -1338,7 +1338,7 @@ const Grade: React.FC<{
               drop="right"
             >
               <Tooltip
-                showTooltip={nextExamLoading || anyUncommentedItems}
+                showTooltip={(nextExamLoading || anyUncommentedItems) ? 'onHover' : 'never'}
                 message={nextExamLoading
                   ? 'Please wait; still loading...'
                   : 'Some items have no comments; please grade them'}

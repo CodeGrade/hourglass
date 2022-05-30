@@ -92,10 +92,7 @@ const ShowPreset: React.FC<{
   const VariantIcon = iconForPoints(points);
   return (
     <Alert variant={variant} className="p-0 preset">
-      <Tooltip
-        showTooltip
-        message="Click to apply this message"
-      >
+      <Tooltip message="Click to apply this message">
         <Button
           disabled={loading}
           variant={variant}

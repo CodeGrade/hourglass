@@ -1021,7 +1021,7 @@ const PublishGradesButton: React.FC<{
   const reason = loading ? 'Loading...' : 'Not all exams are graded yet';
   return (
     <Tooltip
-      showTooltip={disabled}
+      showTooltip={disabled ? 'onHover' : 'never'}
       message={reason}
       placement="bottom"
     >

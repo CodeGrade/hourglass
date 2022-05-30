@@ -31,7 +31,7 @@ const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
   } = props;
   return (
     <Tooltip
-      showTooltip={disabled || !!enabledMessage}
+      showTooltip={(disabled || !!enabledMessage) ? 'onHover' : 'never'}
       message={disabled ? disabledMessage : enabledMessage}
       placement={placement}
     >

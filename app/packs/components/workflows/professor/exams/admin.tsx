@@ -586,7 +586,7 @@ export const ExamInfoEditor: React.FC<{
             </Form.Group>
           </Col>
           <Col sm="auto" className="pl-0 pr-2 d-flex flex-column justify-content-center">
-            <Icon I={BsArrow90DegLeft} />
+            <Icon I={BsArrow90DegLeft} size="1.25em" />
             <TooltipButton
               variant="link"
               disabled={false}
@@ -596,7 +596,7 @@ export const ExamInfoEditor: React.FC<{
             >
               <Icon I={linked ? GrLink : GrUnlink} />
             </TooltipButton>
-            <span style={{ transform: 'scaleY(-1)' }}><Icon I={BsArrow90DegLeft} /></span>
+            <span style={{ transform: 'scaleY(-1)' }}><Icon I={BsArrow90DegLeft} size="1.25em" /></span>
           </Col>
         </Form.Group>
         <Form.Group as={Row} controlId="examDuration" className="align-items-center my-0">
@@ -1097,25 +1097,23 @@ const ExamAdminQuery: React.FC = () => {
   );
   return (
     <DocumentTitle title={data.exam.name}>
-      <Container>
-        <ExamInformation exam={data.exam} />
-        <Form.Group>
-          <TabbedChecklist
-            exam={data.exam}
-            examId={examId}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Link to={`/exams/${data.exam.id}/proctoring`}>
-            <Button className="mr-2" variant="success">Proctor!</Button>
-          </Link>
-          <StartGradingButton />
-          <PublishGradesButton examId={data.exam} />
-          <Link to={`/exams/${data.exam.id}/submissions`}>
-            <Button className="ml-2" variant="primary">View submissions</Button>
-          </Link>
-        </Form.Group>
-      </Container>
+      <ExamInformation exam={data.exam} />
+      <Form.Group>
+        <TabbedChecklist
+          exam={data.exam}
+          examId={examId}
+        />
+      </Form.Group>
+      <Form.Group>
+        <Link to={`/exams/${data.exam.id}/proctoring`}>
+          <Button className="mr-2" variant="success">Proctor!</Button>
+        </Link>
+        <StartGradingButton />
+        <PublishGradesButton examId={data.exam} />
+        <Link to={`/exams/${data.exam.id}/submissions`}>
+          <Button className="ml-2" variant="primary">View submissions</Button>
+        </Link>
+      </Form.Group>
     </DocumentTitle>
   );
 };

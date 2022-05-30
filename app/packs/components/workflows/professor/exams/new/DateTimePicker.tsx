@@ -6,7 +6,7 @@ import {
   Dropdown,
   Button,
 } from 'react-bootstrap';
-import { BsCalendar } from 'react-icons/bs';
+import { BsCalendar3 } from 'react-icons/bs';
 import DatePicker from 'react-datepicker';
 import TimePicker from 'react-timekeeper';
 import { DateTime } from 'luxon';
@@ -85,7 +85,7 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
           id="choose-time"
           disabled={disabled}
         >
-          <BsCalendar />
+          <BsCalendar3 />
         </Dropdown.Toggle>
         <Dropdown.Menu
           alignRight

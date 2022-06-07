@@ -1,6 +1,10 @@
 name: build-docker
 
-on: push
+on:
+  push:
+    branches:
+      - master
+      - stress-changes
 
 jobs:
   docker:

@@ -89,7 +89,7 @@ interface IAlertContext {
 
 export const AlertContext = React.createContext<IAlertContext>({} as IAlertContext);
 
-export const AllAlerts: React.FC = ({ children }) => {
+export const AllAlerts: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [alerts, setAlerts] = useState<HGAlertWithID[]>([]);
   const val = useMemo<IAlertContext>(() => ({
     alert: (alert) => {

@@ -20,7 +20,7 @@ interface ErrorState {
   withContainer?: boolean;
 }
 
-type ErrorProps = Record<string, unknown>;
+type ErrorProps = React.PropsWithChildren<Record<string, unknown>>;
 
 export default class ErrorBoundary extends React.Component<ErrorProps, ErrorState> {
   constructor(props: ErrorProps) {

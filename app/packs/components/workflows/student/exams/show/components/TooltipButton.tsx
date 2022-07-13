@@ -16,7 +16,7 @@ interface TooltipButtonProps {
   size?: ButtonProps['size'];
 }
 
-const TooltipButton: React.FC<TooltipButtonProps> = (props) => {
+const TooltipButton: React.FC<React.PropsWithChildren<TooltipButtonProps>> = (props) => {
   const {
     disabled,
     disabledMessage,

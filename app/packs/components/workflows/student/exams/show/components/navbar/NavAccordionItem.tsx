@@ -23,7 +23,7 @@ export interface NavAccordionItemProps {
   tooltipClassname?: string;
 }
 
-const NavAccordionItem: React.FC<NavAccordionItemProps> = (props) => {
+const NavAccordionItem: React.FC<React.PropsWithChildren<NavAccordionItemProps>> = (props) => {
   const {
     onSectionClick,
     expanded,

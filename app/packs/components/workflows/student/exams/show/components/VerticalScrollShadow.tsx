@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './VerticalScrollShadow.scss';
 
-const VerticalScrollShadow: React.FC<{
+const VerticalScrollShadow: React.FC<React.PropsWithChildren<{
   className?: string,
-}> = (props) => {
+}>> = (props) => {
   const {
     className,
     children,

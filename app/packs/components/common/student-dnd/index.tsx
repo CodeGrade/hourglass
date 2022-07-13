@@ -62,9 +62,9 @@ interface DropStudent {
   student: Student;
 }
 
-const DropTarget: React.FC<{
+const DropTarget: React.FC<React.PropsWithChildren<{
   onAdd: (student: Student) => void;
-}> = (props) => {
+}>> = (props) => {
   const {
     children,
     onAdd,

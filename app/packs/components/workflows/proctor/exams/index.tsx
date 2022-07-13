@@ -180,7 +180,7 @@ export interface MessageProps {
   body: React.ReactElement | string;
 }
 
-const ShowMessage: React.FC<MessageProps> = (props) => {
+const ShowMessage: React.FC<React.PropsWithChildren<MessageProps>> = (props) => {
   const {
     icon,
     iconClass,

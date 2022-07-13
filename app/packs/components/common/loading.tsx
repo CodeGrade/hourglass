@@ -28,11 +28,11 @@ const STYLES = {
 
 const SPINNER = <Spinner animation="border" role="status" />;
 
-const Loading: React.FC<{
+const Loading: React.FC<React.PropsWithChildren<{
   loading: boolean;
   noText?: boolean;
   className?: string,
-}> = (props) => {
+}>> = (props) => {
   const {
     loading,
     className,

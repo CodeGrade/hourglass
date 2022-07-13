@@ -3,15 +3,11 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import ReactQuill from 'react-quill/src';
+import ReactQuill from '@kylesferrazza/react-quill';
 import QuillPasteSmart from 'quill-paste-smart';
 import './CustomEditor.scss';
 
 ReactQuill.Quill.register('modules/clipboard', QuillPasteSmart, true);
-
-// declare module ReactQuill {
-//   ReactQuill: unknown;
-// }
 
 export interface CustomEditorProps {
   value: string;
@@ -66,6 +62,7 @@ const formatOptions = [
   'formula', 'image',
   // NO 'video'
 ];
+
 
 const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
   const {

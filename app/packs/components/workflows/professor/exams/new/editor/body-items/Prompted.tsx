@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
-import ReactQuill from 'react-quill/src';
+import ReactQuill from '@kylesferrazza/react-quill';
 import { HTMLVal } from '@student/exams/show/types';
 import { EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
 

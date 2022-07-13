@@ -9,7 +9,7 @@ import {
   Form,
   Modal,
 } from 'react-bootstrap';
-import ReactQuill from 'react-quill/src';
+import ReactQuill from '@kylesferrazza/react-quill';
 import { FaTrashAlt } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import { useDebounce, useDebouncedCallback } from 'use-debounce';

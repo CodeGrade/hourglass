@@ -9,7 +9,7 @@ import {
   Form,
   Modal,
 } from 'react-bootstrap';
-import { ReactQuillProps } from 'react-quill';
+import ReactQuill from 'react-quill/src';
 import { FaTrashAlt } from 'react-icons/fa';
 import { GrDrag } from 'react-icons/gr';
 import { useDebounce, useDebouncedCallback } from 'use-debounce';
@@ -170,7 +170,7 @@ export const EditHTMLVal: React.FC<{
   placeholder?: string;
   debounceDelay?: number;
   className?: string;
-  theme?: ReactQuillProps['theme'];
+  theme?: ReactQuill.ReactQuillProps['theme'];
 }> = (props) => {
   const {
     disabled = false,

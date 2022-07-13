@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 
-const DocumentTitle: React.FC<{
+const DocumentTitle: React.FC<React.PropsWithChildren<{
   title: string;
-}> = (props) => {
+}>> = (props) => {
   const {
     title,
     children,

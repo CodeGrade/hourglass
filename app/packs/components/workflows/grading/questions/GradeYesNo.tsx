@@ -1,7 +1,7 @@
 import React from 'react';
 import { YesNoProps } from '@proctor/registrations/show/questions/DisplayYesNo';
 
-const GradeYesNo: React.FC<YesNoProps> = (props) => {
+const GradeYesNo: React.FC<React.PropsWithChildren<YesNoProps>> = (props) => {
   const {
     info,
     value,

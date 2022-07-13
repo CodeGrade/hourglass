@@ -2,9 +2,9 @@ import React from 'react';
 import { HTMLVal } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 
-const Prompted: React.FC<{
+const Prompted: React.FC<React.PropsWithChildren<{
   prompt?: HTMLVal;
-}> = (props) => {
+}>> = (props) => {
   const {
     children,
     prompt,

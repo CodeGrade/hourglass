@@ -739,20 +739,20 @@ const BodyItemGrades: React.FC<{
 };
 
 interface AnswersRowProps<T, V> {
-  ShowStudent?: React.ComponentType<{
+  ShowStudent?: React.ComponentType<React.PropsWithChildren<{
     info: T,
     value: V,
     valueUpdate?: React.DependencyList;
     refreshProps: React.DependencyList;
     fullyExpandCode?: boolean;
-  }>;
-  ShowExpected: React.ComponentType<{
+  }>>;
+  ShowExpected: React.ComponentType<React.PropsWithChildren<{
     info: T,
     value: V,
     valueUpdate?: React.DependencyList;
     refreshProps: React.DependencyList;
     fullyExpandCode?: boolean;
-  }>;
+  }>>;
   info: T;
   studentAnswer: V;
   expectedAnswer: V;

@@ -63,7 +63,7 @@ export interface RearrangeableListProps<T extends { id: string }> {
 }
 
 export function RearrangeableList<T extends { id: string }>(
-  props: React.PropsWithChildren<RearrangeableListProps<T>>,
+  props: RearrangeableListProps<T>,
 ): React.ReactElement {
   const {
     dbArray,

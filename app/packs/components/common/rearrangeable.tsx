@@ -202,6 +202,7 @@ const RearrangeableItem: React.FC<{
     },
   });
   const [{ isDragging }, drag, preview] = useDrag({
+    type: identifier,
     item: { type: identifier, index, startIndex: index },
     collect: (monitor: DragSourceMonitor) => ({
       isDragging: monitor.isDragging(),

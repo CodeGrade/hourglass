@@ -85,6 +85,7 @@ const DraggableStudent: React.FC<{
     student,
   } = props;
   const [{ isDragging }, drag] = useDrag<DropStudent, DropStudent, { isDragging: boolean }>({
+    type: 'STUDENT',
     item: {
       type: 'STUDENT',
       student,

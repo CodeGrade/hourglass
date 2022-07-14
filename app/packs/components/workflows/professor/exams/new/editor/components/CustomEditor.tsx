@@ -63,7 +63,6 @@ const formatOptions = [
   // NO 'video'
 ];
 
-
 const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
   const {
     value,

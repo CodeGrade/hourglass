@@ -60,7 +60,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 @each $color, $value in $theme-colors {
-  div.alert-#{$color} .remirror-theme .remirror-floating-popover .remirror-button-active {
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-button-active {
     background-color: theme-color-level($color, $alert-bg-level) !important;
     border-color: theme-color-level($color, $alert-border-level) !important;
     color: theme-color-level($color, $alert-color-level) !important;

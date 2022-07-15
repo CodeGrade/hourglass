@@ -60,7 +60,14 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 @each $color, $value in $theme-colors {
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-button-active {
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-button-active,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-button:hover,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-button:hover,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-button:active,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-button[aria-expanded="true"],
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-item:hover,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-item:active,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-item:focus {
     background-color: theme-color-level($color, $alert-bg-level) !important;
     border-color: theme-color-level($color, $alert-border-level) !important;
     color: theme-color-level($color, $alert-color-level) !important;

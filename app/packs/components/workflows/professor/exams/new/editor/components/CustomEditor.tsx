@@ -3,7 +3,6 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import { v3 as uuid } from 'uuid';
 import ReactQuill from 'react-quill';
 import QuillPasteSmart from 'quill-paste-smart';
 import { 
@@ -17,7 +16,6 @@ import {
   ComponentItem,
 } from '@remirror/react';
 import { AllStyledComponent } from '@remirror/styles/emotion';
-import '@remirror/styles/all.css';
 import { BubbleMenu } from './RemirrorBubbleMenu';
 import { TopToolbar } from './RemirrorTopToolbar';
 import { 
@@ -44,6 +42,7 @@ import {
   PlaceholderExtension, PlaceholderOptions,
 } from 'remirror/extensions';
 import './CustomEditor.scss';
+import ErrorBoundary from '@hourglass/common/boundary';
 
 ReactQuill.Quill.register('modules/clipboard', QuillPasteSmart, true);
 
@@ -80,7 +79,6 @@ const DEFAULT_OPTIONS: WysiwygOptions = {
 
 const RemirrorEditor: React.FC<React.PropsWithChildren<CustomEditorProps & { 
     options?: WysiwygOptions,
-    readOnly?: boolean,
   }>> = (props) => {
   const {
     value,
@@ -117,24 +115,23 @@ const RemirrorEditor: React.FC<React.PropsWithChildren<CustomEditorProps & {
     [placeholder]);
   const { manager, state } = useRemirror({
     extensions: extensions,
-    extraAttributes: [
-      {identifiers: ['code', 'codeblock'], attributes: { id: { default: () => uuid() } }}
-    ],
     content: value,
     selection: 'end',
     stringHandler: 'html',
   });
   return (
-    <AllStyledComponent>
-      <ThemeProvider>
-        <Remirror manager={manager} initialContent={state}>
-          <TopToolbar items={remirrorToolbarOptions} refocusEditor label="Top Toolbar" />
-          <EditorComponent />
-          <BubbleMenu items={remirrorToolbarOptions} />
-          {children}
-        </Remirror>
-      </ThemeProvider>
-    </AllStyledComponent>
+    <ErrorBoundary>
+      <AllStyledComponent className='position-relative'>
+        <ThemeProvider>
+          <Remirror manager={manager} initialContent={state} editable={!disabled} classNames={['position-static']}>
+            {theme === 'snow' && !disabled && <TopToolbar items={remirrorToolbarOptions} refocusEditor label="Top Toolbar" />}
+            {theme !== 'snow' && <BubbleMenu enabled={!disabled} items={remirrorToolbarOptions} />}
+            <EditorComponent />
+            {children}
+          </Remirror>
+        </ThemeProvider>
+      </AllStyledComponent>
+    </ErrorBoundary>
   )
 };
 
@@ -199,19 +196,19 @@ const remirrorToolbarOptions : ToolbarItemUnion[] = [
             items: [
               {
                 type: ComponentItem.MenuCommandPane,
-                commandName: "setLeftAlign",
+                commandName: "leftAlign",
               },
               {
                 type: ComponentItem.MenuCommandPane,
-                commandName: "setCenterAlign",
+                commandName: "centerAlign",
               },
               {
                 type: ComponentItem.MenuCommandPane,
-                commandName: "setRightAlign",
+                commandName: "rightAlign",
               },
               {
                 type: ComponentItem.MenuCommandPane,
-                commandName: "setJustified",
+                commandName: "justifyAlign",
               },
             ],
           },
@@ -364,7 +361,7 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
   }, []);
 
   return (
-    <div className="d-inline-block">
+    <div className="d-inline-block w-100">
       <p>Quill:</p>
       <ReactQuill
         ref={ref}
@@ -379,10 +376,11 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
       />
       <p>Remirror:</p>
       <RemirrorEditor
-        readOnly={disabled}
+        disabled={disabled}
         id={`${id}-remirror`}
         className={className}
         value={value}
+        theme={theme || 'snow'}
         placeholder={placeholder}
         onChange={() => {}}
         />

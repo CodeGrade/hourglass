@@ -96,6 +96,12 @@
       border-top-right-radius: 0px;
     }
   }
+  .remirror-menu-item {
+    width: 100%;
+  }
+  button.remirror-menu-item-column {
+    padding-right: var(--rmr-space-2);
+  }
   .remirror-tooltip, &.remirror-tooltip { 
     background-color: white; 
     border: 1px solid black;

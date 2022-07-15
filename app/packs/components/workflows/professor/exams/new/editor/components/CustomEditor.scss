@@ -53,3 +53,74 @@
   border: 1px solid gray;
   border-radius: 2px;
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+.remirror-theme {
+  --rmr-font-family-default: "Helvetica", "Arial", sans-serif !important;
+  .remirror-toolbar {
+    height: 30px;
+    border: 1px solid var(--rmr-color-border);
+    border-top-left-radius: var(--rmr-radius-border);
+    border-top-right-radius: var(--rmr-radius-border);
+    padding: 2px;
+    > button, > .remirror-group > button, > .remirror-group > .remirror-role > button {
+      padding: 3px; 
+      width: 24px;
+      height: 24px;
+    }
+    > .remirror-group > .remirror-role:not(:first-child) > button {
+      border-bottom-left-radius: 0px;
+      border-top-left-radius: 0px;
+    }
+    > .remirror-group > .remirror-role:not(:last-child) > button {
+      border-bottom-right-radius: 0px;
+      border-top-right-radius: 0px;
+    }
+  }
+  .remirror-tooltip, &.remirror-tooltip { 
+    background-color: white; 
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 2px;
+  }
+  div.remirror-editor-wrapper { // need the div to increase the rule specificity
+    border: 1px solid var(--rmr-color-border);
+    border-radius: var(--rmr-radius-border);
+    padding-top: 0px;
+    background-color: white;
+    .ProseMirror, .ProseMirror:focus {
+      box-shadow: none; 
+      height: 100%;
+      min-height: unset;
+      padding: calc(0.75*var(--rmr-space-3)) var(--rmr-space-3);
+      color: initial;
+    }
+  }
+  .remirror-toolbar + .remirror-editor-wrapper {
+    padding-top: 0px;
+    border: 1px solid var(--rmr-color-border);
+    border-top: 0px;
+    border-bottom-left-radius: var(--rmr-radius-border);
+    border-bottom-right-radius: var(--rmr-radius-border);
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+  }
+  .remirror-floating-popover {
+    z-index: 1000;
+    > .remirror-toolbar {
+      font-size: initial;
+      background-color: rgb(68, 68, 68);
+      border-radius: 25px; //var(--rmr-radius-border);
+      padding: var(--rmr-space-2) var(--rmr-space-3);
+      height: calc(24px + 2*var(--rmr-space-2));
+      .remirror-separator { border-color: rgb(136, 136, 136); }
+      > .remirror-role, > .remirror-group > .remirror-role { background-color: unset; }
+      > button, > .remirror-group > button, > .remirror-group > .remirror-role > button { 
+        background-color: rgb(68, 68, 68);
+        border-color: white;
+        color: white;
+        width: 28px;
+      }
+    }
+  }

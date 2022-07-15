@@ -1,5 +1,8 @@
-@import '@kylesferrazza/react-quill/dist/quill.snow.css';
-@import '@kylesferrazza/react-quill/dist/quill.bubble.css';
+@import 'node_modules/bootstrap/scss/functions';
+@import 'node_modules/bootstrap/scss/variables';
+@import 'node_modules/bootstrap/scss/mixins';
+@import 'react-quill/dist/quill.snow.css';
+@import 'react-quill/dist/quill.bubble.css';
 
 .ql-container {
   font-size: unset;
@@ -56,6 +59,14 @@
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
+@each $color, $value in $theme-colors {
+  div.alert-#{$color} .remirror-theme .remirror-floating-popover .remirror-button-active {
+    background-color: theme-color-level($color, $alert-bg-level) !important;
+    border-color: theme-color-level($color, $alert-border-level) !important;
+    color: theme-color-level($color, $alert-color-level) !important;
+  }
+}
+
 .remirror-theme {
   --rmr-font-family-default: "Helvetica", "Arial", sans-serif !important;
   .remirror-toolbar {
@@ -89,7 +100,7 @@
     border-radius: var(--rmr-radius-border);
     padding-top: 0px;
     background-color: white;
-    .ProseMirror, .ProseMirror:focus {
+    .ProseMirror, .ProseMirror:focus, .ProseMirror:active {
       box-shadow: none; 
       height: 100%;
       min-height: unset;

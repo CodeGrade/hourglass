@@ -32,8 +32,8 @@ Warden::Manager.after_set_user only: :fetch do |record, warden, options|
   if (record.respond_to?(:unique_session_id) && warden.authenticated?(scope) && options[:store] != false &&
       record.unique_session_id != warden.session(scope)['unique_session_id'] && !env['devise.skip_session_limitable'])
     Rails.logger.warn(
-      '[devise-security][session_limitable] session id mismatch: '\
-      "expected=#{record.unique_session_id.inspect} "\
+      '[devise-security][session_limitable] session id mismatch: ' \
+      "expected=#{record.unique_session_id.inspect} " \
       "actual=#{warden.session(scope)['unique_session_id'].inspect}",
     )
     warden.raw_session.clear

@@ -1,7 +1,7 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
-import { editorQueryResponse } from '@professor/exams/new/editor/__generated__/editorQuery.graphql';
+import { editorQuery$data } from '@professor/exams/new/editor/__generated__/editorQuery.graphql';
 import CodeMirror from 'codemirror';
 
 export type ExamTakerAction =
@@ -487,7 +487,7 @@ export interface AnomalyListener {
   capture?: boolean;
 }
 
-export type Policy = editorQueryResponse['examVersion']['policies'][number];
+export type Policy = editorQuery$data['examVersion']['policies'][number];
 
 export function policyPermits(policy: readonly Policy[], query: Policy): boolean {
   return policy.find((p) => p === query) !== undefined;

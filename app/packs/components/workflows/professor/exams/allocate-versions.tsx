@@ -27,12 +27,12 @@ import { useFragment, graphql } from 'react-relay';
 import { useMutationWithDefaults } from '@hourglass/common/helpers';
 
 import { TabEditButton } from './admin';
-import { allocateVersions$key, allocateVersions } from './__generated__/allocateVersions.graphql';
+import { allocateVersions$key, allocateVersions$data } from './__generated__/allocateVersions.graphql';
 import { allocateVersionsMutation } from './__generated__/allocateVersionsMutation.graphql';
 
-type Section = allocateVersions['course']['sections'][number];
-type Student = allocateVersions['unassignedStudents'][number];
-type Version = allocateVersions['examVersions']['edges'][number]['node'];
+type Section = allocateVersions$data['course']['sections'][number];
+type Student = allocateVersions$data['unassignedStudents'][number];
+type Version = allocateVersions$data['examVersions']['edges'][number]['node'];
 
 interface FormContextType {
   sections: readonly Section[];

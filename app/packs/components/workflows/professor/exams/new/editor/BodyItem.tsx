@@ -35,13 +35,13 @@ import Matching from './body-items/Matching';
 import { SingleRubricKeyEditor } from './Rubric';
 import { DragHandle, DestroyButton } from './components/helpers';
 
-import { PartEditor } from './__generated__/PartEditor.graphql';
+import { PartEditor$data } from './__generated__/PartEditor.graphql';
 import { BodyItemEditor$key } from './__generated__/BodyItemEditor.graphql';
 import { BodyItemDestroyMutation } from './__generated__/BodyItemDestroyMutation.graphql';
 import { BodyItemReorderMutation } from './__generated__/BodyItemReorderMutation.graphql';
 
 export const ReorderableBodyItemsEditor: React.FC<{
-  bodyItems: PartEditor['bodyItems'];
+  bodyItems: PartEditor$data['bodyItems'];
   partId: string;
   disabled?: boolean;
   showRubricEditors?: boolean;

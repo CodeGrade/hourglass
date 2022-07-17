@@ -31,7 +31,7 @@ import { TabEditButton } from '@professor/exams/admin';
 import { graphql, useFragment } from 'react-relay';
 import { useMutationWithDefaults } from '@hourglass/common/helpers';
 
-import { roomsIndex, roomsIndex$key } from './__generated__/roomsIndex.graphql';
+import { roomsIndex$data, roomsIndex$key } from './__generated__/roomsIndex.graphql';
 import { roomsUpdateMutation } from './__generated__/roomsUpdateMutation.graphql';
 
 const EditExamRooms: React.FC<{
@@ -76,7 +76,7 @@ const EditExamRooms: React.FC<{
 
 export default EditExamRooms;
 
-function createInitialValues(rooms: roomsIndex['rooms']): FormValues {
+function createInitialValues(rooms: roomsIndex$data['rooms']): FormValues {
   return {
     rooms: rooms.map(({
       name,
@@ -93,7 +93,7 @@ function createInitialValues(rooms: roomsIndex['rooms']): FormValues {
 
 const Editable: React.FC<{
   examId: string;
-  rooms: roomsIndex['rooms'];
+  rooms: roomsIndex$data['rooms'];
 }> = (props) => {
   const {
     examId,
@@ -111,7 +111,7 @@ const Editable: React.FC<{
 };
 
 const Readonly: React.FC<{
-  rooms: roomsIndex['rooms'];
+  rooms: roomsIndex$data['rooms'];
 }> = (props) => {
   const {
     rooms,

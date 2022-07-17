@@ -181,6 +181,19 @@ class HourglassSchema < GraphQL::Schema
     end
   end
 
+  def self.write_graphql!
+    File.open('app/packs/relay/data/schema.graphql', 'w') do |f|
+      schema_str = GraphQL::Schema::Printer.print_schema(self)
+      f.write(schema_str)
+    end
+  end
+
+  def self.ensure_queries_file!
+    File.open('./config/schemas/graphql-queries.json', 'w') do |f|
+      # just open the file without writing anything
+    end
+  end
+
   def self.do_mutation!(mutation_query, user, input)
     execute(
       mutation_query,

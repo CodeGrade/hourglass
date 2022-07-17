@@ -30,10 +30,27 @@
         "type": "github"
       }
     },
+    "nixpkgs-watchman": {
+      "locked": {
+        "lastModified": 1658023725,
+        "narHash": "sha256-23kjGQeociWiCQih8qzulZrSwcWtZv9xX0wGd0m/iDU=",
+        "owner": "kylesferrazza",
+        "repo": "nixpkgs",
+        "rev": "4bbeac4da6df015a03b4249494969626dbbb6c39",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kylesferrazza",
+        "ref": "update-watchman",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "nixpkgs": "nixpkgs",
-        "nixpkgs-ruby": "nixpkgs-ruby"
+        "nixpkgs-ruby": "nixpkgs-ruby",
+        "nixpkgs-watchman": "nixpkgs-watchman"
       }
     }
   },

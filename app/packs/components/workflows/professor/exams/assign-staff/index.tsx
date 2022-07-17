@@ -27,11 +27,11 @@ import { useFragment, graphql } from 'react-relay';
 import { useMutationWithDefaults } from '@hourglass/common/helpers';
 import { TabEditButton } from '@professor/exams/admin';
 
-import { assignStaff, assignStaff$key } from './__generated__/assignStaff.graphql';
+import { assignStaff$data, assignStaff$key } from './__generated__/assignStaff.graphql';
 import { assignStaffUpdateMutation } from './__generated__/assignStaffUpdateMutation.graphql';
 
 interface FormContextType {
-  sections: assignStaff['course']['sections'];
+  sections: assignStaff$data['course']['sections'];
 }
 
 const FormContext = React.createContext<FormContextType>({
@@ -154,7 +154,7 @@ const Students: React.FC<WrappedFieldArrayProps<Student>> = (props) => {
   );
 };
 
-type Section = assignStaff['course']['sections'][number];
+type Section = assignStaff$data['course']['sections'][number];
 
 interface FormRoom {
   id: string;
@@ -374,10 +374,10 @@ const DNDForm = reduxForm<FormValues, StaffSeatingFormExtraProps>({
 
 interface StaffAssignmentProps {
   examId: string;
-  sections: assignStaff['course']['sections'];
-  unassigned: assignStaff['unassignedStaff'];
-  proctors: assignStaff['proctorRegistrationsWithoutRooms'];
-  rooms: assignStaff['rooms'];
+  sections: assignStaff$data['course']['sections'];
+  unassigned: assignStaff$data['unassignedStaff'];
+  proctors: assignStaff$data['proctorRegistrationsWithoutRooms'];
+  rooms: assignStaff$data['rooms'];
 }
 
 const Editable: React.FC<StaffAssignmentProps> = (props) => {

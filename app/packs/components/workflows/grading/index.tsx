@@ -123,7 +123,7 @@ import { gradingCompletion$key } from './__generated__/gradingCompletion.graphql
 import { gradingVersionAdmin$key } from './__generated__/gradingVersionAdmin.graphql';
 import { gradingExamAdmin$key } from './__generated__/gradingExamAdmin.graphql';
 import { gradingBeginGrading$key } from './__generated__/gradingBeginGrading.graphql';
-import { gradingMyGrading, gradingMyGrading$key } from './__generated__/gradingMyGrading.graphql';
+import { gradingMyGrading$data, gradingMyGrading$key } from './__generated__/gradingMyGrading.graphql';
 import { gradingQuery } from './__generated__/gradingQuery.graphql';
 import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 import { gradingGraderQuery } from './__generated__/gradingGraderQuery.graphql';
@@ -1771,8 +1771,8 @@ const allBlank = (stats) => {
   return stats.notStarted === 0;
 };
 
-type GradingLockInfo = gradingMyGrading['examVersions']['edges'][number]['node']['inProgress']['edges'][number]['node'];
-type QPInfo = gradingMyGrading['examVersions']['edges'][number]['node']['qpPairs'];
+type GradingLockInfo = gradingMyGrading$data['examVersions']['edges'][number]['node']['inProgress']['edges'][number]['node'];
+type QPInfo = gradingMyGrading$data['examVersions']['edges'][number]['node']['qpPairs'];
 
 const groupTree = (
   collection: {readonly edges: readonly {readonly node: GradingLockInfo}[]},

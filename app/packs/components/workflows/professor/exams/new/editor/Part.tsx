@@ -35,7 +35,7 @@ import EditReference from './Reference';
 import { SEP_SUB_YESNO } from './Question';
 import { ReorderableBodyItemsEditor } from './BodyItem';
 
-import { QuestionEditor } from './__generated__/QuestionEditor.graphql';
+import { QuestionEditor$data } from './__generated__/QuestionEditor.graphql';
 import { PartEditor$key } from './__generated__/PartEditor.graphql';
 import { PartDestroyMutation } from './__generated__/PartDestroyMutation.graphql';
 import { PartChangeMutation } from './__generated__/PartChangeMutation.graphql';
@@ -51,7 +51,7 @@ import { useCreateYesNoMutation } from './body-items/YesNo';
 import { useCreateHtmlMutation } from './body-items/Html';
 
 export const ReorderablePartsEditor: React.FC<{
-  parts: QuestionEditor['parts'];
+  parts: QuestionEditor$data['parts'];
   disabled?: boolean;
   questionId: string;
   showRubricEditors?: boolean;

@@ -3,6 +3,7 @@ reloader = ActiveSupport::FileUpdateChecker.new([], {
   Rails.root.join('app/graphql/mutations').to_s => ['rb'],
 }) do
   HourglassSchema.write_json!
+  HourglassSchema.write_graphql!
 end
 
 Rails.application.config.to_prepare do
@@ -11,6 +12,7 @@ end
 
 Rails.application.config.after_initialize do
   HourglassSchema.write_json!
+  HourglassSchema.write_graphql!
 end
 
 if File.exists?(Rails.root.join('config/schemas/graphql-queries.json'))

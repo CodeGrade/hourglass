@@ -26,8 +26,8 @@ import Icon from '@student/exams/show/components/Icon';
 import { MdPerson } from 'react-icons/md';
 
 import { homeQuery } from './__generated__/homeQuery.graphql';
-import { home_futureregs$key, home_futureregs as HFR } from './__generated__/home_futureregs.graphql';
-import { home_studentregs$key, home_studentregs as HSR } from './__generated__/home_studentregs.graphql';
+import { home_futureregs$key, home_futureregs$data as HFR } from './__generated__/home_futureregs.graphql';
+import { home_studentregs$key, home_studentregs$data as HSR } from './__generated__/home_studentregs.graphql';
 import { home_profregs$key } from './__generated__/home_profregs.graphql';
 import { home_proctorregs$key } from './__generated__/home_proctorregs.graphql';
 import { home_staffregs$key } from './__generated__/home_staffregs.graphql';

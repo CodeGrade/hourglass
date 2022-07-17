@@ -98,7 +98,7 @@ function expandRubric(rawRubric : RawRubric, rubricsByID: RawRubricMap): Rubric 
   }
 }
 
-type RawRootRubric = Omit<RubricSingle$data, ' $refType'>;
+type RawRootRubric = Omit<RubricSingle$data, ' $fragmentType'>;
 
 export function expandRootRubric(rawRubric : RawRootRubric): Rubric {
   const rubricsById: RawRubricMap = {};

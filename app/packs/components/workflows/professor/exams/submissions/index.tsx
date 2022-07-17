@@ -31,14 +31,14 @@ import DocumentTitle from '@hourglass/common/documentTitle';
 import { CurrentGrading } from '@professor/exams/types';
 import { describeRemainingTime } from '@student/exams/show/components/navbar/TimeRemaining';
 
-import { submissionsAllQuery, submissionsAllQueryResponse } from './__generated__/submissionsAllQuery.graphql';
+import { submissionsAllQuery, submissionsAllQuery$data } from './__generated__/submissionsAllQuery.graphql';
 import { submissionsRootQuery } from './__generated__/submissionsRootQuery.graphql';
 import { submissionsAuditRootQuery } from './__generated__/submissionsAuditRootQuery.graphql';
 import { submissionsStaffQuery } from './__generated__/submissionsStaffQuery.graphql';
 import { submissionsAuditStaffQuery } from './__generated__/submissionsAuditStaffQuery.graphql';
 import { submissionsStudentQuery } from './__generated__/submissionsStudentQuery.graphql';
 
-type Registration = submissionsAllQueryResponse['exam']['registrations'][number];
+type Registration = submissionsAllQuery$data['exam']['registrations'][number];
 
 const ExamSubmissions: React.FC = () => (
   <ErrorBoundary>

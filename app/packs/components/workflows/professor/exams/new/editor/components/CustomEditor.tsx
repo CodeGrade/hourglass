@@ -7,11 +7,9 @@ import ReactQuill from 'react-quill';
 import QuillPasteSmart from 'quill-paste-smart';
 import { 
   useRemirror,
-  useCommands,
   ThemeProvider,
   Remirror,
   EditorComponent,
-  Toolbar,
   ToolbarItemUnion,
   ComponentItem,
 } from '@remirror/react';
@@ -33,7 +31,7 @@ import {
   BlockquoteExtension,
   CodeExtension,
   CodeBlockExtension, CodeBlockOptions,
-  LinkExtension, LinkOptions,
+  LinkOptions,
   NodeFormattingExtension,
   TrailingNodeExtension, TrailingNodeOptions,
   SearchExtension, SearchOptions,
@@ -43,6 +41,7 @@ import {
 } from 'remirror/extensions';
 import './CustomEditor.scss';
 import ErrorBoundary from '@hourglass/common/boundary';
+import { prosemirrorNodeToHtml, RemirrorEventListenerProps } from 'remirror';
 
 ReactQuill.Quill.register('modules/clipboard', QuillPasteSmart, true);
 
@@ -106,24 +105,39 @@ const RemirrorEditor: React.FC<React.PropsWithChildren<CustomEditorProps & {
       new TextColorExtension({}),
       new BlockquoteExtension(),
       new FontFamilyExtension(),
-      new FontSizeExtension({}),
+      new FontSizeExtension({
+        defaultSize: '16',
+        unit: 'px',
+      }),
       new BulletListExtension({}),
       new OrderedListExtension({}),
-      new NodeFormattingExtension({}),
+      new NodeFormattingExtension(disableTab ? { indents: [] } : {}),
       new CodeBlockExtension({}),
     ],
     [placeholder]);
-  const { manager, state } = useRemirror({
+  const { manager, state, setState } = useRemirror({
     extensions: extensions,
     content: value,
     selection: 'end',
     stringHandler: 'html',
   });
+  const updateState = useCallback((parameter: RemirrorEventListenerProps<Remirror.Extensions>) => {
+    setState(parameter.state);
+    if (parameter.tr?.docChanged && onChange) {
+      onChange(prosemirrorNodeToHtml(parameter.state.doc), null, "user", null);
+    }
+  }, [setState, onChange]);
   return (
     <ErrorBoundary>
       <AllStyledComponent className='position-relative'>
         <ThemeProvider>
-          <Remirror manager={manager} initialContent={state} editable={!disabled} classNames={['position-static']}>
+          <Remirror 
+            manager={manager}
+            initialContent={state}
+            onChange={updateState}
+            editable={!disabled}
+            classNames={['position-static']}
+          >
             {theme === 'snow' && !disabled && <TopToolbar items={remirrorToolbarOptions} refocusEditor label="Top Toolbar" />}
             {theme !== 'snow' && <BubbleMenu enabled={!disabled} items={remirrorToolbarOptions} />}
             <EditorComponent />
@@ -172,6 +186,44 @@ const remirrorToolbarOptions : ToolbarItemUnion[] = [
     type: ComponentItem.ToolbarGroup,
     label: "Simple Formatting",
     items: [
+      { 
+        type: ComponentItem.ToolbarMenu,
+        label: "Font family",
+        icon: "fontSize2",
+        items: [
+          {
+            type: ComponentItem.MenuGroup,
+            role: "radio",
+            items: [
+              {
+                type: ComponentItem.MenuCommandPane, 
+                commandName: "increaseFontSize",
+                shortcut: "^ +",
+              },
+              {
+                type: ComponentItem.MenuCommandPane,
+                commandName: "decreaseFontSize",
+                shortcut: "^ -",
+              },
+              {
+                type: ComponentItem.MenuPane,
+                onClick: (_event, context) => context.commands.toggleFontFamily("serif"),
+                label: "Serif",
+              },
+              {
+                type: ComponentItem.MenuPane,
+                onClick: (_event, context) => context.commands.toggleFontFamily("sansserif"),
+                label: "Sans Serif",
+              },
+              {
+                type: ComponentItem.MenuPane,
+                onClick: (_event, context) => context.commands.toggleFontFamily("monospace"),
+                label: "Monospace",
+              },
+            ]
+          }
+        ]
+      },
       { type: ComponentItem.ToolbarCommandButton, commandName: "toggleBold", display: "icon" },
       { type: ComponentItem.ToolbarCommandButton, commandName: "toggleItalic", display: "icon" },
       { type: ComponentItem.ToolbarCommandButton, commandName: "toggleUnderline", display: "icon" },
@@ -377,12 +429,13 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
       <p>Remirror:</p>
       <RemirrorEditor
         disabled={disabled}
+        disableTab={disableTab}
         id={`${id}-remirror`}
         className={className}
         value={value}
         theme={theme || 'snow'}
         placeholder={placeholder}
-        onChange={() => {}}
+        onChange={onChange}
         />
     </div>
   );

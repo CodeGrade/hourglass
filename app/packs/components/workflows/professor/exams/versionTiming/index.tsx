@@ -3,20 +3,17 @@ import {
   Button,
   Row,
   Col,
-  Card,
-  ToggleButtonGroup,
-  ToggleButton,
 } from 'react-bootstrap';
+import { graphql, useFragment } from 'react-relay';
+import { DateTime } from 'luxon';
+import { BsPencilSquare } from 'react-icons/bs';
 import Icon from '@student/exams/show/components/Icon';
 import { AlertContext } from '@hourglass/common/alerts';
-import { graphql, useFragment } from 'react-relay';
-import { ExamTimesViewer, ExamTimesEditor } from './editors';
 import { useMutationWithDefaults } from '@hourglass/common/helpers';
+import { ExamTimesViewer, ExamTimesEditor } from './editors';
 
 import { versionTiming$key, versionTiming } from './__generated__/versionTiming.graphql';
 import { versionTimingUpdateMutation } from './__generated__/versionTimingUpdateMutation.graphql';
-import { DateTime } from 'luxon';
-import { BsPencilSquare } from 'react-icons/bs';
 
 const EditExamVersionTiming: React.FC<{
   examKey: versionTiming$key;
@@ -50,24 +47,24 @@ const EditExamVersionTiming: React.FC<{
     startTime,
     endTime,
     duration,
-    examVersions
+    examVersions,
   } = res;
   return (
     <>
-      {examVersions.edges.map((n) => <ExamVersionInfoEditor
-        key={n.node.id}
-        examVersionId={n.node.id}
-        examStart={DateTime.fromISO(startTime)}
-        examEnd={DateTime.fromISO(endTime)}
-        examDuration={duration}
-        version={n.node}
+      {examVersions.edges.map((n) => (
+        <ExamVersionInfoEditor
+          key={n.node.id}
+          examVersionId={n.node.id}
+          examStart={DateTime.fromISO(startTime)}
+          examEnd={DateTime.fromISO(endTime)}
+          examDuration={duration}
+          version={n.node}
         />
-      )}
+      ))}
     </>
   );
-}
+};
 export default EditExamVersionTiming;
-
 
 const ExamVersionInfoEditor: React.FC<{
   examVersionId: string,
@@ -81,7 +78,7 @@ const ExamVersionInfoEditor: React.FC<{
     examStart,
     examEnd,
     examDuration,
-    version
+    version,
   } = props;
   const { alert } = useContext(AlertContext);
   const versionStartTime = version.startTime && DateTime.fromISO(version.startTime);
@@ -126,7 +123,8 @@ const ExamVersionInfoEditor: React.FC<{
         <h3>
           {version.name}
           {showEditor
-            ? <span className="float-right">
+            ? (
+              <span className="float-right">
                 <Button
                   variant="danger"
                   disabled={loading}
@@ -137,27 +135,29 @@ const ExamVersionInfoEditor: React.FC<{
                           examVersionId,
                           duration: null,
                           startTime: null,
-                          endTime: null
+                          endTime: null,
                         },
-                        withRubric: true
+                        withRubric: true,
                       },
                     });
-                  }}>
+                  }}
+                >
                   Reset
                 </Button>
-                <Button 
-                  variant="secondary" 
+                <Button
+                  variant="secondary"
                   disabled={loading}
                   className="ml-2"
                   onClick={() => {
                     setStartTime(versionStartTime || examStart);
                     setEndTime(versionEndTime || examEnd);
-                    setDuration(versionDuration ?? examDuration)
+                    setDuration(versionDuration ?? examDuration);
                     setShowEditor(false);
-                  }}>
+                  }}
+                >
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   disabled={loading}
                   className="ml-2"
                   onClick={() => {
@@ -169,89 +169,47 @@ const ExamVersionInfoEditor: React.FC<{
                           startTime: startTime.toISO(),
                           endTime: endTime.toISO(),
                         },
-                        withRubric: true
-                      }
+                        withRubric: true,
+                      },
                     });
-                  }}>
+                  }}
+                >
                   Save
                 </Button>
               </span>
-            : <span className="float-right">
-               <Button onClick={() => setShowEditor(true)}>
-                 <Icon I={BsPencilSquare} />
-                 <span className="ml-2">
-                   Edit
-                 </span>
-               </Button>
-             </span>
-          }
+            )
+            : (
+              <span className="float-right">
+                <Button onClick={() => setShowEditor(true)}>
+                  <Icon I={BsPencilSquare} />
+                  <span className="ml-2">
+                    Edit
+                  </span>
+                </Button>
+              </span>
+            )}
         </h3>
         {showEditor
-          ? <ExamTimesEditor
+          ? (
+            <ExamTimesEditor
               start={startTime}
               setStart={setStartTime}
               end={endTime}
               setEnd={setEndTime}
               duration={duration}
               setDuration={setDuration}
-              unsetPlaceholder={'Same as exam'}
-          />
-          : <ExamTimesViewer
-            startTime={versionStartTime}
-            endTime={versionEndTime}
-            duration={versionDuration}
-            placeholder={'Same as exam'}
-          />
-        }
+              unsetPlaceholder="Same as exam"
+            />
+          )
+          : (
+            <ExamTimesViewer
+              startTime={versionStartTime}
+              endTime={versionEndTime}
+              duration={versionDuration}
+              placeholder="Same as exam"
+            />
+          )}
       </Col>
     </Row>
-  );
-};
-
-const ExamVersionInfoEditorOld: React.FC<{
-  onClickEdit: () => void;
-  startTime: DateTime;
-  endTime: DateTime;
-  duration: number;
-}> = (props) => {
-  const {
-    onClickEdit,
-    startTime,
-    endTime,
-    duration,
-  } = props;
-  const [customTime, useCustomTime] = useState(
-    startTime !== null || endTime !== null || duration !== null
-  );
-  return (
-    <Card>
-      <Card.Body>
-        <Row>
-          <Col>
-            <span className="mr-3">Time availability:</span>
-            <ToggleButtonGroup
-              name="availability"
-              size='sm'
-              type="radio"
-              value={customTime ? 'yes' : 'no'}
-              onChange={(newVal: 'yes' | 'no') => useCustomTime(newVal === 'yes')}
-            >
-              <ToggleButton
-                variant='outline-primary'
-                value="no"
-              >
-                Same as exam
-              </ToggleButton>
-              <ToggleButton
-                variant='outline-primary'
-                value="yes"
-              >
-                Customized
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Col>
-        </Row>
-      </Card.Body>
-    </Card>
   );
 };

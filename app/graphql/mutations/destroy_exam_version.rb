@@ -6,6 +6,7 @@ module Mutations
     argument :exam_version_id, ID, required: true, loads: Types::ExamVersionType
 
     field :deletedId, ID, null: false
+    field :exam, Types::ExamType, null: false
 
     def authorized?(exam_version:)
       return true if exam_version.course.user_is_professor?(context[:current_user])
@@ -17,10 +18,14 @@ module Mutations
       check_final(exam_version)
       check_started(exam_version)
 
+      exam = exam_version.exam
       destroyed = exam_version.destroy
       raise GraphQL::ExecutionError, exam_version.errors.full_messages.to_sentence unless destroyed
 
-      { deletedId: HourglassSchema.id_from_object(exam_version, Types::ExamVersionType, context) }
+      { 
+        deletedId: HourglassSchema.id_from_object(exam_version, Types::ExamVersionType, context) ,
+        exam: exam
+      }
     end
 
     private

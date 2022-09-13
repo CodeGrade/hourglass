@@ -717,6 +717,26 @@ const ShowVersion: React.FC<{
     mutation adminDestroyVersionMutation($input: DestroyExamVersionInput!) {
       destroyExamVersion(input: $input) {
         deletedId
+        exam {
+          checklist {
+            timing {
+              reason
+              status
+            }
+            staff {
+              reason
+              status
+            }
+            seating {
+              reason
+              status
+            }
+            versions {
+              reason
+              status
+            }    
+          }
+        }
       }
     }
     `,

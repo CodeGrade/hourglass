@@ -130,4 +130,26 @@ class ExamVersionTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'exam versions can have alternate times' do
+    ev = create(:exam_version, :blank)
+    exam = ev.exam
+    assert_nil ev.start_time
+    assert_nil ev.end_time
+    assert_nil ev.duration
+    assert_equal exam.start_time, ev.effective_start_time
+    assert_equal exam.end_time, ev.effective_end_time
+    assert_equal exam.duration, ev.effective_duration
+
+    now = DateTime.now
+    ev.start_time = now + 1.hour
+    ev.end_time = now + 5.hours
+    ev.duration = 300
+    assert_not_equal exam.start_time, ev.effective_start_time
+    assert_not_equal exam.end_time, ev.effective_end_time
+    assert_not_equal exam.duration, ev.effective_duration
+    assert_equal now + 1.hour, ev.effective_start_time
+    assert_equal now + 5.hours, ev.effective_end_time
+    assert_equal 300, ev.effective_duration
+  end
 end

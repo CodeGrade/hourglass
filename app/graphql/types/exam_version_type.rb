@@ -46,6 +46,9 @@ module Types
     end
 
     field :policies, [Types::LockdownPolicyType], null: false
+    field :duration, Integer, null: true
+    field :start_time, GraphQL::Types::ISO8601DateTime, null: true
+    field :end_time, GraphQL::Types::ISO8601DateTime, null: true
 
     field :students, [Types::UserType], null: false do
       guard Guards::PROFESSORS

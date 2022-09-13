@@ -91,6 +91,41 @@ class AccommodationTest < ActiveSupport::TestCase
     assert_in_delta (exam.end_time + extra_duration), reg.accommodated_end_time, 1.second
   end
 
+  test 'custom exam_version time, accommodated end time with expansion' do
+    acc = build(:accommodation, percent_time_expansion: 25)
+    reg = acc.registration
+    exam_version = reg.exam_version
+    exam = reg.exam
+    exam_version.start_time = exam.start_time + 1.day
+    exam_version.end_time = exam.end_time + 1.day
+    exam_version.duration = exam.duration * 2
+    extra_duration = exam.duration / 4.0
+    assert_not_in_delta exam.end_time + extra_duration, reg.accommodated_end_time, 1.second
+    assert_in_delta exam_version.effective_end_time + (extra_duration * 2), reg.accommodated_end_time, 1.second
+  end
+
+  test 'custom exam_version time, start time is updated to exam_version start time' do
+    reg = build(:registration)
+    exam = reg.exam
+    exam_version = reg.exam_version
+    exam_version.start_time = exam.start_time - 2.hours
+    build(:accommodation, registration: reg)
+    assert_equal exam_version.effective_start_time, reg.accommodated_start_time
+    assert_not_equal exam.start_time, reg.accommodated_start_time
+  end
+
+  test 'custom exam_version time, start time is updated to accommodated start time' do
+    reg = build(:registration)
+    exam = reg.exam
+    exam_version = reg.exam_version
+    exam_version.start_time = exam.start_time - 2.hours
+    new_start_time = exam.start_time - 1.hour
+    build(:accommodation, registration: reg, new_start_time: new_start_time)
+    assert_equal new_start_time, reg.accommodated_start_time
+    assert_not_equal exam_version.effective_start_time, reg.accommodated_start_time
+    assert_not_equal exam.start_time, reg.accommodated_start_time
+  end
+
   test 'full time remaining for an early start' do
     reg = build(:registration, :early_start)
     exam = reg.exam

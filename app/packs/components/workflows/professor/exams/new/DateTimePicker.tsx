@@ -19,6 +19,7 @@ interface DateTimeProps {
   value?: DateTime;
   minValue?: DateTime;
   maxValue?: DateTime;
+  unsetPlaceholder?: string;
   onChange: (newVal: DateTime) => void;
   nullable?: boolean;
 }
@@ -52,6 +53,7 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
     minValue,
     maxValue,
     onChange,
+    unsetPlaceholder = 'Not set.',
     nullable = false,
   } = props;
   const timeZone = value?.zoneName ?? 'UTC';
@@ -63,7 +65,7 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
           ...DateTime.DATETIME_SHORT,
           timeZone,
           timeZoneName: 'short',
-        }) ?? 'Not set.'}
+        }) ?? unsetPlaceholder}
       />
       {value && nullable && (
         <InputGroup.Append>

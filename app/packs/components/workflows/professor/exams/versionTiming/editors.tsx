@@ -153,4 +153,4 @@ export const ExamTimesEditor: React.FC<{
       </Form.Group>
     </>
   );
-}
+};

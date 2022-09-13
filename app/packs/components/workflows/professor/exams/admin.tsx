@@ -28,8 +28,6 @@ import {
   Tab,
   Nav,
   Container,
-  ToggleButtonGroup,
-  ToggleButton,
 } from 'react-bootstrap';
 import {
   FaChevronUp,
@@ -47,7 +45,6 @@ import { DateTime } from 'luxon';
 import Tooltip from '@student/exams/show/components/Tooltip';
 import EditExamRooms from '@professor/exams/rooms';
 import EditExamVersionTiming from '@professor/exams/versionTiming/';
-import { ExamTimesViewer, ExamTimesEditor } from './versionTiming/editors';
 import ManageAccommodations from '@professor/exams/accommodations';
 import AssignSeating from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
@@ -58,12 +55,13 @@ import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { policyToString } from '@professor/exams/new/editor/Policies';
+import { uploadFile } from '@hourglass/common/types/api';
 import {
   graphql,
   useFragment,
   useLazyLoadQuery,
 } from 'react-relay';
-import { uploadFile } from '@hourglass/common/types/api';
+import { ExamTimesViewer, ExamTimesEditor } from './versionTiming/editors';
 import './dnd.scss';
 import './admin.scss';
 
@@ -487,7 +485,6 @@ const ExamInfoViewer: React.FC<{
   );
 };
 
-
 export const ExamInfoEditor: React.FC<{
   disabled: boolean;
   onSubmit: (info: ExamUpdateInfo) => void;
@@ -565,8 +562,6 @@ export const ExamInfoEditor: React.FC<{
     </Card>
   );
 };
-
-
 
 const VersionInfo: React.FC<{
   exam: admin_versionInfo$key;
@@ -762,8 +757,6 @@ const ShowVersion: React.FC<{
   } else if (loading) {
     disabledDeleteMessage = 'Please wait...';
   }
-  const startTime = res.startTime && DateTime.fromISO(res.startTime);
-  const endTime = res.startTime && DateTime.fromISO(res.endTime);
   return (
     <>
       <h3 className="flex-grow-1">

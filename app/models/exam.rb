@@ -46,6 +46,7 @@ class Exam < ApplicationRecord
 
   validate :end_after_start
   validate :duration_valid
+  validate :versions_valid_times
 
   def graded
     finalized? && grading_locks.incomplete.none?
@@ -204,9 +205,22 @@ class Exam < ApplicationRecord
     end
   end
 
+  def timing_checklist
+    if exam_versions.blank?
+      checklist_na 'There are no versions yet.'
+    elsif exam_versions.all?(&:customized_time?)
+      checklist_complete 'All exam versions have defined timing'
+    elsif exam_versions.any?(&:customized_time?)
+      checklist_warning 'Exam versions do not all define timing'
+    else
+      checklist_na 'All exam versions use the exam timing'
+    end
+  end
+
   def checklist
     {
       rooms: room_checklist,
+      timing: timing_checklist,
       staff: staff_checklist,
       seating: seating_checklist,
       versions: versions_checklist,
@@ -315,5 +329,16 @@ class Exam < ApplicationRecord
     return unless end_time <= start_time
 
     errors.add(:end_time, 'must be later than start time')
+  end
+
+  def versions_valid_times
+    return if new_record?
+
+    exam_versions.each do |ev|
+      if ev.effective_end_time <= ev.effective_start_time || ev.effective_duration > ev.effective_time_window
+        errors.add(:base, 'Ensure that the times for this exam are valid for all exam versions')
+        break
+      end
+    end
   end
 end

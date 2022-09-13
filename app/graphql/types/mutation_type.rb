@@ -26,6 +26,7 @@ module Types
     field :update_staff_seating, mutation: Mutations::UpdateStaffSeating
     field :update_exam_rooms, mutation: Mutations::UpdateExamRooms
     field :update_version_registrations, mutation: Mutations::UpdateVersionRegistrations
+    field :update_version_timing, mutation: Mutations::UpdateVersionTiming
     field :destroy_accommodation, mutation: Mutations::DestroyAccommodation
     field :update_accommodation, mutation: Mutations::UpdateAccommodation
     field :create_accommodation, mutation: Mutations::CreateAccommodation

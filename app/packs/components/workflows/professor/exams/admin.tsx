@@ -16,7 +16,6 @@ import {
   Link,
 } from 'react-router-dom';
 import { pluralize, useMutationWithDefaults, useRefresher } from '@hourglass/common/helpers';
-import { NumericInput } from '@hourglass/common/NumericInput';
 import {
   Card,
   Collapse,
@@ -29,6 +28,8 @@ import {
   Tab,
   Nav,
   Container,
+  ToggleButtonGroup,
+  ToggleButton,
 } from 'react-bootstrap';
 import {
   FaChevronUp,
@@ -40,21 +41,20 @@ import {
 import Icon from '@student/exams/show/components/Icon';
 import ExamViewer from '@proctor/registrations/show';
 import LinkButton from '@hourglass/common/linkbutton';
-import ReadableDate from '@hourglass/common/ReadableDate';
 import { AlertContext } from '@hourglass/common/alerts';
-import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { DateTime } from 'luxon';
 import Tooltip from '@student/exams/show/components/Tooltip';
 import EditExamRooms from '@professor/exams/rooms';
+import EditExamVersionTiming from '@professor/exams/versionTiming/';
+import { ExamTimesViewer, ExamTimesEditor } from './versionTiming/editors';
 import ManageAccommodations from '@professor/exams/accommodations';
 import AssignSeating from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
 import ErrorBoundary from '@hourglass/common/boundary';
-import { GrLink, GrUnlink } from 'react-icons/gr';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
-import { BsPencilSquare, BsFillQuestionCircleFill, BsArrow90DegLeft } from 'react-icons/bs';
+import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { policyToString } from '@professor/exams/new/editor/Policies';
@@ -246,6 +246,7 @@ const PreFlightChecklist: React.FC<{
     fragment admin_checklist on Exam {
       ...admin_versionInfo
       ...accommodations_all
+      ...versionTiming
       ...allocateVersions
       ...roomsIndex
       ...assignStaff
@@ -253,6 +254,10 @@ const PreFlightChecklist: React.FC<{
       name
       checklist {
         rooms {
+          reason
+          status
+        }
+        timing {
           reason
           status
         }
@@ -297,6 +302,20 @@ const PreFlightChecklist: React.FC<{
           </Nav.Item>
           <Nav.Item>
             <Nav.Link
+              eventKey="timing"
+              onClick={() => history.push(`/exams/${examId}/admin/timing`)}
+            >
+              <ChecklistIcon
+                reason={checklist.timing.reason}
+                status={checklist.timing.status}
+              />
+              <span className="ml-2">
+                Custom timing
+              </span>
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
               eventKey="rooms"
               onClick={() => history.push(`/exams/${examId}/admin/rooms`)}
             >
@@ -319,7 +338,7 @@ const PreFlightChecklist: React.FC<{
                 status={checklist.staff.status}
               />
               <span className="ml-2">
-                Assign staff members
+                Proctors
               </span>
             </Nav.Link>
           </Nav.Item>
@@ -333,7 +352,7 @@ const PreFlightChecklist: React.FC<{
                 status={checklist.versions.status}
               />
               <span className="ml-2">
-                Allocate versions
+                Assign versions
               </span>
             </Nav.Link>
           </Nav.Item>
@@ -347,7 +366,7 @@ const PreFlightChecklist: React.FC<{
                 status={checklist.seating.status}
               />
               <span className="ml-2">
-                Assign seating
+                Seating
               </span>
             </Nav.Link>
           </Nav.Item>
@@ -367,6 +386,11 @@ const PreFlightChecklist: React.FC<{
           <Tab.Pane eventKey="edit-versions">
             <ErrorBoundary>
               <VersionInfo exam={res} />
+            </ErrorBoundary>
+          </Tab.Pane>
+          <Tab.Pane eventKey="timing">
+            <ErrorBoundary>
+              <EditExamVersionTiming examKey={res} />
             </ErrorBoundary>
           </Tab.Pane>
           <Tab.Pane eventKey="rooms">
@@ -453,22 +477,16 @@ const ExamInfoViewer: React.FC<{
             </Button>
           </span>
         </h1>
-        <Row className="align-items-center">
-          <Form.Label column sm={2}>Starts:</Form.Label>
-          <ReadableDate value={startTime} showTime />
-        </Row>
-        <Row className="align-items-center">
-          <Form.Label column sm={2}>Ends:</Form.Label>
-          <ReadableDate value={endTime} showTime />
-        </Row>
-        <Row className="align-items-center">
-          <Form.Label column sm={2}>Duration:</Form.Label>
-          {`${duration / 60.0} minutes`}
-        </Row>
+        <ExamTimesViewer
+          startTime={startTime}
+          endTime={endTime}
+          duration={duration}
+        />
       </Card.Body>
     </Card>
   );
 };
+
 
 export const ExamInfoEditor: React.FC<{
   disabled: boolean;
@@ -492,9 +510,7 @@ export const ExamInfoEditor: React.FC<{
   const [name, setName] = useState<string>(defaultName);
   const [start, setStart] = useState<DateTime>(defaultStartTime);
   const [end, setEnd] = useState<DateTime>(defaultEndTime);
-  const [linked, setLinked] = useState<boolean>(true);
   const [duration, setDuration] = useState<number | string>(`${defaultDuration / 60.0}`);
-
   return (
     <Card className="mb-4">
       <Card.Body>
@@ -536,97 +552,21 @@ export const ExamInfoEditor: React.FC<{
           </span>
           <div className="col flex-grow-0 pl-0" />
         </Form.Group>
-        <Form.Group as={Row} className="mb-3">
-          <Col className="pr-0" sm={2}>
-            <Form.Group as={Row} controlId="examStartTime" className="align-items-center">
-              <Form.Label column>Start time:</Form.Label>
-            </Form.Group>
-            <Form.Group as={Row} controlId="examEndTime" className="align-items-center mb-0">
-              <Form.Label column>End time:</Form.Label>
-            </Form.Group>
-          </Col>
-          <Col className="pr-0">
-            <Form.Group as={Row} controlId="examStartTime" className="align-items-center">
-              <Col>
-                <DateTimePicker
-                  disabled={disabled}
-                  value={start}
-                  maxValue={linked ? undefined : end}
-                  onChange={(newVal) => {
-                    if (linked) {
-                      setEnd(newVal.plus(end.diff(start)));
-                      setStart(newVal);
-                    } else {
-                      const curDuration = { minutes: Number(duration) || 0 };
-                      const maxStartTime = end.minus(curDuration);
-                      setStart(newVal <= maxStartTime ? newVal : maxStartTime);
-                    }
-                  }}
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group as={Row} controlId="examEndTime" className="align-items-center mb-0">
-              <Col>
-                <DateTimePicker
-                  disabled={disabled}
-                  value={end}
-                  minValue={linked ? undefined : start}
-                  onChange={(newVal) => {
-                    if (linked) {
-                      setStart(newVal.minus(end.diff(start)));
-                      setEnd(newVal);
-                    } else {
-                      const curDuration = { minutes: Number(duration) || 0 };
-                      const minEndTime = start.plus(curDuration);
-                      setEnd(newVal >= minEndTime ? newVal : minEndTime);
-                    }
-                  }}
-                />
-              </Col>
-            </Form.Group>
-          </Col>
-          <Col sm="auto" className="pl-0 pr-2 d-flex flex-column justify-content-center">
-            <Icon I={BsArrow90DegLeft} size="1.25em" />
-            <TooltipButton
-              variant="link"
-              disabled={false}
-              className="ml-1 p-0 rotate-45"
-              enabledMessage={linked ? 'Start and end times are linked' : 'Start and end times are independent'}
-              onClick={() => setLinked(!linked)}
-            >
-              <Icon I={linked ? GrLink : GrUnlink} />
-            </TooltipButton>
-            <span style={{ transform: 'scaleY(-1)' }}><Icon I={BsArrow90DegLeft} size="1.25em" /></span>
-          </Col>
-        </Form.Group>
-        <Form.Group as={Row} controlId="examDuration" className="align-items-center my-0">
-          <Form.Label column sm={2}>Duration (minutes):</Form.Label>
-          <Col>
-            <NumericInput
-              disabled={disabled}
-              value={duration}
-              className="overflow-visible"
-              variant="primary"
-              min={0}
-              max={linked ? undefined : end.diff(start).as('minutes')}
-              onChange={(newVal) => {
-                if (linked) {
-                  setDuration(newVal);
-                  if (start.plus({ minutes: newVal }) > end) {
-                    setEnd(start.plus({ minutes: newVal }));
-                  }
-                } else {
-                  const availTime = end.diff(start).as('minutes');
-                  setDuration(Math.min(newVal, availTime));
-                }
-              }}
-            />
-          </Col>
-        </Form.Group>
+        <ExamTimesEditor
+          disabled={disabled}
+          start={start}
+          setStart={setStart}
+          end={end}
+          setEnd={setEnd}
+          duration={duration}
+          setDuration={setDuration}
+        />
       </Card.Body>
     </Card>
   );
 };
+
+
 
 const VersionInfo: React.FC<{
   exam: admin_versionInfo$key;
@@ -763,6 +703,9 @@ const ShowVersion: React.FC<{
     fragment admin_version on ExamVersion {
       id
       name
+      startTime
+      endTime
+      duration
       anyStarted
       anyFinalized
       fileExportUrl
@@ -819,6 +762,8 @@ const ShowVersion: React.FC<{
   } else if (loading) {
     disabledDeleteMessage = 'Please wait...';
   }
+  const startTime = res.startTime && DateTime.fromISO(res.startTime);
+  const endTime = res.startTime && DateTime.fromISO(res.endTime);
   return (
     <>
       <h3 className="flex-grow-1">

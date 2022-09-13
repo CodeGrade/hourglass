@@ -22,6 +22,8 @@ class ExamVersion < ApplicationRecord
   has_many :db_questions, -> { order(:index) }, class_name: 'Question', dependent: :destroy, inverse_of: :exam_version
 
   validate :reference_errors
+  validate :end_after_start
+  validate :duration_valid
 
   def reference_errors
     db_references.each do |ref|
@@ -97,6 +99,35 @@ class ExamVersion < ApplicationRecord
       answers: def_answers,
       scratch: '',
     }
+  end
+
+  # Exam versions can specify their own start, end and durations, which override
+  # the exam-wide settings.  The effective_start_time is either the exam_version's
+  # start time, if defined, or else the exam's start time.
+  def effective_start_time
+    start_time || exam.start_time
+  end
+
+  # Exam versions can specify their own start, end and durations, which override
+  # the exam-wide settings.  The effective_end_time is either the exam_version's
+  # end time, if defined, or else the exam's end time.
+  def effective_end_time
+    end_time || exam.end_time
+  end
+
+  # Exam versions can specify their own start, end and durations, which override
+  # the exam-wide settings.  The effective_duration is either the exam_version's
+  # duration, if defined, or else the exam's duratoin.
+  def effective_duration
+    duration || exam.duration
+  end
+
+  def effective_time_window
+    (effective_end_time - effective_start_time).seconds
+  end
+
+  def customized_time?
+    start_time.present? || end_time.present? || duration.present?
   end
 
   def swap_questions(index_from, index_to)
@@ -509,5 +540,21 @@ class ExamVersion < ApplicationRecord
         }
       end.compact
     end
+  end
+
+  private
+
+  def duration_valid
+    return unless effective_duration > effective_time_window
+
+    mins = (effective_time_window / 60.0).to_i
+    errors.add(:duration, "can't be longer than the duration between start and end times (#{mins} minutes)")
+  end
+
+  def end_after_start
+    return if end_time.nil? && start_time.nil?
+    return unless effective_end_time <= effective_start_time
+
+    errors.add(:end_time, 'must be later than start time')
   end
 end

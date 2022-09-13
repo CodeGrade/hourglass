@@ -67,21 +67,26 @@ class Registration < ApplicationRecord
   # my-start >= my-exam-start
   # my-end <= my-exam-end
   # my-end <= my-start + my-duration
+  #
+  # NOTE: If the exam version itself defines a start time/end time/duration,
+  # those override the exam-specified times.
 
   def accommodated_start_time
-    accommodation&.new_start_time || exam.start_time
+    accommodation&.new_start_time || exam_version.effective_start_time
   end
 
   def accommodated_duration
-    exam.duration * (accommodation&.factor || 1)
+    exam_version.effective_duration * (accommodation&.factor || 1)
   end
 
   def accommodated_extra_duration
-    accommodated_duration - exam.duration
+    accommodated_duration - exam_version.effective_duration
   end
 
   def accommodated_end_time
-    accommodated_start_time + (exam.end_time - exam.start_time) + accommodated_extra_duration
+    accommodated_start_time +
+      (exam_version.effective_end_time - exam_version.effective_start_time) +
+      accommodated_extra_duration
   end
 
   # End time plus any applicable extensions

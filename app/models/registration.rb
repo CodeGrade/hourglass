@@ -84,9 +84,7 @@ class Registration < ApplicationRecord
   end
 
   def accommodated_end_time
-    accommodated_start_time +
-      (exam_version.effective_end_time - exam_version.effective_start_time) +
-      accommodated_extra_duration
+    accommodated_start_time + exam_version.effective_time_window + accommodated_extra_duration
   end
 
   # End time plus any applicable extensions

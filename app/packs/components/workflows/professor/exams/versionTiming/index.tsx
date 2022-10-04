@@ -70,6 +70,7 @@ const ExamVersionInfoEditor: React.FC<{
   examVersionId: string,
   examStart: DateTime,
   examEnd: DateTime,
+  /** duration in seconds */
   examDuration: number,
   version: versionTiming['examVersions']['edges'][number]['node']
 }> = (props) => {
@@ -87,7 +88,7 @@ const ExamVersionInfoEditor: React.FC<{
   const [showEditor, setShowEditor] = useState<boolean>(false);
   const [startTime, setStartTime] = useState(versionStartTime || examStart);
   const [endTime, setEndTime] = useState(versionEndTime || examEnd);
-  const [duration, setDuration] = useState<string | number>(versionDuration ?? examDuration);
+  const [duration, setDuration] = useState<string | number>((versionDuration ?? examDuration) / 60.0);
   const [mutate, loading] = useMutationWithDefaults<versionTimingUpdateMutation>(
     graphql`
     mutation versionTimingUpdateMutation($input: UpdateVersionTimingInput!, $withRubric: Boolean!) {
@@ -120,7 +121,7 @@ const ExamVersionInfoEditor: React.FC<{
   return (
     <Row className="mb-2">
       <Col>
-        <h3>
+        <h3 className="clearfix">
           {version.name}
           {showEditor
             ? (

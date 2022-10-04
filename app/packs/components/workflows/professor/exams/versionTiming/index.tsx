@@ -88,7 +88,9 @@ const ExamVersionInfoEditor: React.FC<{
   const [showEditor, setShowEditor] = useState<boolean>(false);
   const [startTime, setStartTime] = useState(versionStartTime || examStart);
   const [endTime, setEndTime] = useState(versionEndTime || examEnd);
-  const [duration, setDuration] = useState<string | number>((versionDuration ?? examDuration) / 60.0);
+  const [duration, setDuration] = useState<string | number>(
+    (versionDuration ?? examDuration) / 60.0,
+  );
   const [mutate, loading] = useMutationWithDefaults<versionTimingUpdateMutation>(
     graphql`
     mutation versionTimingUpdateMutation($input: UpdateVersionTimingInput!, $withRubric: Boolean!) {

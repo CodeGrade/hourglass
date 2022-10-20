@@ -167,7 +167,7 @@ export const NumericInput: React.FC<{
             variant={variant}
             disabled={disabled || (max !== undefined && numValue >= max)}
             tabIndex={-1}
-            onClick={() => onChange(clamp(numValue + step, min, max), false)}
+            onClick={() => { if (onChange) onChange(clamp(numValue + step, min, max), false); }}
           >
             <Icon className="m-0 p-0" size={size === 'lg' ? '0.75em' : '0.5em'} I={FaChevronUp} />
           </Button>
@@ -177,7 +177,7 @@ export const NumericInput: React.FC<{
             variant={variant}
             disabled={disabled || (min !== undefined && numValue <= min)}
             tabIndex={-1}
-            onClick={() => onChange(clamp(numValue - step, min, max), false)}
+            onClick={() => { if (onChange) onChange(clamp(numValue - step, min, max), false); }}
           >
             <Icon size={size === 'lg' ? '0.75em' : '0.5em'} I={FaChevronDown} />
           </Button>

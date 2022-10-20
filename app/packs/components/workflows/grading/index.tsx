@@ -715,12 +715,14 @@ interface AnswersRowProps<T, V> {
   ShowStudent?: React.ComponentType<{
     info: T,
     value: V,
+    valueUpdate?: React.DependencyList;
     refreshProps: React.DependencyList;
     fullyExpandCode?: boolean;
   }>;
   ShowExpected: React.ComponentType<{
     info: T,
     value: V,
+    valueUpdate?: React.DependencyList;
     refreshProps: React.DependencyList;
     fullyExpandCode?: boolean;
   }>;
@@ -734,6 +736,7 @@ interface AnswersRowProps<T, V> {
   comments: GradingComment[];
   registrationId: string;
   refreshProps: React.DependencyList;
+  valueUpdate?: React.DependencyList;
 }
 
 function AnswersRow<T, V>(
@@ -753,6 +756,7 @@ function AnswersRow<T, V>(
     registrationId,
     children,
     refreshProps,
+    valueUpdate,
   } = props;
   const res = useFragment<gradingRubric$key>(
     graphql`
@@ -794,6 +798,7 @@ function AnswersRow<T, V>(
               info={info}
               value={studentAnswer}
               refreshProps={refreshProps}
+              valueUpdate={valueUpdate}
             >
               {children}
             </ShowStudent>
@@ -813,6 +818,7 @@ function AnswersRow<T, V>(
               info={info}
               value={expectedAnswer}
               refreshProps={refreshProps}
+              valueUpdate={valueUpdate}
             />
           </Col>
         </Row>
@@ -891,6 +897,7 @@ const GradeBodyItem: React.FC<{
             expectedAnswer={expectedAnswer as CodeState}
             comments={comments}
             registrationId={registrationId}
+            valueUpdate={[registrationId]}
             refreshProps={refreshProps}
           />
         </>

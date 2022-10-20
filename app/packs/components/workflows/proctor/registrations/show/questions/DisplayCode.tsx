@@ -6,6 +6,7 @@ import { ExamContext } from '@hourglass/common/context';
 interface CodeProps {
   info: CodeInfo;
   value?: CodeState;
+  valueUpdate?: React.DependencyList;
   refreshProps?: React.DependencyList;
   fullyExpandCode?: boolean;
 }
@@ -15,6 +16,7 @@ const DisplayCode: React.FC<CodeProps> = (props) => {
     info,
     value,
     refreshProps,
+    valueUpdate,
     fullyExpandCode = false,
   } = props;
   const { lang, initial } = info;
@@ -47,6 +49,7 @@ const DisplayCode: React.FC<CodeProps> = (props) => {
   return (
     <Editor
       refreshProps={refreshProps}
+      valueUpdate={valueUpdate}
       readOnly
       value={text}
       markDescriptions={marks}

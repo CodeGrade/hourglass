@@ -126,13 +126,29 @@ import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 import { gradingGraderQuery } from './__generated__/gradingGraderQuery.graphql';
 import { gradingSyncExamToBottlenoseMutation } from './__generated__/gradingSyncExamToBottlenoseMutation.graphql';
 
-export function variantForPoints(points: number): AlertProps['variant'] {
+export function variantForPoints(points: number | string): AlertProps['variant'] {
+  if (typeof points === 'string') {
+    const p = Number(points);
+    if (Number.isFinite(p)) {
+      points = p;
+    } else {
+      return 'warning';
+    }
+  }
   if (points < 0) return 'danger';
   if (points > 0) return 'success';
   return 'warning';
 }
 
-export function iconForPoints(points: number): IconType {
+export function iconForPoints(points: number | string): IconType {
+  if (typeof points === 'string') {
+    const p = Number(points);
+    if (Number.isFinite(p)) {
+      points = p;
+    } else {
+      return RiMessage2Line;
+    }
+  }
   if (points < 0) return RiChatDeleteLine;
   if (points > 0) return RiChatCheckLine;
   return RiMessage2Line;
@@ -230,8 +246,8 @@ const Feedback: React.FC<{
   useLayoutEffect(() => {
     if (isFocused) { alertRef.current.focus(); }
   }, [isFocused]);
-  const variant = variantForPoints(points);
-  const VariantIcon = iconForPoints(points);
+  const variant = variantForPoints(pointStr);
+  const VariantIcon = iconForPoints(pointStr);
   return (
     <Alert
       ref={alertRef}

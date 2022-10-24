@@ -648,16 +648,23 @@ const SavedComment: React.FC<{
       },
     });
   };
-  const doUpdate = () => {
-    mutateUpdate({
-      variables: {
-        input: {
-          gradingCommentId: comment.id,
-          message: value.message,
-          points: value.points,
+  const [needsSaving, setNeedingSaving] = useState(false);
+  useEffect(() => {
+    if (needsSaving) {
+      mutateUpdate({
+        variables: {
+          input: {
+            gradingCommentId: comment.id,
+            message: value.message,
+            points: value.points,
+          },
         },
-      },
-    });
+      });
+    }
+    setNeedingSaving(false);
+  }, [needsSaving]);
+  const doUpdate = () => {
+    setNeedingSaving(true);
   };
   return (
     <Feedback

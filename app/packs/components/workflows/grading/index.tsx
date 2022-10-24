@@ -130,6 +130,7 @@ export function variantForPoints(points: number | string): AlertProps['variant']
   if (typeof points === 'string') {
     const p = Number(points);
     if (Number.isFinite(p)) {
+      // eslint-disable-next-line no-param-reassign
       points = p;
     } else {
       return 'warning';
@@ -144,6 +145,7 @@ export function iconForPoints(points: number | string): IconType {
   if (typeof points === 'string') {
     const p = Number(points);
     if (Number.isFinite(p)) {
+      // eslint-disable-next-line no-param-reassign
       points = p;
     } else {
       return RiMessage2Line;

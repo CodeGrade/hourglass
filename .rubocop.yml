@@ -14,6 +14,7 @@ AllCops:
     - bin/**/*
     - lib/audit.rb
     - lib/tasks/**.rake
+    - scripts/*
 Style/SymbolArray:
   EnforcedStyle: brackets
 Style/TrailingCommaInHashLiteral:

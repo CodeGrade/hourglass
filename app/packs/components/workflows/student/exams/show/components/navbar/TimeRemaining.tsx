@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Duration } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import { TimeInfo } from '@student/exams/show/types';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { FaClock } from 'react-icons/fa';
@@ -264,6 +264,12 @@ const TimeRemaining: React.FC<TimeRemainingProps> = (props) => {
                 >
                   <RenderIcon I={FaClock} />
                 </Button>
+              </td>
+            </tr>
+            <tr className="font-weight-bold">
+              <td className="align-middle">Current time:</td>
+              <td className="w-100 align-middle">
+                {DateTime.now().toLocaleString(DateTime.DATETIME_MED)}
               </td>
             </tr>
             <tr className="font-weight-bold">

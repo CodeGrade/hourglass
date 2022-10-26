@@ -7,7 +7,7 @@ class Registration < ApplicationRecord
   belongs_to :exam_version
 
   has_many :anomalies, dependent: :destroy
-  has_many :snapshots, dependent: :destroy
+  has_many :snapshots, -> { order(:created_at) }, dependent: :destroy
   has_many :messages, dependent: :destroy
   has_many :student_questions, dependent: :destroy
   has_one :accommodation, dependent: :destroy

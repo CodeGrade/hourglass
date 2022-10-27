@@ -539,7 +539,7 @@ const ManageAccommodations: React.FC<{
         </Col>
       </Form.Group>
       <Form.Group as={Row}>
-        <Col className='text-center'>
+        <Col className="text-center">
           <DropdownButton
             title="Copy accommodations from other exam:"
             disabled={loading}

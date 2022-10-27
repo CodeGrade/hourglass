@@ -30,6 +30,7 @@ module Types
     field :destroy_accommodation, mutation: Mutations::DestroyAccommodation
     field :update_accommodation, mutation: Mutations::UpdateAccommodation
     field :create_accommodation, mutation: Mutations::CreateAccommodation
+    field :copy_accommodation, mutation: Mutations::CopyAccommodations
     field :create_exam, mutation: Mutations::CreateExam
     field :finalize_item, mutation: Mutations::FinalizeItem
     field :send_message, mutation: Mutations::SendMessage

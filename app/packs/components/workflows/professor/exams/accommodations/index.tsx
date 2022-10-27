@@ -6,6 +6,8 @@ import {
   Button,
   Form,
   Table,
+  DropdownButton,
+  Dropdown,
 } from 'react-bootstrap';
 import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import Icon from '@student/exams/show/components/Icon';
@@ -13,7 +15,12 @@ import ReadableDate from '@hourglass/common/ReadableDate';
 import { NumericInput } from '@hourglass/common/NumericInput';
 import { BsPencilSquare } from 'react-icons/bs';
 import { AlertContext } from '@hourglass/common/alerts';
-import { SelectOption, SelectOptions, useMutationWithDefaults } from '@hourglass/common/helpers';
+import {
+  pluralize,
+  SelectOption,
+  SelectOptions,
+  useMutationWithDefaults,
+} from '@hourglass/common/helpers';
 import { FaTrash } from 'react-icons/fa';
 import Select from 'react-select';
 import { DateTime } from 'luxon';
@@ -22,6 +29,7 @@ import { graphql, useFragment } from 'react-relay';
 import { accommodations_all$key } from './__generated__/accommodations_all.graphql';
 import { accommodations_accommodation$key } from './__generated__/accommodations_accommodation.graphql';
 import { accommodations_regsWithout$key } from './__generated__/accommodations_regsWithout.graphql';
+import { accommodationsCopyMutation } from './__generated__/accommodationsCopyMutation.graphql';
 import { accommodationsCreateMutation } from './__generated__/accommodationsCreateMutation.graphql';
 import { accommodationsUpdateMutation } from './__generated__/accommodationsUpdateMutation.graphql';
 import { accommodationsDestroyMutation } from './__generated__/accommodationsDestroyMutation.graphql';
@@ -408,10 +416,17 @@ const ManageAccommodations: React.FC<{
   const {
     exam,
   } = props;
+  const { alert } = useContext(AlertContext);
   const res = useFragment(
     graphql`
     fragment accommodations_all on Exam {
       id
+      course {
+        exams {
+          id
+          name
+        }
+      }
       ...accommodations_regsWithout
       accommodations(first: 100000) @connection(key: "Exam_accommodations", filters: []) {
         edges {
@@ -430,12 +445,70 @@ const ManageAccommodations: React.FC<{
     `,
     exam,
   );
-  const { accommodations } = res;
+  const { accommodations, course: { exams } } = res;
   const sorted = [...accommodations.edges].sort(
     (a, b) => a.node.registration.user.displayName.localeCompare(
       b.node.registration.user.displayName,
     ),
   );
+  const [copy, loading] = useMutationWithDefaults<accommodationsCopyMutation>(
+    graphql`
+    mutation accommodationsCopyMutation($input: CopyAccommodationsInput!) {
+      copyAccommodation(input: $input) {
+        sourceExam { 
+          name
+        }
+        duplicateCount
+        exam {
+          name
+          accommodations(first: 100000) @connection(key: "Exam_accommodations", filters: []) {
+            edges {
+              node {
+                ...accommodations_accommodation
+              }
+            }
+          }
+        }
+      }
+    }
+    `,
+    {
+      onCompleted: (response) => {
+        const {
+          sourceExam: { name: sourceName },
+          exam: { name: destName },
+          duplicateCount,
+        } = response.copyAccommodation;
+        const duplicates = pluralize(duplicateCount, 'duplicate', 'duplicates');
+        const title = 'Successfully copied accommodations';
+        const message = `Accommodations copied from ${sourceName} to ${destName}; ${duplicates} ignored.`;
+        alert({
+          variant: 'success',
+          title,
+          autohide: true,
+          message,
+        });
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error copying accommodations',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
+  const copyAccommodationsFrom = (sourceExamId) => {
+    copy({
+      variables: {
+        input: {
+          sourceExamId,
+          destExamId: res.id,
+        },
+      },
+    });
+  };
   return (
     <>
       <Form.Group>
@@ -463,6 +536,26 @@ const ManageAccommodations: React.FC<{
       <Form.Group as={Row}>
         <Col>
           <NewAccommodation exam={res} />
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row}>
+        <Col className='text-center'>
+          <DropdownButton
+            title="Copy accommodations from other exam:"
+            disabled={loading}
+            className="mb-2"
+          >
+            {exams.map((e) => (e.id === res.id ? undefined : (
+              <Dropdown.Item
+                key={e.id}
+                onClick={(): void => {
+                  copyAccommodationsFrom(e.id);
+                }}
+              >
+                {e.name}
+              </Dropdown.Item>
+            )))}
+          </DropdownButton>
         </Col>
       </Form.Group>
     </>

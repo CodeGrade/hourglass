@@ -318,6 +318,7 @@ export const ImpersonateUser: React.FC<{
         <Col className="w-100">
           <h1>Impersonation</h1>
           <Select
+            isClearable
             placeholder="Select a user to impersonate..."
             isDisabled={loading}
             options={userOptions}
@@ -353,7 +354,7 @@ export const ImpersonateUser: React.FC<{
               );
             }}
             onChange={(val: ImpersonateVal) => {
-              setSelectedUser(val.value);
+              setSelectedUser(val?.value);
             }}
           />
         </Col>

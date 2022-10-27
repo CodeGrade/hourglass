@@ -100,7 +100,7 @@ import FourOhFour from '@hourglass/workflows/FourOhFour';
 import Spoiler from '@hourglass/common/Spoiler';
 import { NumericInput } from '@hourglass/common/NumericInput';
 import { CurrentGrading } from '@professor/exams/types';
-import { ShowRubrics } from '@grading/UseRubrics';
+import { combineCompletionAny, CompletionStatus, ShowRubrics } from '@grading/UseRubrics';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
 import { DateTime } from 'luxon';
 
@@ -762,6 +762,7 @@ interface AnswersRowProps<T, V> {
   registrationId: string;
   refreshProps: React.DependencyList;
   valueUpdate?: React.DependencyList;
+  onRubricCompletionChanged: (type: string, newCompletion: CompletionStatus) => void;
 }
 
 function AnswersRow<T, V>(
@@ -782,6 +783,7 @@ function AnswersRow<T, V>(
     children,
     refreshProps,
     valueUpdate,
+    onRubricCompletionChanged,
   } = props;
   const res = useFragment<gradingRubric$key>(
     graphql`
@@ -865,6 +867,7 @@ function AnswersRow<T, V>(
               pnumRubricKey={pnumRubricKey}
               bnumRubricKey={bnumRubricKey}
               showCompletenessAgainst={comments.map((c) => c.presetComment?.id)}
+              onRubricCompletionChanged={onRubricCompletionChanged}
               registrationId={registrationId}
               qnum={qnum}
               pnum={pnum}
@@ -889,6 +892,7 @@ const GradeBodyItem: React.FC<{
   comments: GradingComment[];
   registrationId: string;
   refreshProps: React.DependencyList;
+  onRubricCompletionChanged: (type: string, newCompletion: CompletionStatus) => void;
 }> = (props) => {
   const {
     expectedAnswer,
@@ -901,6 +905,7 @@ const GradeBodyItem: React.FC<{
     comments,
     registrationId,
     refreshProps,
+    onRubricCompletionChanged,
   } = props;
   switch (info.type) {
     case 'HTML':
@@ -921,6 +926,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as CodeState}
             expectedAnswer={expectedAnswer as CodeState}
             comments={comments}
+            onRubricCompletionChanged={onRubricCompletionChanged}
             registrationId={registrationId}
             valueUpdate={[registrationId]}
             refreshProps={refreshProps}
@@ -941,6 +947,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as CodeTagState}
             expectedAnswer={expectedAnswer as CodeTagState}
             comments={comments}
+            onRubricCompletionChanged={onRubricCompletionChanged}
             registrationId={registrationId}
             refreshProps={refreshProps}
           />
@@ -961,6 +968,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as YesNoState}
             expectedAnswer={expectedAnswer as YesNoState}
             comments={comments}
+            onRubricCompletionChanged={onRubricCompletionChanged}
             registrationId={registrationId}
             refreshProps={refreshProps}
           />
@@ -980,6 +988,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as TextState}
             expectedAnswer={expectedAnswer as TextState}
             comments={comments}
+            onRubricCompletionChanged={onRubricCompletionChanged}
             registrationId={registrationId}
             refreshProps={refreshProps}
           />
@@ -1000,6 +1009,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as MatchingState}
             expectedAnswer={expectedAnswer as MatchingState}
             comments={comments}
+            onRubricCompletionChanged={onRubricCompletionChanged}
             registrationId={registrationId}
             refreshProps={refreshProps}
           />
@@ -1019,6 +1029,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as AllThatApplyState}
             expectedAnswer={expectedAnswer as AllThatApplyState}
             comments={comments}
+            onRubricCompletionChanged={onRubricCompletionChanged}
             registrationId={registrationId}
             refreshProps={refreshProps}
           />
@@ -1039,6 +1050,7 @@ const GradeBodyItem: React.FC<{
             studentAnswer={studentAnswer as MultipleChoiceState}
             expectedAnswer={expectedAnswer as MultipleChoiceState}
             comments={comments}
+            onRubricCompletionChanged={onRubricCompletionChanged}
             registrationId={registrationId}
             refreshProps={refreshProps}
           />
@@ -1082,6 +1094,8 @@ mutation gradingSyncExamToBottlenoseMutation($input: SyncExamToBottlenoseInput!)
   }
 }
 `;
+
+type RubricCompletionStatus = Record<string, CompletionStatus>;
 
 const Grade: React.FC<{
   registrationKey: grading_one$key;
@@ -1246,15 +1260,27 @@ const Grade: React.FC<{
       },
     },
   );
+  const [curCompletionStatus, setCurCompletionStatus] = useState<RubricCompletionStatus[]>([]);
+  const mergedStatus: CompletionStatus[] = curCompletionStatus.map(
+    (cCS) => Object.values(cCS).reduce(combineCompletionAny, 'incomplete'),
+  );
   const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
   const singlePart = dbQuestions[qnum].parts.length === 1
     && !dbQuestions[qnum].parts[0].name?.value?.trim();
   const allComments = res.gradingComments.edges.map(({ node }) => node);
-  const anyUncommentedItems = dbQuestions[qnum].parts[pnum].bodyItems.some((b, bnum) => (
-    ((b.info as BodyItemInfo).type !== 'HTML')
-      && (allComments.filter((c) => (c.qnum === qnum && c.pnum === pnum && c.bnum === bnum))
-        .length === 0)
-  ));
+  // const anyUncommentedItems = dbQuestions[qnum].parts[pnum].bodyItems.some((b, bnum) => (
+  //   ((b.info as BodyItemInfo).type !== 'HTML')
+  //     && (allComments.filter((c) => (c.qnum === qnum && c.pnum === pnum && c.bnum === bnum))
+  //       .length === 0)
+  // ));
+  let disabledMessage: string;
+  if (nextExamLoading) {
+    disabledMessage = 'Please wait; still loading...';
+  } else if (mergedStatus.some((s) => s === 'incomplete')) {
+    disabledMessage = 'All rubrics are incomplete; please complete them to finish grading';
+  } else if (mergedStatus.some((s) => s === 'invalid')) {
+    disabledMessage = 'Some rubrics are used incorrectly; please correct them before finishing grading';
+  }
   return (
     <ExamContext.Provider value={contextVal}>
       <ExamViewerContext.Provider value={viewerContextVal}>
@@ -1328,6 +1354,14 @@ const Grade: React.FC<{
                   examVersionKey={res.examVersion}
                   check={check}
                   comments={comments}
+                  onRubricCompletionChanged={(type, status) => {
+                    const newCompletionStatus = [...curCompletionStatus];
+                    newCompletionStatus[bnum] = {
+                      ...curCompletionStatus[bnum],
+                      [type]: status,
+                    };
+                    setCurCompletionStatus(newCompletionStatus);
+                  }}
                   registrationId={res.id}
                   refreshProps={refreshProps}
                 />
@@ -1340,10 +1374,8 @@ const Grade: React.FC<{
             <span className="m-4">
               <TooltipButton
                 variant="primary"
-                disabled={nextExamLoading || anyUncommentedItems}
-                disabledMessage={nextExamLoading
-                  ? 'Please wait; still loading...'
-                  : 'Some items have no comments; please grade them'}
+                disabled={disabledMessage !== undefined}
+                disabledMessage={disabledMessage}
                 placement="top"
                 cursorClass=""
                 onClick={() => {
@@ -1370,15 +1402,13 @@ const Grade: React.FC<{
               drop="right"
             >
               <Tooltip
-                showTooltip={nextExamLoading || anyUncommentedItems}
-                message={nextExamLoading
-                  ? 'Please wait; still loading...'
-                  : 'Some items have no comments; please grade them'}
+                showTooltip={disabledMessage !== undefined}
+                message={disabledMessage}
                 placement="top"
               >
                 <Dropdown.Item
                   className="pointer-events-auto"
-                  disabled={anyUncommentedItems}
+                  disabled={disabledMessage !== undefined}
                   onClick={() => {
                     mutateReleaseAndFinish({
                       variables: {

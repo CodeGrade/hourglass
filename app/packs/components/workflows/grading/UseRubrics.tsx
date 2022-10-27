@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   Rubric,
   RubricOne,
@@ -45,6 +45,7 @@ type PresetCommentId = GradingComment['presetComment']['id']
 interface ShowRubricProps<R> {
   rubric: R;
   showCompletenessAgainst?: PresetCommentId[];
+  onRubricCompletionChanged?: (newCompletion: CompletionStatus) => void;
   parentRubricType?: Rubric['type'];
   collapseKey?: string;
   qnum: number;
@@ -126,9 +127,12 @@ const ShowPreset: React.FC<{
   );
 };
 
-type CompletionStatus = 'complete' | 'incomplete' | 'invalid'
-function combineCompletionAll(c1 : CompletionStatus, c2: CompletionStatus): CompletionStatus {
-  // complete < incomplete < invalid
+export type CompletionStatus = 'complete' | 'incomplete' | 'invalid'
+/** Enforces the ordering `complete < incomplete < invalid` */
+export function combineCompletionAll(
+  c1 : CompletionStatus,
+  c2: CompletionStatus,
+): CompletionStatus {
   switch (c1) {
     case 'complete': return c2;
     case 'incomplete': return (c2 === 'invalid') ? c2 : c1;
@@ -137,8 +141,11 @@ function combineCompletionAll(c1 : CompletionStatus, c2: CompletionStatus): Comp
       throw new ExhaustiveSwitchError(c1);
   }
 }
-function combineCompletionAny(c1 : CompletionStatus, c2: CompletionStatus): CompletionStatus {
-  // incomplete < complete < invalid
+/** Enforced the ordering `incomplete < complete < invalid` */
+export function combineCompletionAny(
+  c1 : CompletionStatus,
+  c2: CompletionStatus,
+): CompletionStatus {
   switch (c1) {
     case 'incomplete': return c2;
     case 'complete': return (c2 !== 'incomplete') ? c2 : c1;
@@ -589,6 +596,7 @@ const ShowRubricKey: React.FC<ShowRubricProps<UseRubricsKey$key> & {
     caption,
     rubric: rubricKey,
     showCompletenessAgainst,
+    onRubricCompletionChanged,
     qnum,
     pnum,
     bnum,
@@ -658,6 +666,7 @@ const ShowRubricKey: React.FC<ShowRubricProps<UseRubricsKey$key> & {
           <ShowRubric
             rubric={rubric}
             showCompletenessAgainst={showCompletenessAgainst}
+            onRubricCompletionChanged={onRubricCompletionChanged}
             qnum={qnum}
             pnum={pnum}
             bnum={bnum}
@@ -679,9 +688,13 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
     registrationId,
     parentRubricType,
     showCompletenessAgainst,
+    onRubricCompletionChanged,
     collapseKey,
   } = props;
   const showCompleteness = completionStatus(rubric, parentRubricType, showCompletenessAgainst);
+  useEffect(() => {
+    if (onRubricCompletionChanged) onRubricCompletionChanged(showCompleteness);
+  }, [showCompleteness]);
   const completenessClass = statusToClass(showCompleteness);
   let body;
   switch (rubric.type) {
@@ -744,6 +757,7 @@ export const ShowRubrics: React.FC<{
   pnumRubricKey: UseRubricsKey$key;
   bnumRubricKey: UseRubricsKey$key;
   showCompletenessAgainst?: PresetCommentId[];
+  onRubricCompletionChanged: (type: string, newCompletion: CompletionStatus) => void;
   qnum: number;
   pnum: number;
   bnum: number;
@@ -755,6 +769,7 @@ export const ShowRubrics: React.FC<{
     pnumRubricKey,
     bnumRubricKey,
     showCompletenessAgainst,
+    onRubricCompletionChanged,
     qnum,
     pnum,
     bnum,
@@ -766,6 +781,7 @@ export const ShowRubrics: React.FC<{
         caption="Exam-wide rubric"
         rubric={examRubricKey}
         showCompletenessAgainst={showCompletenessAgainst}
+        onRubricCompletionChanged={(b) => onRubricCompletionChanged('exam', b)}
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
@@ -775,6 +791,7 @@ export const ShowRubrics: React.FC<{
         caption="Question rubric"
         rubric={qnumRubricKey}
         showCompletenessAgainst={showCompletenessAgainst}
+        onRubricCompletionChanged={(b) => onRubricCompletionChanged('question', b)}
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
@@ -784,6 +801,7 @@ export const ShowRubrics: React.FC<{
         caption="Part rubric"
         rubric={pnumRubricKey}
         showCompletenessAgainst={showCompletenessAgainst}
+        onRubricCompletionChanged={(b) => onRubricCompletionChanged('part', b)}
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
@@ -793,6 +811,7 @@ export const ShowRubrics: React.FC<{
         caption="Item rubric"
         rubric={bnumRubricKey}
         showCompletenessAgainst={showCompletenessAgainst}
+        onRubricCompletionChanged={(b) => onRubricCompletionChanged('item', b)}
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}

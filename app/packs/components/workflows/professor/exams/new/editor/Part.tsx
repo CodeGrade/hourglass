@@ -311,6 +311,8 @@ export const OnePart: React.FC<{
           <Card.Title>
             {handleRef && <DragHandle handleRef={handleRef} variant="success" />}
             <DestroyButton
+              description="part"
+              confirm
               disabled={disabled}
               onClick={() => {
                 mutateDestroyPart({

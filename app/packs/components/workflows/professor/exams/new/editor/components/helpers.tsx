@@ -7,6 +7,7 @@ import {
   Button,
   ButtonProps,
   Form,
+  Modal,
 } from 'react-bootstrap';
 import { ReactQuillProps } from 'react-quill';
 import { FaTrashAlt } from 'react-icons/fa';
@@ -45,25 +46,72 @@ export const DragHandle: React.FC<{
 export const DestroyButton: React.FC<{
   disabled?: boolean;
   className?: string;
+  confirm: boolean;
+  description: string;
   onClick: () => void;
 }> = (props) => {
   const {
     disabled = false,
     className = 'position-absolute t-0 r-0 z-1000',
+    confirm,
+    description,
     onClick,
   } = props;
+  const [showWarningModal, setShowWarningModal] = useState(false);
   return (
-    <span className={className}>
-      <Button
-        variant="danger"
-        disabled={disabled}
-        onClick={onClick}
-        className={!disabled ? '' : 'cursor-not-allowed pointer-events-auto'}
-        title="Delete"
+    <>
+      <Modal
+        centered
+        keyboard
+        show={showWarningModal}
+        onHide={() => {
+          setShowWarningModal(false);
+        }}
       >
-        <FaTrashAlt />
-      </Button>
-    </span>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {`Are you sure you want to delete this ${description}?`}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowWarningModal(false);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => {
+              setShowWarningModal(false);
+              onClick();
+            }}
+          >
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      <span className={className}>
+        <Button
+          variant="danger"
+          disabled={disabled}
+          onClick={() => {
+            if (confirm) {
+              setShowWarningModal(true);
+            } else {
+              onClick();
+            }
+          }}
+          className={!disabled ? '' : 'cursor-not-allowed pointer-events-auto'}
+          title={`Delete this ${description}`}
+        >
+          <FaTrashAlt />
+        </Button>
+      </span>
+    </>
   );
 };
 

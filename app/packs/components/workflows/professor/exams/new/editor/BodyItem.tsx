@@ -274,6 +274,8 @@ export const BodyItemEditor: React.FC<{
     <Card className="border border-secondary alert-secondary">
       {handleRef && <DragHandle handleRef={handleRef} variant="secondary" />}
       <DestroyButton
+        description="item"
+        confirm
         disabled={disabled}
         onClick={destroyItem}
       />

@@ -163,6 +163,8 @@ const OneOption: React.FC<{
       </Col>
       <Col className="px-0" sm="auto">
         <DestroyButton
+          description="option"
+          confirm
           className=""
           disabled={disabled}
           onClick={() => deleteOption(option.index)}

@@ -168,6 +168,8 @@ const OnePrompt: React.FC<{
       </Col>
       <Col className="px-0" sm="auto">
         <DestroyButton
+          description="prompt"
+          confirm
           disabled={disabled}
           className=""
           onClick={() => deleteItem(option.index)}
@@ -279,6 +281,8 @@ const OneValue: React.FC<{
       </Col>
       <Col className="px-0" sm="auto">
         <DestroyButton
+          description="value"
+          confirm
           disabled={disabled}
           className=""
           onClick={() => deleteValue(value.index)}

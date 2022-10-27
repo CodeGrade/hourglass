@@ -325,6 +325,8 @@ export const OneQuestion: React.FC<{
           <Card.Title>
             {handleRef && <DragHandle variant="primary" handleRef={handleRef} />}
             <DestroyButton
+              description="question"
+              confirm
               disabled={disabled}
               onClick={() => {
                 mutateDestroyQuestion({

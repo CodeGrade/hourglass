@@ -233,6 +233,8 @@ const SingleRubricEditor: React.FC<SingleRubricEditorProps> = (props) => {
         {handleRef && <DragHandle handleRef={handleRef} variant="secondary" />}
         {showDestroy && (
           <DestroyButton
+            description="rubric"
+            confirm
             disabled={loading || disabled}
             onClick={() => {
               mutate({
@@ -901,6 +903,8 @@ const RubricPresetEditor: React.FC<{
       <Card.Body>
         {handleRef && <DragHandle handleRef={handleRef} variant="warning" />}
         <DestroyButton
+          description="preset"
+          confirm
           disabled={loading || disabled}
           onClick={() => {
             mutate({

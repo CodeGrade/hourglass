@@ -246,8 +246,10 @@ class Exam < ApplicationRecord
   end
 
   def finalize_registrations_that_have_run_out_of_time!
-    registrations.in_progress.each do |r|
-      r.finalize! if r.over?
+    Registration.transaction do
+      registrations.includes(:accommodation, :exam_version, :user, exam_version: {exam: {course: [:students]}}).in_progress.each do |r|
+        r.finalize! if r.over?
+      end
     end
   end
 

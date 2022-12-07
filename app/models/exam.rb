@@ -230,7 +230,7 @@ class Exam < ApplicationRecord
   def initialize_grading_locks!(reset: false)
     pairs_by_version = exam_versions.to_h { |v| [v.id, v.qp_pairs] }
     GradingLock.transaction do
-      existing = GradingLock.where(registration: registrations)
+      existing = GradingLock.where(registration: registrations).includes(:question, :part)
       existing.update(grader: nil) if reset
       existing = existing.group_by(&:registration_id)
       registrations.final.each do |registration|

@@ -27,11 +27,11 @@ module Types
 
     field :qnum, Integer, null: false
     def qnum
-      object.question.index
+      RecordLoader.for(Question).load(object.question_id).then{|q| q.index}
     end
     field :pnum, Integer, null: false
     def pnum
-      object.part.index
+      RecordLoader.for(Part).load(object.part_id).then{|q| q.index}
     end
 
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false

@@ -180,21 +180,14 @@ module Types
     def grading_locks(grader: nil, completed_by: nil, grader_current_user: nil, completed_by_current_user: nil)
       grader = context[:current_user] if grader_current_user
       completed_by = context[:current_user] if completed_by_current_user
-      if grader && completed_by
-        puts "Grader #{grader.display_name}, completed_by #{completed_by.display_name}"
-        AssociationLoader.for(ExamVersion, :grading_locks, 
-          merge: -> { where(grader: grader, completed_by: completed_by).order(updated_at: :desc) }).load(object)
-      elsif grader
-        puts "Grader #{grader.display_name}"
-        AssociationLoader.for(ExamVersion, :grading_locks, 
-          merge: -> { where(grader: grader).order(updated_at: :desc) }).load(object)
-      elsif completed_by
-        puts "Completed_by #{completed_by.display_name}"
-        AssociationLoader.for(ExamVersion, :grading_locks, 
-          merge: -> { where(completed_by: completed_by).order(updated_at: :desc) }).load(object)
-      else
-        AssociationLoader.for(ExamVersion, :grading_locks,
-          merge: -> { order(updated_at: :desc) }).load(object)
+      AssociationLoader.for(ExamVersion, :grading_locks, merge: -> { order(updated_at: :desc) }).load(object).then do |locks|
+        if grader
+          locks = locks.filter{|l| l.grader_id == grader.id}
+        end
+        if completed_by
+          locks = locks.filter{|l| l.completed_by_id == completed_by.id}
+        end
+        locks
       end
     end
 

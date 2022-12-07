@@ -468,7 +468,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def qp_pairs
-    db_questions.map do |q|
+    db_questions.includes(:parts).map do |q|
       q.parts.map do |p|
         { question: q, part: p }
       end

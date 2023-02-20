@@ -12,7 +12,7 @@ import { AlertContext } from '@hourglass/common/alerts';
 import { useMutationWithDefaults } from '@hourglass/common/helpers';
 import { ExamTimesViewer, ExamTimesEditor } from './editors';
 
-import { versionTiming$key, versionTiming } from './__generated__/versionTiming.graphql';
+import { versionTiming$key, versionTiming$data } from './__generated__/versionTiming.graphql';
 import { versionTimingUpdateMutation } from './__generated__/versionTimingUpdateMutation.graphql';
 
 const EditExamVersionTiming: React.FC<{
@@ -72,7 +72,7 @@ const ExamVersionInfoEditor: React.FC<{
   examEnd: DateTime,
   /** duration in seconds */
   examDuration: number,
-  version: versionTiming['examVersions']['edges'][number]['node']
+  version: versionTiming$data['examVersions']['edges'][number]['node']
 }> = (props) => {
   const {
     examVersionId,

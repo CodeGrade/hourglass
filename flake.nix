@@ -1,17 +1,10 @@
 {
   description = "hourglass";
 
-  inputs.nixpkgs-ruby.url = "github:nixos/nixpkgs/nixos-unstable";
-  inputs.nixpkgs-watchman.url = "github:kylesferrazza/nixpkgs/update-watchman";
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
-  outputs = { self, nixpkgs, nixpkgs-ruby, nixpkgs-watchman }: let
+  outputs = { self, nixpkgs }: let
     pkgs = import nixpkgs {
-      system = "x86_64-linux";
-    };
-    rubyPkgs = import nixpkgs-ruby {
-      system = "x86_64-linux";
-    };
-    watchmanPkgs = import nixpkgs-watchman {
       system = "x86_64-linux";
     };
   in {
@@ -71,10 +64,8 @@
         chromium
         which
         lzma
-      ]) ++ (with rubyPkgs; [
-        ruby_2_7.devEnv
-      ]) ++ (with watchmanPkgs; [
         watchman
+        ruby_2_7.devEnv
       ]);
 
       shellHook = ''

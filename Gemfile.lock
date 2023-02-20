@@ -400,7 +400,7 @@ DEPENDENCIES
   webpacker (~> 6.0.0.rc.5)
 
 RUBY VERSION
-   ruby 2.7.5p203
+   ruby 2.7.7p221
 
 BUNDLED WITH
-   2.3.6
+   2.4.6

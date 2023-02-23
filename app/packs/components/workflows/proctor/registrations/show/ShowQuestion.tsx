@@ -7,8 +7,8 @@ import { QuestionFilesContext } from '@hourglass/common/context';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@professor/exams/types';
-import { pluralize, pointsStr, questionPoints } from '@hourglass/common/helpers';
-import { ShowQuestion$data, ShowQuestion$key } from './__generated__/ShowQuestion.graphql';
+import { pointsStr, questionPoints } from '@hourglass/common/helpers';
+import { ShowQuestion$key } from './__generated__/ShowQuestion.graphql';
 
 interface ShowQuestionProps {
   refreshCodeMirrorsDeps: React.DependencyList;

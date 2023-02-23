@@ -59,6 +59,43 @@ export function pluralize(number: number, singular: string, plural: string): str
   return `${number} ${plural}`;
 }
 
+export type PointsInfo = {
+  regularPoints: number;
+  extraCreditPoints: number;
+}
+
+export function questionPoints(questionIsExtraCredit: boolean, parts: readonly {points: number, extraCredit?: boolean}[]): PointsInfo {
+  if (questionIsExtraCredit || (parts.length == 1 && parts[0].extraCredit)) {
+    return {
+      regularPoints: 0,
+      extraCreditPoints: parts.reduce((points, part, _idx) => points + part.points, 0)
+    }
+  } else {
+    return parts.reduce((points, part, _idx) => {
+      const { extraCreditPoints, regularPoints } = points;
+      return part.extraCredit ? {
+        regularPoints,
+        extraCreditPoints: extraCreditPoints + part.points
+      } : {
+        extraCreditPoints,
+        regularPoints: regularPoints + part.points
+      };
+    }, { regularPoints: 0, extraCreditPoints: 0});
+  }
+}
+export function pointsStr(points: Partial<PointsInfo>): string {
+  const { extraCreditPoints = 0, regularPoints = 0 } = points;
+  const regPointsStr = pluralize(regularPoints, 'point', 'points');
+  const extraPointsStr = pluralize(extraCreditPoints, 'point', 'points') + ' extra credit';
+  if (extraCreditPoints == 0) { return regPointsStr; }
+  if (regularPoints == 0) {
+    return extraPointsStr;
+  } else {
+    return `${regPointsStr}, ${extraPointsStr}`;
+  }
+}
+
+
 export type SelectOption<T> = {
   label: string;
   value: T;

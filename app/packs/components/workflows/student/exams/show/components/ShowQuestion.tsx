@@ -10,6 +10,7 @@ import {
 } from '@student/exams/show/containers/scrollspy/Question';
 import SubmitButton from '@student/exams/show/containers/SubmitButton';
 import { QuestionFilesContext } from '@hourglass/common/context';
+import { pointsStr, questionPoints } from '@hourglass/common/helpers';
 
 interface ShowQuestionProps {
   examTakeUrl: string;
@@ -53,15 +54,16 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     description,
     parts,
     separateSubparts,
+    extraCredit,
   } = question;
   const split = paginated && separateSubparts;
   const isCurrent = selectedQuestion === qnum;
   const active = !paginated || isCurrent;
   const classes = active ? '' : 'd-none';
   const singlePart = parts.length === 1 && !parts[0].name?.value?.trim();
-  const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
-  const strPoints = points > 1 || points === 0 ? 'points' : 'point';
-  const subtitle = `(${points} ${strPoints})`;
+  const points = questionPoints(extraCredit, parts);
+  const strPoints = pointsStr(points);
+  const subtitle = `(${strPoints})`;
   const questionFilesContextVal = useMemo(() => ({
     references,
   }), [references]);
@@ -106,6 +108,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
                 pnum={i}
                 qnum={qnum}
                 separateSubparts={separateSubparts}
+                questionIsExtraCredit={extraCredit}
                 spyQuestion={spyQuestion}
               />
               <div className={showArrows ? 'mb-5' : 'd-none'}>

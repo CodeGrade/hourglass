@@ -7,8 +7,8 @@ import { QuestionFilesContext } from '@hourglass/common/context';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@professor/exams/types';
-import { pluralize } from '@hourglass/common/helpers';
-import { ShowQuestion$key } from './__generated__/ShowQuestion.graphql';
+import { pluralize, pointsStr, questionPoints } from '@hourglass/common/helpers';
+import { ShowQuestion$data, ShowQuestion$key } from './__generated__/ShowQuestion.graphql';
 
 interface ShowQuestionProps {
   refreshCodeMirrorsDeps: React.DependencyList;
@@ -52,8 +52,10 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
         id
         name { value }
         points
+        extraCredit
         ...PartShow 
       }
+      extraCredit
     }`,
     questionKey,
   );
@@ -63,10 +65,11 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     description,
     parts,
     rootRubric,
+    extraCredit,
   } = res;
   const singlePart = parts.length === 1 && !parts[0].name?.value?.trim();
-  const points = parts.reduce((pts, p, _idx) => pts + p.points, 0);
-  const strPoints = pluralize(points, 'point', 'points');
+  const points = questionPoints(extraCredit, parts);
+  const strPoints = pointsStr(points);
   let curScore = 0;
   for (let i = 0; i < parts.length; i += 1) {
     if (currentGrading[i]?.score !== undefined) {
@@ -124,6 +127,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             pnum={i}
             qnum={qnum}
             currentGrading={currentGrading[i]}
+            questionIsExtraCredit={extraCredit}
             refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
             showRequestGrading={singlePart ? null : registrationId}
             fullyExpandCode={fullyExpandCode}

@@ -9,7 +9,7 @@ import { PartName } from '@student/exams/show/components/Part';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@professor/exams/types';
-import { pluralize, useMutationWithDefaults } from '@hourglass/common/helpers';
+import { pluralize, pointsStr, questionPoints, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { graphql, useFragment } from 'react-relay';
 import { AlertContext } from '@hourglass/common/alerts';
 import { PartRequestGradingLockMutation } from './__generated__/PartRequestGradingLockMutation.graphql';
@@ -25,6 +25,7 @@ interface PartProps {
   anonymous?: boolean;
   showRequestGrading?: string;
   fullyExpandCode?: boolean;
+  questionIsExtraCredit: boolean;
   overviewMode: boolean;
 }
 const REQUEST_GRADE_MUTATION = graphql`
@@ -113,6 +114,7 @@ const Part: React.FC<PartProps> = (props) => {
     showRequestGrading = false,
     fullyExpandCode = false,
     overviewMode,
+    questionIsExtraCredit,
   } = props;
   const res = useFragment<PartShow$key>(
     graphql`
@@ -151,12 +153,13 @@ const Part: React.FC<PartProps> = (props) => {
     bodyItems,
     rootRubric,
   } = res;
-  const strPoints = pluralize(points, 'point', 'points');
+  const partPoints = questionPoints(questionIsExtraCredit, [{ extraCredit, points }]);
+  const strPoints = pointsStr(partPoints);
   let subtitle;
   if (currentGrading?.score !== undefined) {
-    subtitle = `${currentGrading?.score} / ${strPoints}${extraCredit ? ' (Extra credit)' : ''}`;
+    subtitle = `${currentGrading?.score} / ${strPoints}`;
   } else {
-    subtitle = `(${strPoints}${extraCredit ? ', extra credit' : ''})`;
+    subtitle = `(${strPoints})`;
   }
   const contextVal = useMemo(() => ({ references }), [references]);
 

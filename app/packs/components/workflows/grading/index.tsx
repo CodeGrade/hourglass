@@ -65,6 +65,8 @@ import {
   useRefresher,
   pluralize,
   useMutationWithDefaults,
+  questionPoints,
+  pointsStr,
 } from '@hourglass/common/helpers';
 import DisplayAllThatApply from '@proctor/registrations/show/questions/DisplayAllThatApply';
 import DisplayMultipleChoice from '@proctor/registrations/show/questions/DisplayMultipleChoice';
@@ -1174,6 +1176,7 @@ const Grade: React.FC<{
             bodyItems {
               info
             }
+            points
           }
         }
         answers
@@ -1267,6 +1270,9 @@ const Grade: React.FC<{
   const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
   const singlePart = dbQuestions[qnum].parts.length === 1
     && !dbQuestions[qnum].parts[0].name?.value?.trim();
+  const points = questionPoints(dbQuestions[qnum].extraCredit, dbQuestions[qnum].parts);
+  const strPoints = pointsStr(points);
+  const subtitle = `(${strPoints})`;
   const allComments = res.gradingComments.edges.map(({ node }) => node);
   // const anyUncommentedItems = dbQuestions[qnum].parts[pnum].bodyItems.some((b, bnum) => (
   //   ((b.info as BodyItemInfo).type !== 'HTML')
@@ -1287,9 +1293,9 @@ const Grade: React.FC<{
         <div>
           <Row>
             <Col sm={{ span: 6, offset: 3 }}>
-              <h2>
+              <h2 className="d-flex align-items-baseline">
                 <QuestionName qnum={qnum} name={dbQuestions[qnum].name} />
-                {dbQuestions[qnum].extraCredit ? <span className="ml-4">(Extra credit)</span> : null}
+                {singlePart && <span className="ml-auto point-count">{subtitle}</span>}
               </h2>
             </Col>
           </Row>
@@ -1514,6 +1520,8 @@ const ShowOnePart: React.FC<{
           parts {
             id
             name { value }
+            points,
+            extraCredit
             ...PartShow
           }
         }
@@ -1538,13 +1546,19 @@ const ShowOnePart: React.FC<{
   }), [currentAnswers]);
   const singlePart = questions[qnum].parts.length === 1
     && !questions[qnum].parts[0].name?.value?.trim();
+  const points = questionPoints(questions[qnum].extraCredit, questions[qnum].parts);
+  const strPoints = pointsStr(points);
+  const subtitle = `(${strPoints})`;
   return (
     <ExamContext.Provider value={contextVal}>
       <ExamViewerContext.Provider value={viewerContextVal}>
         <div>
           <Row>
             <Col sm={{ span: 6, offset: 3 }}>
-              <h2><QuestionName qnum={qnum} name={questions[qnum].name} /></h2>
+              <h2 className="d-flex align-items-baseline">
+                <QuestionName qnum={qnum} name={questions[qnum].name} />
+                {singlePart && <span className="ml-auto point-count">{subtitle}</span>}
+              </h2>
             </Col>
           </Row>
           <PromptRow prompt={questions[qnum].description} />
@@ -1567,6 +1581,7 @@ const ShowOnePart: React.FC<{
                   qnum={qnum}
                   pnum={pnum}
                   anonymous={singlePart}
+                  questionIsExtraCredit={questions[qnum].extraCredit}
                   currentGrading={currentGrading[qnum][pnum]}
                   showRequestGrading={res.id}
                   overviewMode={false}

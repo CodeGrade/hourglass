@@ -8,7 +8,7 @@ import {
 } from '@student/exams/show/containers/scrollspy/Part';
 import './Part.css';
 import Body from '@student/exams/show/components/Body';
-import { alphabetIdx } from '@hourglass/common/helpers';
+import { alphabetIdx, pointsStr, questionPoints } from '@hourglass/common/helpers';
 import ErrorBoundary from '@hourglass/common/boundary';
 import { PartFilesContext } from '@hourglass/common/context';
 
@@ -17,6 +17,7 @@ interface PartProps {
   qnum: number;
   pnum: number;
   anonymous?: boolean;
+  questionIsExtraCredit: boolean;
   separateSubparts: boolean;
   spyQuestion?: (question: number, pnum?: number) => void;
 }
@@ -45,6 +46,7 @@ const Part: React.FC<PartProps> = (props) => {
     pnum,
     anonymous,
     separateSubparts,
+    questionIsExtraCredit,
     spyQuestion,
   } = props;
   const {
@@ -53,9 +55,11 @@ const Part: React.FC<PartProps> = (props) => {
     description,
     points,
     bodyItems,
+    extraCredit,
   } = part;
-  const strPoints = points > 1 || points === 0 ? 'points' : 'point';
-  const subtitle = `(${points} ${strPoints})`;
+  const partPoints = questionPoints(questionIsExtraCredit, [{ extraCredit, points }]);
+  const strPoints = pointsStr(partPoints);
+  const subtitle = `(${strPoints})`;
   const partFilesContextVal = useMemo(() => ({
     references,
   }), [references]);

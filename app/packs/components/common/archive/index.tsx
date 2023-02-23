@@ -9,6 +9,7 @@ export async function handleDir(root: JSZip): Promise<ExamFile[]> {
   root.forEach((path, file) => {
     if (file.dir) return;
     const exploded = path.split('/');
+    if (exploded.indexOf('__MACOSX') >= 0) return;
     const fileName = exploded.pop();
     let current = ret;
     const pathSoFar = [];

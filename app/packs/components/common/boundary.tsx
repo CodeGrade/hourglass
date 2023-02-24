@@ -4,15 +4,18 @@ import RegularNavbar from './navbar';
 
 export const RenderError: React.FC<{
   error: Error;
-}> = ({ error }) => (
+  errorInfo?: unknown;
+}> = ({ error, errorInfo }) => (
   <span className="text-danger">
     <p>Something went wrong.</p>
     <small>{error.message}</small>
+    <pre>{errorInfo?.['componentStack']}</pre>
   </span>
 );
 
 interface ErrorState {
   error?: Error;
+  errorInfo?: unknown;
   withNavbar?: boolean;
   withContainer?: boolean;
 }
@@ -31,8 +34,17 @@ export default class ErrorBoundary extends React.Component<ErrorProps, ErrorStat
     };
   }
 
+  componentDidCatch(error: Error, errorInfo: unknown) {
+    // Catch errors in any components below and re-render with error message
+    this.setState({
+      error: error,
+      errorInfo: errorInfo
+    })
+    // You can also log error messages to an error reporting service here
+  }
+
   render(): React.ReactNode {
-    const { error } = this.state;
+    const { error, errorInfo } = this.state;
     const { withNavbar, withContainer } = this.props;
     if (error) {
       if (withNavbar) {
@@ -40,7 +52,7 @@ export default class ErrorBoundary extends React.Component<ErrorProps, ErrorStat
           <>
             <RegularNavbar />
             <Container>
-              <RenderError error={error} />
+              <RenderError error={error} errorInfo={errorInfo} />
             </Container>
           </>
         );
@@ -48,12 +60,12 @@ export default class ErrorBoundary extends React.Component<ErrorProps, ErrorStat
       if (withContainer) {
         return (
           <Container>
-            <RenderError error={error} />
+            <RenderError error={error}  errorInfo={errorInfo} />
           </Container>
         );
       }
       return (
-        <RenderError error={error} />
+        <RenderError error={error} errorInfo={errorInfo} />
       );
     }
 

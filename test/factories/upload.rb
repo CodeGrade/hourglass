@@ -36,6 +36,12 @@ FactoryBot.define do
       end
     end
 
+    trait :extra_credit do
+      transient do
+        file_name { 'extra-credits' }
+      end
+    end
+
     initialize_with do
       UploadTestHelper.with_test_uploaded_fixture_zip file_name do |real_upload|
         Upload.new(real_upload)

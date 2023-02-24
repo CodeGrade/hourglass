@@ -1,0 +1,151 @@
+---
+policies:
+- IGNORE_LOCKDOWN
+- TOLERATE_WINDOWED
+contents:
+  questions:
+  - name: Q1 no ec
+    description: Anon single part
+    separateSubparts: false
+    parts:
+    - points: 1.0
+      body:
+      - YesNo:
+          prompt: Q1 ec?
+          correctAnswer: false
+      - YesNo:
+          prompt: Q1 ec?
+          correctAnswer: false
+  - name: Q2 no ec
+    description: named single part
+    separateSubparts: false
+    parts:
+    - name: name
+      points: 2.0
+      body:
+      - YesNo:
+          prompt: Q2 ec?
+          correctAnswer: false
+      - YesNo:
+          prompt: Q2A ec?
+          correctAnswer: false
+  - name: Q3 ec
+    description: anon single part
+    extraCredit: true
+    separateSubparts: false
+    parts:
+    - points: 3.0
+      body:
+      - YesNo:
+          prompt: Q3 ec?
+          correctAnswer: true
+      - YesNo:
+          prompt: Q3A ec?
+          correctAnswer: false
+  - name: Q4 ec
+    description: named single part
+    extraCredit: true
+    separateSubparts: false
+    parts:
+    - name: name
+      points: 4.0
+      body:
+      - YesNo:
+          prompt: Q4 ec?
+          correctAnswer: true
+      - YesNo:
+          prompt: Q4A ec?
+          correctAnswer: false
+  - name: Q5 no ec
+    description: anon single ec part
+    separateSubparts: false
+    parts:
+    - points: 5.0
+      extraCredit: true
+      body:
+      - YesNo:
+          prompt: Q5 ec?
+          correctAnswer: false
+      - YesNo:
+          prompt: Q5A ec?
+          correctAnswer: true
+  - name: Q6 no ec
+    description: named single ec part
+    separateSubparts: false
+    parts:
+    - name: name
+      points: 6.0
+      extraCredit: true
+      body:
+      - YesNo:
+          prompt: Q6 ec?
+          correctAnswer: false
+      - YesNo:
+          prompt: Q6A ec?
+          correctAnswer: true
+  - name: Q7 ec
+    description: anon single ec part
+    extraCredit: true
+    separateSubparts: false
+    parts:
+    - points: 7.0
+      extraCredit: true
+      body:
+      - YesNo:
+          prompt: Q7 ec?
+          correctAnswer: true
+      - YesNo:
+          prompt: Q7A ec?
+          correctAnswer: true
+  - name: Q8 ec
+    description: named single ec part
+    extraCredit: true
+    separateSubparts: false
+    parts:
+    - name: name
+      points: 8.0
+      extraCredit: true
+      body:
+      - YesNo:
+          prompt: Q8 ec?
+          correctAnswer: true
+      - YesNo:
+          prompt: Q8A ec?
+          correctAnswer: true
+  - name: Q9 no ec
+    description: multi part
+    separateSubparts: false
+    parts:
+    - points: 9.0
+      body:
+      - YesNo:
+          prompt: Q9 ec?
+          correctAnswer: false
+      - YesNo:
+          prompt: Q9A ec?
+          correctAnswer: false
+    - points: 19.0
+      extraCredit: true
+      body:
+      - YesNo:
+          prompt: Q9B ec?
+          correctAnswer: true
+  - name: Q10 ec
+    description: multi part ec
+    extraCredit: true
+    separateSubparts: false
+    parts:
+    - points: 10.0
+      body:
+      - YesNo:
+          prompt: Q10 ec?
+          correctAnswer: true
+      - YesNo:
+          prompt: Q10A ec?
+          correctAnswer: false
+    - points: 20.0
+      extraCredit: true
+      body:
+      - YesNo:
+          prompt: Q10B ec?
+          correctAnswer: true

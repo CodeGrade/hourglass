@@ -54,3 +54,7 @@ Rails.application.configure do
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
 end
+
+
+OmniAuth.config.test_mode = true
+Rails.application.env_config["devise.mapping"] = Devise.mappings[:user] # If using Devise

@@ -1273,6 +1273,9 @@ const Grade: React.FC<{
   const points = questionPoints(dbQuestions[qnum].extraCredit, dbQuestions[qnum].parts);
   const strPoints = pointsStr(points);
   const subtitle = `(${strPoints})`;
+  const partPoints = questionPoints(dbQuestions[qnum].extraCredit, [dbQuestions[qnum].parts[pnum]]);
+  const partStrPoints = pointsStr(partPoints);
+  const partSubtitle = `(${partStrPoints})`;
   const allComments = res.gradingComments.edges.map(({ node }) => node);
   // const anyUncommentedItems = dbQuestions[qnum].parts[pnum].bodyItems.some((b, bnum) => (
   //   ((b.info as BodyItemInfo).type !== 'HTML')
@@ -1313,12 +1316,13 @@ const Grade: React.FC<{
           <div>
             <Row>
               <Col sm={{ span: 6, offset: 3 }}>
-                <h3>
+                <h3 className="d-flex align-items-baseline">
                   <PartName
                     anonymous={singlePart}
                     pnum={pnum}
                     name={dbQuestions[qnum].parts[pnum].name}
                   />
+                  {!singlePart && <span className="ml-auto point-count">{partSubtitle}</span>}
                 </h3>
               </Col>
             </Row>

@@ -3,10 +3,6 @@
 require 'application_system_test_case'
 
 class ExtraCreditTest < ApplicationSystemTestCase
-  def setup
-    Webpacker.compile
-  end
-
   test 'extra credits should be visible to students' do
     @version = create(:exam_version, upload: create(:upload, :extra_credit))
     @exam = @version.exam

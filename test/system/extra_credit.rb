@@ -91,7 +91,7 @@ class ExtraCreditTest < ApplicationSystemTestCase
     find_button('Begin grading...').click
     find_link('Whatever is needed').click
     @expected.each_with_index do |exp, idx|
-      find_button('Continue grading').click if (idx > 0)
+      find_button('Continue grading').click if idx.positive?
       page.assert_text exp
       find_button('Finish this submission and start next one').click
     end

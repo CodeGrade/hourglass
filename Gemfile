@@ -46,6 +46,8 @@ gem 'bootsnap', '>= 1.4.2', require: false
 gem 'activerecord_json_validator', '~> 2.0'
 gem 'json-schema', '~> 2.8'
 
+gem 'listen', '~> 3.3'
+
 group :development, :test do
   gem 'byebug'
   gem 'factory_bot_rails', require: false
@@ -60,7 +62,6 @@ end
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
-  gem 'listen', '~> 3.3'
   gem 'rubocop-rails'
   gem 'spring'
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.

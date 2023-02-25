@@ -1882,7 +1882,13 @@ const RenderPnumTree : React.FC<{
   if (!multipart) {
     return (
       <ul className={className}>
-        {info[0].map((item) => <RenderItem item={item} examId={examId} />)}
+        {info[0].map((item) => (
+          <RenderItem
+            key={`reg-${item.registration.id}-q${item.qnum}-p${item.pnum}`}
+            item={item}
+            examId={examId}
+          />
+        ))}
       </ul>
     );
   }
@@ -2046,7 +2052,7 @@ const MyGrading: React.FC<{
         const finishedTree = groupTree(node.finished);
         if (inProgressTree.length === 0 && finishedTree.length === 0) return null;
         return (
-          <ul className="d-inline-block align-top">
+          <ul key={`version-${node.id}`} className="d-inline-block align-top">
             {node.inProgress.edges.length > 0 && (
               <li key={`inprogress-${node.id}`}>
                 <b>{`${node.name}`}</b>

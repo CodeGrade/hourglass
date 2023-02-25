@@ -1177,6 +1177,7 @@ const Grade: React.FC<{
               info
             }
             points
+            extraCredit
           }
         }
         answers

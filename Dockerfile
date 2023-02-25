@@ -12,7 +12,7 @@ COPY Gemfile /home/app/hourglass/Gemfile
 COPY Gemfile.lock /home/app/hourglass/Gemfile.lock
 RUN bash -lc 'rvm install ruby-2.7.5'
 RUN bash -lc 'rvm --default use ruby-2.7.5'
-RUN bundle install
+RUN bundle install --without test development
 
 COPY package.json /home/app/hourglass/package.json
 COPY yarn.lock /home/app/hourglass/yarn.lock

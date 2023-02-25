@@ -6,6 +6,7 @@ module Mutations
     argument :exam_version_id, ID, required: false, loads: Types::ExamVersionType
     argument :qnum, Integer, required: false
     argument :pnum, Integer, required: false
+    argument :allow_change_problems, Boolean, required: false
 
     field :registration_id, ID, null: false
     field :qnum, Integer, null: false
@@ -17,14 +18,42 @@ module Mutations
       raise GraphQL::ExecutionError, 'You do not have permission.'
     end
 
-    def resolve(exam:, exam_version: nil, qnum: nil, pnum: nil)
+    def resolve(exam:, exam_version: nil, qnum: nil, pnum: nil, allow_change_problems: false)
       GradingLock.transaction do
-        lock = my_currently_grading(exam) || next_incomplete(exam, exam_version, qnum, pnum)
+        my_next_lock = my_currently_grading(exam)
+        my_next_incomplete = my_next_lock.nil? && next_incomplete(exam, exam_version, qnum, pnum)
 
-        raise GraphQL::ExecutionError, 'No submissions need grading.' unless lock
+        lock = my_next_lock || my_next_incomplete[:lock]
+
+        # if you didn't specify a preference, then you can't object to changing problems
+        no_preference = exam_version.nil? || qnum.nil? || pnum.nil?
+
+        changed = my_next_incomplete && 
+                  !(my_next_incomplete[:same_version] &&
+                    my_next_incomplete[:same_question] &&
+                    my_next_incomplete[:same_part])
+        puts "Allow change? #{allow_change_problems}, no preference? #{no_preference}, changed? #{changed}"
+        puts "my_next_incomplete: #{my_next_incomplete.inspect}"
+        if !allow_change_problems && !no_preference && changed
+          submission_type = 'part' unless my_next_incomplete[:same_part]
+          submission_type = 'question' unless my_next_incomplete[:same_question]
+          submission_type = 'exam version' unless my_next_incomplete[:same_version]
+          raise GraphQL::ExecutionError.new(
+            "There are no more submissions for that #{submission_type}",
+            extensions: { anyRemaining: my_next_incomplete[:more] }
+          )
+        elsif lock.nil?
+          raise GraphQL::ExecutionError.new(
+            'No submissions need grading', 
+            extensions: { anyRemaining: false },
+          )
+        end
 
         updated = lock.update(grader: context[:current_user])
-        raise GraphQL::ExecutionError, updated.errors.full_messages.to_sentence unless updated
+        raise GraphQL::ExecutionError, {
+          message: updated.errors.full_messages.to_sentence,
+          anyRemaining: true
+         } unless updated
 
         reg_id = HourglassSchema.id_from_object(lock.registration, Types::RegistrationType, context)
         { registration_id: reg_id, qnum: lock.question.index, pnum: lock.part.index }
@@ -34,30 +63,49 @@ module Mutations
     private
 
     def my_currently_grading(exam)
-      my_incomplete = exam.grading_locks.includes(:question, :part).where(grader: context[:current_user]).incomplete
-      my_incomplete = my_incomplete.sort_by { |gl| [gl.question.index, gl.part.index] }
-      my_incomplete.first
+      exam.grading_locks
+          .includes(:question, :part)
+          .where(grader: context[:current_user])
+          .incomplete
+          .min_by { |gl| [gl.question.index, gl.part.index] }
     end
 
     def next_incomplete(exam, exam_version, qnum, pnum)
       sorted = exam.grading_locks.includes(:question, :part).incomplete.no_grader.to_a
-      if (exam_version && exam_version.exam == exam)
+      puts "Requesting next incomplete for #{exam_version&.name}, #{qnum}, #{pnum}"
+      # If no particular preference was made, assume everything is the same
+      same_version = exam_version.nil?
+      same_question = qnum.nil?
+      same_part = pnum.nil?
+      puts "Same #{same_version}, #{same_question}, #{same_part}"
+      if (exam_version && (exam_version.exam == exam))
         reg_ids = exam_version.registration_ids.to_set
         for_cur_version = sorted.select { |s| reg_ids.member?(s.registration_id) } 
         unless for_cur_version.empty?
+          same_version = true
+          puts "Found some for same version #{exam_version.name}"
           sorted = for_cur_version 
           by_qnum = qnum ? sorted.select { |s| s.question.index == qnum } : []
           unless by_qnum.empty?
+            same_question = true
+            puts "Found some more for same question #{qnum}"
             sorted = by_qnum
             by_pnum = pnum ? sorted.select { |s| s.part.index == pnum } : []
             unless by_pnum.empty?
+              same_part = true
+              puts "Found some more for same part #{pnum}"
               sorted = by_pnum
             end
           end
         end
       end
-      sorted = sorted.sort_by { |gl| [gl.question.index, gl.part.index] }
-      sorted.first
+      {
+        lock: sorted.min_by { |gl| [gl.question.index, gl.part.index] },
+        same_version: same_version,
+        same_question: same_question,
+        same_part: same_part,
+        more: !sorted.empty?
+      }
     end
   end
 end

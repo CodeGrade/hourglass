@@ -22,6 +22,7 @@ import {
   Dropdown,
   DropdownButton,
   Carousel,
+  Modal,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
@@ -1099,6 +1100,39 @@ mutation gradingSyncExamToBottlenoseMutation($input: SyncExamToBottlenoseInput!)
 
 type RubricCompletionStatus = Record<string, CompletionStatus>;
 
+const ChangeProblemsDialog: React.FC<{
+  message: string;
+  show: boolean;
+  changeProblems: () => void;
+  stopGrading: () => void;
+}> = (props) => {
+  const {
+    message,
+    show,
+    changeProblems,
+    stopGrading,
+  } = props;
+  return (
+    <Modal centered keyboard show={show} onHide={stopGrading}>
+      <Modal.Header closeButton>
+        Change problems?
+      </Modal.Header>
+      <Modal.Body>
+        <p>{message}</p>
+        <p>Do you want to continue grading?</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={stopGrading}>
+          Stop grading for now
+        </Button>
+        <Button variant="primary" onClick={changeProblems}>
+          Continue grading
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
 const Grade: React.FC<{
   registrationKey: grading_one$key;
   qnum: number;
@@ -1201,6 +1235,25 @@ const Grade: React.FC<{
   const viewerContextVal = useMemo(() => ({
     answers: currentAnswers,
   }), [currentAnswers]);
+  const [changeProblemsMessage, setChangeProblemsMessage] = useState('');
+  const [showChangeProblems, setShowChangeProblems] = useState(false);
+  const cancelChangeProblems = () => {
+    setShowChangeProblems(false);
+    history.replace(`/exams/${examId}/grading`);
+  };
+  const changeProblems = () => {
+    mutateGradeNext({
+      variables: {
+        input: {
+          examId,
+          examVersionId: examVersion.id,
+          qnum,
+          pnum,
+          allowChangeProblems: true,
+        },
+      },
+    });
+  };
   const [mutateGradeNext, nextLoading] = useMutationWithDefaults<gradingNextMutation>(
     GRADE_NEXT_MUTATION,
     {
@@ -1212,8 +1265,13 @@ const Grade: React.FC<{
         } = gradeNext;
         history.replace(`/exams/${examId}/grading/${nextRegId}/${nextQ}/${nextP}`);
       },
-      onError: () => {
-        history.replace(`/exams/${examId}/grading`);
+      onError: (err) => {
+        if (err.cause?.[0]?.extensions.anyRemaining) {
+          setChangeProblemsMessage(err.message);
+          setShowChangeProblems(true);
+        } else {
+          history.replace(`/exams/${examId}/grading`);
+        }
       },
     },
   );
@@ -1404,6 +1462,12 @@ const Grade: React.FC<{
               >
                 Finish this submission and start next one
               </TooltipButton>
+              <ChangeProblemsDialog
+                message={changeProblemsMessage}
+                show={showChangeProblems}
+                changeProblems={changeProblems}
+                stopGrading={cancelChangeProblems}
+              />
             </span>
             <DropdownButton
               className="m-4 d-inline-block"
@@ -2116,6 +2180,8 @@ const BeginGradingButton: React.FC<{
   const { examId } = useParams<{ examId: string }>();
   const history = useHistory();
   const { alert } = useContext(AlertContext);
+  const [noMoreGrading, setNoMoreGrading] = useState(false);
+  const [noMoreGradingMessage, setNoMoreGradingMessage] = useState('');
   const [mutate, loading] = useMutationWithDefaults<gradingNextMutation>(
     GRADE_NEXT_MUTATION,
     {
@@ -2128,12 +2194,17 @@ const BeginGradingButton: React.FC<{
         history.push(`/exams/${examId}/grading/${registrationId}/${qnum}/${pnum}`);
       },
       onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error getting started',
-          message: err.message,
-          copyButton: true,
-        });
+        if (err.cause?.[0]?.extensions && !err.cause[0].extensions.anyRemaining) {
+          setNoMoreGradingMessage(err.message);
+          setNoMoreGrading(true);
+        } else {
+          alert({
+            variant: 'danger',
+            title: 'Error getting started',
+            message: err.message,
+            copyButton: true,
+          });
+        }
       },
     },
   );
@@ -2147,6 +2218,23 @@ const BeginGradingButton: React.FC<{
   return (
     <div>
       <h3>Grading progress:</h3>
+      <Modal
+        centered
+        keyboard
+        show={noMoreGrading}
+        onHide={() => setNoMoreGrading(false)}
+      >
+        <Modal.Header closeButton>All done!</Modal.Header>
+        <Modal.Body>{noMoreGradingMessage}</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="success"
+            onClick={() => setNoMoreGrading(false)}
+          >
+            Hooray!
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <Dropdown>
         <Dropdown.Toggle disabled={loading} id="start-grading-any" variant="primary">
           Begin grading...
@@ -2160,6 +2248,7 @@ const BeginGradingButton: React.FC<{
                 variables: {
                   input: {
                     examId,
+                    allowChangeProblems: true,
                   },
                 },
               });

@@ -36,7 +36,10 @@ const fetchQuery: FetchFunction = async (
       throw new Error(await response.text());
     }
     if ('errors' in json) {
-      throw new Error(json.errors.map(({ message }) => message).join('\n'));
+      throw new Error(
+        json.errors.map(({ message }) => message).join('\n'),
+        { cause: json.errors },
+      );
     }
     return json;
   })

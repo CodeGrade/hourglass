@@ -32,8 +32,6 @@ module Mutations
                   !(my_next_incomplete[:same_version] &&
                     my_next_incomplete[:same_question] &&
                     my_next_incomplete[:same_part])
-        puts "Allow change? #{allow_change_problems}, no preference? #{no_preference}, changed? #{changed}"
-        puts "my_next_incomplete: #{my_next_incomplete.inspect}"
         if !allow_change_problems && !no_preference && changed
           submission_type = 'part' unless my_next_incomplete[:same_part]
           submission_type = 'question' unless my_next_incomplete[:same_question]
@@ -72,28 +70,23 @@ module Mutations
 
     def next_incomplete(exam, exam_version, qnum, pnum)
       sorted = exam.grading_locks.includes(:question, :part).incomplete.no_grader.to_a
-      puts "Requesting next incomplete for #{exam_version&.name}, #{qnum}, #{pnum}"
       # If no particular preference was made, assume everything is the same
       same_version = exam_version.nil?
       same_question = qnum.nil?
       same_part = pnum.nil?
-      puts "Same #{same_version}, #{same_question}, #{same_part}"
       if (exam_version && (exam_version.exam == exam))
         reg_ids = exam_version.registration_ids.to_set
         for_cur_version = sorted.select { |s| reg_ids.member?(s.registration_id) } 
         unless for_cur_version.empty?
           same_version = true
-          puts "Found some for same version #{exam_version.name}"
           sorted = for_cur_version 
           by_qnum = qnum ? sorted.select { |s| s.question.index == qnum } : []
           unless by_qnum.empty?
             same_question = true
-            puts "Found some more for same question #{qnum}"
             sorted = by_qnum
             by_pnum = pnum ? sorted.select { |s| s.part.index == pnum } : []
             unless by_pnum.empty?
               same_part = true
-              puts "Found some more for same part #{pnum}"
               sorted = by_pnum
             end
           end

@@ -50,7 +50,7 @@ class ExtraCreditTest < ApplicationSystemTestCase
     @registration.finalize!
     sign_in @student
     visit "/exams/#{exam_id(@exam)}"
-    page.assert_text "You have submitted this exam"
+    page.assert_text 'You have submitted this exam'
   end
 
   test 'extra credits should be visible to students after exam' do
@@ -86,14 +86,13 @@ class ExtraCreditTest < ApplicationSystemTestCase
     @registration.finalize!
     @exam.initialize_grading_locks!
     sign_in @ta
-    visit "/"
-    find_button("Start Grading").click
-    find_button("Begin grading...").click
-    find_link("Whatever is needed").click
+    visit '/'
+    find_button('Start Grading').click
+    find_button('Begin grading...').click
+    find_link('Whatever is needed').click
     @expected.each do |exp|
       page.assert_text exp
-      find_button("Finish this submission and start next one").click
+      find_button('Finish this submission and start next one').click
     end
   end
-
 end

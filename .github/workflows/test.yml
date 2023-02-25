@@ -7,7 +7,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install nix
       uses: cachix/install-nix-action@v13
       with:
@@ -21,13 +21,13 @@ jobs:
     - name: Get nix deps
       run: nix -L develop -c echo
     - name: Cache nix gems
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           .nix-gems/
         key: ${{ runner.os }}-gems-${{ hashFiles('Gemfile.lock') }}
     - name: Cache npm packages
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: |
           node_modules/

@@ -54,7 +54,7 @@
       name = "hourglass";
       buildInputs = (with pkgs; [
         postgresql
-        qt4
+        qt512.full
         curl.dev
         pcre
         nodejs-16_x

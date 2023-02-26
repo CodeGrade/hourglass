@@ -16,6 +16,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     @grader_reg = create(:staff_registration, section: @section)
     @grader = @grader_reg.user
     @exam.initialize_grading_locks!
+    @qps = @version.qp_pairs.map { |qp| [qp[:question].index, qp[:part].index] }
   end
 
   STATIC_GRAPHQL_QUERIES['REQUEST_LOCK_MUTATION'] = <<-GRAPHQL
@@ -50,10 +51,12 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
       pnum: pnum,
     })
     return ans if raw
+
     assert_not ans['errors']
-    return ans['data']['requestGradingLock']
+    ans['data']['requestGradingLock']
   end
 
+  # rubocop:disable Metrics/ParameterLists
   def attempt_unlock(user, reg, qnum, pnum, complete, raw: false)
     ans = HourglassSchema.do_mutation!('RELEASE_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
@@ -62,23 +65,26 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
       markComplete: complete,
     })
     return ans if raw
+
     assert_not ans['errors']
-    return ans['data']['releaseGradingLock']
+    ans['data']['releaseGradingLock']
   end
+  # rubocop:enable Metrics/ParameterLists
 
   def attempt_unlock_all(user, exam, raw: false)
     ans = HourglassSchema.do_mutation!('RELEASE_ALL_LOCKS_MUTATION', user, {
       examId: HourglassSchema.id_from_object(exam, Types::ExamType, {}),
     })
     return ans if raw
+
     assert_not ans['errors']
-    return ans['data']['releaseAllLocks']
+    ans['data']['releaseAllLocks']
   end
 
   def locks_for(reg)
     reg.grading_locks
        .includes(:question, :part)
-       .group_by{ |l| [l.question.index, l.part.index] }
+       .group_by { |l| [l.question.index, l.part.index] }
   end
 
   def lock_for(reg, qnum, pnum)
@@ -86,7 +92,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   end
 
   test 'acquiring a lock' do
-    qnum, pnum = [0, 0]
+    qnum, pnum = @qps.first
     res = attempt_lock(@ta, @student_reg1, qnum, pnum)
     assert res['acquired']
     @student_reg1.reload
@@ -96,7 +102,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot reacquire a lock' do
-    qnum, pnum = [0, 0]
+    qnum, pnum = @qps.first
     res = attempt_lock(@ta, @student_reg1, qnum, pnum)
     assert res['acquired']
     res = attempt_lock(@ta, @student_reg1, qnum, pnum)
@@ -109,7 +115,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot acquire a lock for a locked part' do
-    qnum, pnum = [0, 0]
+    qnum, pnum = @qps.first
     res = attempt_lock(@ta, @student_reg1, qnum, pnum)
     assert res['acquired']
     res = attempt_lock(@grader, @student_reg1, qnum, pnum)
@@ -122,7 +128,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   end
 
   test 'releasing a lock' do
-    qnum, pnum = [0, 0]
+    qnum, pnum = @qps.first
     res = attempt_lock(@ta, @student_reg1, qnum, pnum)
     assert res['acquired']
     @student_reg1.reload
@@ -138,7 +144,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   end
 
   test "grader cannot release another grader's lock" do
-    qnum, pnum = [0, 0]
+    qnum, pnum = @qps.first
     res = attempt_lock(@ta, @student_reg1, qnum, pnum)
     assert res['acquired']
     @student_reg1.reload
@@ -157,7 +163,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   end
 
   test 'professor can release a lock belonging to a grader' do
-    qnum, pnum = [0, 0]
+    qnum, pnum = @qps.first
     res = attempt_lock(@ta, @student_reg1, qnum, pnum)
     assert res['acquired']
     @student_reg1.reload
@@ -176,7 +182,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   end
 
   test 'release multiple locks' do
-    assert 5, @exam.grading_locks.length
+    assert @qps.length, @exam.grading_locks.length
     res = attempt_unlock_all(@prof, @exam, raw: true)
     assert_not res['errors']
     assert res['data']['releaseAllGradingLocks']['released']

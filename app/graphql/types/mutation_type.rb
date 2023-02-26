@@ -7,7 +7,6 @@ module Types
     field :impersonate_user, mutation: Mutations::ImpersonateUser
     
     field :commence_grading, mutation: Mutations::CommenceGrading
-    field :acquire_grading_lock, mutation: Mutations::AcquireGradingLock
     field :release_grading_lock, mutation: Mutations::ReleaseGradingLock
     field :release_all_grading_locks, mutation: Mutations::ReleaseAllGradingLocks
     

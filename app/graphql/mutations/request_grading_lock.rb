@@ -33,17 +33,5 @@ module Mutations
         end
       end
     end
-
-    private
-
-    def check_permissions_for_lock(user, lock, course)
-      owns_lock = lock.grader == user
-      return if owns_lock
-
-      is_prof = course.professors.exists? user.id
-      return if is_prof
-
-      raise GraphQL::ExecutionError, 'You do not have permission.'
-    end
   end
 end

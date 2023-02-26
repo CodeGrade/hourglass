@@ -15,12 +15,14 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     @ta = @ta_reg.user
     @grader_reg = create(:staff_registration, section: @section)
     @grader = @grader_reg.user
+    @exam.initialize_grading_locks!
   end
 
-  STATIC_GRAPHQL_QUERIES['ACQUIRE_LOCK_MUTATION'] = <<-GRAPHQL
-    mutation acquireLock($input: AcquireGradingLockInput!) {
-      acquireGradingLock(input: $input) {
+  STATIC_GRAPHQL_QUERIES['REQUEST_LOCK_MUTATION'] = <<-GRAPHQL
+    mutation requestLock($input: RequestGradingLockInput!) {
+      requestGradingLock(input: $input) {
         acquired
+        currentOwner { displayName }
       }
     }
   GRAPHQL
@@ -41,122 +43,141 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
-  def attempt_lock(user, reg, qnum, pnum)
-    HourglassSchema.do_mutation!('ACQUIRE_LOCK_MUTATION', user, {
+  def attempt_lock(user, reg, qnum, pnum, raw: false)
+    ans = HourglassSchema.do_mutation!('REQUEST_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
       qnum: qnum,
       pnum: pnum,
     })
+    return ans if raw
+    assert_not ans['errors']
+    return ans['data']['requestGradingLock']
   end
 
-  def attempt_unlock(user, reg, qnum, pnum, complete)
-    HourglassSchema.do_mutation!('RELEASE_LOCK_MUTATION', user, {
+  def attempt_unlock(user, reg, qnum, pnum, complete, raw: false)
+    ans = HourglassSchema.do_mutation!('RELEASE_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
       qnum: qnum,
       pnum: pnum,
       markComplete: complete,
     })
+    return ans if raw
+    assert_not ans['errors']
+    return ans['data']['releaseGradingLock']
   end
 
-  def attempt_unlock_all(user, exam)
-    HourglassSchema.do_mutation!('RELEASE_ALL_LOCKS_MUTATION', user, {
+  def attempt_unlock_all(user, exam, raw: false)
+    ans = HourglassSchema.do_mutation!('RELEASE_ALL_LOCKS_MUTATION', user, {
       examId: HourglassSchema.id_from_object(exam, Types::ExamType, {}),
     })
+    return ans if raw
+    assert_not ans['errors']
+    return ans['data']['releaseAllLocks']
+  end
+
+  def locks_for(reg)
+    reg.grading_locks
+       .includes(:question, :part)
+       .group_by{ |l| [l.question.index, l.part.index] }
+  end
+
+  def lock_for(reg, qnum, pnum)
+    locks_for(reg).dig([qnum, pnum], 0)
   end
 
   test 'acquiring a lock' do
-    res = attempt_lock(@ta, @student_reg1, 0, 0)
-    assert_not res['errors']
-    assert res['data']['acquireGradingLock']['acquired']
+    qnum, pnum = [0, 0]
+    res = attempt_lock(@ta, @student_reg1, qnum, pnum)
+    assert res['acquired']
     @student_reg1.reload
-    locks = @student_reg1.grading_locks
-    assert_equal 1, locks.length
-    assert_equal @ta, locks.first.grader
+    lock = lock_for(@student_reg1, qnum, pnum)
+    assert_not_nil lock
+    assert_equal @ta, lock.grader
   end
 
   test 'cannot reacquire a lock' do
-    res = attempt_lock(@ta, @student_reg1, 0, 0)
-    assert_not res['errors']
-    assert res['data']['acquireGradingLock']['acquired']
-    res = attempt_lock(@ta, @student_reg1, 0, 0)
-    assert_not res['errors'].empty?
-    assert_match(/already being graded/, res['errors'][0]['message'])
+    qnum, pnum = [0, 0]
+    res = attempt_lock(@ta, @student_reg1, qnum, pnum)
+    assert res['acquired']
+    res = attempt_lock(@ta, @student_reg1, qnum, pnum)
+    assert_not res['acquired']
+    assert_equal @ta.display_name, res['currentOwner']['displayName']
     @student_reg1.reload
-    locks = @student_reg1.grading_locks
-    assert_equal 1, locks.length
-    assert_equal @ta, locks.first.grader
+    lock = lock_for(@student_reg1, qnum, pnum)
+    assert_not_nil lock
+    assert_equal @ta, lock.grader
   end
 
   test 'cannot acquire a lock for a locked part' do
-    res = attempt_lock(@ta, @student_reg1, 0, 0)
-    assert_not res['errors']
-    assert res['data']['acquireGradingLock']['acquired']
-    res = attempt_lock(@grader, @student_reg1, 0, 0)
-    assert_not res['errors'].empty?
-    assert_match(/already being graded/, res['errors'][0]['message'])
+    qnum, pnum = [0, 0]
+    res = attempt_lock(@ta, @student_reg1, qnum, pnum)
+    assert res['acquired']
+    res = attempt_lock(@grader, @student_reg1, qnum, pnum)
+    assert_not res['acquired']
+    assert_equal @ta.display_name, res['currentOwner']['displayName']
     @student_reg1.reload
-    locks = @student_reg1.grading_locks
-    assert_equal 1, locks.length
-    assert_equal @ta, locks.first.grader
+    lock = lock_for(@student_reg1, qnum, pnum)
+    assert_not_nil lock
+    assert_equal @ta, lock.grader
   end
 
   test 'releasing a lock' do
-    res = attempt_lock(@ta, @student_reg1, 0, 0)
-    assert_not res['errors']
-    assert res['data']['acquireGradingLock']['acquired']
+    qnum, pnum = [0, 0]
+    res = attempt_lock(@ta, @student_reg1, qnum, pnum)
+    assert res['acquired']
     @student_reg1.reload
-    assert_equal 1, @student_reg1.grading_locks.length
-    assert_equal @ta, @student_reg1.grading_locks.first.grader
-    res = attempt_unlock(@ta, @student_reg1, 0, 0, true)
-    assert_not res['errors']
-    assert res['data']['releaseGradingLock']['released']
+    lock = lock_for(@student_reg1, qnum, pnum)
+    assert_not_nil lock
+    assert_equal @ta, lock.grader
+    res = attempt_unlock(@ta, @student_reg1, qnum, pnum, true)
+    assert res['released']
     @student_reg1.reload
-    assert_equal 1, @student_reg1.grading_locks.length
-    assert_equal @ta, @student_reg1.grading_locks.first.completed_by
+    lock = lock_for(@student_reg1, qnum, pnum)
+    assert_not_nil lock
+    assert_equal @ta, lock.completed_by
   end
 
   test "grader cannot release another grader's lock" do
-    res = attempt_lock(@ta, @student_reg1, 0, 0)
-    assert_not res['errors']
-    assert res['data']['acquireGradingLock']['acquired']
+    qnum, pnum = [0, 0]
+    res = attempt_lock(@ta, @student_reg1, qnum, pnum)
+    assert res['acquired']
     @student_reg1.reload
-    assert_equal 1, @student_reg1.grading_locks.length
-    assert_equal @ta, @student_reg1.grading_locks.first.grader
+    lock = lock_for(@student_reg1, qnum, pnum)
+    assert_not_nil lock
+    assert_equal @ta, lock.grader
 
-    res = attempt_unlock(@grader, @student_reg1, 0, 0, true)
+    res = attempt_unlock(@grader, @student_reg1, qnum, pnum, true, raw: true)
     assert_not res['errors'].empty?
     assert_match(/do not have permission/, res['errors'][0]['message'])
     @student_reg1.reload
-    assert_equal 1, @student_reg1.grading_locks.length
-    assert_nil @student_reg1.grading_locks.first.completed_by
+    lock = lock_for(@student_reg1, qnum, pnum)
+    assert_not_nil lock
+    assert_equal @ta, lock.grader
+    assert_nil lock.completed_by
   end
 
   test 'professor can release a lock belonging to a grader' do
-    res = attempt_lock(@ta, @student_reg1, 0, 0)
-    assert_not res['errors']
-    assert res['data']['acquireGradingLock']['acquired']
+    qnum, pnum = [0, 0]
+    res = attempt_lock(@ta, @student_reg1, qnum, pnum)
+    assert res['acquired']
     @student_reg1.reload
-    assert_equal 1, @student_reg1.grading_locks.length
-    assert_equal @ta, @student_reg1.grading_locks.first.grader
+    lock = lock_for(@student_reg1, qnum, pnum)
+    assert_not_nil lock
+    assert_equal @ta, lock.grader
 
-    res = attempt_unlock(@prof, @student_reg1, 0, 0, false)
+    res = attempt_unlock(@prof, @student_reg1, qnum, pnum, false)
     assert_not res['errors']
-    assert res['data']['releaseGradingLock']['released']
+    assert res['released']
     @student_reg1.reload
-    assert_equal 1, @student_reg1.grading_locks.length
-    assert_nil @student_reg1.grading_locks.first.completed_by
-    assert_nil @student_reg1.grading_locks.first.grader
+    lock = lock_for(@student_reg1, qnum, pnum)
+    assert_not_nil lock
+    assert_nil lock.completed_by
+    assert_nil lock.grader
   end
 
   test 'release multiple locks' do
-    lock1 = create(:grading_lock, registration: @student_reg1, grader: @grader)
-    create(
-      :grading_lock,
-      registration: @student_reg1, grader: @ta,
-      part: lock1.question.parts.find_by(index: 1)
-    )
-    assert 2, @exam.grading_locks.length
-    res = attempt_unlock_all(@prof, @exam)
+    assert 5, @exam.grading_locks.length
+    res = attempt_unlock_all(@prof, @exam, raw: true)
     assert_not res['errors']
     assert res['data']['releaseAllGradingLocks']['released']
     @exam.reload

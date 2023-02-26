@@ -70,11 +70,11 @@ export const ClaimGradingButton: React.FC<{
             message: 'You now hold the grading lock for this part',
           });
         } else {
-          const currentOwner = res.requestGradingLock.currentOwner;
+          const { currentOwner } = res.requestGradingLock;
           alert({
             variant: 'danger',
             title: 'Error claiming grading lock',
-            message: `The lock is already held by ${currentOwner.displayName}`
+            message: `The lock is already held by ${currentOwner.displayName}`,
           });
         }
       },

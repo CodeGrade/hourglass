@@ -62,12 +62,21 @@ export const ClaimGradingButton: React.FC<{
   >(
     REQUEST_GRADE_MUTATION,
     {
-      onCompleted: () => {
-        alert({
-          variant: 'success',
-          title: 'Grading lock claimed',
-          message: 'You now hold the grading lock for this part',
-        });
+      onCompleted: (res) => {
+        if (res.requestGradingLock.acquired) {
+          alert({
+            variant: 'success',
+            title: 'Grading lock claimed',
+            message: 'You now hold the grading lock for this part',
+          });
+        } else {
+          const currentOwner = res.requestGradingLock.currentOwner;
+          alert({
+            variant: 'danger',
+            title: 'Error claiming grading lock',
+            message: `The lock is already held by ${currentOwner.displayName}`
+          });
+        }
       },
       onError: (err) => {
         alert({

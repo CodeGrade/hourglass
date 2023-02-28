@@ -35,19 +35,20 @@ class GradingCommentTest < ActiveSupport::TestCase
     assert build(:grading_comment, registration: @reg2, points: 5).valid?
   end
 
-  def create_comment(reg, q, p, b, preset)
+  def create_comment(reg, question, part, bodyitem, preset)
     GradingComment.create!(
       creator: @grader,
       registration: reg,
-      question: q,
-      part: p,
-      body_item: b,
+      question: question,
+      part: part,
+      body_item: bodyitem,
       preset_comment: preset,
       points: preset.points,
-      message: preset.grader_hint
+      message: preset.grader_hint,
     )
   end
-  test 'score with extra credit is accurate' do
+
+  def setup_ec_exam
     @version = create(:exam_version, upload: create(:upload, :extra_credit))
     @exam = @version.exam
     @reg = create(:registration, exam_version: @version)
@@ -61,9 +62,15 @@ class GradingCommentTest < ActiveSupport::TestCase
     # Confirm exam version is right
     assert_equal @normal_points, @version.total_points
     assert_equal @total, @version.total_points(include_extra_credit: true)
-    # Before grading, when all rubrics are credit based, assume full points
+  end
+
+  test 'score with extra credit is accurate: before grading' do
+    setup_ec_exam
     assert_equal @total, @reg.current_score
-    # Fail all questions
+  end
+
+  test 'score with extra credit is accurate: fail all questions' do
+    setup_ec_exam
     @qp_pairs.each do |qp|
       qp[:part].body_items.each do |bi|
         bi.preset_comments.where(points: 0).each do |preset|
@@ -74,7 +81,10 @@ class GradingCommentTest < ActiveSupport::TestCase
     @reg.reload
     assert_equal 0, @reg.current_score
     assert_equal 0, @reg.current_score_percentage
-    # Get only normal credit
+  end
+
+  test 'score with extra credit is accurate: normal points' do
+    setup_ec_exam
     @reg.grading_comments.destroy_all
     @qp_pairs.each do |qp|
       if !qp[:question].extra_credit && !qp[:part].extra_credit
@@ -94,7 +104,10 @@ class GradingCommentTest < ActiveSupport::TestCase
     @reg.reload
     assert_equal @normal_points, @reg.current_score
     assert_equal 100, @reg.current_score_percentage
-    # Get everything
+  end
+
+  test 'score with extra credit is accurate: include extra credit' do
+    setup_ec_exam
     @reg.grading_comments.destroy_all
     @qp_pairs.each do |qp|
       qp[:part].body_items.each do |bi|

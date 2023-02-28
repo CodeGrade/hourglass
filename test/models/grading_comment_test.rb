@@ -35,6 +35,79 @@ class GradingCommentTest < ActiveSupport::TestCase
     assert build(:grading_comment, registration: @reg2, points: 5).valid?
   end
 
+  def create_comment(reg, q, p, b, preset)
+    GradingComment.create!(
+      creator: @grader,
+      registration: reg,
+      question: q,
+      part: p,
+      body_item: b,
+      preset_comment: preset,
+      points: preset.points,
+      message: preset.grader_hint
+    )
+  end
+  test 'score with extra credit is accurate' do
+    @version = create(:exam_version, upload: create(:upload, :extra_credit))
+    @exam = @version.exam
+    @reg = create(:registration, exam_version: @version)
+    @qp_pairs = @version.qp_pairs
+    @total = @qp_pairs.sum { |qp| qp[:part].points }
+    extra, normal = @qp_pairs.partition do |qp|
+      qp[:question].extra_credit || qp[:part].extra_credit
+    end
+    @extra_points = extra.sum { |qp| qp[:part].points }
+    @normal_points = normal.sum { |qp| qp[:part].points }
+    # Confirm exam version is right
+    assert_equal @normal_points, @version.total_points
+    assert_equal @total, @version.total_points(include_extra_credit: true)
+    # Before grading, when all rubrics are credit based, assume full points
+    assert_equal @total, @reg.current_score
+    # Fail all questions
+    @qp_pairs.each do |qp|
+      qp[:part].body_items.each do |bi|
+        bi.preset_comments.where(points: 0).each do |preset|
+          create_comment(@reg, qp[:question], qp[:part], bi, preset)
+        end
+      end
+    end
+    @reg.reload
+    assert_equal 0, @reg.current_score
+    assert_equal 0, @reg.current_score_percentage
+    # Get only normal credit
+    @reg.grading_comments.destroy_all
+    @qp_pairs.each do |qp|
+      if !qp[:question].extra_credit && !qp[:part].extra_credit
+        qp[:part].body_items.each do |bi|
+          bi.preset_comments.where.not(points: 0).each do |preset|
+            create_comment(@reg, qp[:question], qp[:part], bi, preset)
+          end
+        end
+      else
+        qp[:part].body_items.each do |bi|
+          bi.preset_comments.where(points: 0).each do |preset|
+            create_comment(@reg, qp[:question], qp[:part], bi, preset)
+          end
+        end
+      end
+    end
+    @reg.reload
+    assert_equal @normal_points, @reg.current_score
+    assert_equal 100, @reg.current_score_percentage
+    # Get everything
+    @reg.grading_comments.destroy_all
+    @qp_pairs.each do |qp|
+      qp[:part].body_items.each do |bi|
+        bi.preset_comments.where.not(points: 0).each do |preset|
+          create_comment(@reg, qp[:question], qp[:part], bi, preset)
+        end
+      end
+    end
+    @reg.reload
+    assert_equal @total, @reg.current_score
+    assert_equal 100.0 * (@total / @normal_points), @reg.current_score_percentage
+  end
+
   # test 'invalid qnum' do
   #   bad = build(:grading_check, qnum: @version.db_questions.length)
   #   assert_not bad.valid?

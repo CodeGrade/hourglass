@@ -74,8 +74,22 @@ class ExamVersion < ApplicationRecord
     self[:policies].to_s.split ','
   end
 
-  def total_points
-    db_questions.includes(:parts).flat_map(&:parts).flat_map(&:points).sum
+  def total_points(include_extra_credit: false)
+    if include_extra_credit
+      db_questions
+        .includes(:parts)
+        .flat_map(&:parts)
+        .flat_map(&:points)
+        .sum
+    else
+      db_questions
+        .includes(:parts)
+        .reject(&:extra_credit)
+        .flat_map(&:parts)
+        .reject(&:extra_credit)
+        .flat_map(&:points)
+        .sum
+    end
   end
 
   def answers

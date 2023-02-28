@@ -13,9 +13,29 @@ contents:
       - YesNo:
           prompt: Q1 ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 0.5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q1P1B1 Correct
+                points: 0.5
+              - graderHint: Nope
+                points: 0
       - YesNo:
           prompt: Q1 ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 0.5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q1P1B2 Correct
+                points: 0.5
+              - graderHint: Nope
+                points: 0
   - name: Q2 no ec
     description: named single part
     separateSubparts: false
@@ -26,9 +46,29 @@ contents:
       - YesNo:
           prompt: Q2 ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 1
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q2P1B1 Correct
+                points: 1
+              - graderHint: Nope
+                points: 0
       - YesNo:
           prompt: Q2A ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 1
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q2P1B2 Correct
+                points: 1
+              - graderHint: Nope
+                points: 0
   - name: Q3 ec
     description: anon single part
     extraCredit: true
@@ -39,9 +79,29 @@ contents:
       - YesNo:
           prompt: Q3 ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 1.5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q3P1B1 Correct
+                points: 1.5
+              - graderHint: Nope
+                points: 0
       - YesNo:
           prompt: Q3A ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 1.5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q3P1B2 Correct
+                points: 1.5
+              - graderHint: Nope
+                points: 0
   - name: Q4 ec
     description: named single part
     extraCredit: true
@@ -53,9 +113,29 @@ contents:
       - YesNo:
           prompt: Q4 ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 2
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q4P1B1 Correct
+                points: 2
+              - graderHint: Nope
+                points: 0
       - YesNo:
           prompt: Q4A ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 2
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q4P1B2 Correct
+                points: 2
+              - graderHint: Nope
+                points: 0
   - name: Q5 no ec
     description: anon single ec part
     separateSubparts: false
@@ -66,9 +146,29 @@ contents:
       - YesNo:
           prompt: Q5 ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 2.5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q5P1B1 Correct
+                points: 2.5
+              - graderHint: Nope
+                points: 0
       - YesNo:
           prompt: Q5A ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 2.5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q5P1B2 Correct
+                points: 2.5
+              - graderHint: Nope
+                points: 0
   - name: Q6 no ec
     description: named single ec part
     separateSubparts: false
@@ -80,9 +180,29 @@ contents:
       - YesNo:
           prompt: Q6 ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 3
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q6P1B1 Correct
+                points: 3
+              - graderHint: Nope
+                points: 0
       - YesNo:
           prompt: Q6A ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 3
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q6P1B2 Correct
+                points: 3
+              - graderHint: Nope
+                points: 0
   - name: Q7 ec
     description: anon single ec part
     extraCredit: true
@@ -94,9 +214,29 @@ contents:
       - YesNo:
           prompt: Q7 ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 3.5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q7P1B1 Correct
+                points: 3.5
+              - graderHint: Nope
+                points: 0
       - YesNo:
           prompt: Q7A ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 3.5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q7P1B2 Correct
+                points: 3.5
+              - graderHint: Nope
+                points: 0
   - name: Q8 ec
     description: named single ec part
     extraCredit: true
@@ -109,9 +249,29 @@ contents:
       - YesNo:
           prompt: Q8 ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 4
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q8P1B1 Correct
+                points: 4
+              - graderHint: Nope
+                points: 0
       - YesNo:
           prompt: Q8A ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 4
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q8P1B2 Correct
+                points: 4
+              - graderHint: Nope
+                points: 0
   - name: Q9 no ec
     description: multi part
     separateSubparts: false
@@ -121,15 +281,45 @@ contents:
       - YesNo:
           prompt: Q9 ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 4.5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q9P1B1 Correct
+                points: 4.5
+              - graderHint: Nope
+                points: 0
       - YesNo:
           prompt: Q9A ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 4.5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q9P1B2 Correct
+                points: 4.5
+              - graderHint: Nope
+                points: 0
     - points: 19.0
       extraCredit: true
       body:
       - YesNo:
           prompt: Q9B ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 19
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q9P2B1 Correct
+                points: 19
+              - graderHint: Nope
+                points: 0
   - name: Q10 ec
     description: multi part ec
     extraCredit: true
@@ -140,12 +330,42 @@ contents:
       - YesNo:
           prompt: Q10 ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q10P1B1 Correct
+                points: 5
+              - graderHint: Nope
+                points: 0
       - YesNo:
           prompt: Q10A ec?
           correctAnswer: false
+          rubric:
+            type: one
+            points: 5
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q10P1B2 Correct
+                points: 5
+              - graderHint: Nope
+                points: 0
     - points: 20.0
       extraCredit: true
       body:
       - YesNo:
           prompt: Q10B ec?
           correctAnswer: true
+          rubric:
+            type: one
+            points: 20
+            choices:
+              direction: credit
+              presets:
+              - graderHint: Q10P2B1 Correct
+                points: 20
+              - graderHint: Nope
+                points: 0

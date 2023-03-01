@@ -41,13 +41,15 @@ module Mutations
 
     def update_rooms(updates)
       updates.each do |update|
-        update[:room].update!(name: update[:name])
+        updated = update[:room].update(name: update[:name])
+        raise GraphQL::ExecutionError, update[:room].errors.full_messages.to_sentence unless updated
       end
     end
 
     def create_rooms(exam, new_rooms)
       new_rooms.each do |name|
-        Room.create!(exam: exam, name: name)
+        room = Room.new(exam: exam, name: name)
+        raise GraphQL::ExecutionError, room.errors.full_messages.to_sentence unless room.save
       end
     end
 

@@ -51,8 +51,10 @@ import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
 import ErrorBoundary from '@hourglass/common/boundary';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
+import { BiHide, BiShow } from 'react-icons/bi';
 import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
+import { GrSync } from 'react-icons/gr';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { policyToString } from '@professor/exams/new/editor/Policies';
 import { uploadFile } from '@hourglass/common/types/api';
@@ -76,6 +78,7 @@ import { admin_version$key } from './__generated__/admin_version.graphql';
 import { admin_preview_version$key } from './__generated__/admin_preview_version.graphql';
 import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMutation.graphql';
 import { adminDestroyVersionMutation } from './__generated__/adminDestroyVersionMutation.graphql';
+import { adminSyncExamToBottlenoseMutation } from './__generated__/adminSyncExamToBottlenoseMutation.graphql';
 
 export interface ExamUpdateInfo {
   name: string;
@@ -946,7 +949,7 @@ const PublishGradesButton: React.FC<{
     examId,
   );
   const { alert } = useContext(AlertContext);
-  const [publish, loading] = useMutationWithDefaults<adminPublishGradesMutation>(
+  const [publish, publishLoading] = useMutationWithDefaults<adminPublishGradesMutation>(
     graphql`
       mutation adminPublishGradesMutation($input: PublishGradesInput!) {
         publishGrades(input: $input) {
@@ -974,9 +977,37 @@ const PublishGradesButton: React.FC<{
       },
     },
   );
+  const [syncGrades, syncLoading] = useMutationWithDefaults<adminSyncExamToBottlenoseMutation>(
+    graphql`
+    mutation adminSyncExamToBottlenoseMutation($input: SyncExamToBottlenoseInput!) {
+      syncExamToBottlenose(input: $input) {
+        exam {
+          name
+        }
+      }
+    }
+    `,
+    {
+      onCompleted: ({ syncExamToBottlenose }) => {
+        alert({
+          variant: 'success',
+          title: 'Exam synced',
+          message: `${syncExamToBottlenose.exam.name} was synced successfully.`,
+        });
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error syncing exam',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
 
-  const disabled = loading || !res.graded;
-  const reason = loading ? 'Loading...' : 'Not all exams are graded yet';
+  const disabled = publishLoading || syncLoading || !res.graded;
+  const reason = (publishLoading || syncLoading) ? 'Loading...' : 'Not all exams are graded yet';
   return (
     <Tooltip
       showTooltip={disabled}
@@ -1001,6 +1032,7 @@ const PublishGradesButton: React.FC<{
             });
           }}
         >
+          <Icon I={BiShow} className="mr-2" />
           Publish all grades
         </Dropdown.Item>
         <Dropdown.Item
@@ -1015,7 +1047,23 @@ const PublishGradesButton: React.FC<{
             });
           }}
         >
+          <Icon I={BiHide} className="mr-2" />
           Unpublish all grades
+        </Dropdown.Item>
+        <Dropdown.Divider />
+        <Dropdown.Item
+          onClick={() => {
+            syncGrades({
+              variables: {
+                input: {
+                  examId: res.id,
+                },
+              },
+            });
+          }}
+        >
+          <Icon I={GrSync} className="mr-2" />
+          Sync to Bottlenose
         </Dropdown.Item>
       </DropdownButton>
     </Tooltip>
@@ -1048,6 +1096,7 @@ const ExamAdminQuery: React.FC = () => {
         ...admin_publishGrades
         ...admin_examInfo
         ...admin_checklist
+        graded
       }
     }
     `,

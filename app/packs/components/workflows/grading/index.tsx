@@ -127,7 +127,6 @@ import { gradingMyGrading, gradingMyGrading$key } from './__generated__/gradingM
 import { gradingQuery } from './__generated__/gradingQuery.graphql';
 import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 import { gradingGraderQuery } from './__generated__/gradingGraderQuery.graphql';
-import { gradingSyncExamToBottlenoseMutation } from './__generated__/gradingSyncExamToBottlenoseMutation.graphql';
 
 export function variantForPoints(points: number | string): AlertProps['variant'] {
   if (typeof points === 'string') {
@@ -1088,16 +1087,6 @@ mutation gradingNextMutation($input: GradeNextInput!) {
 }
 `;
 
-const SYNC_EXAM_TO_BOTTLENOSE_MUTATION = graphql`
-mutation gradingSyncExamToBottlenoseMutation($input: SyncExamToBottlenoseInput!) {
-  syncExamToBottlenose(input: $input) {
-    exam {
-      name
-    }
-  }
-}
-`;
-
 type RubricCompletionStatus = Record<string, CompletionStatus>;
 
 const ChangeProblemsDialog: React.FC<{
@@ -1771,49 +1760,6 @@ const GradeOnePartHelp: React.FC<{
         </Col>
       </Row>
     </Container>
-  );
-};
-
-const SyncExamToBottlenoseButton: React.FC = () => {
-  const { examId } = useParams<{ examId: string }>();
-  const { alert } = useContext(AlertContext);
-  const [mutate, loading] = useMutationWithDefaults<gradingSyncExamToBottlenoseMutation>(
-    SYNC_EXAM_TO_BOTTLENOSE_MUTATION,
-    {
-      onCompleted: ({ syncExamToBottlenose }) => {
-        alert({
-          variant: 'success',
-          title: 'Exam synced',
-          message: `${syncExamToBottlenose.exam.name} was synced successfully.`,
-        });
-      },
-      onError: (err) => {
-        alert({
-          variant: 'danger',
-          title: 'Error syncing exam',
-          message: err.message,
-          copyButton: true,
-        });
-      },
-    },
-  );
-  return (
-    <Button
-      disabled={loading}
-      variant="success"
-      className="mr-2"
-      onClick={() => {
-        mutate({
-          variables: {
-            input: {
-              examId,
-            },
-          },
-        });
-      }}
-    >
-      Sync to Bottlenose
-    </Button>
   );
 };
 
@@ -2628,7 +2574,6 @@ const ExamGradingAdministration: React.FC<{
           }
         }
       }
-      graded
     }
     `,
     examKey,
@@ -2638,9 +2583,6 @@ const ExamGradingAdministration: React.FC<{
       {res.examVersions.edges.map(({ node }) => (
         <VersionAdministration key={node.id} versionKey={node} />
       ))}
-      {res.graded && (
-        <SyncExamToBottlenoseButton /> // move to far right
-      )}
     </>
   );
 };

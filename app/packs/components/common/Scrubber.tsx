@@ -23,7 +23,11 @@ export enum Direction {
   BottomToTop = 'bottom-to-top',
 }
 
-type OptLabeledVal<T> = T | { val: T, label?: string, color?: string }
+type OptLabeledVal<T> = T | {
+  val: T,
+  label?: string,
+  style?: CSSProperties,
+}
 
 export interface ScrubberProps<T> {
   min: OptLabeledVal<T>;
@@ -64,20 +68,33 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
   const locatedPoints = pointsOfInterest.map((point) => {
     const pVal = (typeof point === 'object' && 'val' in point) ? point.val : point;
     const label = (typeof point === 'object' && 'label' in point) ? point.label : String(pVal);
-    const color = (typeof point === 'object' && 'color' in point) ? point.color : barColor;
+    const style = (typeof point === 'object' && 'style' in point) ? point.style : ({ backgroundColor: barColor });
     return {
       position: (locater(pVal) - minVal) / range,
       val: pVal,
       label,
-      color,
+      style,
     };
   });
-  const allPoints = locatedPoints.map((p) => p.position);
+  const allPoints = [0, ...locatedPoints.map((p) => p.position), 1];
   const ranges: {rangeMin: number, rangeMax: number}[] = [];
-  for (let i = 1; i < allPoints.length; i += 1) {
-    const rangeMin = ranges[i - 2]?.rangeMax ?? 0;
-    const rangeMax = (allPoints[i - 1] + allPoints[i]) / 2;
-    ranges.push({ rangeMin, rangeMax });
+  for (let i = 0; i < locatedPoints.length; i += 1) {
+    if (i === 0) {
+      ranges.push({
+        rangeMin: allPoints[0],
+        rangeMax: (allPoints[1] + allPoints[2]) / 2,
+      });
+    } else if (i === locatedPoints.length - 1) {
+      ranges.push({
+        rangeMin: ranges[i - 1].rangeMax,
+        rangeMax: allPoints[i + 2],
+      });
+    } else {
+      ranges.push({
+        rangeMin: ranges[i - 1].rangeMax,
+        rangeMax: (allPoints[i] + allPoints[i + 1]) / 2,
+      });
+    }
   }
 
   const positionMark = (markVal: number): CSSProperties => {
@@ -177,7 +194,7 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
   useEffect(() => {
     if (val !== undefined) {
       setCurValue(val);
-      setCurPosition(locater(val));
+      setCurPosition((locater(val) - minVal) / range);
     } else {
       setCurValue(typeof min === 'object' && 'val' in min ? min.val : min);
       setCurPosition(0);
@@ -196,7 +213,7 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
     >
       <span className="bar" style={{ backgroundColor: barColor }} />
       {ranges.map(({ rangeMin, rangeMax }, index) => {
-        const color = locatedPoints[index]?.color ?? barColor;
+        const style = locatedPoints[index]?.style ?? ({ backgroundColor: barColor });
         return (
           <span
             className="bar"
@@ -205,7 +222,7 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
             style={{
               ...positionMark(rangeMin),
               width: `${rangeMax * 100}%`,
-              backgroundColor: color,
+              ...style,
             }}
           />
         );

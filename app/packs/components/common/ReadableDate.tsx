@@ -1,7 +1,7 @@
 import React from 'react';
 import { DateTime, Duration } from 'luxon';
 
-function makeReadableDate(dd: DateTime, showTime: boolean, capitalize: boolean): string {
+export function makeReadableDate(dd: DateTime, showTime: boolean, capitalize: boolean): string {
   const today = DateTime.local().startOf('day');
   const yesterday = today.minus({ days: 1 });
   const tomorrow = today.plus({ days: 1 });

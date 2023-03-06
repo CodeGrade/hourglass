@@ -1,0 +1,37 @@
+.scrubber {
+  width: 700px;
+  height: 100%;
+  position: relative;
+  overflow-y: visible;
+  .bar {
+    position: absolute;
+  }
+  &.left-to-right, &.right-to-left {
+    overflow-x: hidden;
+    .bar {
+      top: 50%;
+      width: 100%;
+      height: 5px;
+      transform: translate(0, -50%);
+    }
+    .point-of-interest {
+      transform: translateX(-50%);
+      bottom: 50%;
+      position: absolute;
+    }
+    .thumb {
+      transform: translate(-50%, -50%);
+      top: 50%;
+      position: absolute;
+      color: red;
+    }
+  }
+  &.top-to-bottom, &.bottom-to-top {
+    .bar {
+      left: 50%;
+      height: 100%;
+      width: 10px;
+      transform: translate(-50%, 0%);
+    }
+  }
+}

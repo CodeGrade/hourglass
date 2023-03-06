@@ -9,6 +9,7 @@ import {
   Switch,
   Route,
   Link,
+  Redirect,
 } from 'react-router-dom';
 import { DateTime, LocaleOptions } from 'luxon';
 import { Container, Button, Table } from 'react-bootstrap';
@@ -19,6 +20,7 @@ import {
 } from '@student/exams/show/types';
 import Spoiler from '@hourglass/common/Spoiler';
 import ExamViewer from '@proctor/registrations/show';
+import ExamTimelineViewer, { SnapshotsState } from '@proctor/registrations/show/Timeline';
 import ExamViewerStudent from '@student/registrations/show';
 import { FinalizeDialog, finalizeItemMutation } from '@proctor/exams';
 import { AlertContext } from '@hourglass/common/alerts';
@@ -31,7 +33,9 @@ import { describeRemainingTime } from '@student/exams/show/components/navbar/Tim
 
 import { submissionsAllQuery, submissionsAllQueryResponse } from './__generated__/submissionsAllQuery.graphql';
 import { submissionsRootQuery } from './__generated__/submissionsRootQuery.graphql';
+import { submissionsAuditRootQuery } from './__generated__/submissionsAuditRootQuery.graphql';
 import { submissionsStaffQuery } from './__generated__/submissionsStaffQuery.graphql';
+import { submissionsAuditStaffQuery } from './__generated__/submissionsAuditStaffQuery.graphql';
 import { submissionsStudentQuery } from './__generated__/submissionsStudentQuery.graphql';
 
 type Registration = submissionsAllQueryResponse['exam']['registrations'][number];
@@ -339,6 +343,50 @@ const ExamSubmissionQuery: React.FC = () => {
   );
 };
 
+const ExamSubmissionAudit: React.FC = () => (
+  <ErrorBoundary>
+    <Suspense
+      fallback={<p>Loading...</p>}
+    >
+      <ExamSubmissionAuditQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const ExamSubmissionAuditQuery: React.FC = () => {
+  const { examId, registrationId } = useParams<{ examId: string, registrationId: string }>();
+  const res = useLazyLoadQuery<submissionsAuditRootQuery>(
+    graphql`
+    query submissionsAuditRootQuery($registrationId: ID!) {
+      me {
+        id
+      }
+      registration(id: $registrationId) {
+        published
+        exam { 
+          id
+          name
+        }
+        user {
+          id
+          displayName
+        }
+      }
+    }
+    `,
+    { registrationId },
+  );
+  const myRegistration = res.me.id === res.registration.user.id;
+  if (myRegistration) {
+    return (
+      <Redirect to={`/exams/${examId}/submissions/${registrationId}`} />
+    );
+  }
+  return (
+    <ExamSubmissionAuditStaff />
+  );
+};
+
 function round(value: number, places: number): number {
   const multiplier = 10 ** places;
   return Math.round(value * multiplier) / multiplier;
@@ -485,10 +533,94 @@ const ExamSubmissionStaffQuery: React.FC = () => {
   );
 };
 
+const ExamSubmissionAuditStaff: React.FC = () => (
+  <ErrorBoundary>
+    <Suspense
+      fallback={<p>Loading...</p>}
+    >
+      <ExamSubmissionAuditStaffQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const ExamSubmissionAuditStaffQuery: React.FC = () => {
+  const { registrationId } = useParams<{ registrationId: string }>();
+  const res = useLazyLoadQuery<submissionsAuditStaffQuery>(
+    graphql`
+    query submissionsAuditStaffQuery($registrationId: ID!, $withRubric: Boolean!) {
+      registration(id: $registrationId) {
+        snapshots {
+          createdAt
+          answers
+        }
+        startTime
+        endTime
+        published
+        user {
+          nuid
+          displayName
+        }
+        exam { name }
+        examVersion {
+          ...TimelineExamViewer
+        }
+      }
+    }
+    `,
+    { registrationId, withRubric: false },
+  );
+  const [title, setTitle] = useState<string>(undefined);
+  const { registration } = res;
+  const {
+    snapshots,
+    published,
+    startTime,
+    endTime,
+    user,
+    exam,
+  } = registration;
+  const userInfo = `${user.displayName} (${user.nuid})`;
+  const titleInfo = published ? userInfo : '<redacted>';
+  if (title === undefined) setTitle(`${exam.name} -- Submission for ${titleInfo}`);
+  if (snapshots === null && !published) {
+    return (
+      <DocumentTitle title={`${exam.name} -- Submission for ${user.displayName}`}>
+        <h1>{`Submission for ${exam.name}`}</h1>
+        <p>Your submission is not yet graded, and cannot be viewed at this time.</p>
+      </DocumentTitle>
+    );
+  }
+  return (
+    <DocumentTitle title={title}>
+      <h1>
+        {'Submission by '}
+        {(published ? userInfo : (
+          <Spoiler
+            text={userInfo}
+            onToggle={(newOpen) => {
+              setTitle(`${exam.name} -- Submission for ${newOpen ? userInfo : '<redacted>'}`);
+            }}
+          />
+        ))}
+      </h1>
+      <ExamTimelineViewer
+        version={registration.examVersion}
+        snapshots={snapshots as SnapshotsState}
+        startTime={DateTime.fromISO(startTime)}
+        endTime={DateTime.fromISO(endTime)}
+        registrationId={registrationId}
+      />
+    </DocumentTitle>
+  );
+};
+
 const Submissions: React.FC = () => (
   <Container>
     <Switch>
-      <Route path="/exams/:examId/submissions/:registrationId">
+      <Route path="/exams/:examId/submissions/:registrationId/timeline">
+        <ExamSubmissionAudit />
+      </Route>
+      <Route path="/exams/:examId/submissions/:registrationId" exact>
         <ExamSubmission />
       </Route>
       <Route path="/exams/:examId/submissions">

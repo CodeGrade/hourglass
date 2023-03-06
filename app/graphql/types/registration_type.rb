@@ -71,6 +71,15 @@ module Types
       end
     end
 
+    field :snapshots, [Types::SnapshotType], null: true
+    def snapshots
+      if Guards::ALL_STAFF.call(self, nil, context)
+        object.snapshots
+      else
+        nil
+      end
+    end
+
     field :current_grading, GraphQL::Types::JSON, null: true
     def current_grading
       if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)

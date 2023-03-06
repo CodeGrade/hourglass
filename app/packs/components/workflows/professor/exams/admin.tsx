@@ -290,10 +290,10 @@ const PreFlightChecklist: React.FC<{
           min={0}
           max={100}
           pointsOfInterest={[
-            { val: 20, color: 'red' },
+            { val: 20, style: { backgroundColor: 'red' } },
             30,
-            { val: 50, color: 'green', label: 'CUSTOM' },
-            { val: 70, color: 'yellow' }, 90, 100,
+            { val: 50, style: { backgroundColor: 'green' }, label: 'CUSTOM' },
+            { val: 70, style: { backgroundColor: 'yellow' } }, 90, 100,
           ]}
           onChange={console.log}
         />

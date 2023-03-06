@@ -112,6 +112,13 @@ module Types
       object.answers
     end
 
+    field :default_answers, GraphQL::Types::JSON, null: false do
+      guard Guards::ALL_STAFF
+    end
+    def default_answers
+      object.default_answers
+    end
+
     field :instructions, Types::HtmlType, null: false do
       guard ALL_STAFF_OR_PUBLISHED
     end

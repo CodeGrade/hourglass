@@ -146,6 +146,8 @@ class HourglassSchema < GraphQL::Schema
       Types::RoomType
     when Section
       Types::SectionType
+    when Snapshot
+      Types::SnapshotType
     when StaffRegistration
       Types::StaffRegistrationType
     when Term

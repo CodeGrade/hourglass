@@ -33,64 +33,95 @@ interface ExamTimelineViewerProps {
   registrationId?: string;
 }
 
-/// Constructs a 2d palette of colors.  Each core color (n, 0)
-/// differs from its neighbors by a hue angle of the golden angle,
-/// so as to maximize the differences among consecutive colors.
-/// Each family of related colors (n, v) varies around the core color
-/// in both hue and brightness.
+/**
+ * Constructs a palette of evenly-spaced colors around the color wheel,
+ * with a predetermined number of colors and numbers of shades per color.
+ * To ensure that consecutive hues are as widely spaced as possible, instead of
+ * choosing colors `[0,1,2,3,4]*72deg` around the circle, we go in steps of two,
+ * producing `[0,2,4,1,3]*72deg`.  When we are requested to produce an even number
+ * of colors, we'll round up to the nearest odd number to select the hue separation.
+ * So, a four-color palette would be `[0,2,4,1]*72deg` as well.  Lastly, to avoid
+ * choosing pure red/green/blue hues, we assume at least 5 colors.
+ *
+ * To produce the shades of individual colors, we likewise vary the brightness
+ * and hue of each base color around a circle centered at the base color.  So, to
+ * produce e.g. 5 shades of a color, we'd conceptually produce `sin([0,1,2,3,4]*72deg)
+ * variations in brightness and hue.  To ensure that no two brightnesses or hue shifts
+ * are identical, we break the symmetry.  Since sin(2*72deg)=sin(3*72deg), we need to
+ * offset by a bit.  We can't use 0.5, since that would make sin(0.5*72deg)=sin(4.5*72deg).
+ * Instead we offset by 0.25, which creates `sin([0.25,1.25,2.25,3.25,4.25]*72deg)`, which
+ * are all unique.
+ */
 class Palette {
-  #lastHue: number;
+  #numShades: number[];
 
-  #palette: Map<number, d3.ColorCommonInstance>;
+  #saturation: number;
 
-  #paletteVariants: Map<number, Map<number, d3.ColorCommonInstance>>;
+  #luminanceVariance: number;
 
-  #lastShift: Map<number, number>;
+  #hueVariance: number;
 
-  #variation: number;
+  #hueOffset: number;
 
-  static goldenAngle = 2.399963229728653;
+  static saturation = 0.65;
 
-  constructor(seed: number, variation: number) {
-    this.#lastHue = seed % (Math.PI * 2.0);
-    this.#variation = variation;
-    this.#palette = new Map();
-    this.#paletteVariants = new Map();
-    this.#lastShift = new Map();
+  static fullColorLuminance = 0.5;
+
+  static luminanceVariance = 0.5;
+
+  static hueVariance = 10;
+
+  constructor(
+    numShadesPerColor: number[],
+    colorParams?: {
+      hueOffset?: number,
+      saturation?: number,
+      luminanceVariance?: number,
+      hueVariance?: number,
+    },
+  ) {
+    const {
+      hueOffset = 0,
+      saturation = Palette.saturation,
+      luminanceVariance = Palette.luminanceVariance,
+      hueVariance = Palette.hueVariance,
+    } = colorParams ?? {};
+    this.#numShades = [...numShadesPerColor];
+    this.#hueOffset = hueOffset;
+    this.#saturation = saturation;
+    this.#luminanceVariance = luminanceVariance;
+    this.#hueVariance = hueVariance;
   }
 
-  static #hueToColor(hue: number): d3.ColorCommonInstance {
-    const a = 40 * Math.cos(hue);
-    const b = 40 * Math.sin(hue);
-    return d3.lab(74, a, b);
+  static #oddAbove(n: number): number {
+    return n + (1 - (n % 2));
   }
 
-  get(colorNum: number, variantNum = 0): d3.ColorCommonInstance {
-    if (!this.#palette.has(colorNum)) {
-      this.#lastHue = (this.#lastHue + Palette.goldenAngle) % (Math.PI * 2.0);
-      const color = Palette.#hueToColor(this.#lastHue);
-      const newMap = new Map<number, d3.ColorCommonInstance>();
-      newMap.set(variantNum, color);
-      this.#palette.set(colorNum, color);
-      this.#paletteVariants.set(colorNum, newMap);
-      this.#lastShift.set(colorNum, 0);
+  get(colorNum?: number, variantNum?: number): d3.ColorCommonInstance {
+    if (colorNum === undefined) { return d3.gray(50); }
+    // Note: we need an odd number so that when we divide the color wheel into sections,
+    // consecutive color numbers can be spaced 2 sections apart (for greater contrast)
+    // without any repetition. (E.g. for 4 colors or 5 colors, we want to
+    // use angles mod 360 degrees of [0, 72*2, 72*4, 72, 72*3].)
+    const hueAngle = (360 / Palette.#oddAbove(Math.max(5, this.#numShades.length)));
+    const hue = d3.hsl(
+      (this.#hueOffset + (colorNum % this.#numShades.length) * 2 * hueAngle) % 360,
+      this.#saturation,
+      Palette.fullColorLuminance,
+    );
+    if (variantNum === undefined) {
+      return hue;
     }
-    const colorMap = this.#paletteVariants.get(colorNum);
-    if (!colorMap.has(variantNum)) {
-      do {
-        const lastShift = (this.#lastShift.get(colorNum) + Palette.goldenAngle) % (Math.PI * 2.0);
-        this.#lastShift.set(colorNum, lastShift);
-        const baseColor = this.#palette.get(colorNum);
-        const color = d3.hsl(baseColor);
-        color.h += this.#variation * Math.sin(lastShift);
-        // Note: *2 - 0.75 is deliberately asymmetric, since darker colors are drastically darker
-        // and lighter colors are only somewhat lighter.  But this still may saturate to white,
-        // so loop until it avoids white
-        const finalColor = color.brighter(this.#variation * (Math.cos(lastShift) * 2.0 - 0.75));
-        colorMap.set(variantNum, finalColor);
-      } while (colorMap.get(variantNum).hex() === '#ffffff');
-    }
-    return colorMap.get(variantNum);
+    const numShadesForColor = this.#numShades[colorNum % this.#numShades.length];
+    const varianceAngle = (360 / Palette.#oddAbove(numShadesForColor));
+    // Since we're evenly spaced around the unit circle, and are therefore symmetric,
+    // to break the symmetry we can't add 0.5 to the variant num, since that just trades
+    // the parity of which values are equal.  Instead we add 0.25, which prevents
+    // pairs of variantNums from aligning around the circle, thereby ensuring all variants
+    // are distinct
+    const varAngle = (((variantNum + 0.25) % numShadesForColor) * varianceAngle) % 360;
+    hue.h += this.#hueVariance * Math.sin(varAngle * (Math.PI / 180));
+    return hue.brighter(this.#luminanceVariance * Math.cos(varAngle * (Math.PI / 180)));
   }
 }
 
@@ -144,7 +175,7 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
     files: files as ExamFile[],
     fmap: createMap(files as ExamFile[]),
   }), [files]);
-  const palette = useMemo(() => new Palette(Math.random() * 50, 0.75), [startTime]);
+  const palette = useMemo(() => new Palette([3, 2, 5], { hueOffset: 30 }), [startTime]);
   const timestamps = snapshots.map((s) => DateTime.fromISO(s.createdAt));
   const [curTimestamp, setCurTimestamp] = useState(timestamps[timestamps.length - 1]);
   const answersByTimestamp = Object.fromEntries(snapshots.map(({ createdAt, answers }) => (
@@ -184,17 +215,6 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
     <ExamContext.Provider value={examContextVal}>
       <ExamViewerContext.Provider value={examViewerContextVal}>
         <ExamFilesContext.Provider value={examFilesContextVal}>
-          <table>
-            {Array.from(Array(10).keys()).map((_, i) => (
-              <tr>
-                {Array.from(Array(10).keys()).map((_, v) => (
-                  <td style={{ backgroundColor: palette.get(i, v).hex() }}>
-                    {`colorNum ${i}, variant ${v} ${palette.get(i, v).hex()}`}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </table>
           <div className="d-block w-100" style={{ height: '50px', overflow: 'visible' }}>
             <Scrubber
               min={startTime < timestamps[0] ? startTime : timestamps[0]}

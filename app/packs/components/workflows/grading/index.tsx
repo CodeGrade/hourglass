@@ -1635,6 +1635,7 @@ const ShowOnePart: React.FC<{
               <Col sm={{ span: 6, offset: 3 }}>
                 <Part
                   refreshCodeMirrorsDeps={refreshProps}
+                  valueUpdate={refreshProps}
                   partKey={questions[qnum].parts[pnum]}
                   qnum={qnum}
                   pnum={pnum}

@@ -20,6 +20,7 @@ interface ExamViewerProps {
   currentGrading?: CurrentGrading;
   currentAnswers: AnswersState;
   refreshCodeMirrorsDeps?: React.DependencyList;
+  valueUpdate?: React.DependencyList;
   overviewMode: boolean;
 }
 
@@ -28,7 +29,8 @@ const ExamViewerStudent: React.FC<ExamViewerProps> = (props) => {
     version,
     currentGrading,
     currentAnswers,
-    refreshCodeMirrorsDeps,
+    refreshCodeMirrorsDeps = [],
+    valueUpdate = [],
     overviewMode,
   } = props;
   const res = useFragment(
@@ -89,6 +91,7 @@ const ExamViewerStudent: React.FC<ExamViewerProps> = (props) => {
             <div>
               <DisplayQuestions
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+                valueUpdate={valueUpdate}
                 version={res}
                 currentGrading={currentGrading}
                 fullyExpandCode

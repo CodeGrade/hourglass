@@ -1,21 +1,22 @@
+$thickness: 10px;
 .scrubber {
-  width: 700px;
-  height: 100%;
   position: relative;
-  overflow-y: visible;
   .bar {
     position: absolute;
   }
   &.left-to-right, &.right-to-left {
+    width: 100%;
+    height: 50px;
+    overflow-y: visible;
     overflow-x: hidden;
     .bar {
       top: 50%;
       width: 100%;
-      height: 5px;
+      height: calc(0.5 * #{$thickness});
       transform: translate(0, -50%);
     }
     .point-of-interest {
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY($thickness);
       bottom: 50%;
       position: absolute;
     }
@@ -23,15 +24,44 @@
       transform: translate(-50%, -50%);
       top: 50%;
       position: absolute;
-      color: red;
+      background-color: white;
+      border: 1px solid black;
+      border-radius: 0.5em;
+      display: inline-block;
+      width: 1em;
+      height: 1em;
     }
   }
   &.top-to-bottom, &.bottom-to-top {
+    height: 100%;
+    width: calc(3 * #{$thickness});
+    overflow-x: visible;
+    overflow-y: hidden;
     .bar {
       left: 50%;
       height: 100%;
-      width: 10px;
+      width: $thickness;
       transform: translate(-50%, 0%);
+    }
+    .point-of-interest {
+      font-size: $thickness;
+      transform: translateY(-50%) translateX($thickness);
+      position: absolute;
+      // > span {
+      //   transform: translateX(50%) rotate(90deg);
+      //   position: absolute;
+      // }
+    }
+    .thumb {
+      transform: translate(-50%, -50%);
+      left: 50%;
+      position: absolute;
+      background-color: white;
+      border: 1px solid black;
+      border-radius: max(0.5em, calc(0.5 * #{$thickness}));
+      display: inline-block;
+      width: max(1em, $thickness);
+      height: max(1em, $thickness);
     }
   }
 }

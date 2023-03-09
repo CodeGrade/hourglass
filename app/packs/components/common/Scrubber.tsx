@@ -7,10 +7,9 @@ import React, {
   useEffect,
 } from 'react';
 import Icon from '@student/exams/show/components/Icon';
-import { FaMapMarker } from 'react-icons/fa';
-import { BiCurrentLocation } from 'react-icons/bi';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import './scrubber.scss';
+import { FaCircle } from 'react-icons/fa';
 
 // Inspired by https://github.com/nick-michael/react-scrubber
 
@@ -61,6 +60,7 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
   const [curPosition, setCurPosition] = useState<number>(0);
   const [curLabel, setCurLabel] = useState<string>(null);
   const [dragging, setDragging] = useState<boolean>(false);
+  const [curSelectionRanges, setCurSelectionRanges] = useState<Range[]>([]);
 
   const minVal = locater(typeof min === 'object' && 'val' in min ? min.val : min);
   const maxVal = locater(typeof max === 'object' && 'val' in max ? max.val : max);
@@ -92,7 +92,7 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
     } else {
       ranges.push({
         rangeMin: ranges[i - 1].rangeMax,
-        rangeMax: (allPoints[i] + allPoints[i + 1]) / 2,
+        rangeMax: (allPoints[i + 1] + allPoints[i + 2]) / 2,
       });
     }
   }
@@ -114,6 +114,23 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
     }
   };
 
+  const dimensionMath = (rangeMin: number, rangeMax: number): CSSProperties => {
+    switch (dir) {
+      case Direction.LeftRight:
+      case Direction.RightLeft:
+        return {
+          width: `${(rangeMax - rangeMin) * 100}%`,
+        };
+      case Direction.TopToBottom:
+      case Direction.BottomToTop:
+        return {
+          height: `${(rangeMax - rangeMin) * 100}%`,
+        };
+      default:
+        throw new ExhaustiveSwitchError(dir);
+    }
+  };
+
   // Returns a percentage value
   const getPositionFromMouseX = (e: MouseEvent): number => {
     const containerDomNode = containerRef.current;
@@ -121,7 +138,7 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
       return 0;
     }
     const { left, width } = containerDomNode.getBoundingClientRect();
-    const cursor = e.pageX;
+    const cursor = e.pageX - window.scrollX;
     const clamped = clamp(left, left + width, cursor);
     return (clamped - left) / width;
   };
@@ -132,10 +149,10 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
     if (!containerDomNode) {
       return 0;
     }
-    const { bottom, height } = containerDomNode.getBoundingClientRect();
-    const cursor = e.pageY;
-    const clamped = clamp(bottom - height, bottom, cursor);
-    return (bottom - clamped) / height;
+    const { top, height } = containerDomNode.getBoundingClientRect();
+    const cursor = e.pageY - window.scrollY;
+    const clamped = clamp(top, top + height, cursor);
+    return (clamped - top) / height;
   };
 
   const getPositionFromCursor = (e: MouseEvent): number => {
@@ -155,6 +172,10 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
 
   const handleMouseDown: MouseEventHandler<HTMLSpanElement> = (_e) => {
     setDragging(true);
+    const curSel = document.getSelection();
+    setCurSelectionRanges(
+      new Array(curSel.rangeCount).map((_, i) => curSel.getRangeAt(i).cloneRange()),
+    );
   };
 
   const handleMouseMove: MouseEventHandler<HTMLSpanElement> = (e) => {
@@ -184,11 +205,15 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
         setCurPosition(mousePosAsPct);
         setCurLabel(String(minVal + mousePosAsPct * range));
       }
+      const curSel = document.getSelection();
+      curSel.removeAllRanges();
+      curSelectionRanges.forEach((r) => curSel.addRange(r));
     }
   };
 
   const handleMouseUp: MouseEventHandler<HTMLSpanElement> = (_e) => {
     setDragging(false);
+    setCurSelectionRanges([]);
   };
 
   useEffect(() => {
@@ -221,7 +246,7 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
             key={index}
             style={{
               ...positionMark(rangeMin),
-              width: `${rangeMax * 100}%`,
+              ...dimensionMath(rangeMin, rangeMax),
               ...style,
             }}
           />
@@ -235,21 +260,20 @@ function Scrubber<T>(props: ScrubberProps<T>): ReturnType<React.FC<ScrubberProps
           style={positionMark(position)}
           title={label}
         >
-          <Icon I={FaMapMarker} />
+          <Icon I={FaCircle} size="1em" />
         </span>
       ))}
       <span
         ref={thumbRef}
         role="slider"
+        aria-label="Scroll through versions"
         className="thumb"
         aria-valuenow={curValue ? locater(curValue) : minVal}
         tabIndex={0}
         title={dragging ? undefined : curLabel}
         onMouseDown={handleMouseDown}
         style={positionMark(curPosition)}
-      >
-        <Icon I={BiCurrentLocation} />
-      </span>
+      />
     </div>
   );
 }

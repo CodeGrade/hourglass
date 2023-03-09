@@ -58,7 +58,6 @@ import { GrSync } from 'react-icons/gr';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { policyToString } from '@professor/exams/new/editor/Policies';
 import { uploadFile } from '@hourglass/common/types/api';
-import Scrubber from '@hourglass/common/Scrubber';
 import {
   graphql,
   useFragment,
@@ -285,7 +284,7 @@ const PreFlightChecklist: React.FC<{
   const { examId, tabName } = useParams<{ examId: string, tabName: string }>();
   return (
     <>
-      <div className="d-block w-100" style={{ height: '50px', overflow: 'visible' }}>
+      {/* <div className="d-block w-100" style={{ height: '50px', overflow: 'visible' }}>
         <Scrubber
           min={0}
           max={100}
@@ -297,7 +296,7 @@ const PreFlightChecklist: React.FC<{
           ]}
           onChange={console.log}
         />
-      </div>
+      </div> */}
       <h1>Pre-flight Checklist</h1>
       <Tab.Container activeKey={tabName}>
         <Nav

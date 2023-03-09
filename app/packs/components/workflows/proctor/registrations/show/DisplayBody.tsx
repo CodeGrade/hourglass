@@ -38,6 +38,7 @@ import { DisplayBody$key } from './__generated__/DisplayBody.graphql';
 export interface BodyProps {
   bodyKey: DisplayBody$key;
   refreshCodeMirrorsDeps: React.DependencyList;
+  valueUpdate: React.DependencyList;
   qnum: number;
   pnum: number;
   bnum: number;
@@ -160,6 +161,7 @@ const ShowCurrentGrading: React.FC<{
 const DisplayBody: React.FC<BodyProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
+    valueUpdate,
     bodyKey,
     qnum,
     pnum,
@@ -224,6 +226,7 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
             info={body.info}
             value={value as CodeState}
             refreshProps={refreshCodeMirrorsDeps}
+            valueUpdate={valueUpdate}
             fullyExpandCode={fullyExpandCode}
           />
           {bRubric && overviewMode && <ShowRubricKey rubricKey={bRubric} forWhat="item" />}

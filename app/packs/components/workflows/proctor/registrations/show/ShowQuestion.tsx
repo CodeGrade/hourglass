@@ -12,23 +12,27 @@ import { ShowQuestion$key } from './__generated__/ShowQuestion.graphql';
 
 interface ShowQuestionProps {
   refreshCodeMirrorsDeps: React.DependencyList;
+  valueUpdate: React.DependencyList;
   questionKey: ShowQuestion$key,
   qnum: number;
   currentGrading?: CurrentGrading[number];
   registrationId?: string;
   fullyExpandCode: boolean;
   overviewMode: boolean;
+  classNameDecorator?: (qnum: number, pnum: number, bnum: number) => string;
 }
 
 const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
+    valueUpdate,
     questionKey,
     qnum,
     currentGrading = [],
     registrationId,
     fullyExpandCode,
     overviewMode,
+    classNameDecorator,
   } = props;
   const res = useFragment<ShowQuestion$key>(
     graphql`
@@ -85,9 +89,10 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     subtitle = `(${strPoints})`;
   }
   const contextVal = useMemo(() => ({ references }), [references]);
+  const extraClasses = classNameDecorator && classNameDecorator(qnum, undefined, undefined);
   return (
     <QuestionFilesContext.Provider value={contextVal}>
-      <div>
+      <div className={extraClasses}>
         <h1 id={`question-${qnum}`} className="d-flex align-items-baseline">
           <QuestionName name={name} qnum={qnum} />
           {singlePart && (
@@ -129,9 +134,11 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             currentGrading={currentGrading[i]}
             questionIsExtraCredit={extraCredit}
             refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+            valueUpdate={valueUpdate}
             showRequestGrading={singlePart ? null : registrationId}
             fullyExpandCode={fullyExpandCode}
             overviewMode={overviewMode}
+            classNameDecorator={classNameDecorator}
           />
         ))}
       </div>

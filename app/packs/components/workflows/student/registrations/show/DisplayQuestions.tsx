@@ -7,21 +7,25 @@ import { DisplayQuestions$key } from './__generated__/DisplayQuestions.graphql';
 
 interface DisplayQuestionsProps {
   refreshCodeMirrorsDeps: React.DependencyList;
+  valueUpdate: React.DependencyList;
   currentGrading?: CurrentGrading;
   registrationId?: string;
   fullyExpandCode: boolean;
   overviewMode: boolean;
   version: DisplayQuestions$key;
+  classNameDecorator?: (qnum: number, pnum: number, bnum: number) => string;
 }
 
 const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
+    valueUpdate,
     currentGrading = [],
     registrationId,
     fullyExpandCode,
     overviewMode,
     version,
+    classNameDecorator,
   } = props;
   const res = useFragment(
     graphql`
@@ -43,9 +47,11 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           qnum={i}
           currentGrading={currentGrading[i]}
           refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+          valueUpdate={valueUpdate}
           registrationId={registrationId}
           fullyExpandCode={fullyExpandCode}
           overviewMode={overviewMode}
+          classNameDecorator={classNameDecorator}
         />
       ))}
     </>

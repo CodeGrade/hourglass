@@ -10,6 +10,7 @@ import {
 import { getCSRFToken } from '@student/exams/show/helpers';
 import { createConsumer } from '@rails/actioncable';
 import { createLegacyRelaySubscriptionHandler } from 'graphql-ruby-client/subscriptions/createRelaySubscriptionHandler';
+import { Consumer } from 'actioncable';
 
 const fetchQuery: FetchFunction = async (
   operation,
@@ -48,7 +49,7 @@ const fetchQuery: FetchFunction = async (
 const cable = createConsumer();
 
 const subscriptionHandler = createLegacyRelaySubscriptionHandler({
-  cable,
+  cable: (cable as Consumer),
 });
 
 const handleSubscribe: SubscribeFunction = (operation, variables, cacheConfig) => (

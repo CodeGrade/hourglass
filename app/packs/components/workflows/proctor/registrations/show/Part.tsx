@@ -18,6 +18,7 @@ import { PartShow$key } from './__generated__/PartShow.graphql';
 
 interface PartProps {
   refreshCodeMirrorsDeps: React.DependencyList;
+  valueUpdate: React.DependencyList;
   partKey: PartShow$key;
   qnum: number;
   pnum: number;
@@ -27,6 +28,7 @@ interface PartProps {
   fullyExpandCode?: boolean;
   questionIsExtraCredit: boolean;
   overviewMode: boolean;
+  classNameDecorator?: (qnum: number, pnum: number, bnum: number) => string;
 }
 const REQUEST_GRADE_MUTATION = graphql`
 mutation PartRequestGradingLockMutation($input: RequestGradingLockInput!) {
@@ -115,6 +117,7 @@ export const ClaimGradingButton: React.FC<{
 const Part: React.FC<PartProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
+    valueUpdate,
     partKey,
     qnum,
     pnum,
@@ -124,6 +127,7 @@ const Part: React.FC<PartProps> = (props) => {
     fullyExpandCode = false,
     overviewMode,
     questionIsExtraCredit,
+    classNameDecorator,
   } = props;
   const res = useFragment<PartShow$key>(
     graphql`
@@ -171,10 +175,11 @@ const Part: React.FC<PartProps> = (props) => {
     subtitle = `(${strPoints})`;
   }
   const contextVal = useMemo(() => ({ references }), [references]);
+  const extraClasses = classNameDecorator && classNameDecorator(qnum, pnum, undefined);
 
   return (
     <PartFilesContext.Provider value={contextVal}>
-      <div>
+      <div className={extraClasses}>
         <h3 id={`question-${qnum}-part-${pnum}`} className="d-flex align-items-baseline">
           <PartName anonymous={anonymous} name={name} pnum={pnum} />
           <span className="ml-auto">
@@ -206,20 +211,24 @@ const Part: React.FC<PartProps> = (props) => {
           />
         )}
         {rootRubric && overviewMode && <ShowRubricKey rubricKey={rootRubric} forWhat="part" />}
-        {bodyItems.map((b, i) => (
-          <div className={`p-2 bodyitem ${(b as BodyItem).info.type}`} key={b.id}>
-            <DisplayBody
-              bodyKey={b}
-              qnum={qnum}
-              pnum={pnum}
-              bnum={i}
-              currentGrading={currentGrading?.body[i]}
-              refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
-              fullyExpandCode={fullyExpandCode}
-              overviewMode={overviewMode}
-            />
-          </div>
-        ))}
+        {bodyItems.map((b, i) => {
+          const bodyExtraClasses = classNameDecorator && classNameDecorator(qnum, pnum, i);
+          return (
+            <div className={`p-2 bodyitem ${(b as BodyItem).info.type} ${bodyExtraClasses}`} key={b.id}>
+              <DisplayBody
+                bodyKey={b}
+                qnum={qnum}
+                pnum={pnum}
+                bnum={i}
+                currentGrading={currentGrading?.body[i]}
+                refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+                valueUpdate={valueUpdate}
+                fullyExpandCode={fullyExpandCode}
+                overviewMode={overviewMode}
+              />
+            </div>
+          );
+        })}
       </div>
     </PartFilesContext.Provider>
   );

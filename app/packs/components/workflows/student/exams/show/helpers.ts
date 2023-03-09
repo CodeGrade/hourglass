@@ -15,7 +15,7 @@ function pulse(elem: HTMLElement): void {
   elem.classList.add('bg-pulse');
 }
 
-function scrollToElem(id: string, smooth = true): void {
+export function scrollToElem(id: string, smooth = true): void {
   setTimeout(() => {
     const elem = document.getElementById(id);
     const elemTop = elem.getBoundingClientRect().top + window.pageYOffset;

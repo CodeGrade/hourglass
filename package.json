@@ -104,7 +104,7 @@
     "@types/react-datepicker": "^2.11.1",
     "@types/react-dom": "^17.0.5",
     "@types/react-redux": "^7.1.16",
-    "@types/react-relay": "^11.0.0",
+    "@types/react-relay": "^12.0.0",
     "@types/react-router-dom": "^5.1.7",
     "@types/react-select": "3.0.13",
     "@types/redux-form": "^8.3.1",

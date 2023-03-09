@@ -21,6 +21,7 @@ interface ExamViewerProps {
   currentGrading?: CurrentGrading;
   currentAnswers?: AnswersState;
   refreshCodeMirrorsDeps?: React.DependencyList;
+  valueUpdate?: React.DependencyList;
   registrationId?: string;
   overviewMode: boolean;
 }
@@ -30,7 +31,8 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     version,
     currentGrading,
     currentAnswers,
-    refreshCodeMirrorsDeps,
+    refreshCodeMirrorsDeps = [],
+    valueUpdate = [],
     registrationId,
     overviewMode,
   } = props;
@@ -143,6 +145,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
             <div>
               <DisplayQuestions
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+                valueUpdate={valueUpdate}
                 version={res}
                 currentGrading={currentGrading}
                 registrationId={registrationId}

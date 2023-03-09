@@ -6,10 +6,12 @@ import {
   ExamViewerContext,
   ExamFilesContext,
 } from '@hourglass/common/context';
-import Scrubber from '@hourglass/common/Scrubber';
+import Scrubber, { Direction } from '@hourglass/common/Scrubber';
 import { makeReadableDate } from '@hourglass/common/ReadableDate';
+import { alphabetIdx } from '@hourglass/common/helpers';
 import { createMap } from '@student/exams/show/files';
 import DisplayQuestions from '@student/registrations/show/DisplayQuestions';
+import { scrollToElem, scrollToQuestion } from '@student/exams/show/helpers';
 import { FileViewer } from '@student/exams/show/components/FileViewer';
 import Scratch from '@student/exams/show/components/navbar/Scratch';
 import { useFragment } from 'react-relay';
@@ -17,7 +19,6 @@ import { graphql } from 'relay-runtime';
 import { DateTime } from 'luxon';
 import { diff, flattenChangeset } from 'json-diff-ts';
 import * as d3 from 'd3-color';
-
 import { TimelineExamViewer$key } from './__generated__/TimelineExamViewer.graphql';
 
 export type SnapshotsState = Array<{
@@ -63,6 +64,8 @@ class Palette {
 
   #hueOffset: number;
 
+  #initialColors: d3.ColorCommonInstance[];
+
   static saturation = 0.65;
 
   static fullColorLuminance = 0.5;
@@ -71,6 +74,8 @@ class Palette {
 
   static hueVariance = 10;
 
+  static defaultColors = ['#47c2ff', '#fad389', '#f56476', '#5da271', '#654f6f'];
+
   constructor(
     numShadesPerColor: number[],
     colorParams?: {
@@ -78,6 +83,7 @@ class Palette {
       saturation?: number,
       luminanceVariance?: number,
       hueVariance?: number,
+      initialColors?: string[],
     },
   ) {
     const {
@@ -85,16 +91,23 @@ class Palette {
       saturation = Palette.saturation,
       luminanceVariance = Palette.luminanceVariance,
       hueVariance = Palette.hueVariance,
+      initialColors = Palette.defaultColors,
     } = colorParams ?? {};
     this.#numShades = [...numShadesPerColor];
     this.#hueOffset = hueOffset;
     this.#saturation = saturation;
     this.#luminanceVariance = luminanceVariance;
     this.#hueVariance = hueVariance;
+    this.#initialColors = initialColors.map((c) => d3.rgb(c));
   }
 
   static #oddAbove(n: number): number {
     return n + (1 - (n % 2));
+  }
+
+  getHueAngle(colorNum?: number): number {
+    const hueAngle = (360 / Palette.#oddAbove(Math.max(5, this.#numShades.length)));
+    return (this.#hueOffset - (colorNum % this.#numShades.length) * 2 * hueAngle) % 360;
   }
 
   get(colorNum?: number, variantNum?: number): d3.ColorCommonInstance {
@@ -103,11 +116,13 @@ class Palette {
     // consecutive color numbers can be spaced 2 sections apart (for greater contrast)
     // without any repetition. (E.g. for 4 colors or 5 colors, we want to
     // use angles mod 360 degrees of [0, 72*2, 72*4, 72, 72*3].)
-    const hueAngle = (360 / Palette.#oddAbove(Math.max(5, this.#numShades.length)));
-    const hue = d3.hsl(
-      (this.#hueOffset + (colorNum % this.#numShades.length) * 2 * hueAngle) % 360,
-      this.#saturation,
-      Palette.fullColorLuminance,
+    const hue = (colorNum < this.#initialColors.length
+      ? d3.hsl(this.#initialColors[colorNum])
+      : d3.hsl(
+        this.getHueAngle(colorNum - this.#initialColors.length),
+        this.#saturation,
+        Palette.fullColorLuminance,
+      )
     );
     if (variantNum === undefined) {
       return hue;
@@ -130,7 +145,7 @@ function makeStripes(palette: Palette, scratch: boolean, nums: Set<number>): CSS
   if (scratch) {
     colors.push(d3.gray(50));
   }
-  nums.forEach((c) => colors.push(palette.get(c)));
+  Array.from(nums).sort().forEach((c) => colors.push(palette.get(c)));
   const size = 10;
   const usedColors = colors.map((c, index) => `${c.hex()} ${index > 0 ? `${size * index}px` : ''}, ${c.hex()} ${size * (index + 1)}px`);
   const stripes = `repeating-linear-gradient(135deg, ${usedColors.join(', ')})`;
@@ -143,7 +158,7 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
     snapshots,
     startTime,
     endTime,
-    refreshCodeMirrorsDeps,
+    refreshCodeMirrorsDeps = [],
     registrationId,
   } = props;
   const res = useFragment(
@@ -175,9 +190,12 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
     files: files as ExamFile[],
     fmap: createMap(files as ExamFile[]),
   }), [files]);
-  const palette = useMemo(() => new Palette([3, 2, 5], { hueOffset: 30 }), [startTime]);
+  const paletteSkeleton = (defaultAnswers as AnswersState).answers.map((parts) => parts.length);
+  const palette = useMemo(() => new Palette(paletteSkeleton, { hueOffset: 340 }), [startTime]);
   const timestamps = snapshots.map((s) => DateTime.fromISO(s.createdAt));
+  const timestepIndices = new Map(timestamps.map((s, i) => [+s, i]));
   const [curTimestamp, setCurTimestamp] = useState(timestamps[timestamps.length - 1]);
+  const curTimestampIndex = timestepIndices.get(+curTimestamp);
   const answersByTimestamp = Object.fromEntries(snapshots.map(({ createdAt, answers }) => (
     // NOTE: the .fromISO().toISO() isn't an identity function: it normalizes
     // timezones so that the frontend here doesn't depend on how Ruby supplied
@@ -188,35 +206,81 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
     (index === 0 ? defaultAnswers : snapshots[index - 1].answers),
     answers,
   ))), [snapshots]);
-  const changes = useMemo(() => diffs.map((d) => {
+  const changes = diffs.map((d) => {
     const paths = d.map((change) => change.path);
-    const scratch = paths.find((p) => p === 'scratch') !== undefined;
-    const questions = new Set(paths.map((p) => Number(p.match(/answers\[(\d)\]/)[1])));
-    const questionParts = [...questions].map((qnum) => {
+    const [scratchPaths, questionsPaths] = paths.reduce((acc, p) => {
+      acc[p.endsWith('scratch') ? 0 : 1].push(p);
+      return acc;
+    }, [[], []]);
+    const scratch = scratchPaths.length > 0;
+    const questions = new Set(questionsPaths.map((p) => Number(p.match(/answers\[(\d)\]/)[1])));
+    const questionParts = new Map(Array.from(questions).map((qnum) => {
       const qpaths = paths.filter((p) => p.match(`answers\\[${qnum}\\]`));
       const parts = qpaths.map((p) => Number(p.match(/answers\[\d\]\[(\d)\]/)[1]));
-      return new Set(parts);
-    });
+      return [qnum, new Set(parts)];
+    }));
     return { scratch, questions, parts: questionParts };
-  }), [snapshots]);
-  console.log(timestamps);
-  console.log(changes);
-  console.log(diffs);
+  });
   const answers = (curTimestamp
     ? answersByTimestamp[curTimestamp.toISO()]
     : defaultAnswers as AnswersState);
   const examViewerContextVal = useMemo(() => ({
     answers,
-  }), [answers]);
+  }), [curTimestampIndex, answers]);
   const examFilesContextVal = useMemo(() => ({
     references,
   }), [references]);
+  const didItemChange = (qnum?: number, pnum?: number, bnum?: number) => {
+    const change = changes[curTimestampIndex];
+    if (bnum !== undefined) {
+      // do nothing yet
+    } else if (pnum !== undefined) {
+      if (change.parts.get(qnum)?.has(pnum)) { return 'alert alert-primary'; }
+    } else if (pnum === undefined && qnum === undefined) {
+      if (change.scratch) { return 'alert alert-info'; }
+    }
+    return '';
+  };
+  const onChange = (_, time) => {
+    setCurTimestamp(time);
+    const nextIndex = timestepIndices.get(+time);
+    const newChange = changes[nextIndex];
+    if (newChange.scratch) {
+      scrollToElem('scratchbox');
+    } else {
+      let firstActiveQ;
+      let firstActiveP;
+      newChange.parts.forEach((activeParts, qnum) => {
+        if (firstActiveQ === undefined && activeParts.size > 0) {
+          firstActiveQ = qnum;
+          // note: cannot use Math.min(...activeParts), for some reason:
+          // once transcompiled, it produces Math.min.apply(Math, activeParts),
+          // which yields Infinity
+          firstActiveP = Math.min(...Array.from(activeParts));
+        }
+      });
+      if (firstActiveQ >= 0) {
+        scrollToQuestion(firstActiveQ, firstActiveP);
+      }
+    }
+  };
+  const summary = (change: typeof changes[number]): string => {
+    const parts: string[] = [];
+    if (change.scratch) { parts.push('scratch'); }
+    change.parts.forEach((pnums, qnum) => {
+      pnums.forEach((pnum) => {
+        parts.push(`Question ${qnum + 1} part ${alphabetIdx(pnum)}`);
+      });
+    });
+    return parts.join(',\n');
+  };
   return (
     <ExamContext.Provider value={examContextVal}>
       <ExamViewerContext.Provider value={examViewerContextVal}>
         <ExamFilesContext.Provider value={examFilesContextVal}>
-          <div className="d-block w-100" style={{ height: '50px', overflow: 'visible' }}>
+          {/* <div className="d-block w-100 sticky-top" style={{ backgroundColor: 'white' }}>
             <Scrubber
+              dir={Direction.LeftRight}
               min={startTime < timestamps[0] ? startTime : timestamps[0]}
               max={endTime > timestamps[timestamps.length - 1]
                 ? endTime
@@ -225,14 +289,42 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
               locater={(timestamp) => (timestamp?.toMillis() ?? 0)}
               pointsOfInterest={timestamps.map((ts, index) => ({
                 val: ts,
-                label: makeReadableDate(ts, true, true),
+                label: `${makeReadableDate(ts, true, true)}\nChanges: ${summary(changes[index])}`,
                 style: makeStripes(palette, changes[index].scratch, changes[index].questions),
               }))}
-              onChange={(_, time) => setCurTimestamp(time)}
+              showPins={false}
+              onChange={onChange}
             />
+          </div> */}
+          <div
+            className="d-block position-fixed sticky-top"
+            style={{
+              left: 0,
+              height: '80%',
+              top: '50%',
+              transform: 'translate(0, -50%)',
+            }}
+          >
+            <Scrubber
+              dir={Direction.TopToBottom}
+              min={startTime < timestamps[0] ? startTime : timestamps[0]}
+              max={endTime > timestamps[timestamps.length - 1]
+                ? endTime
+                : timestamps[timestamps.length - 1]}
+              val={curTimestamp ?? startTime}
+              locater={(timestamp) => (timestamp?.toMillis() ?? 0)}
+              pointsOfInterest={timestamps.map((ts, index) => ({
+                val: ts,
+                label: `${makeReadableDate(ts, true, true)}\nChanges: ${summary(changes[index])}`,
+                style: makeStripes(palette, changes[index].scratch, changes[index].questions),
+              }))}
+              showPins
+              onChange={onChange}
+            />
+
           </div>
           <div>
-            <div>
+            <div className={changes[curTimestampIndex]?.scratch ? 'alert-info' : ''}>
               <span>Scratch space:</span>
               <Scratch
                 value={answers.scratch}
@@ -249,10 +341,12 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
             <div>
               <DisplayQuestions
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
+                valueUpdate={[...refreshCodeMirrorsDeps, curTimestampIndex]}
                 version={res}
                 registrationId={registrationId}
                 fullyExpandCode
                 overviewMode={false}
+                classNameDecorator={didItemChange}
               />
             </div>
           </div>

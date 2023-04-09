@@ -27,6 +27,7 @@ import {
   ActivateWaypointsAction,
   Policy,
   TimeInfo,
+  PolicyExemption,
 } from '@student/exams/show/types';
 import lock from '@student/exams/show/lockdown/lock';
 import { DateTime } from 'luxon';
@@ -126,7 +127,7 @@ export function updateScratch(val: string): UpdateScratchAction {
   };
 }
 
-export function doLoad(examTakeUrl: string): Thunk {
+export function doLoad(examTakeUrl: string, pin?: string): Thunk {
   return (dispatch): void => {
     fetch(examTakeUrl, {
       method: 'POST',
@@ -137,6 +138,7 @@ export function doLoad(examTakeUrl: string): Thunk {
       credentials: 'same-origin',
       body: JSON.stringify({
         task: 'start',
+        pin,
       }),
     })
       .then(async (result) => {
@@ -148,7 +150,7 @@ export function doLoad(examTakeUrl: string): Thunk {
       })
       .then((result) => {
         if (result.type === 'ANOMALOUS') {
-          dispatch(lockdownFailed('You have been locked out. Please see an instructor.'));
+          dispatch(lockdownFailed(result.reason ?? 'You have been locked out. Please see an instructor.'));
         } else {
           const {
             time,
@@ -174,17 +176,19 @@ export function doLoad(examTakeUrl: string): Thunk {
 
 export function doTryLockdown(
   policies: readonly Policy[],
+  policyExemptions: readonly PolicyExemption[],
   examTakeUrl: string,
+  pin?: string,
 ): Thunk {
   return (dispatch): void => {
-    lock(policies).then(() => {
+    lock(policies, policyExemptions).then(() => {
       window.history.pushState({}, document.title);
       if (policyPermits(policies, 'IGNORE_LOCKDOWN')) {
         dispatch(lockdownIgnored());
       } else {
         dispatch(lockedDown());
       }
-      dispatch(doLoad(examTakeUrl));
+      dispatch(doLoad(examTakeUrl, pin));
     }).catch((err) => {
       dispatch(lockdownFailed(err?.message ?? 'general failure'));
     });

@@ -73,6 +73,7 @@ const ExamSubmissionsQuery: React.FC = () => {
           startTime
           endTime
           effectiveEndTime
+          currentPin
         }
       }
     }
@@ -133,6 +134,7 @@ const ExamSubmissionsQuery: React.FC = () => {
     else if (r.started) groups.started.push(r);
     else groups.notStarted.push(r);
   });
+  const anyPins = registrations.some((r) => (r.currentPin ?? '') !== '');
   const startedButNotFinished = groups.over.length > 0 || groups.started.length > 0;
   const timeOpts : LocaleOptions & Intl.DateTimeFormatOptions = {
     weekday: 'short', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
@@ -200,7 +202,7 @@ const ExamSubmissionsQuery: React.FC = () => {
               </div>
             )}
           </h4>
-          <Table>
+          <Table hover>
             <thead>
               <tr>
                 <th>Student</th>
@@ -235,7 +237,7 @@ const ExamSubmissionsQuery: React.FC = () => {
       {groups.started.length === 0 ? (
         <i>No one is currently taking the exam</i>
       ) : (
-        <Table>
+        <Table hover>
           <thead>
             <tr>
               <th>Student</th>
@@ -279,15 +281,26 @@ const ExamSubmissionsQuery: React.FC = () => {
       {groups.notStarted.length === 0 ? (
         <i>Everyone has started</i>
       ) : (
-        <ul>
-          {groups.notStarted.map((reg) => (
-            <li key={reg.id}>
-              <Link to={`/exams/${examId}/submissions/${reg.id}`}>
-                {reg.user.displayName}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <Table hover>
+          <thead>
+            <tr>
+              <th>Student</th>
+              {anyPins && (<th>Current PIN</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {groups.notStarted.map((reg) => (
+              <tr key={reg.id}>
+                <td>
+                  <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+                    {reg.user.displayName}
+                  </Link>
+                </td>
+                <td>{reg.currentPin ?? 'none required'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       )}
     </DocumentTitle>
   );

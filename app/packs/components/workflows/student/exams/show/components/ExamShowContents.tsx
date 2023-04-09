@@ -5,7 +5,8 @@ import React, {
   useState,
 } from 'react';
 import {
-  ExamVersion, Policy, policyPermits,
+  ExamVersion,
+  policyPermits,
 } from '@student/exams/show/types';
 import { createMap } from '@student/exams/show/files';
 import { ExamContext, ExamFilesContext } from '@hourglass/common/context';
@@ -50,6 +51,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
         examVersion {
           policies
         }
+        policyExemptions
       }
     }
     `,
@@ -61,7 +63,7 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
     setWarningModalReason(reason);
     setShowWarningModal(true);
   };
-  const policies = res.myRegistration.examVersion.policies as readonly Policy[];
+  const { policyExemptions, examVersion: { policies } } = res.myRegistration;
   const cleanupBeforeSubmit = useAnomalyListeners(
     res.takeUrl,
     policies,
@@ -104,7 +106,8 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
           show={showWarningModal}
           onHide={() => {
             setShowWarningModal(false);
-            if (!policyPermits(policies, 'TOLERATE_WINDOWED')) {
+            if (!policyPermits(policies, 'TOLERATE_WINDOWED')
+                && !policyPermits(policyExemptions, 'TOLERATE_WINDOWED')) {
               openFullscreen();
             }
           }}
@@ -122,7 +125,8 @@ const ExamShowContents: React.FC<ExamShowContentsProps> = (props) => {
               variant="primary"
               onClick={() => {
                 setShowWarningModal(false);
-                if (!policyPermits(policies, 'TOLERATE_WINDOWED')) {
+                if (!policyPermits(policies, 'TOLERATE_WINDOWED')
+                    && !policyPermits(policyExemptions, 'TOLERATE_WINDOWED')) {
                   openFullscreen();
                 }
               }}

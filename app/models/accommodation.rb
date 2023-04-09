@@ -23,4 +23,8 @@ class Accommodation < ApplicationRecord
   def visible_to?(check_user, role_for_exam, _role_for_course)
     (role_for_exam >= Exam.roles[:professor]) || course.professors.exists?(check_user.id)
   end
+
+  def policy_exemptions
+    self[:policy_exemptions].to_s.split ','
+  end
 end

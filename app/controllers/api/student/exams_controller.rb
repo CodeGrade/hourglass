@@ -55,6 +55,10 @@ module Api
       end
 
       def start_exam!
+        unless @registration.validate_pin!(params[:pin])
+          return { type: 'ANOMALOUS', reason: 'Invalid PIN: please contact a proctor for a new PIN' }
+        end
+
         @registration.update(start_time: DateTime.now) if @registration.start_time.nil?
 
         answers = @registration.current_answers

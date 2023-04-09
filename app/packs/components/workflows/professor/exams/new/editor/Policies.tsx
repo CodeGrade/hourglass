@@ -14,6 +14,7 @@ export const policyToString: Record<Policy, string> = {
   IGNORE_LOCKDOWN: 'Ignore lockdown',
   TOLERATE_WINDOWED: 'Tolerate windowed mode',
   MOCK_LOCKDOWN: 'Warn upon lockdown violation',
+  STUDENT_PIN: 'Require PIN for students to log in',
 };
 
 const allPolicies: Policy[] = Object.keys(policyToString) as Policy[];

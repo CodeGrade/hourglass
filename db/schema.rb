@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_06_011324) do
+ActiveRecord::Schema.define(version: 2023_11_16_195043) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 2023_11_06_011324) do
     t.integer "percent_time_expansion", default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "policy_exemptions", default: "", null: false
     t.index ["registration_id"], name: "index_accommodations_on_registration_id", unique: true
   end
 
@@ -72,6 +73,8 @@ ActiveRecord::Schema.define(version: 2023_11_06_011324) do
     t.datetime "start_time"
     t.datetime "end_time"
     t.integer "duration"
+    t.string "pin_nonce"
+    t.integer "pin_strength", default: 6, null: false
     t.index ["exam_id"], name: "index_exam_versions_on_exam_id"
   end
 

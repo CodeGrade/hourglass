@@ -4,7 +4,6 @@ import RegularNavbar from '@hourglass/common/navbar';
 import { Row, Col, Container } from 'react-bootstrap';
 import ExamShowContents from '@student/exams/show/containers/ExamShowContents';
 import PreStart from '@student/exams/show/containers/PreStart';
-import { Policy } from '@student/exams/show/types';
 import './ExamTaker.scss';
 import { useFragment, graphql } from 'react-relay';
 
@@ -32,6 +31,7 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
         examVersion {
           policies
         }
+        policyExemptions
       }
     }
     `,
@@ -60,7 +60,8 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
       <Container>
         <PreStart
           examKey={res}
-          policies={res.myRegistration.examVersion.policies as readonly Policy[]}
+          policies={res.myRegistration.examVersion.policies}
+          policyExemptions={res.myRegistration.policyExemptions}
           examTakeUrl={res.takeUrl}
         />
       </Container>

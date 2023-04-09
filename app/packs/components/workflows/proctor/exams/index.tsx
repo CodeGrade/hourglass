@@ -57,13 +57,13 @@ import {
 import ErrorBoundary from '@hourglass/common/boundary';
 
 import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
-import { exams_recipients$key, exams_recipients$data } from './__generated__/exams_recipients.graphql';
 import { exams_anomalies$key } from './__generated__/exams_anomalies.graphql';
 import { exams_anomaly$key } from './__generated__/exams_anomaly.graphql';
 import { examsFinalizeItemMutation } from './__generated__/examsFinalizeItemMutation.graphql';
 import { examsDestroyAnomalyMutation } from './__generated__/examsDestroyAnomalyMutation.graphql';
 import { examsSendMessageMutation } from './__generated__/examsSendMessageMutation.graphql';
 import { exams_messages$key } from './__generated__/exams_messages.graphql';
+import { exams_proctoring$data, exams_proctoring$key } from './__generated__/exams_proctoring.graphql';
 
 export interface Recipient {
   type: MessageType.Direct | MessageType.Room | MessageType.Version | MessageType.Exam;
@@ -71,9 +71,14 @@ export interface Recipient {
   name: string;
 }
 
+type Student = Recipient & {
+  currentPin?: string;
+  pinValidated: boolean;
+}
+
 export interface SplitRecipients {
   rooms: Recipient[];
-  students: Recipient[];
+  students: Student[];
   studentsByRoom: Record<RoomAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>>;
   studentsByVersion: Record<VersionAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>>;
   versions: Recipient[];
@@ -1676,64 +1681,18 @@ const SendMessage: React.FC<{
 };
 
 const SplitViewLoaded: React.FC<{
-  examId: string;
-  exam: exams_recipients$data;
+  exam: exams_proctoring$data;
   recipients: SplitRecipients;
+  recipientOptions: RecipientOptions;
 }> = (props) => {
   const {
-    examId,
     exam,
     recipients,
+    recipientOptions,
   } = props;
   const { alert } = useContext(AlertContext);
   const messageRef = useRef<HTMLTextAreaElement>();
-  const roomOptions: SelectOptions<Recipient> = recipients.rooms.map((r) => ({
-    label: r.name,
-    // This toString is needed because otherwise some CSS
-    // mangler tries to convert this value directly to a string
-    // to be used as a key, and then we get duplicate keys
-    // since they're all [object Object]
-    value: { ...r, toString: ((): string => r.id), type: MessageType.Room },
-  }));
-  roomOptions.unshift({ label: 'No room', value: { type: MessageType.Room, id: undefined, name: 'No room' } });
-  const recipientOptions = useMemo<RecipientOptions>(() => ([
-    {
-      label: 'Entire exam',
-      options: [{
-        label: 'Entire exam',
-        value: {
-          type: MessageType.Exam,
-          id: examId,
-          // This toString is needed because otherwise some CSS
-          // mangler tries to convert this value directly to a string
-          // to be used as a key, and then we get duplicate keys
-          // since they're all [object Object]
-          toString: () => examId,
-          name: 'Entire exam',
-        },
-      }],
-    },
-    {
-      label: 'Rooms',
-      options: roomOptions,
-    },
-    {
-      label: 'Versions',
-      options: recipients.versions.map((r) => ({
-        label: r.name,
-        // ditto
-        value: { ...r, toString: ((): string => r.id), type: MessageType.Version },
-      })),
-    },
-    {
-      label: 'Students',
-      options: recipients.students.map((r) => ({
-        label: r.name,
-        // ditto
-        value: { ...r, toString: ((): string => r.id), type: MessageType.Direct },
-      })),
-    },
-  ]), [recipients]);
+
   const [selectedRecipient, setSelectedRecipient] = useState<MessageFilterOption>(
     recipientOptions[0].options[0],
   );
@@ -1774,18 +1733,139 @@ const SplitViewLoaded: React.FC<{
   );
 };
 
-const ProctoringSplitView: React.FC<{
-  exam: exams_recipients$key;
+const ShowCurrentPins: React.FC<{
+  recipients: SplitRecipients;
+  recipientOptions: RecipientOptions;
+}> = (props) => {
+  const { recipients, recipientOptions } = props;
+  const [showing, setShowing] = useState(false);
+  const [filter, setFilter] = useState<MessageFilterOption[]>(undefined);
+  let all: Array<Student> = [];
+  if (filter) {
+    all = recipients.students.filter((s) => (
+      filter.some((f) => {
+        switch (f.value.type) {
+          case MessageType.Direct:
+            return f.value.name === s.name;
+          case MessageType.Room:
+            return recipients.studentsByRoom[f.value.id]?.[s.id];
+          case MessageType.Version:
+            return recipients.studentsByVersion[f.value.id]?.[s.id];
+          case MessageType.Exam:
+            return true;
+          default:
+            throw new ExhaustiveSwitchError(f.value.type);
+        }
+      })
+    ));
+  } else {
+    all = recipients.students;
+  }
+  return (
+    <>
+      <Button
+        variant="info"
+        className="float-right"
+        onClick={() => setShowing(true)}
+      >
+        Show current PINs
+      </Button>
+      <Modal
+        centered
+        keyboard
+        scrollable
+        show={showing}
+        onHide={() => setShowing(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Current PINs for students</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className="d-flex" controlId="message-filter">
+            <Form.Label column sm="auto" className="pl-0">Filter by:</Form.Label>
+            <Col>
+              <Select
+                classNamePrefix="filterMessages"
+                isClearable
+                isMulti
+                placeholder="Choose selection criteria..."
+                value={filter}
+                onChange={(value: MessageFilterOption[], _action) => {
+                  if (value?.length > 0) {
+                    setFilter(value);
+                  } else {
+                    setFilter(undefined);
+                  }
+                }}
+                formatGroupLabel={formatGroupLabel}
+                options={recipientOptions}
+              />
+            </Col>
+          </Form.Group>
+          <Row>
+            <Table hover className="m-0">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Current PIN</th>
+                </tr>
+              </thead>
+              <tbody>
+                {all.map((reg) => (
+                  <tr key={reg.id}>
+                    <td>{reg.name}</td>
+                    <td>
+                      {reg.pinValidated
+                        ? 'Already validated'
+                        : (reg.currentPin ?? 'none required')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Row>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={() => setShowing(false)}
+          >
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+};
+
+const ExamProctoring: React.FC = () => (
+  <ErrorBoundary>
+    <Suspense
+      fallback={(
+        <Container fluid>
+          <RegularNavbar className="row" />
+          <p>Loading...</p>
+        </Container>
+      )}
+    >
+      <ExamProctoringQuery />
+    </Suspense>
+  </ErrorBoundary>
+);
+
+const ProctoringRecipients: React.FC<{
+  exam: exams_proctoring$key;
 }> = (props) => {
   const {
     exam,
   } = props;
-  const res = useFragment<exams_recipients$key>(
+  const res = useFragment<exams_proctoring$key>(
     graphql`
-    fragment exams_recipients on Exam {
+    fragment exams_proctoring on Exam {
       ...exams_anomalies
       ...exams_messages
       id
+      name
       examVersions(first: 100) @connection(key: "Exam_examVersions", filters: []) {
         edges {
           node {
@@ -1802,6 +1882,8 @@ const ProctoringSplitView: React.FC<{
           id
           displayName
         }
+        currentPin,
+        pinValidated
       }
       rooms {
         id
@@ -1811,16 +1893,18 @@ const ProctoringSplitView: React.FC<{
     `,
     exam,
   );
-  const students: Recipient[] = [];
+  const students: Student[] = [];
   const studentsByRoom: Record<RoomAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>> = {};
   const versionsByRoom: Record<RoomAnnouncement['id'], Record<VersionAnnouncement['id'], boolean>> = {};
   const studentsByVersion: Record<VersionAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>> = {};
   const roomsByVersion: Record<VersionAnnouncement['id'], Record<RoomAnnouncement['id'], boolean>> = {};
   res.registrations.forEach((reg) => {
-    const r: Recipient = {
+    const r : Student = {
       type: MessageType.Direct,
       id: reg.id,
       name: reg.user.displayName,
+      currentPin: reg.currentPin,
+      pinValidated: reg.pinValidated,
     };
     students.push(r);
     studentsByRoom[reg.room?.id] = studentsByRoom[reg.room?.id] ?? {};
@@ -1856,29 +1940,79 @@ const ProctoringSplitView: React.FC<{
     versionsByRoom,
     roomsByVersion,
   }), [res.examVersions, res.registrations, res.rooms]);
+  const roomOptions: SelectOptions<Recipient> = recipients.rooms.map((r) => ({
+    label: r.name,
+    // This toString is needed because otherwise some CSS
+    // mangler tries to convert this value directly to a string
+    // to be used as a key, and then we get duplicate keys
+    // since they're all [object Object]
+    value: { ...r, toString: ((): string => r.id), type: MessageType.Room },
+  }));
+  roomOptions.unshift({ label: 'No room', value: { type: MessageType.Room, id: undefined, name: 'No room' } });
+  const recipientOptions = useMemo<RecipientOptions>(() => ([
+    {
+      label: 'Entire exam',
+      options: [{
+        label: 'Entire exam',
+        value: {
+          type: MessageType.Exam,
+          id: res.id,
+          // This toString is needed because otherwise some CSS
+          // mangler tries to convert this value directly to a string
+          // to be used as a key, and then we get duplicate keys
+          // since they're all [object Object]
+          toString: () => res.id,
+          name: 'Entire exam',
+        },
+      }],
+    },
+    {
+      label: 'Rooms',
+      options: roomOptions,
+    },
+    {
+      label: 'Versions',
+      options: recipients.versions.map((r) => ({
+        label: r.name,
+        // ditto
+        value: { ...r, toString: ((): string => r.id), type: MessageType.Version },
+      })),
+    },
+    {
+      label: 'Students',
+      options: recipients.students.map((r) => ({
+        label: r.name,
+        // ditto
+        value: { ...r, toString: ((): string => r.id), type: MessageType.Direct },
+      })),
+    },
+  ]), [recipients]);
   return (
-    <SplitViewLoaded
-      exam={res}
-      examId={res.id}
-      recipients={recipients}
-    />
+    <>
+      <RegularNavbar className="row" />
+      <Row>
+        <Col>
+          <h1>
+            {res.name}
+            <ShowCurrentPins
+              recipients={recipients}
+              recipientOptions={recipientOptions}
+            />
+          </h1>
+        </Col>
+      </Row>
+      <div className="content-wrapper">
+        <div className="content h-100">
+          <SplitViewLoaded
+            exam={res}
+            recipients={recipients}
+            recipientOptions={recipientOptions}
+          />
+        </div>
+      </div>
+    </>
   );
 };
-
-const ExamProctoring: React.FC = () => (
-  <ErrorBoundary>
-    <Suspense
-      fallback={(
-        <Container fluid>
-          <RegularNavbar className="row" />
-          <p>Loading...</p>
-        </Container>
-      )}
-    >
-      <ExamProctoringQuery />
-    </Suspense>
-  </ErrorBoundary>
-);
 
 const ExamProctoringQuery: React.FC = () => {
   const {
@@ -1888,7 +2022,7 @@ const ExamProctoringQuery: React.FC = () => {
     graphql`
     query examsProctorQuery($examId: ID!) {
       exam(id: $examId) {
-        ...exams_recipients
+        ...exams_proctoring
         name
         id
       }
@@ -1901,17 +2035,7 @@ const ExamProctoringQuery: React.FC = () => {
       <Container fluid>
         <div className="wrapper vh-100">
           <div className="inner-wrapper">
-            <RegularNavbar className="row" />
-            <Row>
-              <Col>
-                <h1>{data.exam.name}</h1>
-              </Col>
-            </Row>
-            <div className="content-wrapper">
-              <div className="content h-100">
-                <ProctoringSplitView exam={data.exam} />
-              </div>
-            </div>
+            <ProctoringRecipients exam={data.exam} />
           </div>
         </div>
       </Container>

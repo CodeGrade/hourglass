@@ -3,6 +3,7 @@ import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
 import { editorQuery$data } from '@professor/exams/new/editor/__generated__/editorQuery.graphql';
 import CodeMirror from 'codemirror';
+import { ExamShowContents } from './components/__generated__/ExamShowContents.graphql';
 
 export type ExamTakerAction =
   LoadExamAction |
@@ -24,6 +25,7 @@ export type StartExamResponse = AnomalousReponse | ContentsResponse;
 
 export interface AnomalousReponse {
   type: 'ANOMALOUS';
+  reason?: string;
 }
 
 export interface ContentsResponse {
@@ -488,7 +490,11 @@ export interface AnomalyListener {
 }
 
 export type Policy = editorQuery$data['examVersion']['policies'][number];
+export type PolicyExemption = ExamShowContents['myRegistration']['policyExemptions'][number];
 
-export function policyPermits(policy: readonly Policy[], query: Policy): boolean {
+export function policyPermits<P extends string>(
+  policy: readonly P[],
+  query: P,
+): boolean {
   return policy.find((p) => p === query) !== undefined;
 }

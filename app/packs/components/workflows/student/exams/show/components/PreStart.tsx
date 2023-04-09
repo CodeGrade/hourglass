@@ -1,18 +1,20 @@
-import React from 'react';
-import { Button, Alert } from 'react-bootstrap';
+import React, { useRef } from 'react';
+import { Button, Alert, Form } from 'react-bootstrap';
 import AnomalousMessaging from '@student/exams/show/components/AnomalousMessaging';
 import ErrorBoundary from '@hourglass/common/boundary';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { DateTime } from 'luxon';
 import { useFragment, graphql } from 'react-relay';
 import { AllAlerts } from '@hourglass/common/alerts';
+import { Policy, policyPermits } from '@student/exams/show/types';
 
 import { PreStart$key } from './__generated__/PreStart.graphql';
 
 interface PreStartProps {
-  onClick: () => void;
+  onClick: (pin?: string) => void;
   isError: boolean;
   errorMsg?: string;
+  policies: readonly Policy[];
   examKey: PreStart$key;
 }
 
@@ -20,6 +22,7 @@ const PreStart: React.FC<PreStartProps> = (props) => {
   const {
     onClick,
     isError,
+    policies,
     errorMsg,
     examKey,
   } = props;
@@ -32,6 +35,8 @@ const PreStart: React.FC<PreStartProps> = (props) => {
         anomalous
         over
         lastSnapshot
+        policyExemptions
+        pinValidated
       }
     }
     `,
@@ -41,7 +46,10 @@ const PreStart: React.FC<PreStartProps> = (props) => {
     anomalous,
     over,
     lastSnapshot,
+    policyExemptions,
+    pinValidated,
   } = res.myRegistration;
+  const pinRef = useRef<HTMLInputElement>();
   if (over) {
     const parsed = lastSnapshot ? DateTime.fromISO(lastSnapshot) : undefined;
     return (
@@ -88,25 +96,36 @@ const PreStart: React.FC<PreStartProps> = (props) => {
       </AllAlerts>
     );
   }
+  const requirePin = (
+    !pinValidated
+    && policyPermits(policies, 'STUDENT_PIN')
+    && !policyPermits(policyExemptions, 'IGNORE_PIN')
+  );
   return (
     <div>
       <h1>{res.name}</h1>
       <Alert variant="warning">
         <div className="text-center"><b><i>Make sure that your window is not maximized right now!</i></b></div>
       </Alert>
+      {requirePin && (
+        <Form.Group controlId="studentPIN">
+          <Form.Label>Enter the PIN supplied by your proctor:</Form.Label>
+          <Form.Control type="text" placeholder="PIN" ref={pinRef} />
+        </Form.Group>
+      )}
       <p>Click the following button to enter secure mode and begin the exam.</p>
       <Button
         variant="success"
-        onClick={onClick}
+        onClick={() => onClick(pinRef.current?.value)}
       >
         Begin Exam
       </Button>
       <div>
         {isError && (
-          <p className="text-danger">
-            Error locking down:
-            <i>{errorMsg}</i>
-          </p>
+          <Alert variant="danger" className="mt-4">
+            <p>Error locking down:</p>
+            <p><i>{errorMsg}</i></p>
+          </Alert>
         )}
       </div>
     </div>

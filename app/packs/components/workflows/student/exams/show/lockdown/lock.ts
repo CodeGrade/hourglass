@@ -1,12 +1,19 @@
 import { Policy, policyPermits } from '@student/exams/show/types';
+import {
+  PolicyExemption,
+} from '@student/exams/show/components/__generated__/ExamShowContents.graphql';
 import { isCovered, isFullscreen, openFullscreen } from './helpers';
 
 /**
  * Lock down the client browser.
  * @throws Error if lockdown fails
  */
-export default async function lock(policies: readonly Policy[]): Promise<void> {
-  if (policyPermits(policies, 'TOLERATE_WINDOWED')) return;
+export default async function lock(
+  policies: readonly Policy[],
+  policyExemptions: readonly PolicyExemption[],
+): Promise<void> {
+  if (policyPermits(policies, 'TOLERATE_WINDOWED')
+      || policyPermits(policyExemptions, 'TOLERATE_WINDOWED')) return;
 
   try {
     await navigator.clipboard.writeText('');

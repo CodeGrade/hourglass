@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'digest'
+
 # Room registrations for exam-taking students.
 class Registration < ApplicationRecord
   belongs_to :user
@@ -55,6 +57,37 @@ class Registration < ApplicationRecord
   }
 
   scope :without_accommodation, -> { includes(:accommodation).where(accommodations: { id: nil }) }
+
+  def current_pin(strength = nil)
+    return nil if exam_version.pin_nonce.blank?
+
+    sha = Digest::SHA256.new
+    sha << exam_version.pin_nonce.to_s
+    sha << user.id.to_s
+    sha << login_attempt_count.to_s
+    digest = sha.hexdigest
+    if strength
+      digest.last(strength)
+    elsif exam_version.pin_strength
+      digest.last(exam_version.pin_strength)
+    else
+      digest
+    end
+  end
+
+  def validate_pin!(pin)
+    return true if pin_validated
+
+    cur = current_pin
+    if cur.nil? || cur.casecmp(pin).zero?
+      self.pin_validated = true
+    else
+      self.login_attempt_count += 1
+    end
+    save!
+
+    pin_validated
+  end
 
   # TIMELINE EXPLANATION
   #

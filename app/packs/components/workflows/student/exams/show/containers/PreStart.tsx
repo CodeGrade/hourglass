@@ -6,19 +6,26 @@ import {
   MDTP,
   MSTP,
   Policy,
+  PolicyExemption,
 } from '@student/exams/show/types';
 import { doTryLockdown } from '@student/exams/show/actions';
 
 interface OwnProps {
   policies: readonly Policy[];
+  policyExemptions: readonly PolicyExemption[],
   examTakeUrl: string;
 }
 
 const mapDispatchToProps: MDTP<{
-  onClick: () => void;
+  onClick: (pin?: string) => void;
 }, OwnProps> = (dispatch, ownProps) => ({
-  onClick: (): void => {
-    dispatch(doTryLockdown(ownProps.policies, ownProps.examTakeUrl));
+  onClick: (pin?: string): void => {
+    dispatch(doTryLockdown(
+      ownProps.policies,
+      ownProps.policyExemptions,
+      ownProps.examTakeUrl,
+      pin,
+    ));
   },
 });
 

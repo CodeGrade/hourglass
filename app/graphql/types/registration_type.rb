@@ -13,6 +13,16 @@ module Types
       return obj.object.published
     }  
 
+    field :policy_exemptions, [Types::PolicyExemptionType], null: false
+    def policy_exemptions
+      object.accommodation&.policy_exemptions || []
+    end
+
+    field :pin_validated, Boolean, null: false
+    field :current_pin, String, null: true do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
+
     field :room, Types::RoomType, null: true
     def room
       RecordLoader.for(Room).load(object.room_id)

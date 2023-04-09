@@ -46,6 +46,11 @@ class ExamVersion < ApplicationRecord
         type: 'None',
       )
     end
+    if policies.include? 'STUDENT_PIN'
+      self.pin_nonce = DateTime.now.to_i.to_s if pin_nonce.blank?
+    else
+      self.pin_nonce = nil
+    end
   end
 
   accepts_nested_attributes_for :db_questions, :rubrics, :db_references

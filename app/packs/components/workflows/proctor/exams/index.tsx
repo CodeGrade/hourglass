@@ -365,11 +365,13 @@ const ShowAnomaly: React.FC<{
   replyTo: (userId: string) => void;
   examId: string;
   anomalyKey: exams_anomaly$key;
+  filterBy: (displayName: string, regId: string) => boolean;
 }> = (props) => {
   const {
     replyTo,
     examId,
     anomalyKey,
+    filterBy,
   } = props;
   const anomaly = useFragment(
     graphql`
@@ -390,7 +392,7 @@ const ShowAnomaly: React.FC<{
     `,
     anomalyKey,
   );
-  return (
+  return (filterBy(anomaly.registration.user.displayName, anomaly.registration.id) ? (
     <tr key={anomaly.id}>
       <td>{anomaly.registration.user.displayName}</td>
       <td>
@@ -426,7 +428,7 @@ const ShowAnomaly: React.FC<{
         </div>
       </td>
     </tr>
-  );
+  ) : undefined);
 };
 
 const newAnomalySubscriptionSpec = graphql`
@@ -455,10 +457,12 @@ const anomalyDestroyedSubscriptionSpec = graphql`
 const ShowAnomalies: React.FC<{
   replyTo: (userId: string) => void;
   exam: exams_anomalies$key;
+  filterBy: (displayName: string, regId: string) => boolean;
 }> = (props) => {
   const {
     replyTo,
     exam,
+    filterBy,
   } = props;
   const { alert } = useContext(AlertContext);
   const {
@@ -527,7 +531,13 @@ const ShowAnomalies: React.FC<{
     <>
       {data.anomalies.edges.length === 0 && <tr><td colSpan={4}>No anomalies.</td></tr>}
       {data.anomalies.edges.map((edge) => (
-        <ShowAnomaly key={edge.node.id} replyTo={replyTo} examId={data.id} anomalyKey={edge.node} />
+        <ShowAnomaly
+          key={edge.node.id}
+          replyTo={replyTo}
+          examId={data.id}
+          anomalyKey={edge.node}
+          filterBy={filterBy}
+        />
       ))}
       {hasNext && (
         <tr>
@@ -714,18 +724,43 @@ const FinalizeRegs: React.FC<{
 
 const ExamAnomalies: React.FC<{
   replyTo: (userId: string) => void;
+  recipients: SplitRecipients;
   recipientOptions: RecipientOptions;
   exam: exams_anomalies$key;
 }> = (props) => {
   const {
     replyTo,
+    recipients,
     recipientOptions,
     exam,
   } = props;
+  const [filter, setFilter] = useState<MessageFilterOption[]>(undefined);
+  const filterBy = useMemo(() => makeRegistrationFilter(recipients, filter), [filter]);
   return (
     <div className="wrapper h-100">
       <div className="inner-wrapper">
         <h2>Anomalies</h2>
+        <Form.Group className="d-flex" controlId="message-filter">
+          <Form.Label column sm="auto" className="pl-0">Filter by:</Form.Label>
+          <Col>
+            <Select
+              classNamePrefix="filterMessages"
+              isClearable
+              isMulti
+              placeholder="Choose selection criteria..."
+              value={filter}
+              onChange={(value: MessageFilterOption[], _action) => {
+                if (value?.length > 0) {
+                  setFilter(value);
+                } else {
+                  setFilter(undefined);
+                }
+              }}
+              formatGroupLabel={formatGroupLabel}
+              options={recipientOptions}
+            />
+          </Col>
+        </Form.Group>
         <div className="content-wrapper">
           <div className="content overflow-auto-y">
             <Table>
@@ -739,7 +774,11 @@ const ExamAnomalies: React.FC<{
                 </tr>
               </thead>
               <tbody>
-                <ShowAnomalies replyTo={replyTo} exam={exam} />
+                <ShowAnomalies
+                  replyTo={replyTo}
+                  exam={exam}
+                  filterBy={filterBy}
+                />
               </tbody>
             </Table>
           </div>
@@ -1714,6 +1753,7 @@ const SplitViewLoaded: React.FC<{
       <Col sm={6}>
         <ExamAnomalies
           exam={exam}
+          recipients={recipients}
           recipientOptions={recipientOptions}
           replyTo={replyTo}
         />
@@ -1733,6 +1773,26 @@ const SplitViewLoaded: React.FC<{
   );
 };
 
+const makeRegistrationFilter = (
+  recipients: SplitRecipients,
+  filter: MessageFilterOption[],
+) => (displayName: string, regId: string) => (
+  filter.some((f) => {
+    switch (f.value.type) {
+      case MessageType.Direct:
+        return f.value.name === displayName;
+      case MessageType.Room:
+        return recipients.studentsByRoom[f.value.id]?.[regId];
+      case MessageType.Version:
+        return recipients.studentsByVersion[f.value.id]?.[regId];
+      case MessageType.Exam:
+        return true;
+      default:
+        throw new ExhaustiveSwitchError(f.value.type);
+    }
+  })
+);
+
 const ShowCurrentPins: React.FC<{
   recipients: SplitRecipients;
   recipientOptions: RecipientOptions;
@@ -1740,24 +1800,10 @@ const ShowCurrentPins: React.FC<{
   const { recipients, recipientOptions } = props;
   const [showing, setShowing] = useState(false);
   const [filter, setFilter] = useState<MessageFilterOption[]>(undefined);
+  const filterBy = useMemo(() => makeRegistrationFilter(recipients, filter), [filter]);
   let all: Array<Student> = [];
   if (filter) {
-    all = recipients.students.filter((s) => (
-      filter.some((f) => {
-        switch (f.value.type) {
-          case MessageType.Direct:
-            return f.value.name === s.name;
-          case MessageType.Room:
-            return recipients.studentsByRoom[f.value.id]?.[s.id];
-          case MessageType.Version:
-            return recipients.studentsByVersion[f.value.id]?.[s.id];
-          case MessageType.Exam:
-            return true;
-          default:
-            throw new ExhaustiveSwitchError(f.value.type);
-        }
-      })
-    ));
+    all = recipients.students.filter((s) => filterBy(s.name, s.id));
   } else {
     all = recipients.students;
   }

@@ -60,6 +60,7 @@ class Registration < ApplicationRecord
 
   def current_pin(strength = nil)
     return nil if exam_version.pin_nonce.blank?
+    return nil if accommodation&.policy_exemptions&.include? 'IGNORE_PIN'
 
     sha = Digest::SHA256.new
     sha << exam_version.pin_nonce.to_s

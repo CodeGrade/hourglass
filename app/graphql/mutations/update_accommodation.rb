@@ -6,6 +6,7 @@ module Mutations
     argument :accommodation_id, ID, required: true, loads: Types::AccommodationType
     argument :new_start_time, GraphQL::Types::ISO8601DateTime, required: false
     argument :percent_time_expansion, Integer, required: true
+    argument :policy_exemptions, [Types::PolicyExemptionType], required: false
 
     field :accommodation, Types::AccommodationType, null: true
 
@@ -17,6 +18,7 @@ module Mutations
 
     def resolve(accommodation:, **args)
       args[:new_start_time] = nil unless args.key?(:new_start_time)
+      args[:policy_exemptions] = args[:policy_exemptions].join(',') if args[:policy_exemptions]
       updated = accommodation.update(args)
       raise GraphQL::ExecutionError, accommodation.errors.full_messages unless updated
 

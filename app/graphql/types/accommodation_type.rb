@@ -7,7 +7,7 @@ module Types
 
     guard Guards::VISIBILITY
 
-    description 'Accommodates a student with additional time.'
+    description 'Accommodates a student with additional/alternate times, or alternate policies.'
 
     field :registration, Types::RegistrationType, null: false
     def registration
@@ -15,5 +15,6 @@ module Types
     end
     field :new_start_time, GraphQL::Types::ISO8601DateTime, null: true
     field :percent_time_expansion, Integer, null: false
+    field :policy_exemptions, [Types::PolicyExemptionType], null: true
   end
 end

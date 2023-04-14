@@ -26,6 +26,7 @@ import Select from 'react-select';
 import { DateTime } from 'luxon';
 import { graphql, useFragment } from 'react-relay';
 
+import { PolicyExemption } from '@hourglass/workflows/student/exams/show/types';
 import { accommodations_all$key } from './__generated__/accommodations_all.graphql';
 import { accommodations_accommodation$key } from './__generated__/accommodations_accommodation.graphql';
 import { accommodations_regsWithout$key } from './__generated__/accommodations_regsWithout.graphql';
@@ -34,12 +35,63 @@ import { accommodationsCreateMutation } from './__generated__/accommodationsCrea
 import { accommodationsUpdateMutation } from './__generated__/accommodationsUpdateMutation.graphql';
 import { accommodationsDestroyMutation } from './__generated__/accommodationsDestroyMutation.graphql';
 
+export interface PolicyExemptionsProps {
+  value: readonly PolicyExemption[];
+  disabled?: boolean;
+  onChange: (newPolicies: PolicyExemption[]) => void;
+  className?: string;
+}
+
+export const policyToString: Record<PolicyExemption, string> = {
+  IGNORE_LOCKDOWN: 'Ignore lockdown',
+  TOLERATE_WINDOWED: 'Tolerate windowed mode',
+  IGNORE_PIN: 'Bypass student PIN for login',
+};
+
+const allPolicies: PolicyExemption[] = Object.keys(policyToString) as PolicyExemption[];
+
+type PolicyExemptionOption = SelectOption<PolicyExemption>;
+type PolicyExemptionOptions = SelectOptions<PolicyExemption>;
+
+const policyValues: PolicyExemptionOptions = allPolicies.map((policy) => ({
+  value: policy,
+  label: policyToString[policy],
+}));
+
+const Policies: React.FC<PolicyExemptionsProps> = (props) => {
+  const {
+    value,
+    disabled = false,
+    onChange,
+    className,
+  } = props;
+  const curPolicyValues = value.map((p) => policyValues.find((pv) => pv.value === p));
+  return (
+    <Form.Group as={Row} className={className} controlId="examPolicies">
+      <Col>
+        <Select
+          className="basic-multi-select z-1000"
+          isMulti
+          isDisabled={disabled}
+          placeholder="Choose policies exemptions..."
+          options={policyValues}
+          value={curPolicyValues}
+          onChange={(options: PolicyExemptionOption[]): void => (
+            onChange((options ?? []).map((o) => o.value))
+          )}
+        />
+      </Col>
+    </Form.Group>
+  );
+};
+
 const AccommodationEditor: React.FC<{
   disabled?: boolean;
-  submit: (startTime: DateTime, extraTime: number) => void;
+  submit: (startTime: DateTime, extraTime: number, policies: readonly PolicyExemption[]) => void;
   cancel: () => void;
   newStartTime: DateTime;
   percentTimeExpansion: number;
+  policyExemptions: readonly PolicyExemption[];
   displayName: string;
 }> = (props) => {
   const {
@@ -49,48 +101,57 @@ const AccommodationEditor: React.FC<{
     displayName,
     newStartTime,
     percentTimeExpansion,
+    policyExemptions,
   } = props;
   const [startTime, setStartTime] = useState(newStartTime);
   const [extraTime, setExtraTime] = useState<number | string>(`${percentTimeExpansion}`);
+  const [policies, setPolicies] = useState(policyExemptions);
   return (
-    <tr>
-      <td className="align-middle">
-        {displayName}
-      </td>
-      <td>
-        <DateTimePicker
-          disabled={disabled}
-          onChange={setStartTime}
-          value={startTime}
-          nullable
-        />
-      </td>
-      <td>
-        <NumericInput
-          disabled={disabled}
-          min={0}
-          value={extraTime}
-          onChange={setExtraTime}
-        />
-      </td>
-      <td align="right" className="text-nowrap">
-        <Button
-          disabled={disabled}
-          variant="secondary"
-          onClick={cancel}
-        >
-          Cancel
-        </Button>
-        <Button
-          disabled={disabled}
-          variant="primary"
-          className="ml-2"
-          onClick={() => submit(startTime, Number(extraTime))}
-        >
-          Save
-        </Button>
-      </td>
-    </tr>
+    <>
+      <tr>
+        <td className="align-middle" rowSpan={2}>
+          {displayName}
+        </td>
+        <td className="border-bottom-0">
+          <DateTimePicker
+            disabled={disabled}
+            onChange={setStartTime}
+            value={startTime}
+            nullable
+          />
+        </td>
+        <td className="border-bottom-0">
+          <NumericInput
+            disabled={disabled}
+            min={0}
+            value={extraTime}
+            onChange={setExtraTime}
+          />
+        </td>
+        <td align="right" rowSpan={2} className="align-middle text-nowrap">
+          <Button
+            disabled={disabled}
+            variant="secondary"
+            onClick={cancel}
+          >
+            Cancel
+          </Button>
+          <Button
+            disabled={disabled}
+            variant="primary"
+            className="ml-2"
+            onClick={() => submit(startTime, Number(extraTime), policies)}
+          >
+            Save
+          </Button>
+        </td>
+      </tr>
+      <tr>
+        <td className="border-top-0 pt-0" colSpan={2}>
+          <Policies className="mb-0 py-0" value={policies} onChange={setPolicies} />
+        </td>
+      </tr>
+    </>
   );
 };
 
@@ -108,6 +169,7 @@ const SingleAccommodation: React.FC<{
       id
       newStartTime
       percentTimeExpansion
+      policyExemptions
       registration {
         id
         user {
@@ -185,6 +247,7 @@ const SingleAccommodation: React.FC<{
           id
           newStartTime
           percentTimeExpansion
+          policyExemptions
         }
       }
     }
@@ -210,13 +273,18 @@ const SingleAccommodation: React.FC<{
       },
     },
   );
-  const submit = (newStartTime: DateTime, percentTimeExpansion: number) => {
+  const submit = (
+    newStartTime: DateTime,
+    percentTimeExpansion: number,
+    policyExemptions: PolicyExemption[],
+  ) => {
     update({
       variables: {
         input: {
           accommodationId: accommodation.id,
           newStartTime: newStartTime?.toISO(),
           percentTimeExpansion,
+          policyExemptions,
         },
       },
     });
@@ -231,6 +299,7 @@ const SingleAccommodation: React.FC<{
           DateTime.fromISO(accommodation.newStartTime)
         ) : undefined}
         percentTimeExpansion={accommodation.percentTimeExpansion}
+        policyExemptions={accommodation.policyExemptions}
         cancel={stopEdit}
         submit={submit}
       />
@@ -241,15 +310,30 @@ const SingleAccommodation: React.FC<{
       <td className="align-middle">
         {accommodation.registration.user.displayName}
       </td>
-      <td className="align-middle">
-        {accommodation.newStartTime ? (
-          <ReadableDate showTime value={DateTime.fromISO(accommodation.newStartTime)} />
-        ) : (
-          <i>Not set.</i>
-        )}
+      <td className="py-2 w-100 pl-0" colSpan={2}>
+        <table className="w-100">
+          <tbody className="border-0">
+            <tr>
+              <td className="align-middle border-top-0">
+                {accommodation.newStartTime ? (
+                  <ReadableDate showTime value={DateTime.fromISO(accommodation.newStartTime)} />
+                ) : (
+                  <i>Not set.</i>
+                )}
+              </td>
+              <td className="align-middle border-top-0" width="5%">
+                {accommodation.percentTimeExpansion}
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={2} className="border-top-0">
+                {accommodation.policyExemptions.map((l) => policyToString[l]).join(', ') || (<i>No exemptions</i>)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </td>
-      <td className="align-middle">{accommodation.percentTimeExpansion}</td>
-      <td align="right" className="text-nowrap">
+      <td align="right" className="align-middle text-nowrap" width={20}>
         <Button
           disabled={loading}
           variant="danger"
@@ -516,10 +600,15 @@ const ManageAccommodations: React.FC<{
         <Table>
           <thead>
             <tr>
-              <Col as="th" sm="auto">Student</Col>
-              <Col as="th">Start Time</Col>
-              <Col as="th" sm="auto" className="text-nowrap">% Extra Time</Col>
-              <Col as="th" sm="auto">Actions</Col>
+              <Col className="border-bottom-0" as="th" sm="auto">Student</Col>
+              <Col className="border-bottom-0" as="th">Start Time</Col>
+              <Col className="border-bottom-0 text-nowrap" as="th" sm="auto">% Extra Time</Col>
+              <Col className="border-bottom-0" as="th" sm="auto">Actions</Col>
+            </tr>
+            <tr>
+              <Col className="border-top-0" as="th" sm="auto" />
+              <Col className="border-top-0" as="th" sm="auto" colSpan={2}>Policy Exemptions</Col>
+              <Col className="border-top-0" as="th" sm="auto" />
             </tr>
           </thead>
           <tbody>

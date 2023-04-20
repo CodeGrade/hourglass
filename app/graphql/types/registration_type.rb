@@ -98,6 +98,15 @@ module Types
       end
     end
 
+    field :current_part_scores, GraphQL::Types::JSON, null: true
+    def current_part_scores
+      if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
+        object.current_part_scores
+      else
+        nil
+      end
+    end
+
     field :grading_checks, [Types::GradingCheckType], null: true
     def grading_checks
       if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)

@@ -24,6 +24,12 @@ module Types
         cur[who] = allowed
       end
 
+      def self.is_cached?(obj, _args, ctx)
+        ctx[:access_cache]
+          .dig(obj.class.name, obj.object.id, :visible, ctx[:current_user].id)
+          .present?
+      end
+
       VISIBILITY = lambda { |obj, _args, ctx|
         cached = ctx[:access_cache]
                  .dig(obj.class.name, obj.object.id, :visible, ctx[:current_user].id)

@@ -25,6 +25,7 @@ import ShowExam from '@student/exams/show';
 import ShowCourse from '@professor/courses/show';
 import ExamAdmin from '@professor/exams/admin';
 import ExamSubmissions from '@professor/exams/submissions';
+import ExamStats from '@professor/exams/stats';
 import ExamProctoring from '@proctor/exams/index';
 import EditRubric from '@professor/exams/new/editor';
 import { AllAlerts } from '@hourglass/common/alerts';
@@ -180,6 +181,9 @@ const Entry: React.FC = () => {
                       </Route>
                       <Route path="/exams/:examId/submissions">
                         <ExamSubmissions />
+                      </Route>
+                      <Route path="/exams/:examId/stats">
+                        <ExamStats />
                       </Route>
                       <Route path="/exams/:examId/versions/:versionId/edit" exact>
                         <EditRubric />

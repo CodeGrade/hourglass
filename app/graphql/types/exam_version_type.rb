@@ -10,8 +10,9 @@ module Types
     global_id_field :id
 
     guard ->(obj, args, ctx) {
+      cached = Guards.is_cached?(obj, args, ctx)
       ans = Guards::VISIBILITY.call(obj, args, ctx)
-      unless ctx[:skip_eager_fields]
+      unless ctx[:skip_eager_fields] || cached
         all_qpbs = obj.object.db_questions.includes(parts: :body_items).map do |q|
           [ q, q.parts.map do |p| [p, p.body_items.to_a] end ]
         end.flatten
@@ -221,6 +222,33 @@ module Types
             finished: gls_by_pnum[p.id]&.count { |gl| !gl.completed_by_id.nil? } || 0,
           } 
         end
+      end
+    end
+
+    field :current_scores, GraphQL::Types::JSON, null: true do
+      guard Guards::PROFESSORS
+    end
+    def current_scores
+      AssociationLoader.for(ExamVersion, :registrations, includes: [
+        exam_version: { rubrics: ExamVersion.rubric_includes },
+        grading_comments: [
+          :creator,
+          :body_item,
+          question: {
+            parts: :body_items
+          }, 
+          part: :body_items,
+          preset_comment: [{ rubric_preset: [{ rubric: :parent_section }] }]
+        ],
+        grading_locks: [:question, :part],
+        grading_checks: [:creator, :question, :part, :body_item],
+        accommodation: {
+          registration: {
+            exam_version: :exam
+          }
+        }
+      ]).load(object).then do |regs|
+        regs.map(&:current_part_scores)
       end
     end
   end

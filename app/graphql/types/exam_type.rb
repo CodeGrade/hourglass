@@ -44,14 +44,14 @@ module Types
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def anomalies
-      AssociationLoader.for(Exam, :anomalies, merge: -> { includes(registration: [ :accommodation, { exam_version: :exam } ]).unforgiven }).load(object)
+      AssociationLoader.for(Exam, :anomalies, merge: -> { unforgiven }, include: [registration: [ :accommodation, { exam_version: :exam } ]]).load(object)
     end
 
     field :messages, Types::MessageType.connection_type, null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def messages
-      AssociationLoader.for(Exam, :messages, merge: -> { includes(:registration) }).load(object)
+      AssociationLoader.for(Exam, :messages, includes: [:registration]).load(object)
     end
 
     field :version_announcements, Types::VersionAnnouncementType.connection_type, null: false do
@@ -85,32 +85,48 @@ module Types
       guard Guards::PROFESSORS
     end
 
-    field :registrations, [Types::RegistrationType], null: false do
+    field :registrations, [Types::RegistrationType], null: false, extras: [:lookahead] do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
-    def registrations
-      AssociationLoader.for(Exam, :registrations, merge: -> { includes(:exam_version, accommodation: { registration: { exam_version: :exam }}) }).load(object)
+    def registrations(lookahead:)
+      includes = [:exam_version, accommodation: { registration: { exam_version: :exam }}]
+      if [:current_grading, :current_part_scores].any? { |f| lookahead.selects?(f) }
+        includes[1].merge!({
+          grading_comments: [
+            :creator, :body_item,
+            question: { parts: :body_items },
+            part: :body_items,
+            preset_comment: [{ rubric_preset: [{ rubric: :parent_section }] }]
+          ],
+          grading_locks: [:question, :part],
+          grading_checks: [:creator, :question, :part, :body_item],
+          exam_version: {
+            rubrics: ExamVersion.rubric_includes
+          }
+        })
+      end
+      AssociationLoader.for(Exam, :registrations, includes: includes).load(object)
     end
 
     field :in_progress_registrations, [Types::RegistrationType], null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def in_progress_registrations
-      AssociationLoader.for(Exam, :registrations, merge: -> { includes(:exam_version, accommodation: { registration: { exam_version: :exam }}).in_progress }).load(object)
+      AssociationLoader.for(Exam, :registrations, merge: -> { in_progress }, includes: [:exam_version, accommodation: { registration: { exam_version: :exam }}]).load(object)
     end
 
     field :final_registrations, [Types::RegistrationType], null: false do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
     def final_registrations
-      AssociationLoader.for(Exam, :registrations, merge: -> { includes(:exam_version, accommodation: { registration: { exam_version: :exam }}).final }).load(object)
+      AssociationLoader.for(Exam, :registrations, merge: -> { final }, includes: [:exam_version, accommodation: { registration: { exam_version: :exam }}]).load(object)
     end
 
     field :registrations_without_accommodation, Types::RegistrationType.connection_type, null: false do
       guard Guards::PROFESSORS
     end
     def registrations_without_accommodation
-      AssociationLoader.for(Exam, :registrations, merge: -> { includes(:exam_version, accommodation: { registration: { exam_version: :exam }}).without_accommodation }).load(object)
+      AssociationLoader.for(Exam, :registrations, merge: -> { without_accommodation }, includes: [:exam_version, accommodation: { registration: { exam_version: :exam }}]).load(object)
     end
 
     field :registrations_without_rooms, [Types::RegistrationType], null: false do

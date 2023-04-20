@@ -7,10 +7,11 @@ class AssociationLoader < GraphQL::Batch::Loader
     nil
   end
 
-  def initialize(model, association_name, merge: nil)
+  def initialize(model, association_name, includes: nil, merge: nil)
     @model = model
     @association_name = association_name
     @merge = merge
+    @includes = includes
     validate
   end
 
@@ -40,11 +41,16 @@ class AssociationLoader < GraphQL::Batch::Loader
   end
 
   def preload_association(records)
-    ::ActiveRecord::Associations::Preloader.new.preload(records, @association_name)
+    if @includes.present?
+      ::ActiveRecord::Associations::Preloader.new.preload(records, Hash[@association_name, @includes])
+    else
+      ::ActiveRecord::Associations::Preloader.new.preload(records, @association_name)
+    end
   end
 
   def read_association(record)
     scope = record.public_send(@association_name)
+    scope = scope.includes(@includes) if @includes.present?
     scope = scope.merge(@merge) if @merge.present?
     scope
   end

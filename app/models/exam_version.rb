@@ -489,21 +489,21 @@ class ExamVersion < ApplicationRecord
 
   delegate :root_rubrics, to: :rubrics
 
-  def rubric_includes
+  def self.rubric_includes
     [
-      :question, :part,
+      :question, :part, :body_item,
       {
         rubric_preset: :preset_comments,
         subsections: [
-          :question, :part,
+          :question, :part, :body_item,
           {
             rubric_preset: :preset_comments,
             subsections: [
-              :question, :part,
+              :question, :part, :body_item,
               {
                 rubric_preset: :preset_comments,
                 subsections: [
-                  :question, :part, { rubric_preset: :preset_comments }
+                  :question, :part, :body_item, { rubric_preset: :preset_comments }
                 ],
               }
             ],
@@ -514,7 +514,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def rubrics_for_grading
-    root_rubrics.includes(*rubric_includes)
+    root_rubrics.includes(*ExamVersion.rubric_includes)
   end
 
   def part_tree

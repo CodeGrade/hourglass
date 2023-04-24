@@ -3,6 +3,7 @@ import DocumentTitle from '@hourglass/common/documentTitle';
 import React, { Suspense, useMemo, useState } from 'react';
 import * as d3 from 'd3-array';
 import {
+  Collapse,
   Container, Table, ToggleButton, ToggleButtonGroup,
 } from 'react-bootstrap';
 import { graphql, useLazyLoadQuery } from 'react-relay';
@@ -15,8 +16,10 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { QuestionName } from '@hourglass/workflows/student/exams/show/components/ShowQuestion';
-import { PartName } from '@hourglass/workflows/student/exams/show/components/Part';
+import { QuestionName } from '@student/exams/show/components/ShowQuestion';
+import { PartName } from '@student/exams/show/components/Part';
+import Icon from '@student/exams/show/components/Icon';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { statsExamQuery } from './__generated__/statsExamQuery.graphql';
 
 type ExamVersion = statsExamQuery['response']['exam']['examVersions']['edges'][number]['node'];
@@ -170,6 +173,7 @@ const RenderVersionStats: React.FC<{
     regs,
   } = props;
   const { qpPairs, dbQuestions } = version;
+  const [showDetails, setShowDetails] = useState(false);
   const [showAsPct, setShowAsPct] = useState(true);
   const rawScores = [];
   const numPoints = d3.sum(
@@ -218,36 +222,53 @@ const RenderVersionStats: React.FC<{
         barColor={colors[0]}
         showSummary
       >
-        <p><b>Grade distribution</b></p>
+        <h4><b>Grade distribution</b></h4>
       </RenderStats>
-      {qpPairs.map(({ qnum, pnum }, index) => {
-        const singlePart = dbQuestions[qnum].parts.length === 1
-          && !dbQuestions[qnum].parts[0].name?.value?.trim();
-        stats[index].sort();
-        return (
-          <div key={`q${qnum}-p${pnum}`} className="d-inline-block px-3 w-25">
-            <RenderStats
-              width="100%"
-              height={200}
-              minPoints={0}
-              maxPoints={dbQuestions[qnum].parts[pnum].points}
-              dataPoints={stats[index]}
-              showAsPct={showAsPct}
-              barColor={colors[(index + 1) % colors.length]}
-            >
-              <b>
-                <QuestionName qnum={qnum} name={version.dbQuestions[qnum].name} />
-                <br />
-                <PartName
-                  anonymous={singlePart}
-                  pnum={pnum}
-                  name={dbQuestions[qnum].parts[pnum].name}
-                />
-              </b>
-            </RenderStats>
+      <div>
+        <h4 className="flex-grow-1">
+          <span
+            role="button"
+            onClick={() => setShowDetails((s) => !s)}
+            onKeyPress={() => setShowDetails((s) => !s)}
+            tabIndex={0}
+          >
+            Per-question stats
+            {showDetails ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+          </span>
+        </h4>
+        <Collapse in={showDetails}>
+          <div>
+            {qpPairs.map(({ qnum, pnum }, index) => {
+              const singlePart = dbQuestions[qnum].parts.length === 1
+              && !dbQuestions[qnum].parts[0].name?.value?.trim();
+              stats[index].sort();
+              return (
+                <div key={`q${qnum}-p${pnum}`} className="d-inline-block px-3 w-25">
+                  <RenderStats
+                    width="100%"
+                    height={200}
+                    minPoints={0}
+                    maxPoints={dbQuestions[qnum].parts[pnum].points}
+                    dataPoints={stats[index]}
+                    showAsPct={showAsPct}
+                    barColor={colors[(index + 1) % colors.length]}
+                  >
+                    <b>
+                      <QuestionName qnum={qnum} name={version.dbQuestions[qnum].name} />
+                      <br />
+                      <PartName
+                        anonymous={singlePart}
+                        pnum={pnum}
+                        name={dbQuestions[qnum].parts[pnum].name}
+                      />
+                    </b>
+                  </RenderStats>
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
+        </Collapse>
+      </div>
     </>
   );
 };

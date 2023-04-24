@@ -68,7 +68,6 @@ const ExamStats: React.FC<{
           regs={regsByVersion.get(version.id)}
         />
       ))}
-      <pre>{JSON.stringify(registrations)}</pre>
     </>
   );
 };
@@ -138,18 +137,22 @@ const RenderStats: React.FC<{
         </Table>
       )}
       {children}
-      <ResponsiveContainer className="clear-both" width={width} height={height}>
+      <ResponsiveContainer
+        className="clear-both"
+        width={width}
+        height={height}
+      >
         <ComposedChart data={buckets}>
           <XAxis dataKey="range" hide />
           <XAxis dataKey="x0" scale="band" xAxisId="values" />
-          <YAxis />
+          <YAxis width={30} />
           <Tooltip
             filterNull
             cursor={false}
             animationDuration={0}
             itemStyle={{ color: 'black' }}
           />
-          <Bar dataKey="count" fill={barColor} />
+          <Bar dataKey="count" fill={barColor} isAnimationActive={false} />
         </ComposedChart>
       </ResponsiveContainer>
     </>
@@ -222,7 +225,7 @@ const RenderVersionStats: React.FC<{
           && !dbQuestions[qnum].parts[0].name?.value?.trim();
         stats[index].sort();
         return (
-          <div key={`q${qnum}-p${pnum}`} className="d-inline-block w-25">
+          <div key={`q${qnum}-p${pnum}`} className="d-inline-block px-3 w-25">
             <RenderStats
               width="100%"
               height={200}

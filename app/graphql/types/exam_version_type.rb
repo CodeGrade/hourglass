@@ -65,6 +65,13 @@ module Types
       object.any_started?
     end
 
+    field :registrations, [Types::RegistrationType], null: false do
+      guard Guards::PROCTORS_AND_PROFESSORS
+    end
+    def registrations()
+      AssociationLoader.for(ExamVersion, :registrations).load(object)
+    end
+    
     field :started_count, Integer, null: false do
       guard Guards::PROFESSORS
     end

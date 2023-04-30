@@ -3,13 +3,17 @@ import DocumentTitle from '@hourglass/common/documentTitle';
 import React, { Suspense, useMemo, useState } from 'react';
 import * as d3 from 'd3-array';
 import {
+  Alert,
+  Button,
+  Card,
   Collapse,
   Container, Table, ToggleButton, ToggleButtonGroup,
 } from 'react-bootstrap';
-import { graphql, useLazyLoadQuery } from 'react-relay';
+import { graphql, useFragment, useLazyLoadQuery } from 'react-relay';
 import { useParams } from 'react-router-dom';
 import {
   Bar,
+  BarChart,
   ComposedChart,
   ResponsiveContainer,
   Tooltip,
@@ -19,8 +23,17 @@ import {
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
 import Icon from '@student/exams/show/components/Icon';
+import { expandRootRubric } from '@professor/exams/rubrics';
+import { nonEmptyRubric } from '@grading/UseRubrics';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { iconForPoints, variantForPoints } from '@hourglass/workflows/grading';
+import { ExhaustiveSwitchError, pluralize } from '@hourglass/common/helpers';
+import { Preset, Rubric } from '@professor/exams/types';
+import { IconType } from 'react-icons';
+import { RiMessage2Line } from 'react-icons/ri';
 import { statsExamQuery } from './__generated__/statsExamQuery.graphql';
+import { statsRubricHistograms, statsRubricHistograms$key } from './__generated__/statsRubricHistograms.graphql';
+import { statsUseRubrics$key } from './__generated__/statsUseRubrics.graphql';
 
 type ExamVersion = statsExamQuery['response']['exam']['examVersions']['edges'][number]['node'];
 type Registration = statsExamQuery['response']['exam']['registrations'][number];
@@ -266,6 +279,7 @@ const RenderVersionStats: React.FC<{
                 </div>
               );
             })}
+            <RubricPresetHistograms examVersionKey={version} />
           </div>
         </Collapse>
       </div>
@@ -296,6 +310,7 @@ const ExamStatsQuery: React.FC = () => {
                   points
                 }
               }
+              ...statsRubricHistograms
             }
           }
         }
@@ -323,6 +338,509 @@ const ExamStatsQuery: React.FC = () => {
       />
     </DocumentTitle>
   );
+};
+
+const RubricPresetHistograms: React.FC<{
+  examVersionKey: statsRubricHistograms$key;
+}> = (props) => {
+  const { examVersionKey } = props;
+  const res = useFragment(
+    graphql`
+    fragment statsRubricHistograms on ExamVersion {
+      id
+      rootRubric { ...statsUseRubrics }
+      dbQuestions {
+        id
+        name { type value }
+        index
+        rootRubric { ...statsUseRubrics }
+        parts {
+          id
+          name { type value }
+          index
+          rootRubric { ...statsUseRubrics }
+          bodyItems {
+            id
+            index
+            rootRubric { ...statsUseRubrics }
+          }
+        }
+      }
+      registrations {
+        gradingComments(first: 1000000) {
+          edges {
+            node {
+              id
+              points
+              message
+              qnum
+              pnum
+              bnum
+              presetComment { 
+                id
+                order
+                points
+                graderHint
+                studentFeedback
+                rubricPreset {
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    `,
+    examVersionKey,
+  );
+  return (
+    <>
+      {res.dbQuestions.map((q) => (
+        <div key={`q${q.index}`}>
+          <QuestionName qnum={q.index} name={q.name} />
+          {q.parts.map((p) => (
+            <div key={`q${q.index}-p${p.index}`}>
+              <PartName anonymous={false} pnum={p.index} name={p.name} />
+              {p.bodyItems.map((b) => (
+                <div key={`q${q.index}-p${p.index}-b${b.index}`}>
+                  <RenderCommentHistograms
+                    qnum={q.index}
+                    pnum={p.index}
+                    bnum={b.index}
+                    eRubricKey={res.rootRubric}
+                    qRubricKey={q.rootRubric}
+                    pRubricKey={p.rootRubric}
+                    bRubricKey={b.rootRubric}
+                    comments={res.registrations.map((r) => r.gradingComments)}
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      ))}
+    </>
+  );
+};
+
+const RenderCommentHistograms: React.FC<{
+  qnum: number,
+  pnum: number,
+  bnum: number,
+  eRubricKey: statsUseRubrics$key,
+  qRubricKey: statsUseRubrics$key,
+  pRubricKey: statsUseRubrics$key,
+  bRubricKey: statsUseRubrics$key,
+  comments: statsRubricHistograms['registrations'][number]['gradingComments'][],
+}> = (props) => {
+  const {
+    qnum,
+    pnum,
+    bnum,
+    eRubricKey,
+    qRubricKey,
+    pRubricKey,
+    bRubricKey,
+    comments,
+  } = props;
+  return (
+    <div>
+      <RenderCommentHistogram
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        rubric={eRubricKey}
+        comments={comments}
+      />
+      <RenderCommentHistogram
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        rubric={qRubricKey}
+        comments={comments}
+      />
+      <RenderCommentHistogram
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        rubric={pRubricKey}
+        comments={comments}
+      />
+      <RenderCommentHistogram
+        qnum={qnum}
+        pnum={pnum}
+        bnum={bnum}
+        rubric={bRubricKey}
+        comments={comments}
+      />
+    </div>
+  );
+};
+
+type PresetUsageData = {
+  key: 'placeholder',
+} | {
+  key: 'none',
+} | {
+  key: Exclude<string, 'placeholder'>,
+  'Preset default': number,
+  'Edited points': number,
+  'Edited message': number,
+  Customized: number,
+  Total: number,
+};
+
+function sortRubric(rubric: Rubric, ans: Preset[]): Preset[] {
+  switch (rubric.type) {
+    case 'all':
+    case 'any':
+    case 'one':
+      if (rubric.choices instanceof Array) {
+        rubric.choices.forEach((r) => sortRubric(r, ans));
+      } else {
+        ans.push(...rubric.choices.presets);
+      }
+      break;
+    case 'none':
+      break;
+    default: throw new ExhaustiveSwitchError(rubric);
+  }
+  return ans;
+}
+
+const RenderCommentHistogram: React.FC<{
+  qnum: number,
+  pnum: number,
+  bnum: number,
+  rubric: statsUseRubrics$key,
+  comments: statsRubricHistograms['registrations'][number]['gradingComments'][],
+}> = (props) => {
+  const {
+    qnum,
+    pnum,
+    bnum,
+    rubric: rubricKey,
+    comments,
+  } = props;
+  const rawRubric = useFragment<statsUseRubrics$key>(
+    graphql`
+    fragment statsUseRubrics on Rubric {
+      id
+      type
+      order
+      points
+      description {
+        type
+        value
+      }
+      rubricPreset {
+        id
+        direction
+        label
+        mercy
+        presetComments {
+          id
+          label
+          order
+          points
+          graderHint
+          studentFeedback
+        }
+      }
+      subsections { id }
+      allSubsections {
+        id
+        type
+        order
+        points
+        description {
+          type
+          value
+        }
+        rubricPreset {
+          id
+          direction
+          label
+          mercy
+          presetComments {
+            id
+            label
+            order
+            points
+            graderHint
+            studentFeedback
+          }
+        }
+        subsections { id }
+      }
+    }
+    `,
+    rubricKey,
+  );
+  const rubric = expandRootRubric(rawRubric);
+  const orderedRubricPresets = sortRubric(rubric, []);
+  const rubricPresetToRubricMap = new Map(
+    rawRubric.allSubsections.map((s) => [s.rubricPreset?.id, s]),
+  );
+  orderedRubricPresets.push({ id: 'none', graderHint: undefined, points: 0 });
+  const relevantComments = comments.flatMap(({ edges }) => (
+    edges.filter(({ node }) => (
+      node.qnum === qnum && node.pnum === pnum && node.bnum === bnum
+    )).map(({ node }) => node)));
+  const byPresets: Record<string, {
+    newPoints: (typeof comments)[number]['edges'][number]['node'][],
+    newMessage: (typeof comments)[number]['edges'][number]['node'][],
+    custom: (typeof comments)[number]['edges'][number]['node'][],
+    preset: (typeof comments)[number]['edges'][number]['node'][],
+  }> = {};
+  const presets: Record<string, (typeof comments)[number]['edges'][number]['node']['presetComment']> = {};
+  relevantComments.forEach((comment) => {
+    if (comment.presetComment) {
+      presets[comment.presetComment.id] = comment.presetComment;
+      byPresets[comment.presetComment.id] ??= {
+        newPoints: [],
+        newMessage: [],
+        custom: [],
+        preset: [],
+      };
+      const pointsChanged = comment.points !== comment.presetComment.points;
+      const messageChanged = (
+        comment.message !== comment.presetComment.graderHint
+        && comment.message !== comment.presetComment.studentFeedback
+      );
+      if (pointsChanged && messageChanged) byPresets[comment.presetComment.id].custom.push(comment);
+      else if (pointsChanged) byPresets[comment.presetComment.id].newPoints.push(comment);
+      else if (messageChanged) byPresets[comment.presetComment.id].newMessage.push(comment);
+      else byPresets[comment.presetComment.id].preset.push(comment);
+    } else {
+      byPresets.none ??= {
+        newPoints: [],
+        newMessage: [],
+        custom: [],
+        preset: [],
+      };
+      byPresets.none.custom.push(comment);
+    }
+  });
+  const buckets: PresetUsageData[] = Object.keys(byPresets).map((key) => {
+    if (key === 'none') {
+      return {
+        key: 'none',
+        'Preset default': 0,
+        'Edited points': 0,
+        'Edited message': 0,
+        Customized: byPresets[key].custom.length,
+        Total: byPresets[key].custom.length,
+      };
+    }
+    return {
+      key,
+      'Preset default': byPresets[key].preset.length,
+      'Edited points': byPresets[key].newPoints.length,
+      'Edited message': byPresets[key].newMessage.length,
+      Customized: byPresets[key].custom.length,
+      Total: byPresets[key].preset.length
+        + byPresets[key].newPoints.length
+        + byPresets[key].newMessage.length
+        + byPresets[key].custom.length,
+    };
+  });
+  buckets.sort((p1, p2) => (
+    orderedRubricPresets.findIndex((p) => p.id === p1.key)
+    - orderedRubricPresets.findIndex((p) => p.id === p2.key)));
+  for (let i = buckets.length - 1; i >= 1; i -= 1) {
+    if (rubricPresetToRubricMap.get(presets[buckets[i].key]?.rubricPreset?.id)
+      !== rubricPresetToRubricMap.get(presets[buckets[i - 1].key]?.rubricPreset?.id)) {
+      buckets.splice(i, 0, { key: 'placeholder' });
+    }
+  }
+  if (nonEmptyRubric(rubric)) {
+    return (
+      <div className="w-100">
+        <div
+          className="w-50 d-inline-block align-top"
+          style={{ marginTop: 2 }}
+        >
+          {buckets.map((value, index) => {
+            const { graderHint, studentFeedback, points } = presets[value.key] ?? {
+              points: 0,
+            };
+            const variant = variantForPoints(points);
+            const VariantIcon = iconForPoints(points);
+            return (
+              <div
+                // eslint-disable-next-line react/no-array-index-key
+                key={`${value.key}-${index}`}
+                className="px-0 mx-0"
+                style={{
+                  textOverflow: 'ellipsis',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  paddingTop: 2,
+                  height: 40,
+                }}
+              >
+                <RenderPreset
+                  value={value}
+                  points={points}
+                  variant={variant}
+                  VariantIcon={VariantIcon}
+                  graderHint={graderHint}
+                  studentFeedback={studentFeedback}
+                />
+              </div>
+            );
+          })}
+        </div>
+        <ResponsiveContainer
+          className="d-inline-block p-0 m-0"
+          width="50%"
+          height={30 + (buckets.length * 40)} // 30 is axis default height
+        >
+          <BarChart
+            data={buckets}
+            layout="vertical"
+            margin={{
+              top: 0, bottom: 0, left: 5, right: 5,
+            }}
+          >
+            <YAxis
+              dataKey="key"
+              type="category"
+              width={2}
+              interval={0}
+              tick={false}
+            />
+            <XAxis type="number" />
+            <Tooltip
+              filterNull
+              cursor={false}
+              animationDuration={0}
+              // labelFormatter={(label, payload) => `${label}: ${payload[0]?.payload?.Total}`}
+              content={<CustomTooltip presets={presets} />}
+            />
+            <Bar dataKey="Preset default" stackId="a" fill={colors[0]} isAnimationActive={false} />
+            <Bar dataKey="Edited points" stackId="a" fill={colors[1]} isAnimationActive={false} />
+            <Bar dataKey="Edited message" stackId="a" fill={colors[8]} isAnimationActive={false} />
+            <Bar dataKey="Customized" stackId="a" fill={colors[3]} isAnimationActive={false} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
+  return null;
+};
+
+const RenderPreset: React.FC<{
+  value: PresetUsageData,
+  points: number,
+  variant: string,
+  VariantIcon: IconType,
+  graderHint: string,
+  studentFeedback: string,
+}> = (props) => {
+  const {
+    value,
+    points,
+    variant,
+    VariantIcon,
+    graderHint,
+    studentFeedback,
+  } = props;
+  switch (value.key) {
+    case 'placeholder': return null;
+    case 'none':
+      return (
+        <Alert
+          variant="info"
+          className="p-0 m-0 preset"
+        >
+          <Button disabled variant="info" size="sm" className="mr-2 align-self-center">
+            <Icon I={RiMessage2Line} className="mr-2" />
+            ?? points
+          </Button>
+          Custom message
+        </Alert>
+      );
+    default:
+      return (
+        <Alert
+          variant={variant}
+          className="p-0 m-0 preset"
+          style={{
+            width: '100%',
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+          }}
+        >
+          <Button
+            disabled
+            variant={variant}
+            size="sm"
+            className="mr-2 align-self-center"
+          >
+            <Icon I={VariantIcon} className="mr-2" />
+            {pluralize(points, 'point', 'points')}
+          </Button>
+          {studentFeedback ?? graderHint}
+        </Alert>
+      );
+  }
+};
+
+type RechartPayload<T> = {
+  payload: T,
+  fill: string,
+  color: string,
+  name: string,
+  value: number,
+}
+
+const CustomTooltip: React.FC<{
+  active?: boolean,
+  payload?: RechartPayload<PresetUsageData>[],
+  label?: string,
+  presets: Record<string, {
+    readonly points: number,
+    readonly graderHint: string,
+    readonly studentFeedback: string,
+  }>,
+}> = (props) => {
+  const {
+    presets,
+    active,
+    payload,
+    label,
+  } = props;
+  if (active && payload?.length) {
+    const payload0 = payload[0].payload;
+    return (
+      <Card border="info" className="p-2 mb-0">
+        <p style={{ maxWidth: '40em' }}>
+          {label === 'none' ? 'Custom (no preset)' : presets[label]?.studentFeedback ?? presets[label]?.graderHint}
+        </p>
+        <table className="table table-sm mb-0">
+          <tbody>
+            {payload.map((value, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <tr key={index} className="py-1 my-1">
+                <td style={{ width: '2em', backgroundColor: value.fill }} />
+                <td>{value.name}</td>
+                <td>{value.value}</td>
+              </tr>
+            ))}
+            <tr>
+              <td />
+              <td><b>Total</b></td>
+              <td>{('Total' in payload0) && payload0.Total}</td>
+            </tr>
+          </tbody>
+        </table>
+      </Card>
+    );
+  }
+  return null;
 };
 
 const ExamStatDisplay: React.FC = () => (

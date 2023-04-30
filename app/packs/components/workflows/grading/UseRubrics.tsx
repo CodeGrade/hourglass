@@ -585,7 +585,7 @@ const ShowAny: React.FC<ShowRubricProps<RubricAny>> = (props) => {
   );
 };
 
-function nonEmptyRubric(r ?: Rubric): boolean {
+export function nonEmptyRubric(r ?: Rubric): boolean {
   return r !== null && r !== undefined && r.type !== 'none';
 }
 

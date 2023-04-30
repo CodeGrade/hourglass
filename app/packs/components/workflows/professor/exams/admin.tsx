@@ -1130,9 +1130,14 @@ const ExamAdminQuery: React.FC = () => {
         </Link>
         <StartGradingButton />
         <PublishGradesButton examId={data.exam} />
-        <Link to={`/exams/${data.exam.id}/submissions`}>
-          <Button className="ml-2" variant="primary">View submissions</Button>
-        </Link>
+        <DropdownButton className="d-inline-block ml-2" variant="primary" title="View...">
+          <Dropdown.Item href={`/exams/${data.exam.id}/submissions`}>
+            View submissions
+          </Dropdown.Item>
+          <Dropdown.Item href={`/exams/${data.exam.id}/stats`}>
+            View statistics
+          </Dropdown.Item>
+        </DropdownButton>
       </Form.Group>
     </DocumentTitle>
   );

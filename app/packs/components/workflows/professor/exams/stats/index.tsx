@@ -33,7 +33,7 @@ import { IconType } from 'react-icons';
 import { RiMessage2Line } from 'react-icons/ri';
 import { statsExamQuery } from './__generated__/statsExamQuery.graphql';
 import { statsRubricHistograms, statsRubricHistograms$key } from './__generated__/statsRubricHistograms.graphql';
-import { statsUseRubrics$key } from './__generated__/statsUseRubrics.graphql';
+import { statsUseRubrics, statsUseRubrics$key } from './__generated__/statsUseRubrics.graphql';
 
 type ExamVersion = statsExamQuery['response']['exam']['examVersions']['edges'][number]['node'];
 type Registration = statsExamQuery['response']['exam']['registrations'][number];
@@ -491,6 +491,9 @@ type PresetUsageData = {
   Total: number,
 };
 
+type GradingCommentConnection = statsRubricHistograms['registrations'][number]['gradingComments'];
+type GradingComment = GradingCommentConnection['edges'][number]['node'];
+
 function sortRubric(rubric: Rubric, ans: Preset[]): Preset[] {
   switch (rubric.type) {
     case 'all':
@@ -507,6 +510,118 @@ function sortRubric(rubric: Rubric, ans: Preset[]): Preset[] {
     default: throw new ExhaustiveSwitchError(rubric);
   }
   return ans;
+}
+
+function computePresets(
+  comments: GradingCommentConnection[],
+  qnum: number,
+  pnum: number,
+  bnum: number,
+): {
+  presets: Record<string, GradingComment['presetComment']>,
+  byPresets: Record<string, {
+    newPoints: GradingComment[],
+    newMessage: GradingComment[],
+    custom: GradingComment[],
+    preset: GradingComment[],
+  }>
+} {
+  const relevantComments = comments.flatMap(({ edges }) => (
+    edges.filter(({ node }) => (
+      node.qnum === qnum && node.pnum === pnum && node.bnum === bnum
+    )).map(({ node }) => node)));
+  const byPresets: Record<string, {
+    newPoints: GradingComment[],
+    newMessage: GradingComment[],
+    custom: GradingComment[],
+    preset: GradingComment[],
+  }> = {};
+  const presets: Record<string, GradingComment['presetComment']> = {};
+  relevantComments.forEach((comment) => {
+    if (comment.presetComment) {
+      presets[comment.presetComment.id] = comment.presetComment;
+      byPresets[comment.presetComment.id] ??= {
+        newPoints: [],
+        newMessage: [],
+        custom: [],
+        preset: [],
+      };
+      const pointsChanged = comment.points !== comment.presetComment.points;
+      const messageChanged = (
+        comment.message !== comment.presetComment.graderHint
+        && comment.message !== comment.presetComment.studentFeedback
+      );
+      if (pointsChanged && messageChanged) {
+        byPresets[comment.presetComment.id].custom.push(comment);
+      } else if (pointsChanged) {
+        byPresets[comment.presetComment.id].newPoints.push(comment);
+      } else if (messageChanged) {
+        byPresets[comment.presetComment.id].newMessage.push(comment);
+      } else {
+        byPresets[comment.presetComment.id].preset.push(comment);
+      }
+    } else {
+      byPresets.none ??= {
+        newPoints: [],
+        newMessage: [],
+        custom: [],
+        preset: [],
+      };
+      byPresets.none.custom.push(comment);
+    }
+  });
+  return { presets, byPresets };
+}
+
+function computeBuckets(
+  rawRubric: statsUseRubrics,
+  rubric: Rubric,
+  byPresets: Record<string, {
+    newPoints: GradingComment[],
+    newMessage: GradingComment[],
+    custom: GradingComment[],
+    preset: GradingComment[],
+  }>,
+  presets: Record<string, GradingComment['presetComment']>,
+) {
+  const rubricPresetToRubricMap = new Map(
+    rawRubric.allSubsections.map((s) => [s.rubricPreset?.id, s]),
+  );
+  const orderedRubricPresets = sortRubric(rubric, []);
+  orderedRubricPresets.push({ id: 'none', graderHint: undefined, points: 0 });
+  const buckets: PresetUsageData[] = Object.keys(byPresets).map((key) => {
+    if (key === 'none') {
+      return {
+        key: 'none',
+        'Preset default': 0,
+        'Edited points': 0,
+        'Edited message': 0,
+        Customized: byPresets[key].custom.length,
+        Total: byPresets[key].custom.length,
+      };
+    }
+    return {
+      key,
+      'Preset default': byPresets[key].preset.length,
+      'Edited points': byPresets[key].newPoints.length,
+      'Edited message': byPresets[key].newMessage.length,
+      Customized: byPresets[key].custom.length,
+      Total: byPresets[key].preset.length
+        + byPresets[key].newPoints.length
+        + byPresets[key].newMessage.length
+        + byPresets[key].custom.length,
+    };
+  });
+  buckets.sort((p1, p2) => (
+    orderedRubricPresets.findIndex((p) => p.id === p1.key)
+    - orderedRubricPresets.findIndex((p) => p.id === p2.key)));
+  for (let i = buckets.length - 1; i >= 1; i -= 1) {
+    if (rubricPresetToRubricMap.get(presets[buckets[i].key]?.rubricPreset?.id)
+      !== rubricPresetToRubricMap.get(presets[buckets[i - 1].key]?.rubricPreset?.id)) {
+      buckets.splice(i, 0, { key: 'placeholder' });
+    }
+  }
+  return buckets;
 }
 
 const RenderCommentHistogram: React.FC<{
@@ -579,82 +694,13 @@ const RenderCommentHistogram: React.FC<{
     rubricKey,
   );
   const rubric = expandRootRubric(rawRubric);
-  const orderedRubricPresets = sortRubric(rubric, []);
-  const rubricPresetToRubricMap = new Map(
-    rawRubric.allSubsections.map((s) => [s.rubricPreset?.id, s]),
+  const { presets, byPresets } = computePresets(comments, qnum, pnum, bnum);
+  const buckets: PresetUsageData[] = computeBuckets(
+    rawRubric,
+    rubric,
+    byPresets,
+    presets,
   );
-  orderedRubricPresets.push({ id: 'none', graderHint: undefined, points: 0 });
-  const relevantComments = comments.flatMap(({ edges }) => (
-    edges.filter(({ node }) => (
-      node.qnum === qnum && node.pnum === pnum && node.bnum === bnum
-    )).map(({ node }) => node)));
-  const byPresets: Record<string, {
-    newPoints: (typeof comments)[number]['edges'][number]['node'][],
-    newMessage: (typeof comments)[number]['edges'][number]['node'][],
-    custom: (typeof comments)[number]['edges'][number]['node'][],
-    preset: (typeof comments)[number]['edges'][number]['node'][],
-  }> = {};
-  const presets: Record<string, (typeof comments)[number]['edges'][number]['node']['presetComment']> = {};
-  relevantComments.forEach((comment) => {
-    if (comment.presetComment) {
-      presets[comment.presetComment.id] = comment.presetComment;
-      byPresets[comment.presetComment.id] ??= {
-        newPoints: [],
-        newMessage: [],
-        custom: [],
-        preset: [],
-      };
-      const pointsChanged = comment.points !== comment.presetComment.points;
-      const messageChanged = (
-        comment.message !== comment.presetComment.graderHint
-        && comment.message !== comment.presetComment.studentFeedback
-      );
-      if (pointsChanged && messageChanged) byPresets[comment.presetComment.id].custom.push(comment);
-      else if (pointsChanged) byPresets[comment.presetComment.id].newPoints.push(comment);
-      else if (messageChanged) byPresets[comment.presetComment.id].newMessage.push(comment);
-      else byPresets[comment.presetComment.id].preset.push(comment);
-    } else {
-      byPresets.none ??= {
-        newPoints: [],
-        newMessage: [],
-        custom: [],
-        preset: [],
-      };
-      byPresets.none.custom.push(comment);
-    }
-  });
-  const buckets: PresetUsageData[] = Object.keys(byPresets).map((key) => {
-    if (key === 'none') {
-      return {
-        key: 'none',
-        'Preset default': 0,
-        'Edited points': 0,
-        'Edited message': 0,
-        Customized: byPresets[key].custom.length,
-        Total: byPresets[key].custom.length,
-      };
-    }
-    return {
-      key,
-      'Preset default': byPresets[key].preset.length,
-      'Edited points': byPresets[key].newPoints.length,
-      'Edited message': byPresets[key].newMessage.length,
-      Customized: byPresets[key].custom.length,
-      Total: byPresets[key].preset.length
-        + byPresets[key].newPoints.length
-        + byPresets[key].newMessage.length
-        + byPresets[key].custom.length,
-    };
-  });
-  buckets.sort((p1, p2) => (
-    orderedRubricPresets.findIndex((p) => p.id === p1.key)
-    - orderedRubricPresets.findIndex((p) => p.id === p2.key)));
-  for (let i = buckets.length - 1; i >= 1; i -= 1) {
-    if (rubricPresetToRubricMap.get(presets[buckets[i].key]?.rubricPreset?.id)
-      !== rubricPresetToRubricMap.get(presets[buckets[i - 1].key]?.rubricPreset?.id)) {
-      buckets.splice(i, 0, { key: 'placeholder' });
-    }
-  }
   if (nonEmptyRubric(rubric)) {
     return (
       <div className="w-100">
@@ -760,7 +806,7 @@ const RenderPreset: React.FC<{
             <Icon I={RiMessage2Line} className="mr-2" />
             ?? points
           </Button>
-          Custom message
+          Custom (no preset)
         </Alert>
       );
     default:

@@ -1,6 +1,12 @@
 import ErrorBoundary from '@hourglass/common/boundary';
 import DocumentTitle from '@hourglass/common/documentTitle';
-import React, { Suspense, useMemo, useState } from 'react';
+import React, {
+  RefObject,
+  Suspense,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import * as d3 from 'd3-array';
 import {
   Alert,
@@ -693,6 +699,15 @@ const RenderCommentHistogram: React.FC<{
     `,
     rubricKey,
   );
+  const [frozenPos, setFrozenPos] = useState<{ x: number, y: number }>(undefined);
+  const [tooltipPosFrozen, setTooltipPozFrozen] = useState(false);
+  const [
+    tooltipFrozenPayload,
+    setTooltipFrozenPayload,
+  ] = useState<RechartPayload<PresetUsageData>[]>(undefined);
+  const [tooltipFrozenLabel, setTooltipFrozenLabel] = useState<string>(undefined);
+  const tooltipRef = useRef<HTMLDivElement>(undefined);
+  const chartRef = useRef<RefObject<HTMLDivElement>>(undefined);
   const rubric = expandRootRubric(rawRubric);
   const { presets, byPresets } = computePresets(comments, qnum, pnum, bnum);
   const buckets: PresetUsageData[] = computeBuckets(
@@ -740,6 +755,7 @@ const RenderCommentHistogram: React.FC<{
           })}
         </div>
         <ResponsiveContainer
+          ref={chartRef}
           className="d-inline-block p-0 m-0"
           width="50%"
           height={30 + (buckets.length * 40)} // 30 is axis default height
@@ -749,6 +765,25 @@ const RenderCommentHistogram: React.FC<{
             layout="vertical"
             margin={{
               top: 0, bottom: 0, left: 5, right: 5,
+            }}
+            onMouseDown={(state, event: MouseEvent) => {
+              if (event.target instanceof HTMLElement
+                && tooltipRef.current.contains(event.target)) {
+                return;
+              }
+              const rect = tooltipRef.current?.getBoundingClientRect();
+              const parentRect = chartRef.current?.current?.getBoundingClientRect();
+              if (!tooltipPosFrozen && rect && parentRect) {
+                setFrozenPos({ x: rect.x - parentRect.x, y: rect.y - parentRect.y });
+                setTooltipPozFrozen(true);
+                setTooltipFrozenPayload(state.activePayload);
+                setTooltipFrozenLabel(state.activeLabel);
+              } else {
+                setFrozenPos(undefined);
+                setTooltipPozFrozen(false);
+                setTooltipFrozenPayload(undefined);
+                setTooltipFrozenLabel(undefined);
+              }
             }}
           >
             <YAxis
@@ -760,11 +795,20 @@ const RenderCommentHistogram: React.FC<{
             />
             <XAxis type="number" />
             <Tooltip
-              filterNull
+              filterNull={!tooltipPosFrozen}
               cursor={false}
               animationDuration={0}
-              // labelFormatter={(label, payload) => `${label}: ${payload[0]?.payload?.Total}`}
-              content={<CustomTooltip presets={presets} />}
+              position={frozenPos}
+              content={(
+                <CustomTooltip
+                  frozenPos={tooltipPosFrozen}
+                  frozenPayload={tooltipFrozenPayload}
+                  frozenLabel={tooltipFrozenLabel}
+                  innerRef={tooltipRef}
+                  presets={presets}
+                />
+              )}
+              wrapperStyle={{ pointerEvents: 'auto' }}
             />
             <Bar dataKey="Preset default" stackId="a" fill={colors[0]} isAnimationActive={false} />
             <Bar dataKey="Edited points" stackId="a" fill={colors[1]} isAnimationActive={false} />
@@ -845,25 +889,39 @@ type RechartPayload<T> = {
 
 const CustomTooltip: React.FC<{
   active?: boolean,
+  frozenPayload?: RechartPayload<PresetUsageData>[],
   payload?: RechartPayload<PresetUsageData>[],
+  frozenLabel?: string,
   label?: string,
+  innerRef?: RefObject<HTMLDivElement>,
   presets: Record<string, {
     readonly points: number,
     readonly graderHint: string,
     readonly studentFeedback: string,
   }>,
+  frozenPos?: boolean,
 }> = (props) => {
   const {
     presets,
     active,
-    payload,
-    label,
+    frozenPayload,
+    payload: defaultPayload,
+    frozenLabel,
+    label: defaultLabel,
+    innerRef,
+    frozenPos,
   } = props;
+  const payload = frozenPayload ?? defaultPayload;
+  const label = frozenLabel ?? defaultLabel;
   if (active && payload?.length) {
     const payload0 = payload[0].payload;
     return (
-      <Card border="info" className="p-2 mb-0">
-        <p style={{ maxWidth: '40em' }}>
+      <Card
+        border={frozenPos ? 'warning' : 'info'}
+        className="p-2 mb-0"
+        ref={innerRef}
+      >
+        <p style={{ maxWidth: '25em' }}>
           {label === 'none' ? 'Custom (no preset)' : presets[label]?.studentFeedback ?? presets[label]?.graderHint}
         </p>
         <table className="table table-sm mb-0">

@@ -1,25 +1,19 @@
 import ErrorBoundary from '@hourglass/common/boundary';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import React, {
-  RefObject,
   Suspense,
   useMemo,
-  useRef,
   useState,
 } from 'react';
 import * as d3 from 'd3-array';
 import {
-  Alert,
-  Button,
-  Card,
   Collapse,
-  Container, Modal, Table, ToggleButton, ToggleButtonGroup,
+  Container, Table, ToggleButton, ToggleButtonGroup,
 } from 'react-bootstrap';
-import { graphql, useFragment, useLazyLoadQuery } from 'react-relay';
-import { Link, useParams } from 'react-router-dom';
+import { graphql, useLazyLoadQuery } from 'react-relay';
+import { useParams } from 'react-router-dom';
 import {
   Bar,
-  BarChart,
   ComposedChart,
   ResponsiveContainer,
   Tooltip,
@@ -29,17 +23,10 @@ import {
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
 import Icon from '@student/exams/show/components/Icon';
-import { expandRootRubric } from '@professor/exams/rubrics';
-import { nonEmptyRubric } from '@grading/UseRubrics';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import { iconForPoints, variantForPoints } from '@hourglass/workflows/grading';
-import { ExhaustiveSwitchError, pluralize } from '@hourglass/common/helpers';
-import { Preset, Rubric } from '@professor/exams/types';
-import { IconType } from 'react-icons';
-import { RiMessage2Line } from 'react-icons/ri';
 import { statsExamQuery } from './__generated__/statsExamQuery.graphql';
-import { statsRubricHistograms, statsRubricHistograms$key } from './__generated__/statsRubricHistograms.graphql';
-import { statsUseRubrics, statsUseRubrics$key } from './__generated__/statsUseRubrics.graphql';
+import RubricPresetHistograms from './RubricPresetHistograms';
+import { colors } from './utils';
 
 type ExamVersion = statsExamQuery['response']['exam']['examVersions']['edges'][number]['node'];
 type Registration = statsExamQuery['response']['exam']['registrations'][number];
@@ -96,11 +83,6 @@ const ExamStats: React.FC<{
     </>
   );
 };
-
-const colors = [
-  'steelblue', 'maroon', 'gold', 'seagreen', 'orange', 'indigo',
-  'dodgerblue', 'firebrick', 'goldenrod', 'mediumseagreen', 'sandybrown', 'darkmagenta',
-];
 
 function round(n: number, numDigits: number) {
   return Math.round(n * 10 ** numDigits) / 10 ** numDigits;
@@ -198,6 +180,7 @@ const RenderVersionStats: React.FC<{
   } = props;
   const { qpPairs, dbQuestions } = version;
   const [showDetails, setShowDetails] = useState(false);
+  const [showRubrics, setShowRubrics] = useState(false);
   const [showAsPct, setShowAsPct] = useState(true);
   const rawScores = [];
   const numPoints = d3.sum(
@@ -264,7 +247,7 @@ const RenderVersionStats: React.FC<{
           <div>
             {qpPairs.map(({ qnum, pnum }, index) => {
               const singlePart = dbQuestions[qnum].parts.length === 1
-              && !dbQuestions[qnum].parts[0].name?.value?.trim();
+                && !dbQuestions[qnum].parts[0].name?.value?.trim();
               stats[index].sort();
               return (
                 <div key={`q${qnum}-p${pnum}`} className="d-inline-block px-3 w-25">
@@ -290,6 +273,21 @@ const RenderVersionStats: React.FC<{
                 </div>
               );
             })}
+          </div>
+        </Collapse>
+        <h4 className="flex-grow-1">
+          <span
+            role="button"
+            onClick={() => setShowRubrics((s) => !s)}
+            onKeyPress={() => setShowRubrics((s) => !s)}
+            tabIndex={0}
+          >
+            Per-question rubric presets usage
+            {showRubrics ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+          </span>
+        </h4>
+        <Collapse in={showRubrics}>
+          <div>
             <RubricPresetHistograms
               examVersionKey={version}
               examId={examId}
@@ -324,7 +322,7 @@ const ExamStatsQuery: React.FC = () => {
                   points
                 }
               }
-              ...statsRubricHistograms
+              ...RubricPresetHistograms
             }
           }
         }
@@ -352,777 +350,6 @@ const ExamStatsQuery: React.FC = () => {
         registrations={data.exam.registrations}
       />
     </DocumentTitle>
-  );
-};
-
-const RubricPresetHistograms: React.FC<{
-  examId: string,
-  examVersionKey: statsRubricHistograms$key;
-}> = (props) => {
-  const { examId, examVersionKey } = props;
-  const res = useFragment(
-    graphql`
-    fragment statsRubricHistograms on ExamVersion {
-      id
-      rootRubric { ...statsUseRubrics }
-      dbQuestions {
-        id
-        name { type value }
-        index
-        rootRubric { ...statsUseRubrics }
-        parts {
-          id
-          name { type value }
-          index
-          rootRubric { ...statsUseRubrics }
-          bodyItems {
-            id
-            index
-            rootRubric { ...statsUseRubrics }
-          }
-        }
-      }
-      registrations {
-        id
-        user { 
-          id
-          displayName
-        }
-        gradingComments(first: 1000000) {
-          edges {
-            node {
-              id
-              points
-              message
-              qnum
-              pnum
-              bnum
-              presetComment { 
-                id
-                order
-                points
-                graderHint
-                studentFeedback
-                rubricPreset {
-                  id
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    `,
-    examVersionKey,
-  );
-  return (
-    <>
-      {res.dbQuestions.map((q) => (
-        <div key={`q${q.index}`}>
-          <QuestionName qnum={q.index} name={q.name} />
-          {q.parts.map((p) => (
-            <div key={`q${q.index}-p${p.index}`}>
-              <PartName anonymous={false} pnum={p.index} name={p.name} />
-              {p.bodyItems.map((b) => (
-                <div key={`q${q.index}-p${p.index}-b${b.index}`}>
-                  <RenderCommentHistograms
-                    examId={examId}
-                    qnum={q.index}
-                    pnum={p.index}
-                    bnum={b.index}
-                    eRubricKey={res.rootRubric}
-                    qRubricKey={q.rootRubric}
-                    pRubricKey={p.rootRubric}
-                    bRubricKey={b.rootRubric}
-                    comments={res.registrations.map((r) => r.gradingComments)}
-                    registrations={res.registrations}
-                  />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      ))}
-    </>
-  );
-};
-
-const RenderCommentHistograms: React.FC<{
-  examId: string,
-  qnum: number,
-  pnum: number,
-  bnum: number,
-  eRubricKey: statsUseRubrics$key,
-  qRubricKey: statsUseRubrics$key,
-  pRubricKey: statsUseRubrics$key,
-  bRubricKey: statsUseRubrics$key,
-  comments: statsRubricHistograms['registrations'][number]['gradingComments'][],
-  registrations: statsRubricHistograms['registrations'],
-}> = (props) => {
-  const {
-    examId,
-    qnum,
-    pnum,
-    bnum,
-    eRubricKey,
-    qRubricKey,
-    pRubricKey,
-    bRubricKey,
-    comments,
-    registrations,
-  } = props;
-  return (
-    <div>
-      <RenderCommentHistogram
-        examId={examId}
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
-        rubric={eRubricKey}
-        comments={comments}
-        registrations={registrations}
-      />
-      <RenderCommentHistogram
-        examId={examId}
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
-        rubric={qRubricKey}
-        comments={comments}
-        registrations={registrations}
-      />
-      <RenderCommentHistogram
-        examId={examId}
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
-        rubric={pRubricKey}
-        comments={comments}
-        registrations={registrations}
-      />
-      <RenderCommentHistogram
-        examId={examId}
-        qnum={qnum}
-        pnum={pnum}
-        bnum={bnum}
-        rubric={bRubricKey}
-        comments={comments}
-        registrations={registrations}
-      />
-    </div>
-  );
-};
-
-type PresetUsageData = {
-  key: 'placeholder',
-} | {
-  key: 'none',
-} | {
-  key: Exclude<string, 'placeholder'>,
-  'Preset default': number,
-  'Edited points': number,
-  'Edited message': number,
-  Customized: number,
-  Total: number,
-};
-
-type GradingCommentConnection = statsRubricHistograms['registrations'][number]['gradingComments'];
-type GradingComment = GradingCommentConnection['edges'][number]['node'];
-
-function sortRubric(rubric: Rubric, ans: Preset[]): Preset[] {
-  switch (rubric.type) {
-    case 'all':
-    case 'any':
-    case 'one':
-      if (rubric.choices instanceof Array) {
-        rubric.choices.forEach((r) => sortRubric(r, ans));
-      } else {
-        ans.push(...rubric.choices.presets);
-      }
-      break;
-    case 'none':
-      break;
-    default: throw new ExhaustiveSwitchError(rubric);
-  }
-  return ans;
-}
-
-function computePresets(
-  comments: GradingCommentConnection[],
-  qnum: number,
-  pnum: number,
-  bnum: number,
-): {
-  presets: Record<string, GradingComment['presetComment']>,
-  byPresets: Record<string, {
-    newPoints: GradingComment[],
-    newMessage: GradingComment[],
-    custom: GradingComment[],
-    preset: GradingComment[],
-  }>
-} {
-  const relevantComments = comments.flatMap(({ edges }) => (
-    edges.filter(({ node }) => (
-      node.qnum === qnum && node.pnum === pnum && node.bnum === bnum
-    )).map(({ node }) => node)));
-  const byPresets: Record<string, {
-    newPoints: GradingComment[],
-    newMessage: GradingComment[],
-    custom: GradingComment[],
-    preset: GradingComment[],
-  }> = {};
-  const presets: Record<string, GradingComment['presetComment']> = {};
-  relevantComments.forEach((comment) => {
-    if (comment.presetComment) {
-      presets[comment.presetComment.id] = comment.presetComment;
-      byPresets[comment.presetComment.id] ??= {
-        newPoints: [],
-        newMessage: [],
-        custom: [],
-        preset: [],
-      };
-      const pointsChanged = comment.points !== comment.presetComment.points;
-      const messageChanged = (
-        comment.message !== comment.presetComment.graderHint
-        && comment.message !== comment.presetComment.studentFeedback
-      );
-      if (pointsChanged && messageChanged) {
-        byPresets[comment.presetComment.id].custom.push(comment);
-      } else if (pointsChanged) {
-        byPresets[comment.presetComment.id].newPoints.push(comment);
-      } else if (messageChanged) {
-        byPresets[comment.presetComment.id].newMessage.push(comment);
-      } else {
-        byPresets[comment.presetComment.id].preset.push(comment);
-      }
-    } else {
-      byPresets.none ??= {
-        newPoints: [],
-        newMessage: [],
-        custom: [],
-        preset: [],
-      };
-      byPresets.none.custom.push(comment);
-    }
-  });
-  return { presets, byPresets };
-}
-
-function computeBuckets(
-  rawRubric: statsUseRubrics,
-  rubric: Rubric,
-  byPresets: Record<string, {
-    newPoints: GradingComment[],
-    newMessage: GradingComment[],
-    custom: GradingComment[],
-    preset: GradingComment[],
-  }>,
-  presets: Record<string, GradingComment['presetComment']>,
-) {
-  const rubricPresetToRubricMap = new Map(
-    rawRubric.allSubsections.map((s) => [s.rubricPreset?.id, s]),
-  );
-  const orderedRubricPresets = sortRubric(rubric, []);
-  orderedRubricPresets.push({ id: 'none', graderHint: undefined, points: 0 });
-  const buckets: PresetUsageData[] = Object.keys(byPresets).map((key) => {
-    if (key === 'none') {
-      return {
-        key: 'none',
-        'Preset default': 0,
-        'Edited points': 0,
-        'Edited message': 0,
-        Customized: byPresets[key].custom.length,
-        Total: byPresets[key].custom.length,
-      };
-    }
-    return {
-      key,
-      'Preset default': byPresets[key].preset.length,
-      'Edited points': byPresets[key].newPoints.length,
-      'Edited message': byPresets[key].newMessage.length,
-      Customized: byPresets[key].custom.length,
-      Total: byPresets[key].preset.length
-        + byPresets[key].newPoints.length
-        + byPresets[key].newMessage.length
-        + byPresets[key].custom.length,
-    };
-  });
-  buckets.sort((p1, p2) => (
-    orderedRubricPresets.findIndex((p) => p.id === p1.key)
-    - orderedRubricPresets.findIndex((p) => p.id === p2.key)));
-  for (let i = buckets.length - 1; i >= 1; i -= 1) {
-    if (rubricPresetToRubricMap.get(presets[buckets[i].key]?.rubricPreset?.id)
-      !== rubricPresetToRubricMap.get(presets[buckets[i - 1].key]?.rubricPreset?.id)) {
-      buckets.splice(i, 0, { key: 'placeholder' });
-    }
-  }
-  return buckets;
-}
-
-const RenderCommentHistogram: React.FC<{
-  examId: string,
-  qnum: number,
-  pnum: number,
-  bnum: number,
-  rubric: statsUseRubrics$key,
-  comments: statsRubricHistograms['registrations'][number]['gradingComments'][],
-  registrations: statsRubricHistograms['registrations'],
-}> = (props) => {
-  const {
-    examId,
-    qnum,
-    pnum,
-    bnum,
-    rubric: rubricKey,
-    comments,
-    registrations,
-  } = props;
-  const rawRubric = useFragment<statsUseRubrics$key>(
-    graphql`
-    fragment statsUseRubrics on Rubric {
-      id
-      type
-      order
-      points
-      description {
-        type
-        value
-      }
-      rubricPreset {
-        id
-        direction
-        label
-        mercy
-        presetComments {
-          id
-          label
-          order
-          points
-          graderHint
-          studentFeedback
-        }
-      }
-      subsections { id }
-      allSubsections {
-        id
-        type
-        order
-        points
-        description {
-          type
-          value
-        }
-        rubricPreset {
-          id
-          direction
-          label
-          mercy
-          presetComments {
-            id
-            label
-            order
-            points
-            graderHint
-            studentFeedback
-          }
-        }
-        subsections { id }
-      }
-    }
-    `,
-    rubricKey,
-  );
-  const gradingCommentToRegistrationMap = useMemo(() => new Map(
-    registrations.flatMap((r) => r.gradingComments.edges.map(({ node: c }) => [c.id, r.id])),
-  ), [registrations]);
-  const registrationsMap = useMemo(
-    () => new Map(registrations.map((r) => [r.id, r])),
-    [registrations],
-  );
-  const [frozenPos, setFrozenPos] = useState<{ x: number, y: number }>(undefined);
-  const [tooltipPosFrozen, setTooltipPozFrozen] = useState(false);
-  const [
-    tooltipFrozenPayload,
-    setTooltipFrozenPayload,
-  ] = useState<RechartPayload<PresetUsageData>[]>(undefined);
-  const [tooltipFrozenLabel, setTooltipFrozenLabel] = useState<string>(undefined);
-  const tooltipRef = useRef<HTMLDivElement>(undefined);
-  const chartRef = useRef<RefObject<HTMLDivElement>>(undefined);
-  const rubric = expandRootRubric(rawRubric);
-  const { presets, byPresets } = computePresets(comments, qnum, pnum, bnum);
-  const buckets: PresetUsageData[] = computeBuckets(
-    rawRubric,
-    rubric,
-    byPresets,
-    presets,
-  );
-  const [linksComments, setLinksComments] = useState<{
-    comment: GradingComment,
-    registration: statsRubricHistograms['registrations'][number],
-  }[]>(undefined);
-  const [showLinks, setShowLinks] = useState(false);
-  const [linksTitle, setLinksTitle] = useState<string>('');
-  const [linksPreset, setLinksPreset] = useState<PresetUsageData>(undefined);
-  const onClickRow = (value: RechartPayload<PresetUsageData>) => {
-    if ('Total' in value.payload) {
-      let relevantComments: GradingComment[];
-      switch (value.name as keyof (typeof value.payload)) {
-        case 'Preset default':
-          relevantComments = byPresets[value.payload.key].preset;
-          break;
-        case 'Edited points':
-          relevantComments = byPresets[value.payload.key].newPoints;
-          break;
-        case 'Edited message':
-          relevantComments = byPresets[value.payload.key].newMessage;
-          break;
-        case 'Customized':
-          relevantComments = byPresets[value.payload.key].custom;
-          break;
-        default:
-          return;
-      }
-      setLinksTitle(`${value.name} for`);
-      setLinksComments(
-        relevantComments.map((c) => ({
-          comment: c,
-          registration: registrationsMap.get(gradingCommentToRegistrationMap.get(c.id)),
-        })),
-      );
-      setLinksPreset(value.payload);
-      setShowLinks(true);
-    }
-  };
-  if (nonEmptyRubric(rubric)) {
-    return (
-      <div className="w-100">
-        {linksPreset && (
-          <ShowLinks
-            examId={examId}
-            presetUsage={linksPreset}
-            preset={presets[linksPreset.key]}
-            comments={linksComments}
-            title={linksTitle}
-            show={showLinks}
-            onClose={() => setShowLinks(false)}
-          />
-        )}
-        <div
-          className="w-50 d-inline-block align-top"
-          style={{ marginTop: 2 }}
-        >
-          {buckets.map((value, index) => {
-            const { graderHint, studentFeedback, points } = presets[value.key] ?? {
-              points: 0,
-            };
-            const variant = variantForPoints(points);
-            const VariantIcon = iconForPoints(points);
-            return (
-              <div
-                // eslint-disable-next-line react/no-array-index-key
-                key={`${value.key}-${index}`}
-                className="px-0 mx-0"
-                style={{
-                  textOverflow: 'ellipsis',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  paddingTop: 2,
-                  height: 40,
-                }}
-              >
-                <RenderPreset
-                  value={value}
-                  points={points}
-                  variant={variant}
-                  VariantIcon={VariantIcon}
-                  graderHint={graderHint}
-                  studentFeedback={studentFeedback}
-                />
-              </div>
-            );
-          })}
-        </div>
-        <ResponsiveContainer
-          ref={chartRef}
-          className="d-inline-block p-0 m-0"
-          width="50%"
-          height={30 + (buckets.length * 40)} // 30 is axis default height
-        >
-          <BarChart
-            data={buckets}
-            layout="vertical"
-            margin={{
-              top: 0, bottom: 0, left: 5, right: 5,
-            }}
-            onMouseDown={(state, event: MouseEvent) => {
-              if (event.target instanceof HTMLElement
-                && tooltipRef.current.contains(event.target)) {
-                return;
-              }
-              const rect = tooltipRef.current?.getBoundingClientRect();
-              const parentRect = chartRef.current?.current?.getBoundingClientRect();
-              if (!tooltipPosFrozen && rect && parentRect) {
-                setFrozenPos({ x: rect.x - parentRect.x, y: rect.y - parentRect.y });
-                setTooltipPozFrozen(true);
-                setTooltipFrozenPayload(state.activePayload);
-                setTooltipFrozenLabel(state.activeLabel);
-              } else {
-                setFrozenPos(undefined);
-                setTooltipPozFrozen(false);
-                setTooltipFrozenPayload(undefined);
-                setTooltipFrozenLabel(undefined);
-              }
-            }}
-          >
-            <YAxis
-              dataKey="key"
-              type="category"
-              width={2}
-              interval={0}
-              tick={false}
-            />
-            <XAxis type="number" />
-            <Tooltip
-              filterNull={!tooltipPosFrozen}
-              cursor={false}
-              animationDuration={0}
-              position={frozenPos}
-              content={(
-                <CustomTooltip
-                  frozenPos={tooltipPosFrozen}
-                  frozenPayload={tooltipFrozenPayload}
-                  frozenLabel={tooltipFrozenLabel}
-                  innerRef={tooltipRef}
-                  presets={presets}
-                  onClickRow={onClickRow}
-                />
-              )}
-              wrapperStyle={{ pointerEvents: 'auto' }}
-            />
-            <Bar dataKey="Preset default" stackId="a" fill={colors[0]} isAnimationActive={false} />
-            <Bar dataKey="Edited points" stackId="a" fill={colors[1]} isAnimationActive={false} />
-            <Bar dataKey="Edited message" stackId="a" fill={colors[8]} isAnimationActive={false} />
-            <Bar dataKey="Customized" stackId="a" fill={colors[3]} isAnimationActive={false} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    );
-  }
-  return null;
-};
-
-const RenderPreset: React.FC<{
-  value: PresetUsageData,
-  points: number,
-  variant: string,
-  VariantIcon: IconType,
-  graderHint: string,
-  studentFeedback: string,
-}> = (props) => {
-  const {
-    value,
-    points,
-    variant,
-    VariantIcon,
-    graderHint,
-    studentFeedback,
-  } = props;
-  switch (value.key) {
-    case 'placeholder': return null;
-    case 'none':
-      return (
-        <Alert
-          variant="info"
-          className="p-0 m-0 preset"
-        >
-          <Button disabled variant="info" size="sm" className="mr-2 align-self-center">
-            <Icon I={RiMessage2Line} className="mr-2" />
-            ?? points
-          </Button>
-          Custom (no preset)
-        </Alert>
-      );
-    default:
-      return (
-        <Alert
-          variant={variant}
-          className="p-0 m-0 preset"
-          style={{
-            width: '100%',
-            textOverflow: 'ellipsis',
-            overflow: 'hidden',
-          }}
-        >
-          <Button
-            disabled
-            variant={variant}
-            size="sm"
-            className="mr-2 align-self-center"
-          >
-            <Icon I={VariantIcon} className="mr-2" />
-            {pluralize(points, 'point', 'points')}
-          </Button>
-          {studentFeedback ?? graderHint}
-        </Alert>
-      );
-  }
-};
-
-type RechartPayload<T> = {
-  payload: T,
-  fill: string,
-  color: string,
-  name: string,
-  value: number,
-}
-
-const CustomTooltip: React.FC<{
-  active?: boolean,
-  frozenPayload?: RechartPayload<PresetUsageData>[],
-  payload?: RechartPayload<PresetUsageData>[],
-  frozenLabel?: string,
-  label?: string,
-  innerRef?: RefObject<HTMLDivElement>,
-  presets: Record<string, {
-    readonly points: number,
-    readonly graderHint: string,
-    readonly studentFeedback: string,
-  }>,
-  frozenPos?: boolean,
-  onClickRow?: (value: RechartPayload<PresetUsageData>) => void,
-}> = (props) => {
-  const {
-    presets,
-    active,
-    frozenPayload,
-    payload: defaultPayload,
-    frozenLabel,
-    label: defaultLabel,
-    innerRef,
-    frozenPos,
-    onClickRow,
-  } = props;
-  const payload = frozenPayload ?? defaultPayload;
-  const label = frozenLabel ?? defaultLabel;
-  if (active && payload?.length) {
-    const payload0 = payload[0].payload;
-    return (
-      <Card
-        border={frozenPos ? 'warning' : 'info'}
-        className="p-2 mb-0"
-        ref={innerRef}
-      >
-        <p style={{ maxWidth: '25em' }}>
-          {label === 'none' ? 'Custom (no preset)' : presets[label]?.studentFeedback ?? presets[label]?.graderHint}
-        </p>
-        <table className="table table-sm mb-0">
-          <tbody>
-            {payload.map((value, index) => (
-              <tr
-                // eslint-disable-next-line react/no-array-index-key
-                key={index}
-                className="py-1 my-1"
-                onClick={() => onClickRow?.(value)}
-              >
-                <td style={{ width: '2em', backgroundColor: value.fill }} />
-                <td>{value.name}</td>
-                <td>{value.value}</td>
-              </tr>
-            ))}
-            <tr>
-              <td />
-              <td><b>Total</b></td>
-              <td>{('Total' in payload0) && payload0.Total}</td>
-            </tr>
-          </tbody>
-        </table>
-      </Card>
-    );
-  }
-  return null;
-};
-
-const ShowLinks: React.FC<{
-  examId: string,
-  comments: { comment: GradingComment, registration: statsRubricHistograms['registrations'][number] }[],
-  presetUsage: PresetUsageData,
-  preset: GradingComment['presetComment'],
-  title: string,
-  show: boolean,
-  onClose: () => void,
-}> = (props) => {
-  const {
-    examId,
-    presetUsage,
-    preset,
-    comments,
-    title,
-    show,
-    onClose,
-  } = props;
-  return (
-    <Modal
-      size="xl"
-      centered
-      keyboard
-      scrollable
-      show={show}
-      onHide={onClose}
-    >
-      <Modal.Header closeButton>
-        <p style={{ whiteSpace: 'nowrap' }} className="pr-2">{title}</p>
-        <span className="w-100">
-          <RenderPreset
-            value={presetUsage}
-            graderHint={preset?.graderHint}
-            points={preset?.points}
-            studentFeedback={preset?.studentFeedback}
-            variant={variantForPoints(preset?.points)}
-            VariantIcon={iconForPoints(preset?.points)}
-          />
-        </span>
-      </Modal.Header>
-      <Modal.Body>
-        <table>
-          {comments.map(({ comment, registration }) => (
-            <tr>
-              <td style={{ whiteSpace: 'nowrap' }} className="pr-3">
-                <Link
-                  key={comment.id}
-                  target="blank"
-                  to={`/exams/${examId}/submissions/${registration.id}`}
-                >
-                  {`${registration.user.displayName}:`}
-                </Link>
-              </td>
-              <td className="w-100">
-                <Link
-                  key={comment.id}
-                  target="blank"
-                  to={`/exams/${examId}/submissions/${registration.id}`}
-                >
-                  <Alert
-                    variant={variantForPoints(comment.points)}
-                    className="w-100 p-0 m-0 preset"
-                  >
-                    <Button
-                      disabled
-                      variant={variantForPoints(comment.points)}
-                      size="sm"
-                      className="mr-2 align-self-center"
-                    >
-                      <Icon I={iconForPoints(comment.points)} className="mr-2" />
-                      {pluralize(comment.points, 'point', 'points')}
-                    </Button>
-                    {comment.message}
-                  </Alert>
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </table>
-      </Modal.Body>
-    </Modal>
   );
 };
 

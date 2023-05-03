@@ -301,7 +301,7 @@ class Exam < ApplicationRecord
       regs.to_h do |r|
         [
           r.user.username,
-          [r.current_score],
+          [r.current_score_percentage],
         ]
       end
     end

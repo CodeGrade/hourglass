@@ -37,6 +37,7 @@ const RenderCommentHistograms: React.FC<{
   qnum: number,
   pnum: number,
   bnum: number,
+  singlePart: boolean,
   eRubricKey: RubricPresetHistogramsUseRubrics$key,
   qRubricKey: RubricPresetHistogramsUseRubrics$key,
   pRubricKey: RubricPresetHistogramsUseRubrics$key,
@@ -49,6 +50,7 @@ const RenderCommentHistograms: React.FC<{
     qnum,
     pnum,
     bnum,
+    singlePart,
     eRubricKey,
     qRubricKey,
     pRubricKey,
@@ -63,6 +65,7 @@ const RenderCommentHistograms: React.FC<{
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
+        singlePart={singlePart}
         rubric={eRubricKey}
         comments={comments}
         registrations={registrations}
@@ -72,6 +75,7 @@ const RenderCommentHistograms: React.FC<{
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
+        singlePart={singlePart}
         rubric={qRubricKey}
         comments={comments}
         registrations={registrations}
@@ -81,6 +85,7 @@ const RenderCommentHistograms: React.FC<{
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
+        singlePart={singlePart}
         rubric={pRubricKey}
         comments={comments}
         registrations={registrations}
@@ -90,6 +95,7 @@ const RenderCommentHistograms: React.FC<{
         qnum={qnum}
         pnum={pnum}
         bnum={bnum}
+        singlePart={singlePart}
         rubric={bRubricKey}
         comments={comments}
         registrations={registrations}
@@ -233,6 +239,7 @@ const RenderCommentHistogram: React.FC<{
   qnum: number,
   pnum: number,
   bnum: number,
+  singlePart: boolean,
   rubric: RubricPresetHistogramsUseRubrics$key,
   comments: RubricPresetHistograms['registrations'][number]['gradingComments'][],
   registrations: RubricPresetHistograms['registrations'],
@@ -242,6 +249,7 @@ const RenderCommentHistogram: React.FC<{
     qnum,
     pnum,
     bnum,
+    singlePart,
     rubric: rubricKey,
     comments,
     registrations,
@@ -373,6 +381,9 @@ const RenderCommentHistogram: React.FC<{
             comments={linksComments}
             title={linksTitle}
             show={showLinks}
+            qnum={qnum}
+            pnum={pnum}
+            singlePart={singlePart}
             onClose={() => setShowLinks(false)}
           />
         )}
@@ -557,6 +568,7 @@ const RenderRubricPresetHistograms: React.FC<{
                       qnum={q.index}
                       pnum={p.index}
                       bnum={b.index}
+                      singlePart={singlePart}
                       eRubricKey={res.rootRubric}
                       qRubricKey={q.rootRubric}
                       pRubricKey={p.rootRubric}

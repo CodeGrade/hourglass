@@ -20,6 +20,9 @@ export const ShowLinks: React.FC<{
   preset: GradingComment['presetComment'],
   title: string,
   show: boolean,
+  qnum: number,
+  pnum: number,
+  singlePart: boolean,
   onClose: () => void,
 }> = (props) => {
   const {
@@ -29,6 +32,9 @@ export const ShowLinks: React.FC<{
     comments,
     title,
     show,
+    qnum,
+    pnum,
+    singlePart,
     onClose,
   } = props;
   return (
@@ -55,42 +61,46 @@ export const ShowLinks: React.FC<{
       </Modal.Header>
       <Modal.Body>
         <table>
-          {comments.map(({ comment, registration }) => (
-            <tr>
-              <td style={{ whiteSpace: 'nowrap' }} className="pr-3">
-                <Link
-                  key={comment.id}
-                  target="blank"
-                  to={`/exams/${examId}/submissions/${registration.id}`}
-                >
-                  {`${registration.user.displayName}:`}
-                </Link>
-              </td>
-              <td className="w-100">
-                <Link
-                  key={comment.id}
-                  target="blank"
-                  to={`/exams/${examId}/submissions/${registration.id}`}
-                >
-                  <Alert
-                    variant={variantForPoints(comment.points)}
-                    className="w-100 p-0 m-0 preset"
+          {comments.map(({ comment, registration }) => {
+            const anchor = singlePart ? `question-${qnum}` : `question-${qnum}-part-${pnum}`;
+            const submissionLink = `/exams/${examId}/submissions/${registration.id}#${anchor}`;
+            return (
+              <tr>
+                <td style={{ whiteSpace: 'nowrap' }} className="pr-3">
+                  <Link
+                    key={comment.id}
+                    target="blank"
+                    to={submissionLink}
                   >
-                    <Button
-                      disabled
+                    {`${registration.user.displayName}:`}
+                  </Link>
+                </td>
+                <td className="w-100">
+                  <Link
+                    key={comment.id}
+                    target="blank"
+                    to={submissionLink}
+                  >
+                    <Alert
                       variant={variantForPoints(comment.points)}
-                      size="sm"
-                      className="mr-2 align-self-center"
+                      className="w-100 p-0 m-0 preset"
                     >
-                      <Icon I={iconForPoints(comment.points)} className="mr-2" />
-                      {pluralize(comment.points, 'point', 'points')}
-                    </Button>
-                    {comment.message}
-                  </Alert>
-                </Link>
-              </td>
-            </tr>
-          ))}
+                      <Button
+                        disabled
+                        variant={variantForPoints(comment.points)}
+                        size="sm"
+                        className="mr-2 align-self-center"
+                      >
+                        <Icon I={iconForPoints(comment.points)} className="mr-2" />
+                        {pluralize(comment.points, 'point', 'points')}
+                      </Button>
+                      {comment.message}
+                    </Alert>
+                  </Link>
+                </td>
+              </tr>
+            );
+          })}
         </table>
       </Modal.Body>
     </Modal>

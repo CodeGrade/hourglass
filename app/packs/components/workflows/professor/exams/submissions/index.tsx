@@ -3,6 +3,7 @@ import React, {
   useCallback,
   useContext,
   Suspense,
+  useEffect,
 } from 'react';
 import {
   useParams,
@@ -10,6 +11,7 @@ import {
   Route,
   Link,
   Redirect,
+  useLocation,
 } from 'react-router-dom';
 import { DateTime, LocaleOptions } from 'luxon';
 import { Container, Button, Table } from 'react-bootstrap';
@@ -24,6 +26,7 @@ import ExamTimelineViewer, { SnapshotsState } from '@proctor/registrations/show/
 import ExamViewerStudent from '@student/registrations/show';
 import { FinalizeDialog, finalizeItemMutation } from '@proctor/exams';
 import { AlertContext } from '@hourglass/common/alerts';
+import { scrollToElem } from '@student/exams/show/helpers';
 import { examsFinalizeItemMutation } from '@proctor/exams/__generated__/examsFinalizeItemMutation.graphql';
 import Icon from '@student/exams/show/components/Icon';
 import ErrorBoundary from '@hourglass/common/boundary';
@@ -464,6 +467,10 @@ const ExamSubmissionStaff: React.FC = () => (
 
 const ExamSubmissionStaffQuery: React.FC = () => {
   const { registrationId } = useParams<{ registrationId: string }>();
+  const { hash } = useLocation();
+  useEffect(() => {
+    setTimeout(() => scrollToElem(hash.substring(1)));
+  }, [hash]);
   const queryData = useLazyLoadQuery<submissionsStaffQuery>(
     graphql`
     query submissionsStaffQuery($registrationId: ID!, $withRubric: Boolean!) {

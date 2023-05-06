@@ -65,6 +65,9 @@
         lzma
         watchman
         ruby_2_7.devEnv
+
+        # passenger compilation libs
+        libxcrypt
       ]);
 
       shellHook = ''

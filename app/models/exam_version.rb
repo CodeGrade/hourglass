@@ -369,9 +369,7 @@ class ExamVersion < ApplicationRecord
 
   def part_scores_for(reg)
     detailed_grade_breakdown_for(reg).map do |q|
-      q.map do |p|
-        p['score']
-      end
+      q.pluck('score')
     end
   end
 

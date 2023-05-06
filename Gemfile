@@ -60,7 +60,9 @@ group :development, :test do
 end
 
 group :development do
-  gem 'better_errors'
+  # https://github.com/BetterErrors/better_errors/issues/516
+  gem 'better_errors', '2.9.1'
+
   gem 'binding_of_caller'
   gem 'rubocop-rails'
   gem 'spring'

@@ -20,7 +20,7 @@ import { nonEmptyRubric } from '@grading/UseRubrics';
 import { iconForPoints, variantForPoints } from '@hourglass/workflows/grading';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
 import { Preset, Rubric } from '@professor/exams/types';
-import { RubricPresetHistogramsUseRubrics, RubricPresetHistogramsUseRubrics$key } from './__generated__/RubricPresetHistogramsUseRubrics.graphql';
+import { RubricPresetHistogramsUseRubrics$data, RubricPresetHistogramsUseRubrics$key } from './__generated__/RubricPresetHistogramsUseRubrics.graphql';
 import {
   GradingComment,
   GradingCommentConnection,
@@ -30,7 +30,7 @@ import {
 } from './utils';
 import { ShowLinks, RenderPreset } from './ShowLinks';
 import CustomTooltip from './CustomTooltip';
-import { RubricPresetHistograms, RubricPresetHistograms$key } from './__generated__/RubricPresetHistograms.graphql';
+import { RubricPresetHistograms$data, RubricPresetHistograms$key } from './__generated__/RubricPresetHistograms.graphql';
 
 const RenderCommentHistograms: React.FC<{
   examId: string,
@@ -42,8 +42,8 @@ const RenderCommentHistograms: React.FC<{
   qRubricKey: RubricPresetHistogramsUseRubrics$key,
   pRubricKey: RubricPresetHistogramsUseRubrics$key,
   bRubricKey: RubricPresetHistogramsUseRubrics$key,
-  comments: RubricPresetHistograms['registrations'][number]['gradingComments'][],
-  registrations: RubricPresetHistograms['registrations'],
+  comments: RubricPresetHistograms$data['registrations'][number]['gradingComments'][],
+  registrations: RubricPresetHistograms$data['registrations'],
 }> = (props) => {
   const {
     examId,
@@ -184,7 +184,7 @@ function computePresets(
 }
 
 function computeBuckets(
-  rawRubric: RubricPresetHistogramsUseRubrics,
+  rawRubric: RubricPresetHistogramsUseRubrics$data,
   rubric: Rubric,
   byPresets: Record<string, {
     newPoints: GradingComment[],
@@ -241,8 +241,8 @@ const RenderCommentHistogram: React.FC<{
   bnum: number,
   singlePart: boolean,
   rubric: RubricPresetHistogramsUseRubrics$key,
-  comments: RubricPresetHistograms['registrations'][number]['gradingComments'][],
-  registrations: RubricPresetHistograms['registrations'],
+  comments: RubricPresetHistograms$data['registrations'][number]['gradingComments'][],
+  registrations: RubricPresetHistograms$data['registrations'],
 }> = (props) => {
   const {
     examId,
@@ -335,7 +335,7 @@ const RenderCommentHistogram: React.FC<{
   );
   const [linksComments, setLinksComments] = useState<{
     comment: GradingComment,
-    registration: RubricPresetHistograms['registrations'][number],
+    registration: RubricPresetHistograms$data['registrations'][number],
   }[]>(undefined);
   const [showLinks, setShowLinks] = useState(false);
   const [linksTitle, setLinksTitle] = useState<string>('');

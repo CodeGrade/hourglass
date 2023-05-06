@@ -1,4 +1,4 @@
-import { RubricPresetHistograms } from './__generated__/RubricPresetHistograms.graphql';
+import { RubricPresetHistograms$data } from './__generated__/RubricPresetHistograms.graphql';
 
 export type RechartPayload<T> = {
   payload: T,
@@ -21,7 +21,7 @@ export type PresetUsageData = {
   Total: number,
 };
 
-export type GradingCommentConnection = RubricPresetHistograms['registrations'][number]['gradingComments'];
+export type GradingCommentConnection = RubricPresetHistograms$data['registrations'][number]['gradingComments'];
 export type GradingComment = GradingCommentConnection['edges'][number]['node'];
 
 export const colors = [

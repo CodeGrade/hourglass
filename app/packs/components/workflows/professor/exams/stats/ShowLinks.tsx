@@ -10,12 +10,12 @@ import { iconForPoints, variantForPoints } from '@hourglass/workflows/grading';
 import { pluralize } from '@hourglass/common/helpers';
 import { IconType } from 'react-icons';
 import { RiMessage2Line } from 'react-icons/ri';
-import { RubricPresetHistograms } from './__generated__/RubricPresetHistograms.graphql';
+import { RubricPresetHistograms$data } from './__generated__/RubricPresetHistograms.graphql';
 import { GradingComment, PresetUsageData } from './utils';
 
 export const ShowLinks: React.FC<{
   examId: string,
-  comments: { comment: GradingComment, registration: RubricPresetHistograms['registrations'][number] }[],
+  comments: { comment: GradingComment, registration: RubricPresetHistograms$data['registrations'][number] }[],
   presetUsage: PresetUsageData,
   preset: GradingComment['presetComment'],
   title: string,

@@ -88,7 +88,7 @@ function round(n: number, numDigits: number) {
   return Math.round(n * 10 ** numDigits) / 10 ** numDigits;
 }
 
-const RenderStats: React.FC<{
+const RenderStats: React.FC<React.PropsWithChildren & {
   width?: string | number,
   height?: string | number,
   dataPoints: number[];

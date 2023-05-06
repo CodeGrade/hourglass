@@ -522,12 +522,10 @@ class ExamVersion < ApplicationRecord
   def part_tree
     db_questions.includes(parts: :body_items).map do |q|
       q.parts.map do |p|
-        yield(**{
-          question: q,
-          part: p,
-          qnum: q.index,
-          pnum: p.index,
-        })
+        yield(question: q,
+              part: p,
+              qnum: q.index,
+              pnum: p.index)
       end
     end
   end

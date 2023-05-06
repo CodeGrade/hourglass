@@ -42,7 +42,7 @@ module Bottlenose
           if role == 'title'
             []
           else
-            users.map { |u| u['username'] }
+            users.pluck('username')
           end
         end
       end.flatten

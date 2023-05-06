@@ -29,7 +29,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     sign_in reg.user
 
     get export_file_api_professor_version_path(ev)
-    parsed = JSON.parse(response.body)
+    parsed = response.parsed_body
     assert_equal compact_blank(ev.export_exam_info), compact_blank(parsed['info'])
     assert_equal compact_blank(ev.files) || [], compact_blank(parsed['files']) || []
   end

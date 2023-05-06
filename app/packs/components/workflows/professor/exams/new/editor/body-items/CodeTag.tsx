@@ -287,19 +287,19 @@ const EditAnswer: React.FC<{
     onChange,
   } = props;
   const [showModal, setShowModal] = useState(false);
-  const examReferences = useContext(ExamFilesContext);
-  const questionReferences = useContext(QuestionFilesContext);
-  const partReferences = useContext(PartFilesContext);
+  const { references: examReferences } = useContext(ExamFilesContext);
+  const { references: questionReferences } = useContext(QuestionFilesContext);
+  const { references: partReferences } = useContext(PartFilesContext);
   let references: readonly FileRef[];
   switch (choice) {
     case 'exam':
-      references = examReferences.references;
+      references = examReferences;
       break;
     case 'question':
-      references = questionReferences.references;
+      references = questionReferences;
       break;
     case 'part':
-      references = partReferences.references;
+      references = partReferences;
       break;
     default:
       throw new ExhaustiveSwitchError(choice);

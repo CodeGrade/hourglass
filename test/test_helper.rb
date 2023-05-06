@@ -39,6 +39,7 @@ module ActionDispatch
     self.use_transactional_tests = false
 
     setup do
+      Capybara.default_driver = :selenium_chrome_headless
       DatabaseCleaner.clean_with :truncation
     end
 
@@ -87,7 +88,3 @@ end
 DatabaseCleaner.strategy = :deletion
 DatabaseCleaner.start
 DatabaseCleaner.clean_with :truncation
-
-Capybara::Webkit.configure do |config|
-  config.allow_url('test.host')
-end

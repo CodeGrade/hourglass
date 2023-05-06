@@ -374,7 +374,7 @@ DEPENDENCIES
   react-rails
   rubocop-rails
   rubyzip
-  spring
+  spring (= 4.0.0)
   tzinfo-data
   web-console (>= 4.1.0)
   webdrivers

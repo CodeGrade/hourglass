@@ -44,7 +44,7 @@ gem 'pretender'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'activerecord_json_validator', '~> 2.0'
-gem 'json-schema', '~> 2.8'
+gem 'json-schema', '~> 4.0'
 
 gem 'listen', '~> 3.3'
 

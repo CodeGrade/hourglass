@@ -3,7 +3,7 @@ import { MapStateToProps } from 'react-redux';
 import { DateTime } from 'luxon';
 import { editorQuery$data } from '@professor/exams/new/editor/__generated__/editorQuery.graphql';
 import CodeMirror from 'codemirror';
-import { ExamShowContents } from './components/__generated__/ExamShowContents.graphql';
+import { ExamShowContents$data } from './components/__generated__/ExamShowContents.graphql';
 
 export type ExamTakerAction =
   LoadExamAction |
@@ -490,7 +490,7 @@ export interface AnomalyListener {
 }
 
 export type Policy = editorQuery$data['examVersion']['policies'][number];
-export type PolicyExemption = ExamShowContents['myRegistration']['policyExemptions'][number];
+export type PolicyExemption = ExamShowContents$data['myRegistration']['policyExemptions'][number];
 
 export function policyPermits<P extends string>(
   policy: readonly P[],

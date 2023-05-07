@@ -1,9 +1,32 @@
 # frozen_string_literal: true
 
 module Types
+  class GuardWrapper
+    attr_accessor :class, :object
+
+    def initialize(cls, object)
+      @class = cls
+      @object = object
+    end
+  end
+
   # The base class of Hourglass objects returned by GraphQL
   class BaseObject < GraphQL::Schema::Object
     field_class Types::BaseField
+
+    def self.guard(proc)
+      @guard_proc = proc
+    end
+
+    def self.authorized?(obj, ctx)
+      return true unless @guard_proc
+
+      wrapped = Types::GuardWrapper.new(self, obj)
+      answer = @guard_proc.call(wrapped, nil, ctx)
+      return true if answer
+
+      raise GraphQL::ExecutionError, "You do not have permission to view that information."
+    end
 
     module Guards
       def self.exam_role(user, ctx)

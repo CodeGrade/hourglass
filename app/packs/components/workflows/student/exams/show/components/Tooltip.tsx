@@ -27,6 +27,7 @@ const Tooltip: React.FC<TooltipProps> = (props) => {
     ? (
       <BSTooltip
         className={className}
+        style={{ pointerEvents: 'none' }}
         id={null}
       >
         {message}

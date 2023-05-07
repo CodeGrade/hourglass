@@ -18,6 +18,7 @@ function pulse(elem: HTMLElement): void {
 export function scrollToElem(id: string, smooth = true): void {
   setTimeout(() => {
     const elem = document.getElementById(id);
+    if (!elem) { return; }
     const elemTop = elem.getBoundingClientRect().top + window.pageYOffset;
     window.scrollTo({
       left: 0,

@@ -10,8 +10,8 @@ RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 WORKDIR /home/app/hourglass
 COPY Gemfile /home/app/hourglass/Gemfile
 COPY Gemfile.lock /home/app/hourglass/Gemfile.lock
-RUN bash -lc 'rvm install ruby-2.7.8'
-RUN bash -lc 'rvm --default use ruby-2.7.8'
+RUN bash -lc 'rvm install ruby-3.0.2'
+RUN bash -lc 'rvm --default use ruby-3.0.2'
 RUN bundle install --without test development
 
 COPY package.json /home/app/hourglass/package.json

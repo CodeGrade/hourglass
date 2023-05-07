@@ -10,7 +10,7 @@ gem 'rails', '~> 6.1'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
 
-gem 'graphql', '~> 1.0'
+gem 'graphql', '~> 2.0.0'
 gem 'graphql-batch'
 
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker

@@ -1,9 +1,10 @@
 GIT
   remote: https://github.com/CodeGrade/omniauth-bottlenose
-  revision: 3e7c696c9b1da6823f5936a5bc7b061f3630720a
+  revision: 62026630bf96874214a3b20b2c859bad378a6d77
+  ref: 6202663
   specs:
-    omniauth-bottlenose (0.1.0)
-      omniauth-oauth2 (~> 1.7.0)
+    omniauth-bottlenose (0.2.0)
+      omniauth-oauth2 (~> 1.8.0)
 
 GEM
   remote: https://rubygems.org/
@@ -203,9 +204,9 @@ GEM
       hashie (>= 3.4.6)
       rack (>= 2.2.3)
       rack-protection
-    omniauth-oauth2 (1.7.3)
+    omniauth-oauth2 (1.8.0)
       oauth2 (>= 1.4, < 3)
-      omniauth (>= 1.9, < 3)
+      omniauth (~> 2.0)
     omniauth-rails_csrf_protection (1.0.1)
       actionpack (>= 4.2)
       omniauth (~> 2.0)
@@ -373,7 +374,7 @@ DEPENDENCIES
   listen (~> 3.3)
   minitest-reporters
   omniauth-bottlenose!
-  omniauth-oauth2 (~> 1.7.0)
+  omniauth-oauth2 (~> 1.8.0)
   omniauth-rails_csrf_protection
   passenger (>= 5.3.2)
   pg (>= 0.18, < 2.0)

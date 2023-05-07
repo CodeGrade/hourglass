@@ -1313,7 +1313,7 @@ const Grade: React.FC<{
   );
   const [curCompletionStatus, setCurCompletionStatus] = useState<RubricCompletionStatus[]>([]);
   const mergedStatus: CompletionStatus[] = curCompletionStatus.map(
-    (cCS) => Object.values(cCS).reduce(combineCompletionAny, 'incomplete'),
+    (cCS) => (cCS ? Object.values(cCS).reduce(combineCompletionAny, 'incomplete') : undefined),
   );
   const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
   const singlePart = dbQuestions[qnum].parts.length === 1

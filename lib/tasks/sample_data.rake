@@ -15,6 +15,7 @@ end
 NUM_SIM_USERS = 1000
 
 def create_simulation_users(lecture:, lab:, room:, exam_version:)
+  puts "Creating simulation users..."
   (0..NUM_SIM_USERS).each do |i|
     student = create(:user, username: "stresstest#{i}")
     create(:student_registration, user: student, section: lecture)
@@ -26,6 +27,7 @@ end
 
 def make_sample_data
   ActiveRecord::Base.transaction do
+    puts "Loading sample data"
     create(:admin, username: 'admin')
     make_cs2500
     make_cs3500
@@ -33,6 +35,7 @@ def make_sample_data
 end
 
 def make_cs2500
+  puts "Creating CS2500..."
   fall2021 = create(:term, year: 2021, semester: Term.semesters['fall'])
   cs2500 = create(:course, title: 'CS 2500', term: fall2021)
   cs2500lec = create(:section, :lecture, course: cs2500)
@@ -82,6 +85,7 @@ def make_cs2500
 end
 
 def make_cs3500
+  puts "Creating CS3500..."
   spring2022 = create(:term, year: 2022, semester: Term.semesters['spring'])
   cs3500 = create(:course, title: 'CS 3500', term: spring2022)
   cs3500lec = create(:section, :lecture, course: cs3500)

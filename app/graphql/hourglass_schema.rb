@@ -15,11 +15,11 @@ class HourglassSchema < GraphQL::Schema
   # Feedback and error messages in development mode will be 
   # more informative than in production/test modes.
   if Rails.env.development?
-    use GraphQL::Guard.new(
-      not_authorized:  lambda do |type, field|
-        GraphQL::ExecutionError.new("Not authorized to access #{type}.#{field}")
-      end,
-    )
+    # use GraphQL::Guard.new(
+    #   not_authorized:  lambda do |type, field|
+    #     GraphQL::ExecutionError.new("Not authorized to access #{type}.#{field}")
+    #   end,
+    # )
 
     def self.unauthorized_object(error)
       # Add a top-level error to the response instead of returning nil:
@@ -38,11 +38,11 @@ class HourglassSchema < GraphQL::Schema
       super(query_str, **kwargs)
     end
   else
-    use GraphQL::Guard.new(
-      not_authorized:  lambda do |type, field|
-        GraphQL::ExecutionError.new("You do not have permission to view that data.")
-      end,
-    )
+    # use GraphQL::Guard.new(
+    #   not_authorized:  lambda do |type, field|
+    #     GraphQL::ExecutionError.new("You do not have permission to view that data.")
+    #   end,
+    # )
   
     def self.unauthorized_object(error)
       # Add a top-level error to the response instead of returning nil:

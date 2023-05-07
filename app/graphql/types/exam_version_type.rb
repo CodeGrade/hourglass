@@ -17,7 +17,7 @@ module Types
           [ q, q.parts.map do |p| [p, p.body_items.to_a] end ]
         end.flatten
         all_qpbs.each do |qpb|
-          resolved = HourglassSchema.resolve_type(qpb.class, qpb, ctx)
+          resolved, _ = HourglassSchema.resolve_type(qpb.class, qpb, ctx)
           Guards.cache(
             ctx[:access_cache], 
             [resolved.name, qpb.id, :visible, ctx[:current_user].id],
@@ -25,7 +25,7 @@ module Types
           )
         end
         [obj.object.rubrics, obj.object.db_references, obj.object.rubric_presets, obj.object.preset_comments].flatten.each do |r|
-          resolved = HourglassSchema.resolve_type(r.class, r, ctx)
+          resolved, _ = HourglassSchema.resolve_type(r.class, r, ctx)
           Guards.cache(
             ctx[:access_cache], 
             [resolved.name, r.id, :visible, ctx[:current_user].id],

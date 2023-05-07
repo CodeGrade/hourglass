@@ -10,18 +10,17 @@ gem 'rails', '~> 6.1'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
 
-gem 'graphql', '~> 1.12.17'
+gem 'graphql', '~> 2.0.0'
 gem 'graphql-batch'
-gem 'graphql-guard'
 
 # Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
 gem 'webpacker', '~> 6.0.0.rc.5'
 
 gem 'react-rails'
 
-gem 'devise', '~> 4.8.0'
-gem 'omniauth-bottlenose', git: 'https://github.com/CodeGrade/omniauth-bottlenose'
-gem 'omniauth-oauth2', '~> 1.7.0'
+gem 'devise', '~> 4.9.0'
+gem 'omniauth-bottlenose', git: 'https://github.com/CodeGrade/omniauth-bottlenose', ref: '6202663'
+gem 'omniauth-oauth2', '~> 1.8.0'
 gem 'omniauth-rails_csrf_protection'
 
 gem 'bootstrap_form', '>= 4.2.0'
@@ -44,7 +43,7 @@ gem 'pretender'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'activerecord_json_validator', '~> 2.0'
-gem 'json-schema', '~> 2.8'
+gem 'json-schema', '~> 4.0'
 
 gem 'listen', '~> 3.3'
 

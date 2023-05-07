@@ -25,6 +25,7 @@ class GradingLock < ApplicationRecord
 
   delegate :exam_version, to: :registration
   delegate :exam, to: :registration
+  delegate :course, to: :exam
 
   scope :incomplete, -> { where(completed_by: nil) }
   scope :complete, -> { where.not(completed_by: nil) }

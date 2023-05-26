@@ -1402,7 +1402,7 @@ const Grade: React.FC<{
               return (
                 <GradeBodyItem
                   // eslint-disable-next-line react/no-array-index-key
-                  key={bnum}
+                  key={`${res.id}-${bnum}`}
                   info={b.info as BodyItemInfo}
                   studentAnswer={studentAnswer}
                   expectedAnswer={expectedAnswer}
@@ -1689,15 +1689,28 @@ const GradeOnePartQuery: React.FC = () => {
     { registrationId, withRubric: true },
   );
 
-  return <GradeOnePartHelp registration={res.registration} qnum={qnum} pnum={pnum} />;
+  return (
+    <GradeOnePartHelp
+      registrationId={registrationId}
+      registration={res.registration}
+      qnum={qnum}
+      pnum={pnum}
+    />
+  );
 };
 
 const GradeOnePartHelp: React.FC<{
   qnum: string,
   pnum: string,
+  registrationId: string,
   registration: gradingQuery['response']['registration'],
 }> = (props) => {
-  const { registration, qnum, pnum } = props;
+  const {
+    registrationId,
+    registration,
+    qnum,
+    pnum,
+  } = props;
   const { qpPairs } = registration.examVersion;
   const indexOfQP = qpPairs.findIndex((qp) => (
     qp.qnum === Number(qnum) && qp.pnum === Number(pnum)
@@ -1735,7 +1748,7 @@ const GradeOnePartHelp: React.FC<{
             {qpPairs.map((qp, index) => (
               <Carousel.Item
                 // eslint-disable-next-line react/no-array-index-key
-                key={index}
+                key={`${registrationId}-${index}`}
                 className="mb-4"
               >
                 <Col className="overflow-auto-y">

@@ -1823,7 +1823,7 @@ const RenderQnumTree : React.FC<{
         if (multipart) {
           return (
             // eslint-disable-next-line react/no-array-index-key
-            <li key={qnum}>
+            <li key={`${examId}-${qnum}`}>
               {`Question ${qnum + 1}:`}
               <RenderPnumTree
                 info={byQnum}
@@ -1836,7 +1836,7 @@ const RenderQnumTree : React.FC<{
         }
         return (
           // eslint-disable-next-line react/no-array-index-key
-          <li key={qnum}>
+          <li key={`${examId}-${qnum}`}>
             <CollapsibleQnumTree
               qnum={qnum}
               info={byQnum}
@@ -1920,7 +1920,7 @@ const RenderPnumTree : React.FC<{
     <ul className={className}>
       {info.map((items, pnum) => (
         // eslint-disable-next-line react/no-array-index-key
-        <li key={pnum}>
+        <li key={`${examId}-${pnum}`}>
           <CollapsiblePnumTree
             pnum={pnum}
             items={items}

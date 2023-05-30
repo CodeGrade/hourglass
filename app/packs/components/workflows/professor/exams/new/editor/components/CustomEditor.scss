@@ -1,8 +1,8 @@
 @import 'node_modules/bootstrap/scss/functions';
 @import 'node_modules/bootstrap/scss/variables';
 @import 'node_modules/bootstrap/scss/mixins';
-@import 'react-quill/dist/quill.snow.css';
-@import 'react-quill/dist/quill.bubble.css';
+@import '@kylesferrazza/react-quill/dist/quill.snow.css';
+@import '@kylesferrazza/react-quill/dist/quill.bubble.css';
 
 .ql-container {
   font-size: unset;
@@ -60,14 +60,14 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 @each $color, $value in $theme-colors {
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-button-active,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-button:hover,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-button:hover,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-button:active,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-button[aria-expanded="true"],
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-item:hover,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-item:active,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .remirror-menu-item:focus {
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .MuiButtonBase-root,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .MuiIconButton-root,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .MuiButtonBase-root:hover,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar .MuiButtonBase-root:active,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar button.remirror-menu-button[aria-expanded="true"],
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar button.remirror-menu-item:hover,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar button.remirror-menu-item:active,
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar button.remirror-menu-item:focus {
     background-color: theme-color-level($color, $alert-bg-level) !important;
     border-color: theme-color-level($color, $alert-border-level) !important;
     color: theme-color-level($color, $alert-color-level) !important;
@@ -82,16 +82,16 @@
     border-top-left-radius: var(--rmr-radius-border);
     border-top-right-radius: var(--rmr-radius-border);
     padding: 2px;
-    > button, > .remirror-group > button, > .remirror-group > .remirror-role > button {
+    > button, > div.MuiBox-root > button, > div.MuiBox-root > .remirror-role > button {
       padding: 3px; 
       width: 24px;
       height: 24px;
     }
-    > .remirror-group > .remirror-role:not(:first-child) > button {
+    > div.MuiBox-root > .remirror-role:not(:first-child) > button {
       border-bottom-left-radius: 0px;
       border-top-left-radius: 0px;
     }
-    > .remirror-group > .remirror-role:not(:last-child) > button {
+    > div.MuiBox-root > .remirror-role:not(:last-child) > button {
       border-bottom-right-radius: 0px;
       border-top-right-radius: 0px;
     }
@@ -148,3 +148,4 @@
       }
     }
   }
+}

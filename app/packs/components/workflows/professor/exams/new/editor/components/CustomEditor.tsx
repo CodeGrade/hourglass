@@ -3,20 +3,39 @@ import React, {
   useEffect,
   useRef,
 } from 'react';
-import ReactQuill from 'react-quill';
+import ReactQuill from '@kylesferrazza/react-quill';
 import QuillPasteSmart from 'quill-paste-smart';
-import { 
+import {
   useRemirror,
   ThemeProvider,
   Remirror,
   EditorComponent,
-  ToolbarItemUnion,
-  ComponentItem,
+  Toolbar,
+  VerticalDivider,
+  FloatingToolbar,
+  useCommands,
+  useActive,
+  CommandButtonGroup,
+  DropdownButton,
+  CommandMenuItem,
+  ToggleBoldButton,
+  ToggleItalicButton,
+  ToggleUnderlineButton,
+  ToggleStrikeButton,
+  ToggleCodeButton,
+  ToggleSubscriptButton,
+  ToggleSuperscriptButton,
+  ToggleBlockquoteButton,
+  ToggleCodeBlockButton,
+  ToggleOrderedListButton,
+  ToggleBulletListButton,
+  ToggleHeadingMenuItem,
+  CommandButton,
 } from '@remirror/react';
+import { FindExtension, FindOptions } from '@remirror/extension-find';
 import { AllStyledComponent } from '@remirror/styles/emotion';
-import { BubbleMenu } from './RemirrorBubbleMenu';
-import { TopToolbar } from './RemirrorTopToolbar';
-import { 
+import '@remirror/styles/all.css';
+import {
   FontFamilyExtension,
   FontSizeExtension,
   BoldExtension, BoldOptions,
@@ -31,17 +50,19 @@ import {
   BlockquoteExtension,
   CodeExtension,
   CodeBlockExtension, CodeBlockOptions,
+  LinkExtension,
   LinkOptions,
   NodeFormattingExtension,
   TrailingNodeExtension, TrailingNodeOptions,
-  SearchExtension, SearchOptions,
   BulletListExtension,
   OrderedListExtension,
   PlaceholderExtension, PlaceholderOptions,
 } from 'remirror/extensions';
+
+// import { BubbleMenu } from './RemirrorBubbleMenu';
+// import { TopToolbar } from './RemirrorTopToolbar';
 import './CustomEditor.scss';
-import ErrorBoundary from '@hourglass/common/boundary';
-import { prosemirrorNodeToHtml, RemirrorEventListenerProps } from 'remirror';
+import { ActiveFromExtensions, CoreIcon } from 'remirror';
 
 ReactQuill.Quill.register('modules/clipboard', QuillPasteSmart, true);
 
@@ -62,7 +83,7 @@ export interface WysiwygOptions
     DropCursorOptions,
     HeadingOptions,
     LinkOptions,
-    SearchOptions,
+    FindOptions,
     TrailingNodeOptions,
     PlaceholderOptions {}
 
@@ -70,23 +91,25 @@ const DEFAULT_OPTIONS: WysiwygOptions = {
   ...BoldExtension.defaultOptions,
   ...CodeBlockExtension.defaultOptions,
   ...DropCursorExtension.defaultOptions,
-  ...SearchExtension.defaultOptions,
+  ...FindExtension.defaultOptions,
+  ...LinkExtension.defaultOptions,
   ...TrailingNodeExtension.defaultOptions,
   ...HeadingExtension.defaultOptions,
   ...PlaceholderExtension.defaultOptions,
 };
 
-const RemirrorEditor: React.FC<React.PropsWithChildren<CustomEditorProps & { 
-    options?: WysiwygOptions,
-  }>> = (props) => {
+const RemirrorEditor: React.FC<React.PropsWithChildren<CustomEditorProps & {
+  options?: WysiwygOptions,
+  readOnly?: boolean,
+}>> = (props) => {
   const {
     value,
     placeholder,
-    className,
-    theme,
-    onChange,
-    disabled,
-    disableTab,
+    // className,
+    // theme,
+    // onChange,
+    // disabled,
+    // disableTab,
     options = DEFAULT_OPTIONS,
     children,
   } = props;
@@ -98,55 +121,41 @@ const RemirrorEditor: React.FC<React.PropsWithChildren<CustomEditorProps & {
       new UnderlineExtension(),
       new StrikeExtension(),
       new PlaceholderExtension({ placeholder }),
-      new HeadingExtension({ levels: [1,2,3,4,5,6] }),
+      new HeadingExtension({ levels: [1, 2, 3, 4, 5, 6] }),
       new CodeExtension(),
       new SubExtension(),
       new SupExtension(),
       new TextColorExtension({}),
       new BlockquoteExtension(),
       new FontFamilyExtension(),
-      new FontSizeExtension({
-        defaultSize: '16',
-        unit: 'px',
-      }),
+      new FontSizeExtension({}),
       new BulletListExtension({}),
       new OrderedListExtension({}),
-      new NodeFormattingExtension(disableTab ? { indents: [] } : {}),
+      new NodeFormattingExtension({}),
       new CodeBlockExtension({}),
     ],
-    [placeholder]);
-  const { manager, state, setState } = useRemirror({
-    extensions: extensions,
+    [placeholder],
+  );
+  const { manager, state } = useRemirror({
+    extensions,
     content: value,
     selection: 'end',
     stringHandler: 'html',
   });
-  const updateState = useCallback((parameter: RemirrorEventListenerProps<Remirror.Extensions>) => {
-    setState(parameter.state);
-    if (parameter.tr?.docChanged && onChange) {
-      onChange(prosemirrorNodeToHtml(parameter.state.doc), null, "user", null);
-    }
-  }, [setState, onChange]);
   return (
-    <ErrorBoundary>
-      <AllStyledComponent className='position-relative'>
-        <ThemeProvider>
-          <Remirror 
-            manager={manager}
-            initialContent={state}
-            onChange={updateState}
-            editable={!disabled}
-            classNames={['position-static']}
-          >
-            {theme === 'snow' && !disabled && <TopToolbar items={remirrorToolbarOptions} refocusEditor label="Top Toolbar" />}
-            {theme !== 'snow' && <BubbleMenu enabled={!disabled} items={remirrorToolbarOptions} />}
-            <EditorComponent />
-            {children}
-          </Remirror>
-        </ThemeProvider>
-      </AllStyledComponent>
-    </ErrorBoundary>
-  )
+    <AllStyledComponent>
+      <ThemeProvider>
+        <Remirror manager={manager} initialContent={state}>
+          {/* <TopToolbar items={remirrorToolbarOptions} refocusEditor label="Top Toolbar" /> */}
+          <WysiwygToolbar />
+          <EditorComponent />
+          <FloatingToolbar />
+          {/* <BubbleMenu items={remirrorToolbarOptions} /> */}
+          {children}
+        </Remirror>
+      </ThemeProvider>
+    </AllStyledComponent>
+  );
 };
 
 const toolbarOptions = [
@@ -172,177 +181,262 @@ const toolbarOptions = [
   ['clean'], // remove formatting button
 ];
 
+const FONT_FAMILIES: Array<[React.CSSProperties['fontFamily'], string]> = [
+  ['sans-serif', 'Sans serif'],
+  ['serif', 'Serif'],
+  ['monospace', 'Monospace'],
+];
+
+const FontFamilyButtons: React.FC = () => {
+  const { setFontFamily } = useCommands();
+  const active = useActive();
+  return (
+    <CommandButtonGroup>
+      <DropdownButton aria-label="Font family" icon="text">
+        {FONT_FAMILIES.map(([fontFamily, label]) => (
+          <CommandMenuItem
+            key={fontFamily}
+            commandName="setFontFamily"
+            onSelect={() => setFontFamily(fontFamily)}
+            enabled={setFontFamily.enabled(fontFamily)}
+            active={active.fontFamily({ fontFamily })}
+            label={<span style={{ fontFamily }}>{label}</span>}
+          />
+        ))}
+      </DropdownButton>
+    </CommandButtonGroup>
+  );
+};
+
+const JustificationMenu: React.FC = () => {
+  const {
+    leftAlign,
+    rightAlign,
+    centerAlign,
+    justifyAlign,
+  } = useCommands();
+  return (
+    <DropdownButton aria-label="Justification" icon="alignJustify">
+      <CommandMenuItem
+        commandName="leftAlign"
+        onSelect={leftAlign}
+        enabled={leftAlign.enabled()}
+        active={leftAlign.active?.()}
+      />
+      <CommandMenuItem
+        commandName="centerAlign"
+        onSelect={centerAlign}
+        enabled={centerAlign.enabled()}
+        active={centerAlign.active?.()}
+      />
+      <CommandMenuItem
+        commandName="rightAlign"
+        onSelect={rightAlign}
+        enabled={rightAlign.enabled()}
+        active={rightAlign.active?.()}
+      />
+      <CommandMenuItem
+        commandName="justifyAlign"
+        onSelect={justifyAlign}
+        enabled={justifyAlign.enabled()}
+        active={justifyAlign.active?.()}
+      />
+    </DropdownButton>
+  );
+};
+const headingLevel = (active: ActiveFromExtensions<Remirror.Extensions>): CoreIcon => {
+  for (let i = 1; i <= 6; i += 1) {
+    if (active.heading({ level: i })) { return `h${i}` as CoreIcon; }
+  }
+  return 'heading';
+};
+
+export const WysiwygToolbar: React.FC = () => {
+  const active = useActive();
+  const { increaseIndent, decreaseIndent } = useCommands();
+  return (
+    <Toolbar className="remirror-toolbar">
+      <FontFamilyButtons />
+      <CommandButtonGroup>
+        <ToggleBoldButton />
+        <ToggleItalicButton />
+        <ToggleUnderlineButton />
+        <ToggleStrikeButton />
+        <ToggleCodeButton />
+        <ToggleSubscriptButton />
+        <ToggleSuperscriptButton />
+      </CommandButtonGroup>
+      <VerticalDivider />
+      <CommandButtonGroup>
+        <JustificationMenu />
+        <ToggleBlockquoteButton />
+        <ToggleCodeBlockButton />
+        <DropdownButton
+          aria-label="Heading level options"
+          icon={headingLevel(active)}
+        >
+          <ToggleHeadingMenuItem attrs={{ level: 1 }} />
+          <ToggleHeadingMenuItem attrs={{ level: 2 }} />
+          <ToggleHeadingMenuItem attrs={{ level: 3 }} />
+          <ToggleHeadingMenuItem attrs={{ level: 4 }} />
+          <ToggleHeadingMenuItem attrs={{ level: 5 }} />
+          <ToggleHeadingMenuItem attrs={{ level: 6 }} />
+        </DropdownButton>
+        <ToggleOrderedListButton />
+        <ToggleBulletListButton />
+        <CommandButton
+          commandName="increaseIndent"
+          onSelect={increaseIndent}
+          enabled={increaseIndent.enabled?.()}
+        />
+        <CommandButton
+          commandName="decreaseIndent"
+          onSelect={decreaseIndent}
+          enabled={decreaseIndent.enabled?.()}
+        />
+      </CommandButtonGroup>
+      {/* <HistoryButtonGroup /> */}
+      {/* copy/cut/paste */}
+      {/* <DataTransferButtonGroup /> */}
+    </Toolbar>
+  );
+};
+
+/*
 const remirrorToolbarOptions : ToolbarItemUnion[] = [
   {
     type: ComponentItem.ToolbarGroup,
-    label: "History",
+    label: 'History',
     items: [
-      { type: ComponentItem.ToolbarCommandButton, commandName: "undo", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "redo", display: "icon" },
+      { type: ComponentItem.ToolbarCommandButton, commandName: 'undo', display: 'icon' },
+      { type: ComponentItem.ToolbarCommandButton, commandName: 'redo', display: 'icon' },
     ],
-    separator: "end",
+    separator: 'end',
   },
   {
     type: ComponentItem.ToolbarGroup,
-    label: "Simple Formatting",
+    label: 'Simple Formatting',
     items: [
-      { 
-        type: ComponentItem.ToolbarMenu,
-        label: "Font family",
-        icon: "fontSize2",
-        items: [
-          {
-            type: ComponentItem.MenuGroup,
-            role: "radio",
-            items: [
-              {
-                type: ComponentItem.MenuCommandPane, 
-                commandName: "increaseFontSize",
-                shortcut: "^ +",
-              },
-              {
-                type: ComponentItem.MenuCommandPane,
-                commandName: "decreaseFontSize",
-                shortcut: "^ -",
-              },
-              {
-                type: ComponentItem.MenuPane,
-                onClick: (_event, context) => context.commands.toggleFontFamily("serif"),
-                label: "Serif",
-              },
-              {
-                type: ComponentItem.MenuPane,
-                onClick: (_event, context) => context.commands.toggleFontFamily("sansserif"),
-                label: "Sans Serif",
-              },
-              {
-                type: ComponentItem.MenuPane,
-                onClick: (_event, context) => context.commands.toggleFontFamily("monospace"),
-                label: "Monospace",
-              },
-            ]
-          }
-        ]
-      },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleBold", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleItalic", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleUnderline", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleStrike", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleCode", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleSubscript", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleSuperscript", display: "icon" },
+    { type: ComponentItem.ToolbarCommandButton, commandName: 'toggleBold', display: 'icon' },
+    { type: ComponentItem.ToolbarCommandButton, commandName: 'toggleItalic', display: 'icon' },
+    { type: ComponentItem.ToolbarCommandButton, commandName: 'toggleUnderline', display: 'icon' },
+    { type: ComponentItem.ToolbarCommandButton, commandName: 'toggleStrike', display: 'icon' },
+    { type: ComponentItem.ToolbarCommandButton, commandName: 'toggleCode', display: 'icon' },
+    { type: ComponentItem.ToolbarCommandButton, commandName: 'toggleSubscript', display: 'icon' },
+    { type: ComponentItem.ToolbarCommandButton, commandName: 'toggleSuperscript', display: 'icon' },
     ],
-    separator: "end",
+    separator: 'end',
   },
   {
     type: ComponentItem.ToolbarGroup,
-    label: "Block Formatting",
+    label: 'Block Formatting',
     items: [
       {
         type: ComponentItem.ToolbarMenu,
-        label: "Alignment",
+        label: 'Alignment',
         items: [
           {
             type: ComponentItem.MenuGroup,
-            role: "radio",
+            role: 'radio',
             items: [
               {
                 type: ComponentItem.MenuCommandPane,
-                commandName: "leftAlign",
+                commandName: 'setLeftAlign',
               },
               {
                 type: ComponentItem.MenuCommandPane,
-                commandName: "centerAlign",
+                commandName: 'setCenterAlign',
               },
               {
                 type: ComponentItem.MenuCommandPane,
-                commandName: "rightAlign",
+                commandName: 'setRightAlign',
               },
               {
                 type: ComponentItem.MenuCommandPane,
-                commandName: "justifyAlign",
+                commandName: 'setJustified',
               },
             ],
           },
         ],
       },
-      //{ type: ComponentItem.ToolbarCommandButton, commandName: "liftListItemOutOfList", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleBlockquote", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleCodeBlock", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleOrderedList", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "toggleBulletList", display: "icon" },
-      { type: ComponentItem.ToolbarCommandButton, commandName: "sharedSinkListItem", display: "label" },
+{ type: ComponentItem.ToolbarCommandButton, commandName: 'liftListItemOutOfList', display: 'icon' },
+{ type: ComponentItem.ToolbarCommandButton, commandName: 'toggleBlockquote', display: 'icon' },
+{ type: ComponentItem.ToolbarCommandButton, commandName: 'toggleCodeBlock', display: 'icon' },
+{ type: ComponentItem.ToolbarCommandButton, commandName: 'toggleOrderedList', display: 'icon' },
+{ type: ComponentItem.ToolbarCommandButton, commandName: 'toggleBulletList', display: 'icon' },
+{ type: ComponentItem.ToolbarCommandButton, commandName: 'sharedSinkListItem', display: 'label' },
     ],
-    separator: "end",
+    separator: 'end',
   },
   {
     type: ComponentItem.ToolbarGroup,
-    label: "Heading Formatting",
+    label: 'Heading Formatting',
     items: [
       {
         type: ComponentItem.ToolbarCommandButton,
-        commandName: "toggleHeading",
-        display: "icon",
+        commandName: 'toggleHeading',
+        display: 'icon',
         attrs: { level: 1 },
       },
       {
         type: ComponentItem.ToolbarCommandButton,
-        commandName: "toggleHeading",
-        display: "icon",
+        commandName: 'toggleHeading',
+        display: 'icon',
         attrs: { level: 2 },
       },
       {
         type: ComponentItem.ToolbarCommandButton,
-        commandName: "toggleHeading",
-        display: "icon",
+        commandName: 'toggleHeading',
+        display: 'icon',
         attrs: { level: 3 },
       },
     ],
-    separator: "none",
+    separator: 'none',
   },
   {
     type: ComponentItem.ToolbarMenu,
-    label: "Headings",
+    label: 'Headings',
     items: [
       {
         type: ComponentItem.MenuGroup,
-        role: "radio",
+        role: 'radio',
         items: [
           {
             type: ComponentItem.MenuCommandPane,
-            commandName: "toggleHeading",
+            commandName: 'toggleHeading',
             attrs: { level: 1 },
           },
           {
             type: ComponentItem.MenuCommandPane,
-            commandName: "toggleHeading",
+            commandName: 'toggleHeading',
             attrs: { level: 2 },
           },
           {
             type: ComponentItem.MenuCommandPane,
-            commandName: "toggleHeading",
+            commandName: 'toggleHeading',
             attrs: { level: 3 },
           },
           {
             type: ComponentItem.MenuCommandPane,
-            commandName: "toggleHeading",
+            commandName: 'toggleHeading',
             attrs: { level: 4 },
           },
           {
             type: ComponentItem.MenuCommandPane,
-            commandName: "toggleHeading",
+            commandName: 'toggleHeading',
             attrs: { level: 5 },
           },
           {
             type: ComponentItem.MenuCommandPane,
-            commandName: "toggleHeading",
+            commandName: 'toggleHeading',
             attrs: { level: 6 },
           },
         ],
       },
     ],
   },
-]
+];
+*/
 
 const modules = {
   toolbar: toolbarOptions,
@@ -413,7 +507,7 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
   }, []);
 
   return (
-    <div className="d-inline-block w-100">
+    <div className="d-inline-block">
       <p>Quill:</p>
       <ReactQuill
         ref={ref}
@@ -428,15 +522,14 @@ const CustomEditor: React.FC<CustomEditorProps> = ((props) => {
       />
       <p>Remirror:</p>
       <RemirrorEditor
-        disabled={disabled}
-        disableTab={disableTab}
+        readOnly={disabled}
         id={`${id}-remirror`}
         className={className}
         value={value}
-        theme={theme || 'snow'}
         placeholder={placeholder}
-        onChange={onChange}
-        />
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        onChange={() => {}}
+      />
     </div>
   );
 });

@@ -324,12 +324,19 @@ const headingLevel = (active: ActiveFromExtensions<Remirror.Extensions>): IconTy
   return HEADING_ICONS[0];
 };
 
+const BLACK: ColorResult = {
+  hex: '#000',
+  rgb: { r: 0, g: 0, b: 0 },
+  hsl: { h: 0, s: 0, l: 0 },
+};
 const FormatColorButton: React.FC<{
   I: IconType,
   setColor: CommandShape<[color: string, options?: SetTextColorOptions]>,
   removeColor: CommandShape<[options?: SetTextColorOptions]>,
   extensionName: string,
   extensionAttr: string,
+  onDropdownOpen?: MouseEventHandler<HTMLElement>,
+  onDropdownClose?: MenuProps['onClose']
 }> = (props) => {
   const {
     I,
@@ -337,6 +344,8 @@ const FormatColorButton: React.FC<{
     removeColor,
     extensionName,
     extensionAttr,
+    onDropdownClose,
+    onDropdownOpen,
   } = props;
   const active = useActive();
   const state = useEditorState();
@@ -350,15 +359,17 @@ const FormatColorButton: React.FC<{
   }, [setColor, removeColor, active]);
 
   const markColor = getMarkRanges(state.selection, extensionName)[0]?.mark?.attrs;
-  const initColor = markColor?.[extensionAttr] || 'black';
-  const [curColor, setCurColor] = useState(initColor);
+  const initColor: ColorResult = markColor?.[extensionAttr] || BLACK;
+  const [curColor, setCurColor] = useState<ColorResult>(initColor);
   return (
     <RemirrorDropdownButton
       aria-label="text color"
       icon={<Icon I={I} size="0.75em" />}
-      iconSx={{ color: `${curColor} !important` }}
+      iconSx={{ color: `${curColor.hex} !important` }}
       anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
       transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+      onClick={onDropdownOpen}
+      onClose={onDropdownClose}
       PaperProps={{
         sx: {
           '> .MuiList-padding': {
@@ -372,13 +383,20 @@ const FormatColorButton: React.FC<{
         className="block-picker"
         onChange={setCurColor}
         onChangeComplete={toggleColor}
-        color={curColor}
+        color={curColor.hex}
       />
     </RemirrorDropdownButton>
   );
 };
 
-const TextColorButton: React.FC = () => {
+const TextColorButton: React.FC<{
+  onDropdownOpen?: MouseEventHandler<HTMLElement>,
+  onDropdownClose?: MenuProps['onClose']
+}> = (props) => {
+  const {
+    onDropdownOpen,
+    onDropdownClose,
+  } = props;
   const { setTextColor, removeTextColor } = useCommands();
   return (
     <FormatColorButton
@@ -387,6 +405,8 @@ const TextColorButton: React.FC = () => {
       removeColor={removeTextColor}
       extensionName={textColorExtension.name}
       extensionAttr="color"
+      onDropdownOpen={onDropdownOpen}
+      onDropdownClose={onDropdownClose}
     />
   );
   // const active = useActive();
@@ -424,7 +444,14 @@ const TextColorButton: React.FC = () => {
   //   </RemirrorDropdownButton>
   // );
 };
-const TextBackgroundColor: React.FC = () => {
+const TextBackgroundColor: React.FC<{
+  onDropdownOpen?: MouseEventHandler<HTMLElement>,
+  onDropdownClose?: MenuProps['onClose']
+}> = (props) => {
+  const {
+    onDropdownOpen,
+    onDropdownClose,
+  } = props;
   const { setTextHighlight, removeTextHighlight } = useCommands();
   return (
     <FormatColorButton
@@ -433,6 +460,8 @@ const TextBackgroundColor: React.FC = () => {
       removeColor={removeTextHighlight}
       extensionName={textHighlightExtension.name}
       extensionAttr="highlight"
+      onDropdownOpen={onDropdownOpen}
+      onDropdownClose={onDropdownClose}
     />
   );
 };
@@ -462,8 +491,14 @@ export const WysiwygToolbar: React.FC<{
         <ToggleCodeButton icon={<Icon I={FaCode} size="1em" />} />
         <ToggleSubscriptButton icon={<Icon I={FaSubscript} size="1em" />} />
         <ToggleSuperscriptButton icon={<Icon I={FaSuperscript} size="1em" />} />
-        <TextColorButton />
-        <TextBackgroundColor />
+        <TextColorButton
+          onDropdownOpen={onDropdownOpen}
+          onDropdownClose={onDropdownClose}
+        />
+        <TextBackgroundColor
+          onDropdownOpen={onDropdownOpen}
+          onDropdownClose={onDropdownClose}
+        />
       </CommandButtonGroup>
       <VerticalDivider />
       <CommandButtonGroup>

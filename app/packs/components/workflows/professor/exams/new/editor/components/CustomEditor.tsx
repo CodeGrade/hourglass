@@ -63,11 +63,14 @@ import {
 
 import './CustomEditor.scss';
 import {
-  ActiveFromExtensions, CommandShape, getMarkRanges,
+  ActiveFromExtensions,
+  CommandShape,
+  MarkType,
+  getMarkRanges,
 } from 'remirror';
 import { MenuProps } from '@material-ui/core';
 import Icon from '@hourglass/workflows/student/exams/show/components/Icon';
-import { BlockPicker, ColorResult } from 'react-color';
+import { CompactPicker, ColorResult } from 'react-color';
 import {
   FaAlignCenter,
   FaAlignJustify,
@@ -136,8 +139,8 @@ const DEFAULT_OPTIONS: WysiwygOptions = {
   ...TextHighlightExtension.defaultOptions,
 };
 
-const textColorExtension = new TextColorExtension({});
-const textHighlightExtension = new TextHighlightExtension({});
+const textColorExtension = new TextColorExtension({ markOverride: { inclusive: true } });
+const textHighlightExtension = new TextHighlightExtension({ markOverride: { inclusive: true } });
 const RemirrorEditor: React.FC<React.PropsWithChildren<CustomEditorProps & {
   options?: WysiwygOptions,
   readOnly?: boolean,
@@ -324,17 +327,12 @@ const headingLevel = (active: ActiveFromExtensions<Remirror.Extensions>): IconTy
   return HEADING_ICONS[0];
 };
 
-const BLACK: ColorResult = {
-  hex: '#000',
-  rgb: { r: 0, g: 0, b: 0 },
-  hsl: { h: 0, s: 0, l: 0 },
-};
 const FormatColorButton: React.FC<{
   I: IconType,
   setColor: CommandShape<[color: string, options?: SetTextColorOptions]>,
   removeColor: CommandShape<[options?: SetTextColorOptions]>,
-  extensionName: string,
   extensionAttr: string,
+  extensionType: MarkType,
   onDropdownOpen?: MouseEventHandler<HTMLElement>,
   onDropdownClose?: MenuProps['onClose']
 }> = (props) => {
@@ -342,30 +340,40 @@ const FormatColorButton: React.FC<{
     I,
     setColor,
     removeColor,
-    extensionName,
     extensionAttr,
+    extensionType,
     onDropdownClose,
     onDropdownOpen,
   } = props;
-  const active = useActive();
   const state = useEditorState();
 
+  // const { from, to } = getTextSelection(state.selection, state.doc);
+  const mark = getMarkRanges(state.selection, extensionType);
+
+  const isMarkedColor = mark[0]?.mark;
+  // state.doc.rangeHasMark(from, Math.min(to, from + 1), extensionType);
   const toggleColor = useCallback((color: ColorResult) => {
-    if (active[extensionName]({ color: color.hex })) {
+    // Alternate strategy: clear color and replace it if the color is changed
+    // if (isMarkedColor) {
+    //   removeColor();
+    //   if (isMarkedColor.attrs[extensionAttr] !== color.hex) {
+    //     setColor(color.hex, { selection: { from: mark[0].from, to: mark[0].to } });
+    //   }
+    if (isMarkedColor && isMarkedColor.attrs[extensionAttr] === color.hex) {
       removeColor();
     } else {
       setColor(color.hex);
     }
-  }, [setColor, removeColor, active]);
+  }, [setColor, removeColor, isMarkedColor]);
 
-  const markColor = getMarkRanges(state.selection, extensionName)[0]?.mark?.attrs;
-  const initColor: ColorResult = markColor?.[extensionAttr] || BLACK;
-  const [curColor, setCurColor] = useState<ColorResult>(initColor);
+  // const allMarksOfType = getMarkRanges(state.selection, extensionType);
+
+  const curColor: string = isMarkedColor?.attrs[extensionAttr] || 'black';
   return (
     <RemirrorDropdownButton
       aria-label="text color"
       icon={<Icon I={I} size="0.75em" />}
-      iconSx={{ color: `${curColor.hex} !important` }}
+      iconSx={{ color: `${curColor} !important` }}
       anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
       transformOrigin={{ horizontal: 'center', vertical: 'top' }}
       onClick={onDropdownOpen}
@@ -379,11 +387,10 @@ const FormatColorButton: React.FC<{
         },
       }}
     >
-      <BlockPicker
+      <CompactPicker
         className="block-picker"
-        onChange={setCurColor}
         onChangeComplete={toggleColor}
-        color={curColor.hex}
+        color={curColor}
       />
     </RemirrorDropdownButton>
   );
@@ -403,46 +410,12 @@ const TextColorButton: React.FC<{
       I={MdOutlineFormatColorText}
       setColor={setTextColor}
       removeColor={removeTextColor}
-      extensionName={textColorExtension.name}
+      extensionType={textColorExtension.type}
       extensionAttr="color"
       onDropdownOpen={onDropdownOpen}
       onDropdownClose={onDropdownClose}
     />
   );
-  // const active = useActive();
-  // const state = useEditorState();
-
-  // const curColor = getMarkRanges(state.selection, textColorExtension.name)[0]?.mark?.attrs;
-  // const toggleTextColor = useCallback((color: ColorResult) => {
-  //   if (active.textColor({ color: color.hex })) {
-  //     removeTextColor();
-  //   } else {
-  //     setTextColor(color.hex);
-  //   }
-  // }, [setTextColor, removeTextColor, active]);
-  // return (
-  //   <RemirrorDropdownButton
-  //     aria-label="text color"
-  //     icon={<Icon I={MdOutlineFormatColorText} size="0.75em" />}
-  //     iconSx={{ color: `${curColor?.color || 'black'} !important` }}
-  //     anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
-  //     transformOrigin={{ horizontal: 'center', vertical: 'top' }}
-  //     PaperProps={{
-  //       sx: {
-  //         MuiList: {
-  //           paddingTop: 0,
-  //           paddingBottom: 0,
-  //         },
-  //       },
-  //     }}
-  //   >
-  //     <BlockPicker
-  //       className="block-picker"
-  //       onChange={toggleTextColor}
-  //       color={curColor?.color || 'black'}
-  //     />
-  //   </RemirrorDropdownButton>
-  // );
 };
 const TextBackgroundColor: React.FC<{
   onDropdownOpen?: MouseEventHandler<HTMLElement>,
@@ -458,7 +431,7 @@ const TextBackgroundColor: React.FC<{
       I={MdOutlineFormatColorFill}
       setColor={setTextHighlight}
       removeColor={removeTextHighlight}
-      extensionName={textHighlightExtension.name}
+      extensionType={textHighlightExtension.type}
       extensionAttr="highlight"
       onDropdownOpen={onDropdownOpen}
       onDropdownClose={onDropdownClose}

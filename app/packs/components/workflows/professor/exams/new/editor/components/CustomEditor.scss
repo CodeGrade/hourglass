@@ -1,81 +1,48 @@
 @import 'node_modules/bootstrap/scss/functions';
 @import 'node_modules/bootstrap/scss/variables';
 @import 'node_modules/bootstrap/scss/mixins';
-@import '@kylesferrazza/react-quill/dist/quill.snow.css';
-@import '@kylesferrazza/react-quill/dist/quill.bubble.css';
-
-.ql-container {
-  font-size: unset;
-}
-
-.ql-bubble .ql-tooltip {
-  z-index: 1001; // make sure this hovers above the movers
-}
-
-.ql-snow .ql-picker:not(.ql-font) .ql-picker-label svg {
-  padding: 2px 4px;
-  position: inherit;
-  bottom: 2px;
-}
-
-.ql-snow .ql-picker:not(.ql-font):hover .ql-picker-label svg {
-  bottom: 3px;
-}
-
-
-.ql-snow .ql-font .ql-picker-label::before {
-  line-height: 18px;
-  padding: 1px !important;
-}
-
-.quill.bg-white {
-  border-radius: 4px;
-  background-color: unset !important;
-  color: initial !important;
-}
-
-.quill.bg-white .ql-snow.ql-toolbar {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-.quill.bg-white .ql-container {
-  background-color: white !important;
-}
-
-.ql-snow.ql-toolbar {
-  padding: 4px;
-  border-radius: 4px 4px 0 0;
-}
-
-.ql-snow.ql-toolbar button {
-  padding: 3px;
-  width: 24px;
-}
-
-.ql-snow.ql-toolbar button:hover, .ql-snow.ql-toolbar .ql-picker:hover {
-  border: 1px solid gray;
-  border-radius: 2px;
-}
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 @each $color, $value in $theme-colors {
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .MuiButtonBase-root,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .MuiIconButton-root,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .MuiButtonBase-root:hover,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar .MuiButtonBase-root:active,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar button.remirror-menu-button[aria-expanded="true"],
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar button.remirror-menu-item:hover,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar button.remirror-menu-item:active,
-  div.card.border-#{$color} .remirror-theme .remirror-toolbar button.remirror-menu-item:focus {
-    background-color: theme-color-level($color, $alert-bg-level) !important;
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar button,
+  div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button,
+  div.card div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button,
+  div.card div.card div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button {
+    color: theme-color-level($color, $alert-color-level);
+    border: 0px;
+  }
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar button:hover,
+  div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button:hover,
+  div.card div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button:hover,
+  div.card div.card div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button:hover {
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    margin: -1px;
+  }
+
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar button.Mui-selected,
+  div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button.Mui-selected,
+  div.card div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button.Mui-selected,
+  div.card div.card div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button.Mui-selected {
     border-color: theme-color-level($color, $alert-border-level) !important;
-    color: theme-color-level($color, $alert-color-level) !important;
+    background-color: theme-color-level($color, $alert-bg-level) !important;
+  }
+
+  div.card.border-#{$color} .remirror-theme .remirror-toolbar button.Mui-disabled,
+  div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button.Mui-disabled,
+  div.card div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button.Mui-disabled,
+  div.card div.card div.card div.card.border-#{$color} .remirror-theme .remirror-toolbar button.Mui-disabled {
+    color: gray !important;
+    background-color: rgba(0,0,0,0.08) !important;
   }
 }
 
 .remirror-theme {
   --rmr-font-family-default: "Helvetica", "Arial", sans-serif !important;
+  position: relative;
+  &:focus-within {
+    .remirror-toolbar.bubble:not(.menu-active),
+    .remirror-toolbar.bubble.menu-active { visibility: initial; }
+  }
   .remirror-toolbar {
     height: 30px;
     border: 1px solid var(--rmr-color-border);
@@ -87,13 +54,24 @@
       width: 24px;
       height: 24px;
     }
-    > div.MuiBox-root > .remirror-role:not(:first-child) > button {
+    > div.MuiBox-root > .remirror-role:not(:first-of-type) > button {
       border-bottom-left-radius: 0px;
       border-top-left-radius: 0px;
     }
     > div.MuiBox-root > .remirror-role:not(:last-child) > button {
       border-bottom-right-radius: 0px;
       border-top-right-radius: 0px;
+    }
+    &.bubble {
+      position: absolute;
+      transform: translateY(-100%);
+      flex-wrap: wrap;
+      justify-content: center;
+      overflow-y: unset;
+      height: unset;
+      &:not(.menu-active) {
+        visibility: hidden;
+      }
     }
   }
   .remirror-menu-item {
@@ -119,9 +97,10 @@
       min-height: unset;
       padding: calc(0.75*var(--rmr-space-3)) var(--rmr-space-3);
       color: initial;
+      text-align: left;
     }
   }
-  .remirror-toolbar + .remirror-editor-wrapper {
+  .remirror-toolbar:not(.bubble) + .remirror-editor-wrapper {
     padding-top: 0px;
     border: 1px solid var(--rmr-color-border);
     border-top: 0px;

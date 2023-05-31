@@ -186,13 +186,11 @@ export const EditHTMLVal: React.FC<{
     onChange,
     debounceDelay,
   );
-  const handleChange = useCallback((newVal: string, _delta, source, _editor): void => {
-    if (source === 'user') {
-      debouncedOnChange({
-        type: 'HTML',
-        value: newVal,
-      });
-    }
+  const handleChange = useCallback((newVal: string): void => {
+    debouncedOnChange({
+      type: 'HTML',
+      value: newVal,
+    });
   }, [onChange]);
   return (
     <Loading loading={disabled} noText>

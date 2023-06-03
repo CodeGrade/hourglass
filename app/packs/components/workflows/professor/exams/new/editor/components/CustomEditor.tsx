@@ -65,6 +65,7 @@ import './CustomEditor.scss';
 import {
   ActiveFromExtensions,
   CommandShape,
+  CoreIcon,
   MarkType,
   getMarkRanges,
 } from 'remirror';
@@ -273,10 +274,17 @@ const JustificationMenu: React.FC<{
     centerAlign,
     justifyAlign,
   } = useCommands();
+
+  let menuIcon: CoreIcon;
+  if (justifyAlign.active()) menuIcon = 'alignJustify';
+  else if (centerAlign.active()) menuIcon = 'alignCenter';
+  else if (rightAlign.active()) menuIcon = 'alignRight';
+  else menuIcon = 'alignLeft';
+
   return (
     <RemirrorDropdownButton
       aria-label="Justification"
-      icon="alignJustify"
+      icon={menuIcon}
       onClick={onDropdownOpen}
       onClose={onDropdownClose}
     >

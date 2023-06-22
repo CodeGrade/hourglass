@@ -1,6 +1,5 @@
 import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
-import ReactQuill from '@kylesferrazza/react-quill';
 import { HTMLVal } from '@student/exams/show/types';
 import { EditHTMLVal } from '@professor/exams/new/editor/components/helpers';
 
@@ -10,7 +9,7 @@ const Prompted: React.FC<{
   onChange: (newVal: HTMLVal) => void;
   debounceDelay?: number;
   className?: string;
-  theme?: ReactQuill.ReactQuillProps['theme'];
+  theme?: string;
 }> = (props) => {
   const {
     value = { type: 'HTML', value: '' },

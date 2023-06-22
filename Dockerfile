@@ -1,4 +1,4 @@
-FROM phusion/passenger-ruby27
+FROM phusion/passenger-ruby30
 RUN apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold"
 
 RUN rm -f /etc/service/nginx/down
@@ -10,8 +10,8 @@ RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 WORKDIR /home/app/hourglass
 COPY Gemfile /home/app/hourglass/Gemfile
 COPY Gemfile.lock /home/app/hourglass/Gemfile.lock
-RUN bash -lc 'rvm install ruby-2.7.8'
-RUN bash -lc 'rvm --default use ruby-2.7.8'
+RUN bash -lc 'rvm install ruby-3.0.2'
+RUN bash -lc 'rvm --default use ruby-3.0.2'
 RUN bundle install --without test development
 
 COPY package.json /home/app/hourglass/package.json

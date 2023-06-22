@@ -64,7 +64,7 @@
         which
         lzma
         watchman
-        ruby_3_0.devEnv
+        ruby_3_0_2.devEnv
 
         # passenger compilation libs
         libxcrypt

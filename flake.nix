@@ -7,7 +7,7 @@
   # https://lazamar.co.uk/nix-versions/?channel=nixpkgs-unstable&package=ruby
   inputs.nixpkgs-ruby.url = "github:nixos/nixpkgs/5e15d5da4abb74f0dd76967044735c70e94c5af1";
 
-  inpux.nixpkgs-watchman.url = "github:nixos/nixpkgs/4e9c02bcc709fe1737a746add0e8e0109133d808";
+  inputs.nixpkgs-watchman.url = "github:nixos/nixpkgs/4e9c02bcc709fe1737a746add0e8e0109133d808";
 
   outputs = { self, nixpkgs, nixpkgs-ruby, nixpkgs-watchman }: let
     pkgs = import nixpkgs {

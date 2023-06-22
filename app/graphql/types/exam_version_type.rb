@@ -97,7 +97,7 @@ module Types
     #   guard Guards::ALL_STAFF
     # end
     # def questions
-    #   object.db_questions.as_json(format: :graphql)
+    #   object.db_questions.map { |q| q.as_json(format: :graphql) }
     # end
 
     field :db_questions, [Types::QuestionType], null: false do

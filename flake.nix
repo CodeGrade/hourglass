@@ -7,11 +7,16 @@
   # https://lazamar.co.uk/nix-versions/?channel=nixpkgs-unstable&package=ruby
   inputs.nixpkgs-ruby.url = "github:nixos/nixpkgs/5e15d5da4abb74f0dd76967044735c70e94c5af1";
 
-  outputs = { self, nixpkgs, nixpkgs-ruby }: let
+  inpux.nixpkgs-watchman.url = "github:nixos/nixpkgs/4e9c02bcc709fe1737a746add0e8e0109133d808";
+
+  outputs = { self, nixpkgs, nixpkgs-ruby, nixpkgs-watchman }: let
     pkgs = import nixpkgs {
       system = "x86_64-linux";
     };
     rubyPkgs = import nixpkgs-ruby {
+      system = "x86_64-linux";
+    };
+    watchmanPkgs = import nixpkgs-watchman {
       system = "x86_64-linux";
     };
   in {
@@ -70,12 +75,13 @@
         chromium
         which
         lzma
-        watchman
 
         # passenger compilation libs
         libxcrypt
-      ]) ++(with rubyPkgs; [
+      ]) ++ (with rubyPkgs; [
         ruby_3_0
+      ]) ++ (with watchmanPkgs; [
+        watchman
       ]);
 
       shellHook = ''

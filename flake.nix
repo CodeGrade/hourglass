@@ -3,8 +3,14 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
 
-  outputs = { self, nixpkgs }: let
+  # https://lazamar.co.uk/nix-versions/?channel=nixpkgs-unstable&package=ruby
+  inputs.nixpkgs-ruby.url = "github:nixos/nixpkgs/5e15d5da4abb74f0dd76967044735c70e94c5af1";
+
+  outputs = { self, nixpkgs, nixpkgs-ruby }: let
     pkgs = import nixpkgs {
+      system = "x86_64-linux";
+    };
+    rubyPkgs = import nixpkgs-ruby {
       system = "x86_64-linux";
     };
   in {
@@ -64,10 +70,11 @@
         which
         lzma
         watchman
-        ruby_3_0_2.devEnv
 
         # passenger compilation libs
         libxcrypt
+      ]) ++(with rubyPkgs; [
+        ruby_3_0
       ]);
 
       shellHook = ''

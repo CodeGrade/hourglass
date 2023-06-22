@@ -21,7 +21,7 @@ gem 'react-rails'
 
 gem 'devise', '~> 4.8.0'
 gem 'omniauth-bottlenose', git: 'https://github.com/CodeGrade/omniauth-bottlenose'
-gem 'omniauth-oauth2', '~> 1.7.0'
+gem 'omniauth-oauth2', '~> 1.8.0'
 gem 'omniauth-rails_csrf_protection'
 
 gem 'bootstrap_form', '>= 4.2.0'

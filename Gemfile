@@ -56,7 +56,7 @@ group :development, :test do
   gem 'pry-rails'
   gem 'pry-rescue'
   gem 'pry-stack_explorer'
-  gem 'puma', '~> 4.1'
+  gem 'puma', '~> 5.6'
 end
 
 group :development do

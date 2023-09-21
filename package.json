@@ -46,7 +46,7 @@
     "d3-color": "^3.0.1",
     "file-loader": "^6.2.0",
     "graphiql": "^1.9.13",
-    "graphql": "^16.5.0",
+    "graphql": "^16.8.1",
     "graphql-ruby-client": "^1.10.1",
     "graphql-ws": "^5.9.1",
     "ignore-loader": "^0.1.2",

@@ -17,7 +17,8 @@ COPY Gemfile /home/app/hourglass/Gemfile
 COPY Gemfile.lock /home/app/hourglass/Gemfile.lock
 RUN bash -lc 'rvm install ruby-3.0.2'
 RUN bash -lc 'rvm --default use ruby-3.0.2'
-RUN bundle install --without test development
+RUN bundle config set --local without 'test development'
+RUN bundle install
 
 COPY package.json /home/app/hourglass/package.json
 COPY yarn.lock /home/app/hourglass/yarn.lock

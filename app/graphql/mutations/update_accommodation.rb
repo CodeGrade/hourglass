@@ -16,6 +16,7 @@ module Mutations
     end
 
     def resolve(accommodation:, **args)
+      args[:new_start_time] = nil unless args.key?(:new_start_time)
       updated = accommodation.update(args)
       raise GraphQL::ExecutionError, accommodation.errors.full_messages unless updated
 

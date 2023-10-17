@@ -138,10 +138,11 @@ export const ExamTimesEditor: React.FC<{
             min={0}
             max={linked ? undefined : end.diff(start).as('minutes')}
             onChange={(newVal) => {
+              const numNewVal = Number(newVal) || 0;
               if (linked) {
-                setDuration(newVal);
-                if (start.plus({ minutes: newVal }) > end) {
-                  setEnd(start.plus({ minutes: newVal }));
+                setDuration(numNewVal);
+                if (start.plus({ minutes: numNewVal }) > end) {
+                  setEnd(start.plus({ minutes: numNewVal }));
                 }
               } else {
                 const availTime = end.diff(start).as('minutes');

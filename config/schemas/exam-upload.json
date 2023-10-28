@@ -417,7 +417,6 @@
     "TextPrompt": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["prompt"],
       "properties": {
         "prompt": { "$ref": "#/definitions/HTML" },
         "correctAnswer": { "type": "string" },

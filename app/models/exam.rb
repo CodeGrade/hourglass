@@ -233,27 +233,46 @@ class Exam < ApplicationRecord
       existing = GradingLock.where(registration: registrations).includes(:question, :part)
       existing.update(grader: nil) if reset
       existing = existing.group_by(&:registration_id)
-      registrations.final.each do |registration|
+      to_be_created = []
+      registrations.includes(:exam_version).final.each do |registration|
         existing_for_reg = existing[registration.id] || []
         existing_pairs = existing_for_reg.map { |gl| { question: gl.question, part: gl.part } }
         existing_pairs = existing_pairs.to_set
         missing = pairs_by_version[registration.exam_version_id].reject { |qp| existing_pairs.member? qp }
-        missing.each do |qp|
-          GradingLock.create(registration: registration, question: qp[:question], part: qp[:part])
+        new_locks = missing.map do |qp|
+          { registration: registration, question: qp[:question], part: qp[:part] }
+        end
+        # For safety's sake, validate these new locks
+        # No need to validate the uniqueness criterion, since we're specifically
+        # creating only the missing grading_locks inside of a transaction
+        new_locks.each do |l|
+          GradingLock.new(l).validate!(:bulk_create)
+          to_be_created << { registration_id: l[:registration].id, question_id: l[:question].id, part_id: l[:part].id }
         end
       end
+      # NOTE: skipping validations here is fine, because we checked them above
+      # rubocop: disable Rails/SkipsModelValidations
+      if to_be_created.present?
+        GradingLock
+          .create_with(created_at: DateTime.now, updated_at: DateTime.now)
+          .insert_all(to_be_created, returning: false)
+      end
+      # rubocop: enable Rails/SkipsModelValidations
     end
   end
 
   def finalize_registrations_that_have_run_out_of_time!
     Registration.transaction do
-      registrations.includes(
+      to_be_finalized = registrations.includes(
         :accommodation,
         :user,
         exam_version: { exam: { course: [:students] } },
-      ).in_progress.each do |r|
-        r.finalize! if r.over?
-      end
+      ).in_progress.filter(&:over?)
+      # NOTE: skipping validation is safe here, since end_times have no validations associated with them
+      # and making this a single query instead of O(#students) is a big win
+      # rubocop: disable Rails/SkipsModelValidations
+      Registration.where(id: to_be_finalized.map(&:id)).update_all(end_time: DateTime.now)
+      # rubocop: enable Rails/SkipsModelValidations
     end
   end
 

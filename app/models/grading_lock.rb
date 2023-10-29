@@ -8,10 +8,12 @@ class GradingLock < ApplicationRecord
   belongs_to :grader, class_name: 'User', optional: true
   belongs_to :completed_by, class_name: 'User', optional: true
 
+  # NOTE: The :bulk_create context is used only in exam#initialize_grading_locks!
+  # where this uniqueness property is already guaranteed
   validates :part, uniqueness: {
     scope: [:registration_id, :question],
     message: 'is already being graded',
-  }
+  }, unless: -> { validation_context == :bulk_create }
 
   validate :valid_qp
 

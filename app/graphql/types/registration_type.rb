@@ -119,7 +119,12 @@ module Types
     field :grading_comments, Types::GradingCommentType.connection_type, null: true
     def grading_comments
       if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
-        AssociationLoader.for(Registration, :grading_comments).load(object)
+        AssociationLoader.for(Registration, :grading_comments).load(object).then do |ans|
+          ans.each do |c|
+            c.cache_user!(user)
+          end
+          ans
+        end
       else
         nil
       end
@@ -128,14 +133,12 @@ module Types
     field :all_grading_comments, [Types::GradingCommentType], null: false
     def all_grading_comments
       if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
-        AssociationLoader.for(Registration, :grading_comments, includes: [
-          :creator, 
-          :question,
-          :part,
-          :body_item,
-          preset_comment: :rubric_preset,
-          registration: :user,
-        ]).load(object)
+        AssociationLoader.for(Registration, :grading_comments).load(object).then do |ans|
+          ans.each do |c|
+            c.cache_user!(user)
+          end
+          ans
+        end
       else
         nil
       end

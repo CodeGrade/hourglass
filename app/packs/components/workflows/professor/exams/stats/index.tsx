@@ -29,8 +29,7 @@ import RubricPresetHistograms from './RubricPresetHistograms';
 import { colors } from './utils';
 
 type ExamVersion = statsExamQuery['response']['exam']['examVersions']['edges'][number]['node'];
-type Registration = statsExamQuery['response']['exam']['registrations'][number];
-type RegistrationScore = statsExamQuery['response']['exam']['examVersions']['edges'][number]['node']['currentScores'][number];
+type RegistrationScore = ExamVersion['currentScores'][number];
 function doBinning(binner, vals: number[]) {
   const ans = binner(vals);
   return ans.map((b) => ({
@@ -45,30 +44,20 @@ const ExamStats: React.FC<{
   examId: string,
   title?: string;
   examVersions: readonly ExamVersion[],
-  registrations: readonly Registration[],
 }> = (props) => {
   const {
     examId,
     title,
     examVersions,
-    registrations,
   } = props;
   const examVersionsMap = new Map(
     examVersions.map((v) => [v.id, v]),
   );
-  const regsById: Map<Registration['id'], Registration> = new Map(
-    registrations.filter((r) => r.started).map((r) => [r.id, r]),
-  );
-  const regsByVersion: Map<ExamVersion['id'], Registration[]> = new Map(
-    Array.from(examVersionsMap.keys()).map(
-      (id) => [id, registrations.filter((r) => r.examVersion.id === id && r.started)],
-    ),
-  );
-  const scoresByRegId: Map<ExamVersion['id'], Map<Registration['id'], RegistrationScore['scores']>> = new Map(
+  const scoresByRegId: Map<ExamVersion['id'], Map<RegistrationScore['registration']['id'], RegistrationScore['scores']>> = new Map(
     examVersions.map(
       (v) => [
         v.id,
-        new Map(v.currentScores.filter((reg) => regsById.get(reg.registration.id)?.started)
+        new Map(v.currentScores.filter((reg) => reg.registration.started)
           .map((reg) => [reg.registration.id, reg.scores]))],
     ),
   );
@@ -90,7 +79,6 @@ const ExamStats: React.FC<{
           key={version.id}
           version={version}
           stats={statsByVersion[version.id]}
-          regs={regsByVersion.get(version.id)}
         />
       ))}
     </>
@@ -182,37 +170,25 @@ const RenderStats: React.FC<React.PropsWithChildren & {
 const RenderVersionStats: React.FC<{
   examId: string,
   version: ExamVersion,
-  regs: Registration[],
   stats: number[][],
 }> = (props) => {
   const {
     examId,
     version,
     stats,
-    regs,
   } = props;
   const { qpPairs, dbQuestions } = version;
   const [showDetails, setShowDetails] = useState(false);
   const [showRubrics, setShowRubrics] = useState(false);
   const [showAsPct, setShowAsPct] = useState(true);
-  const rawScores = [];
   const numPoints = d3.sum(
     dbQuestions.filter((q) => !q.extraCredit)
       .map((q) => q.parts.filter((p) => !p.extraCredit).map((p) => p.points))
       .flat(),
   );
-  const regsById: Map<Registration['id'], Registration> = new Map(
-    regs.filter((r) => r.started).map((r) => [r.id, r]),
-  );
-  const scoresByRegId: Map<Registration['id'], RegistrationScore['scores']> = new Map(
-    version.currentScores
-      .filter((reg) => regsById.get(reg.registration.id)?.started)
-      .map((reg) => [reg.registration.id, reg.scores]),
-  );
-  regs.forEach((r) => {
-    const rawScore = d3.sum(scoresByRegId.get(r.id).flat());
-    rawScores.push(rawScore);
-  });
+  const rawScores = version.currentScores
+    .filter((reg) => reg.registration.started)
+    .map((reg) => d3.sum(reg.scores.flat()));
   rawScores.sort();
   return (
     <>
@@ -345,16 +321,11 @@ const ExamStatsQuery: React.FC = () => {
               }
               ...RubricPresetHistograms
               currentScores {
-                registration { id }
+                registration { id started }
                 scores
               }
             }
           }
-        }
-        registrations {
-          id
-          started
-          examVersion { id }
         }
       }
     }
@@ -371,7 +342,6 @@ const ExamStatsQuery: React.FC = () => {
         examId={examId}
         title={data.exam.name}
         examVersions={examVersions}
-        registrations={data.exam.registrations}
       />
     </DocumentTitle>
   );

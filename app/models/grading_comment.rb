@@ -31,8 +31,16 @@ class GradingComment < ApplicationRecord
     end
   end
 
+  # This method should be called only by registration_type, to
+  # preemptively cache the registration's user without having to
+  # load this object's registration field, to in turn get the user
+  # to check in visible_to? below.
+  def cache_user!(reg_user)
+    @user = reg_user
+  end
+
   def visible_to?(check_user, role_for_exam, _role_for_course)
-    (user == check_user) ||
+    ((@user || user) == check_user) ||
       (role_for_exam >= Exam.roles[:staff]) ||
       course.all_staff.exists?(check_user.id)
   end

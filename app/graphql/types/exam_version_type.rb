@@ -279,7 +279,7 @@ module Types
           }
         }
       ]).load(object).then do |regs|
-        regs.map(&:exam_version).to_set.map(&:cache_grading_info!)
+        regs.to_set(&:exam_version).map(&:cache_grading_info!)
         regs.map do |r|
           {
             registration: r,

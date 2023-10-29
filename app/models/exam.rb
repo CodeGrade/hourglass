@@ -288,9 +288,17 @@ class Exam < ApplicationRecord
   end
 
   def bottlenose_exam_grades(regs = nil)
-    regs = registrations if regs.nil?
+    if regs.nil?
+      regs = registrations.includes(
+        :snapshots,
+        exam_version: { rubrics: ExamVersion.rubric_includes },
+      )
+    end
+    versions = regs.to_set(&:exam_version)
+    versions.each(&:cache_grading_info!)
+    versions.each(&:cache_default_answers!)
     regs = regs.reject { |r| r.current_answers == r.exam_version.default_answers }
-    all_versions = exam_versions.map { |ev| ev.bottlenose_summary(with_names: false) }
+    all_versions = versions.map { |ev| ev.bottlenose_summary(with_names: false) }
     if compatible_versions(all_versions)
       regs.to_h do |r|
         [

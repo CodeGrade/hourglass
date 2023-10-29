@@ -102,7 +102,14 @@ class ExamVersion < ApplicationRecord
     end
   end
 
+  def cache_default_answers!
+    @default_answers_cache = default_answers
+    @default_answers_cache
+  end
+
   def default_answers
+    return @default_answers_cache if @default_answers_cache
+
     def_answers = answers.map do |ans_q|
       ans_q.map do |ans_p|
         ans_p.map { |_| { NO_ANS: true } }

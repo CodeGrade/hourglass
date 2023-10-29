@@ -289,9 +289,10 @@ class Exam < ApplicationRecord
 
   def bottlenose_exam_grades(regs = nil)
     regs = registrations if regs.nil?
+    regs = regs.reject { |r| r.current_answers == r.exam_version.default_answers }
     all_versions = exam_versions.map { |ev| ev.bottlenose_summary(with_names: false) }
     if compatible_versions(all_versions)
-      regs.reject { |r| r.current_answers == r.exam_version.default_answers }.to_h do |r|
+      regs.to_h do |r|
         [
           r.user.username,
           r.current_part_scores,

@@ -165,11 +165,7 @@ class ExamVersion < ApplicationRecord
   end
 
   def root_rubric
-    rubrics.where(
-      question: nil,
-      part: nil,
-      body_item: nil,
-    ).root_rubrics.first
+    rubrics.exam_version_root_rubrics.first
   end
 
   # NOTE: format should be either :export or :graphql
@@ -228,7 +224,6 @@ class ExamVersion < ApplicationRecord
     Rails.logger.debug e.backtrace
   end
 
-  # rubocop:disable Metrics/PerceivedComplexity
   def flatten_groups(obj)
     # Each key in grouped has non-nil points, eventually bottoming out
     # at a rubric_preset with a direction and label, that contains
@@ -253,9 +248,9 @@ class ExamVersion < ApplicationRecord
       {
         id: obj.id,
         points: obj.new_record? ? nil : obj.points,
-        qnum: obj.question&.index,
-        pnum: obj.part&.index,
-        bnum: obj.body_item&.index,
+        qnum: cached_qpb_nums[:questions][obj.question_id],
+        pnum: cached_qpb_nums[:parts][obj.part_id],
+        bnum: cached_qpb_nums[:body_items][obj.body_item_id],
       }.stringify_keys
     when RubricPreset
       {
@@ -273,9 +268,9 @@ class ExamVersion < ApplicationRecord
     when GradingComment
       {
         id: obj.id,
-        qnum: obj.question&.index,
-        pnum: obj.part&.index,
-        bnum: obj.body_item&.index,
+        qnum: cached_qpb_nums[:questions][obj.question_id],
+        pnum: cached_qpb_nums[:parts][obj.part_id],
+        bnum: cached_qpb_nums[:body_items][obj.body_item_id],
         grader: obj.creator.display_name,
         points: obj.points,
         message: obj.message,
@@ -284,26 +279,121 @@ class ExamVersion < ApplicationRecord
       obj
     end
   end
-  # rubocop:enable Metrics/PerceivedComplexity
+
+  def cache_grading_info!
+    cached_preset_comments
+    cached_grading_comments
+    cached_grading_checks
+    cached_grading_locks
+    cached_rubrics_for_grading
+    cached_qpb_nums
+  end
+
+  def cached_preset_comments
+    return @preset_comments_cache if @preset_comments_cache
+
+    @preset_comments_cache = preset_comments.includes(
+      rubric_preset: [{ rubric: :parent_section }],
+    ).index_by(&:id)
+    @preset_comments_cache
+  end
+
+  def cached_qpb_nums
+    return @qpb_nums_cache if @qpb_nums_cache
+
+    parts = Part.where(question: db_questions)
+    body_items = BodyItem.where(part: parts)
+    @qpb_nums_cache = {
+      questions: db_questions.to_h { |q| [q.id, q.index] },
+      parts: parts.to_h { |p| [p.id, p.index] },
+      body_items: body_items.to_h { |b| [b.id, b.index] },
+    }
+    @qpb_nums_cache
+  end
+
+  def cached_grading_comments
+    return @grading_comments_cache if @grading_comments_cache
+
+    @grading_comments_cache = GradingComment
+                              .where(registration: registrations)
+                              .includes(
+                                :creator, :question, :part, :body_item
+                              )
+                              .group_by(&:registration_id)
+    @grading_comments_cache = registrations.to_h { |r| [r.id, @grading_comments_cache[r.id].to_a] }
+    @grading_comments_cache
+  end
+
+  def cached_grading_comments_for(reg)
+    return @grading_comments_cache[reg.id] if @grading_comments_cache&.dig(reg.id)
+
+    @grading_comments_cache ||= {}
+    @grading_comments_cache[reg.id] = reg.grading_comments.includes(
+      :creator, :question, :part, :body_item
+    ).to_a
+    @grading_comments_cache[reg.id]
+  end
+
+  def cached_grading_checks
+    return @grading_checks_cache if @grading_checks_cache&.any?
+
+    @grading_checks_cache = GradingCheck
+                            .where(registration: registrations)
+                            .includes(
+                              :creator, :question, :part, :body_item
+                            )
+                            .group_by(&:registration_id)
+    @grading_checks_cache = registrations.to_h { |r| [r.id, @grading_checks_cache[r.id].to_a] }
+    @grading_checks_cache
+  end
+
+  def cached_grading_checks_for(reg)
+    return @grading_checks_cache[reg.id] if @grading_checks_cache&.dig(reg.id)
+
+    @grading_checks_cache ||= {}
+    @grading_checks_cache[reg.id] = reg.grading_checks.includes(
+      :creator, :question, :part, :body_item
+    ).to_a
+    @grading_checks_cache[reg.id]
+  end
+
+  def cached_grading_locks
+    return @grading_locks_cache if @grading_locks_cache
+
+    @grading_locks_cache = GradingLock.where(registration: registrations).group_by(&:registration_id)
+    @grading_locks_cache = registrations.to_h { |r| [r.id, @grading_locks_cache[r.id].to_a] }
+    @grading_locks_cache
+  end
+
+  def cached_grading_locks_for(reg)
+    return @grading_locks_cache[reg.id] if @grading_locks_cache&.dig(reg.id)
+
+    @grading_locks_cache ||= {}
+    @grading_locks_cache[reg] = reg.grading_locks.includes(:question, :part).to_a
+    @grading_locks_cache[reg]
+  end
+
+  def cached_rubrics_for_grading
+    return @rubrics_for_grading_cache if @rubrics_for_grading_cache
+
+    @rubrics_for_grading_cache = rubrics_for_grading
+    @rubrics_for_grading_cache
+  end
 
   # Tree of questions to parts to score for that part
   # rubocop:disable Metrics/PerceivedComplexity
   def detailed_grade_breakdown_for(reg)
-    comments_and_rubrics = reg.grading_comments.includes(
-      :creator, :question, :part, :body_item,
-      preset_comment: [{ rubric_preset: [{ rubric: :parent_section }] }]
-    )
+    comments_and_rubrics = cached_grading_comments_for(reg)
+    preset_comments = cached_preset_comments
+
     comments = multi_group_by(comments_and_rubrics, [:question_id, :part_id, :body_item_id, :preset_comment_id])
-    checks = multi_group_by(
-      reg.grading_checks.includes(:creator, :question, :part, :body_item),
-      [:question_id, :part_id, :body_item_id],
-    )
-    rubric_tree = multi_group_by(rubrics_for_grading, [:question_id, :part_id, :body_item_id], true)
-    locks = multi_group_by(reg.grading_locks.includes(:question, :part), [:question_id, :part_id], true)
+    checks = multi_group_by(cached_grading_checks_for(reg), [:question_id, :part_id, :body_item_id])
+    rubric_tree = multi_group_by(cached_rubrics_for_grading, [:question_id, :part_id, :body_item_id], true)
+    locks = multi_group_by(cached_grading_locks_for(reg), [:question_id, :part_id], true)
 
     exam_rubric = rubric_tree.dig(nil, nil, nil)
     # rubocop:disable Metrics/BlockLength
-    part_tree do |question:, part:, **|
+    cached_part_tree do |question:, part:, **|
       question_rubric = rubric_tree.dig(question.id, nil, nil)
       part_rubric = rubric_tree.dig(question.id, part.id, nil)
       graded = !locks.dig(question.id, part.id)&.completed_by_id.nil?
@@ -322,7 +412,6 @@ class ExamVersion < ApplicationRecord
       body_item_info = part.body_items.each_with_index.map do |body_item, _bnum|
         body_checks = checks.dig(question.id, part.id, body_item.id) || []
         body_comments = comments.dig(question.id, part.id, body_item.id) || {}
-        preset_comments = PresetComment.where(id: body_comments.keys).index_by(&:id)
 
         grouped =
           body_comments
@@ -524,6 +613,20 @@ class ExamVersion < ApplicationRecord
               part: p,
               qnum: q.index,
               pnum: p.index)
+      end
+    end
+  end
+
+  def cached_part_tree
+    @part_tree_cache ||= db_questions.includes(parts: :body_items).map do |q|
+      q.parts.map do |p|
+        { question: q, part: p, qnum: q.index, pnum: p.index }
+      end
+    end
+
+    @part_tree_cache.map do |qparts|
+      qparts.map do |qp_info|
+        yield(**qp_info)
       end
     end
   end

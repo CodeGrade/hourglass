@@ -37,6 +37,10 @@ class Rubric < ApplicationRecord
           source: 'ancestor'
 
   scope :root_rubrics, -> { joins(:ancestor_links).group('id').having('count(rubrics.id) = 1') }
+  scope :exam_version_root_rubrics, -> { root_rubrics.where(question_id: nil, part_id: nil, body_item_id: nil) }
+  scope :question_root_rubrics, -> { root_rubrics.where(part_id: nil, body_item_id: nil) }
+  scope :part_root_rubrics, -> { root_rubrics.where(body_item_id: nil) }
+  scope :body_item_root_rubrics, -> { root_rubrics }
 
   before_create do
     self_link = RubricTreePath.new(ancestor: self, descendant: self, path_length: 0)
@@ -138,7 +142,7 @@ class Rubric < ApplicationRecord
     question && part && body_item.nil?
   end
 
-  def body_rubric
+  def body_rubric?
     question && part && body_item && true
   end
 

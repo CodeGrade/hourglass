@@ -30,6 +30,7 @@ import { colors } from './utils';
 
 type ExamVersion = statsExamQuery['response']['exam']['examVersions']['edges'][number]['node'];
 type Registration = statsExamQuery['response']['exam']['registrations'][number];
+type RegistrationScore = statsExamQuery['response']['exam']['examVersions']['edges'][number]['node']['currentScores'][number];
 function doBinning(binner, vals: number[]) {
   const ans = binner(vals);
   return ans.map((b) => ({
@@ -60,11 +61,17 @@ const ExamStats: React.FC<{
       (id) => [id, registrations.filter((r) => r.examVersion.id === id && r.started)],
     ),
   );
+  const scoresByRegId: Map<ExamVersion['id'], Map<Registration['id'], RegistrationScore['scores']>> = new Map(
+    examVersions.map(
+      (v) => [v.id, new Map(v.currentScores.map((reg) => [reg.registration.id, reg.scores]))],
+    ),
+  );
   const statsByVersion: Record<ExamVersion['id'], number[][]> = {};
   examVersionsMap.forEach((version, id) => {
     const stats = [];
     version.qpPairs.forEach(({ qnum, pnum }, index) => {
-      stats[index] = regsByVersion.get(id).map((r) => r.currentPartScores[qnum][pnum]);
+      stats[index] = Array.from(scoresByRegId.get(id).values())
+        .map((scores) => scores[qnum][pnum]);
     });
     statsByVersion[id] = stats;
   });
@@ -188,8 +195,9 @@ const RenderVersionStats: React.FC<{
       .map((q) => q.parts.filter((p) => !p.extraCredit).map((p) => p.points))
       .flat(),
   );
+  const scoresByRegId: Map<Registration['id'], RegistrationScore['scores']> = new Map(version.currentScores.map((reg) => [reg.registration.id, reg.scores]));
   regs.forEach((r) => {
-    const rawScore = d3.sum((r.currentPartScores as number[][]).flat());
+    const rawScore = d3.sum(scoresByRegId.get(r.id).flat());
     rawScores.push(rawScore);
   });
   rawScores.sort();
@@ -323,13 +331,16 @@ const ExamStatsQuery: React.FC = () => {
                 }
               }
               ...RubricPresetHistograms
+              currentScores {
+                registration { id }
+                scores
+              }
             }
           }
         }
         registrations {
           id
           started
-          currentPartScores
           examVersion { id }
         }
       }

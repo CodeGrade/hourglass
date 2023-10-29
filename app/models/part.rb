@@ -29,9 +29,7 @@ class Part < ApplicationRecord
   end
 
   def root_rubric
-    rubrics.where(
-      body_item: nil,
-    ).root_rubrics.first
+    rubrics.part_root_rubrics.first
   end
 
   def as_json(format:)

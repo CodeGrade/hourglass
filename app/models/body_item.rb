@@ -81,7 +81,7 @@ class BodyItem < ApplicationRecord
   end
 
   def root_rubric
-    rubrics.root_rubrics.first
+    rubrics.body_item_root_rubrics.first
   end
 
   def rubric_as_json(format:)

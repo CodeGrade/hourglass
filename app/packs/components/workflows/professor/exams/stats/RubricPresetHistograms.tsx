@@ -23,7 +23,7 @@ import { Preset, Rubric } from '@professor/exams/types';
 import { RubricPresetHistogramsUseRubrics$data, RubricPresetHistogramsUseRubrics$key } from './__generated__/RubricPresetHistogramsUseRubrics.graphql';
 import {
   GradingComment,
-  GradingCommentConnection,
+  GradingCommentList,
   PresetUsageData,
   RechartPayload,
   colors,
@@ -42,7 +42,7 @@ const RenderCommentHistograms: React.FC<{
   qRubricKey: RubricPresetHistogramsUseRubrics$key,
   pRubricKey: RubricPresetHistogramsUseRubrics$key,
   bRubricKey: RubricPresetHistogramsUseRubrics$key,
-  comments: RubricPresetHistograms$data['registrations'][number]['gradingComments'][],
+  comments: RubricPresetHistograms$data['registrations'][number]['allGradingComments'][],
   registrations: RubricPresetHistograms$data['registrations'],
 }> = (props) => {
   const {
@@ -123,7 +123,7 @@ function sortRubric(rubric: Rubric, ans: Preset[]): Preset[] {
 }
 
 function computePresets(
-  comments: GradingCommentConnection[],
+  comments: GradingCommentList[],
   qnum: number,
   pnum: number,
   bnum: number,
@@ -136,10 +136,9 @@ function computePresets(
     preset: GradingComment[],
   }>
 } {
-  const relevantComments = comments.flatMap(({ edges }) => (
-    edges.filter(({ node }) => (
-      node.qnum === qnum && node.pnum === pnum && node.bnum === bnum
-    )).map(({ node }) => node)));
+  const relevantComments = comments.flat().filter((node) => (
+    node.qnum === qnum && node.pnum === pnum && node.bnum === bnum
+  ));
   const byPresets: Record<string, {
     newPoints: GradingComment[],
     newMessage: GradingComment[],
@@ -241,7 +240,7 @@ const RenderCommentHistogram: React.FC<{
   bnum: number,
   singlePart: boolean,
   rubric: RubricPresetHistogramsUseRubrics$key,
-  comments: RubricPresetHistograms$data['registrations'][number]['gradingComments'][],
+  comments: GradingCommentList[],
   registrations: RubricPresetHistograms$data['registrations'],
 }> = (props) => {
   const {
@@ -310,7 +309,7 @@ const RenderCommentHistogram: React.FC<{
     rubricKey,
   );
   const gradingCommentToRegistrationMap = useMemo(() => new Map(
-    registrations.flatMap((r) => r.gradingComments.edges.map(({ node: c }) => [c.id, r.id])),
+    registrations.flatMap((r) => r.allGradingComments.map((c) => [c.id, r.id])),
   ), [registrations]);
   const registrationsMap = useMemo(
     () => new Map(registrations.map((r) => [r.id, r])),
@@ -524,25 +523,21 @@ const RenderRubricPresetHistograms: React.FC<{
           id
           displayName
         }
-        gradingComments(first: 1000000) {
-          edges {
-            node {
+        allGradingComments {
+          id
+          points
+          message
+          qnum
+          pnum
+          bnum
+          presetComment { 
+            id
+            order
+            points
+            graderHint
+            studentFeedback
+            rubricPreset {
               id
-              points
-              message
-              qnum
-              pnum
-              bnum
-              presetComment { 
-                id
-                order
-                points
-                graderHint
-                studentFeedback
-                rubricPreset {
-                  id
-                }
-              }
             }
           }
         }
@@ -573,7 +568,7 @@ const RenderRubricPresetHistograms: React.FC<{
                       qRubricKey={q.rootRubric}
                       pRubricKey={p.rootRubric}
                       bRubricKey={b.rootRubric}
-                      comments={res.registrations.map((r) => r.gradingComments)}
+                      comments={res.registrations.map((r) => r.allGradingComments)}
                       registrations={res.registrations}
                     />
                   </div>

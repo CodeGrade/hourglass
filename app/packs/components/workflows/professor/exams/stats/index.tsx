@@ -56,6 +56,9 @@ const ExamStats: React.FC<{
   const examVersionsMap = new Map(
     examVersions.map((v) => [v.id, v]),
   );
+  const regsById: Map<Registration['id'], Registration> = new Map(
+    registrations.filter((r) => r.started).map((r) => [r.id, r]),
+  );
   const regsByVersion: Map<ExamVersion['id'], Registration[]> = new Map(
     Array.from(examVersionsMap.keys()).map(
       (id) => [id, registrations.filter((r) => r.examVersion.id === id && r.started)],
@@ -63,7 +66,10 @@ const ExamStats: React.FC<{
   );
   const scoresByRegId: Map<ExamVersion['id'], Map<Registration['id'], RegistrationScore['scores']>> = new Map(
     examVersions.map(
-      (v) => [v.id, new Map(v.currentScores.map((reg) => [reg.registration.id, reg.scores]))],
+      (v) => [
+        v.id,
+        new Map(v.currentScores.filter((reg) => regsById.get(reg.registration.id)?.started)
+          .map((reg) => [reg.registration.id, reg.scores]))],
     ),
   );
   const statsByVersion: Record<ExamVersion['id'], number[][]> = {};
@@ -195,7 +201,14 @@ const RenderVersionStats: React.FC<{
       .map((q) => q.parts.filter((p) => !p.extraCredit).map((p) => p.points))
       .flat(),
   );
-  const scoresByRegId: Map<Registration['id'], RegistrationScore['scores']> = new Map(version.currentScores.map((reg) => [reg.registration.id, reg.scores]));
+  const regsById: Map<Registration['id'], Registration> = new Map(
+    regs.filter((r) => r.started).map((r) => [r.id, r]),
+  );
+  const scoresByRegId: Map<Registration['id'], RegistrationScore['scores']> = new Map(
+    version.currentScores
+      .filter((reg) => regsById.get(reg.registration.id)?.started)
+      .map((reg) => [reg.registration.id, reg.scores]),
+  );
   regs.forEach((r) => {
     const rawScore = d3.sum(scoresByRegId.get(r.id).flat());
     rawScores.push(rawScore);

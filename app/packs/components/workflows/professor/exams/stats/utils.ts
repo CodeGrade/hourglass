@@ -21,8 +21,8 @@ export type PresetUsageData = {
   Total: number,
 };
 
-export type GradingCommentConnection = RubricPresetHistograms$data['registrations'][number]['gradingComments'];
-export type GradingComment = GradingCommentConnection['edges'][number]['node'];
+export type GradingCommentList = RubricPresetHistograms$data['registrations'][number]['allGradingComments'];
+export type GradingComment = GradingCommentList[number];
 
 export const colors = [
   'steelblue', 'maroon', 'gold', 'seagreen', 'orange', 'indigo',

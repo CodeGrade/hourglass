@@ -45,5 +45,8 @@ module Types
     field :root_rubric, Types::RubricType, null: false do
       guard Guards::ALL_STAFF
     end
+    def root_rubric
+      AssociationLoader.for(Part, :rubrics, merge: -> { part_root_rubrics }).load(object).then(&:first)
+    end
   end
 end

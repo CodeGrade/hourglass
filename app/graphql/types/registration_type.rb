@@ -125,6 +125,23 @@ module Types
       end
     end
 
+    field :all_grading_comments, [Types::GradingCommentType], null: false
+    def all_grading_comments
+      if ALL_STAFF_OR_PUBLISHED.call(self, nil, context)
+        AssociationLoader.for(Registration, :grading_comments, includes: [
+          :creator, 
+          :question,
+          :part,
+          :body_item,
+          preset_comment: :rubric_preset,
+          registration: :user,
+        ]).load(object)
+      else
+        nil
+      end
+    end
+
+
     field :anomalous, Boolean, null: false
     def anomalous
       object.anomalous?

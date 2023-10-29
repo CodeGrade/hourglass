@@ -5,6 +5,11 @@ module Types
     field :qnum, Integer, null: false
     field :pnum, Integer, null: false
   end
+
+  class RegistrationScore < Types::BaseObject
+    field :registration, RegistrationType, null: false
+    field :scores, [[Float]], null: false
+  end
   class ExamVersionType < Types::BaseObject
     implements GraphQL::Types::Relay::Node
     global_id_field :id
@@ -65,11 +70,27 @@ module Types
       object.any_started?
     end
 
-    field :registrations, [Types::RegistrationType], null: false do
+    field :registrations, [Types::RegistrationType], null: false, extras: [:lookahead] do
       guard Guards::PROCTORS_AND_PROFESSORS
     end
-    def registrations()
-      AssociationLoader.for(ExamVersion, :registrations).load(object)
+    def registrations(lookahead:)
+      includes = []
+      if [:current_grading, :current_part_scores, :all_grading_comments].any? { |f| lookahead.selects?(f) }
+        includes = [
+          grading_comments: [
+            :creator, :body_item,
+            question: { parts: :body_items },
+            part: :body_items,
+            preset_comment: [{ rubric_preset: [{ rubric: :parent_section }] }]
+          ],
+          grading_locks: [:question, :part],
+          grading_checks: [:creator, :question, :part, :body_item],
+          exam_version: {
+            rubrics: ExamVersion.rubric_includes
+          }
+        ]
+      end
+      AssociationLoader.for(ExamVersion, :registrations, includes: includes).load(object)
     end
     
     field :started_count, Integer, null: false do
@@ -162,6 +183,9 @@ module Types
     field :root_rubric, Types::RubricType, null: true do
       guard Guards::ALL_STAFF
     end
+    def root_rubric
+      AssociationLoader.for(ExamVersion, :rubrics, merge: -> { exam_version_root_rubrics }).load(object).then(&:first)
+    end
 
     field :raw_rubrics, GraphQL::Types::JSON, null: true do
       guard Guards::PROFESSORS
@@ -232,7 +256,7 @@ module Types
       end
     end
 
-    field :current_scores, GraphQL::Types::JSON, null: true do
+    field :current_scores, [RegistrationScore], null: true do
       guard Guards::PROFESSORS
     end
     def current_scores
@@ -255,7 +279,13 @@ module Types
           }
         }
       ]).load(object).then do |regs|
-        regs.map(&:current_part_scores)
+        regs.map(&:exam_version).to_set.map(&:cache_grading_info!)
+        regs.map do |r|
+          {
+            registration: r,
+            scores: r.current_part_scores,
+          }
+        end
       end
     end
   end

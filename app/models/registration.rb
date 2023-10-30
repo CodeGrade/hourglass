@@ -24,6 +24,21 @@ class Registration < ApplicationRecord
   delegate :course, to: :exam
   delegate :term, to: :course
 
+  validates :user, uniqueness: { scope: :exam_version }
+
+  # note: we are not sure whether the current reg will show up in the association,
+  # so this validation remains separate from the previous uniqueness check
+  validate :user_exam_uniqueness
+  def user_exam_uniqueness
+    other_reg_exists =
+      user
+      .registrations
+      .where(exam_version: exam.exam_versions)
+      .where.not(exam_version: exam_version)
+      .any?
+    errors.add(:user, 'already has a registration for another version of that exam') if other_reg_exists
+  end
+
   def room_version_same_exam
     return unless room
 

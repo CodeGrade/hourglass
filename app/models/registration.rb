@@ -24,6 +24,10 @@ class Registration < ApplicationRecord
   delegate :course, to: :exam
   delegate :term, to: :course
 
+  has_one :most_recent_snapshot, lambda {
+    merge(Snapshot.most_recent_by_registration)
+  }, class_name: 'Snapshot', inverse_of: :registration, dependent: nil
+
   def room_version_same_exam
     return unless room
 
@@ -140,7 +144,7 @@ class Registration < ApplicationRecord
   end
 
   def current_answers
-    snapshots.last&.answers || exam_version.default_answers
+    most_recent_snapshot&.answers || exam_version.default_answers
   end
 
   def save_answers(answers)

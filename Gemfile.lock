@@ -54,6 +54,9 @@ GEM
     activerecord (6.1.7.3)
       activemodel (= 6.1.7.3)
       activesupport (= 6.1.7.3)
+    activerecord-explain-analyze (0.1.0)
+      activerecord (>= 4)
+      pg
     activerecord_json_validator (2.1.5)
       activerecord (>= 4.2.0, < 8)
       json_schemer (~> 0.2.18)
@@ -363,6 +366,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  activerecord-explain-analyze
   activerecord_json_validator (~> 2.0)
   better_errors (= 2.9.1)
   binding_of_caller

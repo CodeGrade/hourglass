@@ -145,6 +145,18 @@ module Types
       guard Guards::PROFESSORS
     end
 
+    field :bottlenose_export, GraphQL::Types::JSON, null: false do
+      guard Guards::PROFESSORS
+    end
+
+    field :bottlenose_exam_grades, GraphQL::Types::JSON, null: false do
+      guard Guards::PROFESSORS
+    end
+    
+    field :bottlenose_exam_summary, GraphQL::Types::JSON, null: false do
+      guard Guards::PROFESSORS
+    end
+
     field :my_registration, Types::RegistrationType, null: true
     def my_registration
       current_user = context[:current_user]

@@ -28,6 +28,7 @@ import {
   Tab,
   Nav,
   Container,
+  Modal,
 } from 'react-bootstrap';
 import {
   FaChevronUp,
@@ -51,7 +52,7 @@ import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
 import ErrorBoundary from '@hourglass/common/boundary';
 import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
-import { BiHide, BiShow } from 'react-icons/bi';
+import { BiHide, BiShow, BiSpreadsheet } from 'react-icons/bi';
 import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import { GrSync } from 'react-icons/gr';
@@ -79,6 +80,7 @@ import { admin_preview_version$key } from './__generated__/admin_preview_version
 import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMutation.graphql';
 import { adminDestroyVersionMutation } from './__generated__/adminDestroyVersionMutation.graphql';
 import { adminSyncExamToBottlenoseMutation } from './__generated__/adminSyncExamToBottlenoseMutation.graphql';
+import { adminBottlenoseJsonQuery } from './__generated__/adminBottlenoseJsonQuery.graphql';
 
 export interface ExamUpdateInfo {
   name: string;
@@ -962,6 +964,7 @@ const PublishGradesButton: React.FC<{
     examId,
   );
   const { alert } = useContext(AlertContext);
+  const [showJsonExport, setShowJsonExport] = useState(false);
   const [publish, publishLoading] = useMutationWithDefaults<adminPublishGradesMutation>(
     graphql`
       mutation adminPublishGradesMutation($input: PublishGradesInput!) {
@@ -1022,64 +1025,187 @@ const PublishGradesButton: React.FC<{
   const disabled = publishLoading || syncLoading || !res.graded;
   const reason = (publishLoading || syncLoading) ? 'Loading...' : 'Not all exams are graded yet';
   return (
-    <Tooltip
-      showTooltip={disabled}
-      message={reason}
-      placement="bottom"
-    >
-      <DropdownButton
-        disabled={disabled}
-        className="d-inline-block ml-2"
-        variant="success"
-        title="Publish..."
+    <>
+      <Tooltip
+        showTooltip={disabled}
+        message={reason}
+        placement="bottom"
       >
-        <Dropdown.Item
-          onClick={() => {
-            publish({
-              variables: {
-                input: {
-                  examId: res.id,
-                  published: true,
+        <DropdownButton
+          disabled={disabled}
+          className="d-inline-block ml-2"
+          variant="success"
+          title="Publish..."
+        >
+          <Dropdown.Item
+            onClick={() => {
+              publish({
+                variables: {
+                  input: {
+                    examId: res.id,
+                    published: true,
+                  },
                 },
-              },
+              });
+            }}
+          >
+            <Icon I={BiShow} className="mr-2" />
+            Publish all grades
+          </Dropdown.Item>
+          <Dropdown.Item
+            onClick={() => {
+              publish({
+                variables: {
+                  input: {
+                    examId: res.id,
+                    published: false,
+                  },
+                },
+              });
+            }}
+          >
+            <Icon I={BiHide} className="mr-2" />
+            Unpublish all grades
+          </Dropdown.Item>
+          <Dropdown.Divider />
+          <Dropdown.Item
+            onClick={() => {
+              syncGrades({
+                variables: {
+                  input: {
+                    examId: res.id,
+                  },
+                },
+              });
+            }}
+          >
+            <Icon I={GrSync} className="mr-2" />
+            Sync to Bottlenose
+          </Dropdown.Item>
+          <Dropdown.Item
+            onClick={() => {
+              setShowJsonExport(true);
+            }}
+          >
+            <Icon I={BiSpreadsheet} className="mr-2" />
+            Show Bottlenose Export
+          </Dropdown.Item>
+        </DropdownButton>
+      </Tooltip>
+      {showJsonExport && <ShowBottlenoseJson onClose={() => setShowJsonExport(false)} />}
+    </>
+  );
+};
+
+const renderBottlenoseExport = (bottlenoseExport: { exam_grades: object }): string => {
+  const prettyJson = JSON.stringify(bottlenoseExport, (key, value) => (key === 'exam_grades' ? 'PLACEHOLDER' : value), 2);
+  const formattedElements: string[] = Object.keys(bottlenoseExport.exam_grades)
+    .map((username) => `${JSON.stringify(username)}: ${JSON.stringify(bottlenoseExport.exam_grades[username])}`);
+  const replacements = formattedElements.join(',\n    ');
+  return prettyJson.replace('"PLACEHOLDER"', `{\n    ${replacements}\n  }`);
+};
+
+const ShowBottlenoseJson: React.FC<{
+  onClose: () => void,
+}> = (params) => {
+  const { examId } = useParams<{ examId: string}>();
+  const { onClose } = params;
+  const [name, setName] = useState('');
+  const [prettyJson, setPrettyJson] = useState('');
+  return (
+    <Modal
+      size="xl"
+      centered
+      keyboard
+      scrollable
+      show
+      onHide={onClose}
+    >
+      <Modal.Header closeButton>
+        <h3>Bottlenose Export Data</h3>
+      </Modal.Header>
+      <Modal.Body>
+        <ErrorBoundary>
+          <Suspense
+            fallback={<p>Loading...</p>}
+          >
+            <ShowBottlenoseJsonQuery
+              examId={examId}
+              setName={setName}
+              setPrettyJson={setPrettyJson}
+            />
+          </Suspense>
+        </ErrorBoundary>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          variant="primary"
+          onClick={() => {
+            const blob = new Blob([prettyJson], {
+              type: 'application/json',
             });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${examId}-${name}-export.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
           }}
         >
-          <Icon I={BiShow} className="mr-2" />
-          Publish all grades
-        </Dropdown.Item>
-        <Dropdown.Item
+          Save data
+        </Button>
+        <Button
+          variant="success"
           onClick={() => {
-            publish({
-              variables: {
-                input: {
-                  examId: res.id,
-                  published: false,
-                },
-              },
-            });
+            navigator.clipboard.writeText(prettyJson);
           }}
         >
-          <Icon I={BiHide} className="mr-2" />
-          Unpublish all grades
-        </Dropdown.Item>
-        <Dropdown.Divider />
-        <Dropdown.Item
-          onClick={() => {
-            syncGrades({
-              variables: {
-                input: {
-                  examId: res.id,
-                },
-              },
-            });
-          }}
+          Copy to clipboard
+        </Button>
+        <Button
+          variant="danger"
+          onClick={onClose}
         >
-          <Icon I={GrSync} className="mr-2" />
-          Sync to Bottlenose
-        </Dropdown.Item>
-      </DropdownButton>
-    </Tooltip>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
+const ShowBottlenoseJsonQuery: React.FC<{
+  examId: string,
+  setName: (name: string) => void,
+  setPrettyJson: (json: string) => void,
+}> = (params) => {
+  const {
+    examId,
+    setName,
+    setPrettyJson,
+  } = params;
+  const data = useLazyLoadQuery<adminBottlenoseJsonQuery>(
+    graphql`
+    query adminBottlenoseJsonQuery($examId: ID!) {
+      exam(id: $examId) { 
+        bottlenoseExport 
+        name
+      }
+    }`,
+    { examId },
+    { fetchPolicy: 'network-only' },
+  );
+  const {
+    name,
+    bottlenoseExport,
+  } = data.exam;
+  const prettyJson = renderBottlenoseExport(bottlenoseExport);
+  useEffect(() => {
+    setName(name);
+    setPrettyJson(prettyJson);
+  }, [name, prettyJson]);
+  return (
+    <pre>
+      {prettyJson}
+    </pre>
   );
 };
 

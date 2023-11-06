@@ -309,14 +309,16 @@ class Exam < ApplicationRecord
   def bottlenose_exam_grades(regs = nil)
     if regs.nil?
       regs = registrations.includes(
-        :snapshots,
+        :most_recent_snapshot,
+        :user,
         exam_version: { rubrics: ExamVersion.rubric_includes },
       )
     end
     versions = regs.to_set(&:exam_version)
     versions.each(&:cache_grading_info!)
     versions.each(&:cache_default_answers!)
-    regs = regs.reject { |r| r.current_answers == r.exam_version.default_answers }
+    default_answers = versions.to_h { |v| [v.id, v.default_answers] }
+    regs = regs.reject { |r| r.current_answers == default_answers[r.exam_version_id] }
     all_versions = versions.map { |ev| ev.bottlenose_summary(with_names: false) }
     if compatible_versions(all_versions)
       regs.to_h do |r|
@@ -341,12 +343,14 @@ class Exam < ApplicationRecord
   end
 
   def bottlenose_export
+    summary = bottlenose_exam_summary
+    grades = bottlenose_exam_grades
     {
       'name' => name,
       'exam_id' => bottlenose_assignment_id,
       'finish_time' => end_time.iso8601,
-      'exam_summary' => bottlenose_exam_summary,
-      'exam_grades' => bottlenose_exam_grades,
+      'exam_summary' => summary,
+      'exam_grades' => grades,
     }
   end
 

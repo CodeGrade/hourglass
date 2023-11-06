@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_11_215356) do
+ActiveRecord::Schema.define(version: 2023_11_06_011324) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -236,6 +236,8 @@ ActiveRecord::Schema.define(version: 2022_09_11_215356) do
     t.datetime "end_time"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "login_attempt_count", default: 0, null: false
+    t.boolean "pin_validated", default: false, null: false
     t.index ["end_time"], name: "index_registrations_on_end_time"
     t.index ["exam_version_id", "user_id"], name: "index_registrations_on_exam_version_id_and_user_id", unique: true
     t.index ["exam_version_id"], name: "index_registrations_on_exam_version_id"
@@ -316,6 +318,7 @@ ActiveRecord::Schema.define(version: 2022_09_11_215356) do
     t.jsonb "answers", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["created_at"], name: "index_snapshots_on_created_at"
     t.index ["registration_id"], name: "index_snapshots_on_registration_id"
   end
 

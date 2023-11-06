@@ -323,9 +323,7 @@ class ExamVersion < ApplicationRecord
 
     @grading_comments_cache = GradingComment
                               .where(registration: registrations)
-                              .includes(
-                                :creator, :question, :part, :body_item
-                              )
+                              .includes(:creator)
                               .group_by(&:registration_id)
     @grading_comments_cache = registrations.to_h { |r| [r.id, @grading_comments_cache[r.id].to_a] }
     @grading_comments_cache
@@ -335,9 +333,7 @@ class ExamVersion < ApplicationRecord
     return @grading_comments_cache[reg.id] if @grading_comments_cache&.dig(reg.id)
 
     @grading_comments_cache ||= {}
-    @grading_comments_cache[reg.id] = reg.grading_comments.includes(
-      :creator, :question, :part, :body_item
-    ).to_a
+    @grading_comments_cache[reg.id] = reg.grading_comments.includes(:creator).to_a
     @grading_comments_cache[reg.id]
   end
 
@@ -346,9 +342,7 @@ class ExamVersion < ApplicationRecord
 
     @grading_checks_cache = GradingCheck
                             .where(registration: registrations)
-                            .includes(
-                              :creator, :question, :part, :body_item
-                            )
+                            .includes(:creator)
                             .group_by(&:registration_id)
     @grading_checks_cache = registrations.to_h { |r| [r.id, @grading_checks_cache[r.id].to_a] }
     @grading_checks_cache
@@ -358,9 +352,7 @@ class ExamVersion < ApplicationRecord
     return @grading_checks_cache[reg.id] if @grading_checks_cache&.dig(reg.id)
 
     @grading_checks_cache ||= {}
-    @grading_checks_cache[reg.id] = reg.grading_checks.includes(
-      :creator, :question, :part, :body_item
-    ).to_a
+    @grading_checks_cache[reg.id] = reg.grading_checks.includes(:creator).to_a
     @grading_checks_cache[reg.id]
   end
 
@@ -376,7 +368,7 @@ class ExamVersion < ApplicationRecord
     return @grading_locks_cache[reg.id] if @grading_locks_cache&.dig(reg.id)
 
     @grading_locks_cache ||= {}
-    @grading_locks_cache[reg] = reg.grading_locks.includes(:question, :part).to_a
+    @grading_locks_cache[reg] = reg.grading_locks.to_a
     @grading_locks_cache[reg]
   end
 
@@ -585,28 +577,16 @@ class ExamVersion < ApplicationRecord
 
   delegate :root_rubrics, to: :rubrics
 
-  def self.rubric_includes
-    [
-      :question, :part, :body_item,
-      {
-        rubric_preset: :preset_comments,
-        subsections: [
-          :question, :part, :body_item,
-          {
-            rubric_preset: :preset_comments,
-            subsections: [
-              :question, :part, :body_item,
-              {
-                rubric_preset: :preset_comments,
-                subsections: [
-                  :question, :part, :body_item, { rubric_preset: :preset_comments }
-                ],
-              }
-            ],
-          }
-        ],
-      }
-    ]
+  def self.rubric_includes(depth = 3)
+    (0..depth).reduce(nil) do |includes, _|
+      [
+        :question, :part, :body_item,
+        {
+          rubric_preset: :preset_comments,
+          subsections: includes,
+        }.compact
+      ]
+    end
   end
 
   def rubrics_for_grading
@@ -639,8 +619,8 @@ class ExamVersion < ApplicationRecord
   end
 
   def bottlenose_summary(with_names: true)
-    db_questions.map do |q|
-      parts = q.parts
+    db_questions.includes(:parts).map do |q|
+      parts = q.parts.to_a
       if parts.count == 1
         {
           'name' => with_names ? Nokogiri::HTML.fragment(q.name).content : nil,

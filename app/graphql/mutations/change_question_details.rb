@@ -41,7 +41,7 @@ module Mutations
           raise GraphQL::ExecutionError, 'Updated references must not be nil' unless kwargs[:references]
           question.references.destroy_all
           kwargs[:references].each_with_index do |r, index|
-            question.references << Reference.new(
+            question.references.build(
               exam_version: question.exam_version,
               question: question,
               part: nil,

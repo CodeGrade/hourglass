@@ -18,7 +18,7 @@ class Part < ApplicationRecord
 
   before_save do
     if rubrics.empty?
-      rubrics << Rubric.new(
+      rubrics.build(
         exam_version: exam_version,
         question: question,
         part: self,

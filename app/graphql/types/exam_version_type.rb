@@ -114,13 +114,6 @@ module Types
       object.registrations.final.count
     end
 
-    # field :questions, GraphQL::Types::JSON, null: false do
-    #   guard Guards::ALL_STAFF
-    # end
-    # def questions
-    #   object.db_questions.map { |q| q.as_json(format: :graphql) }
-    # end
-
     field :db_questions, [Types::QuestionType], null: false do
       guard ALL_STAFF_OR_PUBLISHED
     end

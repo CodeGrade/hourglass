@@ -64,7 +64,7 @@ module Api
           exam: {
             # TODO: RUBRICS, ANSWERS SHOULD NOT BE INCLUDED IN QUESTIONS
             questions: version.db_questions.map { |q| q.as_json(format: :graphql) },
-            references: version.db_references.where(part: nil, question: nil).map { |q| q.as_json(format: :graphql) },
+            references: version.db_references.where(part: nil, question: nil).map { |r| r.as_json(format: :graphql) },
             instructions: {
               type: 'HTML',
               value: version.instructions,

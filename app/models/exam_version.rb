@@ -167,10 +167,6 @@ class ExamVersion < ApplicationRecord
     move_association(Reference, db_references, :index, index_from, index_to)
   end
 
-  def info(format:)
-    as_json(format: :graphql)
-  end
-
   def root_rubric
     rubrics.exam_version_root_rubrics.first
   end
@@ -180,7 +176,9 @@ class ExamVersion < ApplicationRecord
   # USe :graphql when passing JSON data to the front-end
   def as_json(format:)
     rubric_as_json =
-      if root_rubric.nil? || root_rubric.is_a?(None)
+      if format == :graphql
+        nil
+      elsif root_rubric.nil? || root_rubric.is_a?(None)
         nil
       else
         root_rubric.as_json(format: format).deep_stringify_keys

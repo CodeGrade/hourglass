@@ -34,7 +34,9 @@ class Part < ApplicationRecord
 
   def as_json(format:)
     rubric_as_json =
-      if root_rubric.nil? || root_rubric.is_a?(None)
+      if format == :graphql
+        nil
+      elsif root_rubric.nil? || root_rubric.is_a?(None)
         nil
       else
         root_rubric.as_json(format: format).deep_stringify_keys

@@ -92,7 +92,7 @@ class ExtraCreditTest < ApplicationSystemTestCase
     # prefill all comments, so we can just zip through "completed" rubrics
     @qp_pairs.each do |qp|
       qp[:part].body_items.each do |bi|
-        bi.preset_comments.where(points: 0).each do |preset|
+        bi.preset_comments.where(points: 0).find_each do |preset|
           create_comment(@registration, qp[:question], qp[:part], bi, preset)
         end
       end

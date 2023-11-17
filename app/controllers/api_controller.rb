@@ -9,7 +9,7 @@ class ApiController < ApplicationController
   private
 
   def require_current_user
-    return head :unauthorized if current_user.nil?
+    head :unauthorized if current_user.nil?
   end
 
   def find_exam_and_course

@@ -73,7 +73,7 @@ class GradingCommentTest < ActiveSupport::TestCase
     setup_ec_exam
     @qp_pairs.each do |qp|
       qp[:part].body_items.each do |bi|
-        bi.preset_comments.where(points: 0).each do |preset|
+        bi.preset_comments.where(points: 0).find_each do |preset|
           create_comment(@reg, qp[:question], qp[:part], bi, preset)
         end
       end
@@ -89,13 +89,13 @@ class GradingCommentTest < ActiveSupport::TestCase
     @qp_pairs.each do |qp|
       if !qp[:question].extra_credit && !qp[:part].extra_credit
         qp[:part].body_items.each do |bi|
-          bi.preset_comments.where.not(points: 0).each do |preset|
+          bi.preset_comments.where.not(points: 0).find_each do |preset|
             create_comment(@reg, qp[:question], qp[:part], bi, preset)
           end
         end
       else
         qp[:part].body_items.each do |bi|
-          bi.preset_comments.where(points: 0).each do |preset|
+          bi.preset_comments.where(points: 0).find_each do |preset|
             create_comment(@reg, qp[:question], qp[:part], bi, preset)
           end
         end
@@ -111,7 +111,7 @@ class GradingCommentTest < ActiveSupport::TestCase
     @reg.grading_comments.destroy_all
     @qp_pairs.each do |qp|
       qp[:part].body_items.each do |bi|
-        bi.preset_comments.where.not(points: 0).each do |preset|
+        bi.preset_comments.where.not(points: 0).find_each do |preset|
           create_comment(@reg, qp[:question], qp[:part], bi, preset)
         end
       end

@@ -5,7 +5,7 @@ require 'test_helper'
 class ExamVersionTest < ActiveSupport::TestCase
   def parse_yaml(name)
     yaml_path = Rails.root.join('test', 'fixtures', 'files', name, 'exam.yaml')
-    YAML.safe_load(File.read(yaml_path))
+    YAML.safe_load_file(yaml_path)
   end
 
   test 'factory builds valid exams' do

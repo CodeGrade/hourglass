@@ -13,7 +13,9 @@ import DateTimePicker from '@professor/exams/new/DateTimePicker';
 import Icon from '@student/exams/show/components/Icon';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import { NumericInput } from '@hourglass/common/NumericInput';
-import { BsPencilSquare } from 'react-icons/bs';
+import { BsCheck2Square, BsPencilSquare } from 'react-icons/bs';
+import { FaTrash } from 'react-icons/fa';
+import { LuUndo2 } from 'react-icons/lu';
 import { AlertContext } from '@hourglass/common/alerts';
 import {
   pluralize,
@@ -21,7 +23,6 @@ import {
   SelectOptions,
   useMutationWithDefaults,
 } from '@hourglass/common/helpers';
-import { FaTrash } from 'react-icons/fa';
 import Select from 'react-select';
 import { DateTime } from 'luxon';
 import { graphql, useFragment } from 'react-relay';
@@ -134,7 +135,10 @@ const AccommodationEditor: React.FC<{
             variant="secondary"
             onClick={cancel}
           >
-            Cancel
+            <Icon I={LuUndo2} size="1.25em" />
+            <span className="ml-2">
+              Cancel
+            </span>
           </Button>
           <Button
             disabled={disabled}
@@ -142,7 +146,10 @@ const AccommodationEditor: React.FC<{
             className="ml-2"
             onClick={() => submit(startTime, Number(extraTime), policies)}
           >
-            Save
+            <Icon I={BsCheck2Square} size="1.25em" />
+            <span className="ml-2">
+              Save
+            </span>
           </Button>
         </td>
       </tr>
@@ -348,7 +355,7 @@ const SingleAccommodation: React.FC<{
           }}
         >
           <Icon I={FaTrash} size="1.25em" />
-          <span className="ml-2">
+          <span className="ml-2 mr-1">
             Delete
           </span>
         </Button>
@@ -357,9 +364,10 @@ const SingleAccommodation: React.FC<{
           variant="primary"
           className="ml-2"
           onClick={edit}
+          style={{ minWidth: '5.5em' }}
         >
-          <Icon I={BsPencilSquare} size="1.25em" />
-          <span className="ml-2">
+          <Icon I={BsPencilSquare} size="1.25em" className="float-left" />
+          <span className="float-right">
             Edit
           </span>
         </Button>

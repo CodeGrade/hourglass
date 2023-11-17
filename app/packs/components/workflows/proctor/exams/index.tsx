@@ -1962,6 +1962,7 @@ const ProctoringRecipients: React.FC<{
     roomsByVersion[reg.examVersion.id] = roomsByVersion[reg.examVersion.id] ?? {};
     roomsByVersion[reg.examVersion.id][reg.room?.id] = true;
   });
+  const anyPins = res.registrations.some((r) => (r.currentPin ?? '') !== '');
   const sortByName = (a, b) => a.name.localeCompare(b.name);
   const recipients: SplitRecipients = useMemo(() => ({
     versions: res.examVersions.edges.map(({ node: ev }) => {
@@ -2040,10 +2041,12 @@ const ProctoringRecipients: React.FC<{
         <Col>
           <h1>
             {res.name}
-            <ShowCurrentPins
-              recipients={recipients}
-              recipientOptions={recipientOptions}
-            />
+            {anyPins && (
+              <ShowCurrentPins
+                recipients={recipients}
+                recipientOptions={recipientOptions}
+              />
+            )}
           </h1>
         </Col>
       </Row>

@@ -296,7 +296,7 @@ const ExamSubmissionsQuery: React.FC = () => {
                     {reg.user.displayName}
                   </Link>
                 </td>
-                <td>{reg.currentPin ?? 'none required'}</td>
+                {anyPins && <td>{reg.currentPin ?? 'none required'}</td>}
               </tr>
             ))}
           </tbody>

@@ -2,6 +2,7 @@ import React, {
   useState,
   useContext,
   useMemo,
+  useEffect,
   useCallback,
   useRef,
   Suspense,
@@ -30,7 +31,12 @@ import {
   FaList,
 } from 'react-icons/fa';
 import Icon from '@student/exams/show/components/Icon';
-import { MdMessage, MdSend, MdPeople } from 'react-icons/md';
+import {
+  MdMessage,
+  MdSend,
+  MdPeople,
+  MdRefresh,
+} from 'react-icons/md';
 import Loading from '@hourglass/common/loading';
 import { AlertContext } from '@hourglass/common/alerts';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
@@ -39,6 +45,7 @@ import {
   SelectOption,
   SelectOptions,
   useMutationWithDefaults,
+  useRefresher,
 } from '@hourglass/common/helpers';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
@@ -53,6 +60,7 @@ import {
   useSubscription,
   useLazyLoadQuery,
   usePaginationFragment,
+  useRefetchableFragment,
 } from 'react-relay';
 import ErrorBoundary from '@hourglass/common/boundary';
 
@@ -64,6 +72,7 @@ import { examsDestroyAnomalyMutation } from './__generated__/examsDestroyAnomaly
 import { examsSendMessageMutation } from './__generated__/examsSendMessageMutation.graphql';
 import { exams_messages$key } from './__generated__/exams_messages.graphql';
 import { exams_proctoring$data, exams_proctoring$key } from './__generated__/exams_proctoring.graphql';
+import { exams_pins$key } from './__generated__/exams_pins.graphql';
 
 export interface Recipient {
   type: MessageType.Direct | MessageType.Room | MessageType.Version | MessageType.Exam;
@@ -71,14 +80,9 @@ export interface Recipient {
   name: string;
 }
 
-type Student = Recipient & {
-  currentPin?: string;
-  pinValidated: boolean;
-}
-
 export interface SplitRecipients {
   rooms: Recipient[];
-  students: Student[];
+  students: Recipient[];
   studentsByRoom: Record<RoomAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>>;
   studentsByVersion: Record<VersionAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>>;
   versions: Recipient[];
@@ -1796,17 +1800,11 @@ const makeRegistrationFilter = (
 const ShowCurrentPins: React.FC<{
   recipients: SplitRecipients;
   recipientOptions: RecipientOptions;
+  exam: exams_pins$key;
 }> = (props) => {
-  const { recipients, recipientOptions } = props;
+  const { recipients, recipientOptions, exam } = props;
   const [showing, setShowing] = useState(false);
-  const [filter, setFilter] = useState<MessageFilterOption[]>(undefined);
-  const filterBy = useMemo(() => makeRegistrationFilter(recipients, filter), [filter]);
-  let all: Array<Student> = [];
-  if (filter) {
-    all = recipients.students.filter((s) => filterBy(s.name, s.id));
-  } else {
-    all = recipients.students;
-  }
+  const [refresh, forceRefresh] = useRefresher();
   return (
     <>
       <Button
@@ -1824,52 +1822,26 @@ const ShowCurrentPins: React.FC<{
         onHide={() => setShowing(false)}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Current PINs for students</Modal.Title>
+          <Modal.Title>
+            <Button
+              variant="info"
+              className="mr-4"
+              onClick={forceRefresh}
+            >
+              <Icon I={MdRefresh} />
+            </Button>
+            Current PINs for students
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form.Group className="d-flex" controlId="message-filter">
-            <Form.Label column sm="auto" className="pl-0">Filter by:</Form.Label>
-            <Col>
-              <Select
-                classNamePrefix="filterMessages"
-                isClearable
-                isMulti
-                placeholder="Choose selection criteria..."
-                value={filter}
-                onChange={(value: MessageFilterOption[], _action) => {
-                  if (value?.length > 0) {
-                    setFilter(value);
-                  } else {
-                    setFilter(undefined);
-                  }
-                }}
-                formatGroupLabel={formatGroupLabel}
-                options={recipientOptions}
-              />
-            </Col>
-          </Form.Group>
-          <Row>
-            <Table hover className="m-0">
-              <thead>
-                <tr>
-                  <th>Student</th>
-                  <th>Current PIN</th>
-                </tr>
-              </thead>
-              <tbody>
-                {all.map((reg) => (
-                  <tr key={reg.id}>
-                    <td>{reg.name}</td>
-                    <td>
-                      {reg.pinValidated
-                        ? 'Already validated'
-                        : (reg.currentPin ?? 'none required')}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Row>
+          <Suspense fallback={<p>Loading...</p>}>
+            <ShowCurrentPinsTable
+              refresh={refresh}
+              recipients={recipients}
+              recipientOptions={recipientOptions}
+              exam={exam}
+            />
+          </Suspense>
         </Modal.Body>
         <Modal.Footer>
           <Button
@@ -1880,6 +1852,94 @@ const ShowCurrentPins: React.FC<{
           </Button>
         </Modal.Footer>
       </Modal>
+    </>
+  );
+};
+
+const ShowCurrentPinsTable: React.FC<{
+  refresh,
+  recipients: SplitRecipients,
+  recipientOptions: RecipientOptions,
+  exam: exams_pins$key,
+}> = (props) => {
+  const {
+    refresh,
+    recipients,
+    recipientOptions,
+    exam,
+  } = props;
+  const [filter, setFilter] = useState<MessageFilterOption[]>(undefined);
+  const filterBy = useMemo(() => makeRegistrationFilter(recipients, filter), [filter]);
+  const [res, refetch] = useRefetchableFragment(
+    graphql`
+    fragment exams_pins on Exam
+    @refetchable(queryName: "RegistrationPinRefetchQuery") {
+      registrations {
+        id
+        currentPin
+        pinValidated
+      }
+    }
+    `,
+    exam,
+  );
+  useEffect(() => {
+    refetch({}, { fetchPolicy: 'network-only' });
+  }, [refresh]);
+  const { registrations } = res;
+  const regsById = new Map(registrations.map((r) => [r.id, r]));
+  let all: Array<Recipient> = [];
+  if (filter) {
+    all = recipients.students.filter((s) => filterBy(s.name, s.id));
+  } else {
+    all = recipients.students;
+  }
+
+  return (
+    <>
+      <Form.Group className="d-flex" controlId="message-filter">
+        <Form.Label column sm="auto" className="pl-0">Filter by:</Form.Label>
+        <Col>
+          <Select
+            classNamePrefix="filterMessages"
+            isClearable
+            isMulti
+            placeholder="Choose selection criteria..."
+            value={filter}
+            onChange={(value: MessageFilterOption[], _action) => {
+              if (value?.length > 0) {
+                setFilter(value);
+              } else {
+                setFilter(undefined);
+              }
+            }}
+            formatGroupLabel={formatGroupLabel}
+            options={recipientOptions}
+          />
+        </Col>
+      </Form.Group>
+      <Row>
+        <Table hover className="m-0">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Current PIN</th>
+            </tr>
+          </thead>
+          <tbody>
+            {all.map((reg) => (
+              <tr key={reg.id}>
+                <td>{reg.name}</td>
+                <td>
+                  {regsById.get(reg.id)?.pinValidated
+                    ? 'Already validated'
+                    : (regsById.get(reg.id)?.currentPin ?? 'none required')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Row>
     </>
   );
 };
@@ -1910,6 +1970,7 @@ const ProctoringRecipients: React.FC<{
     fragment exams_proctoring on Exam {
       ...exams_anomalies
       ...exams_messages
+      ...exams_pins
       id
       name
       examVersions(first: 100) @connection(key: "Exam_examVersions", filters: []) {
@@ -1928,8 +1989,6 @@ const ProctoringRecipients: React.FC<{
           id
           displayName
         }
-        currentPin,
-        pinValidated
       }
       rooms {
         id
@@ -1939,18 +1998,16 @@ const ProctoringRecipients: React.FC<{
     `,
     exam,
   );
-  const students: Student[] = [];
+  const students: Recipient[] = [];
   const studentsByRoom: Record<RoomAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>> = {};
   const versionsByRoom: Record<RoomAnnouncement['id'], Record<VersionAnnouncement['id'], boolean>> = {};
   const studentsByVersion: Record<VersionAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>> = {};
   const roomsByVersion: Record<VersionAnnouncement['id'], Record<RoomAnnouncement['id'], boolean>> = {};
   res.registrations.forEach((reg) => {
-    const r : Student = {
+    const r : Recipient = {
       type: MessageType.Direct,
       id: reg.id,
       name: reg.user.displayName,
-      currentPin: reg.currentPin,
-      pinValidated: reg.pinValidated,
     };
     students.push(r);
     studentsByRoom[reg.room?.id] = studentsByRoom[reg.room?.id] ?? {};
@@ -1962,7 +2019,6 @@ const ProctoringRecipients: React.FC<{
     roomsByVersion[reg.examVersion.id] = roomsByVersion[reg.examVersion.id] ?? {};
     roomsByVersion[reg.examVersion.id][reg.room?.id] = true;
   });
-  const anyPins = res.registrations.some((r) => (r.currentPin ?? '') !== '');
   const sortByName = (a, b) => a.name.localeCompare(b.name);
   const recipients: SplitRecipients = useMemo(() => ({
     versions: res.examVersions.edges.map(({ node: ev }) => {
@@ -2041,12 +2097,11 @@ const ProctoringRecipients: React.FC<{
         <Col>
           <h1>
             {res.name}
-            {anyPins && (
-              <ShowCurrentPins
-                recipients={recipients}
-                recipientOptions={recipientOptions}
-              />
-            )}
+            <ShowCurrentPins
+              recipients={recipients}
+              recipientOptions={recipientOptions}
+              exam={res}
+            />
           </h1>
         </Col>
       </Row>

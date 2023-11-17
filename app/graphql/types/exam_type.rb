@@ -5,6 +5,27 @@ module Types
     implements GraphQL::Types::Relay::Node
     global_id_field :id
 
+    def cache_authorization!(exam, course)
+      exam_role = Exam.roles[:no_reg]
+      course_role = Exam.roles[:no_reg]
+      if course.user_is_professor?(context[:current_user])
+        course_role = exam_role = Exam.roles[:professor]
+      elsif exam&.user_is_proctor?(context[:current_user].id)
+        exam_role = Exam.roles[:proctor]
+        course_role = Exam.roles[:staff]
+      elsif course.user_is_staff?(context[:current_user])
+        course_role = Exam.roles[:staff]
+      elsif course.user_is_student?(context[:current_user])
+        course_role = Exam.roles[:student]
+      end
+      ac = context[:access_cache]
+      ac[:role_for_exam] = {} unless ac.key? :role_for_exam
+      ac[:role_for_exam][context[:current_user].id] = exam_role
+      ac[:role_for_course] = {} unless ac.key? :role_for_course
+      ac[:role_for_course][context[:current_user].id] = course_role
+    end
+
+
     guard lambda { |obj, _, ctx|
       (obj.object.visible_to?(ctx[:current_user], Guards.exam_role(ctx[:current_user], ctx), Guards.course_role(ctx[:current_user], ctx)))
     }
@@ -105,7 +126,18 @@ module Types
           }
         })
       end
-      AssociationLoader.for(Exam, :registrations, includes: includes).load(object)
+      if [:pin_validated, :current_pin].any? { |f| lookahead.selects?(f) }
+        includes << :user
+      end
+      cache_authorization!(object, object.course)
+      AssociationLoader.for(Exam, :registrations, includes: includes).load(object).then do |ans|
+        ans.each do |r| Guards.cache(
+          context[:access_cache],
+          [Types::RegistrationType.name, r.id, :visible, context[:current_user].id],
+          true)
+        end
+        ans
+      end
     end
 
     field :in_progress_registrations, [Types::RegistrationType], null: false do

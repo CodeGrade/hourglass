@@ -51,6 +51,11 @@ module Api
         answers = answer_params
         saved = @registration.save_answers(answers)
         @registration.update(end_time: DateTime.now)
+        HourglassSchema.subscriptions.trigger(
+          :registration_was_updated,
+          { exam_id: HourglassSchema.id_from_object(@exam, Types::ExamType, nil) },
+          @registration,
+        )
         { lockout: !saved }
       end
 
@@ -60,6 +65,11 @@ module Api
         end
 
         @registration.update(start_time: DateTime.now) if @registration.start_time.nil?
+        HourglassSchema.subscriptions.trigger(
+          :registration_was_updated,
+          { exam_id: HourglassSchema.id_from_object(@exam, Types::ExamType, nil) },
+          @registration,
+        )
 
         answers = @registration.current_answers
         version = @registration.exam_version
@@ -96,6 +106,12 @@ module Api
 
       def check_over
         return unless @registration.over?
+
+        HourglassSchema.subscriptions.trigger(
+          :registration_was_updated,
+          { exam_id: HourglassSchema.id_from_object(@exam, Types::ExamType, nil) },
+          @registration,
+        )
 
         last_snapshot = @registration.snapshots.last
         if last_snapshot

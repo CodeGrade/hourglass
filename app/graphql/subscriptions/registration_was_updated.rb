@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Subscriptions
-  class PinWasUpdated < Subscriptions::BaseSubscription
+  class RegistrationWasUpdated < Subscriptions::BaseSubscription
     argument :exam_id, ID, required: true, loads: Types::ExamType
 
     field :registration, Types::RegistrationType, null: false

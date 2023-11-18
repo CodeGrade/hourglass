@@ -61,13 +61,16 @@ const ExamSubmissions: React.FC = () => (
   </ErrorBoundary>
 );
 
-const pinWasUpdatedSubscriptionSpec = graphql`
-  subscription submissionsPinWasUpdatedSubscription($examId: ID!) {
-    pinWasUpdated(examId: $examId) {
+const registrationWasUpdatedSubscriptionSpec = graphql`
+  subscription submissionsRegistrationWasUpdatedSubscription($examId: ID!) {
+    registrationWasUpdated(examId: $examId) {
       registration {
         id
         currentPin
         pinValidated
+        started
+        over
+        final
       }
     }
   }
@@ -100,7 +103,7 @@ const ExamSubmissionsQuery: React.FC = () => {
     { examId },
   );
   useSubscription(useMemo(() => ({
-    subscription: pinWasUpdatedSubscriptionSpec,
+    subscription: registrationWasUpdatedSubscriptionSpec,
     variables: {
       examId,
     },

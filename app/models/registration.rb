@@ -87,7 +87,7 @@ class Registration < ApplicationRecord
     end
     save!
     HourglassSchema.subscriptions.trigger(
-      :pin_was_updated,
+      :registration_was_updated,
       { exam_id: HourglassSchema.id_from_object(exam, Types::ExamType, nil) },
       self,
     )
@@ -180,6 +180,11 @@ class Registration < ApplicationRecord
 
   def finalize!
     update!(end_time: DateTime.now)
+    HourglassSchema.subscriptions.trigger(
+      :registration_was_updated,
+      { exam_id: HourglassSchema.id_from_object(exam, Types::ExamType, nil) },
+      self,
+    )
   end
 
   def current_answers

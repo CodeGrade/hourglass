@@ -18,6 +18,6 @@ module Types
     field :room_announcement_received, subscription: Subscriptions::RoomAnnouncementReceived
     field :room_announcement_was_sent, subscription: Subscriptions::RoomAnnouncementWasSent
 
-    field :pin_was_updated, subscription: Subscriptions::PinWasUpdated
+    field :registration_was_updated, subscription: Subscriptions::RegistrationWasUpdated
   end
 end

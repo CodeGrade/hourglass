@@ -1793,9 +1793,9 @@ const makeRegistrationFilter = (
   })
 );
 
-const pinWasUpdatedSubscriptionSpec = graphql`
-  subscription examsPinWasUpdatedSubscription($examId: ID!) {
-    pinWasUpdated(examId: $examId) {
+const registrationWasUpdatedSubscriptionSpec = graphql`
+  subscription examsRegistrationWasUpdatedSubscription($examId: ID!) {
+    registrationWasUpdated(examId: $examId) {
       registration {
         id
         currentPin
@@ -2001,7 +2001,7 @@ const ProctoringRecipients: React.FC<{
     exam,
   );
   useSubscription(useMemo(() => ({
-    subscription: pinWasUpdatedSubscriptionSpec,
+    subscription: registrationWasUpdatedSubscriptionSpec,
     variables: {
       examId: res.id,
     },

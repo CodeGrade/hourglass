@@ -2,7 +2,6 @@ import React, {
   useState,
   useContext,
   useMemo,
-  useEffect,
   useCallback,
   useRef,
   Suspense,
@@ -35,7 +34,6 @@ import {
   MdMessage,
   MdSend,
   MdPeople,
-  MdRefresh,
 } from 'react-icons/md';
 import Loading from '@hourglass/common/loading';
 import { AlertContext } from '@hourglass/common/alerts';
@@ -45,7 +43,6 @@ import {
   SelectOption,
   SelectOptions,
   useMutationWithDefaults,
-  useRefresher,
 } from '@hourglass/common/helpers';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
@@ -60,7 +57,6 @@ import {
   useSubscription,
   useLazyLoadQuery,
   usePaginationFragment,
-  useRefetchableFragment,
 } from 'react-relay';
 import ErrorBoundary from '@hourglass/common/boundary';
 
@@ -1797,19 +1793,37 @@ const makeRegistrationFilter = (
   })
 );
 
+const pinWasUpdatedSubscriptionSpec = graphql`
+  subscription examsPinWasUpdatedSubscription($examId: ID!) {
+    pinWasUpdated(examId: $examId) {
+      registration {
+        id
+        currentPin
+        pinValidated
+      }
+    }
+  }
+`;
+
 const ShowCurrentPins: React.FC<{
+  enabled: boolean;
   recipients: SplitRecipients;
   recipientOptions: RecipientOptions;
   exam: exams_pins$key;
 }> = (props) => {
-  const { recipients, recipientOptions, exam } = props;
+  const {
+    recipients,
+    recipientOptions,
+    exam,
+    enabled,
+  } = props;
   const [showing, setShowing] = useState(false);
-  const [refresh, forceRefresh] = useRefresher();
   return (
     <>
       <Button
         variant="info"
         className="float-right"
+        disabled={!enabled}
         onClick={() => setShowing(true)}
       >
         Show current PINs
@@ -1823,20 +1837,12 @@ const ShowCurrentPins: React.FC<{
       >
         <Modal.Header closeButton>
           <Modal.Title>
-            <Button
-              variant="info"
-              className="mr-4"
-              onClick={forceRefresh}
-            >
-              <Icon I={MdRefresh} />
-            </Button>
             Current PINs for students
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Suspense fallback={<p>Loading...</p>}>
             <ShowCurrentPinsTable
-              refresh={refresh}
               recipients={recipients}
               recipientOptions={recipientOptions}
               exam={exam}
@@ -1857,20 +1863,18 @@ const ShowCurrentPins: React.FC<{
 };
 
 const ShowCurrentPinsTable: React.FC<{
-  refresh,
   recipients: SplitRecipients,
   recipientOptions: RecipientOptions,
   exam: exams_pins$key,
 }> = (props) => {
   const {
-    refresh,
     recipients,
     recipientOptions,
     exam,
   } = props;
   const [filter, setFilter] = useState<MessageFilterOption[]>(undefined);
   const filterBy = useMemo(() => makeRegistrationFilter(recipients, filter), [filter]);
-  const [res, refetch] = useRefetchableFragment(
+  const res = useFragment<exams_pins$key>(
     graphql`
     fragment exams_pins on Exam
     @refetchable(queryName: "RegistrationPinRefetchQuery") {
@@ -1883,9 +1887,6 @@ const ShowCurrentPinsTable: React.FC<{
     `,
     exam,
   );
-  useEffect(() => {
-    refetch({}, { fetchPolicy: 'network-only' });
-  }, [refresh]);
   const { registrations } = res;
   const regsById = new Map(registrations.map((r) => [r.id, r]));
   let all: Array<Recipient> = [];
@@ -1989,6 +1990,7 @@ const ProctoringRecipients: React.FC<{
           id
           displayName
         }
+        currentPin
       }
       rooms {
         id
@@ -1998,6 +2000,12 @@ const ProctoringRecipients: React.FC<{
     `,
     exam,
   );
+  useSubscription(useMemo(() => ({
+    subscription: pinWasUpdatedSubscriptionSpec,
+    variables: {
+      examId: res.id,
+    },
+  }), [res.id]));
   const students: Recipient[] = [];
   const studentsByRoom: Record<RoomAnnouncement['id'], Record<DirectMessage['registration']['id'], boolean>> = {};
   const versionsByRoom: Record<RoomAnnouncement['id'], Record<VersionAnnouncement['id'], boolean>> = {};
@@ -2019,6 +2027,7 @@ const ProctoringRecipients: React.FC<{
     roomsByVersion[reg.examVersion.id] = roomsByVersion[reg.examVersion.id] ?? {};
     roomsByVersion[reg.examVersion.id][reg.room?.id] = true;
   });
+  const anyPins = res.registrations.some((r) => (r.currentPin ?? '') !== '');
   const sortByName = (a, b) => a.name.localeCompare(b.name);
   const recipients: SplitRecipients = useMemo(() => ({
     versions: res.examVersions.edges.map(({ node: ev }) => {
@@ -2098,6 +2107,7 @@ const ProctoringRecipients: React.FC<{
           <h1>
             {res.name}
             <ShowCurrentPins
+              enabled={anyPins}
               recipients={recipients}
               recipientOptions={recipientOptions}
               exam={res}

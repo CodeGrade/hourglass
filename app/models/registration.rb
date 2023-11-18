@@ -86,6 +86,11 @@ class Registration < ApplicationRecord
       self.login_attempt_count += 1
     end
     save!
+    HourglassSchema.subscriptions.trigger(
+      :pin_was_updated,
+      { exam_id: HourglassSchema.id_from_object(exam, Types::ExamType, nil) },
+      self,
+    )
 
     pin_validated
   end

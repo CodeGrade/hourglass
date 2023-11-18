@@ -4,6 +4,7 @@ import React, {
   useContext,
   Suspense,
   useEffect,
+  useMemo,
 } from 'react';
 import {
   useParams,
@@ -16,7 +17,12 @@ import {
 import { DateTime, LocaleOptions } from 'luxon';
 import { Container, Button, Table } from 'react-bootstrap';
 import { BsListCheck } from 'react-icons/bs';
-import { graphql, useLazyLoadQuery, useMutation } from 'react-relay';
+import {
+  graphql,
+  useLazyLoadQuery,
+  useMutation,
+  useSubscription,
+} from 'react-relay';
 import {
   AnswersState,
 } from '@student/exams/show/types';
@@ -55,6 +61,18 @@ const ExamSubmissions: React.FC = () => (
   </ErrorBoundary>
 );
 
+const pinWasUpdatedSubscriptionSpec = graphql`
+  subscription submissionsPinWasUpdatedSubscription($examId: ID!) {
+    pinWasUpdated(examId: $examId) {
+      registration {
+        id
+        currentPin
+        pinValidated
+      }
+    }
+  }
+`;
+
 const ExamSubmissionsQuery: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
   const queryData = useLazyLoadQuery<submissionsAllQuery>(
@@ -74,12 +92,19 @@ const ExamSubmissionsQuery: React.FC = () => {
           endTime
           effectiveEndTime
           currentPin
+          pinValidated
         }
       }
     }
     `,
     { examId },
   );
+  useSubscription(useMemo(() => ({
+    subscription: pinWasUpdatedSubscriptionSpec,
+    variables: {
+      examId,
+    },
+  }), [examId]));
   const [showModal, setShowModal] = useState(false);
   const openModal = useCallback(() => setShowModal(true), []);
   const closeModal = useCallback(() => setShowModal(false), []);
@@ -296,7 +321,13 @@ const ExamSubmissionsQuery: React.FC = () => {
                     {reg.user.displayName}
                   </Link>
                 </td>
-                {anyPins && <td>{reg.currentPin ?? 'none required'}</td>}
+                {anyPins && (
+                  <td>
+                    {reg.pinValidated
+                      ? 'Already validated'
+                      : (reg.currentPin ?? 'none required')}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

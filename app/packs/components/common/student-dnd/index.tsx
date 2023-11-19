@@ -374,6 +374,10 @@ interface RoomAssignmentProps {
   rooms: readonly Room[];
 }
 
+function sortByName(students: readonly Student[]): Student[] {
+  return students.toSorted((s1, s2) => s1.displayName.localeCompare(s2.displayName));
+}
+
 const Editable: React.FC<RoomAssignmentProps> = (props) => {
   const {
     examId,
@@ -384,7 +388,7 @@ const Editable: React.FC<RoomAssignmentProps> = (props) => {
   const contextVal = useMemo(() => ({ sections }), [sections]);
   const initialValues = useMemo(() => ({
     all: {
-      unassigned,
+      unassigned: sortByName(unassigned),
       rooms,
     },
   }), [unassigned, rooms]);
@@ -419,7 +423,7 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
           <ul className="list-unstyled column-count-4">
             {unassigned.length === 0 ? (
               <p>No students</p>
-            ) : unassigned.map((s) => (
+            ) : sortByName(unassigned).map((s) => (
               <li key={s.id} className="fixed-col-width">
                 <span title={`${s.username} (${s.nuid})`}>{s.displayName}</span>
               </li>
@@ -435,7 +439,7 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
               <p>No students</p>
             ) : (
               <ul className="list-unstyled column-count-4">
-                {r.students.map((s) => (
+                {sortByName(r.students).map((s) => (
                   <li key={s.id} className="fixed-col-width">
                     <span title={`${s.username} (${s.nuid})`}>{s.displayName}</span>
                   </li>

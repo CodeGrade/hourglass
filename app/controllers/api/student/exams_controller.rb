@@ -107,12 +107,6 @@ module Api
       def check_over
         return unless @registration.over?
 
-        HourglassSchema.subscriptions.trigger(
-          :registration_was_updated,
-          { exam_id: HourglassSchema.id_from_object(@exam, Types::ExamType, nil) },
-          @registration,
-        )
-
         last_snapshot = @registration.snapshots.last
         if last_snapshot
           render json: {

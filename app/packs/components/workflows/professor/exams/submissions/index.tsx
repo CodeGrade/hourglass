@@ -156,9 +156,11 @@ const ExamSubmissionsQuery: React.FC = () => {
     over: [],
     final: [],
   };
+  const now = DateTime.local();
+  const inPast = (t : string) => (DateTime.fromISO(t) < now);
   registrations.forEach((r) => {
     if (r.final) groups.final.push(r);
-    else if (r.over) groups.over.push(r);
+    else if (r.over || inPast(r.effectiveEndTime)) groups.over.push(r);
     else if (r.started) groups.started.push(r);
     else groups.notStarted.push(r);
   });

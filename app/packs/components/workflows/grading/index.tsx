@@ -1313,7 +1313,7 @@ const Grade: React.FC<{
   );
   const [curCompletionStatus, setCurCompletionStatus] = useState<RubricCompletionStatus[]>([]);
   const mergedStatus: CompletionStatus[] = curCompletionStatus.map(
-    (cCS) => (cCS ? Object.values(cCS).reduce(combineCompletionAny, 'incomplete') : undefined),
+    (cCS) => (cCS ? combineCompletionAny(Object.values(cCS)) : undefined),
   );
   const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
   const singlePart = dbQuestions[qnum].parts.length === 1
@@ -1325,15 +1325,10 @@ const Grade: React.FC<{
   const partStrPoints = pointsStr(partPoints);
   const partSubtitle = `(${partStrPoints})`;
   const allComments = res.gradingComments.edges.map(({ node }) => node);
-  // const anyUncommentedItems = dbQuestions[qnum].parts[pnum].bodyItems.some((b, bnum) => (
-  //   ((b.info as BodyItemInfo).type !== 'HTML')
-  //     && (allComments.filter((c) => (c.qnum === qnum && c.pnum === pnum && c.bnum === bnum))
-  //       .length === 0)
-  // ));
   let disabledMessage: string;
   if (nextExamLoading) {
     disabledMessage = 'Please wait; still loading...';
-  } else if (mergedStatus.some((s) => s === 'incomplete')) {
+  } else if (mergedStatus.some((s) => s === 'incomplete') || mergedStatus.every((s) => s === 'unused')) {
     disabledMessage = 'All rubrics are incomplete; please complete them to finish grading';
   } else if (mergedStatus.some((s) => s === 'invalid')) {
     disabledMessage = 'Some rubrics are used incorrectly; please correct them before finishing grading';

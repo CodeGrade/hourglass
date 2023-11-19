@@ -127,32 +127,42 @@ const ShowPreset: React.FC<{
   );
 };
 
-export type CompletionStatus = 'complete' | 'incomplete' | 'invalid'
-/** Enforces the ordering `complete < incomplete < invalid` */
-export function combineCompletionAll(
-  c1 : CompletionStatus,
-  c2: CompletionStatus,
-): CompletionStatus {
-  switch (c1) {
-    case 'complete': return c2;
-    case 'incomplete': return (c2 === 'invalid') ? c2 : c1;
-    case 'invalid': return c1;
-    default:
-      throw new ExhaustiveSwitchError(c1);
-  }
+export type CompletionStatus = 'unused' | 'complete' | 'incomplete' | 'invalid'
+/** Enforces the ordering `unused < complete < invalid` and `unused < incomplete < invalid` < */
+function any<T>(vals: T[], target: T): boolean {
+  return vals.some((v) => v === target);
 }
-/** Enforced the ordering `incomplete < complete < invalid` */
-export function combineCompletionAny(
-  c1 : CompletionStatus,
-  c2: CompletionStatus,
-): CompletionStatus {
-  switch (c1) {
-    case 'incomplete': return c2;
-    case 'complete': return (c2 !== 'incomplete') ? c2 : c1;
-    case 'invalid': return c1;
-    default:
-      throw new ExhaustiveSwitchError(c1);
-  }
+function one<T>(vals: T[], target: T): boolean {
+  return vals.filter((v) => v === target).length === 1;
+}
+function several<T>(vals: T[], target: T): boolean {
+  return vals.filter((v) => v === target).length > 1;
+}
+function all<T>(vals: T[], target: T): boolean {
+  return vals.every((v) => v === target);
+}
+function none<T>(vals: T[], target: T): boolean {
+  return !vals.some((v) => v === target);
+}
+
+function combineCompletionOne(cs: CompletionStatus[]): CompletionStatus {
+  if (all(cs, 'unused')) return 'unused';
+  if (any(cs, 'invalid')) return 'invalid';
+  if (one(cs, 'complete') && none(cs, 'incomplete')) return 'complete';
+  if (several(cs, 'complete') || several(cs, 'incomplete')) return 'invalid';
+  return 'incomplete';
+}
+export function combineCompletionAny(cs: CompletionStatus[]): CompletionStatus {
+  if (all(cs, 'unused')) return 'unused';
+  if (any(cs, 'invalid')) return 'invalid';
+  if (any(cs, 'complete') && none(cs, 'incomplete')) return 'complete';
+  return 'incomplete';
+}
+function combineCompletionAll(cs: CompletionStatus[]): CompletionStatus {
+  if (all(cs, 'complete')) return 'complete';
+  if (any(cs, 'invalid')) return 'invalid';
+  if (all(cs, 'unused')) return 'unused';
+  return 'incomplete';
 }
 function completionStatus(rubric: Rubric, parentRubricType: Rubric['type'], presetIDs: PresetCommentId[]): CompletionStatus {
   if (rubric === undefined || rubric === null) return undefined;
@@ -162,44 +172,35 @@ function completionStatus(rubric: Rubric, parentRubricType: Rubric['type'], pres
     case 'all': {
       const { choices } = rubric;
       if (choices instanceof Array) {
-        const completion = choices.reduce((cur: CompletionStatus, r) => (
-          combineCompletionAll(cur, completionStatus(r, 'all', presetIDs))
-        ), 'complete');
-        return (completion === 'incomplete') ? 'invalid' : completion;
+        return combineCompletionAll(
+          choices.map((r) => completionStatus(r, 'all', presetIDs)),
+        );
       }
-      const allUsed = choices.presets.every((p) => presetIDs.some((id) => (p.id === id)));
-      return allUsed ? 'complete' : 'invalid';
+      return combineCompletionAll(
+        choices.presets.map((p) => (presetIDs.some((id) => p.id === id) ? 'complete' : 'unused')),
+      );
     }
     case 'any': {
       const { choices } = rubric;
       if (choices instanceof Array) {
-        const completion = choices.reduce((cur: CompletionStatus, r) => (
-          combineCompletionAny(cur, completionStatus(r, 'any', presetIDs))
-        ), 'incomplete');
-        // An Any rubric is not in error if it's unused
-        return completion;
+        return combineCompletionAny(
+          choices.map((r) => completionStatus(r, 'any', presetIDs)),
+        );
       }
-      const anyUsed = choices.presets.some((p) => presetIDs.some((id) => (p.id === id)));
-      return anyUsed ? 'complete' : 'incomplete';
+      return combineCompletionAny(
+        choices.presets.map((p) => (presetIDs.some((id) => p.id === id) ? 'complete' : 'unused')),
+      );
     }
     case 'one': {
-      // There should be exactly one used message
       const { choices } = rubric;
       if (choices instanceof Array) {
-        const completion = choices.map((r) => completionStatus(r, 'one', presetIDs));
-        const completeCount = completion.filter((c) => c === 'complete').length;
-        if (completeCount > 1 || completion.includes('invalid')) return 'invalid';
-        if (completeCount === 1) return 'complete';
-        if (parentRubricType === 'one') return 'incomplete';
-        return 'invalid';
+        return combineCompletionOne(
+          choices.map((r) => completionStatus(r, 'one', presetIDs)),
+        );
       }
-      const matches = choices.presets.reduce((sum, p) => (
-        sum + presetIDs.filter((id) => (p.id === id)).length
-      ), 0);
-      if (matches > 1) return 'invalid';
-      if (matches === 1) return 'complete';
-      if (parentRubricType === 'one') return 'incomplete';
-      return 'invalid';
+      return combineCompletionOne(
+        choices.presets.map((p) => (presetIDs.some((id) => p.id === id) ? 'complete' : 'unused')),
+      );
     }
     default:
       throw new ExhaustiveSwitchError(rubric);
@@ -209,7 +210,7 @@ const statusToClass = (status: CompletionStatus): string => {
   if (status === 'complete') {
     return 'status-valid';
   }
-  if (status === 'invalid') {
+  if (status === 'invalid' || status === 'incomplete') {
     return 'status-invalid';
   }
   return '';
@@ -691,7 +692,13 @@ const ShowRubric: React.FC<ShowRubricProps<Rubric>> = (props) => {
     onRubricCompletionChanged,
     collapseKey,
   } = props;
-  const showCompleteness = completionStatus(rubric, parentRubricType, showCompletenessAgainst);
+  const rawShowCompleteness = completionStatus(rubric, parentRubricType, showCompletenessAgainst);
+  let showCompleteness;
+  if (parentRubricType === undefined) {
+    showCompleteness = (rawShowCompleteness === 'unused') ? 'incomplete' : rawShowCompleteness;
+  } else {
+    showCompleteness = rawShowCompleteness;
+  }
   useEffect(() => {
     if (onRubricCompletionChanged) onRubricCompletionChanged(showCompleteness);
   }, [showCompleteness]);

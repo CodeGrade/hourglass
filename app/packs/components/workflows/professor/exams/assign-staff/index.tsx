@@ -381,7 +381,7 @@ interface StaffAssignmentProps {
 }
 
 function sortByName(students: readonly Student[]): Student[] {
-  return students.toSorted((s1, s2) => s1.displayName.localeCompare(s2.displayName));
+  return [...students].sort((s1, s2) => s1.displayName.localeCompare(s2.displayName));
 }
 
 const Editable: React.FC<StaffAssignmentProps> = (props) => {

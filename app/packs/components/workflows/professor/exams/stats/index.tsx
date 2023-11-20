@@ -337,7 +337,7 @@ const ExamStatsQuery: React.FC = () => {
     [data.exam.examVersions],
   );
   return (
-    <DocumentTitle title={data.exam.name}>
+    <DocumentTitle title={`${data.exam.name} -- Grading statistics`}>
       <ExamStats
         examId={examId}
         title={data.exam.name}

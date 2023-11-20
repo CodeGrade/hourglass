@@ -295,7 +295,7 @@ const GradingAnomalies: React.FC<{
               <div key={`q${qnum}-p${pnum}`}>
                 <b>
                   <QuestionName qnum={qnum} name={dbQuestions[qnum].name} />
-                  <span className="mx-2">&mdash;</span>
+                  {!singlePart && <span className="mx-2">&mdash;</span>}
                   <PartName
                     anonymous={singlePart}
                     pnum={pnum}
@@ -373,7 +373,7 @@ const PerQuestionStats: React.FC<{
                 >
                   <b>
                     <QuestionName qnum={qnum} name={dbQuestions[qnum].name} />
-                    <br />
+                    {!singlePart && <br />}
                     <PartName
                       anonymous={singlePart}
                       pnum={pnum}

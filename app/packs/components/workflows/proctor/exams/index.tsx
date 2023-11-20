@@ -1777,7 +1777,7 @@ const makeRegistrationFilter = (
   recipients: SplitRecipients,
   filter: MessageFilterOption[],
 ) => (displayName: string, regId: string) => (
-  filter.some((f) => {
+  (filter === undefined) || filter.some((f) => {
     switch (f.value.type) {
       case MessageType.Direct:
         return f.value.name === displayName;

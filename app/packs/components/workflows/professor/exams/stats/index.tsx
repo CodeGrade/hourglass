@@ -11,7 +11,7 @@ import {
   Container, Table, ToggleButton, ToggleButtonGroup,
 } from 'react-bootstrap';
 import { graphql, useLazyLoadQuery } from 'react-relay';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
   Bar,
   ComposedChart,
@@ -20,6 +20,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { pluralize } from '@hourglass/common/helpers';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
 import Icon from '@student/exams/show/components/Icon';
@@ -178,8 +179,6 @@ const RenderVersionStats: React.FC<{
     stats,
   } = props;
   const { qpPairs, dbQuestions } = version;
-  const [showDetails, setShowDetails] = useState(false);
-  const [showRubrics, setShowRubrics] = useState(false);
   const [showAsPct, setShowAsPct] = useState(true);
   const numPoints = d3.sum(
     dbQuestions.filter((q) => !q.extraCredit)
@@ -229,69 +228,198 @@ const RenderVersionStats: React.FC<{
         <h4><b>Grade distribution</b></h4>
       </RenderStats>
       <div>
-        <h4 className="flex-grow-1">
-          <span
-            role="button"
-            onClick={() => setShowDetails((s) => !s)}
-            onKeyPress={() => setShowDetails((s) => !s)}
-            tabIndex={0}
-          >
-            Per-question stats
-            {showDetails ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
-          </span>
-        </h4>
-        <Collapse in={showDetails}>
-          <div>
-            {qpPairs.map(({ qnum, pnum }, index) => {
-              const singlePart = dbQuestions[qnum].parts.length === 1
-                && !dbQuestions[qnum].parts[0].name?.value?.trim();
-              stats[index].sort();
-              return (
-                <div key={`q${qnum}-p${pnum}`} className="d-inline-block px-3 w-25">
-                  <RenderStats
-                    width="100%"
-                    height={200}
-                    minPoints={0}
-                    maxPoints={dbQuestions[qnum].parts[pnum].points}
-                    dataPoints={stats[index]}
-                    showAsPct={showAsPct}
-                    barColor={colors[(index + 1) % colors.length]}
-                  >
-                    <b>
-                      <QuestionName qnum={qnum} name={version.dbQuestions[qnum].name} />
-                      <br />
-                      <PartName
-                        anonymous={singlePart}
-                        pnum={pnum}
-                        name={dbQuestions[qnum].parts[pnum].name}
-                      />
-                    </b>
-                  </RenderStats>
-                </div>
-              );
-            })}
-          </div>
-        </Collapse>
-        <h4 className="flex-grow-1">
-          <span
-            role="button"
-            onClick={() => setShowRubrics((s) => !s)}
-            onKeyPress={() => setShowRubrics((s) => !s)}
-            tabIndex={0}
-          >
-            Per-question rubric presets usage
-            {showRubrics ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
-          </span>
-        </h4>
-        <Collapse in={showRubrics}>
-          <div>
-            <RubricPresetHistograms
-              examVersionKey={version}
-              examId={examId}
-            />
-          </div>
-        </Collapse>
+        <GradingAnomalies
+          examId={examId}
+          version={version}
+        />
+        <PerQuestionStats
+          qpPairs={qpPairs}
+          dbQuestions={dbQuestions}
+          stats={stats}
+          showAsPct={showAsPct}
+        />
+        <RubricUsageHistograms
+          version={version}
+          examId={examId}
+        />
       </div>
+    </>
+  );
+};
+
+const GradingAnomalies: React.FC<{
+  examId: string,
+  version: ExamVersion,
+}> = (props) => {
+  const {
+    examId,
+    version,
+  } = props;
+  const [showDetails, setShowDetails] = useState(false);
+  const {
+    currentScores,
+    qpPairs,
+    dbQuestions,
+  } = version;
+  const anomalousStudents = dbQuestions.map((q, qnum) => (
+    q.parts.map((p, pnum) => (
+      currentScores.filter((s) => (
+        s.scores[qnum][pnum] < 0 || s.scores[qnum][pnum] > p.points
+      )).sort((r1, r2) => (
+        r1.registration.user.displayName.localeCompare(r2.registration.user.displayName)
+      ))
+    ))
+  ));
+  const anyone = anomalousStudents.some((q) => q.some((p) => p.length > 0));
+  if (!anyone) return null;
+  return (
+    <>
+      <h4 className="flex-grow-1">
+        <span
+          role="button"
+          onClick={() => setShowDetails((s) => !s)}
+          onKeyPress={() => setShowDetails((s) => !s)}
+          tabIndex={0}
+        >
+          Grading anomalies
+          {showDetails ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+        </span>
+      </h4>
+      <Collapse in={showDetails}>
+        <div>
+          {qpPairs.map(({ qnum, pnum }) => {
+            const singlePart = dbQuestions[qnum].parts.length === 1
+              && !dbQuestions[qnum].parts[0].name?.value?.trim();
+            const anomalies = anomalousStudents[qnum][pnum];
+            return (
+              <div key={`q${qnum}-p${pnum}`}>
+                <b>
+                  <QuestionName qnum={qnum} name={dbQuestions[qnum].name} />
+                  <span className="mx-2">&mdash;</span>
+                  <PartName
+                    anonymous={singlePart}
+                    pnum={pnum}
+                    name={dbQuestions[qnum].parts[pnum].name}
+                  />
+                </b>
+                <table>
+                  {anomalies.map((a) => {
+                    const anchor = singlePart ? `question-${qnum}` : `question-${qnum}-part-${pnum}`;
+                    return (
+                      <tr>
+                        <Link
+                          key={a.registration.id}
+                          target="blank"
+                          to={`/exams/${examId}/submissions/${a.registration.id}#${anchor}`}
+                        >
+                          {a.registration.user.displayName}
+                        </Link>
+                        {` (${a.scores[qnum][pnum]} / ${pluralize(dbQuestions[qnum].parts[pnum].points, 'point', 'points')})`}
+                      </tr>
+                    );
+                  })}
+                </table>
+              </div>
+            );
+          })}
+        </div>
+      </Collapse>
+    </>
+  );
+};
+
+const PerQuestionStats: React.FC<{
+  qpPairs: ExamVersion['qpPairs'],
+  dbQuestions: ExamVersion['dbQuestions'],
+  stats: number[][],
+  showAsPct: boolean,
+}> = (props) => {
+  const {
+    qpPairs,
+    dbQuestions,
+    stats,
+    showAsPct,
+  } = props;
+  const [showDetails, setShowDetails] = useState(false);
+  return (
+    <>
+      <h4 className="flex-grow-1">
+        <span
+          role="button"
+          onClick={() => setShowDetails((s) => !s)}
+          onKeyPress={() => setShowDetails((s) => !s)}
+          tabIndex={0}
+        >
+          Per-question stats
+          {showDetails ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+        </span>
+      </h4>
+      <Collapse in={showDetails}>
+        <div>
+          {qpPairs.map(({ qnum, pnum }, index) => {
+            const singlePart = dbQuestions[qnum].parts.length === 1
+              && !dbQuestions[qnum].parts[0].name?.value?.trim();
+            stats[index].sort();
+            return (
+              <div key={`q${qnum}-p${pnum}`} className="d-inline-block px-3 w-25">
+                <RenderStats
+                  width="100%"
+                  height={200}
+                  minPoints={0}
+                  maxPoints={dbQuestions[qnum].parts[pnum].points}
+                  dataPoints={stats[index]}
+                  showAsPct={showAsPct}
+                  barColor={colors[(index + 1) % colors.length]}
+                >
+                  <b>
+                    <QuestionName qnum={qnum} name={dbQuestions[qnum].name} />
+                    <br />
+                    <PartName
+                      anonymous={singlePart}
+                      pnum={pnum}
+                      name={dbQuestions[qnum].parts[pnum].name}
+                    />
+                  </b>
+                </RenderStats>
+              </div>
+            );
+          })}
+        </div>
+      </Collapse>
+    </>
+  );
+};
+
+const RubricUsageHistograms: React.FC<{
+  examId: string,
+  version: ExamVersion,
+}> = (props) => {
+  const {
+    version,
+    examId,
+  } = props;
+  const [showRubrics, setShowRubrics] = useState(false);
+  return (
+    <>
+      <h4 className="flex-grow-1">
+        <span
+          role="button"
+          onClick={() => setShowRubrics((s) => !s)}
+          onKeyPress={() => setShowRubrics((s) => !s)}
+          tabIndex={0}
+        >
+          Per-question rubric presets usage
+          {showRubrics ? <Icon I={FaChevronUp} /> : <Icon I={FaChevronDown} />}
+        </span>
+      </h4>
+      <Collapse in={showRubrics}>
+        <div>
+          <RubricPresetHistograms
+            examVersionKey={version}
+            examId={examId}
+          />
+        </div>
+      </Collapse>
     </>
   );
 };
@@ -321,7 +449,11 @@ const ExamStatsQuery: React.FC = () => {
               }
               ...RubricPresetHistograms
               currentScores {
-                registration { id started }
+                registration { 
+                  id
+                  user { displayName }
+                  started
+                }
                 scores
               }
             }

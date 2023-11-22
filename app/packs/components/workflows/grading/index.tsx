@@ -1800,7 +1800,7 @@ const RenderQnumTree : React.FC<{
   info: GradingLockInfo[][][],
   examId: string,
   qpPairs: QPInfo,
-  RenderItem: React.FC<{ item: GradingLockInfo, examId: string }>,
+  RenderItem: React.FC<{ item: GradingLockInfo, examId: string, singlePart: boolean }>,
 }> = (props) => {
   const {
     className,
@@ -1851,7 +1851,7 @@ const CollapsibleQnumTree : React.FC<{
   info: GradingLockInfo[][],
   examId: string,
   multipart: boolean,
-  RenderItem: React.FC<{ item: GradingLockInfo, examId: string }>,
+  RenderItem: React.FC<{ item: GradingLockInfo, examId: string, singlePart: boolean }>,
 }> = (props) => {
   const {
     qnum,
@@ -1889,7 +1889,7 @@ const RenderPnumTree : React.FC<{
   info: GradingLockInfo[][],
   examId: string,
   multipart: boolean,
-  RenderItem: React.FC<{ item: GradingLockInfo, examId: string }>,
+  RenderItem: React.FC<{ item: GradingLockInfo, examId: string, singlePart: boolean }>,
 }> = (props) => {
   const {
     className,
@@ -1906,6 +1906,7 @@ const RenderPnumTree : React.FC<{
             key={`reg-${item.registration.id}-q${item.qnum}-p${item.pnum}`}
             item={item}
             examId={examId}
+            singlePart
           />
         ))}
       </ul>
@@ -1932,7 +1933,7 @@ const CollapsiblePnumTree : React.FC<{
   pnum: number,
   items: GradingLockInfo[],
   examId: string,
-  RenderItem: React.FC<{ item: GradingLockInfo, examId: string }>,
+  RenderItem: React.FC<{ item: GradingLockInfo, examId: string, singlePart: boolean }>,
 }> = (props) => {
   const {
     pnum,
@@ -1954,12 +1955,28 @@ const CollapsiblePnumTree : React.FC<{
       </span>
       <Collapse in={open}>
         <ul>
-          {items.map((item) => <RenderItem key={item.id} item={item} examId={examId} />)}
+          {items.map((item) => (
+            <RenderItem
+              key={item.id}
+              item={item}
+              examId={examId}
+              singlePart={false}
+            />
+          ))}
         </ul>
       </Collapse>
     </>
   );
 };
+
+export function gradingLink(
+  examId: string,
+  registrationId: string,
+  qnum: number,
+  pnum: number,
+): string {
+  return `/exams/${examId}/grading/${registrationId}/${qnum}/${pnum}`;
+}
 
 const RenderLinkToGrading : React.FC<{
   item: GradingLockInfo,
@@ -1978,7 +1995,7 @@ const RenderLinkToGrading : React.FC<{
         <Link
           className="ml-2"
           target="_blank"
-          to={`/exams/${examId}/grading/${registration.id}/${qnum}/${pnum}`}
+          to={gradingLink(examId, registration.id, qnum, pnum)}
         >
           {describeTime(DateTime.fromISO(updatedAt))}
         </Link>
@@ -1987,11 +2004,23 @@ const RenderLinkToGrading : React.FC<{
   );
 };
 
+export function submissionLink(
+  examId: string,
+  registrationId: string,
+  singlePart: boolean,
+  qnum: number,
+  pnum: number,
+): string {
+  const anchor = singlePart ? `question-${qnum}` : `question-${qnum}-part-${pnum}`;
+  return `/exams/${examId}/submissions/${registrationId}#${anchor}`;
+}
+
 const RenderLinkToSubmission : React.FC<{
   item: GradingLockInfo,
   examId: string,
+  singlePart: boolean,
 }> = (props) => {
-  const { item, examId } = props;
+  const { item, examId, singlePart } = props;
   const {
     registration,
     updatedAt,
@@ -2005,7 +2034,7 @@ const RenderLinkToSubmission : React.FC<{
         <Link
           className="ml-2"
           target="_blank"
-          to={`/exams/${examId}/submissions/${registration.id}`}
+          to={submissionLink(examId, registration.id, singlePart, qnum, pnum)}
         >
           <span className="mr-2">{describeTime(DateTime.fromISO(updatedAt))}</span>
         </Link>
@@ -2146,7 +2175,7 @@ const BeginGradingButton: React.FC<{
           qnum,
           pnum,
         } = gradeNext;
-        history.push(`/exams/${examId}/grading/${registrationId}/${qnum}/${pnum}`);
+        history.push(gradingLink(examId, registrationId, qnum, pnum));
       },
       onError: (err) => {
         if (err.cause?.[0]?.extensions && !err.cause[0].extensions.anyRemaining) {

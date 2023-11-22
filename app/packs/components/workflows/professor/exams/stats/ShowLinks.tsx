@@ -6,7 +6,7 @@ import {
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Icon from '@student/exams/show/components/Icon';
-import { iconForPoints, variantForPoints } from '@hourglass/workflows/grading';
+import { iconForPoints, submissionLink, variantForPoints } from '@hourglass/workflows/grading';
 import { pluralize } from '@hourglass/common/helpers';
 import { IconType } from 'react-icons';
 import { RiMessage2Line } from 'react-icons/ri';
@@ -62,15 +62,14 @@ export const ShowLinks: React.FC<{
       <Modal.Body>
         <table>
           {comments.map(({ comment, registration }) => {
-            const anchor = singlePart ? `question-${qnum}` : `question-${qnum}-part-${pnum}`;
-            const submissionLink = `/exams/${examId}/submissions/${registration.id}#${anchor}`;
+            const link = submissionLink(examId, registration.id, singlePart, qnum, pnum);
             return (
               <tr>
                 <td style={{ whiteSpace: 'nowrap' }} className="pr-3">
                   <Link
                     key={comment.id}
                     target="blank"
-                    to={submissionLink}
+                    to={link}
                   >
                     {`${registration.user.displayName}:`}
                   </Link>
@@ -79,7 +78,7 @@ export const ShowLinks: React.FC<{
                   <Link
                     key={comment.id}
                     target="blank"
-                    to={submissionLink}
+                    to={link}
                   >
                     <Alert
                       variant={variantForPoints(comment.points)}

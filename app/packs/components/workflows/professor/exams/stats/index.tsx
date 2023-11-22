@@ -20,6 +20,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { submissionLink } from '@hourglass/workflows/grading';
 import { pluralize } from '@hourglass/common/helpers';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
@@ -303,21 +304,18 @@ const GradingAnomalies: React.FC<{
                   />
                 </b>
                 <table>
-                  {anomalies.map((a) => {
-                    const anchor = singlePart ? `question-${qnum}` : `question-${qnum}-part-${pnum}`;
-                    return (
-                      <tr>
-                        <Link
-                          key={a.registration.id}
-                          target="blank"
-                          to={`/exams/${examId}/submissions/${a.registration.id}#${anchor}`}
-                        >
-                          {a.registration.user.displayName}
-                        </Link>
-                        {` (${a.scores[qnum][pnum]} / ${pluralize(dbQuestions[qnum].parts[pnum].points, 'point', 'points')})`}
-                      </tr>
-                    );
-                  })}
+                  {anomalies.map((a) => (
+                    <tr>
+                      <Link
+                        key={a.registration.id}
+                        target="blank"
+                        to={submissionLink(examId, a.registration.id, singlePart, qnum, pnum)}
+                      >
+                        {a.registration.user.displayName}
+                      </Link>
+                      {` (${a.scores[qnum][pnum]} / ${pluralize(dbQuestions[qnum].parts[pnum].points, 'point', 'points')})`}
+                    </tr>
+                  ))}
                 </table>
               </div>
             );

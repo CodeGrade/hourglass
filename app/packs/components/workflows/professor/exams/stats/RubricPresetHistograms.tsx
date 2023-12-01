@@ -1,4 +1,5 @@
 import React, {
+  Ref,
   RefObject,
   useMemo,
   useRef,
@@ -422,7 +423,9 @@ const RenderCommentHistogram: React.FC<{
           })}
         </div>
         <ResponsiveContainer
-          ref={chartRef}
+          // NOTE: See https://github.com/recharts/recharts/issues/3718#issuecomment-1836866079
+          // for why this cast is currently needed
+          ref={chartRef as unknown as Ref<HTMLDivElement>}
           className="d-inline-block p-0 m-0"
           width="50%"
           height={30 + (buckets.length * 40)} // 30 is axis default height

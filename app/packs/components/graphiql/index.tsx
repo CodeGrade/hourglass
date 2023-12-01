@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import GraphiQL from 'graphiql/dist/index';
+import { GraphiQLInterface, GraphiQLProvider } from 'graphiql/dist';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Fetcher } from '@graphiql/toolkit';
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -32,7 +32,12 @@ const defaultQuery = `
 
 const GIQL: React.FC = () => (
   <div className="vh-100">
-    <GraphiQL fetcher={graphQLFetcher} defaultQuery={defaultQuery} />
+    <GraphiQLProvider
+      fetcher={graphQLFetcher}
+      defaultQuery={defaultQuery}
+    >
+      <GraphiQLInterface />
+    </GraphiQLProvider>
   </div>
 );
 

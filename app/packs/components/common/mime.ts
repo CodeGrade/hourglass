@@ -1,6 +1,8 @@
-import mime from 'mime';
+import defaultMime, { Mime } from 'mime';
 
-mime.define({
+const customMime = new Mime();
+
+customMime.define({
   scheme: ['rkt', 'ss'],
   pyret: ['arr'],
   mllike: ['ml', 'mli'],
@@ -19,6 +21,6 @@ export default (name: string): string => {
     case 'makefile':
       return 'text/x-makefile';
     default:
-      return mime.getType(fname) ?? 'text/plain';
+      return customMime.getType(fname) ?? defaultMime.getType(fname) ?? 'text/plain';
   }
 };

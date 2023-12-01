@@ -73,6 +73,12 @@ module.exports = {
         ignoreRestSiblings: true,
       },
     ],
+    'jsx-a11y/control-has-associated-label': [
+      2,
+      {
+        ignoreElements: ['td', 'tr', 'th'],
+      },
+    ],
     'react/jsx-filename-extension': ['error', { extensions: ['.jsx', '.tsx'] }],
     'react/prop-types': 'off',
     'react/require-default-props': [1, { ignoreFunctionalComponents: true }],

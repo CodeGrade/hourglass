@@ -637,31 +637,36 @@ const VersionInfo: React.FC<{
       <h2>
         Versions
         <div className="float-right">
-          <input
-            type="file"
-            ref={fileInputRef}
-            hidden
-            onChange={(event) => {
-              const { files } = event.target;
-              const [f] = files;
-              if (!f) return;
-              uploadFile<{ id: number; }>(res.examVersionUploadUrl, f).then((innerRes) => {
-                history.push(`/exams/${res.id}/versions/${innerRes.id}/edit`);
-                alert({
-                  variant: 'success',
-                  autohide: true,
-                  message: 'Exam version successfully imported',
+          {
+            // NOTE: this input is controlled by the button,
+            // and so does not need to be labelled
+            // eslint-disable-next-line jsx-a11y/control-has-associated-label
+            <input
+              type="file"
+              ref={fileInputRef}
+              hidden
+              onChange={(event) => {
+                const { files } = event.target;
+                const [f] = files;
+                if (!f) return;
+                uploadFile<{ id: number; }>(res.examVersionUploadUrl, f).then((innerRes) => {
+                  history.push(`/exams/${res.id}/versions/${innerRes.id}/edit`);
+                  alert({
+                    variant: 'success',
+                    autohide: true,
+                    message: 'Exam version successfully imported',
+                  });
+                }).catch((err) => {
+                  alert({
+                    variant: 'danger',
+                    title: 'Exam version not imported',
+                    message: err.message,
+                    copyButton: true,
+                  });
                 });
-              }).catch((err) => {
-                alert({
-                  variant: 'danger',
-                  title: 'Exam version not imported',
-                  message: err.message,
-                  copyButton: true,
-                });
-              });
-            }}
-          />
+              }}
+            />
+          }
           <Button
             disabled={loading}
             className="mr-2"

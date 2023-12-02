@@ -7,7 +7,7 @@ import {
   useLazyLoadQuery,
 } from 'react-relay';
 import ErrorBoundary from '@hourglass/common/boundary';
-import Select, { GroupedOptionsType } from 'react-select';
+import Select, { GroupBase } from 'react-select';
 import {
   Button,
   Container,
@@ -280,7 +280,7 @@ const ShowProfRegs: React.FC<{
 export type ImpersonateVal = SelectOption<string>
 
 export const ImpersonateUser: React.FC<{
-  userOptions: ImpersonateVal[] | GroupedOptionsType<ImpersonateVal>;
+  userOptions: ImpersonateVal[] | readonly GroupBase<ImpersonateVal>[];
   userIdToImageMap: { [key: string]: string; };
   courseId?: ImpersonateUserInput['courseId'];
 }> = (props) => {

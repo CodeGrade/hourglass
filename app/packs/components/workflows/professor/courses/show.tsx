@@ -6,7 +6,7 @@ import SyncCourse from '@professor/courses/sync';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { graphql, useFragment, useLazyLoadQuery } from 'react-relay';
 import ErrorBoundary from '@hourglass/common/boundary';
-import { GroupedOptionsType } from 'react-select';
+import { GroupBase } from 'react-select';
 import { ImpersonateVal, ImpersonateUser } from '@hourglass/workflows/home';
 
 import { showCourseQuery } from './__generated__/showCourseQuery.graphql';
@@ -102,7 +102,7 @@ const ShowCourseQuery: React.FC = () => {
       userIdToImageMap[user.id] = user.imageUrl;
     }
   });
-  const userOptions: GroupedOptionsType<ImpersonateVal> = [
+  const userOptions: GroupBase<ImpersonateVal>[] = [
     {
       label: 'Students',
       options: data.course.students.map((user) => ({

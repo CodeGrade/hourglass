@@ -72,7 +72,11 @@ const Group: React.FC<GroupProps<FileRefOption>> = (props) => {
     files,
     selected = [],
     setState,
-  } = selectProps;
+  } = (selectProps as unknown as {
+    files: FilePickerProps['options']
+    selected: FilePickerProps['selected'],
+    setState: FilePickerProps['onChange']
+  });
   return (
     <FilePicker
       options={files}
@@ -151,9 +155,9 @@ const FilePickerSelect: React.FC<FilePickerProps> = (props) => {
         components={COMPONENTS}
         isDisabled={disabled}
         // Pass-along props to FilePicker
-        files={options}
-        selected={selected}
-        setState={onChange}
+        // Must use this spread-of-lieral-object shenanigan to
+        // dodge TS's complaining about unknown properties
+        {... { files: options, selected, setState: onChange }}
         // Standard Select props
         isMulti
         className="z-1000"

@@ -482,7 +482,7 @@ const NewAccommodation: React.FC<{
   return (
     <InputGroup>
       <Select
-        disabled={loading}
+        isDisabled={loading}
         isClearable
         value={selected}
         onChange={setSelected}

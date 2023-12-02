@@ -496,7 +496,7 @@ class ArchiveUtils
           # Adapted from the implementation of ::Zip::Entry#create_file
           f.get_input_stream do |fs|
             buf = ''
-            while (total < limit && !fs.eof?)
+            while total < limit && !fs.eof?
               buf = fs.sysread(limit - total, buf)
               total += buf.length
             end
@@ -534,7 +534,7 @@ class ArchiveUtils
 
   private_class_method def self.gzip_total_size_too_large?(file, limit)
     Zlib::GzipReader.open(file) do |zf|
-      zf.readpartial(limit) while (!zf.eof? && zf.pos < limit)
+      zf.readpartial(limit) while !zf.eof? && zf.pos < limit
 
       raise FileSizeLimit.new(limit, file) if zf.pos >= limit
     end

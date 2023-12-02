@@ -182,12 +182,12 @@ class Rubric < ApplicationRecord
       type: type.downcase,
       description: description,
       points: points,
-      choices: (rubric_preset_as_json || subsections_as_json),
+      choices: rubric_preset_as_json || subsections_as_json,
       inUse:
         if format == :export
           nil
         else
-          (rubric_preset_as_json&.dig('inUse') || subsections_as_json.any? { |s| s['inUse'] })
+          rubric_preset_as_json&.dig('inUse') || subsections_as_json.any? { |s| s['inUse'] }
         end,
     }.compact
   end

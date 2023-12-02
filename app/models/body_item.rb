@@ -32,7 +32,7 @@ class BodyItem < ApplicationRecord
     return unless info['type'] == 'CodeTag'
 
     file_path = answer['selectedFile']
-    return if (file_path.nil? || exam_version.has_file_path?(file_path))
+    return if file_path.nil? || exam_version.has_file_path?(file_path)
 
     errors.add(:base, "Code tag body item answer refers to a non-existent file: #{file_path}")
   end

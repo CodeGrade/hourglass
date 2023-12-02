@@ -27,7 +27,7 @@ class MarksProcessor
               ch: idx,
             },
             options: {
-              inclusiveLeft: (line_num.zero? && idx.zero?),
+              inclusiveLeft: line_num.zero? && idx.zero?,
             },
           }
           if marks[:byLine][line_num][idx].nil?

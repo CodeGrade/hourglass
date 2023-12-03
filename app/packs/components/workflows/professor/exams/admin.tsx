@@ -29,6 +29,8 @@ import {
   Nav,
   Container,
   Modal,
+  ButtonGroup,
+  Accordion,
 } from 'react-bootstrap';
 import {
   FaChevronUp,
@@ -51,7 +53,7 @@ import AssignSeating from '@hourglass/common/student-dnd';
 import AllocateVersions from '@professor/exams/allocate-versions';
 import AssignStaff from '@professor/exams/assign-staff';
 import ErrorBoundary from '@hourglass/common/boundary';
-import { MdWarning, MdDoNotDisturb } from 'react-icons/md';
+import { MdWarning, MdDoNotDisturb, MdOutlineHelp } from 'react-icons/md';
 import { BiHide, BiShow, BiSpreadsheet } from 'react-icons/bi';
 import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
@@ -606,6 +608,8 @@ const VersionInfo: React.FC<{
     exam,
   );
   const { alert } = useContext(AlertContext);
+  const [showSchema, setShowSchema] = useState(false);
+  const closeSchema = useCallback(() => setShowSchema(false), []);
   const history = useHistory();
   const fileInputRef = createRef<HTMLInputElement>();
   const [createVersion, loading] = useMutationWithDefaults<adminCreateVersionMutation>(
@@ -667,16 +671,26 @@ const VersionInfo: React.FC<{
               }}
             />
           }
-          <Button
-            disabled={loading}
-            className="mr-2"
-            variant="success"
-            onClick={(): void => {
-              fileInputRef.current.click();
-            }}
-          >
-            Import Version
-          </Button>
+          <ButtonGroup>
+            <Button
+              disabled={loading}
+              variant="success"
+              className="pr-1"
+              onClick={(): void => {
+                fileInputRef.current.click();
+              }}
+            >
+              Import Version
+            </Button>
+            <Button
+              disabled={loading}
+              className="mr-2 pl-1"
+              variant="success"
+              onClick={() => setShowSchema(!showSchema)}
+            >
+              <Icon I={MdOutlineHelp} size="1em" />
+            </Button>
+          </ButtonGroup>
           <Button
             disabled={loading}
             variant="success"
@@ -692,6 +706,7 @@ const VersionInfo: React.FC<{
           >
             New Version
           </Button>
+          <ShowImportSchema show={showSchema} onHide={closeSchema} />
         </div>
       </h2>
       <ul>
@@ -705,6 +720,158 @@ const VersionInfo: React.FC<{
         ))}
       </ul>
     </>
+  );
+};
+
+const AccordionItem = Card;
+
+const AccordionHeader: React.FC<React.PropsWithChildren<{
+  eventKey: string
+}>> = (props) => {
+  const {
+    eventKey,
+    children,
+  } = props;
+  return (
+    <Accordion.Toggle as={Card.Header} eventKey={eventKey}>{children}</Accordion.Toggle>
+  );
+};
+
+const AccordionBody: React.FC<React.PropsWithChildren<{
+  eventKey: string
+}>> = (props) => {
+  const {
+    eventKey,
+    children,
+  } = props;
+  return (
+    <Accordion.Collapse eventKey={eventKey}><Card.Body>{children}</Card.Body></Accordion.Collapse>
+  );
+};
+
+const ShowImportSchema: React.FC<{
+  show: boolean;
+  onHide: () => void;
+}> = (props) => {
+  const { show, onHide } = props;
+  const unindent = (n: number, s: string) => s.replaceAll(`\n${' '.repeat(n)}`, '\n').trim();
+  const standaloneFileSchema = unindent(2, `{
+    "files": FilesAndDirectories,
+    "info": CommonExamContents
+  }`);
+  const fileSchema = unindent(2, `{
+    "filedir": "file",
+    "path": the filename,
+    "text": text to display to student (e.g. the filename),
+    "type": MIME type of file,
+    "relPath": the full relative path within this set of files,
+    "contents": a string with the contents of the file,
+    "marks": an optional array of read-only spans of text 
+  }`);
+  const dirSchema = unindent(2, `{
+    "filedir": "dir",
+    "path": the directory name,
+    "text": text to display to student (e.g. "dirname/"),
+    "relPath": the full relative path within this set of files,
+    "nodes": an array of FilesAndDirectories
+  }`);
+  const examSchema = unindent(2, `
+  ExamSchema :=
+    policies: an array of exam policies
+    contents:
+      instructions: an HTML string of instructions
+      questions: an array of Question
+      reference: an optional array of Reference
+      rubric: an optional exam-wide Rubric
+  Reference := one of
+    {file: relative path to a file in the FilesAndDirectories}
+    {dir: relative path to a directory in the FilesAndDirectories}
+  Question :=
+    name: an optional HTML string
+    description: an HTML string
+    separateSubparts: boolean, if parts should be shown in separate pages
+    reference: an optional array of Reference
+    parts: an array of Part
+    rubric: an optional question-wide Rubric
+  Part :=
+    name: an optional HTML string
+    description: an HTML string
+    points: number,
+    rubric: an optional part-wide Rubric
+    body: an array of BodyItem
+  `);
+  return (
+    <Modal
+      size="xl"
+      centered
+      keyboard
+      scrollable
+      show={show}
+      onHide={onHide}
+    >
+      <Modal.Header closeButton className="alert alert-info card-header p-2 mb-0">
+        <Modal.Title>Import schema</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>
+          Hourglass supports importing exam versions either as zip archives,
+          or as consolidated JSON files.
+        </p>
+        <Accordion>
+          <AccordionItem>
+            <AccordionHeader eventKey="zip">Zip upload schema</AccordionHeader>
+            <AccordionBody eventKey="zip">
+              Zip archives must contain a
+              <code> examl.yaml </code>
+              file and a
+              <code> files/ </code>
+              directory as its only two top-level entries.  The
+              <code> files/ </code>
+              directory can contain any files to be shown in the exam
+              (and can contain subdirectories).  The
+              <code> exam.yaml </code>
+              file matches the common schema below.  Any references to files or
+              directories in the exam are implicitly relative to the
+              <code> files/ </code>
+              directory.  (This ensures that exporting the exam as either a zip
+              or as a standalone file yields the same contents.)
+            </AccordionBody>
+          </AccordionItem>
+          <AccordionItem>
+            <AccordionHeader eventKey="json">Standalone JSON upload schema</AccordionHeader>
+            <AccordionBody eventKey="json">
+              A standalone JSON file should look like
+              <pre>{standaloneFileSchema}</pre>
+              <code>FilesAndDirectories</code>
+              , in turn, match the following schema:
+              <Row>
+                <Col sm={6}><pre>{dirSchema}</pre></Col>
+                <Col sm={6}><pre>{fileSchema}</pre></Col>
+              </Row>
+            </AccordionBody>
+          </AccordionItem>
+          <AccordionItem>
+            <AccordionHeader eventKey="common">Common upload schema</AccordionHeader>
+            <AccordionBody eventKey="common">
+              The overall exam schema looks like
+              <pre>{examSchema}</pre>
+              <code>BodyItem</code>
+              s and
+              <code>Rubric</code>
+              s are quite tedious to specify completely.
+            </AccordionBody>
+          </AccordionItem>
+        </Accordion>
+      </Modal.Body>
+      <Modal.Footer className="alert alert-info card-footer mb-0 p-1">
+        <Button
+          variant="primary"
+          onClick={onHide}
+        >
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 };
 

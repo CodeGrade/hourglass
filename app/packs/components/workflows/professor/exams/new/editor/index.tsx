@@ -30,6 +30,7 @@ import {
   ToggleButtonGroup,
 } from 'react-bootstrap';
 import { AlertContext, useAlert } from '@hourglass/common/alerts';
+import DocumentTitle from '@hourglass/common/documentTitle';
 import { useParams } from 'react-router-dom';
 import Policies from './Policies';
 import FileUploader from './FileUploader';
@@ -283,6 +284,7 @@ const ExamVersionEditorQuery: React.FC = () => {
   );
   return (
     <Container fluid>
+      <DocumentTitle title={examVersion.name} />
       <ExamContext.Provider value={contextVal}>
         <ExamFilesContext.Provider value={examReference}>
           <Row>

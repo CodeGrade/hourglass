@@ -83,6 +83,7 @@ import { adminCreateVersionMutation } from './__generated__/adminCreateVersionMu
 import { adminDestroyVersionMutation } from './__generated__/adminDestroyVersionMutation.graphql';
 import { adminSyncExamToBottlenoseMutation } from './__generated__/adminSyncExamToBottlenoseMutation.graphql';
 import { adminBottlenoseJsonQuery } from './__generated__/adminBottlenoseJsonQuery.graphql';
+import { DestroyButtonHelper } from './new/editor/components/helpers';
 
 export interface ExamUpdateInfo {
   name: string;
@@ -967,6 +968,7 @@ const ShowVersion: React.FC<{
   } else if (loading) {
     disabledDeleteMessage = 'Please wait...';
   }
+  const [showWarningModal, setShowWarningModal] = useState(false);
   return (
     <>
       <h3 className="flex-grow-1">
@@ -1009,12 +1011,11 @@ const ShowVersion: React.FC<{
           >
             Edit
           </LinkButton>
-          <TooltipButton
-            variant="danger"
-            disabled={res.anyStarted || res.anyFinalized || loading}
-            disabledMessage={disabledDeleteMessage}
-            cursorClass="cursor-not-allowed"
-            onClick={(): void => {
+          <DestroyButtonHelper
+            description="exam version"
+            showWarningModal={showWarningModal}
+            dismiss={() => setShowWarningModal(false)}
+            destroy={(): void => {
               mutate({
                 variables: {
                   input: {
@@ -1024,8 +1025,16 @@ const ShowVersion: React.FC<{
               });
             }}
           >
-            Delete
-          </TooltipButton>
+            <TooltipButton
+              variant="danger"
+              disabled={res.anyStarted || res.anyFinalized || loading}
+              disabledMessage={disabledDeleteMessage}
+              cursorClass="cursor-not-allowed"
+              onClick={() => setShowWarningModal(true)}
+            >
+              Delete
+            </TooltipButton>
+          </DestroyButtonHelper>
         </div>
       </h3>
       <ErrorBoundary>

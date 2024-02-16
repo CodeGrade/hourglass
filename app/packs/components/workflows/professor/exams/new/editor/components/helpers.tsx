@@ -2,6 +2,7 @@ import React, {
   useEffect,
   useState,
   useCallback,
+  PropsWithChildren,
 } from 'react';
 import {
   Button,
@@ -42,6 +43,56 @@ export const DragHandle: React.FC<{
   );
 };
 
+export const DestroyButtonHelper: React.FC<PropsWithChildren<{
+  description: string;
+  showWarningModal: boolean;
+  dismiss: () => void;
+  destroy: () => void;
+}>> = (props) => {
+  const {
+    description,
+    showWarningModal,
+    dismiss,
+    destroy,
+    children,
+  } = props;
+  return (
+    <>
+      <Modal
+        centered
+        keyboard
+        show={showWarningModal}
+        onHide={dismiss}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm deletion</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {`Are you sure you want to delete this ${description}?`}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="primary"
+            onClick={dismiss}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => {
+              dismiss();
+              destroy();
+            }}
+          >
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {children}
+    </>
+  );
+};
+
 export const DestroyButton: React.FC<{
   disabled?: boolean;
   className?: string;
@@ -58,41 +109,12 @@ export const DestroyButton: React.FC<{
   } = props;
   const [showWarningModal, setShowWarningModal] = useState(false);
   return (
-    <>
-      <Modal
-        centered
-        keyboard
-        show={showWarningModal}
-        onHide={() => {
-          setShowWarningModal(false);
-        }}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm deletion</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {`Are you sure you want to delete this ${description}?`}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="primary"
-            onClick={() => {
-              setShowWarningModal(false);
-            }}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="danger"
-            onClick={() => {
-              setShowWarningModal(false);
-              onClick();
-            }}
-          >
-            Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
+    <DestroyButtonHelper
+      description={description}
+      showWarningModal={showWarningModal}
+      dismiss={() => setShowWarningModal(false)}
+      destroy={onClick}
+    >
       <span className={className}>
         <Button
           variant="danger"
@@ -110,7 +132,7 @@ export const DestroyButton: React.FC<{
           <FaTrashAlt />
         </Button>
       </span>
-    </>
+    </DestroyButtonHelper>
   );
 };
 

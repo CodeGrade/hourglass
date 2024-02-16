@@ -214,7 +214,7 @@ const Part: React.FC<PartProps> = (props) => {
         {bodyItems.map((b, i) => {
           const bodyExtraClasses = classNameDecorator && classNameDecorator(qnum, pnum, i);
           return (
-            <div className={`p-2 bodyitem ${(b as BodyItem).info.type} ${bodyExtraClasses}`} key={b.id}>
+            <div className={`p-2 bodyitem ${(b as BodyItem).info.type} ${bodyExtraClasses ?? ''}`} key={b.id}>
               <DisplayBody
                 bodyKey={b}
                 qnum={qnum}

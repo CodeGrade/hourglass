@@ -301,6 +301,12 @@ export interface HTMLVal {
   value: string;
 }
 
+export interface CodeSnippet {
+  type: 'CodeSnippet';
+  lang: string;
+  initial?: CodeInitial;
+}
+
 export interface AllThatApplyInfo {
   type: 'AllThatApply';
   options: HTMLVal[];
@@ -356,7 +362,7 @@ export interface MatchingInfo {
 export type MatchingState = number[];
 
 export type BodyItemInfo =
-  HTMLVal | AllThatApplyInfo | CodeInfo | YesNoInfo |
+  HTMLVal | CodeSnippet | AllThatApplyInfo | CodeInfo | YesNoInfo |
   CodeTagInfo | MultipleChoiceInfo |
   TextInfo | MatchingInfo;
 

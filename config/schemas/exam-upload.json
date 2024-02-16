@@ -195,6 +195,7 @@
     "BodyItem": {
       "oneOf": [
         { "$ref": "#/definitions/HTML" },
+        { "$ref": "#/definitions/CodeSnippet" },
         { "$ref": "#/definitions/Response" }
       ]
     },
@@ -241,6 +242,22 @@
           }
         }
       ]
+    },
+    "CodeSnippet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["CodeSnippet"],
+      "properties": {
+        "CodeSnippet": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lang"],
+          "properties": {
+            "lang": { "type": "string" },
+            "initial": { "$ref": "#/definitions/CodeInitial" }
+          }
+        }
+      }
     },
     "YesNo": {
       "type": "object",

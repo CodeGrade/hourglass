@@ -24,6 +24,7 @@ import {
 } from '@student/exams/show/types';
 
 import Html from './body-items/Html';
+import CodeSnippet from './body-items/CodeSnippet';
 import CodeTag from './body-items/CodeTag';
 import Text from './body-items/Text';
 import YesNo from './body-items/YesNo';
@@ -191,6 +192,16 @@ export const BodyItemEditor: React.FC<{
       showRubric = false;
       editor = (
         <Html
+          id={id}
+          info={info}
+          disabled={disabled}
+        />
+      );
+      break;
+    case 'CodeSnippet':
+      showRubric = false;
+      editor = (
+        <CodeSnippet
           id={id}
           info={info}
           disabled={disabled}

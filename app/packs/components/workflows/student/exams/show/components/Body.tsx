@@ -9,6 +9,7 @@ import AllThatApply from '@student/exams/show/containers/questions/AllThatApply'
 import { BodyItem } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
 import { ExhaustiveSwitchError } from '@hourglass/common/helpers';
+import DisplayCodeSnippet from '@proctor/registrations/show/questions/DisplayCodeSnippet';
 
 export interface BodyProps {
   body: BodyItem;
@@ -25,6 +26,8 @@ const Body: React.FC<BodyProps> = (props) => {
   switch (info.type) {
     case 'HTML':
       return <HTML value={info} />;
+    case 'CodeSnippet':
+      return <DisplayCodeSnippet info={info} fullyExpandCode />;
     case 'Code':
       return <Code info={body.info} qnum={qnum} pnum={pnum} bnum={bnum} />;
     case 'AllThatApply':

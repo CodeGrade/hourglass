@@ -135,6 +135,24 @@ class BodyItem < ApplicationRecord
     }
   end
 
+  def as_json_CodeSnippet(format:)
+    initial = info['initial']
+    unless initial.nil?
+      if initial.key? 'file'
+        # potentially nothing to do here; confirm with parse_info
+      else
+        unprocessed = MarksProcessor.process_marks_reverse(initial['text'], initial['marks'])
+        initial = { 'code' => unprocessed }
+      end
+    end
+    {
+      'CodeSnippet' => {
+        'lang' => BodyItem.html_val(format, info['lang']),
+        'initial' => initial,
+      }.compact,
+    }
+  end
+
   def as_json_CodeTag(format:)
     {
       'CodeTag' => {
@@ -287,6 +305,27 @@ class BodyItem < ApplicationRecord
           initial: initial,
         }.compact,
         answer: answer,
+      )
+    end
+
+    def from_yaml_CodeSnippet(type, initial: nil, lang: nil)
+      unless initial.nil?
+        if initial.key? 'file'
+          # We check file validity in the BodyItem model
+        else
+          processed = MarksProcessor.process_marks(ensure_utf8(initial['code'], 'text/plain'))
+          initial = {
+            text: processed[:text],
+            marks: processed[:marks],
+          }
+        end
+      end
+      BodyItem.new(
+        info: {
+          type: type,
+          lang: lang,
+          initial: initial,
+        }.compact,
       )
     end
 

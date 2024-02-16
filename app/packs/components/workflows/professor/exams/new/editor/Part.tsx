@@ -49,6 +49,7 @@ import { useCreateMatchingMutation } from './body-items/Matching';
 import { useCreateMultipleChoiceMutation } from './body-items/MultipleChoice';
 import { useCreateYesNoMutation } from './body-items/YesNo';
 import { useCreateHtmlMutation } from './body-items/Html';
+import { useCreateCodeSnippetMutation } from './body-items/CodeSnippet';
 
 export const ReorderablePartsEditor: React.FC<{
   parts: QuestionEditor$data['parts'];
@@ -284,6 +285,7 @@ export const OnePart: React.FC<{
   const [mutateCreateMC, loadingCreateMC] = useCreateMultipleChoiceMutation();
   const [mutateCreateYesNo, loadingCreateYesNo] = useCreateYesNoMutation();
   const [mutateCreateHtml, loadingCreateHtml] = useCreateHtmlMutation();
+  const [mutateCreateCodeSnippet, loadingCreateCodeSnippet] = useCreateCodeSnippetMutation();
 
   const loadingCreateBodyItem = (
     loadingCreateCode
@@ -294,6 +296,7 @@ export const OnePart: React.FC<{
     || loadingCreateMC
     || loadingCreateYesNo
     || loadingCreateHtml
+    || loadingCreateCodeSnippet
   );
   const disabled = (
     parentDisabled
@@ -439,6 +442,24 @@ export const OnePart: React.FC<{
                   }}
                 >
                   Text instructions
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={() => {
+                    mutateCreateCodeSnippet({
+                      variables: {
+                        input: {
+                          partId: part.id,
+                          lang: Object.keys(languages)[0],
+                          initialCode: {
+                            text: '',
+                            marks: [],
+                          },
+                        },
+                      },
+                    });
+                  }}
+                >
+                  Code snippet
                 </Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item

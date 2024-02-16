@@ -51,6 +51,7 @@ import {
   BodyItemInfo,
 } from '@student/exams/show/types';
 import HTML from '@student/exams/show/components/HTML';
+import DisplayCodeSnippet from '@proctor/registrations/show/questions/DisplayCodeSnippet';
 import { isNoAns } from '@student/exams/show/containers/questions/connectors';
 import { ExamViewerContext, ExamContext } from '@hourglass/common/context';
 import { createMap } from '@student/exams/show/files';
@@ -914,6 +915,8 @@ const GradeBodyItem: React.FC<{
       return (
         <PromptRow prompt={info} />
       );
+    case 'CodeSnippet':
+      return <DisplayCodeSnippet info={info} refreshProps={refreshProps} fullyExpandCode />;
     case 'Code':
       return (
         <>

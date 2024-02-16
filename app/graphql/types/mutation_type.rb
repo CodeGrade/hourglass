@@ -90,6 +90,8 @@ module Types
     field :create_html, mutation: Mutations::CreateHtml
     field :change_html_details, mutation: Mutations::ChangeHtmlDetails
     
+    field :create_code_snippet, mutation: Mutations::CreateCodeSnippet
+    field :change_code_snippet_details, mutation: Mutations::ChangeCodeSnippetDetails
 
     field :move_body_item_answer, mutation: Mutations::MoveBodyItemAnswer
   end

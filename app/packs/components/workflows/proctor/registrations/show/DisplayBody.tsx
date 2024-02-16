@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { graphql, useFragment } from 'react-relay';
 import { ExamViewerContext } from '@hourglass/common/context';
 import DisplayCode from '@proctor/registrations/show/questions/DisplayCode';
+import DisplayCodeSnippet from '@proctor/registrations/show/questions/DisplayCodeSnippet';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import DisplayCodeTag from '@proctor/registrations/show/questions/DisplayCodeTag';
 import DisplayText from '@proctor/registrations/show/questions/DisplayText';
@@ -192,6 +193,14 @@ const DisplayBody: React.FC<BodyProps> = (props) => {
   switch (body.info.type) {
     case 'HTML':
       return <HTML value={body.info} />;
+    case 'CodeSnippet':
+      return (
+        <DisplayCodeSnippet
+          info={body.info}
+          refreshProps={refreshCodeMirrorsDeps}
+          fullyExpandCode={fullyExpandCode}
+        />
+      );
     case 'Code': {
       let initial = null;
       if (overviewMode && body.info.initial) {

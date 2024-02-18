@@ -584,6 +584,7 @@ const ExamSubmissionStaffQuery: React.FC = () => {
         currentAnswers={currentAnswers as AnswersState}
         registrationId={registrationId}
         overviewMode={false}
+        rubricsOpen={false}
       />
     </DocumentTitle>
   );

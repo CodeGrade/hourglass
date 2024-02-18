@@ -19,6 +19,7 @@ interface ShowQuestionProps {
   registrationId?: string;
   fullyExpandCode: boolean;
   overviewMode: boolean;
+  rubricsOpen: boolean;
   classNameDecorator?: (qnum: number, pnum: number, bnum: number) => string;
 }
 
@@ -32,6 +33,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
     registrationId,
     fullyExpandCode,
     overviewMode,
+    rubricsOpen,
     classNameDecorator,
   } = props;
   const res = useFragment<ShowQuestion$key>(
@@ -123,7 +125,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             fullyExpandCode={fullyExpandCode}
           />
         )}
-        {rootRubric && overviewMode && <ShowRubricKey rubricKey={rootRubric} forWhat="question" />}
+        {rootRubric && overviewMode && <ShowRubricKey rubricKey={rootRubric} forWhat="question" rubricsOpen={rubricsOpen} />}
         {parts.map((p, i) => (
           <Part
             key={p.id}
@@ -138,6 +140,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
             showRequestGrading={singlePart ? null : registrationId}
             fullyExpandCode={fullyExpandCode}
             overviewMode={overviewMode}
+            rubricsOpen={rubricsOpen}
             classNameDecorator={classNameDecorator}
           />
         ))}

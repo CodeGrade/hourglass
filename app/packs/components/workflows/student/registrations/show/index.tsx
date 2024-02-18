@@ -96,6 +96,7 @@ const ExamViewerStudent: React.FC<ExamViewerProps> = (props) => {
                 currentGrading={currentGrading}
                 fullyExpandCode
                 overviewMode={overviewMode}
+                rubricsOpen={false}
               />
             </div>
           </div>

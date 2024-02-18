@@ -12,6 +12,7 @@ interface DisplayQuestionsProps {
   registrationId?: string;
   fullyExpandCode: boolean;
   overviewMode: boolean;
+  rubricsOpen: boolean;
   version: DisplayQuestions$key;
   classNameDecorator?: (qnum: number, pnum: number, bnum: number) => string;
 }
@@ -23,6 +24,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
     currentGrading = [],
     registrationId,
     fullyExpandCode,
+    rubricsOpen,
     overviewMode,
     version,
     classNameDecorator,
@@ -51,6 +53,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           registrationId={registrationId}
           fullyExpandCode={fullyExpandCode}
           overviewMode={overviewMode}
+          rubricsOpen={rubricsOpen}
           classNameDecorator={classNameDecorator}
         />
       ))}

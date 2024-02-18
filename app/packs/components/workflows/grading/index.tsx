@@ -1641,6 +1641,7 @@ const ShowOnePart: React.FC<{
                   questionIsExtraCredit={questions[qnum].extraCredit}
                   currentGrading={currentGrading[qnum][pnum]}
                   showRequestGrading={res.id}
+                  rubricsOpen={false}
                   overviewMode={false}
                 />
               </Col>

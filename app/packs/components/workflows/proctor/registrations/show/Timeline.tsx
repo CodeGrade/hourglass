@@ -346,6 +346,7 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
                 registrationId={registrationId}
                 fullyExpandCode
                 overviewMode={false}
+                rubricsOpen={false}
                 classNameDecorator={didItemChange}
               />
             </div>

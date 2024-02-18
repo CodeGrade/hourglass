@@ -24,6 +24,7 @@ interface ExamViewerProps {
   valueUpdate?: React.DependencyList;
   registrationId?: string;
   overviewMode: boolean;
+  rubricsOpen: boolean;
 }
 
 const ExamViewer: React.FC<ExamViewerProps> = (props) => {
@@ -35,6 +36,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     valueUpdate = [],
     registrationId,
     overviewMode,
+    rubricsOpen,
   } = props;
   const res = useFragment(
     graphql`
@@ -141,7 +143,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
                 references={references}
               />
             )}
-            {overviewMode && <ShowRubricKey rubricKey={res.rootRubric} forWhat="exam" />}
+            {overviewMode && <ShowRubricKey rubricKey={res.rootRubric} forWhat="exam" rubricsOpen={rubricsOpen} />}
             <div>
               <DisplayQuestions
                 refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
@@ -151,6 +153,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
                 registrationId={registrationId}
                 fullyExpandCode
                 overviewMode={overviewMode}
+                rubricsOpen={rubricsOpen}
               />
             </div>
           </div>

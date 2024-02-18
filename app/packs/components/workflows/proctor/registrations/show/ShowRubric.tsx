@@ -82,8 +82,12 @@ const ShowRubricPresets: React.FC<{ choices: RubricPresets }> = (props) => {
   );
 };
 
-const ShowRubricAll: React.FC<{ rubric: RubricAll, forWhat: string }> = (props) => {
-  const { rubric, forWhat } = props;
+const ShowRubricAll: React.FC<{
+  rubric: RubricAll,
+  forWhat: string,
+  rubricsOpen: boolean,
+}> = (props) => {
+  const { rubric, forWhat, rubricsOpen } = props;
   const { description, choices } = rubric;
   const [open, setOpen] = useState(false);
   let summary;
@@ -92,7 +96,7 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll, forWhat: string }> = (props) 
     body = (
       <>
         {choices.map((c) => (
-          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} />
+          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} rubricsOpen={rubricsOpen} />
         ))}
       </>
     );
@@ -120,7 +124,7 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll, forWhat: string }> = (props) 
         Choose something from
         <i className="mx-1">all</i>
         entries
-        <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />
+        <Icon className="ml-2" I={(rubricsOpen || open) ? FaChevronUp : FaChevronDown} />
       </span>
       <span className="ml-auto">{summary}</span>
     </h5>
@@ -130,7 +134,7 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll, forWhat: string }> = (props) 
       <Alert className="card" variant="dark">
         {heading}
         <HTML value={description} />
-        <Collapse in={open}>
+        <Collapse in={(rubricsOpen || open)}>
           <div>
             {body}
           </div>
@@ -140,8 +144,12 @@ const ShowRubricAll: React.FC<{ rubric: RubricAll, forWhat: string }> = (props) 
   );
 };
 
-const ShowRubricAny: React.FC<{ rubric: RubricAny, forWhat: string }> = (props) => {
-  const { rubric, forWhat } = props;
+const ShowRubricAny: React.FC<{
+  rubric: RubricAny,
+  forWhat: string,
+  rubricsOpen: boolean,
+}> = (props) => {
+  const { rubric, forWhat, rubricsOpen } = props;
   const { points, description, choices } = rubric;
   const [open, setOpen] = useState(false);
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
@@ -152,7 +160,7 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny, forWhat: string }> = (props) 
     body = (
       <>
         {choices.map((c) => (
-          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} />
+          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} rubricsOpen={rubricsOpen} />
         ))}
       </>
     );
@@ -181,7 +189,7 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny, forWhat: string }> = (props) 
         Choose something from
         <i className="mx-1">any</i>
         entries
-        <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />
+        <Icon className="ml-2" I={(rubricsOpen || open) ? FaChevronUp : FaChevronDown} />
       </span>
       <span className="ml-auto">{summary}</span>
     </h5>
@@ -191,7 +199,7 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny, forWhat: string }> = (props) 
       <Alert className="card" variant="dark">
         {heading}
         <HTML value={description} />
-        <Collapse in={open}>
+        <Collapse in={(rubricsOpen || open)}>
           <div>
             {body}
           </div>
@@ -201,8 +209,12 @@ const ShowRubricAny: React.FC<{ rubric: RubricAny, forWhat: string }> = (props) 
   );
 };
 
-const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) => {
-  const { rubric, forWhat } = props;
+const ShowRubricOne: React.FC<{
+  rubric: RubricOne,
+  forWhat: string,
+  rubricsOpen: boolean,
+}> = (props) => {
+  const { rubric, forWhat, rubricsOpen } = props;
   const { points, description, choices } = rubric;
   const [open, setOpen] = useState(false);
   const pointsMsg = `(${pluralize(points, 'point', 'points')})`;
@@ -213,7 +225,7 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
     body = (
       <>
         {choices.map((c) => (
-          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} />
+          <ShowRubric key={c.id} rubric={c} forWhat={forWhat} rubricsOpen={rubricsOpen} />
         ))}
       </>
     );
@@ -242,7 +254,7 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
         Choose something from
         <i className="mx-1">exactly one</i>
         entry
-        <Icon className="ml-2" I={open ? FaChevronUp : FaChevronDown} />
+        <Icon className="ml-2" I={(rubricsOpen || open) ? FaChevronUp : FaChevronDown} />
       </span>
       <span className="ml-auto">{summary}</span>
     </h5>
@@ -252,7 +264,7 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
       <Alert className="card" variant="dark">
         {heading}
         <HTML value={description} />
-        <Collapse in={open}>
+        <Collapse in={(rubricsOpen || open)}>
           <div>
             {body}
           </div>
@@ -265,8 +277,9 @@ const ShowRubricOne: React.FC<{ rubric: RubricOne, forWhat: string }> = (props) 
 export const ShowRubricKey: React.FC<{
   rubricKey: ShowRubricKey$key,
   forWhat: string,
+  rubricsOpen: boolean,
 }> = (props) => {
-  const { rubricKey, forWhat } = props;
+  const { rubricKey, forWhat, rubricsOpen } = props;
   const rawRubric = useFragment<ShowRubricKey$key>(
     graphql`
     fragment ShowRubricKey on Rubric {
@@ -323,19 +336,20 @@ export const ShowRubricKey: React.FC<{
     rubricKey,
   );
   const rubric = expandRootRubric(rawRubric);
-  return <ShowRubric rubric={rubric} forWhat={forWhat} />;
+  return <ShowRubric rubric={rubric} forWhat={forWhat} rubricsOpen={rubricsOpen} />;
 };
 
 const ShowRubric: React.FC<{
   rubric: Rubric,
   forWhat: string,
+  rubricsOpen: boolean,
 }> = (props) => {
-  const { rubric, forWhat } = props;
+  const { rubric, forWhat, rubricsOpen } = props;
   switch (rubric.type) {
     case 'none': return <div><i>{`No ${forWhat} rubric`}</i></div>;
-    case 'all': return <ShowRubricAll rubric={rubric} forWhat={forWhat} />;
-    case 'any': return <ShowRubricAny rubric={rubric} forWhat={forWhat} />;
-    case 'one': return <ShowRubricOne rubric={rubric} forWhat={forWhat} />;
+    case 'all': return <ShowRubricAll rubric={rubric} forWhat={forWhat} rubricsOpen={rubricsOpen} />;
+    case 'any': return <ShowRubricAny rubric={rubric} forWhat={forWhat} rubricsOpen={rubricsOpen} />;
+    case 'one': return <ShowRubricOne rubric={rubric} forWhat={forWhat} rubricsOpen={rubricsOpen} />;
     default:
       throw new ExhaustiveSwitchError(rubric);
   }

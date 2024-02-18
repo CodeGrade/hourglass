@@ -58,6 +58,7 @@ import { BiHide, BiShow, BiSpreadsheet } from 'react-icons/bi';
 import { BsPencilSquare, BsFillQuestionCircleFill } from 'react-icons/bs';
 import { GiOpenBook } from 'react-icons/gi';
 import { GrSync } from 'react-icons/gr';
+import { TbChecklist } from 'react-icons/tb';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { policyToString } from '@professor/exams/new/editor/Policies';
 import { uploadFile } from '@hourglass/common/types/api';
@@ -1055,6 +1056,7 @@ const PreviewVersion: React.FC<{
     open,
     version,
   } = props;
+  const [rubricsOpen, setRubricsOpen] = useState(false);
   const res = useFragment(
     graphql`
     fragment admin_preview_version on ExamVersion {
@@ -1067,16 +1069,30 @@ const PreviewVersion: React.FC<{
   return (
     <Collapse in={open}>
       <div>
-        <h6>
+        <h6 className="clearfix">
           Policies:
           <span className="ml-4">
             {res.policies.map((policy) => policyToString[policy]).join(', ')}
           </span>
+          {open && (
+            <span className="float-right">
+              <TooltipButton
+                enabledMessage="Toggle showing all rubrics"
+                variant={rubricsOpen ? 'info' : 'outline-info'}
+                disabled={false}
+                className="py-1"
+                onClick={(): void => setRubricsOpen((o) => !o)}
+              >
+                <Icon I={TbChecklist} size="1.75em" />
+              </TooltipButton>
+            </span>
+          )}
         </h6>
         <div className="border p-2">
           <ExamViewer
             version={res}
             overviewMode
+            rubricsOpen={rubricsOpen}
             refreshCodeMirrorsDeps={[open]}
           />
         </div>

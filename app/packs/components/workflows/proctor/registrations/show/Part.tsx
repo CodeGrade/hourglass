@@ -28,6 +28,7 @@ interface PartProps {
   fullyExpandCode?: boolean;
   questionIsExtraCredit: boolean;
   overviewMode: boolean;
+  rubricsOpen: boolean;
   classNameDecorator?: (qnum: number, pnum: number, bnum: number) => string;
 }
 const REQUEST_GRADE_MUTATION = graphql`
@@ -126,6 +127,7 @@ const Part: React.FC<PartProps> = (props) => {
     showRequestGrading = false,
     fullyExpandCode = false,
     overviewMode,
+    rubricsOpen,
     questionIsExtraCredit,
     classNameDecorator,
   } = props;
@@ -210,7 +212,7 @@ const Part: React.FC<PartProps> = (props) => {
             fullyExpandCode={fullyExpandCode}
           />
         )}
-        {rootRubric && overviewMode && <ShowRubricKey rubricKey={rootRubric} forWhat="part" />}
+        {rootRubric && overviewMode && <ShowRubricKey rubricKey={rootRubric} forWhat="part" rubricsOpen={rubricsOpen} />}
         {bodyItems.map((b, i) => {
           const bodyExtraClasses = classNameDecorator && classNameDecorator(qnum, pnum, i);
           return (
@@ -225,6 +227,7 @@ const Part: React.FC<PartProps> = (props) => {
                 valueUpdate={valueUpdate}
                 fullyExpandCode={fullyExpandCode}
                 overviewMode={overviewMode}
+                rubricsOpen={rubricsOpen}
               />
             </div>
           );

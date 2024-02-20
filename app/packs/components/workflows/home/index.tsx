@@ -45,6 +45,7 @@ const ShowUpcomingRegistrations: React.FC<{
       examName
       accommodatedStartTime
       courseTitle
+      room { id name }
     }
     `,
     registrations,
@@ -75,12 +76,30 @@ const ShowUpcomingRegistrations: React.FC<{
                     id,
                     examName,
                     accommodatedStartTime,
+                    room,
                   } = reg;
                   const startTime = DateTime.fromISO(accommodatedStartTime).toLocal();
                   const start = startTime.toLocaleString(DateTime.DATETIME_FULL);
                   return (
                     <li key={id}>
-                      {`${examName} at ${start}`}
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td><b>What:</b></td>
+                            <td>{examName}</td>
+                          </tr>
+                          <tr>
+                            <td><b>When:</b></td>
+                            <td>{start}</td>
+                          </tr>
+                          {room && (
+                            <tr>
+                              <td><b>Where:</b></td>
+                              <td>{room.name}</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
                     </li>
                   );
                 })}

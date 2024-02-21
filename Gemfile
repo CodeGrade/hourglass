@@ -19,7 +19,7 @@ gem 'webpacker', '~> 6.0.0.rc.5'
 
 gem 'react-rails'
 
-gem 'devise', '~> 4.8.0'
+gem 'devise', '~> 4.9.3'
 gem 'omniauth-bottlenose', git: 'https://github.com/CodeGrade/omniauth-bottlenose'
 gem 'omniauth-oauth2', '~> 1.8.0'
 gem 'omniauth-rails_csrf_protection'
@@ -44,7 +44,7 @@ gem 'pretender'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'activerecord_json_validator', '~> 2.0'
-gem 'json-schema', '~> 2.8'
+gem 'json-schema', '~> 4.1.1'
 
 gem 'listen', '~> 3.3'
 
@@ -60,8 +60,7 @@ group :development, :test do
 end
 
 group :development do
-  # https://github.com/BetterErrors/better_errors/issues/516
-  gem 'better_errors', '2.9.1'
+  gem 'better_errors'
 
   gem 'binding_of_caller'
   gem 'rubocop-rails'

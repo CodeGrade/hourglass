@@ -20,11 +20,23 @@ class Registration < ApplicationRecord
   validate :room_version_same_exam
   validate :user_in_course
 
-  delegate :exam, to: :exam_version
+  has_one :exam, through: :exam_version
   delegate :proctors_and_professors, to: :exam
   delegate :all_staff, to: :exam
-  delegate :course, to: :exam
-  delegate :term, to: :course
+  has_one :course, through: :exam
+  has_one :term, through: :course
+
+  def exam
+    super || exam_version.try(:exam)
+  end
+
+  def course
+    super || exam.try(:course)
+  end
+
+  def term
+    super || course.try(:term)
+  end
 
   has_one :most_recent_snapshot, lambda {
     merge(Snapshot.most_recent_by_registration)

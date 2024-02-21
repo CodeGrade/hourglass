@@ -5,8 +5,16 @@ class RubricPreset < ApplicationRecord
   belongs_to :rubric
   has_many :preset_comments, -> { order(:order) }, dependent: :destroy, inverse_of: :rubric_preset
 
-  delegate :exam_version, to: :rubric
-  delegate :exam, to: :exam_version
+  has_one :exam_version, through: :rubric
+  has_one :exam, through: :exam_version
+
+  def exam_version
+    super || rubric.try(:exam_version)
+  end
+
+  def exam
+    super || exam_version.try(:exam)
+  end
 
   accepts_nested_attributes_for :preset_comments
 

@@ -8,7 +8,11 @@ class GradingCheck < ApplicationRecord
   belongs_to :part
   belongs_to :body_item
 
-  delegate :exam_version, to: :registration
+  has_one :exam_version, through: :registration
+
+  def exam_version
+    super || registration.try(:exam_version)
+  end
 
   # negative - deduction
   # positive - bonus
@@ -21,8 +25,16 @@ class GradingCheck < ApplicationRecord
     message: 'Grading check already exists on this body item.',
   }
 
-  delegate :user, to: :registration
-  delegate :course, to: :exam_version
+  has_one :user, through: :registration
+  has_one :course, through: :exam_version
+
+  def user
+    super || registration.try(:user)
+  end
+
+  def course
+    super || exam_version.try(:course)
+  end
 
   validate :valid_qpb
 

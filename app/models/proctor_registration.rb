@@ -9,8 +9,12 @@ class ProctorRegistration < ApplicationRecord
 
   validate :room_in_exam
 
-  delegate :course, to: :exam
+  has_one :course, through: :exam
   delegate :professors, to: :exam
+
+  def course
+    super || exam.try(:course)
+  end
 
   def room_in_exam
     return unless room

@@ -6,9 +6,21 @@ class Anomaly < ApplicationRecord
 
   after_create :trigger_subscription
 
-  delegate :user, to: :registration
-  delegate :exam, to: :registration
-  delegate :exam_version, to: :registration
+  has_one :user, through: :registration
+  has_one :exam, through: :registration
+  has_one :exam_version, through: :registration
+
+  def user
+    super || registration.try(:user)
+  end
+
+  def exam
+    super || registration.try(:exam)
+  end
+
+  def exam_version
+    super || registration.try(:exam_version)
+  end
 
   scope :unforgiven, -> { where(forgiven: false) }
   scope :forgiven, -> { where(forgiven: true) }

@@ -7,10 +7,18 @@ class Message < ApplicationRecord
 
   validates :body, presence: true, length: { maximum: 2000 }
 
-  delegate :user, to: :registration
-  delegate :exam, to: :registration
+  has_one :user, through: :registration
+  has_one :exam, through: :registration
   delegate :proctors_and_professors, to: :exam
   delegate :visible_to?, to: :registration
+
+  def user
+    super || registration.try(:user)
+  end
+
+  def exam
+    super || registration.try(:exam)
+  end
 
   validate :sent_by_proctor, if: :sender
 

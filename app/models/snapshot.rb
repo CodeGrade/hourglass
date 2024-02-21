@@ -4,8 +4,16 @@
 class Snapshot < ApplicationRecord
   belongs_to :registration
 
-  delegate :user, to: :registration
-  delegate :exam, to: :registration
+  has_one :user, through: :registration
+  has_one :exam, through: :registration
+
+  def user
+    super || registration.try(:user)
+  end
+
+  def exam
+    super || registation.try(:exam)
+  end
 
   validates :answers, presence: true
 

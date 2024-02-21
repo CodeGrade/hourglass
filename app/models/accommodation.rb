@@ -11,10 +11,26 @@ class Accommodation < ApplicationRecord
     greater_than_or_equal_to: 0,
   }
 
-  delegate :user, to: :registration
-  delegate :exam, to: :registration
-  delegate :exam_version, to: :registration
-  delegate :course, to: :exam
+  has_one :user, through: :registration
+  has_one :exam, through: :registration
+  has_one :exam_version, through: :registration
+  has_one :course, through: :exam
+
+  def user
+    super || registration.try(:user)
+  end
+
+  def exam
+    super || registration.try(:exam)
+  end
+
+  def exam_version
+    super || registration.try(:exam_version)
+  end
+
+  def course
+    super || exam.try(:course)
+  end
 
   def factor
     (percent_time_expansion.to_f / 100.0) + 1.0

@@ -5,5 +5,9 @@ class StudentRegistration < ApplicationRecord
   belongs_to :section
   belongs_to :user
 
-  delegate :course, to: :section
+  has_one :course, through: :section
+
+  def course
+    super || section.try(:course)
+  end
 end

@@ -4,9 +4,17 @@
 class StudentQuestion < ApplicationRecord
   belongs_to :registration
 
-  delegate :exam, to: :registration
-  delegate :user, to: :registration
+  has_one :exam, through: :registration
+  has_one :user, through: :registration
   delegate :proctors_and_professors, to: :exam
+
+  def user
+    super || registration.try(:user)
+  end
+
+  def exam
+    super || registation.try(:exam)
+  end
 
   validates :body, presence: true, length: { maximum: 2000 }
 

@@ -5,9 +5,21 @@ class BodyItem < ApplicationRecord
   belongs_to :part, inverse_of: :body_items
 
   delegate :visible_to?, to: :part
-  delegate :course, to: :part
-  delegate :exam_version, to: :part
-  delegate :question, to: :part
+  has_one :course, through: :part
+  has_one :exam_version, through: :part
+  has_one :question, through: :part
+
+  def course
+    super || part.try(:course)
+  end
+
+  def exam_version
+    super || part.try(:exam_version)
+  end
+
+  def question
+    super || part.try(:question)
+  end
 
   has_many :rubrics, dependent: :destroy
   has_many :rubric_presets, through: :rubrics

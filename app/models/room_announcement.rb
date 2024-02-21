@@ -6,6 +6,10 @@ class RoomAnnouncement < ApplicationRecord
 
   validates :body, presence: true
 
-  delegate :exam, to: :room
+  has_one :exam, through: :room
   delegate :visible_to?, to: :room
+
+  def exam
+    super || room.try(:exam)
+  end
 end

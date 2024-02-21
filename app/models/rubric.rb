@@ -65,8 +65,16 @@ class Rubric < ApplicationRecord
   validate :has_order_if_not_root
   validate :parent_has_no_presets
 
-  delegate :exam, to: :exam_version
-  delegate :course, to: :exam_version
+  has_one :exam, through: :exam_version
+  has_one :course, through: :exam_version
+
+  def exam
+    super || exam_version.try(:exam)
+  end
+
+  def course
+    super || exam_version.try(:course)
+  end
 
   accepts_nested_attributes_for :rubric_preset
 

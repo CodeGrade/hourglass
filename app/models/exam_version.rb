@@ -31,10 +31,14 @@ class ExamVersion < ApplicationRecord
     end
   end
 
-  delegate :course, to: :exam
+  has_one :course, through: :exam
   delegate :professors, to: :exam
   delegate :proctors_and_professors, to: :exam
   delegate :all_staff, to: :exam
+
+  def course
+    super || exam.try(:course)
+  end
 
   before_save do
     if rubrics.empty?

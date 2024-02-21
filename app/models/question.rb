@@ -11,9 +11,13 @@ class Question < ApplicationRecord
   has_many :preset_comments, through: :rubric_presets
 
   delegate :visible_to?, to: :exam_version
-  delegate :course, to: :exam_version
+  has_one :course, through: :exam_version
 
   accepts_nested_attributes_for :parts, :rubrics, :references
+
+  def course
+    super || exam_version.try(:course)
+  end
 
   before_save do
     if rubrics.empty?

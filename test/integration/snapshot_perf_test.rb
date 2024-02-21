@@ -3,11 +3,10 @@
 require 'test_helper'
 
 class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
-  # rubocop: disable Metrics/BlockLength
   NUM_SNAPSHOTS = 200_000
   NUM_REGISTRATIONS = 400
-  test 'snapshots are fast enough' do
-    skip
+  # test 'snapshots are fast enough' do
+  def snapshot_speed
     old_sync = $stdout.sync
     old_logger = ActiveRecord::Base.logger
     ActiveRecord::Base.logger = nil
@@ -61,5 +60,4 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
       ActiveRecord::Base.logger = old_logger
     end
   end
-  # rubocop: enable Metrics/BlockLength
 end

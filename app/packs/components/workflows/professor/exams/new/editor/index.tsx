@@ -31,6 +31,7 @@ import {
 } from 'react-bootstrap';
 import { AlertContext, useAlert } from '@hourglass/common/alerts';
 import DocumentTitle from '@hourglass/common/documentTitle';
+import { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 import { useParams } from 'react-router-dom';
 import Policies from './Policies';
 import FileUploader from './FileUploader';
@@ -55,10 +56,17 @@ const ExamVersionEditor: React.FC = () => (
 );
 
 const ExamVersionEditorQuery: React.FC = () => {
-  const { versionId: examVersionId } = useParams<{ versionId: string }>();
+  const {
+    versionId: examVersionId,
+    examId,
+  } = useParams<{ versionId: string, examId: string }>();
   const data = useLazyLoadQuery<editorQuery>(
     graphql`
-    query editorQuery($examVersionId: ID!) {
+    query editorQuery($examVersionId: ID!, $examId: ID!) {
+      exam(id: $examId) {
+        name
+        course { id title }
+      }
       examVersion(id: $examVersionId) {
         name
         anyStarted
@@ -83,8 +91,13 @@ const ExamVersionEditorQuery: React.FC = () => {
       }
     }
     `,
-    { examVersionId },
+    { examVersionId, examId },
   );
+  const items: NavbarItem[] = useMemo(() => [
+    [`/courses/${data.exam.course.id}`, data.exam.course.title],
+    [`/exams/${examId}/admin`, data.exam.name],
+    [undefined, data.examVersion.name],
+  ], [data.exam.course.id, data.exam.course.title, data.examVersion.name]);
   const { alert } = useContext(AlertContext);
   const [
     mutateUpdateExamVersion,
@@ -285,6 +298,7 @@ const ExamVersionEditorQuery: React.FC = () => {
   return (
     <Container fluid>
       <DocumentTitle title={examVersion.name} />
+      <NavbarBreadcrumbs items={items} />
       <ExamContext.Provider value={contextVal}>
         <ExamFilesContext.Provider value={examReference}>
           <Row>

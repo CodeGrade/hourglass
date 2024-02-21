@@ -6,7 +6,7 @@ import React, {
   useRef,
   Suspense,
 } from 'react';
-import RegularNavbar from '@hourglass/common/navbar';
+import RegularNavbar, { NavbarItem } from '@hourglass/common/navbar';
 import Select from 'react-select';
 import { useParams } from 'react-router-dom';
 import {
@@ -1974,6 +1974,7 @@ const ProctoringRecipients: React.FC<{
       ...exams_pins
       id
       name
+      course { id title }
       examVersions(first: 100) @connection(key: "Exam_examVersions", filters: []) {
         edges {
           node {
@@ -2099,9 +2100,14 @@ const ProctoringRecipients: React.FC<{
       })),
     },
   ]), [recipients]);
+  const items: NavbarItem[] = useMemo(() => [
+    [`/courses/${res.course.id}`, res.course.title],
+    [`/course/${res.id}/admin`, res.name],
+    [undefined, 'Proctoring'],
+  ], [res.course.id, res.course.title, res.id, res.name]);
   return (
     <>
-      <RegularNavbar className="row" />
+      <RegularNavbar className="row" items={items} />
       <Row>
         <Col>
           <h1>

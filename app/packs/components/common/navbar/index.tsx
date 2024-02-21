@@ -6,6 +6,7 @@ import {
 } from 'react-bootstrap';
 import { getCSRFToken } from '@student/exams/show/helpers';
 import { Link } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { useLazyLoadQuery, graphql, useMutation } from 'react-relay';
 import { AlertContext } from '@hourglass/common/alerts';
 import NotLoggedIn from './NotLoggedIn';
@@ -28,19 +29,56 @@ async function logOut(): Promise<unknown> {
 
 const RN: React.FC<{
   className?: string;
-}> = ({ className }) => (
+  items?: NavbarItem[];
+}> = ({ className, items }) => (
   <Suspense
     fallback={(
       <NotLoggedIn />
     )}
   >
-    <RNQuery className={className} />
+    <RNQuery className={className} items={items} />
   </Suspense>
+);
+export type NavbarItem = [string, React.ReactNode?];
+
+export const NavbarBreadcrumbs: React.FC<{
+  items: NavbarItem[]
+}> = ({ items }) => {
+  const breadcrumbs = document.getElementById('navbar-breadcrumbs');
+  if (breadcrumbs) {
+    return (
+      createPortal(
+        <RenderNavbarBreadcrumbs items={items} />,
+        breadcrumbs,
+      )
+    );
+  }
+  return (
+    <h4>
+      Go to
+      <RenderNavbarBreadcrumbs items={items} />
+    </h4>
+  );
+};
+
+const RenderNavbarBreadcrumbs: React.FC<{
+  items: NavbarItem[]
+}> = ({ items }) => (
+  <>
+    {items.map(([link, title], i) => (
+      // eslint-disable-next-line react/no-array-index-key
+      <span key={i}>
+        <span className="mx-1">&raquo;</span>
+        {link ? <Link to={link}>{title}</Link> : title}
+      </span>
+    ))}
+  </>
 );
 
 const RNQuery: React.FC<{
   className?: string;
-}> = ({ className }) => {
+  items?: NavbarItem[];
+}> = ({ className, items }) => {
   const { alert } = useContext(AlertContext);
   const queryData = useLazyLoadQuery<navbarQuery>(
     graphql`
@@ -68,11 +106,14 @@ const RNQuery: React.FC<{
       expand="md"
       className={className}
     >
-      <Navbar.Brand>
-        <Link to="/" className="d-inline-flex align-items-center">
+      <Navbar.Brand className="d-inline-flex align-items-center">
+        <Link to="/">
           <img src={NavbarLogo} alt="Hourglass" className="px-2 d-inline-block" style={{ height: 20 }} />
           <span className="d-inline-block">Hourglass</span>
         </Link>
+        <span id="navbar-breadcrumbs">
+          {items && <RenderNavbarBreadcrumbs items={items} />}
+        </span>
       </Navbar.Brand>
       <Navbar.Toggle />
       <Navbar.Collapse className="justify-content-end">

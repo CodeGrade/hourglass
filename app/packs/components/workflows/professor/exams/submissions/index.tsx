@@ -15,7 +15,14 @@ import {
   useLocation,
 } from 'react-router-dom';
 import { DateTime, LocaleOptions } from 'luxon';
-import { Container, Button, Table } from 'react-bootstrap';
+import {
+  Container,
+  Button,
+  Table,
+  DropdownButton,
+  Dropdown,
+  Modal,
+} from 'react-bootstrap';
 import { BsListCheck } from 'react-icons/bs';
 import {
   graphql,
@@ -27,6 +34,7 @@ import {
   AnswersState,
 } from '@student/exams/show/types';
 import Spoiler from '@hourglass/common/Spoiler';
+import { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 import ExamViewer from '@proctor/registrations/show';
 import ExamTimelineViewer, { SnapshotsState } from '@proctor/registrations/show/Timeline';
 import ExamViewerStudent from '@student/registrations/show';
@@ -46,6 +54,8 @@ import { submissionsAuditRootQuery } from './__generated__/submissionsAuditRootQ
 import { submissionsStaffQuery } from './__generated__/submissionsStaffQuery.graphql';
 import { submissionsAuditStaffQuery } from './__generated__/submissionsAuditStaffQuery.graphql';
 import { submissionsStudentQuery } from './__generated__/submissionsStudentQuery.graphql';
+import { submissionsExportStudentAnswersQuery } from './__generated__/submissionsExportStudentAnswersQuery.graphql';
+import { submissionsExportStudentSnapshotsQuery } from './__generated__/submissionsExportStudentSnapshotsQuery.graphql';
 
 type Registration = submissionsAllQuery$data['exam']['registrations'][number];
 
@@ -76,6 +86,163 @@ const registrationWasUpdatedSubscriptionSpec = graphql`
   }
 `;
 
+const RenderStudentTable: React.FC<{
+  students: readonly Registration[],
+  examId: string,
+  timeOpts: LocaleOptions & Intl.DateTimeFormatOptions,
+  actions?: {
+    export?: (id: string, name: string) => void
+    exportAll?: (id: string, name: string) => void;
+  }
+}> = (props) => {
+  const {
+    students,
+    examId,
+    timeOpts,
+    actions,
+  } = props;
+  return (
+    <Table hover>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Started</th>
+          <th>Ended</th>
+          {actions && <th>Actions</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {students.map((reg) => (
+          <tr key={reg.id}>
+            <td>
+              <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+                {reg.user.displayName}
+              </Link>
+            </td>
+            <td>{reg.startTime && DateTime.fromISO(reg.startTime).toLocaleString(timeOpts)}</td>
+            <td>{reg.endTime && DateTime.fromISO(reg.endTime).toLocaleString(timeOpts)}</td>
+            {actions && (
+              <td>
+                <DropdownButton size="sm" className="d-inline-block" variant="primary" title="Actions">
+                  {actions.export && (
+                    <Dropdown.Item onClick={() => actions.export(reg.id, reg.user.displayName)}>
+                      Export current answers
+                    </Dropdown.Item>
+                  )}
+                  {actions.exportAll && (
+                    <Dropdown.Item onClick={() => actions.exportAll(reg.id, reg.user.displayName)}>
+                      Export all snapshots
+                    </Dropdown.Item>
+                  )}
+                </DropdownButton>
+              </td>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </Table>
+  );
+};
+
+const ExportStudentAnswersQuery: React.FC<{
+  regId: string,
+  confirm: (data: string) => void,
+  cancel: () => void,
+}> = (props) => {
+  const {
+    regId,
+    confirm,
+    cancel,
+  } = props;
+  const queryData = useLazyLoadQuery<submissionsExportStudentAnswersQuery>(
+    graphql`
+      query submissionsExportStudentAnswersQuery($regId: ID!) {
+        registration(id: $regId) {
+          id
+          currentAnswers
+        }
+      }
+    `,
+    { regId },
+  );
+  return (
+    <ExportStudent
+      data={queryData.registration.currentAnswers}
+      confirm={confirm}
+      cancel={cancel}
+    />
+  );
+};
+
+const ExportStudentSnapshotsQuery: React.FC<{
+  regId: string,
+  confirm: (data: string) => void,
+  cancel: () => void,
+}> = (props) => {
+  const {
+    regId,
+    confirm,
+    cancel,
+  } = props;
+  const queryData = useLazyLoadQuery<submissionsExportStudentSnapshotsQuery>(
+    graphql`
+      query submissionsExportStudentSnapshotsQuery($regId: ID!) {
+        registration(id: $regId) {
+          id
+          snapshots {
+            answers
+            createdAt
+          }
+        }
+      }
+    `,
+    { regId },
+  );
+  return (
+    <ExportStudent
+      data={queryData.registration.snapshots}
+      confirm={confirm}
+      cancel={cancel}
+    />
+  );
+};
+
+const ExportStudent: React.FC<{
+  data: unknown,
+  confirm: (data: string) => void,
+  cancel: () => void,
+}> = (props) => {
+  const {
+    data,
+    confirm,
+    cancel,
+  } = props;
+  const dataText = JSON.stringify(data, null, 2);
+  return (
+    <>
+      <Modal.Body>
+        <pre>
+          {dataText}
+        </pre>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          variant="outline-primary"
+          onClick={cancel}
+        >
+          Close
+        </Button>
+        <Button
+          variant="primary"
+          onClick={() => confirm(dataText)}
+        >
+          Export
+        </Button>
+      </Modal.Footer>
+    </>
+  );
+};
+
 const ExamSubmissionsQuery: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
   const queryData = useLazyLoadQuery<submissionsAllQuery>(
@@ -83,6 +250,7 @@ const ExamSubmissionsQuery: React.FC = () => {
     query submissionsAllQuery($examId: ID!) {
       exam(id: $examId) {
         name
+        course { id title }
         registrations {
           id
           user {
@@ -176,35 +344,86 @@ const ExamSubmissionsQuery: React.FC = () => {
     }
     return latestSoFar;
   }, DateTime.fromMillis(0));
+  const [showExportAnswers, setShowExportAnswers] = useState(false);
+  const [showExportSnapshots, setShowExportSnapshots] = useState(false);
+  const [curReg, setCurReg] = useState<string>(undefined);
+  const [curName, setCurName] = useState<string>(undefined);
+  const items: NavbarItem[] = useMemo(() => [
+    [`/courses/${queryData.exam.course.id}`, queryData.exam.course.title],
+    [`/exams/${examId}/admin`, queryData.exam.name],
+    [undefined, 'Submissions'],
+  ], [queryData.exam.course.id, queryData.exam.course.title]);
   return (
     <DocumentTitle title={`${queryData.exam.name} -- All submissions`}>
-      <h4>{`Completed submissions (${groups.final.length})`}</h4>
+      <NavbarBreadcrumbs items={items} />
+      <h4>
+        {`Completed submissions (${groups.final.length})`}
+      </h4>
       {groups.final.length === 0 ? (
         <i>No completed submissions yet</i>
       ) : (
-        <Table>
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Started</th>
-              <th>Ended</th>
-            </tr>
-          </thead>
-          <tbody>
-            {groups.final.map((reg) => (
-              <tr key={reg.id}>
-                <td>
-                  <Link to={`/exams/${examId}/submissions/${reg.id}`}>
-                    {reg.user.displayName}
-                  </Link>
-                </td>
-                <td>{reg.startTime && DateTime.fromISO(reg.startTime).toLocaleString(timeOpts)}</td>
-                <td>{reg.endTime && DateTime.fromISO(reg.endTime).toLocaleString(timeOpts)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+        <RenderStudentTable
+          students={groups.final}
+          examId={examId}
+          timeOpts={timeOpts}
+          actions={{
+            export: (id, name) => {
+              setCurReg(id);
+              setCurName(name);
+              setShowExportAnswers(true);
+            },
+            exportAll: (id, name) => {
+              setCurReg(id);
+              setCurName(name);
+              setShowExportSnapshots(true);
+            },
+          }}
+        />
       )}
+      <Modal
+        show={showExportAnswers}
+        centered
+        keyboard
+        scrollable
+        onHide={() => setShowExportAnswers(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {`Export data for ${curName}`}
+          </Modal.Title>
+        </Modal.Header>
+        <ErrorBoundary>
+          <Suspense fallback={<p>Loading...</p>}>
+            <ExportStudentAnswersQuery
+              regId={curReg}
+              cancel={() => setShowExportAnswers(false)}
+              confirm={(data: string) => navigator.clipboard.writeText(data)}
+            />
+          </Suspense>
+        </ErrorBoundary>
+      </Modal>
+      <Modal
+        show={showExportSnapshots}
+        centered
+        keyboard
+        scrollable
+        onHide={() => setShowExportSnapshots(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+            {`Export data for ${curName}`}
+          </Modal.Title>
+        </Modal.Header>
+        <ErrorBoundary>
+          <Suspense fallback={<p>Loading...</p>}>
+            <ExportStudentSnapshotsQuery
+              regId={curReg}
+              cancel={() => setShowExportSnapshots(false)}
+              confirm={(data: string) => navigator.clipboard.writeText(data)}
+            />
+          </Suspense>
+        </ErrorBoundary>
+      </Modal>
       {groups.over.length === 0 ? (
         null
       ) : (
@@ -232,32 +451,11 @@ const ExamSubmissionsQuery: React.FC = () => {
               </div>
             )}
           </h4>
-          <Table hover>
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Started</th>
-                <th>Ended</th>
-              </tr>
-            </thead>
-            <tbody>
-              {groups.over.map((reg) => (
-                <tr key={reg.id}>
-                  <td>
-                    <Link to={`/exams/${examId}/submissions/${reg.id}`}>
-                      {reg.user.displayName}
-                    </Link>
-                  </td>
-                  <td>
-                    {reg.startTime && DateTime.fromISO(reg.startTime).toLocaleString(timeOpts)}
-                  </td>
-                  <td>
-                    {reg.endTime && DateTime.fromISO(reg.endTime).toLocaleString(timeOpts)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <RenderStudentTable
+            students={groups.over}
+            examId={examId}
+            timeOpts={timeOpts}
+          />
         </>
       )}
       <h4>{`Started submissions (${groups.started.length})`}</h4>
@@ -674,6 +872,9 @@ const ExamSubmissionAuditStaffQuery: React.FC = () => {
 const Submissions: React.FC = () => (
   <Container>
     <Switch>
+      <Route path="/exams/:examId/submissions/manage" exact>
+        Management
+      </Route>
       <Route path="/exams/:examId/submissions/:registrationId/timeline">
         <ExamSubmissionAudit />
       </Route>

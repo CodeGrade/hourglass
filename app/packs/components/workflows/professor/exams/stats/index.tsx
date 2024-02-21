@@ -21,6 +21,7 @@ import {
   YAxis,
 } from 'recharts';
 import { submissionLink } from '@hourglass/workflows/grading';
+import { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 import { pluralize } from '@hourglass/common/helpers';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
@@ -430,6 +431,7 @@ const ExamStatsQuery: React.FC = () => {
       exam(id: $examId) {
         id
         name
+        course { id title }
         examVersions(first: 100) @connection(key: "Exam_examVersions", filters: []) {
           edges {
             node {
@@ -466,8 +468,14 @@ const ExamStatsQuery: React.FC = () => {
     () => data.exam.examVersions.edges.map((v) => v.node),
     [data.exam.examVersions],
   );
+  const items: NavbarItem[] = useMemo(() => [
+    [`/courses/${data.exam.course.id}`, data.exam.course.title],
+    [`/exams/${examId}/admin`, data.exam.name],
+    [undefined, 'Statistics'],
+  ], [data.exam.course.id, data.exam.course.title]);
   return (
     <DocumentTitle title={`${data.exam.name} -- Grading statistics`}>
+      <NavbarBreadcrumbs items={items} />
       <ExamStats
         examId={examId}
         title={data.exam.name}

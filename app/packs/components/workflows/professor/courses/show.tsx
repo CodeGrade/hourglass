@@ -1,6 +1,11 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useMemo } from 'react';
 import { useParams, Link, Route } from 'react-router-dom';
-import { Container, Button } from 'react-bootstrap';
+import {
+  Container,
+  Button,
+  Col,
+  Row,
+} from 'react-bootstrap';
 import NewExam from '@professor/exams/new';
 import SyncCourse from '@professor/courses/sync';
 import DocumentTitle from '@hourglass/common/documentTitle';
@@ -8,6 +13,7 @@ import { graphql, useFragment, useLazyLoadQuery } from 'react-relay';
 import ErrorBoundary from '@hourglass/common/boundary';
 import { GroupBase } from 'react-select';
 import { ImpersonateVal, ImpersonateUser } from '@hourglass/workflows/home';
+import { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 
 import { showCourseQuery } from './__generated__/showCourseQuery.graphql';
 import { show_courseExams$key } from './__generated__/show_courseExams.graphql';
@@ -33,11 +39,19 @@ const CourseExams: React.FC<{
       <ul>
         {res.map((exam) => (
           <li key={exam.id}>
-            <Link
-              to={`/exams/${exam.id}/admin`}
-            >
-              {exam.name}
-            </Link>
+            <Row>
+              <Col>
+                <Link to={`/exams/${exam.id}/admin`}>
+                  {exam.name}
+                </Link>
+              </Col>
+              <Col sm={2}>
+                Export...
+              </Col>
+              <Col sm={2}>
+                Merge...
+              </Col>
+            </Row>
           </li>
         ))}
       </ul>
@@ -125,6 +139,17 @@ const ShowCourseQuery: React.FC = () => {
       })),
     },
   ];
+  const courseItems: NavbarItem[] = useMemo(() => [
+    [undefined, data.course.title],
+  ], [data.course.title]);
+  const syncItems: NavbarItem[] = useMemo(() => [
+    [`/courses/${courseId}`, data.course.title],
+    [undefined, 'Sync'],
+  ], [data.course.title]);
+  const newExamItems: NavbarItem[] = useMemo(() => [
+    [`/courses/${courseId}`, data.course.title],
+    [undefined, 'New exam'],
+  ], [data.course.title]);
   return (
     <Container>
       <div className="d-flex align-items-center justify-content-between">
@@ -149,6 +174,7 @@ const ShowCourseQuery: React.FC = () => {
         </div>
       </div>
       <Route path="/courses/:courseId" exact>
+        <NavbarBreadcrumbs items={courseItems} />
         <DocumentTitle title={data.course.title}>
           <CourseExams courseExams={data.course.exams} />
           <ImpersonateUser
@@ -159,11 +185,13 @@ const ShowCourseQuery: React.FC = () => {
         </DocumentTitle>
       </Route>
       <Route path="/courses/:courseId/sync" exact>
+        <NavbarBreadcrumbs items={syncItems} />
         <DocumentTitle title={`Sync - ${data.course.title}`}>
           <SyncCourse courseId={data.course.id} />
         </DocumentTitle>
       </Route>
       <Route path="/courses/:courseId/new" exact>
+        <NavbarBreadcrumbs items={newExamItems} />
         <DocumentTitle title={`New Exam - ${data.course.title}`}>
           <NewExam courseId={data.course.id} />
         </DocumentTitle>

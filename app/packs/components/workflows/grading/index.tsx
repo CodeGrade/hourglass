@@ -107,6 +107,7 @@ import { CurrentGrading } from '@professor/exams/types';
 import { combineCompletionAny, CompletionStatus, ShowRubrics } from '@grading/UseRubrics';
 import { CREATE_COMMENT_MUTATION, addCommentConfig } from '@grading/createComment';
 import { DateTime } from 'luxon';
+import { NavbarItem, NavbarBreadcrumbs } from '@hourglass/common/navbar';
 
 import './index.scss';
 
@@ -128,6 +129,8 @@ import { gradingMyGrading$data, gradingMyGrading$key } from './__generated__/gra
 import { gradingQuery } from './__generated__/gradingQuery.graphql';
 import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 import { gradingGraderQuery } from './__generated__/gradingGraderQuery.graphql';
+import { CourseRole, gradingRoleQuery } from './__generated__/gradingRoleQuery.graphql';
+import { gradingOneRoleQuery } from './__generated__/gradingOneRoleQuery.graphql';
 
 export function variantForPoints(points: number | string): AlertProps['variant'] {
   if (typeof points === 'string') {
@@ -1130,12 +1133,14 @@ const Grade: React.FC<{
   qnum: number;
   pnum: number;
   refreshProps: React.DependencyList;
+  role: CourseRole;
 }> = (props) => {
   const {
     registrationKey,
     qnum,
     pnum,
     refreshProps,
+    role,
   } = props;
   const res = useFragment(
     graphql`
@@ -1231,7 +1236,11 @@ const Grade: React.FC<{
   const [showChangeProblems, setShowChangeProblems] = useState(false);
   const cancelChangeProblems = () => {
     setShowChangeProblems(false);
-    history.replace(`/exams/${examId}/grading`);
+    if (role === 'PROFESSOR') {
+      history.replace(`/exams/${examId}/grading/admin`);
+    } else {
+      history.replace(`/exams/${examId}/grading`);
+    }
   };
   const changeProblems = () => {
     mutateGradeNext({
@@ -1261,6 +1270,8 @@ const Grade: React.FC<{
         if (err.cause?.[0]?.extensions.anyRemaining) {
           setChangeProblemsMessage(err.message);
           setShowChangeProblems(true);
+        } else if (role === 'PROFESSOR') {
+          history.replace(`/exams/${examId}/grading/admin`);
         } else {
           history.replace(`/exams/${examId}/grading`);
         }
@@ -1302,7 +1313,11 @@ const Grade: React.FC<{
     RELEASE_LOCK_MUTATION,
     {
       onCompleted: () => {
-        window.location.href = `/exams/${examId}/grading`;
+        if (role === 'PROFESSOR') {
+          history.replace(`/exams/${examId}/grading/admin`);
+        } else {
+          history.replace(`/exams/${examId}/grading`);
+        }
       },
       onError: (err) => {
         alert({
@@ -1666,12 +1681,28 @@ const GradeOnePart: React.FC = () => (
 );
 
 const GradeOnePartQuery: React.FC = () => {
-  const { registrationId, qnum, pnum } = useParams<{
-    registrationId: string, qnum: string, pnum: string
+  const {
+    examId,
+    registrationId,
+    qnum,
+    pnum,
+  } = useParams<{
+    examId: string, registrationId: string, qnum: string, pnum: string
   }>();
+  const role = useLazyLoadQuery<gradingOneRoleQuery>(
+    graphql`
+    query gradingOneRoleQuery($examId: ID!) {
+      me { role(examId: $examId) }
+    }`,
+    { examId },
+  );
   const res = useLazyLoadQuery<gradingQuery>(
     graphql`
-    query gradingQuery($registrationId: ID!, $withRubric: Boolean!) {
+    query gradingQuery($examId: ID!, $registrationId: ID!, $withRubric: Boolean!, $skipCourse: Boolean!) {
+      exam(id: $examId) {
+        id name
+        course @skip(if: $skipCourse) { id title }
+      }
       registration(id: $registrationId) {
         ...grading_one
         ...grading_showOne
@@ -1685,16 +1716,35 @@ const GradeOnePartQuery: React.FC = () => {
       }
     }
     `,
-    { registrationId, withRubric: true },
+    {
+      examId,
+      registrationId,
+      withRubric: true,
+      skipCourse: role.me.role !== 'PROFESSOR',
+    },
   );
-
+  const items: NavbarItem[] = useMemo(() => (
+    res.exam.course
+      ? [
+        [`/course/${res.exam.course.id}`, res.exam.course.title],
+        [`/exams/${res.exam.id}/admin`, res.exam.name],
+        [undefined, 'Grading'],
+      ]
+      : [
+        [undefined, res.exam.name],
+        [undefined, 'Grading'],
+      ]), [res.exam.course?.id, res.exam.course?.title, res.exam.id, res.exam.name]);
   return (
-    <GradeOnePartHelp
-      registrationId={registrationId}
-      registration={res.registration}
-      qnum={qnum}
-      pnum={pnum}
-    />
+    <>
+      <NavbarBreadcrumbs items={items} />
+      <GradeOnePartHelp
+        registrationId={registrationId}
+        registration={res.registration}
+        qnum={qnum}
+        pnum={pnum}
+        role={role.me.role}
+      />
+    </>
   );
 };
 
@@ -1703,12 +1753,14 @@ const GradeOnePartHelp: React.FC<{
   pnum: string,
   registrationId: string,
   registration: gradingQuery['response']['registration'],
+  role: CourseRole,
 }> = (props) => {
   const {
     registrationId,
     registration,
     qnum,
     pnum,
+    role,
   } = props;
   const { qpPairs } = registration.examVersion;
   const indexOfQP = qpPairs.findIndex((qp) => (
@@ -1757,6 +1809,7 @@ const GradeOnePartHelp: React.FC<{
                       qnum={qp.qnum}
                       pnum={qp.pnum}
                       refreshProps={[indexOfQP, refresher]}
+                      role={role}
                     />
                   ) : (
                     <ShowOnePart
@@ -2326,19 +2379,39 @@ const GradingGrader: React.FC = () => (
 
 const GradingGraderQuery: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();
+  const role = useLazyLoadQuery<gradingRoleQuery>(
+    graphql`
+    query gradingRoleQuery($examId: ID!) {
+      me { displayName role(examId: $examId) }
+    }`,
+    { examId },
+  );
   const res = useLazyLoadQuery<gradingGraderQuery>(
     graphql`
-    query gradingGraderQuery($examId: ID!) {
+    query gradingGraderQuery($examId: ID!, $skipCourse: Boolean!) {
       exam(id: $examId) {
+        course @skip(if: $skipCourse) { id title }
+        id name
         ...gradingBeginGrading
         ...gradingMyGrading
       }
-    }
-    `,
-    { examId },
+    }`,
+    { examId, skipCourse: role.me.role !== 'PROFESSOR' },
   );
+  const items: NavbarItem[] = useMemo(() => (
+    res.exam.course
+      ? [
+        [`/course/${res.exam.course.id}`, res.exam.course.title],
+        [`/exams/${res.exam.id}/admin`, res.exam.name],
+        [undefined, 'Grading'],
+      ]
+      : [
+        [undefined, res.exam.name],
+        [undefined, 'Grading'],
+      ]), [res.exam.id, res.exam.name]);
   return (
     <Container>
+      <NavbarBreadcrumbs items={items} />
       <BeginGradingButton examKey={res.exam} />
       <MyGrading examKey={res.exam} />
     </Container>
@@ -2647,6 +2720,8 @@ const GradingAdminQuery: React.FC = () => {
     graphql`
     query gradingAdminQuery($examId: ID!) {
       exam(id: $examId) {
+        id name
+        course { id title }
         ...gradingExamAdmin
         ...gradingBeginGrading
         ...gradingMyGrading
@@ -2655,8 +2730,14 @@ const GradingAdminQuery: React.FC = () => {
     `,
     { examId },
   );
+  const items: NavbarItem[] = useMemo(() => [
+    [`/courses/${res.exam.course.id}`, res.exam.course.title],
+    [`/course/${res.exam.id}/admin`, res.exam.name],
+    [undefined, 'Grading'],
+  ], [res.exam.course.id, res.exam.course.title, res.exam.id, res.exam.name]);
   return (
     <>
+      <NavbarBreadcrumbs items={items} />
       <ExamGradingAdministration examKey={res.exam} />
       <BeginGradingButton examKey={res.exam} />
       <MyGrading examKey={res.exam} />

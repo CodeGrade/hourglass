@@ -5,6 +5,7 @@ import React, {
   createRef,
   useCallback,
   Suspense,
+  useMemo,
 } from 'react';
 import {
   Switch,
@@ -62,6 +63,7 @@ import { TbChecklist } from 'react-icons/tb';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import { policyToString } from '@professor/exams/new/editor/Policies';
 import { uploadFile } from '@hourglass/common/types/api';
+import { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 import {
   graphql,
   useFragment,
@@ -1433,13 +1435,19 @@ const ExamAdminQuery: React.FC = () => {
         ...admin_examInfo
         ...admin_checklist
         graded
+        course { id title }
       }
     }
     `,
     { examId, withRubric: true },
   );
+  const items: NavbarItem[] = useMemo(() => [
+    [`/courses/${data.exam.course.id}`, data.exam.course.title],
+    [undefined, data.exam.name],
+  ], [data.exam.course.id, data.exam.course.title]);
   return (
     <DocumentTitle title={data.exam.name}>
+      <NavbarBreadcrumbs items={items} />
       <ExamInformation exam={data.exam} />
       <Form.Group>
         <TabbedChecklist

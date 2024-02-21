@@ -37,7 +37,7 @@
     "@remirror/react": "^2.0.6",
     "@remirror/react-components": "^2.1.12",
     "@remirror/styles": "^2.0.5",
-    "@welldone-software/why-did-you-render": "^7.0.1",
+    "@welldone-software/why-did-you-render": "^8.0.1",
     "actioncable": "^5.2.6",
     "babel-loader": "^9.0.0",
     "babel-plugin-relay": "^16.0.0",

@@ -1,4 +1,4 @@
-FROM phusion/passenger-ruby30
+FROM phusion/passenger-ruby30:2.5.1
 RUN apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold"
 
 RUN rm -f /etc/service/nginx/down
@@ -6,7 +6,7 @@ RUN rm /etc/nginx/sites-enabled/default
 ADD hourglass.conf /etc/nginx/sites-enabled/hourglass.conf
 
 RUN apt-get update
-RUN apt-get install -y ca-certificates curl gnupg
+RUN apt-get install -y ca-certificates curl gnupg graphviz openjdk-17-jdk-headless
 RUN mkdir -p /etc/apt/keyrings
 RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
 ENV NODE_MAJOR=20

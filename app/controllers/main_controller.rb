@@ -30,5 +30,4 @@ class MainController < ApplicationController
     # :user is the scope we are authenticating
     store_location_for(:user, request.fullpath)
   end
-
 end

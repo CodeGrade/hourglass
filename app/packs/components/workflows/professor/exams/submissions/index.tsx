@@ -346,8 +346,8 @@ const ExamSubmissionsQuery: React.FC = () => {
   }, DateTime.fromMillis(0));
   const [showExportAnswers, setShowExportAnswers] = useState(false);
   const [showExportSnapshots, setShowExportSnapshots] = useState(false);
-  const [curReg, setCurReg] = useState<string>(undefined);
-  const [curName, setCurName] = useState<string>(undefined);
+  const [curReg/* , setCurReg */] = useState<string>(undefined);
+  const [curName/* , setCurName */] = useState<string>(undefined);
   const items: NavbarItem[] = useMemo(() => [
     [`/courses/${queryData.exam.course.id}`, queryData.exam.course.title],
     [`/exams/${examId}/admin`, queryData.exam.name],
@@ -366,18 +366,18 @@ const ExamSubmissionsQuery: React.FC = () => {
           students={groups.final}
           examId={examId}
           timeOpts={timeOpts}
-          actions={{
-            export: (id, name) => {
-              setCurReg(id);
-              setCurName(name);
-              setShowExportAnswers(true);
-            },
-            exportAll: (id, name) => {
-              setCurReg(id);
-              setCurName(name);
-              setShowExportSnapshots(true);
-            },
-          }}
+          // actions={{
+          //   export: (id, name) => {
+          //     setCurReg(id);
+          //     setCurName(name);
+          //     setShowExportAnswers(true);
+          //   },
+          //   exportAll: (id, name) => {
+          //     setCurReg(id);
+          //     setCurName(name);
+          //     setShowExportSnapshots(true);
+          //   },
+          // }}
         />
       )}
       <Modal

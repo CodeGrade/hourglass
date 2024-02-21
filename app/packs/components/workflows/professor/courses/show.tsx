@@ -45,12 +45,12 @@ const CourseExams: React.FC<{
                   {exam.name}
                 </Link>
               </Col>
-              <Col sm={2}>
+              {/* <Col sm={2}>
                 Export...
               </Col>
               <Col sm={2}>
                 Merge...
-              </Col>
+              </Col> */}
             </Row>
           </li>
         ))}

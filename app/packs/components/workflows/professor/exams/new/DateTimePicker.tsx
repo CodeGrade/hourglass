@@ -108,6 +108,8 @@ const DateTimePicker: React.FC<DateTimeProps> = (props) => {
           />
           <TimePicker
             time={value?.toFormat('hh:mm a')}
+            switchToMinuteOnHourDropdownSelect
+            switchToMinuteOnHourSelect
             onChange={(time): void => {
               if (disabled) return;
               if (onChange) {

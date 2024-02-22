@@ -30,13 +30,16 @@ html.react-timekeeper-noscroll {
     border-radius: 0.3rem 0 0 0.3rem;
     border-color: $input-border-color;
     border-width: 0px 1px 0px 0px;
+    .react-datepicker__navigation {
+      padding-top: 1em;
+    }
     .react-datepicker__header {
       text-align: center;
       background-color: theme-color("light");
       border-bottom: 1px solid $input-border-color;
       border-top-left-radius: 0.3rem;
       border-top-right-radius: 0rem;
-      padding-top: 0px;
+      padding-top: 1em;
       padding-bottom: 0px;
       height: 4.5rem;
       position: relative;

@@ -17,7 +17,7 @@ html.react-timekeeper-noscroll {
   display: flex;
   align-items: stretch;
   overflow: hidden;
-  z-index: 2000;
+  z-index: 2000 !important;
 
   > div {
     display: inline-block;

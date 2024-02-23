@@ -2109,7 +2109,7 @@ const ProctoringRecipients: React.FC<{
   ]), [recipients]);
   const items: NavbarItem[] = useMemo(() => [
     [`/courses/${res.course.id}`, res.course.title],
-    [`/course/${res.id}/admin`, res.name],
+    [`/exams/${res.id}/admin`, res.name],
     [undefined, 'Proctoring'],
   ], [res.course.id, res.course.title, res.id, res.name]);
   return (

@@ -1928,16 +1928,23 @@ const ShowCurrentPinsTable: React.FC<{
             </tr>
           </thead>
           <tbody>
-            {all.map((reg) => (
-              <tr key={reg.id}>
-                <td>{reg.name}</td>
-                <td>
-                  {regsById.get(reg.id)?.pinValidated
-                    ? 'Already validated'
-                    : (regsById.get(reg.id)?.currentPin ?? 'none required')}
-                </td>
-              </tr>
-            ))}
+            {all.map((reg) => {
+              const r = regsById.get(reg.id);
+              let row: React.ReactElement;
+              if (r?.pinValidated) {
+                row = <td>Already validated</td>;
+              } else if (r?.currentPin) {
+                row = <td style={{ fontFamily: 'monospace' }}>{r.currentPin}</td>;
+              } else {
+                row = <td>none required</td>;
+              }
+              return (
+                <tr key={reg.id}>
+                  <td>{reg.name}</td>
+                  {row}
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       </Row>

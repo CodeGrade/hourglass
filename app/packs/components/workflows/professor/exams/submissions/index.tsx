@@ -517,22 +517,26 @@ const ExamSubmissionsQuery: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {groups.notStarted.map((reg) => (
-              <tr key={reg.id}>
-                <td>
-                  <Link to={`/exams/${examId}/submissions/${reg.id}`}>
-                    {reg.user.displayName}
-                  </Link>
-                </td>
-                {anyPins && (
+            {groups.notStarted.map((reg) => {
+              let row: React.ReactElement;
+              if (reg?.pinValidated) {
+                row = <td>Already validated</td>;
+              } else if (reg?.currentPin) {
+                row = <td style={{ fontFamily: 'monospace' }}>{reg.currentPin}</td>;
+              } else {
+                row = <td>none required</td>;
+              }
+              return (
+                <tr key={reg.id}>
                   <td>
-                    {reg.pinValidated
-                      ? 'Already validated'
-                      : (reg.currentPin ?? 'none required')}
+                    <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+                      {reg.user.displayName}
+                    </Link>
                   </td>
-                )}
-              </tr>
-            ))}
+                  {anyPins && row}
+                </tr>
+              );
+            })}
           </tbody>
         </Table>
       )}

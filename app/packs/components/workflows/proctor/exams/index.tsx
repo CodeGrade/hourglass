@@ -69,6 +69,7 @@ import { examsSendMessageMutation } from './__generated__/examsSendMessageMutati
 import { exams_messages$key } from './__generated__/exams_messages.graphql';
 import { exams_proctoring$data, exams_proctoring$key } from './__generated__/exams_proctoring.graphql';
 import { exams_pins$key } from './__generated__/exams_pins.graphql';
+import { examsProctorRoleQuery } from './__generated__/examsProctorRoleQuery.graphql';
 
 export interface Recipient {
   type: MessageType.Direct | MessageType.Room | MessageType.Version | MessageType.Exam;
@@ -1969,9 +1970,11 @@ const ExamProctoring: React.FC = () => (
 
 const ProctoringRecipients: React.FC<{
   exam: exams_proctoring$key;
+  course?: exams_proctoring$data['course']
 }> = (props) => {
   const {
     exam,
+    course,
   } = props;
   const res = useFragment<exams_proctoring$key>(
     graphql`
@@ -1981,7 +1984,6 @@ const ProctoringRecipients: React.FC<{
       ...exams_pins
       id
       name
-      course { id title }
       examVersions(first: 100) @connection(key: "Exam_examVersions", filters: []) {
         edges {
           node {
@@ -2107,11 +2109,17 @@ const ProctoringRecipients: React.FC<{
       })),
     },
   ]), [recipients]);
-  const items: NavbarItem[] = useMemo(() => [
-    [`/courses/${res.course.id}`, res.course.title],
-    [`/exams/${res.id}/admin`, res.name],
-    [undefined, 'Proctoring'],
-  ], [res.course.id, res.course.title, res.id, res.name]);
+  const items: NavbarItem[] = useMemo(() => (
+    course
+      ? [
+        [`/courses/${course.id}`, course.title],
+        [`/exams/${res.id}/admin`, res.name],
+        [undefined, 'Proctoring'],
+      ]
+      : [
+        [undefined, res.name],
+        [undefined, 'Proctoring'],
+      ]), [course?.id, course?.title, res.id, res.name]);
   return (
     <>
       <RegularNavbar className="row" items={items} />
@@ -2145,24 +2153,32 @@ const ExamProctoringQuery: React.FC = () => {
   const {
     examId,
   } = useParams<{ examId: string }>();
+  const role = useLazyLoadQuery<examsProctorRoleQuery>(
+    graphql`
+    query examsProctorRoleQuery($examId: ID!) {
+      me { role(examId: $examId) }
+    }`,
+    { examId },
+  );
   const data = useLazyLoadQuery<examsProctorQuery>(
     graphql`
-    query examsProctorQuery($examId: ID!) {
+    query examsProctorQuery($examId: ID!, $skipCourse: Boolean!) {
       exam(id: $examId) {
         ...exams_proctoring
+        course @skip(if: $skipCourse) { id title }
         name
         id
       }
     }
     `,
-    { examId },
+    { examId, skipCourse: role.me.role !== 'PROFESSOR' },
   );
   return (
     <DocumentTitle title={`${data.exam.name} - Proctoring`}>
       <Container fluid>
         <div className="wrapper vh-100">
           <div className="inner-wrapper">
-            <ProctoringRecipients exam={data.exam} />
+            <ProctoringRecipients exam={data.exam} course={data.exam.course} />
           </div>
         </div>
       </Container>

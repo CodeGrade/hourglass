@@ -242,7 +242,7 @@ GEM
       binding_of_caller (~> 1.0)
       pry (~> 0.13)
     public_suffix (5.0.4)
-    puma (4.3.12)
+    puma (6.4.2)
       nio4r (~> 2.0)
     racc (1.7.3)
     rack (2.2.8)
@@ -404,7 +404,7 @@ DEPENDENCIES
   pry-rails
   pry-rescue
   pry-stack_explorer
-  puma (~> 4.1)
+  puma (~> 6.4)
   rails (~> 6.1)
   react-rails
   rubocop-rails

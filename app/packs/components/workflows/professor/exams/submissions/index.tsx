@@ -608,17 +608,28 @@ const ExamSubmissionQuery: React.FC = () => {
       </>
     );
   }
-  const items: NavbarItem[] = useMemo(() => [
-    [`/courses/${queryData.registration.exam.course.id}`, queryData.registration.exam.course.title],
-    [`/exams/${examId}/admin`, queryData.registration.exam.name],
-    [`/exams/${examId}/submissions`, 'Submissions'],
-    [undefined,
-      queryData.registration.published
-        ? queryData.registration.user.displayName
-        : <Spoiler text={queryData.registration.user.displayName} />],
-  ], [
-    queryData.registration.exam.course.id,
-    queryData.registration.exam.course.title,
+  const { course } = queryData.registration.exam;
+  const items: NavbarItem[] = useMemo(() => (
+    course
+      ? [
+        [`/courses/${course.id}`, course.title],
+        [`/exams/${examId}/admin`, queryData.registration.exam.name],
+        [`/exams/${examId}/submissions`, 'Submissions'],
+        [undefined,
+          queryData.registration.published
+            ? queryData.registration.user.displayName
+            : <Spoiler text={queryData.registration.user.displayName} />],
+      ]
+      : [
+        [undefined, queryData.registration.exam.name],
+        [undefined, 'Submissions'],
+        [undefined,
+          queryData.registration.published
+            ? queryData.registration.user.displayName
+            : <Spoiler text={queryData.registration.user.displayName} />],
+      ]), [
+    course?.id,
+    course?.title,
     queryData.registration.exam.name,
     queryData.registration.exam.id,
   ]);

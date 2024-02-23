@@ -40,7 +40,7 @@ module Types
           :professor
         elsif context[:current_user].proctor_registrations.find{|r| r.exam_id == exam.id}
           :proctor
-        elsif context[:current_user].registrations.includes(:exam).find{|r| r.exam_id == exam.id}
+        elsif context[:current_user].registrations.includes(:exam).find{|r| r.exam.id == exam.id}
           :student
         else
           :none

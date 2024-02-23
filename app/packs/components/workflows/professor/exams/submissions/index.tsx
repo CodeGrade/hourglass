@@ -56,6 +56,7 @@ import { submissionsAuditStaffQuery } from './__generated__/submissionsAuditStaf
 import { submissionsStudentQuery } from './__generated__/submissionsStudentQuery.graphql';
 import { submissionsExportStudentAnswersQuery } from './__generated__/submissionsExportStudentAnswersQuery.graphql';
 import { submissionsExportStudentSnapshotsQuery } from './__generated__/submissionsExportStudentSnapshotsQuery.graphql';
+import { submissionsRoleQuery } from './__generated__/submissionsRoleQuery.graphql';
 
 type Registration = submissionsAllQuery$data['exam']['registrations'][number];
 
@@ -557,16 +558,24 @@ const ExamSubmission: React.FC = () => (
 );
 
 const ExamSubmissionQuery: React.FC = () => {
-  const { registrationId } = useParams<{ registrationId: string }>();
+  const { registrationId, examId } = useParams<{ registrationId: string, examId: string }>();
+  const role = useLazyLoadQuery<submissionsRoleQuery>(
+    graphql`
+    query submissionsRoleQuery($examId: ID!) {
+      me { id role(examId: $examId) }
+    }`,
+    { examId },
+  );
   const queryData = useLazyLoadQuery<submissionsRootQuery>(
     graphql`
-    query submissionsRootQuery($registrationId: ID!) {
-      me {
-        id
-      }
+    query submissionsRootQuery($registrationId: ID!, $skipCourse: Boolean!) {
       registration(id: $registrationId) {
         published
-        exam { name }
+        exam { 
+          name 
+          id
+          course @skip(if: $skipCourse) { id title }
+        }
         user {
           id
           displayName
@@ -574,26 +583,50 @@ const ExamSubmissionQuery: React.FC = () => {
       }
     }
     `,
-    { registrationId },
+    { registrationId, skipCourse: role.me.role !== 'PROFESSOR' },
   );
-  const myRegistration = queryData.me.id === queryData.registration.user.id;
+  const myRegistration = role.me.id === queryData.registration.user.id;
   // TODO: better error message if the request fails because it is someone else's registration
   if (myRegistration) {
+    const items: NavbarItem[] = useMemo(() => [
+      [undefined, queryData.registration.exam.name],
+    ], [queryData.registration.exam.name]);
     if (!queryData.registration.published) {
       const title = `${queryData.registration.exam.name} -- Submission for ${queryData.registration.user.displayName}`;
       return (
         <DocumentTitle title={title}>
+          <NavbarBreadcrumbs items={items} />
           <h1>{`Submission for ${queryData.registration.exam.name}`}</h1>
           <p>Your submission is not yet graded, and cannot be viewed at this time.</p>
         </DocumentTitle>
       );
     }
     return (
-      <ExamSubmissionStudent />
+      <>
+        <NavbarBreadcrumbs items={items} />
+        <ExamSubmissionStudent />
+      </>
     );
   }
+  const items: NavbarItem[] = useMemo(() => [
+    [`/courses/${queryData.registration.exam.course.id}`, queryData.registration.exam.course.title],
+    [`/exams/${examId}/admin`, queryData.registration.exam.name],
+    [`/exams/${examId}/submissions`, 'Submissions'],
+    [undefined,
+      queryData.registration.published
+        ? queryData.registration.user.displayName
+        : <Spoiler text={queryData.registration.user.displayName} />],
+  ], [
+    queryData.registration.exam.course.id,
+    queryData.registration.exam.course.title,
+    queryData.registration.exam.name,
+    queryData.registration.exam.id,
+  ]);
   return (
-    <ExamSubmissionStaff />
+    <>
+      <NavbarBreadcrumbs items={items} />
+      <ExamSubmissionStaff />
+    </>
   );
 };
 

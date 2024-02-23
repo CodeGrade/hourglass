@@ -1970,7 +1970,7 @@ const ExamProctoring: React.FC = () => (
 
 const ProctoringRecipients: React.FC<{
   exam: exams_proctoring$key;
-  course?: exams_proctoring$data['course']
+  course?: { id: string, title: string };
 }> = (props) => {
   const {
     exam,

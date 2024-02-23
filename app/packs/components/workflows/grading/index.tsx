@@ -1726,7 +1726,7 @@ const GradeOnePartQuery: React.FC = () => {
   const items: NavbarItem[] = useMemo(() => (
     res.exam.course
       ? [
-        [`/course/${res.exam.course.id}`, res.exam.course.title],
+        [`/courses/${res.exam.course.id}`, res.exam.course.title],
         [`/exams/${res.exam.id}/admin`, res.exam.name],
         [undefined, 'Grading'],
       ]
@@ -2401,7 +2401,7 @@ const GradingGraderQuery: React.FC = () => {
   const items: NavbarItem[] = useMemo(() => (
     res.exam.course
       ? [
-        [`/course/${res.exam.course.id}`, res.exam.course.title],
+        [`/courses/${res.exam.course.id}`, res.exam.course.title],
         [`/exams/${res.exam.id}/admin`, res.exam.name],
         [undefined, 'Grading'],
       ]
@@ -2732,7 +2732,7 @@ const GradingAdminQuery: React.FC = () => {
   );
   const items: NavbarItem[] = useMemo(() => [
     [`/courses/${res.exam.course.id}`, res.exam.course.title],
-    [`/course/${res.exam.id}/admin`, res.exam.name],
+    [`/exams/${res.exam.id}/admin`, res.exam.name],
     [undefined, 'Grading'],
   ], [res.exam.course.id, res.exam.course.title, res.exam.id, res.exam.name]);
   return (

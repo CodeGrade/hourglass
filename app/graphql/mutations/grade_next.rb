@@ -51,8 +51,13 @@ module Mutations
         raise GraphQL::ExecutionError, {
           message: updated.errors.full_messages.to_sentence,
           anyRemaining: true
-         } unless updated
+        } unless updated
 
+        HourglassSchema.subscriptions.trigger(
+          :grading_lock_updated,
+          { exam_id: HourglassSchema.id_from_object(exam, Types::ExamType, nil) },
+          lock,
+        )
         reg_id = HourglassSchema.id_from_object(lock.registration, Types::RegistrationType, context)
         { registration_id: reg_id, qnum: lock.question.index, pnum: lock.part.index }
       end

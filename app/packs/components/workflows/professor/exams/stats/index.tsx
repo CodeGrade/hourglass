@@ -463,6 +463,7 @@ const ExamStatsQuery: React.FC = () => {
     }
     `,
     { examId },
+    { fetchPolicy: 'network-only' },
   );
   const examVersions = useMemo(
     () => data.exam.examVersions.edges.map((v) => v.node),

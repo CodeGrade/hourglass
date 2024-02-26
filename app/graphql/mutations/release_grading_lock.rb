@@ -35,6 +35,11 @@ module Mutations
                   end
         raise GraphQL::ExecutionError, lock.errors.full_messages.to_sentence unless updated
 
+        HourglassSchema.subscriptions.trigger(
+          :grading_lock_updated,
+          { exam_id: HourglassSchema.id_from_object(ev.exam, Types::ExamType, nil) },
+          lock,
+        )
         { released: true, grading_lock: lock }
       end
     end

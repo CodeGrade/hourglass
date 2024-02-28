@@ -19,7 +19,7 @@
     },
     "Policy": {
       "type": "string",
-      "enum": ["IGNORE_LOCKDOWN", "TOLERATE_WINDOWED", "MOCK_LOCKDOWN"]
+      "enum": ["IGNORE_LOCKDOWN", "TOLERATE_WINDOWED", "MOCK_LOCKDOWN", "STUDENT_PIN"]
     },
     "Version": {
       "type": "object",

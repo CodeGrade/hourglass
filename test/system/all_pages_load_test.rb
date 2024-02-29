@@ -34,6 +34,10 @@ class AllPagesLoadTest < ApplicationSystemTestCase
     HourglassSchema.id_from_object(exam, Types::ExamType, nil)
   end
 
+  def version_id(version)
+    HourglassSchema.id_from_object(version, Types::ExamVersionType, nil)
+  end
+
   def registration_id(reg)
     HourglassSchema.id_from_object(reg, Types::RegistrationType, nil)
   end
@@ -93,9 +97,86 @@ class AllPagesLoadTest < ApplicationSystemTestCase
     assert_breadcrumbs [@course.title]
   end
 
+  test 'prof @ course sync' do
+    sign_in @professor
+    visit "/courses/#{course_id(@course)}/sync"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, 'Sync']
+  end
+
+  test 'prof @ course new' do
+    sign_in @professor
+    visit "/courses/#{course_id(@course)}/new"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, 'New exam']
+  end
+
   test 'prof @ exam admin' do
     sign_in @professor
     visit "/exams/#{exam_id(@exam)}/admin"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name]
+  end
+
+  test 'prof @ exam rooms' do
+    sign_in @professor
+    visit "/exams/#{exam_id(@exam)}/admin/rooms"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name]
+  end
+
+  test 'prof @ exam rooms edit' do
+    sign_in @professor
+    visit "/exams/#{exam_id(@exam)}/admin/rooms/edit"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name]
+  end
+
+  test 'prof @ exam staff' do
+    sign_in @professor
+    visit "/exams/#{exam_id(@exam)}/admin/staff"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name]
+  end
+
+  test 'prof @ exam staff edit' do
+    sign_in @professor
+    visit "/exams/#{exam_id(@exam)}/admin/staff/edit"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name]
+  end
+
+  test 'prof @ exam versions' do
+    sign_in @professor
+    visit "/exams/#{exam_id(@exam)}/admin/versions"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name]
+  end
+
+  test 'prof @ exam versions edit' do
+    sign_in @professor
+    visit "/exams/#{exam_id(@exam)}/admin/versions/edit"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name]
+  end
+
+  test 'prof @ exam edit' do
+    sign_in @professor
+    visit "/exams/#{exam_id(@exam)}/versions/#{version_id(@version)}/edit"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name, @version.name]
+  end
+
+  test 'prof @ exam seating' do
+    sign_in @professor
+    visit "/exams/#{exam_id(@exam)}/admin/seating"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name]
+  end
+
+  test 'prof @ exam seating edit' do
+    sign_in @professor
+    visit "/exams/#{exam_id(@exam)}/admin/seating/edit"
     page.assert_text('Hourglass')
     assert_breadcrumbs [@course.title, @exam.name]
   end
@@ -117,6 +198,17 @@ class AllPagesLoadTest < ApplicationSystemTestCase
   test 'prof @ exam grading' do
     sign_in @professor
     visit "/exams/#{exam_id(@exam)}/grading"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name, 'Grading']
+  end
+
+  test 'prof @ grading question' do
+    @registration.finalize!
+    @exam.initialize_grading_locks!
+    l = @registration.grading_locks.first
+    l.update(grader: @professor)
+    sign_in @professor
+    visit "/exams/#{exam_id(@exam)}/grading/#{registration_id(@registration)}/#{l.part.question.index}/#{l.part.index}"
     page.assert_text('Hourglass')
     assert_breadcrumbs [@course.title, @exam.name, 'Grading']
   end
@@ -173,6 +265,17 @@ class AllPagesLoadTest < ApplicationSystemTestCase
   test 'staff @ grading' do
     sign_in @ta
     visit "/exams/#{exam_id(@exam)}/grading"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@exam.name, 'Grading']
+  end
+
+  test 'staff @ grading question' do
+    @registration.finalize!
+    @exam.initialize_grading_locks!
+    l = @registration.grading_locks.first
+    l.update(grader: @ta)
+    sign_in @ta
+    visit "/exams/#{exam_id(@exam)}/grading/#{registration_id(@registration)}/#{l.part.question.index}/#{l.part.index}"
     page.assert_text('Hourglass')
     assert_breadcrumbs [@exam.name, 'Grading']
   end

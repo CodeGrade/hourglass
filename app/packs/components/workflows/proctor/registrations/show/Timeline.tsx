@@ -6,8 +6,10 @@ import {
   ExamViewerContext,
   ExamFilesContext,
 } from '@hourglass/common/context';
+import { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 import Scrubber, { Direction } from '@hourglass/common/Scrubber';
 import { makeReadableDate } from '@hourglass/common/ReadableDate';
+import Spoiler from '@hourglass/common/Spoiler';
 import { alphabetIdx } from '@hourglass/common/helpers';
 import { createMap } from '@student/exams/show/files';
 import DisplayQuestions from '@student/registrations/show/DisplayQuestions';
@@ -32,6 +34,16 @@ interface ExamTimelineViewerProps {
   endTime: DateTime,
   refreshCodeMirrorsDeps?: React.DependencyList;
   registrationId?: string;
+  exam: {
+    id: string,
+    name: string,
+    course: {
+      id: string,
+      title: string,
+    }
+  },
+  studentName: string,
+  published: boolean,
 }
 
 /**
@@ -160,6 +172,9 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
     endTime,
     refreshCodeMirrorsDeps = [],
     registrationId,
+    exam,
+    studentName,
+    published,
   } = props;
   const res = useFragment(
     graphql`
@@ -274,10 +289,21 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
     });
     return parts.join(',\n');
   };
+  const items: NavbarItem[] = useMemo(() => [
+    [`/courses/${exam.course.id}`, exam.course.title],
+    [`/exams/${exam.id}/admin`, exam.name],
+    [`/exams/${exam.id}/submissions`, 'Submissions'],
+    [
+      `/exams/${exam.id}/submissions/${registrationId}`,
+      published ? studentName : <Spoiler text={studentName} />,
+    ],
+    [undefined, 'Timeline'],
+  ], [exam.id, exam.name, exam.course.id, exam.course.title]);
   return (
     <ExamContext.Provider value={examContextVal}>
       <ExamViewerContext.Provider value={examViewerContextVal}>
         <ExamFilesContext.Provider value={examFilesContextVal}>
+          <NavbarBreadcrumbs items={items} />
           {/* <div className="d-block w-100 sticky-top" style={{ backgroundColor: 'white' }}>
             <Scrubber
               dir={Direction.LeftRight}

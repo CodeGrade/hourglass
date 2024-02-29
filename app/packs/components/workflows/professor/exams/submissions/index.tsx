@@ -863,7 +863,7 @@ const ExamSubmissionAuditStaffQuery: React.FC = () => {
           nuid
           displayName
         }
-        exam { name }
+        exam { name id course { id title } }
         examVersion {
           ...TimelineExamViewer
         }
@@ -908,10 +908,13 @@ const ExamSubmissionAuditStaffQuery: React.FC = () => {
       </h1>
       <ExamTimelineViewer
         version={registration.examVersion}
+        exam={exam}
         snapshots={snapshots as SnapshotsState}
         startTime={DateTime.fromISO(startTime)}
         endTime={DateTime.fromISO(effectiveEndTime)}
         registrationId={registrationId}
+        studentName={registration.user.displayName}
+        published={registration.published}
       />
     </DocumentTitle>
   );

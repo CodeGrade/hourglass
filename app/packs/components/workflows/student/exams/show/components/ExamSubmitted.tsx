@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Container, Alert } from 'react-bootstrap';
-import RegularNavbar from '@hourglass/common/navbar';
+import RegularNavbar, { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 import { DateTime } from 'luxon';
 import { graphql, useFragment } from 'react-relay';
 import ReadableDate from '@hourglass/common/ReadableDate';
@@ -19,15 +19,21 @@ const ExamSubmitted: React.FC<{
       myRegistration {
         lastSnapshot
       }
+      name
     }
     `,
     examKey,
   );
   const { lastSnapshot } = res.myRegistration;
+  const items: NavbarItem[] = useMemo(() => (
+    [
+      [undefined, res.name],
+    ]), [res.name]);
   const parsed = lastSnapshot ? DateTime.fromISO(lastSnapshot) : undefined;
   return (
     <>
       <RegularNavbar />
+      <NavbarBreadcrumbs items={items} />
       <Container>
         <Alert variant="success">
           <div>

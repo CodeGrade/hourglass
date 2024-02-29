@@ -857,7 +857,7 @@ const ExamSubmissionAuditStaffQuery: React.FC = () => {
           answers
         }
         startTime
-        endTime
+        effectiveEndTime
         published
         user {
           nuid
@@ -878,7 +878,7 @@ const ExamSubmissionAuditStaffQuery: React.FC = () => {
     snapshots,
     published,
     startTime,
-    endTime,
+    effectiveEndTime,
     user,
     exam,
   } = registration;
@@ -910,7 +910,7 @@ const ExamSubmissionAuditStaffQuery: React.FC = () => {
         version={registration.examVersion}
         snapshots={snapshots as SnapshotsState}
         startTime={DateTime.fromISO(startTime)}
-        endTime={DateTime.fromISO(endTime)}
+        endTime={DateTime.fromISO(effectiveEndTime)}
         registrationId={registrationId}
       />
     </DocumentTitle>

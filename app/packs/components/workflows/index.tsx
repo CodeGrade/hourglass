@@ -10,7 +10,7 @@ import React, {
   useEffect,
   useMemo,
 } from 'react';
-import RegularNavbar from '@hourglass/common/navbar';
+import RegularNavbar, { NavbarBreadcrumbContext, NavbarItem } from '@hourglass/common/navbar';
 import {
   Modal,
   Button,
@@ -98,7 +98,9 @@ const Entry: React.FC = () => {
   const [cancelText, setCancelText] = useState<string>('Stay');
   const [leaveText, setLeaveText] = useState<string>('Leave');
   const [customHandler, setCustomHandler] = useState<CustomHandler>(() => (_) => undefined);
+  const [breadcrumbs, setBreadcrumbs] = useState([] as NavbarItem[]);
   const contextValue = useMemo(() => ({ setCustomHandler, setCancelText, setLeaveText }), []);
+  const breadcrumbContext = useMemo(() => ({ breadcrumbs, setBreadcrumbs }), [breadcrumbs]);
   return (
     <RelayEnvironmentProvider environment={environment}>
       <BlockerContext.Provider value={contextValue}>
@@ -149,56 +151,58 @@ const Entry: React.FC = () => {
                 </Button>
               </Modal.Footer>
             </Modal>
-            <Switch>
-              <Route path="/exams/:examId" exact>
-                <AllAlerts>
-                  <ShowExam />
-                </AllAlerts>
-              </Route>
-              <Route path="/exams/:examId/proctoring">
-                <AllAlerts>
-                  <ExamProctoring />
-                </AllAlerts>
-              </Route>
-              <Route path="/exams/:examId/grading">
-                <DocumentTitle title="Grading">
-                  <RegularNavbar className="z-1000-grading" />
+            <NavbarBreadcrumbContext.Provider value={breadcrumbContext}>
+              <Switch>
+                <Route path="/exams/:examId" exact>
                   <AllAlerts>
-                    <Grading />
+                    <ShowExam />
                   </AllAlerts>
-                </DocumentTitle>
-              </Route>
-              <Route path="/">
-                <RegularNavbar />
-                <ErrorBoundary>
+                </Route>
+                <Route path="/exams/:examId/proctoring">
                   <AllAlerts>
-                    <Switch>
-                      <Route exact path="/">
-                        <Home />
-                      </Route>
-                      <Route path="/exams/:examId/admin">
-                        <ExamAdmin />
-                      </Route>
-                      <Route path="/exams/:examId/submissions">
-                        <ExamSubmissions />
-                      </Route>
-                      <Route path="/exams/:examId/stats">
-                        <ExamStats />
-                      </Route>
-                      <Route path="/exams/:examId/versions/:versionId/edit" exact>
-                        <EditRubric />
-                      </Route>
-                      <Route path="/courses/:courseId">
-                        <ShowCourse />
-                      </Route>
-                      <Route path="*">
-                        <FourOhFour />
-                      </Route>
-                    </Switch>
+                    <ExamProctoring />
                   </AllAlerts>
-                </ErrorBoundary>
-              </Route>
-            </Switch>
+                </Route>
+                <Route path="/exams/:examId/grading">
+                  <DocumentTitle title="Grading">
+                    <RegularNavbar className="z-1000-grading" />
+                    <AllAlerts>
+                      <Grading />
+                    </AllAlerts>
+                  </DocumentTitle>
+                </Route>
+                <Route path="/">
+                  <RegularNavbar />
+                  <ErrorBoundary>
+                    <AllAlerts>
+                      <Switch>
+                        <Route exact path="/">
+                          <Home />
+                        </Route>
+                        <Route path="/exams/:examId/admin">
+                          <ExamAdmin />
+                        </Route>
+                        <Route path="/exams/:examId/submissions">
+                          <ExamSubmissions />
+                        </Route>
+                        <Route path="/exams/:examId/stats">
+                          <ExamStats />
+                        </Route>
+                        <Route path="/exams/:examId/versions/:versionId/edit" exact>
+                          <EditRubric />
+                        </Route>
+                        <Route path="/courses/:courseId">
+                          <ShowCourse />
+                        </Route>
+                        <Route path="*">
+                          <FourOhFour />
+                        </Route>
+                      </Switch>
+                    </AllAlerts>
+                  </ErrorBoundary>
+                </Route>
+              </Switch>
+            </NavbarBreadcrumbContext.Provider>
           </BrowserRouter>
         </DndProvider>
       </BlockerContext.Provider>

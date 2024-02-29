@@ -6,7 +6,7 @@ import React, {
   useRef,
   Suspense,
 } from 'react';
-import RegularNavbar, { NavbarItem } from '@hourglass/common/navbar';
+import RegularNavbar, { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 import Select from 'react-select';
 import { useParams } from 'react-router-dom';
 import {
@@ -2122,7 +2122,8 @@ const ProctoringRecipients: React.FC<{
       ]), [course?.id, course?.title, res.id, res.name]);
   return (
     <>
-      <RegularNavbar className="row" items={items} />
+      <RegularNavbar className="row" />
+      <NavbarBreadcrumbs items={items} />
       <Row>
         <Col>
           <h1>

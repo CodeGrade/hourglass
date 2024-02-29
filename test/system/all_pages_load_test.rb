@@ -14,6 +14,9 @@ class AllPagesLoadTest < ApplicationSystemTestCase
     @professor = @professor_reg.user
     @ta_reg = create(:staff_registration, section: create(:section, course: @exam.course))
     @ta = @ta_reg.user
+    @proctor_reg = create(:staff_registration, section: create(:section, course: @exam.course))
+    @proctor = @proctor_reg.user
+    create(:proctor_registration, user: @proctor, exam: @exam)
     @qp_pairs = @version.qp_pairs
     @expected = @qp_pairs.map do |qp|
       ec = qp[:question].extra_credit || qp[:part].extra_credit ? ' extra credit' : ''
@@ -152,4 +155,34 @@ class AllPagesLoadTest < ApplicationSystemTestCase
     page.assert_text('Hourglass')
     assert_breadcrumbs [@course.title, @exam.name, 'Statistics']
   end
+
+  test 'staff @ homepage' do
+    sign_in @ta
+    visit '/'
+    page.assert_text('Hourglass')
+    assert_breadcrumbs []
+  end
+
+  test 'staff @ exam proctor' do
+    sign_in @proctor
+    visit "/exams/#{exam_id(@exam)}/proctoring"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@exam.name, 'Proctoring']
+  end
+
+  test 'staff @ grading' do
+    sign_in @ta
+    visit "/exams/#{exam_id(@exam)}/grading"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@exam.name, 'Grading']
+  end
+
+  test 'staff @ submission' do
+    @registration.finalize!
+    sign_in @ta
+    visit "/exams/#{exam_id(@exam)}/submissions/#{registration_id(@registration)}"
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@exam.name, 'Submissions', @student.display_name]
+  end
+
 end

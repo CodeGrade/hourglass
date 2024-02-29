@@ -48,15 +48,15 @@ class AllPagesLoadTest < ApplicationSystemTestCase
 
   test 'student @ homepage' do
     sign_in @student
-    visit "/"
-    page.assert_text("Hourglass")
+    visit '/'
+    page.assert_text('Hourglass')
     assert_breadcrumbs []
   end
 
   test 'student @ exam before start' do
     sign_in @student
     visit "/exams/#{exam_id(@exam)}"
-    page.assert_text("Hourglass")
+    page.assert_text('Hourglass')
     assert_breadcrumbs []
   end
 
@@ -64,7 +64,7 @@ class AllPagesLoadTest < ApplicationSystemTestCase
     @registration.finalize!
     sign_in @student
     visit "/exams/#{exam_id(@exam)}"
-    page.assert_text("Hourglass")
+    page.assert_text('Hourglass')
     assert_breadcrumbs [@exam.name]
   end
 
@@ -73,85 +73,84 @@ class AllPagesLoadTest < ApplicationSystemTestCase
     @exam.update!(start_time: 2.days.ago, end_time: 1.day.ago)
     sign_in @student
     visit "/exams/#{exam_id(@exam)}"
-    page.assert_text("Hourglass")
+    page.assert_text('Hourglass')
     assert_breadcrumbs [@exam.name]
   end
 
   test 'prof @ homepage' do
     sign_in @professor
-    visit "/"
-    page.assert_text("Hourglass")
+    visit '/'
+    page.assert_text('Hourglass')
     assert_breadcrumbs []
   end
 
   test 'prof @ course' do
     sign_in @professor
     visit "/courses/#{course_id(@course)}"
-    page.assert_text("Hourglass")
+    page.assert_text('Hourglass')
     assert_breadcrumbs [@course.title]
   end
 
   test 'prof @ exam admin' do
     sign_in @professor
     visit "/exams/#{exam_id(@exam)}/admin"
-    page.assert_text("Hourglass")
+    page.assert_text('Hourglass')
     assert_breadcrumbs [@course.title, @exam.name]
   end
 
   test 'prof @ exam proctor' do
     sign_in @professor
     visit "/exams/#{exam_id(@exam)}/proctoring"
-    page.assert_text("Hourglass")
-    assert_breadcrumbs [@course.title, @exam.name, "Proctoring"]
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name, 'Proctoring']
   end
 
   test 'prof @ exam grading admin' do
     sign_in @professor
     visit "/exams/#{exam_id(@exam)}/grading/admin"
-    page.assert_text("Hourglass")
-    assert_breadcrumbs [@course.title, @exam.name, "Grading"]
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name, 'Grading']
   end
 
   test 'prof @ exam grading' do
     sign_in @professor
     visit "/exams/#{exam_id(@exam)}/grading"
-    page.assert_text("Hourglass")
-    assert_breadcrumbs [@course.title, @exam.name, "Grading"]
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name, 'Grading']
   end
 
   test 'prof @ submissions' do
     sign_in @professor
     visit "/exams/#{exam_id(@exam)}/submissions"
-    page.assert_text("Hourglass")
-    assert_breadcrumbs [@course.title, @exam.name, "Submissions"]
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name, 'Submissions']
   end
 
   test 'prof @ submission' do
     @registration.finalize!
     sign_in @professor
     visit "/exams/#{exam_id(@exam)}/submissions/#{registration_id(@registration)}"
-    page.assert_text("Hourglass")
-    assert_breadcrumbs [@course.title, @exam.name, "Submissions", @student.display_name]
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name, 'Submissions', @student.display_name]
   end
 
   test 'prof @ submission timeline' do
     @registration.finalize!
     # NOTE: We just need at least one snapshot for the page to load properly.
     # NOTE: not using Registration#save_answers since I don't care about the content,
-    # and the default_answers won't be saved since they're not different from the 
+    # and the default_answers won't be saved since they're not different from the
     # current_answers...
     Snapshot.create!(registration: @registration, answers: @registration.current_answers)
     sign_in @professor
     visit "/exams/#{exam_id(@exam)}/submissions/#{registration_id(@registration)}/timeline"
-    page.assert_text("Hourglass")
-    assert_breadcrumbs [@course.title, @exam.name, "Submissions", @student.display_name, "Timeline"]
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name, 'Submissions', @student.display_name, 'Timeline']
   end
 
   test 'prof @ stats' do
     sign_in @professor
     visit "/exams/#{exam_id(@exam)}/stats"
-    page.assert_text("Hourglass")
-    assert_breadcrumbs [@course.title, @exam.name, "Statistics"]
+    page.assert_text('Hourglass')
+    assert_breadcrumbs [@course.title, @exam.name, 'Statistics']
   end
-
 end

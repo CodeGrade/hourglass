@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'application_system_test_case'
-require 'test_helper'
 
 class AllPagesLoadTest < ApplicationSystemTestCase
   # driven_by :selenium, using: :chrome, screen_size: [1400, 1400]

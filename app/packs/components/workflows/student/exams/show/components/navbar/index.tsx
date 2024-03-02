@@ -13,6 +13,7 @@ import {
   MdMenu,
 } from 'react-icons/md';
 import { GiOpenBook } from 'react-icons/gi';
+import { TbLetterA, TbLetterASmall } from 'react-icons/tb';
 import JumpTo from '@student/exams/show/containers/navbar/JumpTo';
 import Scratch from '@student/exams/show/containers/navbar/Scratch';
 import ExamMessages from '@student/exams/show/components/navbar/ExamMessages';
@@ -36,6 +37,58 @@ interface NavAccordionProps {
   onSectionClick: (eventKey: string) => void;
   openSection: string;
 }
+
+export const FontSizeControl: React.FC<{
+  defaultSize?: number,
+  options?: number[],
+  setBaseSize: (size: number) => void,
+}> = (props) => {
+  const {
+    defaultSize = 100,
+    options = [50, 66, 80, 90, 100, 110, 125, 150, 200],
+    setBaseSize,
+  } = props;
+  const [curIdx, setIdx] = useState(
+    Math.max(options.indexOf(defaultSize), Math.floor(options.length / 2)),
+  );
+  return (
+    <span className="flex-fill">
+      <span className="d-flex w-100 align-items-center">
+        <h6 className="my-0 mr-3">
+          Text size:
+        </h6>
+        <span className="flex-fill" />
+        <span className="ml-2">
+          <Button
+            size="sm"
+            onClick={() => {
+              const newIdx = Math.max(0, curIdx - 1);
+              if (newIdx !== curIdx) {
+                setIdx(newIdx);
+                setBaseSize(options[newIdx]);
+              }
+            }}
+          >
+            <RenderIcon I={TbLetterASmall} />
+          </Button>
+          <span className="mx-3">{`${options[curIdx]}%`}</span>
+          <Button
+            size="sm"
+            onClick={() => {
+              const newIdx = Math.min(options.length - 1, curIdx + 1);
+              if (newIdx !== curIdx) {
+                setIdx(newIdx);
+                setBaseSize(options[newIdx]);
+              }
+            }}
+          >
+            <RenderIcon I={TbLetterA} />
+          </Button>
+        </span>
+      </span>
+    </span>
+  );
+};
 
 const NavAccordion: React.FC<NavAccordionProps> = (props) => {
   const {
@@ -106,10 +159,12 @@ const NavAccordion: React.FC<NavAccordionProps> = (props) => {
 const ExamNavbar: React.FC<{
   examKey: navbar$key;
   time: TimeInfo;
+  setBaseSize: (pct : number) => void,
 }> = (props) => {
   const {
     examKey,
     time,
+    setBaseSize,
   } = props;
   const res = useFragment(
     graphql`
@@ -225,6 +280,11 @@ const ExamNavbar: React.FC<{
           </span>
         </div>
       </div>
+      {expanded && (
+        <div className="m-0 p-0 mt-2">
+          <FontSizeControl setBaseSize={setBaseSize} />
+        </div>
+      )}
       <VerticalScrollShadow className="mt-4 flex-fill">
         <NavAccordion
           examKey={res}

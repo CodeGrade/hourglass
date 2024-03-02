@@ -287,5 +287,4 @@ class AllPagesLoadTest < ApplicationSystemTestCase
     page.assert_text('Hourglass')
     assert_breadcrumbs [@exam.name, 'Submissions', @student.display_name]
   end
-
 end

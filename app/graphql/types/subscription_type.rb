@@ -19,5 +19,7 @@ module Types
     field :room_announcement_was_sent, subscription: Subscriptions::RoomAnnouncementWasSent
 
     field :registration_was_updated, subscription: Subscriptions::RegistrationWasUpdated
+
+    field :grading_lock_updated, subscription: Subscriptions::GradingLockUpdated
   end
 end

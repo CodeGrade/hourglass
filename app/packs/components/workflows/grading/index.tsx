@@ -83,6 +83,7 @@ import {
   useLazyLoadQuery,
   useFragment,
   graphql,
+  useSubscription,
 } from 'react-relay';
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
@@ -2398,6 +2399,21 @@ const GradingGraderQuery: React.FC = () => {
     }`,
     { examId, skipCourse: role.me.role !== 'PROFESSOR' },
   );
+  useSubscription(useMemo(() => ({
+    subscription: graphql`
+      subscription gradingGraderLocksUpdatedSubscription($examId: ID!) {
+        gradingLockUpdated(examId: $examId) {
+          gradingLock {
+            ...gradingLock
+          }
+          exam {
+            ...gradingBeginGrading
+          }
+        }
+      }
+    `,
+    variables: { examId },
+  }), [examId]));
   const items: NavbarItem[] = useMemo(() => (
     res.exam.course
       ? [
@@ -2729,7 +2745,30 @@ const GradingAdminQuery: React.FC = () => {
     }
     `,
     { examId },
+    { fetchPolicy: 'network-only' },
   );
+  useSubscription(useMemo(() => ({
+    subscription: graphql`
+      subscription gradingAdminLocksUpdatedSubscription($examId: ID!) {
+        gradingLockUpdated(examId: $examId) {
+          gradingLock {
+            ...gradingLock
+          }
+          exam {
+            examVersions {
+              edges {
+                node {
+                  id
+                  ...gradingCompletion
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+    variables: { examId },
+  }), [examId]));
   const items: NavbarItem[] = useMemo(() => [
     [`/courses/${res.exam.course.id}`, res.exam.course.title],
     [`/exams/${res.exam.id}/admin`, res.exam.name],

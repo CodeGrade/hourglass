@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import ExamNavbar from '@student/exams/show/containers/navbar';
 import RegularNavbar from '@hourglass/common/navbar';
 import { Row, Col, Container } from 'react-bootstrap';
@@ -37,9 +37,13 @@ const ExamTaker: React.FC<ExamTakerProps> = (props) => {
     `,
     examKey,
   );
+  const [baseSize, setBaseSize] = useState(100);
+  const baseFontStyle = useMemo(() => ({
+    fontSize: `${baseSize / 100}em`,
+  }), [baseSize]);
   const body = ready ? (
-    <div id="exam-taker" className="d-flex">
-      <ExamNavbar examKey={res} />
+    <div id="exam-taker" className="d-flex" style={baseFontStyle}>
+      <ExamNavbar examKey={res} setBaseSize={setBaseSize} />
       <Container fluid className="flex-fill transition">
         <Row
           id="exam-body"

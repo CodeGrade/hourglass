@@ -15,12 +15,16 @@ module Mutations
 
     def resolve(part:, options:, answer: nil, prompt: nil)
       index = part.body_items.count
+      answer = answer.to_i
+      if options.size <= answer
+        options += (answer + 1 - options.size).times.map {|_| { type: 'HTML', value: '' }}
+      end
       body_item = BodyItem.new(
         part: part,
         index: index, 
         info: {
           type: 'MultipleChoice',
-          options: options || [],
+          options: options,
           prompt: prompt || {
             type: 'HTML',
             value: '',

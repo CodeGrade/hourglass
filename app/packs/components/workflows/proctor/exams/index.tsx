@@ -1046,7 +1046,7 @@ const ShowMessages: React.FC<{
   const earlier = idx === -1 ? [] : all.slice(idx);
   const later = idx === -1 ? all : all.slice(0, idx);
   const dividerClass = later.length === 0 ? 'd-none' : '';
-  useEffect(() => { updateUnreadCount?.(earlier.length); }, [earlier.length]);
+  useEffect(() => { updateUnreadCount?.(later.length); }, [later.length]);
   return (
     <>
       <Form.Group className="d-flex" controlId="message-filter">

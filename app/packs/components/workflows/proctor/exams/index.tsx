@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useRef,
   Suspense,
+  useEffect,
 } from 'react';
 import RegularNavbar, { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 import Select from 'react-select';
@@ -59,6 +60,7 @@ import {
   usePaginationFragment,
 } from 'react-relay';
 import ErrorBoundary from '@hourglass/common/boundary';
+import { FaviconRotation } from './Favicon';
 
 import { examsProctorQuery } from './__generated__/examsProctorQuery.graphql';
 import { exams_anomalies$key } from './__generated__/exams_anomalies.graphql';
@@ -459,11 +461,13 @@ const ShowAnomalies: React.FC<{
   replyTo: (userId: string) => void;
   exam: exams_anomalies$key;
   filterBy: (displayName: string, regId: string) => boolean;
+  updateAnomalyCount?: (anomalies: number) => void;
 }> = (props) => {
   const {
     replyTo,
     exam,
     filterBy,
+    updateAnomalyCount,
   } = props;
   const { alert } = useContext(AlertContext);
   const {
@@ -527,6 +531,10 @@ const ShowAnomalies: React.FC<{
       deletedIDFieldName: 'deletedId',
     }],
   }), [data.id]));
+
+  useEffect(() => {
+    updateAnomalyCount(data.anomalies.edges.length);
+  }, [data.anomalies.edges.length]);
 
   return (
     <>
@@ -728,12 +736,14 @@ const ExamAnomalies: React.FC<{
   recipients: SplitRecipients;
   recipientOptions: RecipientOptions;
   exam: exams_anomalies$key;
+  updateAnomalyCount?: (anomalies: number) => void;
 }> = (props) => {
   const {
     replyTo,
     recipients,
     recipientOptions,
     exam,
+    updateAnomalyCount,
   } = props;
   const [filter, setFilter] = useState<MessageFilterOption[]>(undefined);
   const filterBy = useMemo(() => makeRegistrationFilter(recipients, filter), [filter]);
@@ -779,6 +789,7 @@ const ExamAnomalies: React.FC<{
                   replyTo={replyTo}
                   exam={exam}
                   filterBy={filterBy}
+                  updateAnomalyCount={updateAnomalyCount}
                 />
               </tbody>
             </Table>
@@ -945,6 +956,7 @@ const ShowMessages: React.FC<{
   version: VersionAnnouncement[];
   room: RoomAnnouncement[];
   exam: ExamAnnouncement[];
+  updateUnreadCount?: (messages: number) => void;
 }> = (props) => {
   const {
     replyTo,
@@ -957,6 +969,7 @@ const ShowMessages: React.FC<{
     version,
     room,
     exam,
+    updateUnreadCount,
   } = props;
   const [lastViewed, setLastViewed] = useState<DateTime>(DateTime.local());
   const resetLastViewed = useCallback(() => setLastViewed(DateTime.local()), []);
@@ -1033,6 +1046,7 @@ const ShowMessages: React.FC<{
   const earlier = idx === -1 ? [] : all.slice(idx);
   const later = idx === -1 ? all : all.slice(0, idx);
   const dividerClass = later.length === 0 ? 'd-none' : '';
+  useEffect(() => { updateUnreadCount?.(earlier.length); }, [earlier.length]);
   return (
     <>
       <Form.Group className="d-flex" controlId="message-filter">
@@ -1198,6 +1212,7 @@ const Loaded: React.FC<{
   response: Response;
   recipients: SplitRecipients;
   recipientOptions: RecipientOptions;
+  updateUnreadCount?: (messages: number) => void
 }> = (props) => {
   const {
     selectedRecipient,
@@ -1208,6 +1223,7 @@ const Loaded: React.FC<{
     response,
     recipients,
     recipientOptions,
+    updateUnreadCount,
   } = props;
   const {
     sent,
@@ -1296,7 +1312,27 @@ const Loaded: React.FC<{
     }],
   }), [examId]));
 
+  const curUnread: React.MutableRefObject<Record<MessagesTab, number>> = useRef({
+    [MessagesTab.Timeline]: 0,
+    [MessagesTab.Received]: 0,
+    [MessagesTab.Sent]: 0,
+  });
   const [tabName, setTabName] = useState<MessagesTab>(MessagesTab.Timeline);
+  const updateTimelineUnread = useCallback((unread: number) => {
+    curUnread.current[MessagesTab.Timeline] = unread;
+    if (tabName === MessagesTab.Timeline) { updateUnreadCount?.(unread); }
+  }, [updateUnreadCount, tabName]);
+  const updateSentUnread = useCallback((unread: number) => {
+    curUnread.current[MessagesTab.Sent] = unread;
+    if (tabName === MessagesTab.Sent) { updateUnreadCount?.(unread); }
+  }, [updateUnreadCount, tabName]);
+  const updateReceivedUnread = useCallback((unread: number) => {
+    curUnread.current[MessagesTab.Received] = unread;
+    if (tabName === MessagesTab.Received) { updateUnreadCount?.(unread); }
+  }, [updateUnreadCount, tabName]);
+  useEffect(() => {
+    updateUnreadCount?.(curUnread.current[tabName]);
+  }, [tabName]);
 
   return (
     <Tab.Container activeKey={tabName}>
@@ -1354,6 +1390,7 @@ const Loaded: React.FC<{
                         version={version}
                         room={room}
                         exam={exam}
+                        updateUnreadCount={updateTimelineUnread}
                       />
                     </div>
                   </div>
@@ -1371,6 +1408,7 @@ const Loaded: React.FC<{
                         room={room}
                         exam={exam}
                         receivedOnly
+                        updateUnreadCount={updateReceivedUnread}
                       />
                     </div>
                   </div>
@@ -1388,6 +1426,7 @@ const Loaded: React.FC<{
                         room={room}
                         exam={exam}
                         sentOnly
+                        updateUnreadCount={updateSentUnread}
                       />
                     </div>
                   </div>
@@ -1417,6 +1456,7 @@ const ExamMessages: React.FC<{
   recipients: SplitRecipients;
   recipientOptions: RecipientOptions;
   exam: exams_messages$key;
+  updateUnreadCount?: (messages: number) => void;
 }> = (props) => {
   const {
     selectedRecipient,
@@ -1426,6 +1466,7 @@ const ExamMessages: React.FC<{
     recipients,
     recipientOptions,
     exam,
+    updateUnreadCount,
   } = props;
   const res = useFragment(
     graphql`
@@ -1569,6 +1610,7 @@ const ExamMessages: React.FC<{
       response={response}
       selectedRecipient={selectedRecipient}
       setSelectedRecipient={setSelectedRecipient}
+      updateUnreadCount={updateUnreadCount}
       messageRef={messageRef}
       replyTo={replyTo}
     />
@@ -1724,11 +1766,15 @@ const SplitViewLoaded: React.FC<{
   exam: exams_proctoring$data;
   recipients: SplitRecipients;
   recipientOptions: RecipientOptions;
+  updateUnreadCount?: (messages: number) => void;
+  updateAnomalyCount?: (anomalies: number) => void;
 }> = (props) => {
   const {
     exam,
     recipients,
     recipientOptions,
+    updateUnreadCount,
+    updateAnomalyCount,
   } = props;
   const { alert } = useContext(AlertContext);
   const messageRef = useRef<HTMLTextAreaElement>();
@@ -1757,6 +1803,7 @@ const SplitViewLoaded: React.FC<{
           recipients={recipients}
           recipientOptions={recipientOptions}
           replyTo={replyTo}
+          updateAnomalyCount={updateAnomalyCount}
         />
       </Col>
       <Col sm={6}>
@@ -1767,6 +1814,7 @@ const SplitViewLoaded: React.FC<{
           selectedRecipient={selectedRecipient}
           setSelectedRecipient={setSelectedRecipient}
           messageRef={messageRef}
+          updateUnreadCount={updateUnreadCount}
           replyTo={replyTo}
         />
       </Col>
@@ -2120,9 +2168,57 @@ const ProctoringRecipients: React.FC<{
         [undefined, res.name],
         [undefined, 'Proctoring'],
       ]), [course?.id, course?.title, res.id, res.name]);
+  const curUnread = useRef({ anomalies: 15, messages: 3 });
+  const initialFavicon = useMemo(() => (document.getElementById('favicon') as HTMLLinkElement)?.href, []);
+  const renderBubble = useCallback(
+    (
+      message: number,
+      fillColor: string,
+      textColor: string,
+      _initial: string,
+      previous?: CanvasRenderingContext2D,
+      previousFrame?: CanvasRenderingContext2D,
+    ) => {
+      const canvas = (previous ?? previousFrame)?.canvas ?? document.createElement('canvas');
+      renderUnreads(canvas, previous, message, fillColor, textColor);
+      return canvas.toDataURL();
+    },
+    [curUnread],
+  );
+  const renderUnreadCounts = useCallback(
+    (
+      initial: string,
+      previous?: CanvasRenderingContext2D,
+      previousFrame?: CanvasRenderingContext2D,
+    ) => ((curUnread.current.messages > 0)
+      ? renderBubble(curUnread.current.messages, 'cyan', 'black', initial, previous, previousFrame)
+      : null),
+    [curUnread, renderBubble],
+  );
+  const renderAnomalyCounts = useCallback(
+    (
+      initial: string,
+      previous?: CanvasRenderingContext2D,
+      previousFrame?: CanvasRenderingContext2D,
+    ) => ((curUnread.current.anomalies)
+      ? renderBubble(curUnread.current.anomalies, 'red', 'white', initial, previous, previousFrame)
+      : null),
+    [curUnread, renderBubble],
+  );
+  const setUnreadMessageCount = useCallback((messages: number) => {
+    curUnread.current.messages = messages;
+  }, [curUnread]);
+  const setAnomalyCount = useCallback((anomalies: number) => {
+    curUnread.current.anomalies = anomalies;
+  }, [curUnread]);
   return (
     <>
       <RegularNavbar className="row" />
+      <FaviconRotation
+        options={[initialFavicon, renderAnomalyCounts, renderUnreadCounts]}
+        animated={curUnread.current.anomalies > 0 || curUnread.current.messages > 0}
+        animationDelay={1000}
+      />
       <NavbarBreadcrumbs items={items} />
       <Row>
         <Col>
@@ -2143,11 +2239,74 @@ const ProctoringRecipients: React.FC<{
             exam={res}
             recipients={recipients}
             recipientOptions={recipientOptions}
+            updateUnreadCount={setUnreadMessageCount}
+            updateAnomalyCount={setAnomalyCount}
           />
         </div>
       </div>
     </>
   );
+};
+
+const renderUnreads = (
+  canvas: HTMLCanvasElement,
+  context: CanvasRenderingContext2D,
+  count: number,
+  fillColor: string,
+  textColor: string,
+) => {
+  // Create a rounded square taking 1/4 of the icon size;
+  const radius = canvas.width / 8;
+
+  drawString(
+    `${count}`,
+    fillColor,
+    textColor,
+    0,
+    0,
+    canvas.width,
+    canvas.height,
+    radius,
+    canvas,
+    canvas.getContext('2d'),
+  );
+};
+
+const drawString = (
+  message: string,
+  fillColor: string,
+  textColor: string,
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
+  radius: number,
+  canvas: HTMLCanvasElement,
+  context: CanvasRenderingContext2D,
+) => {
+  context.fillStyle = fillColor;
+  context.strokeStyle = fillColor;
+  context.lineWidth = 1;
+
+  context.beginPath();
+  context.moveTo(left + radius, top);
+  context.quadraticCurveTo(left, top, left, top + radius);
+  context.lineTo(left, bottom - radius);
+  context.quadraticCurveTo(left, bottom, left + radius, bottom);
+  context.lineTo(right - radius, bottom);
+  context.quadraticCurveTo(right, bottom, right, bottom - radius);
+  context.lineTo(right, top + radius);
+  context.quadraticCurveTo(right, top, right - radius, top);
+  context.closePath();
+  context.fill();
+
+  // Make the text size dynamic depending on the icon size
+  // Useful to avoid shrinking on bigger high res icons
+  context.font = `bold ${canvas.width / 1.25}px arial`;
+  context.fillStyle = textColor;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.fillText(message, left + canvas.width / 2, top + canvas.height / 2);
 };
 
 const ExamProctoringQuery: React.FC = () => {

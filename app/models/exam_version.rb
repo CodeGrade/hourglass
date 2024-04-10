@@ -641,7 +641,7 @@ class ExamVersion < ApplicationRecord
             {
               'name' => with_names ? Nokogiri::HTML.fragment(p.name).content : nil,
               'weight' => p.points,
-              'extra' => p.extra_credit,
+              'extra' => q.extra_credit || p.extra_credit,
             }.compact
           end,
         }

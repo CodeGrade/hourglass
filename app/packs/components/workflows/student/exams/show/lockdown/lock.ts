@@ -38,7 +38,8 @@ export default async function lock(
     throw new Error('Please use Chrome, Chromium, or Firefox to continue.');
   }
 
-  if (!isFullscreen()) {
+  let fullscreenInfo = isFullscreen();
+  if (!fullscreenInfo.success) {
     try {
       await openFullscreen();
     } catch (e) {
@@ -46,11 +47,13 @@ export default async function lock(
     }
   }
 
-  if (!isCovered()) {
-    throw new Error('On second monitor...');
+  const coverageInfo = isCovered();
+  if (!coverageInfo.success) {
+    throw new Error(`On second monitor...${JSON.stringify(coverageInfo)}`);
   }
 
-  if (!isFullscreen()) {
-    throw new Error('Close the developer console to continue.');
+  fullscreenInfo = isFullscreen();
+  if (!fullscreenInfo.success) {
+    throw new Error(`Close the developer console to continue.  ${JSON.stringify(fullscreenInfo)}`);
   }
 }

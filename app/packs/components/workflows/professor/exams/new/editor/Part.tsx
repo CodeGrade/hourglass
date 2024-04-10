@@ -16,6 +16,7 @@ import {
   Form,
   Row,
 } from 'react-bootstrap';
+import Tooltip from '@student/exams/show/components/Tooltip';
 import { RearrangeableList } from '@hourglass/common/rearrangeable';
 import { AlertContext } from '@hourglass/common/alerts';
 import { PartFilesContext } from '@hourglass/common/context';
@@ -55,12 +56,14 @@ export const ReorderablePartsEditor: React.FC<{
   parts: QuestionEditor$data['parts'];
   disabled?: boolean;
   questionId: string;
+  questionIsExtraCredit: boolean;
   showRubricEditors?: boolean;
 }> = (props) => {
   const {
     parts,
     disabled: parentDisabled = false,
     questionId,
+    questionIsExtraCredit,
     showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
@@ -116,6 +119,7 @@ export const ReorderablePartsEditor: React.FC<{
               handleRef={partHandleRef}
               isDragging={partIsDragging}
               disabled={disabled}
+              questionIsExtraCredit={questionIsExtraCredit}
               showRubricEditors={showRubricEditors}
             />
           </Col>
@@ -129,12 +133,14 @@ export const OnePart: React.FC<{
   handleRef: React.Ref<HTMLElement>;
   isDragging?: boolean;
   disabled?: boolean;
+  questionIsExtraCredit: boolean;
   showRubricEditors?: boolean;
 }> = (props) => {
   const {
     partKey,
     handleRef,
     disabled: parentDisabled = false,
+    questionIsExtraCredit,
     showRubricEditors = false,
   } = props;
   const { alert } = useContext(AlertContext);
@@ -387,13 +393,21 @@ export const OnePart: React.FC<{
                 </Col>
                 <Form.Label column sm="2">Extra credit?</Form.Label>
                 <Col sm="4">
-                  <YesNoControl
-                    className="bg-white rounded"
-                    value={!!part.extraCredit}
-                    info={SEP_SUB_YESNO}
-                    disabled={disabled}
-                    onChange={updateSeparateSubparts}
-                  />
+                  <Tooltip
+                    showTooltip={questionIsExtraCredit}
+                    placement="top"
+                    message="Parent question is already extra credit"
+                  >
+                    <span className="d-inline-block">
+                      <YesNoControl
+                        className="bg-white rounded"
+                        value={questionIsExtraCredit || (!!part.extraCredit)}
+                        info={SEP_SUB_YESNO}
+                        disabled={disabled || questionIsExtraCredit}
+                        onChange={updateSeparateSubparts}
+                      />
+                    </span>
+                  </Tooltip>
                 </Col>
               </Form.Group>
               <Form.Group as={Row}>

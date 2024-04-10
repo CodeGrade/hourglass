@@ -422,6 +422,7 @@ export const OneQuestion: React.FC<{
             parts={question.parts}
             disabled={loadingCreatePart || parentDisabled}
             questionId={question.id}
+            questionIsExtraCredit={!!question.extraCredit}
             showRubricEditors={showRubricEditors}
           />
           <Row className="text-center">

@@ -183,7 +183,8 @@ export function doTryLockdown(
   return (dispatch): void => {
     lock(policies, policyExemptions).then(() => {
       window.history.pushState({}, document.title);
-      if (policyPermits(policies, 'IGNORE_LOCKDOWN')) {
+      if (policyPermits(policies, 'IGNORE_LOCKDOWN')
+          || policyPermits(policyExemptions, 'IGNORE_LOCKDOWN')) {
         dispatch(lockdownIgnored());
       } else {
         dispatch(lockedDown());

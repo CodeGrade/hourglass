@@ -80,6 +80,7 @@ const registrationWasUpdatedSubscriptionSpec = graphql`
         currentPin
         pinValidated
         started
+        endTime
         over
         final
       }

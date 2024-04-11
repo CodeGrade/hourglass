@@ -290,11 +290,13 @@ class Exam < ApplicationRecord
     reg&.available? || reg&.over?
   end
 
-  def bottlenose_exam_summary
-    if exam_versions.count == 1
-      exam_versions.first.bottlenose_summary
+  def bottlenose_exam_summary(regs = nil)
+    regs = registrations if regs.nil?
+    versions_to_use = exam_versions.where(id: regs.to_set(&:exam_version_id))
+    if versions_to_use.count == 1
+      versions_to_use.first.bottlenose_summary
     else
-      all_versions = exam_versions.map { |ev| ev.bottlenose_summary(with_names: false) }
+      all_versions = versions_to_use.map { |ev| ev.bottlenose_summary(with_names: false) }
       if compatible_versions(all_versions)
         all_versions.first
       else

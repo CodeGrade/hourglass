@@ -115,7 +115,7 @@ module Bottlenose
       when 401
         raise Bottlenose::UnauthorizedError
       else
-        raise Bottlenose::ApiError
+        raise Bottlenose::ApiError, e.message
       end
     rescue Faraday::ConnectionFailed
       raise Bottlenose::ConnectionFailed
@@ -156,8 +156,8 @@ module Bottlenose
 
   # Error calling Bottlenose API.
   class ApiError < RuntimeError
-    def initialize
-      super('Bottlenose API error. Please report to a professor or site admin.')
+    def initialize(message)
+      super("Bottlenose API error. Please report to a professor or site admin. #{message}")
     end
   end
 

@@ -63,6 +63,22 @@ module Mutations
       err = "Cannot update already started student '#{student.display_name}'"
       raise GraphQL::ExecutionError, err if student_reg.started?
 
+      # If a student hasn't really started, and hasn't really been graded,
+      # then should they really be prevented from switching versions?
+      if (!student_reg.started? &&
+           student_reg.final? &&
+           student_reg.snapshots.empty? &&
+           student_reg.grading_comments.empty? &&
+           student_reg.grading_checks.empty?)
+        student_reg.start_time = nil
+        student_reg.grading_locks.destroy_all
+      end
+
+      err = "Cannot update already-finalized and graded student '#{student.display_name}'"
+      finalized = student_reg.final?
+      graded = student_reg.grading_locks.where.not(completed_by: nil).any?
+      raise GraphQL::ExecutionError, err if (finalized && graded)
+
       student_reg.exam_version = version
       saved = student_reg.save
       raise GraphQL::ExecutionError, student_reg.errors.full_messages.to_sentence unless saved

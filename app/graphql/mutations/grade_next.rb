@@ -48,10 +48,10 @@ module Mutations
         end
 
         updated = lock.update(grader: context[:current_user])
-        raise GraphQL::ExecutionError, {
-          message: updated.errors.full_messages.to_sentence,
-          anyRemaining: true
-        } unless updated
+        raise GraphQL::ExecutionError.new(
+          lock.errors.full_messages.to_sentence,
+          extensions: { anyRemaining: true },
+         ) unless updated
 
         HourglassSchema.subscriptions.trigger(
           :grading_lock_updated,

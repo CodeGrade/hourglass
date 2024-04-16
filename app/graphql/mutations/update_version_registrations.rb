@@ -71,6 +71,7 @@ module Mutations
            student_reg.grading_comments.empty? &&
            student_reg.grading_checks.empty?)
         student_reg.start_time = nil
+        student_reg.end_time = nil
         student_reg.grading_locks.destroy_all
       end
 

@@ -32,9 +32,14 @@ const mapDispatchToProps: MDTP<{
 const mapStateToProps: MSTP<{
   isError: boolean;
   errorMsg: string;
+  lockdownRequested: boolean;
 }, OwnProps> = (state: ExamTakerState) => ({
   isError: state.lockdown.status === LockdownStatus.FAILED,
   errorMsg: state.lockdown.message,
+  lockdownRequested: (
+    state.lockdown.status !== LockdownStatus.BEFORE
+    && state.lockdown.status !== LockdownStatus.IGNORED
+  ),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreStart);

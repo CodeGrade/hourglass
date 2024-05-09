@@ -100,7 +100,14 @@ export interface ActivateWaypointsAction {
 }
 
 export type LockdownAction =
-  LockedDownAction | LockdownFailedAction | LockdownIgnoredAction;
+  | LockdownRequestedAction
+  | LockedDownAction
+  | LockdownFailedAction
+  | LockdownIgnoredAction;
+
+export interface LockdownRequestedAction {
+  type: 'IN_PROGRESS';
+}
 
 export interface LockdownIgnoredAction {
   type: 'LOCKDOWN_IGNORED';
@@ -176,6 +183,9 @@ export type SnapshotAction = SnapshotSaving | SnapshotSuccess | SnapshotFailure 
 export enum LockdownStatus {
   // Lockdown hasn't been requested yet.
   BEFORE = 'BEFORE',
+
+  // Lockdown in progress
+  IN_PROGRESS = 'IN-PROGRESS',
 
   // Lockdown request failed.
   FAILED = 'FAILED',

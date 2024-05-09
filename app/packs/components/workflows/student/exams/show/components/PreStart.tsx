@@ -13,7 +13,8 @@ import { PreStart$key } from './__generated__/PreStart.graphql';
 interface PreStartProps {
   onClick: (pin?: string) => void;
   isError: boolean;
-  errorMsg?: string;
+  errorMsg: string;
+  lockdownRequested: boolean,
   policies: readonly Policy[];
   examKey: PreStart$key;
 }
@@ -25,6 +26,7 @@ const PreStart: React.FC<PreStartProps> = (props) => {
     policies,
     errorMsg,
     examKey,
+    lockdownRequested,
   } = props;
   const res = useFragment(
     graphql`
@@ -116,6 +118,7 @@ const PreStart: React.FC<PreStartProps> = (props) => {
       <p>Click the following button to enter secure mode and begin the exam.</p>
       <Button
         variant="success"
+        disabled={lockdownRequested}
         onClick={() => onClick(pinRef.current?.value)}
       >
         Begin Exam

@@ -2,7 +2,7 @@ import { Policy, policyPermits } from '@student/exams/show/types';
 import {
   PolicyExemption,
 } from '@student/exams/show/components/__generated__/ExamShowContents.graphql';
-import { isCovered, isFullscreen, openFullscreen } from './helpers';
+import { isFullscreen, openFullscreen } from './helpers';
 
 /**
  * Lock down the client browser.
@@ -15,22 +15,7 @@ export default async function lock(
   if (policyPermits(policies, 'TOLERATE_WINDOWED')
       || policyPermits(policyExemptions, 'TOLERATE_WINDOWED')) return;
 
-  try {
-    await navigator.clipboard.writeText('');
-  } catch (_eClipboard) {
-    // clearing the clipboard via the proper API failed
-    // so use the legacy API
-    try {
-      const input = document.createElement('input');
-      document.append(input);
-      input.select();
-      document.execCommand('copy');
-      input.remove();
-    } catch (_eExecCommand) {
-      // We weren't able to clear the clipboard at all
-      // probably should flag an anomaly, since the browser is weird
-    }
-  }
+  await clearClipboard();
 
   const isChrome = navigator.userAgent.search('Chrome') >= 0;
   const isFirefox = navigator.userAgent.search('Firefox') >= 0;
@@ -47,13 +32,26 @@ export default async function lock(
     }
   }
 
-  const coverageInfo = isCovered();
-  if (!coverageInfo.success) {
-    throw new Error(`On second monitor...${JSON.stringify(coverageInfo)}`);
-  }
-
   fullscreenInfo = isFullscreen();
   if (!fullscreenInfo.success) {
-    throw new Error(`Close the developer console to continue.  ${JSON.stringify(fullscreenInfo)}`);
+    throw new Error(`Cannot confirm fullscreen.\n${JSON.stringify(fullscreenInfo)}`);
+  }
+}
+export async function clearClipboard() {
+  try {
+    await navigator.clipboard.writeText('');
+  } catch (_eClipboard) {
+    // clearing the clipboard via the proper API failed
+    // so use the legacy API
+    try {
+      const input = document.createElement('input');
+      document.append(input);
+      input.select();
+      document.execCommand('copy');
+      input.remove();
+    } catch (_eExecCommand) {
+      // We weren't able to clear the clipboard at all
+      // probably should flag an anomaly, since the browser is weird
+    }
   }
 }

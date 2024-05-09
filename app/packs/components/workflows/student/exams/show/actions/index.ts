@@ -28,6 +28,7 @@ import {
   Policy,
   TimeInfo,
   PolicyExemption,
+  LockdownRequestedAction,
 } from '@student/exams/show/types';
 import lock from '@student/exams/show/lockdown/lock';
 import { DateTime } from 'luxon';
@@ -76,6 +77,12 @@ export function activateWaypoints(enabled: boolean): ActivateWaypointsAction {
 export function lockedDown(): LockedDownAction {
   return {
     type: 'LOCKED_DOWN',
+  };
+}
+
+export function lockdownStarted(): LockdownRequestedAction {
+  return {
+    type: 'IN_PROGRESS',
   };
 }
 
@@ -181,6 +188,7 @@ export function doTryLockdown(
   pin?: string,
 ): Thunk {
   return (dispatch): void => {
+    dispatch(lockdownStarted());
     lock(policies, policyExemptions).then(() => {
       window.history.pushState({}, document.title);
       if (policyPermits(policies, 'IGNORE_LOCKDOWN')

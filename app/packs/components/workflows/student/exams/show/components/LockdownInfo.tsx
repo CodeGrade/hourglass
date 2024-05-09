@@ -17,6 +17,7 @@ const LockdownInfo: React.FC<LockdownInfoProps> = (props) => {
   } = props;
   switch (status) {
     case LockdownStatus.BEFORE:
+    case LockdownStatus.IN_PROGRESS:
       return (
         <TooltipButton
           variant="secondary"

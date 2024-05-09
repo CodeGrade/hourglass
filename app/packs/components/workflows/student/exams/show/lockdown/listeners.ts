@@ -5,16 +5,17 @@ import {
   policyPermits,
 } from '@student/exams/show/types';
 import { isFullscreen } from './helpers';
+import { clearClipboard } from './lock';
 
 const listeners: {
   event: string;
-  handler: (anomalyDetected: AnomalyDetected) => (e: Event) => void;
+  handler: (anomalyDetected: AnomalyDetected) => (e: Event) => Promise<void>;
   capture?: boolean;
   repeated?: boolean;
 }[] = [
   {
     event: 'keydown',
-    handler: (_detected) => (e: KeyboardEvent): void => {
+    handler: (_detected) => async (e: KeyboardEvent): Promise<void> => {
       if (e.ctrlKey || e.metaKey) {
         switch (e.key) {
           case 's':
@@ -41,7 +42,7 @@ const listeners: {
   },
   {
     event: 'keypress',
-    handler: (_detected) => (e: KeyboardEvent): void => {
+    handler: (_detected) => async (e: KeyboardEvent): Promise<void> => {
       if (e.ctrlKey || e.metaKey) {
         switch (e.key) {
           case 's':
@@ -66,29 +67,43 @@ const listeners: {
   },
   {
     event: 'mouseout',
-    handler: (detected) => (e: MouseEvent): void => {
+    handler: (detected) => async (e: MouseEvent): Promise<void> => {
       if (e.target === null || e.relatedTarget === null) {
+        await clearClipboard();
         detected('moved the mouse out of the window', e);
       }
     },
   },
   {
+    event: 'fullscreenchange',
+    handler: (detected) => async (e: Event): Promise<void> => {
+      requestAnimationFrame(async (_time) => {
+        if (!isFullscreen() || document.fullscreenElement === null) {
+          await clearClipboard();
+          detected('left fullscreen', e);
+        }
+      });
+    },
+  },
+  {
     event: 'resize',
-    handler: (detected) => (e: FocusEvent): void => {
+    handler: (detected) => async (e: FocusEvent): Promise<void> => {
       if (!isFullscreen()) {
-        detected('left fullscreen', e);
+        await clearClipboard();
+        detected('resized window', e);
       }
     },
   },
   {
     event: 'blur',
-    handler: (detected) => (e: FocusEvent): void => {
+    handler: (detected) => async (e: FocusEvent): Promise<void> => {
+      await clearClipboard();
       detected('unfocused the window', e);
     },
   },
   {
     event: 'contextmenu',
-    handler: (_detected) => (e: Event): void => {
+    handler: (_detected) => async (e: Event): Promise<void> => {
       e.preventDefault();
       e.stopPropagation();
       // detected('tried to use the context menu', e);
@@ -96,7 +111,7 @@ const listeners: {
   },
   {
     event: 'beforeunload',
-    handler: (detected) => (e: Event): void => {
+    handler: (detected) => async (e: Event): Promise<void> => {
       detected('tried to navigate away', e);
     },
   },
@@ -114,8 +129,8 @@ export function installListeners(
     capture,
     repeated,
   }) => {
-    const f: EventListener = (...args) => {
-      handler(detected)(...args);
+    const f: EventListener = async (...args) => {
+      await handler(detected)(...args);
       if (!skipCleanup && !repeated) {
         window.removeEventListener(event, f, capture);
       }

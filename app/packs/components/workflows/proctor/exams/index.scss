@@ -32,3 +32,19 @@
   align-items: 'center';
   justify-content: 'space-between';
 }
+
+.printTable {
+  page-break-inside: 'avoid';
+  border-collapse: separate;
+  > tbody > tr > td {
+    border: 1px solid gray;
+    border-radius: 0.5em;
+    padding: 0.5em;
+  }
+  table.pinInfo {
+    tr.nuid {
+      td:first-child { padding-right: 2em;}
+      font-size: 80%;
+    }
+  }
+}

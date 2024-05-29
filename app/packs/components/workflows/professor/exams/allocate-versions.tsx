@@ -24,7 +24,7 @@ import {
 } from 'react-router-dom';
 import { AlertContext } from '@hourglass/common/alerts';
 import { useFragment, graphql } from 'react-relay';
-import { useMutationWithDefaults } from '@hourglass/common/helpers';
+import { formatNuid, useMutationWithDefaults } from '@hourglass/common/helpers';
 
 import { TabEditButton } from './admin';
 import { allocateVersions$key, allocateVersions$data } from './__generated__/allocateVersions.graphql';
@@ -112,7 +112,7 @@ const StudentBadge: React.FC<{
   <Button
     className="badge badge-primary badge-pill"
     size="sm"
-    title={`${student.username} (${student.nuid})`}
+    title={`${student.username} (${formatNuid(student.nuid)})`}
   >
     {student.displayName}
   </Button>
@@ -401,7 +401,7 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
               <p>No students</p>
             ) : sortByName(unassigned).map((s) => (
               <li key={s.id} className="fixed-col-width">
-                <span title={`${s.username} (${s.nuid})`}>{s.displayName}</span>
+                <span title={`${s.username} (${formatNuid(s.nuid)})`}>{s.displayName}</span>
               </li>
             ))}
           </ul>
@@ -417,7 +417,7 @@ const Readonly: React.FC<VersionAssignmentProps> = (props) => {
               <ul className="list-unstyled column-count-4">
                 {sortByName(v.students).map((s) => (
                   <li key={s.id} className="fixed-col-width">
-                    <span title={`${s.username} (${s.nuid})`}>{s.displayName}</span>
+                    <span title={`${s.username} (${formatNuid(s.nuid)})`}>{s.displayName}</span>
                   </li>
                 ))}
               </ul>

@@ -22,6 +22,7 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
+import { formatNuid } from '@hourglass/common/helpers';
 import { AlertContext } from '@hourglass/common/alerts';
 import { TabEditButton } from '@professor/exams/admin';
 import { useFragment, graphql, useMutation } from 'react-relay';
@@ -125,7 +126,7 @@ const StudentBadge: React.FC<{
   <Button
     className="badge badge-primary badge-pill"
     size="sm"
-    title={`${student.username} (${student.nuid})`}
+    title={`${student.username} (${formatNuid(student.nuid)})`}
   >
     {student.displayName}
   </Button>
@@ -425,7 +426,7 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
               <p>No students</p>
             ) : sortByName(unassigned).map((s) => (
               <li key={s.id} className="fixed-col-width">
-                <span title={`${s.username} (${s.nuid})`}>{s.displayName}</span>
+                <span title={`${s.username} (${formatNuid(s.nuid)})`}>{s.displayName}</span>
               </li>
             ))}
           </ul>
@@ -441,7 +442,7 @@ const Readonly: React.FC<RoomAssignmentProps> = (props) => {
               <ul className="list-unstyled column-count-4">
                 {sortByName(r.students).map((s) => (
                   <li key={s.id} className="fixed-col-width">
-                    <span title={`${s.username} (${s.nuid})`}>{s.displayName}</span>
+                    <span title={`${s.username} (${formatNuid(s.nuid)})`}>{s.displayName}</span>
                   </li>
                 ))}
               </ul>

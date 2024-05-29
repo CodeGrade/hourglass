@@ -59,6 +59,10 @@ export function pluralize(number: number, singular: string, plural: string): str
   return `${number} ${plural}`;
 }
 
+export function formatNuid(nuid: number | string): string {
+  return String(nuid).padStart(9, '0');
+}
+
 export type PointsInfo = {
   regularPoints: number;
   extraCreditPoints: number;

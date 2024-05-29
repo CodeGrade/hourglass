@@ -8092,6 +8092,13 @@ react-loading-overlay@^1.0.1:
     prop-types "^15.6.2"
     react-transition-group "^2.5.0"
 
+react-new-window@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/react-new-window/-/react-new-window-1.0.1.tgz#38f97ac5a38a14d2ac8263e2427fcbd5f84e1d64"
+  integrity sha512-pLQlq5NzMxNocXKPIwkXfAxSOZmbpWSbP8QrxCbunpHcx4k249YChkk7l/7P4jjwxq3dI/xwL3nVHLp6h5zM3w==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-onclickoutside@^6.13.0:
   version "6.13.0"
   resolved "https://registry.yarnpkg.com/react-onclickoutside/-/react-onclickoutside-6.13.0.tgz#e165ea4e5157f3da94f4376a3ab3e22a565f4ffc"

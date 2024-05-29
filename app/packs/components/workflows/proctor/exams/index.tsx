@@ -7,6 +7,7 @@ import React, {
   Suspense,
   useEffect,
 } from 'react';
+import NewWindow from 'react-new-window';
 import RegularNavbar, { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 import Select from 'react-select';
 import { useParams } from 'react-router-dom';
@@ -22,6 +23,7 @@ import {
   Media,
   Alert,
   Modal,
+  Card,
 } from 'react-bootstrap';
 import ReadableDate from '@hourglass/common/ReadableDate';
 import {
@@ -43,13 +45,14 @@ import {
   ExhaustiveSwitchError,
   SelectOption,
   SelectOptions,
+  formatNuid,
   useMutationWithDefaults,
 } from '@hourglass/common/helpers';
 import { GiBugleCall } from 'react-icons/gi';
 import { DateTime } from 'luxon';
 import { IconType } from 'react-icons';
 import './index.scss';
-import { BsListCheck } from 'react-icons/bs';
+import { BsListCheck, BsPrinterFill } from 'react-icons/bs';
 import { NewMessages, PreviousMessages } from '@hourglass/common/messages';
 import DocumentTitle from '@hourglass/common/documentTitle';
 import {
@@ -77,6 +80,7 @@ export interface Recipient {
   type: MessageType.Direct | MessageType.Room | MessageType.Version | MessageType.Exam;
   id: string;
   name: string;
+  nuid?: number;
 }
 
 export interface SplitRecipients {
@@ -1867,6 +1871,29 @@ const ShowCurrentPins: React.FC<{
     enabled,
   } = props;
   const [showing, setShowing] = useState(false);
+  const [pinWindow, togglePINWindow] = useState(false);
+  const res = useFragment<exams_pins$key>(
+    graphql`
+    fragment exams_pins on Exam
+    @refetchable(queryName: "RegistrationPinRefetchQuery") {
+      registrations {
+        id
+        currentPin
+        pinValidated
+      }
+    }
+    `,
+    exam,
+  );
+  const { registrations } = res;
+  const regsById = new Map(registrations.map((r) => [r.id, r]));
+  const studentPins = recipients.students.map((s) => ({
+    id: s.id,
+    name: s.name,
+    nuid: s.nuid,
+    currentPin: regsById.get(s.id)?.currentPin,
+    pinValidated: regsById.get(s.id)?.pinValidated,
+  }));
   return (
     <>
       <Button
@@ -1877,16 +1904,36 @@ const ShowCurrentPins: React.FC<{
       >
         Show current PINs
       </Button>
+      {pinWindow && (
+        <NewWindow
+          onUnload={() => togglePINWindow(false)}
+        >
+          <PrintablePinsTable
+            students={studentPins}
+          />
+        </NewWindow>
+      )}
       <Modal
         centered
         keyboard
         scrollable
         show={showing}
-        onHide={() => setShowing(false)}
+        onHide={() => {
+          setShowing(false);
+          togglePINWindow(false);
+        }}
       >
         <Modal.Header closeButton>
-          <Modal.Title>
+          <Modal.Title className="w-100">
             Current PINs for students
+            <Button
+              disabled={pinWindow}
+              className="float-right"
+              onClick={() => togglePINWindow(true)}
+              title="Open in new window to print"
+            >
+              <Icon I={BsPrinterFill} />
+            </Button>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -1894,7 +1941,7 @@ const ShowCurrentPins: React.FC<{
             <ShowCurrentPinsTable
               recipients={recipients}
               recipientOptions={recipientOptions}
-              exam={exam}
+              students={studentPins}
             />
           </Suspense>
         </Modal.Body>
@@ -1911,38 +1958,94 @@ const ShowCurrentPins: React.FC<{
   );
 };
 
+export const PrintablePinsTable: React.FC<{
+  students: Array<{
+    name: string,
+    nuid: number,
+    pinValidated: boolean,
+    currentPin: string,
+  }>,
+}> = (props) => {
+  const {
+    students,
+  } = props;
+  const chunkSize = 4;
+  const sortedStudents = students.toSorted((s1, s2) => s1.name.localeCompare(s2.name));
+  const allInChunks = Array.from(
+    { length: Math.ceil(sortedStudents.length / chunkSize) },
+    (v, i) => sortedStudents.slice(i * chunkSize, i * chunkSize + chunkSize),
+  );
+
+  return (
+    <table className="w-100 printTable" style={{ pageBreakInside: 'avoid' }}>
+      <thead>
+        {Array.from(
+          { length: chunkSize },
+          () => <th style={{ width: '25%', textAlign: 'center' }} />,
+        )}
+      </thead>
+      <tbody>
+        {allInChunks.map((chunk) => (
+          <tr>
+            {chunk.map((reg) => {
+              let row: React.ReactElement;
+              if (reg.pinValidated) {
+                row = <span>Already validated</span>;
+              } else if (reg.currentPin) {
+                row = <span style={{ fontFamily: 'monospace' }}>{reg.currentPin}</span>;
+              } else {
+                row = <span>none required</span>;
+              }
+              return (
+                <td style={{ height: '100%' }}>
+                  <Card.Title>{reg.name}</Card.Title>
+                  <table className="pinInfo">
+                    {reg.nuid && (
+                      <tr className="nuid">
+                        <td>NUID:</td>
+                        <td style={{ fontFamily: 'monospace' }}>
+                          {formatNuid(reg.nuid)}
+                        </td>
+                      </tr>
+                    )}
+                    <tr>
+                      <td>PIN:</td>
+                      <td>{row}</td>
+                    </tr>
+                  </table>
+                </td>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
+
 const ShowCurrentPinsTable: React.FC<{
   recipients: SplitRecipients,
   recipientOptions: RecipientOptions,
-  exam: exams_pins$key,
+  students: Array<{
+    id: string,
+    name: string,
+    nuid: number,
+    pinValidated: boolean,
+    currentPin: string,
+  }>,
 }> = (props) => {
   const {
     recipients,
     recipientOptions,
-    exam,
+    students,
   } = props;
   const [filter, setFilter] = useState<MessageFilterOption[]>(undefined);
   const filterBy = useMemo(() => makeRegistrationFilter(recipients, filter), [filter]);
-  const res = useFragment<exams_pins$key>(
-    graphql`
-    fragment exams_pins on Exam
-    @refetchable(queryName: "RegistrationPinRefetchQuery") {
-      registrations {
-        id
-        currentPin
-        pinValidated
-      }
-    }
-    `,
-    exam,
-  );
-  const { registrations } = res;
-  const regsById = new Map(registrations.map((r) => [r.id, r]));
-  let all: Array<Recipient> = [];
+  let all: typeof students = [];
   if (filter) {
-    all = recipients.students.filter((s) => filterBy(s.name, s.id));
+    all = students.filter((s) => filterBy(s.name, s.id));
   } else {
-    all = recipients.students;
+    all = students;
   }
 
   return (
@@ -1972,23 +2075,24 @@ const ShowCurrentPinsTable: React.FC<{
         <Table hover className="m-0">
           <thead>
             <tr>
+              <th>NUID</th>
               <th>Student</th>
               <th>Current PIN</th>
             </tr>
           </thead>
           <tbody>
             {all.map((reg) => {
-              const r = regsById.get(reg.id);
               let row: React.ReactElement;
-              if (r?.pinValidated) {
+              if (reg.pinValidated) {
                 row = <td>Already validated</td>;
-              } else if (r?.currentPin) {
-                row = <td style={{ fontFamily: 'monospace' }}>{r.currentPin}</td>;
+              } else if (reg.currentPin) {
+                row = <td style={{ fontFamily: 'monospace' }}>{reg.currentPin}</td>;
               } else {
                 row = <td>none required</td>;
               }
               return (
                 <tr key={reg.id}>
+                  <td style={{ fontFamily: 'monospace', fontSize: '0.75em' }}>{formatNuid(reg.nuid)}</td>
                   <td>{reg.name}</td>
                   {row}
                 </tr>
@@ -2047,6 +2151,7 @@ const ProctoringRecipients: React.FC<{
         user {
           id
           displayName
+          nuid
         }
         currentPin
       }
@@ -2074,6 +2179,7 @@ const ProctoringRecipients: React.FC<{
       type: MessageType.Direct,
       id: reg.id,
       name: reg.user.displayName,
+      nuid: reg.user.nuid,
     };
     students.push(r);
     studentsByRoom[reg.room?.id] = studentsByRoom[reg.room?.id] ?? {};

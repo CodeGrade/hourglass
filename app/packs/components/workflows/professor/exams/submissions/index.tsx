@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useMemo,
 } from 'react';
+import NewWindow from 'react-new-window';
 import {
   useParams,
   Switch,
@@ -23,7 +24,8 @@ import {
   Dropdown,
   Modal,
 } from 'react-bootstrap';
-import { BsListCheck } from 'react-icons/bs';
+import { BsListCheck, BsPrinterFill } from 'react-icons/bs';
+import '@proctor/exams/index.scss';
 import {
   graphql,
   useLazyLoadQuery,
@@ -38,9 +40,10 @@ import { NavbarBreadcrumbs, NavbarItem } from '@hourglass/common/navbar';
 import ExamViewer from '@proctor/registrations/show';
 import ExamTimelineViewer, { SnapshotsState } from '@proctor/registrations/show/Timeline';
 import ExamViewerStudent from '@student/registrations/show';
-import { FinalizeDialog, finalizeItemMutation } from '@proctor/exams';
+import { FinalizeDialog, PrintablePinsTable, finalizeItemMutation } from '@proctor/exams';
 import { AlertContext } from '@hourglass/common/alerts';
 import { scrollToElem } from '@student/exams/show/helpers';
+import { formatNuid } from '@hourglass/common/helpers';
 import { examsFinalizeItemMutation } from '@proctor/exams/__generated__/examsFinalizeItemMutation.graphql';
 import Icon from '@student/exams/show/components/Icon';
 import ErrorBoundary from '@hourglass/common/boundary';
@@ -257,6 +260,7 @@ const ExamSubmissionsQuery: React.FC = () => {
           id
           user {
             displayName
+            nuid
           }
           started
           over
@@ -348,6 +352,7 @@ const ExamSubmissionsQuery: React.FC = () => {
   }, DateTime.fromMillis(0));
   const [showExportAnswers, setShowExportAnswers] = useState(false);
   const [showExportSnapshots, setShowExportSnapshots] = useState(false);
+  const [pinWindow, togglePINWindow] = useState(false);
   const [curReg/* , setCurReg */] = useState<string>(undefined);
   const [curName/* , setCurName */] = useState<string>(undefined);
   const items: NavbarItem[] = useMemo(() => [
@@ -507,6 +512,21 @@ const ExamSubmissionsQuery: React.FC = () => {
           </tbody>
         </Table>
       )}
+      {pinWindow && (
+        <NewWindow
+          onUnload={() => togglePINWindow(false)}
+        >
+          <PrintablePinsTable
+            students={groups.notStarted.map((r) => ({
+              id: r.id,
+              name: r.user.displayName,
+              nuid: r.user.nuid,
+              currentPin: r.currentPin,
+              pinValidated: r.pinValidated,
+            }))}
+          />
+        </NewWindow>
+      )}
       <h4>{`Not-yet-started submissions (${groups.notStarted.length})`}</h4>
       {groups.notStarted.length === 0 ? (
         <i>Everyone has started</i>
@@ -515,7 +535,19 @@ const ExamSubmissionsQuery: React.FC = () => {
           <thead>
             <tr>
               <th>Student</th>
-              {anyPins && (<th>Current PIN</th>)}
+              {anyPins && (
+                <th>
+                  Current PIN
+                  <Button
+                    disabled={pinWindow}
+                    className="ml-2"
+                    title="Open in new window to print"
+                    onClick={() => togglePINWindow(true)}
+                  >
+                    <Icon I={BsPrinterFill} />
+                  </Button>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -534,6 +566,7 @@ const ExamSubmissionsQuery: React.FC = () => {
                     <Link to={`/exams/${examId}/submissions/${reg.id}`}>
                       {reg.user.displayName}
                     </Link>
+                    <small className="ml-2">{`(${formatNuid(reg.user.nuid)})`}</small>
                   </td>
                   {anyPins && row}
                 </tr>
@@ -734,7 +767,7 @@ const ExamSubmissionStudentQuery: React.FC = () => {
     currentScorePercentage,
   } = registration;
   const title = `${exam.name} -- Submission for ${user.displayName}`;
-  const userInfo = `${user.displayName} (${user.nuid})`;
+  const userInfo = `${user.displayName} (${formatNuid(user.nuid)})`;
   return (
     <DocumentTitle title={title}>
       <h1>
@@ -798,7 +831,7 @@ const ExamSubmissionStaffQuery: React.FC = () => {
     user,
     exam,
   } = registration;
-  const userInfo = `${user.displayName} (${user.nuid})`;
+  const userInfo = `${user.displayName} (${formatNuid(user.nuid)})`;
   const titleInfo = published ? userInfo : '<redacted>';
   if (title === undefined) setTitle(`${exam.name} -- Submission for ${titleInfo}`);
   if (currentAnswers === null && !published) {
@@ -883,7 +916,7 @@ const ExamSubmissionAuditStaffQuery: React.FC = () => {
     user,
     exam,
   } = registration;
-  const userInfo = `${user.displayName} (${user.nuid})`;
+  const userInfo = `${user.displayName} (${formatNuid(user.nuid)})`;
   const titleInfo = published ? userInfo : '<redacted>';
   if (title === undefined) setTitle(`${exam.name} -- Submission for ${titleInfo}`);
   if (snapshots === null && !published) {

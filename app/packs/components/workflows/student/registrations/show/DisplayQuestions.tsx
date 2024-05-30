@@ -3,6 +3,7 @@ import ShowQuestion from '@proctor/registrations/show/ShowQuestion';
 import { CurrentGrading } from '@professor/exams/types';
 import { graphql, useFragment } from 'react-relay';
 
+import { CourseRole } from '@grading/__generated__/gradingRoleQuery.graphql';
 import { DisplayQuestions$key } from './__generated__/DisplayQuestions.graphql';
 
 interface DisplayQuestionsProps {
@@ -10,6 +11,7 @@ interface DisplayQuestionsProps {
   valueUpdate: React.DependencyList;
   currentGrading?: CurrentGrading;
   registrationId?: string;
+  courseRole?: CourseRole
   fullyExpandCode: boolean;
   overviewMode: boolean;
   rubricsOpen: boolean;
@@ -22,6 +24,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
     refreshCodeMirrorsDeps,
     valueUpdate,
     currentGrading = [],
+    courseRole = 'STUDENT',
     registrationId,
     fullyExpandCode,
     rubricsOpen,
@@ -51,6 +54,7 @@ const DisplayQuestions: React.FC<DisplayQuestionsProps> = (props) => {
           refreshCodeMirrorsDeps={refreshCodeMirrorsDeps}
           valueUpdate={valueUpdate}
           registrationId={registrationId}
+          courseRole={courseRole}
           fullyExpandCode={fullyExpandCode}
           overviewMode={overviewMode}
           rubricsOpen={rubricsOpen}

@@ -59,7 +59,8 @@ import { submissionsAuditStaffQuery } from './__generated__/submissionsAuditStaf
 import { submissionsStudentQuery } from './__generated__/submissionsStudentQuery.graphql';
 import { submissionsExportStudentAnswersQuery } from './__generated__/submissionsExportStudentAnswersQuery.graphql';
 import { submissionsExportStudentSnapshotsQuery } from './__generated__/submissionsExportStudentSnapshotsQuery.graphql';
-import { submissionsRoleQuery } from './__generated__/submissionsRoleQuery.graphql';
+import { CourseRole, submissionsRoleQuery } from './__generated__/submissionsRoleQuery.graphql';
+import { submissionsAuditRoleQuery } from './__generated__/submissionsAuditRoleQuery.graphql';
 
 type Registration = submissionsAllQuery$data['exam']['registrations'][number];
 
@@ -670,22 +671,35 @@ const ExamSubmissionQuery: React.FC = () => {
   return (
     <>
       <NavbarBreadcrumbs items={items} />
-      <ExamSubmissionStaff />
+      <ExamSubmissionStaff courseRole={role.me.role} />
     </>
   );
 };
 
-const ExamSubmissionAudit: React.FC = () => (
-  <ErrorBoundary>
-    <Suspense
-      fallback={<p>Loading...</p>}
-    >
-      <ExamSubmissionAuditQuery />
-    </Suspense>
-  </ErrorBoundary>
-);
+const ExamSubmissionAudit: React.FC = () => {
+  const { examId } = useParams<{ examId: string }>();
+  const role = useLazyLoadQuery<submissionsAuditRoleQuery>(
+    graphql`
+    query submissionsAuditRoleQuery($examId: ID!) {
+      me { role(examId: $examId) }
+    }`,
+    { examId },
+  );
+  return (
+    <ErrorBoundary>
+      <Suspense
+        fallback={<p>Loading...</p>}
+      >
+        <ExamSubmissionAuditQuery courseRole={role.me.role} />
+      </Suspense>
+    </ErrorBoundary>
+  );
+};
 
-const ExamSubmissionAuditQuery: React.FC = () => {
+const ExamSubmissionAuditQuery: React.FC<{
+  courseRole: CourseRole,
+}> = (props) => {
+  const { courseRole } = props;
   const { examId, registrationId } = useParams<{ examId: string, registrationId: string }>();
   const res = useLazyLoadQuery<submissionsAuditRootQuery>(
     graphql`
@@ -715,7 +729,7 @@ const ExamSubmissionAuditQuery: React.FC = () => {
     );
   }
   return (
-    <ExamSubmissionAuditStaff />
+    <ExamSubmissionAuditStaff courseRole={courseRole} />
   );
 };
 
@@ -784,17 +798,21 @@ const ExamSubmissionStudentQuery: React.FC = () => {
   );
 };
 
-const ExamSubmissionStaff: React.FC = () => (
+const ExamSubmissionStaff: React.FC<{
+  courseRole: CourseRole,
+}> = ({ courseRole }) => (
   <ErrorBoundary>
     <Suspense
       fallback={<p>Loading...</p>}
     >
-      <ExamSubmissionStaffQuery />
+      <ExamSubmissionStaffQuery courseRole={courseRole} />
     </Suspense>
   </ErrorBoundary>
 );
 
-const ExamSubmissionStaffQuery: React.FC = () => {
+const ExamSubmissionStaffQuery: React.FC<{
+  courseRole: CourseRole,
+}> = ({ courseRole }) => {
   const { registrationId } = useParams<{ registrationId: string }>();
   const { hash } = useLocation();
   useEffect(() => {
@@ -863,6 +881,7 @@ const ExamSubmissionStaffQuery: React.FC = () => {
         currentGrading={currentGrading as CurrentGrading}
         currentAnswers={currentAnswers as AnswersState}
         registrationId={registrationId}
+        courseRole={courseRole}
         overviewMode={false}
         rubricsOpen={false}
       />
@@ -870,17 +889,21 @@ const ExamSubmissionStaffQuery: React.FC = () => {
   );
 };
 
-const ExamSubmissionAuditStaff: React.FC = () => (
+const ExamSubmissionAuditStaff: React.FC<{
+  courseRole: CourseRole,
+}> = ({ courseRole }) => (
   <ErrorBoundary>
     <Suspense
       fallback={<p>Loading...</p>}
     >
-      <ExamSubmissionAuditStaffQuery />
+      <ExamSubmissionAuditStaffQuery courseRole={courseRole} />
     </Suspense>
   </ErrorBoundary>
 );
 
-const ExamSubmissionAuditStaffQuery: React.FC = () => {
+const ExamSubmissionAuditStaffQuery: React.FC<{
+  courseRole: CourseRole,
+}> = ({ courseRole }) => {
   const { registrationId } = useParams<{ registrationId: string }>();
   const res = useLazyLoadQuery<submissionsAuditStaffQuery>(
     graphql`
@@ -947,6 +970,7 @@ const ExamSubmissionAuditStaffQuery: React.FC = () => {
         startTime={DateTime.fromISO(startTime)}
         endTime={DateTime.fromISO(effectiveEndTime)}
         registrationId={registrationId}
+        courseRole={courseRole}
         studentName={registration.user.displayName}
         published={registration.published}
       />

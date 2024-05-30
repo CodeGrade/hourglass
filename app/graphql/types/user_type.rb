@@ -30,6 +30,8 @@ module Types
           :professor
         elsif context[:current_user].proctor_registrations.includes(:course).find{|r| r.course.id == course_id}
           :proctor
+        elsif context[:current_user].staff_registrations.includes(:course).find{|r| r.course.id == course_id}
+          :staff
         elsif context[:current_user].student_registrations.includes(:course).find{|r| r.course.id == course_id}
           :student
         else
@@ -40,6 +42,8 @@ module Types
           :professor
         elsif context[:current_user].proctor_registrations.find{|r| r.exam_id == exam.id}
           :proctor
+        elsif context[:current_user].staff_registrations.includes(:course).find{|r| r.course.id == exam.course_id}
+          :staff
         elsif context[:current_user].registrations.includes(:exam).find{|r| r.exam.id == exam.id}
           :student
         else

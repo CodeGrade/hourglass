@@ -88,7 +88,7 @@ import {
 import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { PartName } from '@student/exams/show/components/Part';
 import DisplayMatching from '@proctor/registrations/show/questions/DisplayMatching';
-import Part from '@proctor/registrations/show/Part';
+import Part, { REQUEST_GRADE_MUTATION } from '@proctor/registrations/show/Part';
 import DisplayYesNo from '@proctor/registrations/show/questions/DisplayYesNo';
 import ErrorBoundary from '@hourglass/common/boundary';
 import { AlertContext } from '@hourglass/common/alerts';
@@ -99,6 +99,7 @@ import {
   BsPencilSquare,
   BsXSquare,
 } from 'react-icons/bs';
+import { MdOutlineMoveToInbox } from 'react-icons/md';
 import Tooltip from '@student/exams/show/components/Tooltip';
 import TooltipButton from '@student/exams/show/components/TooltipButton';
 import FourOhFour from '@hourglass/workflows/FourOhFour';
@@ -112,6 +113,7 @@ import { NavbarItem, NavbarBreadcrumbs } from '@hourglass/common/navbar';
 
 import './index.scss';
 
+import { PartRequestGradingLockMutation } from '@proctor/registrations/show/__generated__/PartRequestGradingLockMutation.graphql';
 import { grading_one$key, grading_one$data } from './__generated__/grading_one.graphql';
 import { grading_showOne$key } from './__generated__/grading_showOne.graphql';
 import { gradingRubric$key } from './__generated__/gradingRubric.graphql';
@@ -1134,14 +1136,14 @@ const Grade: React.FC<{
   qnum: number;
   pnum: number;
   refreshProps: React.DependencyList;
-  role: CourseRole;
+  courseRole: CourseRole;
 }> = (props) => {
   const {
     registrationKey,
     qnum,
     pnum,
     refreshProps,
-    role,
+    courseRole,
   } = props;
   const res = useFragment(
     graphql`
@@ -1237,7 +1239,7 @@ const Grade: React.FC<{
   const [showChangeProblems, setShowChangeProblems] = useState(false);
   const cancelChangeProblems = () => {
     setShowChangeProblems(false);
-    if (role === 'PROFESSOR') {
+    if (courseRole === 'PROFESSOR') {
       history.replace(`/exams/${examId}/grading/admin`);
     } else {
       history.replace(`/exams/${examId}/grading`);
@@ -1271,7 +1273,7 @@ const Grade: React.FC<{
         if (err.cause?.[0]?.extensions.anyRemaining) {
           setChangeProblemsMessage(err.message);
           setShowChangeProblems(true);
-        } else if (role === 'PROFESSOR') {
+        } else if (courseRole === 'PROFESSOR') {
           history.replace(`/exams/${examId}/grading/admin`);
         } else {
           history.replace(`/exams/${examId}/grading`);
@@ -1314,7 +1316,7 @@ const Grade: React.FC<{
     RELEASE_LOCK_MUTATION,
     {
       onCompleted: () => {
-        if (role === 'PROFESSOR') {
+        if (courseRole === 'PROFESSOR') {
           history.replace(`/exams/${examId}/grading/admin`);
         } else {
           history.replace(`/exams/${examId}/grading`);
@@ -1532,12 +1534,14 @@ const ShowOnePart: React.FC<{
   qnum: number;
   pnum: number;
   refreshProps: React.DependencyList;
+  courseRole: CourseRole;
 }> = (props) => {
   const {
     registrationKey,
     qnum,
     pnum,
     refreshProps,
+    courseRole,
   } = props;
   const res = useFragment(
     graphql`
@@ -1656,6 +1660,7 @@ const ShowOnePart: React.FC<{
                   anonymous={singlePart}
                   questionIsExtraCredit={questions[qnum].extraCredit}
                   currentGrading={currentGrading[qnum][pnum]}
+                  courseRole={courseRole}
                   showRequestGrading={res.id}
                   rubricsOpen={false}
                   overviewMode={false}
@@ -1743,7 +1748,7 @@ const GradeOnePartQuery: React.FC = () => {
         registration={res.registration}
         qnum={qnum}
         pnum={pnum}
-        role={role.me.role}
+        courseRole={role.me.role}
       />
     </>
   );
@@ -1754,14 +1759,14 @@ const GradeOnePartHelp: React.FC<{
   pnum: string,
   registrationId: string,
   registration: gradingQuery['response']['registration'],
-  role: CourseRole,
+  courseRole: CourseRole,
 }> = (props) => {
   const {
     registrationId,
     registration,
     qnum,
     pnum,
-    role,
+    courseRole,
   } = props;
   const { qpPairs } = registration.examVersion;
   const indexOfQP = qpPairs.findIndex((qp) => (
@@ -1810,11 +1815,12 @@ const GradeOnePartHelp: React.FC<{
                       qnum={qp.qnum}
                       pnum={qp.pnum}
                       refreshProps={[indexOfQP, refresher]}
-                      role={role}
+                      courseRole={courseRole}
                     />
                   ) : (
                     <ShowOnePart
                       registrationKey={registration}
+                      courseRole={courseRole}
                       qnum={qp.qnum}
                       pnum={qp.pnum}
                       refreshProps={[indexOfQP, refresher]}
@@ -2456,7 +2462,7 @@ const GradingLock: React.FC<{
     lockKey,
   );
   const { alert } = useContext(AlertContext);
-  const [mutate, loading] = useMutationWithDefaults<gradingReleaseLockMutation>(
+  const [releaseLock, loadingReleaseLock] = useMutationWithDefaults<gradingReleaseLockMutation>(
     RELEASE_LOCK_MUTATION,
     {
       onCompleted: () => {
@@ -2476,6 +2482,37 @@ const GradingLock: React.FC<{
       },
     },
   );
+  const [stealLock, loadingStealLock] = useMutationWithDefaults<
+    PartRequestGradingLockMutation
+  >(
+    REQUEST_GRADE_MUTATION,
+    {
+      onCompleted: (res) => {
+        if (res.requestGradingLock.acquired) {
+          alert({
+            variant: 'success',
+            title: 'Grading lock claimed',
+            message: 'You now hold the grading lock for this part',
+          });
+        } else {
+          const { currentOwner } = res.requestGradingLock;
+          alert({
+            variant: 'danger',
+            title: 'Error claiming grading lock',
+            message: `The lock is already held by ${currentOwner.displayName}`,
+          });
+        }
+      },
+      onError: (err) => {
+        alert({
+          variant: 'danger',
+          title: 'Error claiming grading lock',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    },
+  );
   if (!lock.grader) return null;
   return (
     <tr>
@@ -2486,25 +2523,49 @@ const GradingLock: React.FC<{
       </td>
       <td>{lock.grader.displayName}</td>
       <td>
-        <Button
-          disabled={loading}
-          variant="danger"
-          onClick={() => {
-            mutate({
-              variables: {
-                input: {
-                  markComplete: false,
-                  registrationId: lock.registration.id,
-                  qnum: lock.qnum,
-                  pnum: lock.pnum,
+        <Tooltip message="Forcibly unlock this problem">
+          <Button
+            disabled={loadingReleaseLock}
+            variant="danger"
+            onClick={() => {
+              releaseLock({
+                variables: {
+                  input: {
+                    markComplete: false,
+                    registrationId: lock.registration.id,
+                    qnum: lock.qnum,
+                    pnum: lock.pnum,
+                  },
                 },
-              },
-            });
-          }}
-        >
-          <Icon I={FaTrash} className="mr-2" />
-          Release lock
-        </Button>
+              });
+            }}
+          >
+            <Icon I={FaTrash} className="mr-2" />
+            Release
+          </Button>
+        </Tooltip>
+        <Tooltip message="Forcibly acquire this lock, despite its current owner">
+          <Button
+            disabled={loadingStealLock}
+            variant="warning"
+            className="ml-2"
+            onClick={() => {
+              stealLock({
+                variables: {
+                  input: {
+                    registrationId: lock.registration.id,
+                    qnum: lock.qnum,
+                    pnum: lock.pnum,
+                    steal: true,
+                  },
+                },
+              });
+            }}
+          >
+            <Icon I={MdOutlineMoveToInbox} className="mr-2" />
+            Steal
+          </Button>
+        </Tooltip>
         <Link
           target="_blank"
           to={`/exams/${lock.registration.exam.id}/submissions/${lock.registration.id}`}

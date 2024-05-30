@@ -13,6 +13,8 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     @student_reg1 = @exam.registrations.first
     @ta_reg = create(:staff_registration, :ta, section: @section)
     @ta = @ta_reg.user
+    @ta2_reg = create(:staff_registration, :ta, section: @section)
+    @ta2 = @ta2_reg.user
     @grader_reg = create(:staff_registration, section: @section)
     @grader = @grader_reg.user
     @exam.initialize_grading_locks!
@@ -44,11 +46,12 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
-  def attempt_lock(user, reg, qnum, pnum, raw: false)
+  def attempt_lock(user, reg, qnum, pnum, steal: false, raw: false)
     ans = HourglassSchema.do_mutation!('REQUEST_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
       qnum: qnum,
       pnum: pnum,
+      steal: steal
     })
     return ans if raw
 
@@ -99,6 +102,32 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     lock = lock_for(@student_reg1, qnum, pnum)
     assert_not_nil lock
     assert_equal @ta, lock.grader
+  end
+
+  test 'stealing a lock as professor' do
+    qnum, pnum = @qps.first
+    lock = lock_for(@student_reg1, qnum, pnum)
+    lock.update(grader: @ta)
+    res = attempt_lock(@prof, @student_reg1, qnum, pnum, steal: true)
+    assert res['acquired']
+    @student_reg1.reload
+    lock = lock_for(@student_reg1, qnum, pnum)
+    assert_not_nil lock
+    assert_equal @prof, lock.grader
+  end
+
+  test 'cannot steal a lock as ta' do
+    qnum, pnum = @qps.first
+    [@ta2, @prof].each do |curGrader|
+      lock = lock_for(@student_reg1, qnum, pnum)
+      lock.update(grader: curGrader)
+      res = attempt_lock(@ta, @student_reg1, qnum, pnum, steal: true)
+      assert_not res['acquired']
+      @student_reg1.reload
+      lock = lock_for(@student_reg1, qnum, pnum)
+      assert_not_nil lock
+      assert_equal curGrader, lock.grader
+    end
   end
 
   test 'cannot reacquire a lock' do

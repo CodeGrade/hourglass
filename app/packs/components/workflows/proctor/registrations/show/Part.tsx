@@ -12,6 +12,7 @@ import { CurrentGrading } from '@professor/exams/types';
 import { pointsStr, questionPoints, useMutationWithDefaults } from '@hourglass/common/helpers';
 import { graphql, useFragment } from 'react-relay';
 import { AlertContext } from '@hourglass/common/alerts';
+import { CourseRole } from '@grading/__generated__/gradingRoleQuery.graphql';
 import { PartRequestGradingLockMutation } from './__generated__/PartRequestGradingLockMutation.graphql';
 
 import { PartShow$key } from './__generated__/PartShow.graphql';
@@ -19,6 +20,7 @@ import { PartShow$key } from './__generated__/PartShow.graphql';
 interface PartProps {
   refreshCodeMirrorsDeps: React.DependencyList;
   valueUpdate: React.DependencyList;
+  courseRole: CourseRole;
   partKey: PartShow$key;
   qnum: number;
   pnum: number;
@@ -31,7 +33,7 @@ interface PartProps {
   rubricsOpen: boolean;
   classNameDecorator?: (qnum: number, pnum: number, bnum: number) => string;
 }
-const REQUEST_GRADE_MUTATION = graphql`
+export const REQUEST_GRADE_MUTATION = graphql`
 mutation PartRequestGradingLockMutation($input: RequestGradingLockInput!) {
   requestGradingLock(input: $input) {
     acquired
@@ -44,6 +46,7 @@ mutation PartRequestGradingLockMutation($input: RequestGradingLockInput!) {
 `;
 
 export const ClaimGradingButton: React.FC<{
+  courseRole: CourseRole;
   registrationId: string;
   qnum: number;
   pnum: number;
@@ -52,6 +55,7 @@ export const ClaimGradingButton: React.FC<{
   disabledMessage?: string;
 }> = (props) => {
   const {
+    courseRole,
     registrationId,
     qnum,
     pnum,
@@ -91,10 +95,11 @@ export const ClaimGradingButton: React.FC<{
       },
     },
   );
+  const steal = (courseRole === 'PROFESSOR') && disabled;
   return (
     <TooltipButton
-      variant="info"
-      disabled={disabled || requestLoading}
+      variant={steal ? 'warning' : 'info'}
+      disabled={(disabled && !steal) || requestLoading}
       disabledMessage={disabledMessage}
       cursorClass=""
       className=""
@@ -110,13 +115,14 @@ export const ClaimGradingButton: React.FC<{
         });
       }}
     >
-      {`Claim this part for ${graded ? 'regrading' : 'grading'}`}
+      {`${steal ? 'Steal' : 'Claim'} this part for ${graded ? 'regrading' : 'grading'}`}
     </TooltipButton>
   );
 };
 
 const Part: React.FC<PartProps> = (props) => {
   const {
+    courseRole,
     refreshCodeMirrorsDeps,
     valueUpdate,
     partKey,
@@ -193,6 +199,7 @@ const Part: React.FC<PartProps> = (props) => {
             {showRequestGrading && (
               <span className="ml-4">
                 <ClaimGradingButton
+                  courseRole={courseRole}
                   registrationId={showRequestGrading}
                   qnum={qnum}
                   pnum={pnum}

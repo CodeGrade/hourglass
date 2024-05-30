@@ -8,11 +8,13 @@ import { QuestionName } from '@student/exams/show/components/ShowQuestion';
 import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import { CurrentGrading } from '@professor/exams/types';
 import { pointsStr, questionPoints } from '@hourglass/common/helpers';
+import { CourseRole } from '@grading/__generated__/gradingRoleQuery.graphql';
 import { ShowQuestion$key } from './__generated__/ShowQuestion.graphql';
 
 interface ShowQuestionProps {
   refreshCodeMirrorsDeps: React.DependencyList;
   valueUpdate: React.DependencyList;
+  courseRole: CourseRole
   questionKey: ShowQuestion$key,
   qnum: number;
   currentGrading?: CurrentGrading[number];
@@ -27,6 +29,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
   const {
     refreshCodeMirrorsDeps,
     valueUpdate,
+    courseRole,
     questionKey,
     qnum,
     currentGrading = [],
@@ -105,6 +108,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
               {registrationId && (
                 <span className="ml-4">
                   <ClaimGradingButton
+                    courseRole={courseRole}
                     registrationId={registrationId}
                     qnum={qnum}
                     pnum={0}
@@ -130,6 +134,7 @@ const ShowQuestion: React.FC<ShowQuestionProps> = (props) => {
           <Part
             key={p.id}
             anonymous={singlePart}
+            courseRole={courseRole}
             partKey={p}
             pnum={i}
             qnum={qnum}

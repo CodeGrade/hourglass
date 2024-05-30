@@ -14,6 +14,7 @@ import { CurrentGrading } from '@professor/exams/types';
 import { ShowRubricKey } from '@proctor/registrations/show/ShowRubric';
 import { graphql, useFragment } from 'react-relay';
 
+import { CourseRole } from '@grading/__generated__/gradingRoleQuery.graphql';
 import { showExamViewer$key } from './__generated__/showExamViewer.graphql';
 
 interface ExamViewerProps {
@@ -23,6 +24,7 @@ interface ExamViewerProps {
   refreshCodeMirrorsDeps?: React.DependencyList;
   valueUpdate?: React.DependencyList;
   registrationId?: string;
+  courseRole?: CourseRole;
   overviewMode: boolean;
   rubricsOpen: boolean;
 }
@@ -35,6 +37,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
     refreshCodeMirrorsDeps = [],
     valueUpdate = [],
     registrationId,
+    courseRole = 'NONE',
     overviewMode,
     rubricsOpen,
   } = props;
@@ -151,6 +154,7 @@ const ExamViewer: React.FC<ExamViewerProps> = (props) => {
                 version={res}
                 currentGrading={currentGrading}
                 registrationId={registrationId}
+                courseRole={courseRole}
                 fullyExpandCode
                 overviewMode={overviewMode}
                 rubricsOpen={rubricsOpen}

@@ -21,6 +21,7 @@ import { graphql } from 'relay-runtime';
 import { DateTime } from 'luxon';
 import { diff, flattenChangeset } from 'json-diff-ts';
 import * as d3 from 'd3-color';
+import { CourseRole } from '@grading/__generated__/gradingRoleQuery.graphql';
 import { TimelineExamViewer$key } from './__generated__/TimelineExamViewer.graphql';
 
 export type SnapshotsState = Array<{
@@ -30,6 +31,7 @@ export type SnapshotsState = Array<{
 interface ExamTimelineViewerProps {
   version: TimelineExamViewer$key;
   snapshots?: SnapshotsState;
+  courseRole: CourseRole,
   startTime: DateTime,
   endTime: DateTime,
   refreshCodeMirrorsDeps?: React.DependencyList;
@@ -172,6 +174,7 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
     endTime,
     refreshCodeMirrorsDeps = [],
     registrationId,
+    courseRole,
     exam,
     studentName,
     published,
@@ -370,6 +373,7 @@ const ExamTimelineViewer: React.FC<ExamTimelineViewerProps> = (props) => {
                 valueUpdate={[...refreshCodeMirrorsDeps, curTimestampIndex]}
                 version={res}
                 registrationId={registrationId}
+                courseRole={courseRole}
                 fullyExpandCode
                 overviewMode={false}
                 rubricsOpen={false}

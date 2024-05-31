@@ -11,6 +11,7 @@ module Mutations
     field :registration_id, ID, null: false
     field :qnum, Integer, null: false
     field :pnum, Integer, null: false
+    field :notes, String, null: false
 
     def authorized?(exam:, **_args)
       return true if exam.course.all_staff.exists? context[:current_user].id
@@ -20,10 +21,15 @@ module Mutations
 
     def resolve(exam:, exam_version: nil, qnum: nil, pnum: nil, allow_change_problems: false)
       GradingLock.transaction do
-        my_next_lock = my_currently_grading(exam)
-        my_next_incomplete = my_next_lock.nil? && next_incomplete(exam, exam_version, qnum, pnum)
+        # Ideally, a grader will grade new submissions for the current qnum/pnum,
+        # then finish any postponed submissions for the current qnum/pnum,
+        # before moving on to the next qnum/pnum.
 
-        lock = my_next_lock || my_next_incomplete[:lock]
+        # We'll only query for a new incomplete submission if you have no current active locks.
+        
+        my_next_locks = my_currently_grading(exam)
+
+        my_next_incomplete = my_next_locks[:active].nil? && next_incomplete(exam, exam_version, qnum, pnum)
 
         # if you didn't specify a preference, then you can't object to changing problems
         no_preference = exam_version.nil? || qnum.nil? || pnum.nil?
@@ -32,7 +38,24 @@ module Mutations
                   !(my_next_incomplete[:same_version] &&
                     my_next_incomplete[:same_question] &&
                     my_next_incomplete[:same_part])
-        if !allow_change_problems && !no_preference && changed
+
+        if my_next_locks[:active]
+          # always prefer active locks
+          lock = my_next_locks[:active]
+        elsif my_next_incomplete[:lock]
+          if changed && my_next_locks[:postponed]
+            # prefer not to change problems yet
+            lock = my_next_locks[:postponed]
+          else
+            # prefer incomplete problems before postponed ones
+            lock = my_next_incomplete[:lock]
+          end
+        else
+          # if there's nothing else remaining, try the postponed ones
+          lock = my_next_locks[:postponed]
+        end
+
+        if !allow_change_problems && !no_preference && changed && (lock == my_next_incomplete[:lock])
           submission_type = 'part' unless my_next_incomplete[:same_part]
           submission_type = 'question' unless my_next_incomplete[:same_question]
           submission_type = 'exam version' unless my_next_incomplete[:same_version]
@@ -59,18 +82,27 @@ module Mutations
           lock,
         )
         reg_id = HourglassSchema.id_from_object(lock.registration, Types::RegistrationType, context)
-        { registration_id: reg_id, qnum: lock.question.index, pnum: lock.part.index }
+        {
+          registration_id: reg_id,
+          qnum: lock.question.index,
+          pnum: lock.part.index,
+          notes: lock.notes
+        }
       end
     end
 
     private
 
     def my_currently_grading(exam)
-      exam.grading_locks
-          .includes(:question, :part)
-          .where(grader: context[:current_user])
-          .incomplete
-          .min_by { |gl| [gl.question.index, gl.part.index] }
+      active, postponed = exam.grading_locks
+        .includes(:question, :part)
+        .where(grader: context[:current_user])
+        .incomplete
+        .partition{|gl| gl.notes.blank?}
+      {
+        active: active.min_by { |gl| [gl.question.index, gl.part.index] },
+        postponed: postponed.min_by { |gl| [gl.question.index, gl.part.index, gl.notes] }
+      }
     end
 
     def next_incomplete(exam, exam_version, qnum, pnum)

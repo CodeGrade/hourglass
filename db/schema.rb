@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_16_195043) do
+ActiveRecord::Schema.define(version: 2024_05_31_182212) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -138,6 +138,7 @@ ActiveRecord::Schema.define(version: 2023_11_16_195043) do
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "question_id", null: false
     t.bigint "part_id", null: false
+    t.string "notes", default: "", null: false
     t.index ["completed_by_id"], name: "index_grading_locks_on_completed_by_id"
     t.index ["grader_id"], name: "index_grading_locks_on_grader_id"
     t.index ["part_id"], name: "index_grading_locks_on_part_id"
@@ -233,12 +234,12 @@ ActiveRecord::Schema.define(version: 2023_11_16_195043) do
   create_table "registrations", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "room_id"
-    t.bigint "exam_version_id", null: false
     t.boolean "published", default: false, null: false
     t.datetime "start_time"
     t.datetime "end_time"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "exam_version_id", null: false
     t.integer "login_attempt_count", default: 0, null: false
     t.boolean "pin_validated", default: false, null: false
     t.index ["end_time"], name: "index_registrations_on_end_time"

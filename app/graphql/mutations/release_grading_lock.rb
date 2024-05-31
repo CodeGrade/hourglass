@@ -29,7 +29,7 @@ module Mutations
         updated = if mark_complete.nil?
                     lock.update(grader: nil)
                   elsif mark_complete
-                    lock.update(grader: nil, completed_by: context[:current_user])
+                    lock.update(grader: nil, notes: '', completed_by: context[:current_user])
                   else
                     lock.update(grader: nil, completed_by: nil)
                   end

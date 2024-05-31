@@ -35,6 +35,7 @@ import {
 import { RiMessage2Line, RiChatDeleteLine, RiChatCheckLine } from 'react-icons/ri';
 import { FiCheckSquare } from 'react-icons/fi';
 import { VscGoToFile } from 'react-icons/vsc';
+import { TbMessageQuestion } from 'react-icons/tb';
 import Icon from '@student/exams/show/components/Icon';
 import {
   HTMLVal,
@@ -2052,6 +2053,7 @@ const RenderLinkToGrading : React.FC<{
     updatedAt,
     qnum,
     pnum,
+    notes,
   } = item;
   return (
     <li key={`${registration.id}-${qnum}-${pnum}`}>
@@ -2064,6 +2066,7 @@ const RenderLinkToGrading : React.FC<{
           {describeTime(DateTime.fromISO(updatedAt))}
         </Link>
       </Tooltip>
+      {notes && <span className="ml-2">{`(Note: ${notes})`}</span>}
     </li>
   );
 };
@@ -2128,6 +2131,7 @@ const MyGrading: React.FC<{
                   qnum
                   pnum
                   updatedAt
+                  notes
                   registration { 
                     id 
                     user { displayName }
@@ -2142,6 +2146,7 @@ const MyGrading: React.FC<{
                   qnum
                   pnum
                   updatedAt
+                  notes
                   registration { 
                     id
                     user { displayName }
@@ -2457,6 +2462,7 @@ const GradingLock: React.FC<{
         user { displayName }
       }
       grader { displayName }
+      notes
     }
     `,
     lockKey,
@@ -2521,7 +2527,14 @@ const GradingLock: React.FC<{
       <td>
         <Spoiler text={lock.registration.user.displayName} />
       </td>
-      <td>{lock.grader.displayName}</td>
+      <td>
+        {lock.grader.displayName}
+        {lock.notes && (
+          <Tooltip message={lock.notes}>
+            <span className="p-1"><Icon I={TbMessageQuestion} /></span>
+          </Tooltip>
+        )}
+      </td>
       <td>
         <Tooltip message="Forcibly unlock this problem">
           <Button

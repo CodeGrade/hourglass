@@ -36,5 +36,9 @@ module Types
 
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+
+    field :notes, String, null: false, guard: ->(obj, _args, ctx) {
+      obj.object.grader_id.nil? || obj.object.visible_to?(ctx[:current_user], Guards.exam_role(ctx[:current_user], ctx), Guards.course_role(ctx[:current_user], ctx))
+    }
   end
 end

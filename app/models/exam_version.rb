@@ -577,7 +577,7 @@ class ExamVersion < ApplicationRecord
   def qp_pairs
     db_questions.includes(:parts).map do |q|
       q.parts.map do |p|
-        { question: q, part: p }
+        { question: q, part: p, qnum: q.index, pnum: p.index }
       end
     end.flatten(1)
   end

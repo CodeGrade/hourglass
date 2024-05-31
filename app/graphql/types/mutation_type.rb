@@ -3,6 +3,7 @@
 module Types
   class MutationType < Types::BaseObject
     field :grade_next, mutation: Mutations::GradeNext
+    field :postpone_grading_lock, mutation: Mutations::PostponeGradingLock
     field :stop_impersonating, mutation: Mutations::StopImpersonating
     field :impersonate_user, mutation: Mutations::ImpersonateUser
     

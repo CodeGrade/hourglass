@@ -23,6 +23,7 @@ import {
   DropdownButton,
   Carousel,
   Modal,
+  ButtonGroup,
 } from 'react-bootstrap';
 import {
   FaChevronCircleLeft,
@@ -135,6 +136,7 @@ import { gradingAdminQuery } from './__generated__/gradingAdminQuery.graphql';
 import { gradingGraderQuery } from './__generated__/gradingGraderQuery.graphql';
 import { CourseRole, gradingRoleQuery } from './__generated__/gradingRoleQuery.graphql';
 import { gradingOneRoleQuery } from './__generated__/gradingOneRoleQuery.graphql';
+import { gradingPostponeLockMutation } from './__generated__/gradingPostponeLockMutation.graphql';
 
 export function variantForPoints(points: number | string): AlertProps['variant'] {
   if (typeof points === 'string') {
@@ -1099,6 +1101,80 @@ mutation gradingNextMutation($input: GradeNextInput!) {
 
 type RubricCompletionStatus = Record<string, CompletionStatus>;
 
+const POSTPONE_PROBLEM_MUTATION = graphql`
+mutation gradingPostponeLockMutation($input: PostponeGradingLockInput!) {
+  postponeGradingLock(input: $input) {
+    released
+    gradingLock {
+      id
+    }
+  }
+}
+`;
+
+const PostponeProblemDialog: React.FC<{
+  show: boolean;
+  onHide: () => void;
+  onConfirm: (notes: string, stopGrading: boolean) => void;
+}> = (props) => {
+  const {
+    show,
+    onHide,
+    onConfirm,
+  } = props;
+  const [notes, setNotes] = useState('');
+  useEffect(() => setNotes(''), [show]);
+  return (
+    <Modal centered keyboard show={show} onHide={onHide}>
+      <Modal.Header closeButton>
+        Postpone grading this problem?
+      </Modal.Header>
+      <Modal.Body>
+        <p>
+          If you want to postpone grading this question,
+          leave an explanatory note so you (or a professor)
+          can recall why you&apos;re currently stuck.
+        </p>
+        <Form.Control
+          as="textarea"
+          spellCheck={false}
+          rows={3}
+          placeholder="Leave a note here."
+          value={notes}
+          onChange={(e): void => {
+            const elem = e.target as HTMLTextAreaElement;
+            setNotes(elem.value);
+          }}
+        />
+        <p>Do you want to continue grading?</p>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="danger" onClick={onHide}>
+          Cancel
+        </Button>
+        <TooltipButton
+          variant="secondary"
+          disabled={!notes}
+          disabledMessage="Notes must be non-empty"
+          cursorClass=""
+          onClick={() => onConfirm(notes, true)}
+        >
+          Stop grading for now
+        </TooltipButton>
+        <TooltipButton
+          variant="primary"
+          disabled={!notes}
+          disabledMessage="Notes must be non-empty"
+          cursorClass=""
+          onClick={() => onConfirm(notes, false)}
+        >
+          Continue grading
+        </TooltipButton>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
 const ChangeProblemsDialog: React.FC<{
   message: string;
   show: boolean;
@@ -1236,9 +1312,42 @@ const Grade: React.FC<{
   const viewerContextVal = useMemo(() => ({
     answers: currentAnswers,
   }), [currentAnswers]);
+  const [showPostponeProblem, setShowPostponeProblem] = useState(false);
+  const postponeProblem = (notes: string, stopGrading) => {
+    setShowPostponeProblem(false);
+    mutatePostpone({
+      variables: {
+        input: {
+          registrationId,
+          qnum,
+          pnum,
+          notes,
+        },
+      },
+      onCompleted(_response) {
+        if (stopGrading) {
+          stopGrading();
+        } else {
+          changeProblems();
+        }
+      },
+      onError(err) {
+        alert({
+          variant: 'danger',
+          title: 'Error completing grading',
+          message: err.message,
+          copyButton: true,
+        });
+      },
+    });
+  };
+  const [mutatePostpone, postponeLoading] = useMutationWithDefaults<gradingPostponeLockMutation>(
+    POSTPONE_PROBLEM_MUTATION,
+    {},
+  );
   const [changeProblemsMessage, setChangeProblemsMessage] = useState('');
   const [showChangeProblems, setShowChangeProblems] = useState(false);
-  const cancelChangeProblems = () => {
+  const stopGrading = () => {
     setShowChangeProblems(false);
     if (courseRole === 'PROFESSOR') {
       history.replace(`/exams/${examId}/grading/admin`);
@@ -1337,7 +1446,9 @@ const Grade: React.FC<{
   const mergedStatus: CompletionStatus[] = curCompletionStatus.map(
     (cCS) => (cCS ? combineCompletionAny(Object.values(cCS)) : undefined),
   );
-  const nextExamLoading = releaseNextLoading || releaseFinishLoading || nextLoading;
+  const nextExamLoading = (
+    releaseNextLoading || releaseFinishLoading || nextLoading || postponeLoading
+  );
   const singlePart = dbQuestions[qnum].parts.length === 1
     && !dbQuestions[qnum].parts[0].name?.value?.trim();
   const points = questionPoints(dbQuestions[qnum].extraCredit, dbQuestions[qnum].parts);
@@ -1446,35 +1557,52 @@ const Grade: React.FC<{
         </div>
         <Row className="text-center pb-4">
           <Col className="text-center pb-4">
-            <span className="m-4">
-              <TooltipButton
-                variant="primary"
-                disabled={disabledMessage !== undefined}
-                disabledMessage={disabledMessage}
-                placement="top"
-                cursorClass=""
-                onClick={() => {
-                  mutateReleaseAndContinue({
-                    variables: {
-                      input: {
-                        markComplete: true,
-                        registrationId,
-                        qnum,
-                        pnum,
+            <Tooltip
+              showTooltip={disabledMessage !== undefined}
+              message={disabledMessage}
+              placement="top"
+            >
+              <Dropdown as={ButtonGroup}>
+                <Button
+                  variant="primary"
+                  disabled={disabledMessage !== undefined}
+                  onClick={() => {
+                    mutateReleaseAndContinue({
+                      variables: {
+                        input: {
+                          markComplete: true,
+                          registrationId,
+                          qnum,
+                          pnum,
+                        },
                       },
-                    },
-                  });
-                }}
-              >
-                Finish this submission and start next one
-              </TooltipButton>
-              <ChangeProblemsDialog
-                message={changeProblemsMessage}
-                show={showChangeProblems}
-                changeProblems={changeProblems}
-                stopGrading={cancelChangeProblems}
-              />
-            </span>
+                    });
+                  }}
+                >
+                  Finish this submission and start next one
+                </Button>
+                <Dropdown.Toggle variant="primary" />
+                <Dropdown.Menu>
+                  <Dropdown.Item
+                    className="pointer-events-auto"
+                    onClick={() => setShowPostponeProblem(true)}
+                  >
+                    Postpone grading this submission...
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            </Tooltip>
+            <ChangeProblemsDialog
+              message={changeProblemsMessage}
+              show={showChangeProblems}
+              changeProblems={changeProblems}
+              stopGrading={stopGrading}
+            />
+            <PostponeProblemDialog
+              show={showPostponeProblem}
+              onHide={() => setShowPostponeProblem(false)}
+              onConfirm={postponeProblem}
+            />
             <DropdownButton
               className="m-4 d-inline-block"
               variant="outline-primary"

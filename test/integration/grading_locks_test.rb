@@ -18,7 +18,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     @grader_reg = create(:staff_registration, section: @section)
     @grader = @grader_reg.user
     @exam.initialize_grading_locks!
-    @qps = @version.qp_pairs.map {|qp| [qp[:qnum], qp[:pnum], qp[:question], qp[:part]] }
+    @qps = @version.qp_pairs.map { |qp| [qp[:qnum], qp[:pnum], qp[:question], qp[:part]] }
   end
 
   STATIC_GRAPHQL_QUERIES['REQUEST_LOCK_MUTATION'] = <<-GRAPHQL
@@ -66,12 +66,13 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     }
   GRAPHQL
 
+  # rubocop:disable Metrics/ParameterLists
   def attempt_lock(user, reg, qnum, pnum, steal: false, raw: false)
     ans = HourglassSchema.do_mutation!('REQUEST_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
       qnum: qnum,
       pnum: pnum,
-      steal: steal
+      steal: steal,
     })
     return ans if raw
 
@@ -79,13 +80,12 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     ans['data']['requestGradingLock']
   end
 
-  # rubocop:disable Metrics/ParameterLists
   def attempt_postpone(user, reg, qnum, pnum, notes, raw: false)
     ans = HourglassSchema.do_mutation!('POSTPONE_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
       qnum: qnum,
       pnum: pnum,
-      notes: notes
+      notes: notes,
     })
     return ans if raw
 
@@ -101,7 +101,7 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
       examVersionId: HourglassSchema.id_from_object(exam_version, Types::ExamVersionType, {}),
       qnum: qnum,
       pnum: pnum,
-      allowChangeProblems: allow_change_problems
+      allowChangeProblems: allow_change_problems,
     })
     return ans if raw
 
@@ -166,7 +166,9 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   end
 
   def mark_all_locks_finished
+    # rubocop:disable Rails/SkipsModelValidations
     @exam.grading_locks.update_all(completed_by_id: @prof.id)
+    # rubocop:enable Rails/SkipsModelValidations
   end
 
   test 'postponing a lock with no notes should fail' do
@@ -193,17 +195,21 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     assert note, lock.notes
   end
 
+  # rubocop:disable Metrics/BlockLength
   test 'acquiring another lock when postponed locks are available, without channging problems' do
     # ensure *almost* everything is finished, already, to focus the grade-next check
     mark_all_locks_finished
     qnum, pnum, q, p = @qps.first
     qp_locks = @exam.grading_locks.where(question: q, part: p)
+    # no validations to worry about, might as well be fast
+    # rubocop:disable Rails/SkipsModelValidations
     qp_locks.update_all(completed_by_id: nil)
+    # rubocop:enable Rails/SkipsModelValidations
     @exam.grading_locks.last.update(completed_by: nil)
     note = 'postponing this lock'
     lock = lock_for(@student_reg1, qnum, pnum)
     lock.update(grader: @ta, notes: note)
-    # request more locks, and always get non-postponed ones    
+    # request more locks, and always get non-postponed ones
     (1...qp_locks.count).each do
       res = attempt_grade_next(@ta, @student_reg1, qnum, pnum)
       assert res['registrationId']
@@ -235,12 +241,15 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     mark_all_locks_finished
     qnum, pnum, q, p = @qps.first
     qp_locks = @exam.grading_locks.where(question: q, part: p)
+    # no validations to worry about, might as well be fast
+    # rubocop:disable Rails/SkipsModelValidations
     qp_locks.update_all(completed_by_id: nil)
+    # rubocop:enable Rails/SkipsModelValidations
     @exam.grading_locks.last.update(completed_by: nil)
     note = 'postponing this lock'
     lock = lock_for(@student_reg1, qnum, pnum)
     lock.update(grader: @ta, notes: note)
-    # request more locks, and always get non-postponed ones    
+    # request more locks, and always get non-postponed ones
     (1...qp_locks.count).each do
       res = attempt_grade_next(@ta, @student_reg1, qnum, pnum, allow_change_problems: true)
       assert res['registrationId']
@@ -263,20 +272,21 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     lock.update(completed_by: @ta, grader: nil)
     # try one more time (changing problems) and fail
     res = attempt_grade_next(@ta, @student_reg1, qnum, pnum, allow_change_problems: true)
-    assert_not (res['qnum'] == qnum && res['pnum'] == pnum)
+    assert_not(res['qnum'] == qnum && res['pnum'] == pnum)
   end
+  # rubocop:enable Metrics/BlockLength
 
   test 'cannot steal a lock as ta' do
     qnum, pnum = @qps.first
-    [@ta2, @prof].each do |curGrader|
+    [@ta2, @prof].each do |cur_grader|
       lock = lock_for(@student_reg1, qnum, pnum)
-      lock.update(grader: curGrader)
+      lock.update(grader: cur_grader)
       res = attempt_lock(@ta, @student_reg1, qnum, pnum, steal: true)
       assert_not res['acquired']
       @student_reg1.reload
       lock = lock_for(@student_reg1, qnum, pnum)
       assert_not_nil lock
-      assert_equal curGrader, lock.grader
+      assert_equal cur_grader, lock.grader
     end
   end
 

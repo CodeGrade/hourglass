@@ -1313,7 +1313,7 @@ const Grade: React.FC<{
     answers: currentAnswers,
   }), [currentAnswers]);
   const [showPostponeProblem, setShowPostponeProblem] = useState(false);
-  const postponeProblem = (notes: string, stopGrading) => {
+  const postponeProblem = (notes: string, stopGradingForNow: boolean) => {
     setShowPostponeProblem(false);
     mutatePostpone({
       variables: {
@@ -1325,7 +1325,7 @@ const Grade: React.FC<{
         },
       },
       onCompleted(_response) {
-        if (stopGrading) {
+        if (stopGradingForNow) {
           stopGrading();
         } else {
           changeProblems();

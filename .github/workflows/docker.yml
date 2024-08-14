@@ -22,3 +22,9 @@ jobs:
         with:
           push: true
           tags: ghcr.io/codegrade/hourglass:${{ github.ref_name }}-${{ github.sha }}
+      - name: Cleanup old images
+        uses: actions/delete-package-versions@v4
+        with: 
+          package-name: 'hourglass'
+          package-type: 'container'
+          min-versions-to-keep: 20

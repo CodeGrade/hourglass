@@ -17,7 +17,6 @@ module Bottlenose
 
           hg_course = Course.find_or_initialize_by(bottlenose_id: active_course['id'])
           hg_course.title = active_course['name']
-          hg_course.last_sync = DateTime.now
           hg_course.active = true
           hg_term = Term.find_or_create_by(
             year: term_info['year'],
@@ -29,13 +28,14 @@ module Bottlenose
           hg_course.term = hg_term
 
           hg_course.save!
-          sync_course_regs(hg_course)
+          sync_course_regs(hg_course) if hg_course.empty?
         end
       end
     end
 
     # rubocop:disable  Metrics/BlockLength, Metrics/PerceivedComplexity
     def sync_course_regs(course)
+      course.update(:last_sync, DateTime.now)
       got = bottlenose_get("/api/courses/#{course.bottlenose_id}/registrations")
       all_usernames = got.map do |_sec_id, sec_obj|
         sec_obj.map do |role, users|

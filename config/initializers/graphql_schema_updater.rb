@@ -15,7 +15,7 @@ Rails.application.config.after_initialize do
   HourglassSchema.write_graphql!
 end
 
-if File.exists?(Rails.root.join('config/schemas/graphql-queries.json'))
+if File.exist?(Rails.root.join('config/schemas/graphql-queries.json'))
   STATIC_GRAPHQL_QUERIES = JSON.parse(File.read(Rails.root.join('config/schemas/graphql-queries.json')))
   KNOWN_GRAPHQL_QUERIES = STATIC_GRAPHQL_QUERIES.invert
 else

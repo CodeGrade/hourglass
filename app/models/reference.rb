@@ -48,8 +48,8 @@ class Reference < ApplicationRecord
   def as_json(format:)
     if format == :graphql
       {
-        type: type,
-        path: path,
+        type:,
+        path:,
       }
     else
       { type => path }

@@ -22,14 +22,14 @@ class GraphqlController < ApplicationController
     query = params[:query]
     operation_name = params[:operationName]
     context = {
-      current_user: current_user,
-      true_user: true_user,
+      current_user:,
+      true_user:,
       impersonate_user: ->(user) { impersonate_user(user) },
       stop_impersonating_user: -> { stop_impersonating_user },
-      bottlenose_api: bottlenose_api,
+      bottlenose_api:,
       access_cache: {},
     }
-    result = HourglassSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
+    result = HourglassSchema.execute(query, variables:, context:, operation_name:)
     render json: result
   end
 

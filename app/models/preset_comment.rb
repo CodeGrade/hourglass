@@ -23,10 +23,10 @@ class PresetComment < ApplicationRecord
 
   def as_json(preset_comments_in_use = nil, format:)
     {
-      label: label,
+      label:,
       graderHint: grader_hint,
       studentFeedback: student_feedback,
-      points: points,
+      points:,
       inUse:
         if format == :export
           nil

@@ -30,7 +30,7 @@ module Api
           user_id: e.user.id,
           exam_id: params[:exam_id],
         )
-        Anomaly.create(registration: registration, reason: e.message) if registration
+        Anomaly.create(registration:, reason: e.message) if registration
         render json: { lockout: true, reason: e.message }
       end
 
@@ -92,7 +92,7 @@ module Api
             start: @registration.start_time,
             stop: @registration.effective_end_time,
           },
-          answers: answers,
+          answers:,
         }
       end
 

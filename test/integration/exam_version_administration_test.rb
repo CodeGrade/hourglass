@@ -44,7 +44,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
 
   def assert_updatable(ver, user:)
     new_name = 'New version name'
-    result = try_update(ver, new_name: new_name, user: user)
+    result = try_update(ver, new_name:, user:)
     assert_not result['errors']
     ver.reload
     assert_equal new_name, ver.name
@@ -52,7 +52,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
 
   def assert_not_updatable(ver, user:)
     old_name = ver.name
-    result = try_update(ver, new_name: "#{old_name}!", user: user)
+    result = try_update(ver, new_name: "#{old_name}!", user:)
     assert result['errors']
     assert_not result['errors'].empty?
     ver.reload
@@ -67,7 +67,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   end
 
   def assert_not_destroyable(ver, user:)
-    result = try_destroy(ver, user: user)
+    result = try_destroy(ver, user:)
     assert result['errors']
     assert_not result['errors'].empty?
     ver.reload
@@ -78,7 +78,7 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
   def assert_destroyable(ver, user:)
     exam = ver.exam
     old_length = exam.exam_versions.length
-    result = try_destroy(ver, user: user)
+    result = try_destroy(ver, user:)
     assert_not result['errors']
     assert_raise { ver.reload }
     exam.reload

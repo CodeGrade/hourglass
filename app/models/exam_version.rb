@@ -190,17 +190,17 @@ class ExamVersion < ApplicationRecord
       elsif root_rubric.nil? || root_rubric.is_a?(None)
         nil
       else
-        root_rubric.as_json(format: format).deep_stringify_keys
+        root_rubric.as_json(format:).deep_stringify_keys
       end
     {
       'policies' => policies,
       'contents' => {
         'instructions' => compact_blank(instructions),
-        'questions' => db_questions.map { |q| q.as_json(format: format) },
+        'questions' => db_questions.map { |q| q.as_json(format:) },
         (format == :export ? 'reference' : 'references') => compact_blank(db_references.where(
           question: nil,
           part: nil,
-        ).map { |ref| ref.as_json(format: format) }),
+        ).map { |ref| ref.as_json(format:) }),
         'examRubric' => rubric_as_json,
       }.compact,
     }
@@ -209,12 +209,12 @@ class ExamVersion < ApplicationRecord
   def rubric_as_json(format:)
     rubric_tree = multi_group_by(rubrics_for_grading, [:question_id, :part_id, :body_item_id], true)
     preset_comments_in_use = preset_comments.joins(:grading_comments).pluck(:id)
-    exam_rubric = rubric_tree.delete(nil)&.dig(nil, nil)&.as_json(preset_comments_in_use, format: format)
+    exam_rubric = rubric_tree.delete(nil)&.dig(nil, nil)&.as_json(preset_comments_in_use, format:)
     q_rubrics = rubric_tree.sort.map do |_qnum, rubrics_q|
-      question_rubric = rubrics_q.delete(nil)&.dig(nil)&.as_json(preset_comments_in_use, format: format)
+      question_rubric = rubrics_q.delete(nil)&.dig(nil)&.as_json(preset_comments_in_use, format:)
       p_rubrics = rubrics_q.sort.map do |_pnum, rubrics_p|
-        part_rubric = rubrics_p.delete(nil)&.as_json(preset_comments_in_use, format: format)
-        b_rubrics = rubrics_p.sort.map { |_, b| b.as_json(preset_comments_in_use, format: format) }
+        part_rubric = rubrics_p.delete(nil)&.as_json(preset_comments_in_use, format:)
+        b_rubrics = rubrics_p.sort.map { |_, b| b.as_json(preset_comments_in_use, format:) }
         {
           partRubric: part_rubric,
           body: b_rubrics,

@@ -717,7 +717,7 @@ class ArchiveUtils
           src_dir[:contents][filename] = {
             name: filename,
             type: :symlink,
-            target: target,
+            target:,
           }
         end
       end
@@ -751,16 +751,16 @@ class ArchiveUtils
 
   private_class_method def self.file_to_json(name, contents, perms)
     {
-      name: name,
+      name:,
       type: :file,
-      contents: contents,
-      perms: perms,
+      contents:,
+      perms:,
     }
   end
 
   private_class_method def self.dir_to_json(name)
     {
-      name: name,
+      name:,
       type: :dir,
       contents: {},
     }

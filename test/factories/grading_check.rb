@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :grading_check do
     transient do
-      staff_registration { create(:staff_registration) }
+      staff_registration { association(:staff_registration) }
     end
 
     registration

@@ -113,8 +113,8 @@ class ExtraCreditTest < ApplicationSystemTestCase
     GradingComment.create!(
       creator: @ta,
       registration: reg,
-      question: question,
-      part: part,
+      question:,
+      part:,
       body_item: bodyitem,
       preset_comment: preset,
       points: preset.points,

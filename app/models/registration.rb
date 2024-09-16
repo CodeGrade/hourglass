@@ -209,7 +209,7 @@ class Registration < ApplicationRecord
     json = current_answers
     return true if json == answers
 
-    Snapshot.create(registration: self, answers: answers)
+    Snapshot.create(registration: self, answers:)
   end
 
   def current_score

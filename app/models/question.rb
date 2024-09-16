@@ -22,7 +22,7 @@ class Question < ApplicationRecord
   before_save do
     if rubrics.empty?
       rubrics.build(
-        exam_version: exam_version,
+        exam_version:,
         question: self,
         part: nil,
         body_item: nil,
@@ -42,7 +42,7 @@ class Question < ApplicationRecord
       elsif root_rubric.nil? || root_rubric.is_a?(None)
         nil
       else
-        root_rubric.as_json(format: format).deep_stringify_keys
+        root_rubric.as_json(format:).deep_stringify_keys
       end
     {
       'name' => ApplicationHelper.make_html(format, compact_blank(name)),
@@ -50,9 +50,9 @@ class Question < ApplicationRecord
       'extraCredit' => extra_credit || nil,
       'separateSubparts' => separate_subparts,
       (format == :export ? 'reference' : 'references') =>
-        compact_blank(references.where(part: nil).order(:index).map { |ref| ref.as_json(format: format) }),
+        compact_blank(references.where(part: nil).order(:index).map { |ref| ref.as_json(format:) }),
       'questionRubric' => rubric_as_json,
-      'parts' => parts.order(:index).map { |p| p.as_json(format: format) },
+      'parts' => parts.order(:index).map { |p| p.as_json(format:) },
     }.compact
   end
 

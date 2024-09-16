@@ -11,7 +11,7 @@ FactoryBot.define do
     trait :blank do
       name { 'Blank exam' }
       transient do
-        upload { create(:upload, :blank) }
+        upload { association(:upload, :blank) }
       end
       before(:create) do |ev, _context|
         ev.db_questions.each do |q|
@@ -32,7 +32,7 @@ FactoryBot.define do
     trait :cs2500_v1 do
       name { 'CS2500 Midterm Version 1' }
       transient do
-        upload { create(:upload, :cs2500_v1) }
+        upload { association(:upload, :cs2500_v1) }
       end
     end
 
@@ -43,21 +43,21 @@ FactoryBot.define do
     trait :cs2500_v2 do
       name { 'CS2500 Midterm Version 2' }
       transient do
-        upload { create(:upload, :cs2500_v2) }
+        upload { association(:upload, :cs2500_v2) }
       end
     end
 
     trait :cs3500_v1 do
       name { 'CS3500 Final Version 1' }
       transient do
-        upload { create(:upload, :cs3500_v1) }
+        upload { association(:upload, :cs3500_v1) }
       end
     end
 
     trait :cs3500_v2 do
       name { 'CS3500 Final Version 2' }
       transient do
-        upload { create(:upload, :cs3500_v2) }
+        upload { association(:upload, :cs3500_v2) }
       end
     end
 

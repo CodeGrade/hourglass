@@ -10,7 +10,7 @@ class VersionsControllerTest < ActionDispatch::IntegrationTest
     sign_in reg.user
     UploadTestHelper.with_test_uploaded_fixture_zip 'cs3500final-v1' do |upload|
       post import_api_professor_versions_path(exam), params: {
-        upload: upload,
+        upload:,
       }
     end
     assert_response :created

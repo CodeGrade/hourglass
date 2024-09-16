@@ -70,9 +70,9 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   def attempt_lock(user, reg, qnum, pnum, steal: false, raw: false)
     ans = HourglassSchema.do_mutation!('REQUEST_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
-      qnum: qnum,
-      pnum: pnum,
-      steal: steal,
+      qnum:,
+      pnum:,
+      steal:,
     })
     return ans if raw
 
@@ -83,9 +83,9 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   def attempt_postpone(user, reg, qnum, pnum, notes, raw: false)
     ans = HourglassSchema.do_mutation!('POSTPONE_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
-      qnum: qnum,
-      pnum: pnum,
-      notes: notes,
+      qnum:,
+      pnum:,
+      notes:,
     })
     return ans if raw
 
@@ -99,8 +99,8 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
     ans = HourglassSchema.do_mutation!('GRADE_NEXT_MUTATION', user, {
       examId: HourglassSchema.id_from_object(exam, Types::ExamType, {}),
       examVersionId: HourglassSchema.id_from_object(exam_version, Types::ExamVersionType, {}),
-      qnum: qnum,
-      pnum: pnum,
+      qnum:,
+      pnum:,
       allowChangeProblems: allow_change_problems,
     })
     return ans if raw
@@ -112,8 +112,8 @@ class GradingLocksTest < ActionDispatch::IntegrationTest
   def attempt_unlock(user, reg, qnum, pnum, complete, raw: false)
     ans = HourglassSchema.do_mutation!('RELEASE_LOCK_MUTATION', user, {
       registrationId: HourglassSchema.id_from_object(reg, Types::RegistrationType, {}),
-      qnum: qnum,
-      pnum: pnum,
+      qnum:,
+      pnum:,
       markComplete: complete,
     })
     return ans if raw

@@ -14,16 +14,16 @@ class GraphqlChannel < ApplicationCable::Channel
       access_cache: {},
       # Re-implement whatever context methods you need
       # in this channel or ApplicationCable::Channel
-      current_user: current_user,
+      current_user:,
       # Make sure the channel is in the context
       channel: self,
     }
 
     result = HourglassSchema.execute(
       query,
-      context: context,
-      variables: variables,
-      operation_name: operation_name,
+      context:,
+      variables:,
+      operation_name:,
     )
 
     payload = {

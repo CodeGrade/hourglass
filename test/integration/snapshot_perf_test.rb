@@ -14,9 +14,9 @@ class ExamVersionAdministrationTest < ActionDispatch::IntegrationTest
       $stdout.sync = true
       exam = create(:exam)
       create(:professor_course_registration, course: exam.course)
-      ev = create(:exam_version, :cs3500_v1, exam: exam)
+      ev = create(:exam_version, :cs3500_v1, exam:)
       course = exam.course
-      3.times { create(:section, course: course) }
+      create_list(:section, 3, course:)
       sections = course.sections
       NUM_REGISTRATIONS.times do |i|
         s = create(:student_registration, section: sections[i % sections.count], user: create(:user))

@@ -57,25 +57,25 @@ module Bottlenose
           student_regs = sec.student_registrations.includes(:user).index_by(&:user_id)
           sec_obj['students'].each do |student|
             user = sync_user(student, all_users)
-            reg = student_regs[user.id] || StudentRegistration.new(section: sec, user: user)
+            reg = student_regs[user.id] || StudentRegistration.new(section: sec, user:)
             reg.save!
           end
           staff_regs = sec.staff_registrations.includes(:user).index_by(&:user_id)
           sec_obj['graders'].each do |grader|
             user = sync_user(grader, all_users)
-            reg = staff_regs[user.id] || StaffRegistration.new(section: sec, user: user)
+            reg = staff_regs[user.id] || StaffRegistration.new(section: sec, user:)
             reg.ta = false
             reg.save!
           end
           sec_obj['assistants'].each do |ta|
             user = sync_user(ta, all_users)
-            reg = staff_regs[user.id] || StaffRegistration.new(section: sec, user: user)
+            reg = staff_regs[user.id] || StaffRegistration.new(section: sec, user:)
             reg.ta = true
             reg.save!
           end
           sec_obj['professors'].each do |prof|
             user = sync_user(prof, all_users)
-            reg = prof_regs[user.id] || ProfessorCourseRegistration.new(course: course, user: user)
+            reg = prof_regs[user.id] || ProfessorCourseRegistration.new(course:, user:)
             prof_regs[user.id] = reg if prof_regs[user.id].nil?
             reg.save!
           end
@@ -108,8 +108,8 @@ module Bottlenose
       user
     end
 
-    def bottlenose_send(method, *args)
-      bottlenose_token.send(method, *args).parsed
+    def bottlenose_send(method, *)
+      bottlenose_token.send(method, *).parsed
     rescue OAuth2::Error => e
       case e.response.status
       when 401
@@ -121,12 +121,12 @@ module Bottlenose
       raise Bottlenose::ConnectionFailed
     end
 
-    def bottlenose_post(*args)
-      bottlenose_send(:post, *args)
+    def bottlenose_post(*)
+      bottlenose_send(:post, *)
     end
 
-    def bottlenose_get(*args)
-      bottlenose_send(:get, *args)
+    def bottlenose_get(*)
+      bottlenose_send(:get, *)
     end
 
     def bottlenose_oauth_client

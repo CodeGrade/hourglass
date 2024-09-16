@@ -52,9 +52,9 @@ class BodyItem < ApplicationRecord
   before_save do
     if rubrics.empty?
       rubrics.build(
-        exam_version: exam_version,
-        question: question,
-        part: part,
+        exam_version:,
+        question:,
+        part:,
         body_item: self,
         type: 'None',
       )
@@ -83,12 +83,12 @@ class BodyItem < ApplicationRecord
     else
       if format == :graphql
         return {
-          info: info,
+          info:,
           id: HourglassSchema.id_from_object(self, Types::BodyItemType, {}),
         }
       end
 
-      send("as_json_#{info['type']}", format: format)
+      send("as_json_#{info['type']}", format:)
     end
   end
 
@@ -100,7 +100,7 @@ class BodyItem < ApplicationRecord
     if root_rubric.nil? || root_rubric.is_a?(None)
       nil
     else
-      root_rubric.as_json(format: format).deep_stringify_keys
+      root_rubric.as_json(format:).deep_stringify_keys
     end
   end
 
@@ -116,7 +116,7 @@ class BodyItem < ApplicationRecord
         'options' => info['options'].zip(answer).map do |opt, ans|
           { BodyItem.html_val(format, opt) => ans }
         end,
-        'rubric' => rubric_as_json(format: format),
+        'rubric' => rubric_as_json(format:),
       }.compact,
     }
   end
@@ -142,7 +142,7 @@ class BodyItem < ApplicationRecord
           else
             MarksProcessor.process_marks_reverse(answer['text'], answer['marks'])
           end,
-        'rubric' => rubric_as_json(format: format),
+        'rubric' => rubric_as_json(format:),
       }.compact,
     }
   end
@@ -174,7 +174,7 @@ class BodyItem < ApplicationRecord
           'filename' => answer['selectedFile'],
           'line' => answer['lineNumber'],
         },
-        'rubric' => rubric_as_json(format: format),
+        'rubric' => rubric_as_json(format:),
       }.compact,
     }
   end
@@ -188,7 +188,7 @@ class BodyItem < ApplicationRecord
         'prompts' => BodyItem.html_vals(format, info['prompts']),
         'values' => BodyItem.html_vals(format, info['values']),
         'correctAnswers' => answer,
-        'rubric' => rubric_as_json(format: format),
+        'rubric' => rubric_as_json(format:),
       }.compact,
     }
   end
@@ -199,7 +199,7 @@ class BodyItem < ApplicationRecord
         'prompt' => BodyItem.html_val(format, info['prompt']),
         'options' => BodyItem.html_vals(format, info['options']),
         'correctAnswer' => answer,
-        'rubric' => rubric_as_json(format: format),
+        'rubric' => rubric_as_json(format:),
       }.compact,
     }
   end
@@ -214,7 +214,7 @@ class BodyItem < ApplicationRecord
           else
             BodyItem.html_val(format, answer&.dig('text'))
           end,
-        'rubric' => rubric_as_json(format: format),
+        'rubric' => rubric_as_json(format:),
       }.compact,
     }
   end
@@ -229,7 +229,7 @@ class BodyItem < ApplicationRecord
           'YesNo' => {
             'prompt' => BodyItem.html_val(format, info['prompt']),
             'correctAnswer' => answer,
-            'rubric' => rubric_as_json(format: format),
+            'rubric' => rubric_as_json(format:),
           }.compact,
         }
       end
@@ -241,7 +241,7 @@ class BodyItem < ApplicationRecord
           'TrueFalse' => {
             'prompt' => BodyItem.html_val(format, info['prompt']),
             'correctAnswer' => answer,
-            'rubric' => rubric_as_json(format: format),
+            'rubric' => rubric_as_json(format:),
           }.compact,
         }
       end
@@ -281,7 +281,7 @@ class BodyItem < ApplicationRecord
     def from_yaml_AllThatApply(type, options:, prompt: nil)
       BodyItem.new(
         info: {
-          type: type,
+          type:,
           prompt: html_val(:graphql, prompt),
           options: html_vals(:graphql, options.map(&:keys).flatten),
         }.compact,
@@ -311,12 +311,12 @@ class BodyItem < ApplicationRecord
       end
       BodyItem.new(
         info: {
-          type: type,
+          type:,
           prompt: html_val(:graphql, prompt),
-          lang: lang,
-          initial: initial,
+          lang:,
+          initial:,
         }.compact,
-        answer: answer,
+        answer:,
       )
     end
 
@@ -334,9 +334,9 @@ class BodyItem < ApplicationRecord
       end
       BodyItem.new(
         info: {
-          type: type,
-          lang: lang,
-          initial: initial,
+          type:,
+          lang:,
+          initial:,
         }.compact,
       )
     end
@@ -344,8 +344,8 @@ class BodyItem < ApplicationRecord
     def from_yaml_CodeTag(type, choices:, correct_answer:, prompt: nil)
       BodyItem.new(
         info: {
-          type: type,
-          choices: choices,
+          type:,
+          choices:,
           prompt: html_val(:graphql, prompt),
         }.compact,
         answer: {
@@ -367,7 +367,7 @@ class BodyItem < ApplicationRecord
     )
       BodyItem.new(
         info: {
-          type: type,
+          type:,
           prompt: html_val(:graphql, prompt),
           promptsLabel: html_val(:graphql, prompts_label),
           valuesLabel: html_val(:graphql, values_label),
@@ -382,7 +382,7 @@ class BodyItem < ApplicationRecord
     def from_yaml_MultipleChoice(type, options:, correct_answer:, prompt: nil)
       BodyItem.new(
         info: {
-          type: type,
+          type:,
           prompt: html_val(:graphql, prompt),
           options: html_vals(:graphql, options),
         }.compact,
@@ -393,7 +393,7 @@ class BodyItem < ApplicationRecord
     def from_yaml_Text(type, entire_value: nil, prompt: nil, correct_answer: nil)
       BodyItem.new(
         info: {
-          type: type,
+          type:,
           prompt: html_val(:graphql, prompt || entire_value.to_s),
         }.compact,
         answer: correct_answer,
@@ -414,7 +414,7 @@ class BodyItem < ApplicationRecord
           noLabel: 'False',
           prompt: html_val(:graphql, prompt.to_s),
         }.compact,
-        answer: answer,
+        answer:,
       )
     end
 
@@ -432,7 +432,7 @@ class BodyItem < ApplicationRecord
           noLabel: 'No',
           prompt: html_val(:graphql, prompt.to_s),
         }.compact,
-        answer: answer,
+        answer:,
       )
     end
     # rubocop:enable Naming/MethodName

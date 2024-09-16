@@ -69,7 +69,7 @@ class Exam < ApplicationRecord
   end
 
   def user_is_proctor?(user)
-    proctor_registrations.exists?(user: user)
+    proctor_registrations.exists?(user:)
   end
 
   # All students and proctors registered for the exam.
@@ -114,28 +114,28 @@ class Exam < ApplicationRecord
   def checklist_complete(reason)
     {
       status: :complete,
-      reason: reason,
+      reason:,
     }
   end
 
   def checklist_warning(reason)
     {
       status: :warning,
-      reason: reason,
+      reason:,
     }
   end
 
   def checklist_not_started(reason)
     {
       status: :not_started,
-      reason: reason,
+      reason:,
     }
   end
 
   def checklist_na(reason)
     {
       status: :na,
-      reason: reason,
+      reason:,
     }
   end
 
@@ -240,7 +240,7 @@ class Exam < ApplicationRecord
         existing_pairs = existing_pairs.to_set
         missing = pairs_by_version[registration.exam_version_id].reject { |qp| existing_pairs.member? qp }
         new_locks = missing.map do |qp|
-          { registration: registration, question: qp[:question], part: qp[:part] }
+          { registration:, question: qp[:question], part: qp[:part] }
         end
         # For safety's sake, validate these new locks
         # No need to validate the uniqueness criterion, since we're specifically

@@ -63,6 +63,9 @@ group :development do
   gem 'better_errors'
 
   gem 'binding_of_caller'
+  gem 'rubocop-capybara'
+  gem 'rubocop-factory_bot'
+  gem 'rubocop-graphql'
   gem 'rubocop-rails'
   gem 'spring', '4.0.0'
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.

@@ -27,7 +27,7 @@ class Anomaly < ApplicationRecord
 
   def trigger_subscription
     exam_id = HourglassSchema.id_from_object(exam, Types::ExamType, {})
-    HourglassSchema.subscriptions.trigger(:anomaly_was_created, { exam_id: exam_id }, self)
+    HourglassSchema.subscriptions.trigger(:anomaly_was_created, { exam_id: }, self)
   end
 
   def visible_to?(check_user, role_for_exam, _role_for_course)

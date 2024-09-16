@@ -3,7 +3,11 @@
 FactoryBot.define do
   factory :registration do
     transient do
+      # rubocop:disable FactoryBot/FactoryAssociationWithStrategy
+      # need registration to be fully saved so that the user has an id,
+      # for validation purposes later on
       student_registration { create(:student_registration, course: exam_version.course) }
+      # rubocop:enable FactoryBot/FactoryAssociationWithStrategy
     end
 
     user { student_registration.user }

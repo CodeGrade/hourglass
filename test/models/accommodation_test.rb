@@ -48,9 +48,9 @@ class AccommodationTest < ActiveSupport::TestCase
   test 'accommodated duration with expansion and real values' do
     start_time = DateTime.now
     end_time = start_time + 20.minutes
-    exam = build(:exam, duration: 8.minutes, start_time: start_time, end_time: end_time)
-    exam_version = build(:exam_version, exam: exam)
-    reg = build(:registration, :early_start, exam_version: exam_version)
+    exam = build(:exam, duration: 8.minutes, start_time:, end_time:)
+    exam_version = build(:exam_version, exam:)
+    reg = build(:registration, :early_start, exam_version:)
     build(:accommodation, registration: reg, percent_time_expansion: 25)
     extra_duration = 2.minutes
     assert_equal extra_duration, reg.accommodated_extra_duration
@@ -78,7 +78,7 @@ class AccommodationTest < ActiveSupport::TestCase
     reg = build(:registration)
     exam = reg.exam
     new_start_time = exam.start_time - 1.hour
-    build(:accommodation, registration: reg, new_start_time: new_start_time)
+    build(:accommodation, registration: reg, new_start_time:)
     assert_equal new_start_time, reg.accommodated_start_time
   end
 
@@ -120,7 +120,7 @@ class AccommodationTest < ActiveSupport::TestCase
     exam_version = reg.exam_version
     exam_version.start_time = exam.start_time - 2.hours
     new_start_time = exam.start_time - 1.hour
-    build(:accommodation, registration: reg, new_start_time: new_start_time)
+    build(:accommodation, registration: reg, new_start_time:)
     assert_equal new_start_time, reg.accommodated_start_time
     assert_not_equal exam_version.effective_start_time, reg.accommodated_start_time
     assert_not_equal exam.start_time, reg.accommodated_start_time

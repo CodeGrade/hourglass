@@ -168,7 +168,7 @@ class Rubric < ApplicationRecord
 
   def grading_complete_for(reg)
     # NOTE: need to eliminate any ids that are nil, so we don't select too small a range of comments
-    coords = { question_id: question_id, part_id: part_id, body_item_id: body_item_id }.compact
+    coords = { question_id:, part_id:, body_item_id: }.compact
     comments = multi_group_by(
       reg.grading_comments.includes(:preset_comment).where(coords),
       [:question_id, :part_id, :body_item_id, :preset_comment_id],
@@ -182,14 +182,14 @@ class Rubric < ApplicationRecord
   end
 
   def as_json(preset_comments_in_use = nil, format:)
-    rubric_preset_as_json = rubric_preset&.as_json(preset_comments_in_use, format: format)
+    rubric_preset_as_json = rubric_preset&.as_json(preset_comments_in_use, format:)
     subsections_as_json = subsections.sort_by(&:order).map do |s|
-      s.as_json(preset_comments_in_use, format: format)
+      s.as_json(preset_comments_in_use, format:)
     end
     {
       type: type.downcase,
-      description: description,
-      points: points,
+      description:,
+      points:,
       choices: rubric_preset_as_json || subsections_as_json,
       inUse:
         if format == :export

@@ -18,7 +18,7 @@ RUN bundle install
 
 COPY package.json /home/app/hourglass/package.json
 COPY yarn.lock /home/app/hourglass/yarn.lock
-RUN npm install --global yarn
+# RUN npm install --global yarn
 RUN yarn install --frozen-lockfile
 
 COPY ./ /home/app/hourglass

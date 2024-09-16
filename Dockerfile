@@ -1,4 +1,4 @@
-FROM phusion/passenger-ruby33:3.0.8-arm64
+FROM phusion/passenger-ruby33:3.0.8
 RUN apt-get update && apt-get upgrade -y -o Dpkg::Options::="--force-confold"
 
 RUN rm -f /etc/service/nginx/down

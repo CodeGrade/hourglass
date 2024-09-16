@@ -7,10 +7,8 @@ ADD hourglass.conf /etc/nginx/sites-enabled/hourglass.conf
 
 RUN apt-get update
 RUN apt-get install -y ca-certificates curl gnupg graphviz openjdk-17-jdk-headless
-RUN mkdir -p /etc/apt/keyrings
-RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor --no-tty -o /etc/apt/keyrings/nodesource.gpg
-ENV NODE_MAJOR=20
-RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh
+RUN bash nodesource_setup.sh
 RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 WORKDIR /home/app/hourglass
 COPY Gemfile /home/app/hourglass/Gemfile

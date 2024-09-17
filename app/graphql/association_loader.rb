@@ -42,9 +42,9 @@ class AssociationLoader < GraphQL::Batch::Loader
 
   def preload_association(records)
     if @includes.present?
-      ::ActiveRecord::Associations::Preloader.new.preload(records, Hash[@association_name, @includes])
+      ::ActiveRecord::Associations::Preloader.new(records: records, associations: Hash[@association_name, @includes])
     else
-      ::ActiveRecord::Associations::Preloader.new.preload(records, @association_name)
+      ::ActiveRecord::Associations::Preloader.new(records: records, associations: @association_name)
     end
   end
 

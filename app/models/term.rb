@@ -6,7 +6,7 @@ class Term < ApplicationRecord
 
   # these underscores make .humanize create a space ( ).
   # rubocop:disable Naming/VariableNumber
-  enum semester: { fall: 10, spring: 30, summer_1: 40, summer: 50, summer_2: 60 }
+  enum :semester, { fall: 10, spring: 30, summer_1: 40, summer: 50, summer_2: 60 }
   # rubocop:enable Naming/VariableNumber
 
   has_many :registrations, through: :courses

@@ -26,6 +26,7 @@ module Hourglass
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.1
+    config.active_support.cache_format_version = 7.0
 
     config.before_configuration do
       unless ENV['BOTTLENOSE_URL']
@@ -44,8 +45,10 @@ module Hourglass
 
     # Add subdirectories of models
     config.autoload_paths += Dir[Rails.root.join("app", "models", "{*/}")]
+    config.eager_load_paths += Dir[Rails.root.join("app", "models", "{*/}")]
 
     config.autoload_paths << Rails.root.join('lib')
+    config.eager_load_paths << Rails.root.join('lib')
 
 
     # Configuration for the application, engines, and railties goes here.

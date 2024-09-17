@@ -36,7 +36,8 @@ class Exam < ApplicationRecord
     only_integer: true,
   }
 
-  enum role: {
+  attribute :role, :integer
+  enum :role, {
     no_reg: 0,
     student: 1,
     staff: 2,

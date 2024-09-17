@@ -6,7 +6,9 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '3.3.4'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.1'
+# NOTE: Can't use 7.2 yet until https://github.com/rails/rails/pull/52703
+# gets released (after 7.2.1, I guess)
+gem 'rails', '~> 7.1.0'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
 
@@ -83,7 +85,8 @@ end
 
 group :production do
   gem 'passenger', '>= 5.3.2', require: 'phusion_passenger/rack_handler'
-  gem 'rackup', '~> 0.1.0' # HACK: because https://github.com/rack/rackup/issues/13
+  gem 'rack', '>=3.0'
+  gem 'rackup', '>=2.0.0'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

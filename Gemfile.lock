@@ -258,8 +258,8 @@ GEM
       rack
     rack-test (2.1.0)
       rack (>= 1.3)
-    rackup (1.0.0)
-      rack (< 3)
+    rackup (0.1.0)
+      rack
       webrick
     rails (6.1.7.8)
       actioncable (= 6.1.7.8)
@@ -415,6 +415,7 @@ DEPENDENCIES
   pry-rescue
   pry-stack_explorer
   puma (~> 6.4)
+  rackup (~> 0.1.0)
   rails (~> 6.1)
   react-rails
   rubocop-capybara

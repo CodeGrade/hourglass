@@ -83,6 +83,7 @@ end
 
 group :production do
   gem 'passenger', '>= 5.3.2', require: 'phusion_passenger/rack_handler'
+  gem 'rackup', '~> 0.1.0'  # HACK because https://github.com/rack/rackup/issues/13
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

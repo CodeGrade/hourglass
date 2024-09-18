@@ -14,6 +14,10 @@ Minitest::Reporters.use! [
   # Minitest::Reporters::SpecReporter.new
 ]
 
+OmniAuth.config.test_mode = true
+Rails.application.env_config["devise.mapping"] = Devise.mappings[:user] # If using Devise
+
+
 def find_executable(names)
   names
     .map { |name| [name, *ENV['PATH'].split(File::PATH_SEPARATOR).map { |p| File.join(p, name) }] }

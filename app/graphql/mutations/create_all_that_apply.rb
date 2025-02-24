@@ -24,9 +24,9 @@ module Mutations
         info: {
           type: 'AllThatApply',
           options: options || [],
-          prompt: {
+          prompt: prompt || {
             type: 'HTML',
-            value: prompt || '',
+            value: '',
           }
         },
         answer: answer || [],

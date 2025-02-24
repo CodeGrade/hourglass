@@ -44,6 +44,7 @@ import { editorChangeMutation } from './__generated__/editorChangeMutation.graph
 import { editorChangeFilesMutation } from './__generated__/editorChangeFilesMutation.graphql';
 import { editorQuery } from './__generated__/editorQuery.graphql';
 import { DebouncedFormControl } from './components/helpers';
+import './index.scss';
 
 const ExamVersionEditor: React.FC = () => (
   <ErrorBoundary withContainer>

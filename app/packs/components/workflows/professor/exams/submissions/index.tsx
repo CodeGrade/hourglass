@@ -121,7 +121,7 @@ const RenderStudentTable: React.FC<{
         {students.map((reg) => (
           <tr key={reg.id}>
             <td>
-              <Link to={`/exams/${examId}/submissions/${reg.id}`}>
+              <Link to={`/exams/${examId}/submissions/${reg.id}`} target="_blank">
                 {reg.user.displayName}
               </Link>
             </td>
